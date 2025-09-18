@@ -1,0 +1,79 @@
+# ---- Build artifacts ----
+/build/
+/out/
+/bin/
+/lib/
+/obj/
+/CMakeFiles/
+/CMakeCache.txt
+/Testing/
+/Makefile
+/*.cmake
+/*.ninja
+/.ninja_deps
+/.ninja_log
+
+# ---- Visual Studio ----
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+*.VC.db-shm
+*.VC.db-wal
+
+# ---- Visual Studio Code ----
+.vscode/
+
+# ---- Xcode ----
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+
+# ---- OS generated files ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Logs and temporary files ----
+*.log
+*.tlog
+*.tmp
+
+# ---- Compiled binaries ----
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.obj
+*.o
+*.so
+*.dylib
+
+# ---- Shader compiler outputs ----
+*.cso
+*.hlslbin
+
+# ---- Third-party builds ----
+ThirdParty/*/build/
+ThirdParty/*/bin/
+ThirdParty/*/lib/
+ThirdParty/*/obj/
+
+# ---- Engine / Editor specific ----
+Engine/bin/
+Editor/bin/
+Engine/lib/
+Editor/lib/
+
+# ---- Precompiled headers (VS/MSVC) ----
+*.pch
+
+# ---- Backup and autosave ----
+*~
+*.bak
+*.swp
+*.swo
