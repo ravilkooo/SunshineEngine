@@ -350,9 +350,6 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 			m_renderParticlePS.GetAddressOf()
 		);
 
-		// TO-DO: Solve error
-		// D3D11 ERROR: ID3D11Device::CreateInputLayout: NULL pDesc specified! [ STATE_CREATION ERROR #164: CREATEINPUTLAYOUT_NULLDESC]
-		// Exception thrown at 0x00007FF88F3466CA in SunshineEditor.exe: Microsoft C++ exception: _com_error at memory location 0x000000BC880FB7A0.
 		D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements = nullptr;
 
 		device->CreateInputLayout(
