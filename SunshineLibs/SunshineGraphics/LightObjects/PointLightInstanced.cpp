@@ -47,8 +47,8 @@ PointLightInstanced::PointLightInstanced(ID3D11Device* device, UINT lightsCnt,
         lightPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
         // AddStaticBind(texture);
 
-        wchar_t vsFilePath[150];
-        getGraphicsAssetPath(vsFilePath, 150, L"Shaders/LightPass/PointLightInstancedVShader.hlsl");
+        wchar_t vsFilePath[250];
+        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/LightPass/PointLightInstancedVShader.hlsl");
         Bind::VertexShader* vertexShaderB = new Bind::VertexShader(device, vsFilePath);
         lightPass->AddBind(vertexShaderB);
 
@@ -76,8 +76,8 @@ PointLightInstanced::PointLightInstanced(ID3D11Device* device, UINT lightsCnt,
         lightPass->AddBind(new Bind::InputLayout(device, IALayoutInputElements, numInputElements, vertexShaderB->GetBytecode()));
 
 
-        wchar_t psFilePath[150];
-        getGraphicsAssetPath(psFilePath, 150, L"Shaders/LightPass/PointLightInstancedPShader.hlsl");
+        wchar_t psFilePath[250];
+        getGraphicsAssetPath(psFilePath, 250, L"Shaders/LightPass/PointLightInstancedPShader.hlsl");
         lightPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
         lightPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));

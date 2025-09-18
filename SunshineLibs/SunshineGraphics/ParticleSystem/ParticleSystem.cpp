@@ -221,8 +221,8 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 	//LoadCS(L"Shaders/Particles/SimulateParticlesCShader.hlsl", m_simulateParticlesCShader.Get());
 	Microsoft::WRL::ComPtr<ID3DBlob> cs_blob;
 
-	wchar_t resetCsFilePath[150];
-	getGraphicsAssetPath(resetCsFilePath, 150, L"Shaders/Particles/ResetCShader.hlsl");
+	wchar_t resetCsFilePath[250];
+	getGraphicsAssetPath(resetCsFilePath, 250, L"Shaders/Particles/ResetCShader.hlsl");
 		D3DCompileFromFile(resetCsFilePath,
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
@@ -236,8 +236,8 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 		m_resetCShader.GetAddressOf()
 	);
 
-	wchar_t initSimDispCsFilePath[150];
-	getGraphicsAssetPath(initSimDispCsFilePath, 150, L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl");
+	wchar_t initSimDispCsFilePath[250];
+	getGraphicsAssetPath(initSimDispCsFilePath, 250, L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl");
 	D3DCompileFromFile(initSimDispCsFilePath,
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
@@ -251,8 +251,8 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 		m_initSimulateDispatchArgsCShader.GetAddressOf()
 	);
 
-	wchar_t emitCsFilePath[150];
-	getGraphicsAssetPath(emitCsFilePath, 150, L"Shaders/Particles/EmitParticlesCShader.hlsl");
+	wchar_t emitCsFilePath[250];
+	getGraphicsAssetPath(emitCsFilePath, 250, L"Shaders/Particles/EmitParticlesCShader.hlsl");
 	D3DCompileFromFile(emitCsFilePath,
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
@@ -266,8 +266,8 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 		m_emitParticlesCShader.GetAddressOf()
 	);
 
-	wchar_t simCsFilePath[150];
-	getGraphicsAssetPath(simCsFilePath, 150, L"Shaders/Particles/SimulateParticlesCShader.hlsl");
+	wchar_t simCsFilePath[250];
+	getGraphicsAssetPath(simCsFilePath, 250, L"Shaders/Particles/SimulateParticlesCShader.hlsl");
 	D3DCompileFromFile(simCsFilePath,
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
@@ -282,8 +282,8 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 	);
 
 	{
-		wchar_t vsFilePath[150];
-		getGraphicsAssetPath(vsFilePath, 150, L"Shaders/Particles/RenderParticles_VS.hlsl");
+		wchar_t vsFilePath[250];
+		getGraphicsAssetPath(vsFilePath, 250, L"Shaders/Particles/RenderParticles_VS.hlsl");
 		// m_renderParticle shaders
 		Microsoft::WRL::ComPtr<ID3DBlob> vs_blob;
 		D3DCompileFromFile(vsFilePath,
@@ -300,8 +300,8 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 		);
 
 
-		wchar_t gsFilePath[110];
-		getGraphicsAssetPath(gsFilePath, 110, L"Shaders/Particles/RenderParticles_GS.hlsl");
+		wchar_t gsFilePath[250];
+		getGraphicsAssetPath(gsFilePath, 250, L"Shaders/Particles/RenderParticles_GS.hlsl");
 		// m_renderParticle shaders
 		Microsoft::WRL::ComPtr<ID3DBlob> gs_blob;
 		ID3DBlob* errorVertexCode = nullptr;
@@ -333,8 +333,8 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 			m_renderParticleGS.GetAddressOf()
 		);
 
-		wchar_t psFilePath[150];
-		getGraphicsAssetPath(psFilePath, 150, L"Shaders/Particles/RenderParticles_PS.hlsl");
+		wchar_t psFilePath[250];
+		getGraphicsAssetPath(psFilePath, 250, L"Shaders/Particles/RenderParticles_PS.hlsl");
 		// m_renderParticle shaders
 		Microsoft::WRL::ComPtr<ID3DBlob> ps_blob;
 		D3DCompileFromFile(psFilePath,
@@ -350,6 +350,9 @@ ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* contex
 			m_renderParticlePS.GetAddressOf()
 		);
 
+		// TO-DO: Solve error
+		// D3D11 ERROR: ID3D11Device::CreateInputLayout: NULL pDesc specified! [ STATE_CREATION ERROR #164: CREATEINPUTLAYOUT_NULLDESC]
+		// Exception thrown at 0x00007FF88F3466CA in SunshineEditor.exe: Microsoft C++ exception: _com_error at memory location 0x000000BC880FB7A0.
 		D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements = nullptr;
 
 		device->CreateInputLayout(

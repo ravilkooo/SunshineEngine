@@ -39,8 +39,8 @@ SpotLight::SpotLight(ID3D11Device* device, Vector3 position,
         gBufferPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
         // AddStaticBind(texture);
 
-        wchar_t vsFilePath[150];
-        getGraphicsAssetPath(vsFilePath, 150, L"Shaders/GBufferPass/SpotLightGBufferShaderVS.hlsl");
+        wchar_t vsFilePath[250];
+        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/GBufferPass/SpotLightGBufferShaderVS.hlsl");
         Bind::VertexShader* vertexShaderB = new Bind::VertexShader(device, vsFilePath);
         gBufferPass->AddBind(vertexShaderB);
 
@@ -88,8 +88,8 @@ SpotLight::SpotLight(ID3D11Device* device, Vector3 position,
         gBufferPass->AddBind(new Bind::InputLayout(device, IALayoutInputElements, numInputElements, vertexShaderB->GetBytecode()));
 
 
-        wchar_t psFilePath[150];
-        getGraphicsAssetPath(psFilePath, 150, L"Shaders/GBufferPass/SpotLightGBufferShaderPS.hlsl");
+        wchar_t psFilePath[250];
+        getGraphicsAssetPath(psFilePath, 250, L"Shaders/GBufferPass/SpotLightGBufferShaderPS.hlsl");
         gBufferPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
 
@@ -108,8 +108,8 @@ SpotLight::SpotLight(ID3D11Device* device, Vector3 position,
         lightPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
         // AddStaticBind(texture);
 
-        wchar_t vsFilePath[150];
-        getGraphicsAssetPath(vsFilePath, 150, L"Shaders/LightPass/SpotLightVShader.hlsl");
+        wchar_t vsFilePath[250];
+        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/LightPass/SpotLightVShader.hlsl");
         Bind::VertexShader* vertexShaderB = new Bind::VertexShader(device, vsFilePath);
         lightPass->AddBind(vertexShaderB);
 
@@ -130,8 +130,8 @@ SpotLight::SpotLight(ID3D11Device* device, Vector3 position,
         lightPass->AddBind(new Bind::InputLayout(device, IALayoutInputElements, numInputElements, vertexShaderB->GetBytecode()));
 
 
-        wchar_t psFilePath[150];
-        getGraphicsAssetPath(psFilePath, 150, L"Shaders/LightPass/SpotLightPShader.hlsl");
+        wchar_t psFilePath[250];
+        getGraphicsAssetPath(psFilePath, 250, L"Shaders/LightPass/SpotLightPShader.hlsl");
         lightPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
         /*

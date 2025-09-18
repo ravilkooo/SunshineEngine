@@ -34,8 +34,8 @@ PointLight::PointLight(ID3D11Device* device, Vector3 position,
         // AddStaticBind(texture);
 
         // m_renderParticle shaders
-        wchar_t vsFilePath[150];
-        getGraphicsAssetPath(vsFilePath, 150, L"Shaders/LightPass/PointLightVShader.hlsl");
+        wchar_t vsFilePath[250];
+        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/LightPass/PointLightVShader.hlsl");
         Bind::VertexShader* vertexShaderB = new Bind::VertexShader(device, vsFilePath);
         lightPass->AddBind(vertexShaderB);
 
@@ -66,8 +66,8 @@ PointLight::PointLight(ID3D11Device* device, Vector3 position,
         lightPass->AddBind(new Bind::InputLayout(device, IALayoutInputElements, numInputElements, vertexShaderB->GetBytecode()));
 
 
-        wchar_t psFilePath[150];
-        getGraphicsAssetPath(psFilePath, 150, L"Shaders/LightPass/PointLightPShader.hlsl");
+        wchar_t psFilePath[250];
+        getGraphicsAssetPath(psFilePath, 250, L"Shaders/LightPass/PointLightPShader.hlsl");
         lightPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
         /*

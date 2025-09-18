@@ -27,12 +27,12 @@ DirectionalLight::DirectionalLight(ID3D11Device* device, Vector3 position,
         lightPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
         // AddStaticBind(texture);
 
-        wchar_t vsFilePath[150];
-        getGraphicsAssetPath(vsFilePath, 150, L"Shaders/LightPass/DirectionalLightVShader.hlsl");
+        wchar_t vsFilePath[250];
+        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/LightPass/DirectionalLightVShader.hlsl");
         lightPass->AddBind(new Bind::VertexShader(device, vsFilePath));
 
-        wchar_t psFilePath[150];
-        getGraphicsAssetPath(psFilePath, 150, L"Shaders/LightPass/DirectionalLightPShader.hlsl");
+        wchar_t psFilePath[250];
+        getGraphicsAssetPath(psFilePath, 250, L"Shaders/LightPass/DirectionalLightPShader.hlsl");
         lightPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
         /*

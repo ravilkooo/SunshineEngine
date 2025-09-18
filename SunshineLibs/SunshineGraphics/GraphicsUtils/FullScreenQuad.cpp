@@ -12,12 +12,12 @@ FullScreenQuad::FullScreenQuad(ID3D11Device* device)
         RenderTechnique* colorPass = new RenderTechnique("MainColorPass");
         colorPass->AddBind(new Bind::Topology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP));
         
-        wchar_t vsFilePath[150];
-        getGraphicsAssetPath(vsFilePath, 150, L"Shaders/MainColorPassVS.hlsl");
+        wchar_t vsFilePath[250];
+        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/MainColorPassVS.hlsl");
         colorPass->AddBind(new Bind::VertexShader(device, vsFilePath));
 
-        wchar_t psFilePath[150];
-        getGraphicsAssetPath(psFilePath, 150, L"Shaders/MainColorPassPS.hlsl");
+        wchar_t psFilePath[250];
+        getGraphicsAssetPath(psFilePath, 250, L"Shaders/MainColorPassPS.hlsl");
         colorPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
         indices = (int*)calloc(4, sizeof(int));

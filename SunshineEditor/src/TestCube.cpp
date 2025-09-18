@@ -29,7 +29,7 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
         gBufferPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
         // AddStaticBind(texture);
         
-        wchar_t filePath[100] = EDITOR_ASSETS_DIR;
+        wchar_t filePath[200] = EDITOR_ASSETS_DIR;
         wcsncat(filePath, L"/Shaders/GBufferShaderVS.hlsl", 30);
         vertexShaderB = new Bind::VertexShader(device, filePath);
         gBufferPass->AddBind(vertexShaderB);
@@ -77,7 +77,7 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
 
         gBufferPass->AddBind(new Bind::InputLayout(device, IALayoutInputElements, numInputElements, vertexShaderB->GetBytecode()));
 
-        wchar_t psFilePath[100] = EDITOR_ASSETS_DIR;
+        wchar_t psFilePath[200] = EDITOR_ASSETS_DIR;
         wcsncat(psFilePath, L"/Shaders/GBufferShaderPS.hlsl", 30);
         gBufferPass->AddBind(new Bind::PixelShader(device, psFilePath));
 

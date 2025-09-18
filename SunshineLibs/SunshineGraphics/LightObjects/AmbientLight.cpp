@@ -25,12 +25,12 @@ AmbientLight::AmbientLight(ID3D11Device* device, Vector4 ambient)
         lightPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
         // AddStaticBind(texture);
         
-        wchar_t vsFilePath[150];
-        getGraphicsAssetPath(vsFilePath, 150, L"Shaders/LightPass/AmbientLightVShader.hlsl");
+        wchar_t vsFilePath[250];
+        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/LightPass/AmbientLightVShader.hlsl");
         lightPass->AddBind(new Bind::VertexShader(device, vsFilePath));
 
-        wchar_t psFilePath[150];
-        getGraphicsAssetPath(psFilePath, 150, L"Shaders/LightPass/AmbientLightPShader.hlsl");
+        wchar_t psFilePath[250];
+        getGraphicsAssetPath(psFilePath, 250, L"Shaders/LightPass/AmbientLightPShader.hlsl");
         lightPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
         /*
