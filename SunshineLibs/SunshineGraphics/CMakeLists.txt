@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.20)
 project(SunshineGraphics LANGUAGES CXX)
 
 # Root paths
-# set(GF_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-# set(GF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
-set(GF_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(GF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(GF_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(GF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# set(GF_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+# set(GF_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Tell CMake to reconfigure if files change
 set_property(GLOBAL PROPERTY CMAKE_CONFIGURE_DEPENDS
