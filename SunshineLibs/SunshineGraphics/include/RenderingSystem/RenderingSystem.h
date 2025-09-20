@@ -17,6 +17,10 @@ public:
 	ID3D11DeviceContext* GetDeviceContext() { return context.Get(); }
 
 	virtual void RenderScene(const Scene& scene) = 0;
+	virtual void PresentFrame() {
+		swapChain->Present(1, /*DXGI_PRESENT_DO_NOT_WAIT*/ 0);
+		return;
+	};
 
 	virtual void SetMainCamera(Camera* camera) { this->mainCamera = camera; }
 	virtual Camera* GetMainCamera() { return mainCamera; };
@@ -25,6 +29,7 @@ public:
 
 	virtual void AddPass(RenderPass* pass) = 0;
 
+	std::vector<RenderPass*> passes;
 	Camera* mainCamera;
 protected:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;

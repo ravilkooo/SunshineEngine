@@ -23,7 +23,5 @@ public:
     void AddPass(RenderPass* pass) override;
 
     //GBuffer gBuffer;
-
-    std::vector<RenderPass*> passes;
 };
 

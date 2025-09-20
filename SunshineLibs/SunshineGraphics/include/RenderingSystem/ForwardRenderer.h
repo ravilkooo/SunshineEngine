@@ -58,9 +58,6 @@ public:
 
     void SetMainCamera(Camera* camera);
     Camera* GetMainCamera();
-
-protected:
-    std::vector<RenderPass*> passes;
 };
 
 #endif // RENDERER_H
