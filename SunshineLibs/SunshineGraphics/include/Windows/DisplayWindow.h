@@ -17,7 +17,9 @@ public:
 	HWND hWnd;
 
 	DisplayWindow();
-	DisplayWindow(Game* inGame, LPCWSTR applicationName, HINSTANCE hInstance, int screenWidth, int screenHeight);
+	DisplayWindow(Game* inGame, LPCWSTR applicationName,
+		HINSTANCE hInstance, int screenWidth, int screenHeight,
+		WNDPROC lpfnWndProc = WndProc);
 
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
 	

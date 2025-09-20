@@ -6,17 +6,21 @@ DisplayWindow::DisplayWindow() {
 
 }
 
-DisplayWindow::DisplayWindow(Game* inGame, LPCWSTR applicationName, HINSTANCE hInstance, int screenWidth, int screenHeight)
+DisplayWindow::DisplayWindow(Game* inGame, LPCWSTR applicationName,
+	HINSTANCE hInstance, int screenWidth, int screenHeight,
+	WNDPROC lpfnWndProc)
 {
 	// My custom
 	// inputHandler = new InputHandler()
 
 	WNDCLASSEX wc;
 
-	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	//wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	// for imgui
+	wc.style = CS_CLASSDC;
 	// My custom method
 	//wc.lpfnWndProc = WndProc_RawInput;
-	wc.lpfnWndProc = WndProc;
+	wc.lpfnWndProc = lpfnWndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
@@ -37,7 +41,9 @@ DisplayWindow::DisplayWindow(Game* inGame, LPCWSTR applicationName, HINSTANCE hI
 	RECT windowRect = { 0, 0, static_cast<LONG>(screenWidth), static_cast<LONG>(screenHeight) };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
-	auto dwStyle = WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX | WS_THICKFRAME;
+	//auto dwStyle = WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX | WS_THICKFRAME;
+	// for imgui
+	auto dwStyle = WS_OVERLAPPEDWINDOW;
 
 	auto posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
 	auto posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
