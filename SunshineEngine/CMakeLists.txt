@@ -26,6 +26,10 @@ target_sources(SunshineEngine PRIVATE
 target_link_libraries(SunshineEngine
     PUBLIC
         SunshineGraphics
+        assimp
+        EASTL
+        Jolt
+        ViennaGameJobSystem
 )
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR})
