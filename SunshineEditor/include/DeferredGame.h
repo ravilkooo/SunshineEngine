@@ -10,6 +10,12 @@
 
 #include "TestCube.h"
 
+#include <windows.h>
+#include <d3d11.h>
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
 #define DEBUG_LIGHT_OBJECTS
 
 class DeferredGame :
@@ -20,6 +26,7 @@ public:
     ~DeferredGame();
 
     void Update(float deltaTime) override;
+    void Run() override;
     void Render() override;
 
     void HandleKeyDown(Keys key);
@@ -31,3 +38,8 @@ public:
     // Particle test
     LightPass* gLightPass;
 };
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// Forward declare helper functions
+LRESULT CALLBACK WndProcImGui(HWND, UINT, WPARAM, LPARAM);

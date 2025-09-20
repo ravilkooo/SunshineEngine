@@ -9,6 +9,8 @@ add_library(imgui STATIC
     imgui_widgets.cpp
     imgui.cpp
 
+    imgui_demo.cpp
+
     backends/imgui_impl_dx11.cpp
     backends/imgui_impl_win32.cpp
 

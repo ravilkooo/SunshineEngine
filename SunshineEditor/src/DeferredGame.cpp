@@ -1,5 +1,26 @@
 #include "DeferredGame.h"
 
+// Win32 message handler
+LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+		return true;
+
+	switch (msg)
+	{
+	case WM_SIZE:
+		if (wParam != SIZE_MINIMIZED) {}
+		return 0;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU) return 0;
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	}
+	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
 DeferredGame::DeferredGame()
 {
 	applicationName = L"DeferredGame";
@@ -14,7 +35,8 @@ DeferredGame::DeferredGame()
 
 	physEngine = new PhysicsEngine(&scene);
 
-	displayWindow = DisplayWindow(this, applicationName, hInstance, winWidth, winHeight);
+	displayWindow = DisplayWindow(this, applicationName, hInstance,
+		winWidth, winHeight, WndProcImGui);
 
 	renderer = new DeferredRenderer(&displayWindow);
 
@@ -200,9 +222,110 @@ void DeferredGame::Update(float deltaTime)
 
 }
 
+void DeferredGame::Run()
+{
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	(void)io;
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplWin32_Init(displayWindow.hWnd);
+	ImGui_ImplDX11_Init(renderer->GetDevice(), renderer->GetDeviceContext());
+
+	// Show window
+	ShowWindow(displayWindow.hWnd, SW_SHOWDEFAULT);
+	UpdateWindow(displayWindow.hWnd);
+
+
+	MSG msg = {};
+	ZeroMemory(&msg, sizeof(msg));
+
+	bool isExitRequested = false;
+	unsigned int frameCount = 0;
+	float totalTime = 0;
+
+	while (!isExitRequested) {
+		// Handle the windows messages.
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+			// If windows signals to end the application then exit out.
+			if (msg.message == WM_QUIT) {
+				isExitRequested = true;
+			}
+			continue;
+		}
+
+
+		timer.Tick();
+		deltaTime = timer.GetDeltaTime();
+		totalTime += deltaTime;
+		frameCount++;
+
+		if (totalTime > 1.0f) {
+			float fps = frameCount * 1.0f / totalTime;
+
+			totalTime -= 1.0f;
+
+			WCHAR text[256];
+			swprintf_s(text, TEXT("FPS: %f"), fps);
+			SetWindowText(displayWindow.hWnd, text);
+
+			frameCount = 0;
+		}
+
+		Update(deltaTime);
+
+		// Start the Dear ImGui frame
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		// Example window
+		ImGui::Begin("Hello, ImGui!");
+		ImGui::Text("This is a simple test.");
+		ImGui::SliderFloat("Float value", &io.DeltaTime, 0.0f, 1.0f);
+		if (ImGui::Button("Close"))
+			PostQuitMessage(0);
+		ImGui::End();
+
+		Render();
+
+	}
+
+	// Cleanup
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
+
 void DeferredGame::Render()
 {
-	renderer->RenderScene(scene);
+	// Rendering
+	ImGui::Render();
+	//renderer->RenderScene(scene);
+	
+	// Passes
+	//for (RenderPass* pass : renderer->passes) {
+	for (int i = 0; i < renderer->passes.size() - 1; i++) {
+		renderer->GetDeviceContext()->ClearState();
+		RenderPass* pass = renderer->passes[i];
+		pass->StartFrame();
+		pass->Pass(scene);
+		pass->EndFrame();
+	}
+
+	renderer->GetDeviceContext()->ClearState();
+	RenderPass* pass = renderer->passes.back();
+	pass->StartFrame();
+	pass->Pass(scene);
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	pass->EndFrame();
+
+	renderer->PresentFrame();
 }
 
 void DeferredGame::HandleKeyDown(Keys key) {
