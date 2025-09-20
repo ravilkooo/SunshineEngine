@@ -30,8 +30,21 @@ target_link_libraries(SunshineEngine
         EASTL
         Jolt
         ViennaGameJobSystem
+        lua
 )
 
 target_compile_definitions(SunshineEngine PUBLIC ENGINE_ASSETS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Assets/")
+
+# Collect all Lua scripts files
+file(GLOB_RECURSE SCRIPTS "Assets/Scripts/*.lua")
+
+# Add scripts to the project so they appear in VS
+source_group("Assets\\Scripts" FILES ${SCRIPTS})
+
+# Add scripts as "sources" just for IDE visibility, not for compilation
+set_property(SOURCE ${SCRIPTS} PROPERTY HEADER_FILE_ONLY TRUE)
+
+# Add scripts to the target as "header only" so VS sees them
+target_sources(SunshineEngine PRIVATE ${SCRIPTS})
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR})
