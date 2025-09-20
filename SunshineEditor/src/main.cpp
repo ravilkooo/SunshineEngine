@@ -3,6 +3,7 @@
 #include <VGJS.h>
 #include <assimp/Importer.hpp>
 #include <EASTL/allocator.h>
+#include <imgui.h>
 
 int main() {
 	DeferredGame game = DeferredGame();

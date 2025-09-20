@@ -40,8 +40,11 @@ file(GLOB_RECURSE VGJS_HEADERS
 
 target_sources(VGJS PRIVATE ${VGJS_HEADERS})
 
+# source_group(
+#   TREE ${CMAKE_CURRENT_SOURCE_DIR}
+#   PREFIX "Header Files"
+#   FILES ${VGJS_HEADERS}
+#   )
 source_group(
-  TREE ${CMAKE_CURRENT_SOURCE_DIR}
-  PREFIX "Header Files"
-  FILES ${VGJS_HEADERS}
-  )
+    TREE ${CMAKE_CURRENT_SOURCE_DIR}
+)

@@ -14,11 +14,11 @@ add_subdirectory(assimp)
 add_subdirectory(JoltPhysics/Build)
 add_subdirectory(ViennaGameJobSystem)
 
-# add_subdirectory(imgui)
+add_subdirectory(imgui)
 # add_subdirectory(ozz-animation)
 
 # set_target_properties(EABase EASTL assimp DirectXTK imgui JoltPhysics ViennaGameJobSystem
-set_target_properties(EABase EASTL assimp DirectXTK Jolt VGJS
+set_target_properties(EABase EASTL assimp DirectXTK Jolt VGJS imgui
     PROPERTIES
     FOLDER "ThirdPartyLibs"
 )   

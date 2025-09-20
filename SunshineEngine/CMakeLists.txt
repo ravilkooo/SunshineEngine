@@ -32,4 +32,6 @@ target_link_libraries(SunshineEngine
         ViennaGameJobSystem
 )
 
+target_compile_definitions(SunshineEngine PUBLIC ENGINE_ASSETS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Assets/")
+
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR})
