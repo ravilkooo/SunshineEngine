@@ -40,9 +40,6 @@ DeferredGame::DeferredGame()
 
 	renderer = new DeferredRenderer(&displayWindow);
 
-	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &DeferredGame::HandleKeyDown);
-	InputDevice::getInstance().MouseMove.AddRaw(this, &DeferredGame::HandleMouseMove);
-
 	// GBufferPass
 	GBufferPass* gBufferPass;
 	{
@@ -200,6 +197,10 @@ DeferredGame::DeferredGame()
 		new Bind::TextureB(renderer->GetDevice(), std::string(ws.begin(), ws.end()), aiTextureType_DIFFUSE, 0u));
 
 
+
+	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &DeferredGame::HandleKeyDown);
+	InputDevice::getInstance().MouseMove.AddRaw(this, &DeferredGame::HandleMouseMove);
+
 }
 
 DeferredGame::~DeferredGame()
@@ -238,7 +239,6 @@ void DeferredGame::Run()
 	// Show window
 	ShowWindow(displayWindow.hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(displayWindow.hWnd);
-
 
 	MSG msg = {};
 	ZeroMemory(&msg, sizeof(msg));

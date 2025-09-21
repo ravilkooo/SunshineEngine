@@ -4,15 +4,30 @@
 #include <assimp/Importer.hpp>
 #include <EASTL/allocator.h>
 #include <imgui.h>
+#include <lua.hpp>
 
-#include <lua.hpp>   // from your ThirdParty/Lua/src
+#include "fmod.hpp"
+#include "common.h"
 
 int imgui_test();
+int fmod_test();
+int lua_test();
+int game_test();
 
 int main() {
+    game_test();
+}
+
+int game_test() {
     //imgui_test();
     DeferredGame game = DeferredGame();
     game.Run();
+
+    return 0;
+}
+
+int fmod_test() {
+    FMOD_Main();
 
     return 0;
 }
@@ -115,8 +130,7 @@ int imgui_test()
     return 0;
 }
 
-
-int test_lua() {
+int lua_test() {
     lua_State* L = luaL_newstate();    // create new Lua state
     luaL_openlibs(L);                  // open standard libraries
 

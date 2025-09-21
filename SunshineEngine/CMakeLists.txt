@@ -31,6 +31,16 @@ target_link_libraries(SunshineEngine
         Jolt
         ViennaGameJobSystem
         lua
+        FMOD
+)
+
+message(STATUS "FMOD DLL DIR = ${FMOD_DLL_DIR}")
+
+add_custom_command(TARGET SunshineEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodL.dll>
+        $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmod.dll>
+        $<TARGET_FILE_DIR:SunshineEngine>
 )
 
 target_compile_definitions(SunshineEngine PUBLIC ENGINE_ASSETS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Assets/")

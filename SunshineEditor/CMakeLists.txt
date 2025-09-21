@@ -3,11 +3,16 @@ set(EDITOR_SOURCES
     src/main.cpp
     src/TestCube.cpp
     src/DeferredGame.cpp
+    src/common.cpp
+    src/common_platform.cpp
+    src/play_sound.cpp
 )
 
 set(EDITOR_HEADERS
     include/TestCube.h
     include/DeferredGame.h
+    include/common.h
+    include/common_platform.h
 )
 
 add_executable(SunshineEditor
@@ -29,6 +34,7 @@ target_link_libraries(SunshineEditor
     PRIVATE
         SunshineEngine
         imgui
+        FMOD
 )
 
 # In Engine/CMakeLists.txt
