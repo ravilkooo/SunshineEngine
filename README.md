@@ -17,10 +17,10 @@
 <br />
 <div align="center">
   <a href="https://github.com/ravilkooo/">
-    <img src="logo/SunshineLogo.png" alt="Logo" width="80" height="80">
+    <img src="logo/SunshineLogo.png" alt="Logo" width="160" height="160">
   </a>
 
-<h3 align="center">Sunshine Engine</h3>
+<h2 align="center">Sunshine Engine</h2>
 
   <p align="center">
     Game Engine
