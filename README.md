@@ -86,7 +86,8 @@
 
 ### Prerequisites
 
-* CMake
+* <a href="https://cmake.org/"> CMake </a> (3.20+)
+* Visual Studio 2022 or JetBrains Rider
 
 ### Installation
 
@@ -94,16 +95,24 @@
    ```sh
    git clone https://github.com/ravilkooo/SunshineEngine.git
    ```
-3. Configure projects using CMake
+2. Configure projects using CMake
+  
+    **Option 1**
+
+    Run `configure_solution.bat`
+
+    **Option 2**
+    
+    Or open cmd in repo folder and run this commands:
    ```sh
    mkdir build
    cd build
    cmake .. -G "Visual Studio 17 2022" -A x64
    ```
-4. Open project `Sunshine.sln`
-5. Build `ALL_BUILD`
-6. '*Set as Startup Project*' on `SunshineEditor`
-7. Run Editor
+3. Open project `Sunshine.sln`
+4. Build `ALL_BUILD` (see in *CMakePredefinedTargets*)
+5. '*Set as Startup Project*' on `SunshineEditor` (VS 2022)
+6. Run Editor
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
