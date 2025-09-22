@@ -17,10 +17,10 @@
 <br />
 <div align="center">
   <a href="https://github.com/ravilkooo/">
-    <img src="logo/SunshineLogo.png" alt="Logo" width="80" height="80">
+    <img src="logo/SunshineLogo.png" alt="Logo" width="160" height="160">
   </a>
 
-<h3 align="center">Sunshine Engine</h3>
+<h2 align="center">Sunshine Engine</h2>
 
   <p align="center">
     Game Engine
@@ -68,6 +68,8 @@
 ## About The Project
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
+
+Simple 3D Game Engine
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -121,6 +123,8 @@
 <!-- USAGE EXAMPLES -->
 ## Usage
 
+Make simple games with our Sunshine Engine!
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -170,7 +174,9 @@ Don't forget to give the project a star! Thanks again!
 <!-- CONTACT -->
 ## Contact
 
-Ravil - [@ravilkooo](https://t.me/ravilkooo) - ravilka.zftsh@yandex.ru
+[Ravil](https://github.com/ravilkooo) - ravilka.zftsh@yandex.ru
+
+[Maria20Maria20](https://github.com/Maria20Maria20)
 
 Project Link: [https://github.com/ravilkooo/SunshineEngine](https://github.com/ravilkooo/SunshineEngine)
 
