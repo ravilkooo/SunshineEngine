@@ -6,7 +6,6 @@
 #include <wrl.h>    
 #include <directxmath.h>
 
-#include "Windows/DisplayWindow.h"
 #include "GraphicsUtils/Scene.h"
 #include "RenderPass.h"
 
@@ -39,8 +38,6 @@ protected:
 	Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
 
 	D3D_FEATURE_LEVEL featureLevels[1] = { D3D_FEATURE_LEVEL_11_1 };
-
-	DisplayWindow* displayWindow;
 
 	UINT screenWidth = 800;
 	UINT screenHeight = 800;

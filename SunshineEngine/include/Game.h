@@ -1,15 +1,15 @@
 #pragma once
 
+#include "SunshineEngineAPI.h"
+
+#include <Engine/GameTimer.h>
+#include <GraphicsUtils/Scene.h>
+#include <Physics/PhysicsEngine.h>
+#include <RenderingSystem/RenderingSystem.h>
+#include <Windows/DisplayWindow.h>
 
 
-#include "GameTimer.h"
-#include "GraphicsUtils/Scene.h"
-#include "Physics/PhysicsEngine.h"
-#include "RenderingSystem/RenderingSystem.h"
-#include "Windows/DisplayWindow.h"
-
-
-class Game
+class SUNSHINE_ENGINE_API Game
 {
 public:
     Game();
@@ -36,3 +36,4 @@ public:
 
     float deltaTime = 0.0f;
 };
+

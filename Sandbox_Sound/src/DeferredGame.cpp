@@ -38,7 +38,7 @@ DeferredGame::DeferredGame()
 	displayWindow = DisplayWindow(this, applicationName, hInstance,
 		winWidth, winHeight, WndProcImGui);
 
-	renderer = new DeferredRenderer(&displayWindow);
+	renderer = new DeferredRenderer(displayWindow.hWnd, winWidth, winHeight);
 
 	// GBufferPass
 	GBufferPass* gBufferPass;

@@ -1,19 +1,17 @@
-
-
 #include "RenderingSystem/DeferredRenderer.h"
 
 DeferredRenderer::DeferredRenderer()
 {
 }
 
-DeferredRenderer::DeferredRenderer(DisplayWindow* displayWin)
+DeferredRenderer::DeferredRenderer(HWND hWnd,
+	UINT screenWidth, UINT screenHeight)
 {
 	LPCWSTR applicationName = L"SunshineEngine";
 	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
-	this->displayWindow = displayWin;
-	screenWidth = displayWin->screenWidth;
-	screenHeight = displayWin->screenHeight;
+	this->screenWidth = screenWidth;
+	this->screenHeight = screenHeight;
 
 	// swapChain
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -26,7 +24,7 @@ DeferredRenderer::DeferredRenderer(DisplayWindow* displayWin)
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.OutputWindow = displayWin->hWnd;
+	swapChainDesc.OutputWindow = hWnd;
 	swapChainDesc.Windowed = true;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;

@@ -9,7 +9,6 @@
 
 #include "RenderPass.h"
 
-#include "Windows/DisplayWindow.h"
 #include "GBuffer.h"
 #include "GraphicsUtils/Scene.h"
 
@@ -49,7 +48,7 @@ class ForwardRenderer : public RenderingSystem
     friend class Bindable;
 public:
     ForwardRenderer();
-    ForwardRenderer(DisplayWindow* displayWin);
+    ForwardRenderer(HWND hWnd, UINT screenWidth, UINT screenHeight);
     ~ForwardRenderer();
 
     void RenderScene(const Scene& scene);

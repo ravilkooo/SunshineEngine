@@ -1,5 +1,5 @@
 #pragma once
-#include <Engine/Game.h>
+#include <Game.h>
 #include <RenderingSystem/DeferredRenderer.h>
 #include <RenderingSystem/GBufferPass.h>
 #include <RenderingSystem/LightPass.h>

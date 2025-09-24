@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "SunshineEngineAPI.h"
 
 #include <unordered_set>
 #include <windows.h>
@@ -11,7 +11,7 @@
 
 class Game;
 
-class InputDevice
+class SUNSHINE_ENGINE_API InputDevice
 {
 	friend class Game;
 	friend class DisplayWindow;

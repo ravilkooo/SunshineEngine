@@ -2,7 +2,7 @@
 
 
 
-enum class Keys : int {
+enum class SUNSHINE_ENGINE_API Keys : int {
 
 	None = 0,
 

@@ -84,6 +84,8 @@ Raw delegate payload: 10
 #ifndef CPP_DELEGATES
 #define CPP_DELEGATES
 
+#include "SunshineEngineAPI.h"
+
 #include <vector>
 #include <memory>
 #include <tuple>
@@ -331,7 +333,7 @@ private:
 
 //A handle to a delegate used for a multicast delegate
 //Static ID so that every handle is unique
-class DelegateHandle
+class SUNSHINE_ENGINE_API DelegateHandle
 {
 public:
 	constexpr DelegateHandle() noexcept

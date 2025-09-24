@@ -1,13 +1,13 @@
 #ifndef DISPLAY_WIN_H
 #define DISPLAY_WIN_H
 
-
+#include "SunshineEngineAPI.h"
 
 #include <windows.h>
 #include <iostream>
 #include "InputDevice.h"
 
-class DisplayWindow
+class SUNSHINE_ENGINE_API DisplayWindow
 {
 	friend class Game;
 

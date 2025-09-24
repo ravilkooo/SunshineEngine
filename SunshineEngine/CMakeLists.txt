@@ -1,5 +1,20 @@
+# Root paths
+set(SE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+# Tell CMake to reconfigure if files change
+set_property(GLOBAL PROPERTY CMAKE_CONFIGURE_DEPENDS
+    "${SE_SRC_DIR}/*.cpp"
+    "${SE_INCLUDE_DIR}/*.h"
+)
+
+# Collect sources and headers
+file(GLOB_RECURSE SE_SOURCES "${SE_SRC_DIR}/*.cpp")
+file(GLOB_RECURSE SE_HEADERS "${SE_INCLUDE_DIR}/*.h")
+
 add_library(SunshineEngine SHARED
-    include/SunshineEngineAPI.h
+    ${SE_SOURCES}
+    ${SE_HEADERS}
 )
 
 set_target_properties(SunshineEngine PROPERTIES
@@ -11,7 +26,7 @@ set_target_properties(SunshineEngine PROPERTIES
 target_compile_definitions(SunshineEngine PRIVATE SUNSHINE_ENGINE_EXPORTS)
 
 # Specify public include directory for clients
-target_include_directories(SunshineEngine PUBLIC include)
+target_include_directories(SunshineEngine PUBLIC "${SE_INCLUDE_DIR}")
 
 # Public headers (installed/exported)
 # target_include_directories(SunshineEngine

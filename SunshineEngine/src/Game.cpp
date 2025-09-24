@@ -1,10 +1,8 @@
-
-
-#include "Engine/Game.h"
+#include "Game.h"
 
 Game::Game()
 {
-    //Initialize();
+	//Initialize();
 }
 
 void Game::Run()
@@ -49,10 +47,10 @@ void Game::Run()
 
 void Game::Render()
 {
-    renderer->RenderScene(scene);
+	renderer->RenderScene(scene);
 }
 
 Game::~Game()
 {
-    // Освобождение ресурсов
+	// Освобождение ресурсов
 }
