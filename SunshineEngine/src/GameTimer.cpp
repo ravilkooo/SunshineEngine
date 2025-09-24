@@ -1,6 +1,4 @@
-
-
-#include "Engine/GameTimer.h"
+#include "GameTimer.h"
 
 GameTimer::GameTimer() : deltaTime(0.0f)
 {

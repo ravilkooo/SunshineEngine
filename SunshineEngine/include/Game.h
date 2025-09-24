@@ -1,8 +1,8 @@
 #pragma once
 
 #include "SunshineEngineAPI.h"
+#include "GameTimer.h"
 
-#include <Engine/GameTimer.h>
 #include <GraphicsUtils/Scene.h>
 #include <Physics/PhysicsEngine.h>
 #include <RenderingSystem/RenderingSystem.h>

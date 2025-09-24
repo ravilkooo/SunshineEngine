@@ -1,10 +1,10 @@
 #pragma once
 
-
+#include "SunshineEngineAPI.h"
 
 #include <chrono>
 
-class GameTimer
+class SUNSHINE_ENGINE_API GameTimer
 {
 public:
     GameTimer();
