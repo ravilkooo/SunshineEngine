@@ -2,6 +2,7 @@
 
 #include "SunshineEngineAPI.h"
 #include "GameTimer.h"
+#include <EASTL/algorithm.h>
 
 #include <GraphicsUtils/Scene.h>
 #include <Physics/PhysicsEngine.h>

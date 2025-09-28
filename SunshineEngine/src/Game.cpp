@@ -7,10 +7,17 @@ Game::Game()
 
 void Game::Run()
 {
+	float physicsUpdateFPS = 120.0f;
+	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
+	float accumulator = 0.0f;
+	float accumulatorLimit = 4.0f * physicsUpdateMs;
+
 	MSG msg = {};
 	bool isExitRequested = false;
+	
+	// FPS statitistic
 	unsigned int frameCount = 0;
-	float totalTime = 0;
+	float FPSstatisticTimer = 0;
 
 	while (!isExitRequested) {
 		// Handle the windows messages.
@@ -23,15 +30,19 @@ void Game::Run()
 		if (msg.message == WM_QUIT) {
 			isExitRequested = true;
 		}
+
 		timer.Tick();
 		deltaTime = timer.GetDeltaTime();
-		totalTime += deltaTime;
+		accumulator += deltaTime;
+		accumulator = eastl::min(4.0f * physicsUpdateMs, accumulator);
+	
+		// FPS statistic
+		FPSstatisticTimer += deltaTime;
 		frameCount++;
+		if (FPSstatisticTimer > 1.0f) {
+			float fps = frameCount * 1.0f / FPSstatisticTimer;
 
-		if (totalTime > 1.0f) {
-			float fps = frameCount * 1.0f / totalTime;
-
-			totalTime -= 1.0f;
+			FPSstatisticTimer -= 1.0f;
 
 			WCHAR text[256];
 			swprintf_s(text, TEXT("FPS: %f"), fps);
@@ -40,7 +51,11 @@ void Game::Run()
 			frameCount = 0;
 		}
 
-		Update(deltaTime);
+
+		while (accumulator >= physicsUpdateMs) {
+			Update(physicsUpdateMs);
+			accumulator -= physicsUpdateMs;
+		}
 		Render();
 	}
 }
