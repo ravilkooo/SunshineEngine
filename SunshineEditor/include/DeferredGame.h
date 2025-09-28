@@ -26,11 +26,12 @@ public:
     ~DeferredGame();
 
     void Update(float deltaTime) override;
-    void Run() override;
     void Render() override;
 
     void HandleKeyDown(Keys key);
     void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
+
+    ImGuiIO* io;
     SpotLight* _sl_1;
     float currTime = 0.0f;
     DirectionalLight* _dl_1;
