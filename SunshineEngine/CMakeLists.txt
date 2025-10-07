@@ -34,9 +34,9 @@ target_include_directories(SunshineEngine PUBLIC "${SE_INCLUDE_DIR}")
 #)
 
 # Sources
-target_sources(SunshineEngine PRIVATE
-    src/SunshineEngine.cpp
-)
+# target_sources(SunshineEngine PRIVATE
+#     src/SunshineEngine.cpp
+# )
 
 target_link_libraries(SunshineEngine
     PUBLIC
@@ -49,7 +49,7 @@ target_link_libraries(SunshineEngine
         FMOD
 )
 
-message(STATUS "FMOD DLL DIR = ${FMOD_DLL_DIR}")
+message(STATUS "FMOD_LIB_DIR (from engine) = ${FMOD_LIB_DIR}")
 
 add_custom_command(TARGET SunshineEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
