@@ -9,6 +9,8 @@
 #include <GraphicsUtils/FullScreenQuad.h>
 
 #include "TestCube.h"
+#include <GameObject.h>
+#include <Component/TransformComponent.h>
 
 #include <windows.h>
 #include <d3d11.h>
@@ -38,6 +40,18 @@ public:
 
     // Particle test
     LightPass* gLightPass;
+
+    class MyGo : public GameObject {
+    public:
+        MyGo() {};
+
+        void Tick(float deltaTime) override {
+            return;
+        }
+    };
+
+    // GameObject
+    eastl::unique_ptr<GameObject> gobj;
 };
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
