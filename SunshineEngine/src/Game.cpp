@@ -21,15 +21,17 @@ void Game::Run()
 
 	while (!isExitRequested) {
 		// Handle the windows messages.
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+
+			// If windows signals to end the application then exit out.
+			if (msg.message == WM_QUIT) {
+				isExitRequested = true;
+			}
+			continue;
 		}
 
-		// If windows signals to end the application then exit out.
-		if (msg.message == WM_QUIT) {
-			isExitRequested = true;
-		}
 
 		timer.Tick();
 		deltaTime = timer.GetDeltaTime();
