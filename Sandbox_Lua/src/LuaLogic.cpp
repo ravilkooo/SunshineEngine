@@ -1,29 +1,53 @@
 #include "LuaLogic.h"
 #include <iostream>
 #include <cstring>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+std::string wstringToString(const std::wstring& wideStr)
+{
+    return std::string(wideStr.begin(), wideStr.end());
+}
+void LuaLogic::ScanLuaFiles(const std::string& dirPath) {
+    luaFiles.clear();
+    for (auto& entry : fs::directory_iterator(dirPath)) {
+        if (entry.is_regular_file()) {
+            std::string filename = entry.path().filename().string();
+            if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".lua")
+                luaFiles.push_back(filename);
+        }
+    }
+}
 
 LuaLogic::LuaLogic()
-    : L_(nullptr), scriptLoaded_(false), foundFunction_(false) {
+    : L_(nullptr), scriptLoaded(false), foundFunction(false) {
 }
 
 LuaLogic::~LuaLogic() {
     Cleanup();
 }
 
-bool LuaLogic::Init(const std::string& scriptPath) {
-    Cleanup();
+void LuaLogic::Init() {
+    InitLuaFile();
 
     L_ = luaL_newstate();
     luaL_openlibs(L_);
 
     if (luaL_dofile(L_, scriptPath.c_str()) != LUA_OK) {
-        errorMessage_ = "Error running Lua script: " + std::string(lua_tostring(L_, -1));
+        errorMessage = "Error running Lua script: " + std::string(lua_tostring(L_, -1));
         lua_pop(L_, 1);
-        return false;
     }
+}
 
-    scriptLoaded_ = true;
-    return true;
+void LuaLogic::InitLuaFile()
+{
+    assetsPath = wstringToString(SANDBOX_LUA_ASSETS_DIR) + "Scripts";
+    ScanLuaFiles(assetsPath);
+    if (!luaFiles.empty()) {
+        scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
+    }
+    std::cout << scriptPath << "\n";
 }
 
 void LuaLogic::Cleanup() {
@@ -35,45 +59,44 @@ void LuaLogic::Cleanup() {
 }
 
 void LuaLogic::ClearState() {
-    scriptLoaded_ = false;
-    foundFunction_ = false;
-    params_.clear();
-    lastResult_.clear();
-    errorMessage_.clear();
-    functionName_.clear();
+    scriptLoaded = false;
+    foundFunction = false;
+    params.clear();
+    lastResult.clear();
+    errorMessage.clear();
 }
 
-void LuaLogic::LoadScript(const std::string& path) {
-    if (!Init(path)) {
-        // Init sets errorMessage_ in case of failure
-        foundFunction_ = false;
-        params_.clear();
-        lastResult_.clear();
-    }
+void LuaLogic::LoadScript() {
+    scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
+    Cleanup();
+    Init();
+    errorMessage.clear();
+    foundFunction = false;
+    params.clear();
+    lastResult.clear();
+    scriptLoaded = (L_ != nullptr);
 }
 
 void LuaLogic::SetFunctionName(const std::string& name) {
-    functionName_ = name;
+    //functionName = name;
 }
 
 std::string LuaLogic::GetFunctionName() const {
-    return functionName_;
+    return functionName;
 }
 
-bool LuaLogic::FindFunction(const std::string& funcName) {
-    if (!scriptLoaded_ || funcName.empty()) {
-        errorMessage_ = "Lua not initialized or function name empty!";
+bool LuaLogic::FindFunction() {
+    if (!scriptLoaded) { //|| functionName.empty()
+        errorMessage = "Lua not initialized or function name empty!";
         return false;
     }
+    foundFunction = false;
+    errorMessage.clear();
+    params.clear();
 
-    functionName_ = funcName;
-    foundFunction_ = false;
-    errorMessage_.clear();
-    params_.clear();
-
-    lua_getglobal(L_, funcName.c_str());
+    lua_getglobal(L_, functionName);
     if (lua_isfunction(L_, -1)) {
-        foundFunction_ = true;
+        foundFunction = true;
         lua_pop(L_, 1);
 
         LoadParamsFromLua();
@@ -82,13 +105,13 @@ bool LuaLogic::FindFunction(const std::string& funcName) {
     }
     else {
         lua_pop(L_, 1);
-        errorMessage_ = "No such function: " + funcName;
+        errorMessage = "No such function: " + std::string(functionName);
         return false;
     }
 }
 
 void LuaLogic::LoadParamsFromLua() {
-    lua_getglobal(L_, (functionName_ + "_params").c_str());
+    lua_getglobal(L_, (std::string(functionName) + "_params").c_str());
     if (lua_istable(L_, -1)) {
         int n = lua_rawlen(L_, -1);
         for (int i = 1; i <= n; ++i) {
@@ -104,7 +127,7 @@ void LuaLogic::LoadParamsFromLua() {
             entry.type = lua_tostring(L_, -1);
             lua_pop(L_, 1);
 
-            params_.push_back(entry);
+            params.push_back(entry);
 
             lua_pop(L_, 1); // pop param entry
         }
@@ -113,13 +136,13 @@ void LuaLogic::LoadParamsFromLua() {
 }
 
 bool LuaLogic::CallFunction() {
-    if (!foundFunction_ || functionName_.empty()) {
-        errorMessage_ = "No function loaded to call";
+    if (!foundFunction) { //|| functionName.empty()
+        errorMessage = "No function loaded to call";
         return false;
     }
 
-    lua_getglobal(L_, functionName_.c_str());
-    for (const auto& p : params_) {
+    lua_getglobal(L_, functionName);
+    for (const auto& p : params) {
         if (p.type == "number")
             lua_pushnumber(L_, atof(p.value.data()));
         else if (p.type == "bool")
@@ -128,10 +151,10 @@ bool LuaLogic::CallFunction() {
             lua_pushstring(L_, p.value.data());
     }
 
-    if (lua_pcall(L_, params_.size(), 1, 0) != LUA_OK) {
-        errorMessage_ = "Lua error: " + std::string(lua_tostring(L_, -1));
+    if (lua_pcall(L_, params.size(), 1, 0) != LUA_OK) {
+        errorMessage = "Lua error: " + std::string(lua_tostring(L_, -1));
         lua_pop(L_, 1);
-        lastResult_.clear();
+        lastResult.clear();
         return false;
     }
 
@@ -145,7 +168,7 @@ bool LuaLogic::CallFunction() {
     else
         snprintf(buf, sizeof(buf), "Result: <unknown type>");
 
-    lastResult_ = buf;
+    lastResult = buf;
     lua_pop(L_, 1);
     return true;
 }

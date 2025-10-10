@@ -15,32 +15,39 @@ public:
     LuaLogic();
     ~LuaLogic();
 
-    bool Init(const std::string& scriptPath);
+    void Init();
     void Cleanup();
 
-    void LoadScript(const std::string& path);
-    bool FindFunction(const std::string& funcName);
+    void LoadScript();
+    bool FindFunction();
     bool CallFunction();
 
-    bool IsScriptLoaded() const { return scriptLoaded_; }
-    bool IsFunctionFound() const { return foundFunction_; }
-    std::string GetLastResult() const { return lastResult_; }
-    std::string GetErrorMessage() const { return errorMessage_; }
-    const std::vector<ParamEntry>& GetParams() const { return params_; }
-    std::vector<ParamEntry>& GetParams() { return params_; }
+    bool IsScriptLoaded() const { return scriptLoaded; }
+    bool IsFunctionFound() const { return foundFunction; }
+    std::string GetLastResult() const { return lastResult; }
+    std::string GetErrorMessage() const { return errorMessage; }
+    const std::vector<ParamEntry>& GetParams() const { return params; }
+    std::vector<ParamEntry>& GetParams() { return params; }
 
     void SetFunctionName(const std::string& name);
     std::string GetFunctionName() const;
 
+    std::string scriptPath;
+    std::string assetsPath;
+    int selectedLuaFile = 0;
+    std::vector<std::string> luaFiles;
+    bool scriptLoaded;
+    char functionName[128] = "";
+    bool foundFunction;
+    std::string lastResult;
+    std::string errorMessage;
+    std::vector<ParamEntry> params;
+
 private:
     lua_State* L_;
-    std::vector<ParamEntry> params_;
-    std::string lastResult_;
-    std::string errorMessage_;
-    bool scriptLoaded_;
-    bool foundFunction_;
-    std::string functionName_;
 
+    void InitLuaFile();
+    void ScanLuaFiles(const std::string& dirPath);
     void ClearState();
     void LoadParamsFromLua();
 };
