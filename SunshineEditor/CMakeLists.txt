@@ -24,10 +24,12 @@ add_executable(SunshineEditor
 # source_group("Header Files" FILES ${EDITOR_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(SunshineEditor PRIVATE SunshineEngine)
+target_link_libraries(SunshineEditor PUBLIC SunshineEngine)
 
 # We can `#include` files from include dir
 target_include_directories(SunshineEditor PUBLIC include)
+
+# target_compile_definitions(SunshineEngine PUBLIC EASTL_USER_DEFINED_ALLOCATOR=1)
 
 # Link to SunshineEngine.dll
 target_link_libraries(SunshineEditor

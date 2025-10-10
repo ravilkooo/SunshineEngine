@@ -2,7 +2,6 @@
 #include <Jolt/Jolt.h>
 #include <VGJS.h>
 #include <assimp/Importer.hpp>
-#include <EASTL/allocator.h>
 #include <imgui.h>
 #include <lua.hpp>
 

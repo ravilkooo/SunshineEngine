@@ -2,8 +2,6 @@
 
 #include "SunshineEngineAPI.h"
 
-#define EASTL_MOVE_SEMANTICS_ENABLED 1
-
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
 #include <EASTL/unique_ptr.h>

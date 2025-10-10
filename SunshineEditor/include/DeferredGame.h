@@ -1,4 +1,5 @@
 #pragma once
+
 #include <Game.h>
 #include <RenderingSystem/DeferredRenderer.h>
 #include <RenderingSystem/GBufferPass.h>
@@ -20,6 +21,15 @@
 
 #define DEBUG_LIGHT_OBJECTS
 
+class MyGo : public GameObject {
+public:
+    MyGo() {};
+
+    void Tick(float deltaTime) override {
+        return;
+    }
+};
+
 class DeferredGame :
     public Game
 {
@@ -40,15 +50,6 @@ public:
 
     // Particle test
     LightPass* gLightPass;
-
-    class MyGo : public GameObject {
-    public:
-        MyGo() {};
-
-        void Tick(float deltaTime) override {
-            return;
-        }
-    };
 
     // GameObject
     eastl::unique_ptr<GameObject> gobj;

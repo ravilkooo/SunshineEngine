@@ -214,9 +214,9 @@ DeferredGame::DeferredGame()
 	ShowWindow(displayWindow.hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(displayWindow.hWnd);
 
-	//gobj = eastl::make_unique<MyGo>();
+	gobj = eastl::make_unique<MyGo>();
 
-	//gobj->AddComponent<TransformComponent>();
+	gobj->AddComponent<TransformComponent>();
 
 
 }
@@ -243,7 +243,7 @@ void DeferredGame::Update(float deltaTime)
 	_dl_1->directionalLightData.Direction = Vector3::Transform(_dl_1->directionalLightData.Direction, Matrix::CreateRotationY(5*deltaTime));
 	physEngine->Update(deltaTime);
 
-	//std::cout << gobj->GetComponent<TransformComponent>().position.x << " <- x\n";
+	std::cout << gobj->GetComponent<TransformComponent>().position.x << " <- x\n";
 
 }
 
