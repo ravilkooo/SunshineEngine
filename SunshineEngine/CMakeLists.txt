@@ -47,6 +47,7 @@ target_link_libraries(SunshineEngine
         ViennaGameJobSystem
         lua
         FMOD
+        sol2
 )
 
 message(STATUS "FMOD DLL DIR = ${FMOD_DLL_DIR}")
