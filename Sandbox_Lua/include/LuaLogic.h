@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <lua.hpp>
+#include "sol/sol.hpp"
 
 struct ParamEntry {
     std::string name;
@@ -44,7 +44,7 @@ public:
     std::vector<ParamEntry> params;
 
 private:
-    lua_State* L_;
+    std::unique_ptr<sol::state> lua;
 
     void InitLuaFile();
     void ScanLuaFiles(const std::string& dirPath);

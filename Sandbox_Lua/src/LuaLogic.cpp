@@ -2,7 +2,6 @@
 #include <iostream>
 #include <cstring>
 #include <filesystem>
-#include "sol/sol.hpp"
 
 namespace fs = std::filesystem;
 
@@ -22,7 +21,7 @@ void LuaLogic::ScanLuaFiles(const std::string& dirPath) {
 }
 
 LuaLogic::LuaLogic()
-    : L_(nullptr), scriptLoaded(false), foundFunction(false) {
+    : lua(nullptr), scriptLoaded(false), foundFunction(false) {
 }
 
 LuaLogic::~LuaLogic() {
@@ -32,16 +31,17 @@ LuaLogic::~LuaLogic() {
 void LuaLogic::Init() {
     InitLuaFile();
 
-    L_ = luaL_newstate();
-    luaL_openlibs(L_);
-
-    //sol::state lua;
-    //lua.open_libraries(lua);
+    lua = std::make_unique<sol::state>();
+    lua->open_libraries(sol::lib::base);
 
 
-    if (luaL_dofile(L_, scriptPath.c_str()) != LUA_OK) {
-        errorMessage = "Error running Lua script: " + std::string(lua_tostring(L_, -1));
-        lua_pop(L_, 1);
+    auto result = lua->script_file(scriptPath);
+    if (!result.valid()) {
+        sol::error err = result;
+        errorMessage = std::string("Error running Lua script: ") + err.what();
+    }
+    else {
+        scriptLoaded = true;
     }
 }
 
@@ -56,9 +56,8 @@ void LuaLogic::InitLuaFile()
 }
 
 void LuaLogic::Cleanup() {
-    if (L_) {
-        lua_close(L_);
-        L_ = nullptr;
+    if (lua) {
+        lua = nullptr;
     }
     ClearState();
 }
@@ -79,7 +78,7 @@ void LuaLogic::LoadScript() {
     foundFunction = false;
     params.clear();
     lastResult.clear();
-    scriptLoaded = (L_ != nullptr);
+    scriptLoaded = (lua != nullptr);
 }
 
 void LuaLogic::SetFunctionName(const std::string& name) {
@@ -95,85 +94,74 @@ bool LuaLogic::FindFunction() {
         errorMessage = "Lua not initialized or function name empty!";
         return false;
     }
+
+    //callSolFunction(functionName, 2, 3);
+
     foundFunction = false;
     errorMessage.clear();
     params.clear();
 
-    lua_getglobal(L_, functionName);
-    if (lua_isfunction(L_, -1)) {
+    sol::function func = (*lua)[functionName];
+    if (func.valid()) {
         foundFunction = true;
-        lua_pop(L_, 1);
-
         LoadParamsFromLua();
-
         return true;
     }
     else {
-        lua_pop(L_, 1);
-        errorMessage = "No such function: " + std::string(functionName);
+        errorMessage = "No such function";
         return false;
     }
 }
 
 void LuaLogic::LoadParamsFromLua() {
-    lua_getglobal(L_, (std::string(functionName) + "_params").c_str());
-    if (lua_istable(L_, -1)) {
-        int n = lua_rawlen(L_, -1);
-        for (int i = 1; i <= n; ++i) {
-            lua_rawgeti(L_, -1, i);
-
+    params.clear();
+    sol::object paramTable = (*lua)[(std::string(functionName) + "_params").c_str()];
+    if (paramTable.valid() && paramTable.get_type() == sol::type::table) {
+        sol::table tbl = paramTable;
+        for (auto& pair : tbl) {
             ParamEntry entry;
-
-            lua_getfield(L_, -1, "name");
-            entry.name = lua_tostring(L_, -1);
-            lua_pop(L_, 1);
-
-            lua_getfield(L_, -1, "type");
-            entry.type = lua_tostring(L_, -1);
-            lua_pop(L_, 1);
-
+            sol::table paramEntry = pair.second.as<sol::table>();
+            entry.name = paramEntry["name"].get<std::string>();
+            entry.type = paramEntry["type"].get<std::string>();
             params.push_back(entry);
-
-            lua_pop(L_, 1); // pop param entry
         }
     }
-    lua_pop(L_, 1); // pop _params table
 }
 
 bool LuaLogic::CallFunction() {
-    if (!foundFunction) { //|| functionName.empty()
-        errorMessage = "No function loaded to call";
+    sol::function func = (*lua)[functionName];
+    if (!func.valid())
+    {
+        errorMessage = "No such function";
         return false;
     }
 
-    lua_getglobal(L_, functionName);
+    std::vector<sol::object> args;
     for (const auto& p : params) {
-        if (p.type == "number")
-            lua_pushnumber(L_, atof(p.value.data()));
-        else if (p.type == "bool")
-            lua_pushboolean(L_, std::string(p.value.data()) == "true" || std::string(p.value.data()) == "1");
-        else
-            lua_pushstring(L_, p.value.data());
+        std::string val(p.value.data());
+        if (p.type == "number") {
+            args.push_back(sol::make_object(*lua, std::stod(val)));
+        }
+        else if (p.type == "bool") {
+            args.push_back(sol::make_object(*lua, val == "true" || val == "1"));
+        }
+        else {
+            args.push_back(sol::make_object(*lua, val));
+        }
     }
 
-    if (lua_pcall(L_, params.size(), 1, 0) != LUA_OK) {
-        errorMessage = "Lua error: " + std::string(lua_tostring(L_, -1));
-        lua_pop(L_, 1);
-        lastResult.clear();
+    sol::protected_function_result result = func(sol::as_args(args));
+    if (!result.valid()) {
+        sol::error err = result;
+        errorMessage = "Lua error: " + std::string(err.what());
         return false;
     }
 
-    char buf[256];
-    if (lua_isnumber(L_, -1))
-        snprintf(buf, sizeof(buf), "Result: %f", lua_tonumber(L_, -1));
-    else if (lua_isstring(L_, -1))
-        snprintf(buf, sizeof(buf), "Result: %s", lua_tostring(L_, -1));
-    else if (lua_isboolean(L_, -1))
-        snprintf(buf, sizeof(buf), "Result: %s", lua_toboolean(L_, -1) ? "true" : "false");
-    else
-        snprintf(buf, sizeof(buf), "Result: <unknown type>");
-
-    lastResult = buf;
-    lua_pop(L_, 1);
+    sol::object res = result.get<sol::object>();
+    if (!res.valid() || res.is<sol::nil_t>()) lastResult = "";
+    else if (res.is<std::string>()) lastResult = res.as<std::string>();
+    else if (res.is<double>()) lastResult = std::to_string(res.as<double>());
+    else if (res.is<bool>()) lastResult = res.as<bool>() ? "true" : "false";
+    else lastResult = "<unsupported return type>";
     return true;
 }
