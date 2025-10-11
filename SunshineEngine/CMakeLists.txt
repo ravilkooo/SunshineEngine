@@ -39,6 +39,7 @@ target_link_libraries(SunshineEngine
         ViennaGameJobSystem
         lua
         FMOD
+        sol2
         EASTL
 )
 
