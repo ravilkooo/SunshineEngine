@@ -6,6 +6,7 @@ set(EDITOR_SOURCES
     src/common.cpp
     src/common_platform.cpp
     src/play_sound.cpp
+    src/LuaLogic.cpp
 )
 
 set(EDITOR_HEADERS
@@ -13,6 +14,7 @@ set(EDITOR_HEADERS
     include/DeferredGame.h
     include/common.h
     include/common_platform.h
+    include/LuaLogic.h
 )
 
 add_executable(Sandbox_Lua

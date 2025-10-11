@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstring>
 #include <filesystem>
+#include "sol/sol.hpp"
 
 namespace fs = std::filesystem;
 
@@ -33,6 +34,10 @@ void LuaLogic::Init() {
 
     L_ = luaL_newstate();
     luaL_openlibs(L_);
+
+    //sol::state lua;
+    //lua.open_libraries(lua);
+
 
     if (luaL_dofile(L_, scriptPath.c_str()) != LUA_OK) {
         errorMessage = "Error running Lua script: " + std::string(lua_tostring(L_, -1));
