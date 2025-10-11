@@ -196,6 +196,10 @@ DeferredGame::DeferredGame()
 	gLightPass->particleSystems[0]->SetTexture(
 		new Bind::TextureB(renderer->GetDevice(), std::string(ws.begin(), ws.end()), aiTextureType_DIFFUSE, 0u));
 
+
+	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &DeferredGame::HandleKeyDown);
+	InputDevice::getInstance().MouseMove.AddRaw(this, &DeferredGame::HandleMouseMove);
+
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -210,9 +214,11 @@ DeferredGame::DeferredGame()
 	ShowWindow(displayWindow.hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(displayWindow.hWnd);
 
+	gobj = eastl::make_unique<MyGo>();
 
-	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &DeferredGame::HandleKeyDown);
-	InputDevice::getInstance().MouseMove.AddRaw(this, &DeferredGame::HandleMouseMove);
+	gobj->AddComponent<TransformComponent>();
+
+
 }
 
 DeferredGame::~DeferredGame()
@@ -236,6 +242,8 @@ void DeferredGame::Update(float deltaTime)
 	_sl_1->spotLightData.Spot = 15 + 10 * sin(10*currTime);
 	_dl_1->directionalLightData.Direction = Vector3::Transform(_dl_1->directionalLightData.Direction, Matrix::CreateRotationY(5*deltaTime));
 	physEngine->Update(deltaTime);
+
+	std::cout << gobj->GetComponent<TransformComponent>().position.x << " <- x\n";
 
 }
 

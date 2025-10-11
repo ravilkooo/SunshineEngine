@@ -12,45 +12,38 @@ set_property(GLOBAL PROPERTY CMAKE_CONFIGURE_DEPENDS
 file(GLOB_RECURSE SE_SOURCES "${SE_SRC_DIR}/*.cpp")
 file(GLOB_RECURSE SE_HEADERS "${SE_INCLUDE_DIR}/*.h")
 
-add_library(SunshineEngine SHARED
+add_library(SunshineEngine STATIC
     ${SE_SOURCES}
     ${SE_HEADERS}
 )
 
 set_target_properties(SunshineEngine PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY
-    "${CMAKE_BINARY_DIR}/bin"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
+# target_compile_definitions(SunshineEngine PUBLIC EASTL_USER_DEFINED_ALLOCATOR=1)
+
 # Define ENGINE_EXPORTS when compiling Engine itself
-target_compile_definitions(SunshineEngine PRIVATE SUNSHINE_ENGINE_EXPORTS)
+# target_compile_definitions(SunshineEngine PRIVATE SUNSHINE_ENGINE_EXPORTS)
 
 # Specify public include directory for clients
 target_include_directories(SunshineEngine PUBLIC "${SE_INCLUDE_DIR}")
-
-# Public headers (installed/exported)
-# target_include_directories(SunshineEngine
-#    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-#)
-
-# Sources
-target_sources(SunshineEngine PRIVATE
-    src/SunshineEngine.cpp
-)
 
 target_link_libraries(SunshineEngine
     PUBLIC
         SunshineGraphics
         assimp
-        EASTL
         Jolt
         ViennaGameJobSystem
         lua
         FMOD
         sol2
+        EASTL
 )
 
-message(STATUS "FMOD DLL DIR = ${FMOD_DLL_DIR}")
+message(STATUS "FMOD_LIB_DIR (from engine) = ${FMOD_LIB_DIR}")
 
 add_custom_command(TARGET SunshineEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
