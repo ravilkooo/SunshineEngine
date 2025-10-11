@@ -1,10 +1,13 @@
-#include "DeferredGame.h"
+#include "Game.h"
+#include <windows.h>
+#include <d3d11.h>
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
 #include <Jolt/Jolt.h>
 #include <VGJS.h>
 #include <assimp/Importer.hpp>
 #include <EASTL/allocator.h>
-#include <imgui.h>
-#include <lua.hpp>
 #include <vector>
 #include <string>
 #include <array>
@@ -14,6 +17,32 @@
 #include "LuaLogic.h"
 
 namespace fs = std::filesystem;
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// Forward declare helper functions
+LRESULT CALLBACK WndProcImGui(HWND, UINT, WPARAM, LPARAM);
+
+// Win32 message handler
+LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+		return true;
+
+	switch (msg)
+	{
+	case WM_SIZE:
+		if (wParam != SIZE_MINIMIZED) {}
+		return 0;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU) return 0;
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	}
+	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
 
 bool showExampleWindow = true;
 
@@ -30,17 +59,9 @@ LuaLogic luaLogic;
 int main() {
 	luaLogic.Init();
 
-	game_test();
+	imgui_test();
 
 	luaLogic.Cleanup();
-	return 0;
-}
-
-int game_test() {
-	imgui_test();
-	DeferredGame game = DeferredGame();
-	game.Run();
-
 	return 0;
 }
 
