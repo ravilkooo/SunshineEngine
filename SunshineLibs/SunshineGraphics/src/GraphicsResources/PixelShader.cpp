@@ -1,6 +1,6 @@
 
 
-#include "Bindable/PixelShader.h"
+#include "GraphicsResources/PixelShader.h"
 #include <iostream>
 
 Bind::PixelShader::PixelShader(ID3D11Device* device, LPCWSTR filePath)
@@ -41,6 +41,10 @@ Bind::PixelShader::PixelShader(ID3D11Device* device, LPCWSTR filePath)
 		nullptr,
 		&pPixelShader);
 	pShaderBytecodeBlob->Release();
+}
+
+Bind::PixelShader::~PixelShader()
+{
 }
 
 void Bind::PixelShader::Bind(ID3D11DeviceContext* context) noexcept

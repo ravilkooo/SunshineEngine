@@ -6,6 +6,7 @@
 #include <directxmath.h>
 
 #include "Bindable/BindableCollection.h"
+#include "Drawable.h"
 
 class SceneNode : public Drawable
 {

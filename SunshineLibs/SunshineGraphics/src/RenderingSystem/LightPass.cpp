@@ -78,6 +78,9 @@ void LightPass::StartFrame()
 		camera->GetProjectionMatrix()));
 	// camera->GetProjectionMatrix()
 	camPCB->Update(GetDeviceContext(), { vMatInverse, pMatInverse, camPos, 0 });
+
+	camera->UpdateBuffer(context.Get());
+	camera->BindBuffer(context.Get());
 }
 
 void LightPass::Pass(const Scene& scene)

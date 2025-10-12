@@ -12,6 +12,7 @@
 #include "TestCube.h"
 #include <GameObject.h>
 #include <Component/TransformComponent.h>
+#include <Component/RenderComponent.h>
 
 #include <windows.h>
 #include <d3d11.h>

@@ -78,7 +78,7 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
         gBufferPass->AddBind(new Bind::InputLayout(device, IALayoutInputElements, numInputElements, vertexShaderB->GetBytecode()));
 
         wchar_t psFilePath[200] = EDITOR_ASSETS_DIR;
-        wcsncat(psFilePath, L"/Shaders/GBufferShaderPS.hlsl", 30);
+        wcsncat(psFilePath, L"Shaders/GBufferShaderPS.hlsl", 30);
         gBufferPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
         D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
@@ -88,7 +88,7 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
         gBufferPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
         gBufferPass->AddBind(new Bind::TransformCBuffer(device, this, 0u));
 
-        techniques.insert({ "GBufferPass", gBufferPass });
+        techniñs.insert({ "GBufferPass", gBufferPass });
     }
     // MainColorPass
     /*
@@ -127,7 +127,7 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
         colorPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
         colorPass->AddBind(new Bind::TransformCBuffer(device, this, 0u));
 
-        techniques.insert({ "MainColorPass", colorPass });
+        techniñs.insert({ "MainColorPass", colorPass });
     }
     */
 

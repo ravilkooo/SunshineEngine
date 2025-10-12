@@ -56,10 +56,10 @@ DeferredGame::DeferredGame()
 			renderer->GetBackBuffer(), winWidth, winHeight, gBufferPass->pGBuffer, gBufferPass->GetCamera());
 
 
-		gLightPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pNormalSRV.Get(), 0u));
-		gLightPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pAlbedoSRV.Get(), 1u));
-		gLightPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pSpecularSRV.Get(), 2u));
-		gLightPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pWorldPosSRV.Get(), 3u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pNormalSRV.Get(), 0u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pAlbedoSRV.Get(), 1u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pSpecularSRV.Get(), 2u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pWorldPosSRV.Get(), 3u));
 
 		// Usual sampler for all SRV
 		D3D11_SAMPLER_DESC samplerDesc;
@@ -88,7 +88,7 @@ DeferredGame::DeferredGame()
 
 		colorPass->SetCamera(renderer->GetMainCamera());
 
-		colorPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pLightSRV.Get(), 0u));
+		colorPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pLightSRV.Get(), 0u));
 
 		// Usual sampler for all SRV
 		D3D11_SAMPLER_DESC samplerDesc;
@@ -189,12 +189,12 @@ DeferredGame::DeferredGame()
 	gLightPass->particleSystems[0]->SetBlendState(
 		new Bind::BlendState(renderer->GetDevice(), particleBlendDesc, particleBlendFactor, sampleMask));
 
-	//new Bind::TextureB(device, "bubbleBC7.dds", aiTextureType_DIFFUSE, 0u);
+	//new Bind::Texture(device, "bubbleBC7.dds", 0u);
 
 	std::wstring ws = std::wstring(SANDBOX_SOUND_ASSETS_DIR) + L"bubble24bpp.dds";
 
 	gLightPass->particleSystems[0]->SetTexture(
-		new Bind::TextureB(renderer->GetDevice(), std::string(ws.begin(), ws.end()), aiTextureType_DIFFUSE, 0u));
+		new Bind::Texture(renderer->GetDevice(), std::string(ws.begin(), ws.end()), 0u));
 
 
 

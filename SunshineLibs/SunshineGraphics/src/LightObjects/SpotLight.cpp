@@ -99,7 +99,7 @@ SpotLight::SpotLight(ID3D11Device* device, Vector3 position,
         gBufferPass->AddBind(new Bind::Rasterizer(device, rastDesc));
         gBufferPass->AddBind(new Bind::TransformCBuffer(device, this, 0u));
 
-        // techniques.insert({ "GBufferPass", gBufferPass });
+        // techniñs.insert({ "GBufferPass", gBufferPass });
     }
     // LightPass
     {
@@ -146,7 +146,7 @@ SpotLight::SpotLight(ID3D11Device* device, Vector3 position,
         spotLightPBuffer = new Bind::PixelConstantBuffer<SpotLightPCB>(device, spotLightData, 1u);
         lightPass->AddBind(spotLightPBuffer);
 
-        techniques.insert({ "LightPass", lightPass });
+        techniñs.insert({ "LightPass", lightPass });
     }
 }
 

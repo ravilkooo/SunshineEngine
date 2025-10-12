@@ -23,30 +23,28 @@ DirectionalLight::DirectionalLight(ID3D11Device* device, Vector3 position,
     // LightPass
     {
         RenderTechnique* lightPass = new RenderTechnique("LightPass");
+
         lightPass->AddBind(new Bind::Topology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP));
+        
+        lightPass->mesh = std::make_shared<Mesh>();
         lightPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
-        // AddStaticBind(texture);
 
         wchar_t vsFilePath[250];
         getGraphicsAssetPath(vsFilePath, 250, L"Shaders/LightPass/DirectionalLightVShader.hlsl");
+        //lightPass->vertexShader = std::make_shared<Bind::VertexShader>(device, vsFilePath);
         lightPass->AddBind(new Bind::VertexShader(device, vsFilePath));
 
         wchar_t psFilePath[250];
         getGraphicsAssetPath(psFilePath, 250, L"Shaders/LightPass/DirectionalLightPShader.hlsl");
+        //lightPass->pixelShader = std::make_shared<Bind::PixelShader>(device, psFilePath);
         lightPass->AddBind(new Bind::PixelShader(device, psFilePath));
 
-        /*
-        D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
-        rastDesc.CullMode = D3D11_CULL_BACK;
-        rastDesc.FillMode = D3D11_FILL_SOLID;
-        lightPass->AddBind(new Bind::Rasterizer(device, rastDesc));
-        */
         directionalLightPBuffer = new Bind::PixelConstantBuffer<DirectionalLightPCB>(device, directionalLightData, 1u);
         lightPass->AddBind(directionalLightPBuffer);
-        //std::cout << sizeof(directionalLightData) << "\n";
-        //std::cout << sizeof(directionalLightData) + (16 - (sizeof(directionalLightData) % 16)) % 16 << "\n";
 
-        techniques.insert({ "LightPass", lightPass });
+
+
+        techniñs.insert({ "LightPass", lightPass });
     }
 }
 

@@ -42,7 +42,7 @@ AmbientLight::AmbientLight(ID3D11Device* device, Vector4 ambient)
         //std::cout << sizeof(AmbientLightData) << "\n";
         //std::cout << sizeof(AmbientLightData) + (16 - (sizeof(AmbientLightData) % 16)) % 16 << "\n";
 
-        techniques.insert({ "LightPass", lightPass });
+        techniñs.insert({ "LightPass", lightPass });
     }
 }
 

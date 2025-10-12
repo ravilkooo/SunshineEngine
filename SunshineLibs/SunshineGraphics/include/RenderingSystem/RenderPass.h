@@ -1,12 +1,9 @@
 #pragma once
 
-
-
 #include <d3d11.h>
 #include <wrl.h>
 #include <string>
 #include <GraphicsUtils/Scene.h>
-
 
 class RenderPass
 {
@@ -29,4 +26,3 @@ protected:
 	Microsoft::WRL::ComPtr<ID3D11Device> device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 };
-

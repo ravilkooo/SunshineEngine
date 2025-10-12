@@ -29,7 +29,7 @@ RenderPass -?- Drawable
 Drawable has Bindables for each RenderPass (Technique)
 
 Drawable {}
-map<string, Technique*> techniques;
+map<string, Technique*> techniñs;
 
 RenderPass {}
 string tag;

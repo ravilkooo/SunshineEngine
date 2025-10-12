@@ -82,7 +82,7 @@ PointLight::PointLight(ID3D11Device* device, Vector3 position,
         pointLightPBuffer = new Bind::PixelConstantBuffer<PointLightPCB>(device, pointLightData, 1u);
         lightPass->AddBind(pointLightPBuffer);
 
-        techniques.insert({ "LightPass", lightPass });
+        techniñs.insert({ "LightPass", lightPass });
     }
 }
 

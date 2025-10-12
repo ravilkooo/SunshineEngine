@@ -158,7 +158,7 @@ GBufferPass::GBufferPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3
 	viewport.MinDepth = 0;
 	viewport.MaxDepth = 1.0f;
 
-	camera = new Camera(screenWidth * 1.0f / screenHeight);
+	camera = new Camera(device, screenWidth * 1.0f / screenHeight);
 }
 
 void GBufferPass::StartFrame()
@@ -173,6 +173,21 @@ void GBufferPass::StartFrame()
 	context->ClearRenderTargetView(gBufferRTVs[3], colorFar);
 	context->ClearDepthStencilView(pGBuffer->pDepthDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 	context->RSSetViewports(1, &viewport);
+
+	// Bind camera buffer to 1u slot
+	camera->UpdateBuffer(context.Get());
+	camera->BindBuffer(context.Get());
+}
+
+void GBufferPass::Pass(const Scene& scene)
+{
+	BindAllPerFrame();
+
+	for (SceneNode* node : scene.nodes) {
+		if (!node->HasTechnique(techniqueTag))
+			continue;
+		node->PassTechnique(techniqueTag, GetDeviceContext());
+	}
 }
 
 Camera* GBufferPass::GetCamera()

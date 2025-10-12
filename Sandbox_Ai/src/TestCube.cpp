@@ -88,7 +88,7 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
         gBufferPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
         gBufferPass->AddBind(new Bind::TransformCBuffer(device, this, 0u));
 
-        techniques.insert({ "GBufferPass", gBufferPass });
+        techniñs.insert({ "GBufferPass", gBufferPass });
     }
     // MainColorPass
     /*
@@ -127,7 +127,7 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
         colorPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
         colorPass->AddBind(new Bind::TransformCBuffer(device, this, 0u));
 
-        techniques.insert({ "MainColorPass", colorPass });
+        techniñs.insert({ "MainColorPass", colorPass });
     }
     */
 

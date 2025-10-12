@@ -20,8 +20,6 @@ add_subdirectory(lua)
 add_subdirectory(FMOD)
 # add_subdirectory(ozz-animation)
 
-
-
 # set_target_properties(EABase EASTL assimp DirectXTK imgui JoltPhysics ViennaGameJobSystem
 set_target_properties(EABase EASTL assimp DirectXTK Jolt VGJS imgui lua FMOD
     PROPERTIES

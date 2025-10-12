@@ -17,6 +17,7 @@ public:
 
     // Inherited via RenderPass
     void StartFrame() override;
+    void Pass(const Scene& scene) override;
     void EndFrame() override;
 
     Camera* GetCamera();
@@ -28,10 +29,8 @@ public:
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
 
-
     ID3D11RenderTargetView* gBufferRTVs[4];
     D3D11_VIEWPORT viewport;
     GBuffer* pGBuffer;
-
 };
 

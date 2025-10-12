@@ -4,11 +4,11 @@
 #include <iostream>
 
 
-Camera::Camera() : Camera(1.0f) {
-
+Camera::Camera(ID3D11Device* device) : Camera(device, 1.0f) {
+    InitBuffer(device);
 }
 
-Camera::Camera(float aspectRatio)
+Camera::Camera(ID3D11Device* device, float aspectRatio)
     : position(0.0f, 0.0f, -5.0f), target(0.0f, 0.0f, 1.0f), up(0.0f, 1.0f, 0.0f),
     fov(XM_PIDIV4), aspectRatio(aspectRatio), nearZ(0.1f), farZ(1000.0f),
     orthZ(10.0f), isPerspective(true),
@@ -17,39 +17,58 @@ Camera::Camera(float aspectRatio)
     orbitalPitch(0.0f), orbitalYaw(0.0f),
     spinAxis(0.0f, 1.0f, 0.0f), orbitalAngleSpeed(0.0f)
 {
-
+    InitBuffer(device);
 }
 
 Camera::~Camera()
 {
 }
 
-void Camera::SetPosition(Vector3 position)
+void Camera::InitBuffer(ID3D11Device* device)
+{
+    //DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
+    DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
+    //CameraBuffer{ viewProjMat };
+    cameraBuffer = new Bind::VertexConstantBuffer<CameraBuffer>(device, { viewProjMat }, 1u);
+}
+
+void Camera::UpdateBuffer(ID3D11DeviceContext* context)
+{
+    DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
+    cameraBuffer->Update(context, { viewProjMat });
+}
+
+void Camera::BindBuffer(ID3D11DeviceContext* context)
+{
+    cameraBuffer->Bind(context);
+}
+
+void Camera::SetPosition(DXSM::Vector3 position)
 {
     this->position = position;
 }
 
-Vector3 Camera::GetPosition()
+DXSM::Vector3 Camera::GetPosition()
 {
     return this->position;
 }
 
-void Camera::SetTarget(Vector3 target)
+void Camera::SetTarget(DXSM::Vector3 target)
 {
     this->target = target;
 }
 
-Vector3 Camera::GetTarget()
+DXSM::Vector3 Camera::GetTarget()
 {
     return target;
 }
 
-void Camera::SetUp(Vector3 up)
+void Camera::SetUp(DXSM::Vector3 up)
 {
     this->up = up;
 }
 
-Vector3 Camera::GetUp()
+DXSM::Vector3 Camera::GetUp()
 {
     return up;
 }
@@ -114,7 +133,7 @@ float Camera::GetReferenceLen()
     return referenceLen;
 }
 
-void Camera::Update(float deltaTime, const Matrix targetTransform)
+void Camera::Update(float deltaTime, const DXSM::Matrix targetTransform)
 {
     if (cameraMode == CAMERA_MODE::ORBITAL)
     {
@@ -124,36 +143,36 @@ void Camera::Update(float deltaTime, const Matrix targetTransform)
         position.y = orbitalDistance * sinf(orbitalPitch);
         position.z = orbitalDistance * cosf(orbitalPitch) * sinf(orbitalYaw);
 
-        position = Vector3::Transform(position, targetTransform);
+        position = DXSM::Vector3::Transform(position, targetTransform);
 
-        orbitalTarget = Vector3::Transform(Vector3::Zero, targetTransform);
+        orbitalTarget = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
         target = orbitalTarget;
 
-        up = Vector3::Transform(spinAxis, targetTransform) - orbitalTarget;
+        up = DXSM::Vector3::Transform(spinAxis, targetTransform) - orbitalTarget;
     }
 }
 
-void Camera::Update(float deltaTime, const Matrix targetTransform, Vector3 direction)
+void Camera::Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction)
 {
     if (cameraMode == CAMERA_MODE::FOLLOW)
     {
         //orbitalYaw += orbitalAngleSpeed * deltaTime;
 
-        target = Vector3::Transform(Vector3::Zero, targetTransform);
+        target = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
         
         float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
         position = target - cam2targetDist * (direction + sinf(followPitch) * up);
     }
 }
 
-void Camera::Update(float deltaTime, const Matrix targetTransform, Vector3 direction, float referenceLen)
+void Camera::Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen)
 {
     this->referenceLen = referenceLen;
     if (cameraMode == CAMERA_MODE::FOLLOW)
     {
         //orbitalYaw += orbitalAngleSpeed * deltaTime;
 
-        target = Vector3::Transform(Vector3::Zero, targetTransform);
+        target = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
 
         float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
         position = target - cam2targetDist * (direction + sinf(followPitch) * up);
@@ -182,7 +201,7 @@ void Camera::MoveForward(float speed)
     else
     {
         //XMVECTOR forward = XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position));
-        Vector3 forward = target - position;
+        DXSM::Vector3 forward = target - position;
         forward.Normalize();
         position.x += speed * forward.x;
         position.y += speed * forward.y;
@@ -216,7 +235,7 @@ void Camera::MoveLeft(float speed)
             MLoadFloat3(&up)
         );
         */
-        Vector3 right = (target - position).Cross(up);
+        DXSM::Vector3 right = (target - position).Cross(up);
         right.Normalize();
         position.x += speed * right.x;
         position.y += speed * right.y;
@@ -258,8 +277,8 @@ void Camera::RotateYaw(float angle)
     }
     else
     {
-        Vector3 look_dir = Vector3::Transform(target - position,
-            Matrix::CreateFromQuaternion(Quaternion::CreateFromAxisAngle(up, angle)));
+        DXSM::Vector3 look_dir = DXSM::Vector3::Transform(target - position,
+            DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(up, angle)));
         target = position + look_dir;
     }
 }
@@ -274,16 +293,16 @@ void Camera::RotatePitch(float angle)
     {
         followPitch = eastl::min(eastl::max(-XM_PIDIV2 * 0.9f, followPitch + angle), 0.0f);
         float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
-        Vector3 direction = (target - position);
+        DXSM::Vector3 direction = (target - position);
         direction.y = 0; direction.Normalize();
         position = target - cam2targetDist * (direction + sinf(followPitch) * up);
     }
     else
     {
-        Vector3 look_dir = target - position;
-        Vector3 _axis = up.Cross(look_dir);
-        look_dir = Vector3::Transform(look_dir,
-            Matrix::CreateFromQuaternion(Quaternion::CreateFromAxisAngle(_axis, -angle)));
+        DXSM::Vector3 look_dir = target - position;
+        DXSM::Vector3 _axis = up.Cross(look_dir);
+        look_dir = DXSM::Vector3::Transform(look_dir,
+            DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(_axis, -angle)));
         target = position + look_dir;
     }
 }
@@ -293,28 +312,28 @@ void Camera::SwitchToFPSMode()
     cameraMode = CAMERA_MODE::FPS;
 }
 
-void Camera::SwitchToFollowMode(Vector3 followTarget, Vector3 direction, float referenceLen)
+void Camera::SwitchToFollowMode(DXSM::Vector3 followTarget, DXSM::Vector3 direction, float referenceLen)
 {
     cameraMode = CAMERA_MODE::FOLLOW;
     followPitch = -XM_PI * 0.166f;
     target = followTarget;
     this->referenceLen = referenceLen;
-    up = Vector3(0.0f, 1.0f, 0.0f);
+    up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
     float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
     position = target - cam2targetDist * (direction + sinf(followPitch) * up);
 }
 
 
-void Camera::SwitchToOrbitalMode(Vector3 orbitalTarget)
+void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget)
 {
-    SwitchToOrbitalMode(orbitalTarget, Vector3(0.0f, 1.0f, 0.0f), 1.0f);
+    SwitchToOrbitalMode(orbitalTarget, DXSM::Vector3(0.0f, 1.0f, 0.0f), 1.0f);
 }
 
-void Camera::SwitchToOrbitalMode(Vector3 orbitalTarget, Vector3 spinAxis)
+void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis)
 {
     SwitchToOrbitalMode(orbitalTarget, spinAxis, 1.0f);
 }
-void Camera::SwitchToOrbitalMode(Vector3 orbitalTarget, Vector3 spinAxis, float referenceLen)
+void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis, float referenceLen)
 {
     this->referenceLen = referenceLen;
     cameraMode = CAMERA_MODE::ORBITAL;
@@ -360,7 +379,7 @@ void Camera::SwitchProjection() {
 
 Camera::FrustumPlanes Camera::GetFrustumPlanes()
 {
-    Matrix mat = GetViewMatrix() * GetProjectionMatrix();
+    DXSM::Matrix mat = GetViewMatrix() * GetProjectionMatrix();
     FrustumPlanes planes;
 
     // Левая плоскость
@@ -394,7 +413,7 @@ Camera::FrustumCorners Camera::GetFrustumCorners()
 {
     FrustumCorners corners;
     
-    Matrix viewProjMatrix = GetViewMatrix() * GetProjectionMatrix();
+    DXSM::Matrix viewProjMatrix = GetViewMatrix() * GetProjectionMatrix();
     XMMATRIX invViewProj = XMMatrixInverse(nullptr, viewProjMatrix);
 
     XMVECTOR ndcCorners[8] = {

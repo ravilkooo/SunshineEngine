@@ -45,7 +45,7 @@ MainColorPass::MainColorPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	viewport.MinDepth = 0;
 	viewport.MaxDepth = 1.0f;
 
-	camera = new Camera(screenWidth * 1.0f / screenHeight);
+	camera = new Camera(device, screenWidth * 1.0f / screenHeight);
 }
 
 void MainColorPass::StartFrame()
@@ -55,6 +55,9 @@ void MainColorPass::StartFrame()
 	context->ClearRenderTargetView(renderTargetView, color);
 	context->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH, 1.0f, 0u);
 	context->RSSetViewports(1, &viewport);
+
+	camera->UpdateBuffer(context.Get());
+	camera->BindBuffer(context.Get());
 }
 
 Camera* MainColorPass::GetCamera()

@@ -10,11 +10,11 @@ void Drawable::DrawTechnique(std::string technique, Microsoft::WRL::ComPtr<ID3D1
 }
 bool Drawable::HasTechnique(std::string technique)
 {
-	return techniques.find(technique) != techniques.end();
+	return techniñs.find(technique) != techniñs.end();
 }
 void Drawable::PassTechnique(std::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 {
-	techniques[technique]->BindAll(context);
+	techniñs[technique]->BindAll(context);
 	DrawTechnique(technique, context);
 }
 ;

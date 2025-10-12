@@ -33,6 +33,6 @@ FullScreenQuad::FullScreenQuad(ID3D11Device* device)
         rastDesc.CullMode = D3D11_CULL_NONE;
         rastDesc.FillMode = D3D11_FILL_SOLID;
         colorPass->AddBind(new Bind::Rasterizer(device, rastDesc));
-        techniques.insert({ "MainColorPass", colorPass });
+        techniñs.insert({ "MainColorPass", colorPass });
     }
 }

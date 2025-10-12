@@ -21,6 +21,27 @@ void RenderTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> contex
 	{
 		bindables[i]->Bind(context.Get());
 	}
+
+	if (vertexShader)
+		vertexShader->Bind(context.Get());
+
+	if (pixelShader)
+		pixelShader->Bind(context.Get());
+	
+	if (texture) {
+		texture->Bind(context.Get());
+	}
+
+	if (textureSampler) {
+		textureSampler->Bind(context.Get());
+	}
+}
+
+void RenderTechnique::DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+{
+	if (mesh)
+		mesh->Draw(context.Get());
+
 }
 
 std::string RenderTechnique::GetTechnique()

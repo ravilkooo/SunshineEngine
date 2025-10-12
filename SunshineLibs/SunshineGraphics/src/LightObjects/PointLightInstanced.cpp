@@ -89,7 +89,7 @@ PointLightInstanced::PointLightInstanced(ID3D11Device* device, UINT lightsCnt,
         //lightPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
 
 
-        techniques.insert({ "LightPass", lightPass });
+        techniñs.insert({ "LightPass", lightPass });
     }
 
 
@@ -145,7 +145,7 @@ PointLightInstanced::PointLightInstanced(ID3D11Device* device, UINT lightsCnt,
         gBufferPass->AddBind(new Bind::Rasterizer(device, rastDesc));
 
 
-        techniques.insert({ "GBufferPass", gBufferPass });
+        techniñs.insert({ "GBufferPass", gBufferPass });
     }
 
     // PointLight Data

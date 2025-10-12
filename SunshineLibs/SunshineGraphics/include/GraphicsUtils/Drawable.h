@@ -11,6 +11,7 @@
 #include "GraphicsUtils/Camera.h"
 #include "CommonVertex.h"
 #include "RenderingSystem/RenderTechnique.h"
+#include "Transformable.h"
 
 #include <assimp/scene.h>
 
@@ -18,10 +19,11 @@ namespace Bind {
     class Bindable;
 }
 
-class Drawable {
+class Drawable : public Transformable {
 public:
 	DirectX::XMMATRIX worldMat = DirectX::XMMatrixIdentity();
 
+    DXSM::Matrix GetWorldMatrix() const override { return worldMat; };
     DirectX::XMMATRIX GetViewMatrix() const;
 	DirectX::XMMATRIX GetProjectionMatrix() const;
 
@@ -49,7 +51,7 @@ public:
 
     ID3D11Device* device;
 
-    std::map<std::string, RenderTechnique*> techniques;
+    std::map<std::string, RenderTechnique*> techniñs;
 
     bool HasTechnique(std::string technique);
     
