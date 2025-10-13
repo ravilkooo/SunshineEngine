@@ -7,6 +7,8 @@
 #include "Bindable/BindableCollection.h"
 #include "GraphicsUtils/Camera.h"
 
+namespace DXSM = DirectX::SimpleMath;
+
 class ParticleSystem
 {
 
@@ -38,11 +40,11 @@ public:
 
     struct EmitterPointConstantBuffer
     {
-        Matrix rotMatrix;
+        DXSM::Matrix rotMatrix;
 
-        Vector4 position;
-        Vector4 colorStart;
-        Vector4 colorEnd;
+        DXSM::Vector4 position;
+        DXSM::Vector4 colorStart;
+        DXSM::Vector4 colorEnd;
 
         UINT maxSpawn;
         float particlesLifeSpan;
@@ -76,7 +78,7 @@ public:
 
     struct SimulateParticlesConstantBuffer
     {
-        Vector4 force;
+        DXSM::Vector4 force;
     };
 
     int m_maxParticles = 4 * 1024;
@@ -131,10 +133,10 @@ public:
     void DecrementEmissionRate(float deltaEmissionRate);
 
     void SetBlendState(Bind::BlendState* newBlendState);
-    void SetTexture(Bind::TextureB* newTexture);
+    void SetTexture(Bind::Texture* newTexture);
 
-    void SetEmitPosition(Vector4 newPosition);
-    void SetEmitDir(Vector3 newEmitDir);
+    void SetEmitPosition(DXSM::Vector4 newPosition);
+    void SetEmitDir(DXSM::Vector3 newEmitDir);
 
     Microsoft::WRL::ComPtr<ID3D11ComputeShader>          m_resetCShader;
     Microsoft::WRL::ComPtr<ID3D11ComputeShader>          m_initSimulateDispatchArgsCShader; // pre-simulate
@@ -169,7 +171,7 @@ private:
 
     struct SceneConstantBuffer
     {
-        Vector4 camPosition;
+        DXSM::Vector4 camPosition;
         float dt;
         float rngSeed;
         UINT padding[2];
@@ -194,7 +196,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11PixelShader>       m_renderParticlePS;
 
     // texture
-    Bind::TextureB* m_texture;    // tool
+    Bind::Texture* m_texture;    // tool
     Bind::Sampler* textureSampler;
 
 public:

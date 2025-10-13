@@ -9,12 +9,16 @@ struct PS_IN
     float3 wPos : POSITION;
 };
 
-cbuffer CBuf
+cbuffer TransformCBuf : register(b0)
 {
     row_major float4x4 wMat;
-    row_major float4x4 wMatInvTranspose;
-    row_major float4x4 vpMat;
-};
+    row_major float4x4 wInvTransposeMat;
+}
+
+cbuffer CameraCBuf : register(b1)
+{
+    row_major float4x4 viewProjMat;
+}
 
 PS_IN VSMain(VS_IN input)
 {
@@ -23,7 +27,7 @@ PS_IN VSMain(VS_IN input)
     output.pos = mul(float4(input.pos, 1.0), wMat);
     output.pos = output.pos.xyzw / output.pos.w;
     output.wPos = output.pos.xyz;
-    output.pos = mul(output.pos, vpMat);
+    output.pos = mul(output.pos, viewProjMat);
 	
     return output;
 }

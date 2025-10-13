@@ -6,6 +6,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) # Good for shared libs
 
+# Force all targets to use dynamic runtime (/MD, /MDd)
+if(MSVC)
+    # Fallback for older EASTL or CMake logic
+    add_compile_options(
+        $<$<CONFIG:Debug>:/MDd>
+        $<$<CONFIG:Release>:/MD>
+    )
+endif()
+
 # Set output folders (binaries go into bin/, libs into lib/)
 # Set before add_subdirectory()!!!
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -34,12 +43,3 @@ add_subdirectory(Sandbox_Editor)
 
 # Sandbox_Lua (EXE)
 add_subdirectory(Sandbox_Lua)
-
-# Sandbox_Sound (EXE)
-add_subdirectory(Sandbox_Sound)
-
-# Sandbox_Jolt (EXE)
-add_subdirectory(Sandbox_Jolt)
-
-# Sandbox_Ai (EXE)
-add_subdirectory(Sandbox_Ai)

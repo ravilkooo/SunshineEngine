@@ -73,4 +73,7 @@ target_link_libraries(SunshineGraphics PUBLIC assimp)
 # Link EASTL where needed
 target_link_libraries(SunshineGraphics PUBLIC EASTL)
 
+# SunshineResources
+target_link_libraries(SunshineGraphics PUBLIC SunshineResources)
+
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR})

@@ -5,7 +5,7 @@
 
 namespace Bind {
 
-	TransformCBuffer::TransformCBuffer(ID3D11Device* device, Drawable* parent, UINT slot)
+	TransformCBuffer::TransformCBuffer(ID3D11Device* device, Transformable* parent, UINT slot)
 		: pParent(parent)
 	{
 		//if (!pVcbuf)
@@ -16,6 +16,23 @@ namespace Bind {
 
 	void TransformCBuffer::Bind(ID3D11DeviceContext* context) noexcept
 	{
+		const auto wMat = pParent->GetWorldMatrix();
+		DXSM::Matrix A = wMat;
+		// Correct ?
+		A._41 = 0;
+		A._42 = 0;
+		A._43 = 0;
+		A._44 = 1;
+
+		const auto wMatInvTranspose = (A.Invert()).Transpose();
+
+		const Transforms tf = {
+				wMat, wMatInvTranspose,
+		};
+		pVcbuf->Update(context, tf);
+		pVcbuf->Bind(context);
+
+		/*
 		const auto wMat = pParent->worldMat;
 		const auto vpMat = pParent->GetViewMatrix() * pParent->GetProjectionMatrix();
 		DirectX::XMMATRIX A = wMat;
@@ -28,6 +45,7 @@ namespace Bind {
 		};
 		pVcbuf->Update(context, tf);
 		pVcbuf->Bind(context);
+		*/
 	}
 	
 	// VertexConstantBuffer<TransformCBuffer::Transforms>* TransformCBuffer::pVcbuf;

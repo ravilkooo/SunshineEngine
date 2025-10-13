@@ -1,9 +1,7 @@
 #pragma once
-#include <GraphicsUtils/SceneNode.h>
-
-class TestCube :
-    public SceneNode
+class TestCube
 {
+/*
 public:
     TestCube();
     TestCube(ID3D11Device* device);
@@ -22,5 +20,5 @@ public:
 private:
     Bind::VertexShader* vertexShaderB = nullptr;
     Matrix initTransform = Matrix::Identity;
+*/
 };
-

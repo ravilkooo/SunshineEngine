@@ -5,30 +5,41 @@
 #include <DirectXMath.h>
 #include <SimpleMath.h>
 
-using namespace DirectX;
-using namespace DirectX::SimpleMath;
+#include "Bindable/ConstantBuffer.h"
 
+using namespace DirectX;
+namespace DXSM = DirectX::SimpleMath;
 
 class Camera
 {
 public:
+    struct CameraBuffer {
+        DXSM::Matrix viewProjMatrix;
+    };
+
+    Bind::VertexConstantBuffer<CameraBuffer>* cameraBuffer;
+
     enum class CAMERA_MODE
     {
         FPS, ORBITAL, FOLLOW
     };
 
-    Camera();
-    Camera(float aspectRatio);
+    Camera(ID3D11Device* device);
+    Camera(ID3D11Device* device, float aspectRatio);
     ~Camera();
 
-    void SetPosition(Vector3 position);
-    Vector3 GetPosition();
+    void InitBuffer(ID3D11Device* device);
+    void UpdateBuffer(ID3D11DeviceContext* context);
+    void BindBuffer(ID3D11DeviceContext* context);
 
-    void SetTarget(Vector3 target);
-    Vector3 GetTarget();
+    void SetPosition(DXSM::Vector3 position);
+    DXSM::Vector3 GetPosition();
 
-    void SetUp(Vector3 up);
-    Vector3 GetUp();
+    void SetTarget(DXSM::Vector3 target);
+    DXSM::Vector3 GetTarget();
+
+    void SetUp(DXSM::Vector3 up);
+    DXSM::Vector3 GetUp();
 
     void SetFOV(float fov);
     void SetAspectRatio(float aspectRatio);
@@ -48,9 +59,9 @@ public:
     void SetReferenceLen(float referenceLen);
     float GetReferenceLen();
 
-    void Update(float deltaTime, const Matrix targetTransform);
-    void Update(float deltaTime, const Matrix targetTransform, Vector3 direction);
-    void Update(float deltaTime, const Matrix targetTransform, Vector3 direction, float referenceLen);
+    void Update(float deltaTime, const DXSM::Matrix targetTransform);
+    void Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
+    void Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen);
 
     XMMATRIX GetViewMatrix() const;
     XMMATRIX GetProjectionMatrix() const;
@@ -67,11 +78,11 @@ public:
 
     void SwitchToFPSMode();
     
-    void SwitchToFollowMode(Vector3 followTarget, Vector3 direction, float referenceLen);
+    void SwitchToFollowMode(DXSM::Vector3 followTarget, DXSM::Vector3 direction, float referenceLen);
 
-    void SwitchToOrbitalMode(Vector3 orbitalTarget);
-    void SwitchToOrbitalMode(Vector3 orbitalTarget, Vector3 spinAxis);
-    void SwitchToOrbitalMode(Vector3 orbitalTarget, Vector3 spinAxis, float referenceLen);
+    void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget);
+    void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis);
+    void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis, float referenceLen);
 
     void SwitchProjection();
 
@@ -90,12 +101,13 @@ public:
         XMVECTOR Near[4];
         XMVECTOR Far[4];
     };
+
     FrustumCorners GetFrustumCorners();
 
 private:
-    Vector3 position;
-    Vector3 target;
-    Vector3 up;
+    DXSM::Vector3 position;
+    DXSM::Vector3 target;
+    DXSM::Vector3 up;
 
     bool isPerspective = true;
 
@@ -116,17 +128,15 @@ private:
     CAMERA_MODE cameraMode = CAMERA_MODE::FPS;
 
     // for ORBITAL camera mode
-    Vector3 orbitalTarget;
+    DXSM::Vector3 orbitalTarget;
     float minOrbitalDistance;
     float orbitalDistance;
     float orbitalYaw;
     float orbitalPitch;
     float orbitalAngleSpeed;
     //float orbitalAngleSpeed;
-    Vector3 spinAxis;
+    DXSM::Vector3 spinAxis;
 
     // for FOLLOW camera mode
     float followPitch;
-
-
 };

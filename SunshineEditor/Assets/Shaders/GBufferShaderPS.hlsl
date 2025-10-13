@@ -4,6 +4,7 @@ struct PS_IN
     float4 col : COLOR;
     float3 normal : NORMAL0;
     float3 wPos : POSITION;
+    float2 texCoord : TEXCOORD0;
 };
 
 struct PSOutput

@@ -4,9 +4,8 @@
 #include "GameTimer.h"
 #include <EASTL/algorithm.h>
 
-#include <GraphicsUtils/Scene.h>
-#include <Physics/PhysicsEngine.h>
-#include <RenderingSystem/RenderingSystem.h>
+#include "Scene.h"
+#include <Graphics/RenderingSystem.h>
 #include <Windows/DisplayWindow.h>
 
 
@@ -24,7 +23,6 @@ public:
 
     GameTimer timer;
     Scene scene;
-    PhysicsEngine* physEngine;
     RenderingSystem* renderer;
 
     DisplayWindow displayWindow;

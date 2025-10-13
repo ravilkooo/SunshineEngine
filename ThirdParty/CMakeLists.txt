@@ -21,8 +21,6 @@ add_subdirectory(FMOD)
 # add_subdirectory(ozz-animation)
 add_subdirectory(sol2)
 
-
-
 # set_target_properties(EABase EASTL assimp DirectXTK imgui JoltPhysics ViennaGameJobSystem
 set_target_properties(EABase EASTL assimp DirectXTK Jolt VGJS imgui lua FMOD sol2
     PROPERTIES

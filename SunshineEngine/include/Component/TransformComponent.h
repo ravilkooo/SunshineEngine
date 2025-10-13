@@ -2,16 +2,27 @@
 #include "SunshineEngineAPI.h"
 #include "Component.h"
 #include <SimpleMath.h>
+#include <d3d11.h>
+#include <Bindable/TransformCBuffer.h>
+#include <GraphicsUtils/Transformable.h>
 
 namespace DXSM = DirectX::SimpleMath;
 
 class SUNSHINE_ENGINE_API TransformComponent :
-    public Component
+    public Component, Transformable
 {
 public:
     TransformComponent() {};
 
-    ~TransformComponent() = default;
+    TransformComponent(ID3D11Device* device);
+
+    void SetupBuffer(ID3D11Device* device);
+
+    // To-do ptr
+    Bind::TransformCBuffer* transformBuffer;
+
+    void BindToGraphicsPipeline(ID3D11DeviceContext* context);
+
     /*
     // ================
     // To make SUNSHINE_ENGINE_API work
@@ -24,9 +35,37 @@ public:
     // ================
     */
 
-    DXSM::Vector3 position = { 0, 0, 0 };
-    DXSM::Vector3 rotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
-    DXSM::Vector3 scaleFactor = { 1, 1, 1 };
+    // Transforms - usual as in every engine: translate+rotate+scale
+    // ...Transfrom()
+    // +
+    // Additional local transforms only for object: translate+rotate+scale (for local corrections etc.)
+    // ...LocalTransfrom()
+
+    // Transforms
+    DXSM::Matrix GetTransalationMatrix() const;
+    DXSM::Matrix GetRotationMatrix() const;
+    DXSM::Matrix GetScaleMatrix() const;
+
+    // Additional Transforms
+    DXSM::Matrix GetLocalTransalationMatrix() const;
+    DXSM::Matrix GetLocalRotationMatrix() const;
+    DXSM::Matrix GetLocalScaleMatrix() const;
+
+    DXSM::Matrix GetLocalTransformMatrix() const;
+
+    // World Transform
+    DXSM::Matrix GetWorldMatrix() const override; // include LocalTransfrom
+
+    // Transform
+    DXSM::Vector3 m_position = { 0, 0, 0 };
+    DXSM::Vector3 m_rotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
+    DXSM::Vector3 m_scaleFactor = { 1, 1, 1 };
+
+    // Local Transform
+    DXSM::Vector3 m_localPosition = { 0, 0, 0 };
+    DXSM::Vector3 m_localRotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
+    DXSM::Vector3 m_localScaleFactor = { 1, 1, 1 };
+
     DXSM::Matrix localTransfrom = DXSM::Matrix::Identity;
     
     const std::type_info& getType() const override {
