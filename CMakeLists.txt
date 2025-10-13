@@ -43,12 +43,3 @@ add_subdirectory(Sandbox_Editor)
 
 # Sandbox_Lua (EXE)
 add_subdirectory(Sandbox_Lua)
-
-# Sandbox_Sound (EXE)
-add_subdirectory(Sandbox_Sound)
-
-# Sandbox_Jolt (EXE)
-add_subdirectory(Sandbox_Jolt)
-
-# Sandbox_Ai (EXE)
-add_subdirectory(Sandbox_Ai)

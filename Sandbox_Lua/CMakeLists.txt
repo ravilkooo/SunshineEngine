@@ -2,7 +2,6 @@
 set(EDITOR_SOURCES
     src/main.cpp
     src/TestCube.cpp
-    src/DeferredGame.cpp
     src/common.cpp
     src/common_platform.cpp
     src/play_sound.cpp
@@ -11,7 +10,6 @@ set(EDITOR_SOURCES
 
 set(EDITOR_HEADERS
     include/TestCube.h
-    include/DeferredGame.h
     include/common.h
     include/common_platform.h
     include/LuaLogic.h
