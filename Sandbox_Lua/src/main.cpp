@@ -15,34 +15,10 @@
 #include "common.h"
 #include <filesystem>
 #include "LuaLogic.h"
+#include <TestGameObjects.h>
+#include <Windows/WndProc.h>
 
 namespace fs = std::filesystem;
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-// Forward declare helper functions
-LRESULT CALLBACK WndProcImGui(HWND, UINT, WPARAM, LPARAM);
-
-// Win32 message handler
-LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
-		return true;
-
-	switch (msg)
-	{
-	case WM_SIZE:
-		if (wParam != SIZE_MINIMIZED) {}
-		return 0;
-	case WM_SYSCOMMAND:
-		if ((wParam & 0xfff0) == SC_KEYMENU) return 0;
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	}
-	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
 
 bool showExampleWindow = true;
 
@@ -55,11 +31,13 @@ int lua_test();
 int game_test();
 
 LuaLogic luaLogic;
+//TestGameObjects testGameObjects;
 
 int main() {
 	luaLogic.Init();
 
 	imgui_test();
+	//testGameObjects.Run();
 
 	luaLogic.Cleanup();
 	return 0;
@@ -74,7 +52,7 @@ int fmod_test() {
 int imgui_test()
 {
 	// 1. Create application window
-	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProcImGui, 0, 0,
+	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc::WndProcImGui, 0, 0,
 					  GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
 					  L"ImGuiTestWindow", NULL };
 	RegisterClassEx(&wc);
@@ -150,7 +128,7 @@ int imgui_test()
 			ImGui::EndCombo();
 		}
 		if (ImGui::Button("Load Script")) {
-			luaLogic.LoadScript();			
+			luaLogic.LoadScript();
 		}
 
 		if (luaLogic.scriptLoaded)
