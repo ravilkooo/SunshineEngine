@@ -1,17 +1,14 @@
 #pragma once
-#include <GraphicsUtils/SceneNode.h>
+//#include <GraphicsUtils/SceneNode.h>
+#include <GameObject.h>
 
 class TestCube :
-    public SceneNode
+    public GameObject
 {
 public:
     TestCube();
     TestCube(ID3D11Device* device);
     TestCube(ID3D11Device* device, float width, float height, float depth, Vector3 position, Vector4 col);
-
-    void Update(float deltaTime) override;
-
-    Vector3 GetCenterLocation() override;
 
     Vector3 position = Vector3::Zero;
 

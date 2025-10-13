@@ -1,3 +1,7 @@
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Root paths
 set(SE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(SE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -35,7 +39,6 @@ target_link_libraries(SunshineEngine
     PUBLIC
         SunshineGraphics
         assimp
-        Jolt
         ViennaGameJobSystem
         lua
         FMOD
@@ -51,6 +54,24 @@ add_custom_command(TARGET SunshineEngine POST_BUILD
         $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmod.dll>
         $<TARGET_FILE_DIR:SunshineEngine>
 )
+
+message(STATUS $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/bin/Debug> $<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/bin/Release> )
+
+add_custom_command(TARGET SunshineEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodL.dll>
+        $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmod.dll>
+        ${CMAKE_BINARY_DIR}/bin
+        $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/bin/Debug>
+        $<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/bin/Release> 
+)
+
+
+# -------------- JoltPhysics --------------
+
+target_link_libraries(SunshineEngine PUBLIC Jolt)
+
+# -------------- JoltPhysics --------------
 
 target_compile_definitions(SunshineEngine PUBLIC ENGINE_ASSETS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Assets/")
 

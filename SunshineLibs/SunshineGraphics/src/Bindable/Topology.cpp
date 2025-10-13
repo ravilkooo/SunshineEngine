@@ -1,7 +1,4 @@
-
-
 #include "Bindable/Topology.h"
-
 
 namespace Bind
 {

@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include "Bindable.h"
 #include <d3dcompiler.h>
 

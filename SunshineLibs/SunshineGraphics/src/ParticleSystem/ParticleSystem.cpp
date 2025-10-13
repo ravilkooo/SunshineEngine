@@ -434,7 +434,7 @@ void ParticleSystem::Update(float deltaTime)
 {
 	UpdateEmitter(deltaTime);
 
-	m_sceneConstantBufferData.camPosition = Vector4(camera->GetPosition());
+	m_sceneConstantBufferData.camPosition = DXSM::Vector4(camera->GetPosition());
 	m_sceneConstantBufferData.dt = deltaTime;
 
 	m_sceneConstantBufferData.rngSeed = (float)std::rand();
@@ -680,18 +680,18 @@ void ParticleSystem::SetBlendState(Bind::BlendState* newBlendState)
 	m_blendState = newBlendState;
 }
 
-void ParticleSystem::SetTexture(Bind::TextureB* newTexture)
+void ParticleSystem::SetTexture(Bind::Texture* newTexture)
 {
 	m_texture = newTexture;
 }
 
-void ParticleSystem::SetEmitPosition(Vector4 newPosition)
+void ParticleSystem::SetEmitPosition(DXSM::Vector4 newPosition)
 {
 	m_emitterConstantBufferData.position = newPosition;
 }
 
-void ParticleSystem::SetEmitDir(Vector3 newEmitDir)
+void ParticleSystem::SetEmitDir(DXSM::Vector3 newEmitDir)
 {
 	m_emitterConstantBufferData.rotMatrix =
-		Matrix::CreateFromQuaternion(Quaternion::FromToRotation({ 0,1,0 }, newEmitDir));
+		DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::FromToRotation({ 0,1,0 }, newEmitDir));
 }

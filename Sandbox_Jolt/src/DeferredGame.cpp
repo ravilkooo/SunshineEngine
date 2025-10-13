@@ -40,26 +40,26 @@ DeferredGame::DeferredGame()
 
 	renderer = new DeferredRenderer(displayWindow.hWnd, winWidth, winHeight);
 
-	// GBufferPass
-	GBufferPass* gBufferPass;
+	// GPass
+	GPass* gPass;
 	{
-		gBufferPass = new GBufferPass(renderer->GetDevice(), renderer->GetDeviceContext(),
+		gPass = new GPass(renderer->GetDevice(), renderer->GetDeviceContext(),
 			renderer->GetBackBuffer(), winWidth, winHeight);
 
-		renderer->SetMainCamera(gBufferPass->GetCamera());
+		renderer->SetMainCamera(gPass->GetCamera());
 		renderer->mainCamera->SetPosition({ 0, 0, -10 });
 
-		renderer->AddPass(gBufferPass);
+		renderer->AddPass(gPass);
 	}
 	{
 		gLightPass = new LightPass(renderer->GetDevice(), renderer->GetDeviceContext(),
-			renderer->GetBackBuffer(), winWidth, winHeight, gBufferPass->pGBuffer, gBufferPass->GetCamera());
+			renderer->GetBackBuffer(), winWidth, winHeight, gPass->pGBuffer, gPass->GetCamera());
 
 
-		gLightPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pNormalSRV.Get(), 0u));
-		gLightPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pAlbedoSRV.Get(), 1u));
-		gLightPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pSpecularSRV.Get(), 2u));
-		gLightPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pWorldPosSRV.Get(), 3u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pNormalSRV.Get(), 0u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pAlbedoSRV.Get(), 1u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pSpecularSRV.Get(), 2u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pWorldPosSRV.Get(), 3u));
 
 		// Usual sampler for all SRV
 		D3D11_SAMPLER_DESC samplerDesc;
@@ -88,7 +88,7 @@ DeferredGame::DeferredGame()
 
 		colorPass->SetCamera(renderer->GetMainCamera());
 
-		colorPass->AddPerFrameBind(new Bind::TextureB(renderer->GetDevice(), gBufferPass->pGBuffer->pLightSRV.Get(), 0u));
+		colorPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pLightSRV.Get(), 0u));
 
 		// Usual sampler for all SRV
 		D3D11_SAMPLER_DESC samplerDesc;
@@ -189,12 +189,12 @@ DeferredGame::DeferredGame()
 	gLightPass->particleSystems[0]->SetBlendState(
 		new Bind::BlendState(renderer->GetDevice(), particleBlendDesc, particleBlendFactor, sampleMask));
 
-	//new Bind::TextureB(device, "bubbleBC7.dds", aiTextureType_DIFFUSE, 0u);
+	//new Bind::Texture(device, "bubbleBC7.dds", aiTextureType_DIFFUSE, 0u);
 
 	std::wstring ws = std::wstring(SANDBOX_JOLT_ASSETS_DIR) + L"bubble24bpp.dds";
 
 	gLightPass->particleSystems[0]->SetTexture(
-		new Bind::TextureB(renderer->GetDevice(), std::string(ws.begin(), ws.end()), aiTextureType_DIFFUSE, 0u));
+		new Bind::Texture(renderer->GetDevice(), std::string(ws.begin(), ws.end()), 0u));
 
 
 

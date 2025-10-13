@@ -5,6 +5,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
 #include <EASTL/unique_ptr.h>
+#include <EASTL/weak_ptr.h>
 
 #include "Component/Component.h"
 
@@ -19,7 +20,7 @@ public:
     // To make SUNSHINE_ENGINE_API work
 
     GameObject();
-    virtual ~GameObject();
+    virtual ~GameObject() = default;
     /*
     GameObject(GameObject&&) noexcept = default;
     GameObject& operator=(GameObject&&) noexcept = default;
@@ -30,15 +31,17 @@ public:
     // ================
 
     template<typename T, typename... Args>
-    T& AddComponent(Args&&... args);
+    eastl::shared_ptr<T> AddComponent(Args&&... args);
+    //T& AddComponent(Args&&... args);
 
     template<typename T>
     bool HasComponent() const;
 
     template<typename T>
-    T& GetComponent();
+    eastl::shared_ptr<T> GetComponent();
+    //T& GetComponent();
 
-    virtual void Tick(float deltaTime) = 0;
+    virtual void Update(float deltaTime) {};
 
 protected:
     eastl::unique_ptr<GameObjectImpl> impl;
@@ -46,15 +49,14 @@ protected:
 
 class GameObjectImpl {
 public:
-    eastl::vector<eastl::unique_ptr<Component>> components;
+    eastl::vector<eastl::shared_ptr<Component>> components;
 };
 
 template<typename T, typename... Args>
-T& GameObject::AddComponent(Args&&... args) {
-    auto component = eastl::make_unique<T>(eastl::forward<Args>(args)...);
-    T& ref = *component;
-    impl->components.emplace_back(eastl::move(component));
-    return ref;
+eastl::shared_ptr<T> GameObject::AddComponent(Args&&... args) {
+    auto component = eastl::make_shared<T>(eastl::forward<Args>(args)...);
+    impl->components.emplace_back(component);
+    return component;
 }
 
 template<typename T>
@@ -66,10 +68,10 @@ bool GameObject::HasComponent() const {
 }
 
 template<typename T>
-T& GameObject::GetComponent() {
+eastl::shared_ptr<T> GameObject::GetComponent() {
     for (auto& comp : impl->components) {
         if (typeid(T) == comp->getType()) {
-            return *static_cast<T*>(comp.get());
+            return eastl::static_pointer_cast<T>(comp);
         }
     }
     // assert(false, "Component not found");

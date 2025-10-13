@@ -1,3 +1,0 @@
-
-
-#include "RenderingSystem/GBuffer.h"

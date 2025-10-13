@@ -4,7 +4,7 @@
 
 #include <d3d11.h>
 #include <directxmath.h>
-#include "GraphicsUtils/SceneNode.h"
+//#include "GraphicsUtils/SceneNode.h"
 #include "GraphicsUtils/CommonVertex.h"
 
 DirectX::XMVECTOR NormalizeHomogeneousVector(DirectX::XMVECTOR vec);

@@ -1,3 +1,0 @@
-
-
-#include "LightObjects/LightObject.h"

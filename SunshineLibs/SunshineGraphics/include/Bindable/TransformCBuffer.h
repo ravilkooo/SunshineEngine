@@ -5,10 +5,12 @@
 #include <directxmath.h>
 #include "Bindable.h"
 #include "ConstantBuffer.h"
-#include "GraphicsUtils/Drawable.h"
+#include "GraphicsUtils/Transformable.h"
 
 namespace Bind
 {
+	class TransformComponent;
+
 	class TransformCBuffer : public Bindable
 	{
 	protected:
@@ -16,14 +18,14 @@ namespace Bind
 		{
 			DirectX::XMMATRIX wMat;
 			DirectX::XMMATRIX wMatInvTranspose;
-			DirectX::XMMATRIX viewProj;
+			//DirectX::XMMATRIX viewProj;
 		};
 	public:
-		TransformCBuffer(ID3D11Device* device, Drawable* parent, UINT slot = 0u);
+		TransformCBuffer(ID3D11Device* device, Transformable* parent, UINT slot = 0u);
 		void Bind(ID3D11DeviceContext* context) noexcept override;
 	private:
 		// static
 		VertexConstantBuffer<Transforms>* pVcbuf;
-		Drawable* pParent = nullptr;
+		Transformable* pParent = nullptr;
 	};
 }

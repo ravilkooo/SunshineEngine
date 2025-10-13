@@ -6,10 +6,10 @@
 #include "Topology.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "TextureB.h"
-#include "VertexShader.h"
+#include "GraphicsResources/Texture.h"
+#include "GraphicsResources/VertexShader.h"
 #include "InputLayout.h"
-#include "PixelShader.h"
+#include "GraphicsResources/PixelShader.h"
 #include "TransformCBuffer.h"
 #include "ConstantBuffer.h"
 #include "Rasterizer.h"
@@ -26,7 +26,7 @@ Bindables tips
 	1) Topology
 	2) VertexBuffer
 	3) IndexBuffer
-	4) TextureB
+	4) Texture
 	5) VertexShader
 	6) InputLayout
 	7) PixelShader
