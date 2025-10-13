@@ -1,13 +1,13 @@
 #pragma once
 
 #include <Game.h>
-#include <RenderingSystem/DeferredRenderer.h>
-#include <RenderingSystem/GBufferPass.h>
-#include <RenderingSystem/LightPass.h>
-#include <RenderingSystem/MainColorPass.h>
+#include <Graphics/DeferredRenderer.h>
+#include <Graphics/GPass.h>
+#include <Graphics/LightPass.h>
+#include <Graphics/MainColorPass.h>
 
-#include <LightObjects/LightCollection.h>
-#include <GraphicsUtils/FullScreenQuad.h>
+#include <Graphics/Lighting/LightCollection.h>
+#include <Graphics/FullScreenQuad.h>
 
 #include "TestCube.h"
 #include <GameObject.h>
@@ -26,7 +26,7 @@ class MyGo : public GameObject {
 public:
     MyGo() {};
 
-    void Tick(float deltaTime) override {
+    void Update(float deltaTime) override {
         return;
     }
 };

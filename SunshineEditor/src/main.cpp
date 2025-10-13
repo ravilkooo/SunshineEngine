@@ -135,8 +135,9 @@ int lua_test() {
     luaL_openlibs(L);                  // open standard libraries
 
     // run a Lua script file
-    std::wstring script = ENGINE_ASSETS_DIR;
+    eastl::wstring script = ENGINE_ASSETS_DIR;
     script = script + L"Scripts/test.lua";
+    
 
     if (luaL_dofile(L, std::string(script.begin(), script.end()).c_str()) != LUA_OK) {
         std::cerr << "Error running Lua script: " << lua_tostring(L, -1) << std::endl;

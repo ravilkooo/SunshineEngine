@@ -6,20 +6,14 @@
 class Component
 {
 public:
-    virtual ~Component() = default;
-
-    virtual const std::type_info& getType() const = 0;
-
-    // ================
-    // To make SUNSHINE_ENGINE_API work
-
-    /*
     Component() = default;
-    Component(Component&&) noexcept = default;
-    Component& operator=(Component&&) noexcept = default;
+    virtual ~Component() = default;
 
     Component(const Component&) = delete;
     Component& operator=(const Component&) = delete;
-    */
-    // ================
+
+    Component(Component&&) noexcept = default;
+    Component& operator=(Component&&) noexcept = default;
+
+    virtual const std::type_info& getType() const = 0;
 };

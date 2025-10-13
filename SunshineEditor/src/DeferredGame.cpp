@@ -33,33 +33,31 @@ DeferredGame::DeferredGame()
 
 	scene = Scene();
 
-	physEngine = new PhysicsEngine(&scene);
-
 	displayWindow = DisplayWindow(this, applicationName, hInstance,
 		winWidth, winHeight, WndProcImGui);
 
 	renderer = new DeferredRenderer(displayWindow.hWnd, winWidth, winHeight);
 
-	// GBufferPass
-	GBufferPass* gBufferPass;
+	// GPass
+	GPass* gPass;
 	{
-		gBufferPass = new GBufferPass(renderer->GetDevice(), renderer->GetDeviceContext(),
+		gPass = new GPass(renderer->GetDevice(), renderer->GetDeviceContext(),
 			renderer->GetBackBuffer(), winWidth, winHeight);
 
-		renderer->SetMainCamera(gBufferPass->GetCamera());
+		renderer->SetMainCamera(gPass->GetCamera());
 		renderer->mainCamera->SetPosition({ 0, 0, -10 });
 
-		renderer->AddPass(gBufferPass);
+		renderer->AddPass(gPass);
 	}
 	{
 		gLightPass = new LightPass(renderer->GetDevice(), renderer->GetDeviceContext(),
-			renderer->GetBackBuffer(), winWidth, winHeight, gBufferPass->pGBuffer, gBufferPass->GetCamera());
+			renderer->GetBackBuffer(), winWidth, winHeight, gPass->pGBuffer, gPass->GetCamera());
 
 
-		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pNormalSRV.Get(), 0u));
-		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pAlbedoSRV.Get(), 1u));
-		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pSpecularSRV.Get(), 2u));
-		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pWorldPosSRV.Get(), 3u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pNormalSRV.Get(), 0u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pAlbedoSRV.Get(), 1u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pSpecularSRV.Get(), 2u));
+		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pWorldPosSRV.Get(), 3u));
 
 		// Usual sampler for all SRV
 		D3D11_SAMPLER_DESC samplerDesc;
@@ -88,7 +86,7 @@ DeferredGame::DeferredGame()
 
 		colorPass->SetCamera(renderer->GetMainCamera());
 
-		colorPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gBufferPass->pGBuffer->pLightSRV.Get(), 0u));
+		colorPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pLightSRV.Get(), 0u));
 
 		// Usual sampler for all SRV
 		D3D11_SAMPLER_DESC samplerDesc;
@@ -110,7 +108,7 @@ DeferredGame::DeferredGame()
 
 		renderer->AddPass(colorPass);
 	}
-
+	/*
 	TestCube* _tc = new TestCube(renderer->GetDevice(), 0.2, 0.2, 0.2, { 0,0,0 }, { 1,0,0,1 });
 	_tc->SetInitTransform(Matrix::CreateFromYawPitchRoll(XM_PIDIV4, XM_PIDIV4, 0));
 	scene.AddNode(_tc);
@@ -154,6 +152,7 @@ DeferredGame::DeferredGame()
 	for (SceneNode* node : scene.nodes) {
 		node->camera = renderer->GetMainCamera();
 	}
+	*/
 
 	//Matrix::CreateFromQuaternion(Quaternion::FromToRotation({ 0,1,0 }, { 0,0,1 }));
 	Vector3 emitDir = { 0,0,1 };
@@ -217,40 +216,42 @@ DeferredGame::DeferredGame()
 	gobj = eastl::make_unique<MyGo>();
 
 	gobj->AddComponent<TransformComponent>(renderer->GetDevice());
-	auto& rc = gobj->AddComponent<RenderComponent>();
+	auto rc = gobj->AddComponent<RenderComponent>();
 
-	RenderTechnique* gBufferTech = new RenderTechnique("GBufferPass");
-	gBufferTech->mesh = std::make_shared<Mesh>(renderer->GetDevice(), "");
+	RenderTechnique* gBufferTech = new RenderTechnique("GPass");
+	gBufferTech->mesh = eastl::make_shared<Mesh>(renderer->GetDevice(), "");
 
 	wchar_t filePath[200] = EDITOR_ASSETS_DIR;
 	wcsncat(filePath, L"Shaders/GBufferShaderVS.hlsl", 30);
-	gBufferTech->vertexShader = std::make_shared<Bind::VertexShader>(renderer->GetDevice(), filePath);
+	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(renderer->GetDevice(), filePath);
 
 	wchar_t psFilePath[200] = EDITOR_ASSETS_DIR;
 	wcsncat(psFilePath, L"Shaders/GBufferTextureShaderPS.hlsl", 36);
-	gBufferTech->pixelShader = std::make_shared<Bind::PixelShader>(renderer->GetDevice(), psFilePath);
+	gBufferTech->pixelShader = eastl::make_shared<Bind::PixelShader>(renderer->GetDevice(), psFilePath);
 
-	//gBufferTech->texture = std::make_shared<Bind::Texture>(renderer->GetDevice(), SE_Color(10, 250, 243));
+	//gBufferTech->texture = eastl::make_shared<Bind::Texture>(renderer->GetDevice(), SE_Color(10, 250, 243));
 
 	ws = std::wstring(EDITOR_ASSETS_DIR) + L"bubble24bpp.dds";
 	std::string textureStr = std::string(ws.begin(), ws.end());
 
-	gBufferTech->texture = std::make_shared<Bind::Texture>(
+	gBufferTech->texture = eastl::make_shared<Bind::Texture>(
 		renderer->GetDevice(),
 		textureStr,
 		0u,
 		Bind::PipelineStage::PIXEL_SHADER
 	);
 
-	gBufferTech->textureSampler = std::make_shared<Bind::Sampler>(
+	gBufferTech->textureSampler = eastl::make_shared<Bind::Sampler>(
 		renderer->GetDevice(),
 		CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
 		0u,
 		Bind::PipelineStage::PIXEL_SHADER
 	);
 
-	rc.techniques.insert({ "GBufferPass", gBufferTech });
-	
+	auto p = eastl::make_pair(eastl::string("GPass"), gBufferTech);
+	rc->techniques.insert(eastl::move(p));
+
+	scene.AddGameObject(eastl::move(gobj));
 
 }
 
@@ -264,6 +265,7 @@ DeferredGame::~DeferredGame()
 
 void DeferredGame::Update(float deltaTime)
 {
+	/*
 	// particle test
 	gLightPass->particleSystems[0]->SetEmitDir(_dl_1->directionalLightData.Direction);
 	gLightPass->particleSystems[0]->Update(deltaTime);
@@ -275,7 +277,9 @@ void DeferredGame::Update(float deltaTime)
 	_sl_1->spotLightData.Spot = 15 + 10 * sin(10*currTime);
 	_dl_1->directionalLightData.Direction = Vector3::Transform(_dl_1->directionalLightData.Direction, Matrix::CreateRotationY(5*deltaTime));
 	physEngine->Update(deltaTime);
+	*/
 
+	/*
 	auto gobj_tr = gobj->GetComponent<TransformComponent>();
 	auto gobj_pos = gobj_tr.m_position;
 	
@@ -283,9 +287,8 @@ void DeferredGame::Update(float deltaTime)
 
 	std::cout << gobj_pos.x << ", " << gobj_pos.y << ", " << gobj_pos.z << ", " << " and \t\t\t";
 	std::cout << renderer->GetMainCamera()->GetPosition().z << "\n";
+	*/
 
-	
-	
 	//renderer->mainCamera->RotateYaw(deltaTime);
 	//renderer->mainCamera->MoveLeft(3*deltaTime);
 }
@@ -314,11 +317,6 @@ void DeferredGame::Render()
 	RenderPass* pass = renderer->passes[0];
 	pass->StartFrame();
 	pass->Pass(scene);
-
-	gobj->GetComponent<TransformComponent>().BindToGraphicsPipeline(renderer->GetDeviceContext());
-	gobj->GetComponent<RenderComponent>().PassTechnique("GBufferPass", renderer->GetDeviceContext());
-	gobj->GetComponent<RenderComponent>().DrawTechnique("GBufferPass", renderer->GetDeviceContext());
-
 	pass->EndFrame();
 
 

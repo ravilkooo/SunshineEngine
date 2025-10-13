@@ -6,7 +6,7 @@
 #include <EASTL/map.h>
 #include <EASTL/unique_ptr.h>
 
-#include <RenderingSystem/RenderTechnique.h>
+#include <Graphics/RenderTechnique.h>
 #include <Bindable/Bindable.h>
 
 #include "Component.h"
@@ -15,15 +15,20 @@ class RenderComponent :
     public Component
 {
 public:
-    RenderComponent() {};
-
+    RenderComponent() = default;
     ~RenderComponent() = default;
+
+    RenderComponent(const RenderComponent&) = delete;
+    RenderComponent& operator=(const RenderComponent&) = delete;
+
+    RenderComponent(RenderComponent&&) noexcept = default;
+    RenderComponent& operator=(RenderComponent&&) noexcept = default;
 
     //void Render(ID3D11DeviceContext* context);
 
-    virtual void DrawTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) const noexcept;
-
     bool HasTechnique(eastl::string technique);
+
+    virtual void DrawTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) const noexcept;
 
     void PassTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 

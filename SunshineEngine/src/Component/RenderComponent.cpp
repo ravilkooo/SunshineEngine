@@ -2,7 +2,7 @@
 
 void RenderComponent::DrawTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) const noexcept
 {
-	techniques.at(technique)->DrawTechnique(context);
+	 techniques.at(technique)->DrawTechnique(context);
 }
 bool RenderComponent::HasTechnique(eastl::string technique)
 {
