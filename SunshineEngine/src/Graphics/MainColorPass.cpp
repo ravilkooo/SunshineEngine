@@ -1,9 +1,9 @@
 #include "Graphics/MainColorPass.h"
 
-MainColorPass::MainColorPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
+FinalPass::FinalPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
 	UINT screenWidth, UINT screenHeight)
 	:
-	RenderPass("MainColorPass", device, context)
+	RenderPass("FinalPass", device, context)
 {
 	this->backBuffer = backBuffer;
 	this->screenWidth = screenWidth;
@@ -43,10 +43,10 @@ MainColorPass::MainColorPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	viewport.MinDepth = 0;
 	viewport.MaxDepth = 1.0f;
 
-	camera = new Camera(device, screenWidth * 1.0f / screenHeight);
+	camera = eastl::make_shared<Camera>(device, screenWidth * 1.0f / screenHeight);
 }
 
-void MainColorPass::StartFrame()
+void FinalPass::StartFrame()
 {
 	context->OMSetRenderTargets(1u, &renderTargetView, pDSV);
 	float color[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -58,17 +58,17 @@ void MainColorPass::StartFrame()
 	camera->BindBuffer(context.Get());
 }
 
-Camera* MainColorPass::GetCamera()
+eastl::shared_ptr<Camera> FinalPass::GetCamera()
 {
 	return camera;
 }
 
-void MainColorPass::SetCamera(Camera* camera)
+void FinalPass::SetCamera(eastl::shared_ptr<Camera> camera)
 {
 	this->camera = camera;
 }
 
-void MainColorPass::EndFrame()
+void FinalPass::EndFrame()
 {
 	ID3D11ShaderResourceView* nullSRVs[] = { nullptr };
 	context->PSSetShaderResources(0, 1, nullSRVs);

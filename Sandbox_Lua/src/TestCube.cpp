@@ -90,10 +90,10 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
 
         techniñs.insert({ "GPass", gPass });
     }
-    // MainColorPass
+    // FinalPass
     /*
     {
-        RenderTechnique* colorPass = new RenderTechnique("MainColorPass");
+        RenderTechnique* colorPass = new RenderTechnique("FinalPass");
         colorPass->AddBind(new Bind::Topology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
         colorPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
         // AddStaticBind(texture);
@@ -127,7 +127,7 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
         colorPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
         colorPass->AddBind(new Bind::TransformCBuffer(device, this, 0u));
 
-        techniñs.insert({ "MainColorPass", colorPass });
+        techniñs.insert({ "FinalPass", colorPass });
     }
     */
 

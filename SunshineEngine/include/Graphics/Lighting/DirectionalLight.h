@@ -6,40 +6,41 @@
 #include <GraphicsResources/VertexShader.h>
 #include "GameObject.h"
 
-namespace DXSM = DirectX::SimpleMath;
-
-// : public GameObject
-
 #include "LightObject.h"
+#include "LightData.h"
+
+namespace DXSM = DirectX::SimpleMath;
 
 class DirectionalLight :
     public LightObject
 {
-    /*
 public:
-    DirectionalLight(ID3D11Device* device, Vector3 position, Vector3 direction, Vector4 ambient, Vector4 diffuse, Vector4 specular);
 
-    struct DirectionalLightPCB {
-        XMFLOAT4 Diffuse;
-        XMFLOAT4 Specular;
-        XMFLOAT3 Position;
-        float pad1;
+    DirectionalLightData directionalLightData;
 
-        XMFLOAT3 Direction;
-        float pad2;
-    } directionalLightData;
+    DirectionalLight(ID3D11Device* device,
+        DirectionalLightData directionalLightData =
+        {
+            DXSM::Vector4::One,
+            DXSM::Vector4::One,
+            DXSM::Vector3::Zero, 0,
+            DXSM::Vector3::One, 0
+        });
 
+    // LightPosition GetLightPositionInFrustum(Camera* camera) override;
+    // bool IsFrustumInsideOfLight(Camera* camera) override;
+
+    // Unnecessary?
+    //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+
+    /*
     Vector4 ambient;
 
     Bind::PixelConstantBuffer<DirectionalLightPCB>* directionalLightPBuffer;
 
-    D3D11_DEPTH_STENCIL_DESC GetDepthStencilDesc(LightObject::LightPosition lightPos) override;
+    D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos) override;
     D3D11_RASTERIZER_DESC GetRasterizerDesc(LightObject::LightPosition lightPos) override;
 
-    LightPosition GetLightPositionInFrustum(Camera* camera) override;
-    bool IsFrustumInsideOfLight(Camera* camera) override;
-
-    void UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
     */
 };
 

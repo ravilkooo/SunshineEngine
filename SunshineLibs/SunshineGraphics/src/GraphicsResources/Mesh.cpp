@@ -8,58 +8,31 @@ using namespace DirectX::SimpleMath;
 
 Mesh::Mesh(ID3D11Device* device, const std::string& path)
 {
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
+    eastl::vector<Vertex> vertices;
+    eastl::vector<uint32_t> indices;
 
     UINT attrFlags = VertexAttributesFlags::POSITION | VertexAttributesFlags::UV | VertexAttributesFlags::NORMAL;
 
-    if (!LoadModel(vertices, indices, path, attrFlags)) {
-        CreateUnwrappedCubeMesh_repeat(vertices, indices);
-        //CreateUnwrappedCubeMesh(vertices, indices);
+    if (path == "CubeMesh") {
+        CreateUnwrappedCubeMesh(vertices, indices);
+        m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
-        
+    else if (path == "CubeMesh_repeat") {
+        CreateUnwrappedCubeMesh_repeat(vertices, indices);
+        m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    }
+    else if (path == "ScreenAlignedQuad") {
+        CreateScreenAlignedQuad(vertices, indices);
+        m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    }
+    else if (!LoadModel(vertices, indices, path, attrFlags)) {
+        CreateUnwrappedCubeMesh_repeat(vertices, indices);
+        m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    }
+
     m_indexCount = static_cast<UINT>(indices.size());
-
-    D3D11_BUFFER_DESC vbd = {};
-    vbd.Usage = D3D11_USAGE_DEFAULT;
-    vbd.ByteWidth = UINT(sizeof(Vertex) * vertices.size());
-    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    vbd.CPUAccessFlags = 0;
-    vbd.MiscFlags = 0;
-
-    D3D11_SUBRESOURCE_DATA vinitData = {};
-    vinitData.pSysMem = vertices.data();
-
-    HRESULT hr = device->CreateBuffer(&vbd, &vinitData, m_vertexBuffer.GetAddressOf());
-    if (FAILED(hr))
-        throw std::runtime_error("Failed to create vertex buffer");
-
-    D3D11_BUFFER_DESC ibd = {};
-    ibd.Usage = D3D11_USAGE_DEFAULT;
-    ibd.ByteWidth = UINT(sizeof(uint32_t) * indices.size());
-    ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    ibd.CPUAccessFlags = 0;
-    ibd.MiscFlags = 0;
-
-    D3D11_SUBRESOURCE_DATA iinitData = {};
-    iinitData.pSysMem = indices.data();
-
-    hr = device->CreateBuffer(&ibd, &iinitData, m_indexBuffer.GetAddressOf());
-    if (FAILED(hr))
-        throw std::runtime_error("Failed to create index buffer");
-
-    D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
-    rastDesc.CullMode = D3D11_CULL_BACK;
-    rastDesc.FillMode = D3D11_FILL_SOLID;
-    device->CreateRasterizerState(&rastDesc, &m_rasterizer);
-
-
-    D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT{});
-    dsDesc.DepthEnable = TRUE;
-    // dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-    dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-    dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-    device->CreateDepthStencilState(&dsDesc, &m_depthState);
+    m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
+    m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), m_indexCount);
 
 }
 
@@ -68,7 +41,7 @@ Mesh::~Mesh()
     Release();
 }
 
-void Mesh::CreateUnwrappedCubeMesh(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
+void Mesh::CreateUnwrappedCubeMesh(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
 {
     // Развёртка "крестом" (UV-карта 3x4 квадрата, каждая грань в своём прямоугольнике)
     // Текстурные координаты (U, V) для каждой из 6 граней
@@ -151,7 +124,7 @@ void Mesh::CreateUnwrappedCubeMesh(std::vector<Vertex>& vertices, std::vector<ui
     }
 }
 
-void Mesh::CreateUnwrappedCubeMesh_repeat(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
+void Mesh::CreateUnwrappedCubeMesh_repeat(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
 {
     // Развёртка "крестом" (UV-карта 3x4 квадрата, каждая грань в своём прямоугольнике)
     // Текстурные координаты (U, V) для каждой из 6 граней
@@ -213,8 +186,18 @@ void Mesh::CreateUnwrappedCubeMesh_repeat(std::vector<Vertex>& vertices, std::ve
     }
 }
 
-bool Mesh::LoadModel(std::vector<Vertex>& vertices,
-    std::vector<uint32_t>& indices,
+void Mesh::CreateScreenAlignedQuad(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
+{
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(2);
+    indices.push_back(3);
+
+    vertices.reserve(0);
+}
+
+bool Mesh::LoadModel(eastl::vector<Vertex>& vertices,
+    eastl::vector<uint32_t>& indices,
     const std::string& path, UINT attrFlags)
 {
     Assimp::Importer importer;
@@ -287,22 +270,20 @@ bool Mesh::LoadModel(std::vector<Vertex>& vertices,
 
 void Mesh::Draw(ID3D11DeviceContext* context) const
 {
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
-    context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
-    context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    context->RSSetState(m_rasterizer.Get());
-    context->OMSetDepthStencilState(m_depthState.Get(), 0);
+    //UINT stride = sizeof(Vertex);
+    //UINT offset = 0;
+    //context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
+    //context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+    m_vertexBuffer->Bind(context);
+    m_indexBuffer->Bind(context);
+    m_topology->Bind(context);
 
     context->DrawIndexed(m_indexCount, 0, 0);
 }
 
 void Mesh::Release()
 {
-    m_vertexBuffer.ReleaseAndGetAddressOf();
-    m_indexBuffer.ReleaseAndGetAddressOf();
-    m_rasterizer.ReleaseAndGetAddressOf();
-    m_depthState.ReleaseAndGetAddressOf();
+    //m_vertexBuffer.ReleaseAndGetAddressOf();
+    //m_indexBuffer.ReleaseAndGetAddressOf();
     m_indexCount = 0;
 }

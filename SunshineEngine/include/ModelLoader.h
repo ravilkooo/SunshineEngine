@@ -8,10 +8,11 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "GraphicsUtils/SceneNode.h"
+// #include "GraphicsUtils/SceneNode.h"
 
 class ModelLoader
 {
+    /*
 public:
     enum VertexAttrFlags : UINT {
         POSITION = 0x1,
@@ -23,4 +24,5 @@ public:
     // void ProcessNode(aiNode* node, const aiScene* scene, SceneNode* parent);
 
     // void ProcessMesh(aiMesh* mesh, const aiScene* scene, SceneNode* meshNode)
+    */
 };

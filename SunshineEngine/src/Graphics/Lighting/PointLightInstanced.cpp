@@ -184,7 +184,7 @@ PointLightInstanced::PointLightInstanced(ID3D11Device* device, UINT lightsCnt,
     device->CreateBuffer(&cbd, nullptr, &pPointLightConstBufferData);
 }
 
-D3D11_DEPTH_STENCIL_DESC PointLightInstanced::GetDepthStencilDesc(LightObject::LightPosition lightPos)
+D3D11_DEPTH_STENCIL_DESC PointLightInstanced::ChooseDepthStencilState(LightObject::LightPosition lightPos)
 {
     D3D11_DEPTH_STENCIL_DESC dsDesc = {};
     dsDesc.DepthEnable = TRUE;

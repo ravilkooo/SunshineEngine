@@ -156,7 +156,7 @@ GPass::GPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D
 	viewport.MinDepth = 0;
 	viewport.MaxDepth = 1.0f;
 
-	camera = new Camera(device, screenWidth * 1.0f / screenHeight);
+	camera = eastl::make_shared<Camera>(device, screenWidth * 1.0f / screenHeight);
 }
 
 void GPass::StartFrame()
@@ -191,18 +191,17 @@ void GPass::Pass(const Scene& scene)
 				continue;
 
 			gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
-			renderComponent->PassTechnique(techniqueTag, GetDeviceContext());
-			renderComponent->DrawTechnique(techniqueTag, GetDeviceContext());
+			renderComponent->PassTechnique(techniqueTag, GetDeviceContext()); // Bind + Draw
 		}
 	}
 }
 
-Camera* GPass::GetCamera()
+eastl::shared_ptr<Camera> GPass::GetCamera()
 {
 	return camera;
 }
 
-void GPass::SetCamera(Camera* camera)
+void GPass::SetCamera(eastl::shared_ptr<Camera> camera)
 {
 	this->camera = camera;
 }

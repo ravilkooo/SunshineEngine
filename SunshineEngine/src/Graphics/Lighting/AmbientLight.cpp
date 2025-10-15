@@ -1,5 +1,14 @@
 #include "Graphics/Lighting/AmbientLight.h"
-#include "Utils/wcharUtils.h"
+
+AmbientLight::AmbientLight(AmbientLightData initData)
+{
+    ambientLightData = initData;
+}
+
+//void AmbientLight::UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+//{
+//    //ambientLightPBuffer->Update(context.Get(), ambientLightData);
+//}
 
 /*
 AmbientLight::AmbientLight(ID3D11Device* device, DXSM::Vector4 ambient)
@@ -41,7 +50,7 @@ AmbientLight::AmbientLight(ID3D11Device* device, DXSM::Vector4 ambient)
     }
 }
 
-D3D11_DEPTH_STENCIL_DESC AmbientLight::GetDepthStencilDesc(LightObject::LightPosition lightPos)
+D3D11_DEPTH_STENCIL_DESC AmbientLight::ChooseDepthStencilState(LightObject::LightPosition lightPos)
 {
     D3D11_DEPTH_STENCIL_DESC dsDesc = {};
     dsDesc.DepthEnable = TRUE;
@@ -56,20 +65,5 @@ D3D11_RASTERIZER_DESC AmbientLight::GetRasterizerDesc(LightObject::LightPosition
     rasterDesc.CullMode = D3D11_CULL_NONE;
     rasterDesc.FillMode = D3D11_FILL_SOLID;
     return rasterDesc;
-}
-
-LightObject::LightPosition AmbientLight::GetLightPositionInFrustum(Camera* camera)
-{
-    return LightPosition::FILL;
-}
-
-bool AmbientLight::IsFrustumInsideOfLight(Camera* camera)
-{
-    return true;
-}
-
-void AmbientLight::UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
-{
-    ambientLightPBuffer->Update(context.Get(), ambientLightData);
 }
 */

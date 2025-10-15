@@ -79,9 +79,9 @@ DeferredGame::DeferredGame()
 
 		renderer->AddPass(gLightPass);
 	}
-	// MainColorPass
+	// FinalPass
 	{
-		MainColorPass* colorPass = new MainColorPass(renderer->GetDevice(), renderer->GetDeviceContext(),
+		FinalPass* colorPass = new FinalPass(renderer->GetDevice(), renderer->GetDeviceContext(),
 			renderer->GetBackBuffer(), winWidth, winHeight);
 
 		colorPass->SetCamera(renderer->GetMainCamera());
@@ -189,11 +189,10 @@ DeferredGame::DeferredGame()
 		new Bind::BlendState(renderer->GetDevice(), particleBlendDesc, particleBlendFactor, sampleMask));
 
 	//new Bind::Texture(device, "bubbleBC7.dds", aiTextureType_DIFFUSE, 0u);
-
-	std::wstring ws = std::wstring(EDITOR_ASSETS_DIR) + L"bubble24bpp.dds";
-
+	
 	gLightPass->particleSystems[0]->SetTexture(
-		new Bind::Texture(renderer->GetDevice(), std::string(ws.begin(), ws.end()), 0u));
+		new Bind::Texture(renderer->GetDevice(),
+		JoinWchar_Wstring(EDITOR_ASSETS_DIR, L"bubble24bpp.dds")));
 
 
 	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &DeferredGame::HandleKeyDown);
@@ -213,45 +212,12 @@ DeferredGame::DeferredGame()
 	ShowWindow(displayWindow.hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(displayWindow.hWnd);
 
-	gobj = eastl::make_unique<MyGo>();
+	auto factory = GameObjectFactory();
+	defaultGameObject = factory.CreateDefaultGameObject(renderer->GetDevice());
+	scene.AddGameObject(eastl::move(defaultGameObject));
 
-	gobj->AddComponent<TransformComponent>(renderer->GetDevice());
-	auto rc = gobj->AddComponent<RenderComponent>();
-
-	RenderTechnique* gBufferTech = new RenderTechnique("GPass");
-	gBufferTech->mesh = eastl::make_shared<Mesh>(renderer->GetDevice(), "");
-
-	wchar_t filePath[200] = EDITOR_ASSETS_DIR;
-	wcsncat(filePath, L"Shaders/GBufferShaderVS.hlsl", 30);
-	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(renderer->GetDevice(), filePath);
-
-	wchar_t psFilePath[200] = EDITOR_ASSETS_DIR;
-	wcsncat(psFilePath, L"Shaders/GBufferTextureShaderPS.hlsl", 36);
-	gBufferTech->pixelShader = eastl::make_shared<Bind::PixelShader>(renderer->GetDevice(), psFilePath);
-
-	//gBufferTech->texture = eastl::make_shared<Bind::Texture>(renderer->GetDevice(), SE_Color(10, 250, 243));
-
-	ws = std::wstring(EDITOR_ASSETS_DIR) + L"bubble24bpp.dds";
-	std::string textureStr = std::string(ws.begin(), ws.end());
-
-	gBufferTech->texture = eastl::make_shared<Bind::Texture>(
-		renderer->GetDevice(),
-		textureStr,
-		0u,
-		Bind::PipelineStage::PIXEL_SHADER
-	);
-
-	gBufferTech->textureSampler = eastl::make_shared<Bind::Sampler>(
-		renderer->GetDevice(),
-		CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
-		0u,
-		Bind::PipelineStage::PIXEL_SHADER
-	);
-
-	auto p = eastl::make_pair(eastl::string("GPass"), gBufferTech);
-	rc->techniques.insert(eastl::move(p));
-
-	scene.AddGameObject(eastl::move(gobj));
+	scene.AddGameObject(eastl::move(factory.CreateAmbientLightObject(renderer->GetDevice(), renderer->GetMainCamera())));
+	scene.AddGameObject(eastl::move(factory.CreateFinalPassQuad(renderer->GetDevice())));
 
 }
 
@@ -263,7 +229,7 @@ DeferredGame::~DeferredGame()
 	ImGui::DestroyContext();
 }
 
-void DeferredGame::Update(float deltaTime)
+void DeferredGame::Update(float deltaTime) 
 {
 	/*
 	// particle test
@@ -277,17 +243,12 @@ void DeferredGame::Update(float deltaTime)
 	_sl_1->spotLightData.Spot = 15 + 10 * sin(10*currTime);
 	_dl_1->directionalLightData.Direction = Vector3::Transform(_dl_1->directionalLightData.Direction, Matrix::CreateRotationY(5*deltaTime));
 	physEngine->Update(deltaTime);
-	*/
+	*/;
 
-	/*
-	auto gobj_tr = gobj->GetComponent<TransformComponent>();
-	auto gobj_pos = gobj_tr.m_position;
-	
-	gobj->GetComponent<TransformComponent>().m_localRotation.y += deltaTime;
+	scene.gameObjects[0]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
 
-	std::cout << gobj_pos.x << ", " << gobj_pos.y << ", " << gobj_pos.z << ", " << " and \t\t\t";
-	std::cout << renderer->GetMainCamera()->GetPosition().z << "\n";
-	*/
+	//std::cout << gobj_pos.x << ", " << gobj_pos.y << ", " << gobj_pos.z << ", " << " and \t\t\t";
+	//std::cout << renderer->GetMainCamera()->GetPosition().z << "\n";
 
 	//renderer->mainCamera->RotateYaw(deltaTime);
 	//renderer->mainCamera->MoveLeft(3*deltaTime);
@@ -310,18 +271,9 @@ void DeferredGame::Render()
 
 	// Rendering
 	ImGui::Render();
-	//renderer->RenderScene(scene);
 	
 	// Passes
-	renderer->GetDeviceContext()->ClearState();
-	RenderPass* pass = renderer->passes[0];
-	pass->StartFrame();
-	pass->Pass(scene);
-	pass->EndFrame();
-
-
-	//for (RenderPass* pass : renderer->passes) {
-	for (int i = 1; i < renderer->passes.size() - 1; i++) {
+	for (int i = 0; i < renderer->passes.size() - 1; i++) {
 		renderer->GetDeviceContext()->ClearState();
 		RenderPass* pass = renderer->passes[i];
 		pass->StartFrame();
@@ -330,7 +282,7 @@ void DeferredGame::Render()
 	}
 
 	renderer->GetDeviceContext()->ClearState();
-	pass = renderer->passes.back();
+	RenderPass* pass = renderer->passes.back();
 	pass->StartFrame();
 	pass->Pass(scene);
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

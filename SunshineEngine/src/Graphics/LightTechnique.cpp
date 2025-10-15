@@ -1,0 +1,48 @@
+#include "Graphics/LightTechnique.h"
+
+template<class T>
+void LightTechnique<T>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+{
+	for (size_t i = 0; i < bindables.size(); i++)
+	{
+		bindables[i]->Bind(context.Get());
+	}
+
+	if (vertexShader) {
+		vertexShader->Bind(context.Get());
+	}
+
+	if (pixelShader) {
+		pixelShader->Bind(context.Get());
+	}
+
+	if (texture) {
+		texture->Bind(context.Get());
+	}
+
+	if (textureSampler) {
+		textureSampler->Bind(context.Get());
+	}
+
+	if (lightDataBuffer) {
+		lightDataBuffer->Bind(context.Get());
+	}
+
+	LightPosition lightPos = GetLightPositionInFrustum();
+	// Choose rasterizer
+	ChooseRasterizer(lightPos);
+	// Choose depthState
+	ChooseDepthStencilState(lightPos);
+
+	// Bind rasterizer
+	rasterizer->Bind(context.Get());
+	
+	// Bind depthState
+	depthStencilState->Bind(context.Get());
+}
+
+template <class T>
+LightTechnique<T>::LightTechnique(ID3D11Device* device, eastl::string technique)
+	: RenderTechnique(device, technique)
+{
+}

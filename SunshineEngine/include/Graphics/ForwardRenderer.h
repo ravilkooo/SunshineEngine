@@ -55,8 +55,8 @@ public:
 
     void AddPass(RenderPass* pass) override;
 
-    void SetMainCamera(Camera* camera);
-    Camera* GetMainCamera();
+    void SetMainCamera(eastl::shared_ptr<Camera> camera);
+    eastl::shared_ptr<Camera> GetMainCamera();
 };
 
 #endif // RENDERER_H

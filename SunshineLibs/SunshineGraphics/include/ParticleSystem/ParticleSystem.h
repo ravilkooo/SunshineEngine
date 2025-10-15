@@ -1,6 +1,7 @@
 #pragma once
 
 #include <EASTL/algorithm.h>
+#include <EASTL/shared_ptr.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <SimpleMath.h>
@@ -146,7 +147,7 @@ public:
     Microsoft::WRL::ComPtr<ID3D11Device>               m_d3dDevice;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext>        m_d3dContext;
 
-    Camera* camera;
+    eastl::shared_ptr<Camera> camera;
 
 private:
     struct DeadListCountConstantBuffer

@@ -151,7 +151,7 @@ SpotLight::SpotLight(ID3D11Device* device, DXSM::Vector3 position,
     }
 }
 
-D3D11_DEPTH_STENCIL_DESC SpotLight::GetDepthStencilDesc(LightObject::LightPosition lightPos)
+D3D11_DEPTH_STENCIL_DESC SpotLight::ChooseDepthStencilState(LightObject::LightPosition lightPos)
 {
     D3D11_DEPTH_STENCIL_DESC dsDesc = {};
     // hot fix

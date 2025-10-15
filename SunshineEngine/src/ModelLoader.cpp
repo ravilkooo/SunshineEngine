@@ -1,8 +1,9 @@
 
 
 // Model.cpp
-#include "Utils/ModelLoader.h"
+#include "ModelLoader.h"
 
+/*
 void ModelLoader::LoadModel(const std::string& path, SceneNode* rootNode, UINT attrFlags)
 {
 	Assimp::Importer importer;
@@ -82,13 +83,14 @@ void ModelLoader::LoadModel(const std::string& path, SceneNode* rootNode, UINT a
 
 		}
 	}
-	/*
-	if (pMesh->mTextureCoords[0] && (attrFlags & VertexAttrFlags::TEXTURE))
-	{
-		aiMaterial* material = pModel->mMaterials[pMesh->mMaterialIndex];
-		std::vector<Texture> diffuseTextures = rootNode->LoadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, pModel);
-		rootNode->textures.insert(rootNode->textures.end(), diffuseTextures.begin(), diffuseTextures.end());
-	}
-	*/
+
+	// if (pMesh->mTextureCoords[0] && (attrFlags & VertexAttrFlags::TEXTURE))
+	// {
+	// 	aiMaterial* material = pModel->mMaterials[pMesh->mMaterialIndex];
+	// 	std::vector<Texture> diffuseTextures = rootNode->LoadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, pModel);
+	// 	rootNode->textures.insert(rootNode->textures.end(), diffuseTextures.begin(), diffuseTextures.end());
+	// }
+
 	return;
 }
+*/

@@ -4,6 +4,8 @@
 #include <wrl.h>    
 #include <directxmath.h>
 
+#include <EASTL/shared_ptr.h>
+
 #include "Scene.h"
 #include "RenderPass.h"
 #include <GraphicsUtils/Camera.h>
@@ -20,15 +22,15 @@ public:
 		return;
 	};
 
-	virtual void SetMainCamera(Camera* camera) { this->mainCamera = camera; }
-	virtual Camera* GetMainCamera() { return mainCamera; };
+	virtual void SetMainCamera(eastl::shared_ptr<Camera> camera) { this->mainCamera = camera; }
+	virtual eastl::shared_ptr<Camera> GetMainCamera() { return mainCamera; };
 
 	ID3D11Texture2D* GetBackBuffer() { return backBuffer.Get(); }
 
 	virtual void AddPass(RenderPass* pass) = 0;
 
 	eastl::vector<RenderPass*> passes;
-	Camera* mainCamera;
+	eastl::shared_ptr<Camera> mainCamera;
 protected:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
 

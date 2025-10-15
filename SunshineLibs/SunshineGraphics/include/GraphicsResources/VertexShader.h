@@ -4,6 +4,7 @@
 
 #include "Bindable/Bindable.h"
 #include <d3dcompiler.h>
+#include <EASTL/string.h>
 
 namespace Bind
 {
@@ -12,7 +13,7 @@ namespace Bind
     {
     public:
         VertexShader() {};
-        VertexShader(ID3D11Device* device, std::string filePath) : VertexShader(device, std::wstring(filePath.begin(), filePath.end()).c_str()) {};
+        VertexShader(ID3D11Device* device, eastl::wstring filePath) : VertexShader(device, std::wstring(filePath.begin(), filePath.end()).c_str()) {};
         VertexShader(ID3D11Device* device, LPCWSTR filePath);
         ~VertexShader();
         void Release();
