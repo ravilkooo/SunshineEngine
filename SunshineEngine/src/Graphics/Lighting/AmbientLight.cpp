@@ -2,7 +2,7 @@
 
 AmbientLight::AmbientLight(AmbientLightData initData)
 {
-    ambientLightData = initData;
+    ambientLightData = eastl::make_shared<AmbientLightData>(initData);
 }
 
 //void AmbientLight::UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

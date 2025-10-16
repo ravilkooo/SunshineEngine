@@ -2,6 +2,11 @@
 #include "LightTechnique.h"
 #include "Graphics/Lighting/LightData.h"
 
+#include <SimpleMath.h>
+
+namespace DXSM = DirectX::SimpleMath;
+namespace DX = DirectX;
+
 class PointLightTechnique :
     public LightTechnique<PointLightData>
 {

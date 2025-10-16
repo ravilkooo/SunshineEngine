@@ -19,6 +19,8 @@
 #include <d3d11.h>
 #include <directxmath.h>
 
+#include <EASTL/shared_ptr.h>
+
 #include "GraphicsUtils/Camera.h"
 #include "LightData.h"
 
@@ -28,7 +30,7 @@ class PointLight :
     public LightObject
 {
 public:
-    PointLightData pointLightData;
+    eastl::shared_ptr<PointLightData> pointLightData;
 
     PointLight(
         PointLightData pointLightData =

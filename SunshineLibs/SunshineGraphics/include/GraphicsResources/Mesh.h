@@ -21,14 +21,15 @@
 #include "Bindable/IndexBuffer.h"
 #include "Bindable/Topology.h"
 
-using namespace DirectX::SimpleMath;
+namespace DXSM = DirectX::SimpleMath;
+namespace DX = DirectX;
 
 struct Vertex
 {
-    Vector3 position;
-    Vector4 color;
-    Vector2 texcoord;
-    Vector3 normal;
+    DXSM::Vector3 position;
+    DXSM::Vector4 color;
+    DXSM::Vector2 texcoord;
+    DXSM::Vector3 normal;
 };
 
 enum VertexAttributesFlags : UINT {
@@ -52,6 +53,13 @@ public:
         const std::string& path,
         UINT attrFlags = VertexAttributesFlags::POSITION);
 
+    static Vertex MidPoint(
+        const Vertex& v0, const Vertex& v1);
+
+    static void Subdivide(
+        eastl::vector<Vertex>& vertices,
+        eastl::vector<uint32_t>& indices);
+
     static void CreateUnwrappedCubeMesh(
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices);
@@ -59,6 +67,17 @@ public:
     static void CreateUnwrappedCubeMesh_repeat(
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices);
+
+    static void CreateSphereMesh(
+        eastl::vector<Vertex>& vertices,
+        eastl::vector<uint32_t>& indices,
+        float radius = 1.0f, uint32_t sliceCount=10, uint32_t stackCount=10);
+
+    static void CreateGeosphereMesh(
+        eastl::vector<Vertex>& vertices,
+        eastl::vector<uint32_t>& indices,
+        float radius = 1.0f,
+        UINT numSubdivisions = 6u);
 
     static void CreateScreenAlignedQuad(
         eastl::vector<Vertex>& vertices,

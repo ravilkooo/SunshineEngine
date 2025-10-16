@@ -9,7 +9,7 @@
 #include "Graphics/AmbientLightTechnique.h"
 #include "Graphics/PointLightTechnique.h"
 
-eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultGameObject(ID3D11Device* device)
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultCubeObject(ID3D11Device* device)
 {
     auto obj = eastl::make_unique<GameObject>();
     obj->AddComponent<TransformComponent>(device);
@@ -45,6 +45,42 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultGameObject(ID3D11D
     return obj;
 }
 
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(ID3D11Device* device)
+{
+	auto obj = eastl::make_unique<GameObject>();
+	obj->AddComponent<TransformComponent>(device);
+	auto rc = obj->AddComponent<RenderComponent>();
+
+	RenderTechnique* gBufferTech = new RenderTechnique(device, "GPass");
+	gBufferTech->mesh = eastl::make_shared<Mesh>(device, "Sphere");
+
+	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
+		device, MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassShaderVS.hlsl"));
+
+	gBufferTech->pixelShader = eastl::make_shared<Bind::PixelShader>(
+		device, MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassTextureShaderPS.hlsl"));
+
+	//gBufferTech->texture = eastl::make_shared<Bind::Texture>(device, SE_Color(10, 250, 243));
+	gBufferTech->texture = eastl::make_shared<Bind::Texture>(
+		device,
+		MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"),
+		0u,
+		Bind::PipelineStage::PIXEL_SHADER
+	);
+
+	gBufferTech->textureSampler = eastl::make_shared<Bind::Sampler>(
+		device,
+		CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
+		0u,
+		Bind::PipelineStage::PIXEL_SHADER
+	);
+
+	auto p = eastl::make_pair(eastl::string("GPass"), gBufferTech);
+	rc->techniques.insert(eastl::move(p));
+
+	return obj;
+}
+
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateFinalPassQuad(ID3D11Device* device)
 {
 	auto obj = eastl::make_unique<GameObject>();
@@ -66,19 +102,23 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateFinalPassQuad(ID3D11Devic
 	return obj;
 }
 
-eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(ID3D11Device* device, eastl::shared_ptr<Camera> camera)
+eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
+	ID3D11Device* device,
+	eastl::shared_ptr<Camera> camera,
+	AmbientLightData initData)
 {
-	auto obj = eastl::make_unique<AmbientLight>();
+	auto obj = eastl::make_unique<AmbientLight>(initData);
 	obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>();
 
 	// LightPass - LightTechnique
 	AmbientLightTechnique* lightTech = new AmbientLightTechnique(device, "LightPass");
 	
+	lightTech->lightData = obj->ambientLightData;
 	lightTech->lightDataBuffer =
 		eastl::make_shared<Bind::PixelConstantBuffer<AmbientLightData>>(
 			device,
-			obj->ambientLightData,
+			*(obj->ambientLightData),
 			1u
 	);
 
@@ -99,26 +139,32 @@ eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(ID3D
 	return obj;
 }
 
-eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(ID3D11Device* device, eastl::shared_ptr<Camera> camera)
+eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
+	ID3D11Device* device,
+	eastl::shared_ptr<Camera> camera,
+	PointLightData initData)
 {
-	auto obj = eastl::make_unique<PointLight>();
-	obj->AddComponent<TransformComponent>(device);
+	auto obj = eastl::make_unique<PointLight>(initData);
+	auto tc = obj->AddComponent<TransformComponent>(device);
+	tc->m_localScaleFactor = obj->pointLightData->Range * DXSM::Vector3::One;
+	tc->m_position = obj->pointLightData->Position;
 	auto rc = obj->AddComponent<RenderComponent>();
 
 	// LightPass - LightTechnique
 	PointLightTechnique* lightTech = new PointLightTechnique(device, "LightPass");
-
+	
+	lightTech->lightData = obj->pointLightData;
 	lightTech->lightDataBuffer =
 		eastl::make_shared<Bind::PixelConstantBuffer<PointLightData>>(
 			device,
-			obj->pointLightData,
+			*(obj->pointLightData),
 			1u
 		);
 
 	lightTech->m_camera = camera;
 
 	// Add mesh for pointlight
-	lightTech->mesh = eastl::make_shared<Mesh>(device, "SphereMesh");
+	lightTech->mesh = eastl::make_shared<Mesh>(device, "Sphere");
 
 	lightTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
 		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightVShader.hlsl"));

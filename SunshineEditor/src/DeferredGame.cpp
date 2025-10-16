@@ -155,10 +155,10 @@ DeferredGame::DeferredGame()
 	*/
 
 	//Matrix::CreateFromQuaternion(Quaternion::FromToRotation({ 0,1,0 }, { 0,0,1 }));
-	Vector3 emitDir = { 0,0,1 };
+	DXSM::Vector3 emitDir = { 0,0,1 };
 	ParticleSystem::EmitterPointConstantBuffer emitterDesc =
 	{
-		Matrix::CreateFromQuaternion(Quaternion::FromToRotation({ 0,1,0 }, emitDir)),
+		DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::FromToRotation({ 0,1,0 }, emitDir)),
 		{ 0, 0, 0, 1 },
 		{ 1, 1, 1, 1 },
 		{ 1, 1, 1, 0 },
@@ -213,10 +213,26 @@ DeferredGame::DeferredGame()
 	UpdateWindow(displayWindow.hWnd);
 
 	auto factory = GameObjectFactory();
-	defaultGameObject = factory.CreateDefaultGameObject(renderer->GetDevice());
+	defaultGameObject = factory.CreateDefaultCubeObject(renderer->GetDevice());
+	defaultGameObject->GetComponent<TransformComponent>()->m_position.x += 3;
+
 	scene.AddGameObject(eastl::move(defaultGameObject));
 
+	scene.AddGameObject(eastl::move(factory.CreateDefaultCubeObject(renderer->GetDevice())));
+	scene.AddGameObject(eastl::move(factory.CreateDefaultSphereObject(renderer->GetDevice())));
+
+	scene.gameObjects[2]->GetComponent<TransformComponent>()->m_position.x -= 3;
+
 	scene.AddGameObject(eastl::move(factory.CreateAmbientLightObject(renderer->GetDevice(), renderer->GetMainCamera())));
+	scene.AddGameObject(eastl::move(factory.CreatePointLightObject(renderer->GetDevice(), renderer->GetMainCamera(),
+		{
+			DXSM::Vector4(0.0, 0.0, 0.9, 1.0),
+			DXSM::Vector4(0.0, 0.0, 0.9, 1.0),
+			DXSM::Vector3(-1.0, 0.0, -0.9), 20,
+			DXSM::Vector3(0.1, 0.1, 0.1), 0
+		}
+		)));
+
 	scene.AddGameObject(eastl::move(factory.CreateFinalPassQuad(renderer->GetDevice())));
 
 }
@@ -246,9 +262,9 @@ void DeferredGame::Update(float deltaTime)
 	*/;
 
 	scene.gameObjects[0]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
+	scene.gameObjects[1]->GetComponent<TransformComponent>()->m_localRotation.x += deltaTime;
+	scene.gameObjects[2]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
 
-	//std::cout << gobj_pos.x << ", " << gobj_pos.y << ", " << gobj_pos.z << ", " << " and \t\t\t";
-	//std::cout << renderer->GetMainCamera()->GetPosition().z << "\n";
 
 	//renderer->mainCamera->RotateYaw(deltaTime);
 	//renderer->mainCamera->MoveLeft(3*deltaTime);

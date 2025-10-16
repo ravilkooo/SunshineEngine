@@ -12,7 +12,7 @@ PointLightTechnique::PointLightTechnique(ID3D11Device* device, eastl::string tec
     
     dsDesc.DepthEnable = TRUE;
     dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-    dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+    dsDesc.DepthFunc = D3D11_COMPARISON_GREATER;
     depthCompGreater = eastl::make_shared<Bind::DepthStencilState>(device, dsDesc);
 
     // Rasterizer
@@ -117,12 +117,12 @@ bool PointLightTechnique::IsFrustumInsideOfLight()
 {
     Camera::FrustumCorners frustum = m_camera->GetFrustumCorners();
     for (int i = 0; i < 4; ++i) {
-        XMVECTOR vecToCorner = XMVectorSubtract(frustum.Near[i], Vector3(lightData->Position));
+        DX::XMVECTOR vecToCorner = XMVectorSubtract(frustum.Near[i], DXSM::Vector3(lightData->Position));
         float distance = XMVectorGetX(XMVector3Length(vecToCorner));
         if (distance > lightData->Range) return false;
     }
     for (int i = 0; i < 4; ++i) {
-        XMVECTOR vecToCorner = XMVectorSubtract(frustum.Far[i], Vector3(lightData->Position));
+        DX::XMVECTOR vecToCorner = XMVectorSubtract(frustum.Far[i], DXSM::Vector3(lightData->Position));
         float distance = XMVectorGetX(XMVector3Length(vecToCorner));
         if (distance > lightData->Range) return false;
     }

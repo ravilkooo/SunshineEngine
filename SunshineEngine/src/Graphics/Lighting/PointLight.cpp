@@ -12,7 +12,7 @@ PointLight::PointLight(PointLightData pointLightData)
         pointLightData.Range = eastl::max(pointLightData.Range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
     }
 
-    this->pointLightData = pointLightData;
+    this->pointLightData = eastl::make_shared<PointLightData>(pointLightData);
 
     /*
     CreateSimpleSphereMesh(range, 6, 2,

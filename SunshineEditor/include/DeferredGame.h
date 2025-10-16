@@ -24,6 +24,11 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
+#include <SimpleMath.h>
+
+namespace DXSM = DirectX::SimpleMath;
+namespace DX = DirectX;
+
 #define DEBUG_LIGHT_OBJECTS
 
 class DeferredGame :
