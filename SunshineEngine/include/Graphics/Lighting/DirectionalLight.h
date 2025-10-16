@@ -16,15 +16,15 @@ class DirectionalLight :
 {
 public:
 
-    DirectionalLightData directionalLightData;
+    eastl::shared_ptr<DirectionalLightData> directionalLightData;
 
-    DirectionalLight(ID3D11Device* device,
+    DirectionalLight(
         DirectionalLightData directionalLightData =
         {
-            DXSM::Vector4::One,
-            DXSM::Vector4::One,
+            DXSM::Vector4(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f, 1.0f),
+            DXSM::Vector4(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f, 1.0f),
             DXSM::Vector3::Zero, 0,
-            DXSM::Vector3::One, 0
+            DXSM::Vector3(0, -1, 0), 0
         });
 
     // LightPosition GetLightPositionInFrustum(Camera* camera) override;

@@ -4,9 +4,11 @@
 #include "Component/TransformComponent.h"
 #include "Graphics/Lighting/AmbientLight.h"
 #include "Graphics/Lighting/PointLight.h"
+#include "Graphics/Lighting/DirectionalLight.h"
 
 #include "Graphics/LightTechnique.h"
 #include "Graphics/AmbientLightTechnique.h"
+#include "Graphics/DirectionalLightTechnique.h"
 #include "Graphics/PointLightTechnique.h"
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
@@ -134,6 +136,42 @@ eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 
 	lightTech->pixelShader = eastl::make_shared<Bind::PixelShader>(
 		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/AmbientLightPShader.hlsl"));
+
+	auto p = eastl::make_pair(eastl::string("LightPass"), lightTech);
+	rc->techniques.insert(eastl::move(p));
+
+	return obj;
+}
+
+eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObject(
+	ID3D11Device* device,
+	eastl::shared_ptr<Camera> camera, DirectionalLightData initData)
+{
+	auto obj = eastl::make_unique<DirectionalLight>(initData);
+	obj->AddComponent<TransformComponent>(device);
+	auto rc = obj->AddComponent<RenderComponent>();
+
+	// LightPass - LightTechnique
+	DirectionalLightTechnique* lightTech = new DirectionalLightTechnique(device, "LightPass");
+
+	lightTech->lightData = obj->directionalLightData;
+	lightTech->lightDataBuffer =
+		eastl::make_shared<Bind::PixelConstantBuffer<DirectionalLightData>>(
+			device,
+			*(obj->directionalLightData),
+			1u
+		);
+
+	lightTech->m_camera = camera;
+
+	// Add mesh for Ambient
+	lightTech->mesh = Mesh::CreateScreenAlignedQuad(device);
+
+	lightTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
+		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/DirectionalLightVShader.hlsl"));
+
+	lightTech->pixelShader = eastl::make_shared<Bind::PixelShader>(
+		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/DirectionalLightPShader.hlsl"));
 
 	auto p = eastl::make_pair(eastl::string("LightPass"), lightTech);
 	rc->techniques.insert(eastl::move(p));

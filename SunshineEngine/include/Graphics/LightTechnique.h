@@ -34,5 +34,8 @@ public:
 template class LightTechnique<AmbientLightData>;
 template void LightTechnique<AmbientLightData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);
 
+template class LightTechnique<DirectionalLightData>;
+template void LightTechnique<DirectionalLightData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);
+
 template class LightTechnique<PointLightData>;
 template void LightTechnique<PointLightData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);

@@ -1,11 +1,11 @@
 #include "Graphics/Lighting/DirectionalLight.h"
 
-DirectionalLight::DirectionalLight(ID3D11Device* device,
+DirectionalLight::DirectionalLight(
     DirectionalLightData directionalLightData)
 {
     directionalLightData.Direction.Normalize();
     
-    this->directionalLightData = directionalLightData;
+    this->directionalLightData = eastl::make_shared<DirectionalLightData>(directionalLightData);
 }
 
 //void DirectionalLight::UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

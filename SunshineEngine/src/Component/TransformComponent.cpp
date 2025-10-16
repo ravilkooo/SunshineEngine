@@ -20,7 +20,7 @@ DXSM::Matrix TransformComponent::GetLocalTransalationMatrix() const
 
 DXSM::Matrix TransformComponent::GetLocalRotationMatrix() const
 {
-    return DXSM::Matrix::CreateFromYawPitchRoll(m_localRotation);
+    return DXSM::Matrix::CreateFromYawPitchRoll(m_localRotation.y, m_localRotation.x, m_localRotation.z);
 }
 
 DXSM::Matrix TransformComponent::GetLocalScaleMatrix() const
@@ -41,7 +41,7 @@ DXSM::Matrix TransformComponent::GetTransalationMatrix() const
 
 DXSM::Matrix TransformComponent::GetRotationMatrix() const
 {
-    return DXSM::Matrix::CreateFromYawPitchRoll(m_rotation);
+    return DXSM::Matrix::CreateFromYawPitchRoll(m_rotation.y, m_rotation.x, m_rotation.z);
 }
 
 DXSM::Matrix TransformComponent::GetScaleMatrix() const
@@ -51,5 +51,5 @@ DXSM::Matrix TransformComponent::GetScaleMatrix() const
 
 DXSM::Matrix TransformComponent::GetWorldMatrix() const
 {
-    return GetLocalTransformMatrix() * GetScaleMatrix() * GetLocalRotationMatrix() * GetTransalationMatrix();
+    return GetLocalTransformMatrix() * GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
 }

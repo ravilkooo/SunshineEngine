@@ -223,7 +223,12 @@ DeferredGame::DeferredGame()
 
 	scene.gameObjects[2]->GetComponent<TransformComponent>()->m_position.x -= 3;
 
-	scene.AddGameObject(eastl::move(factory.CreateAmbientLightObject(renderer->GetDevice(), renderer->GetMainCamera())));
+	scene.AddGameObject(eastl::move(factory.CreateDefaultBoxObject(renderer->GetDevice(), 20.0f, 20.0f)));
+	scene.gameObjects[3]->GetComponent<TransformComponent>()->m_position.z += 10.0f;
+	scene.gameObjects[3]->GetComponent<TransformComponent>()->m_rotation = DXSM::Vector3::One * DX::XM_PIDIV2*0.3;
+
+
+	scene.AddGameObject(eastl::move(factory.CreateAmbientLightObject(renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector4::One * 0.5 })));
 	scene.AddGameObject(eastl::move(factory.CreatePointLightObject(renderer->GetDevice(), renderer->GetMainCamera(),
 		{
 			DXSM::Vector4(0.0, 0.0, 0.9, 1.0),
@@ -232,6 +237,9 @@ DeferredGame::DeferredGame()
 			DXSM::Vector3(0.1, 0.1, 0.1), 0
 		}
 		)));
+
+	scene.AddGameObject(eastl::move(factory.CreateDirectionalLightObject(renderer->GetDevice(), renderer->GetMainCamera())));
+
 
 	scene.AddGameObject(eastl::move(factory.CreateFinalPassQuad(renderer->GetDevice())));
 
