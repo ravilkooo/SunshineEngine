@@ -9,14 +9,16 @@
 #include "Graphics/AmbientLightTechnique.h"
 #include "Graphics/PointLightTechnique.h"
 
-eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultCubeObject(ID3D11Device* device)
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
+	ID3D11Device* device,
+	float width, float height, float length)
 {
     auto obj = eastl::make_unique<GameObject>();
     obj->AddComponent<TransformComponent>(device);
     auto rc = obj->AddComponent<RenderComponent>();
 
 	RenderTechnique* gBufferTech = new RenderTechnique(device, "GPass");
-	gBufferTech->mesh = eastl::make_shared<Mesh>(device, "CubeMesh_repeat");
+	gBufferTech->mesh = Mesh::CreateUnwrappedBoxMesh_repeat(device, width, height, length);
 
 	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
 		device, MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassShaderVS.hlsl"));
@@ -45,14 +47,14 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultCubeObject(ID3D11D
     return obj;
 }
 
-eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(ID3D11Device* device)
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(ID3D11Device* device, float radius)
 {
 	auto obj = eastl::make_unique<GameObject>();
 	obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>();
 
 	RenderTechnique* gBufferTech = new RenderTechnique(device, "GPass");
-	gBufferTech->mesh = eastl::make_shared<Mesh>(device, "Sphere");
+	gBufferTech->mesh = Mesh::CreateSphereMesh(device, radius);
 
 	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
 		device, MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassShaderVS.hlsl"));
@@ -125,7 +127,7 @@ eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 	lightTech->m_camera = camera;
 
 	// Add mesh for Ambient
-	lightTech->mesh = eastl::make_shared<Mesh>(device, "ScreenAlignedQuad");
+	lightTech->mesh = Mesh::CreateScreenAlignedQuad(device);
 
 	lightTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
 		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/AmbientLightVShader.hlsl"));
@@ -146,7 +148,6 @@ eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 {
 	auto obj = eastl::make_unique<PointLight>(initData);
 	auto tc = obj->AddComponent<TransformComponent>(device);
-	tc->m_localScaleFactor = obj->pointLightData->Range * DXSM::Vector3::One;
 	tc->m_position = obj->pointLightData->Position;
 	auto rc = obj->AddComponent<RenderComponent>();
 
@@ -164,7 +165,7 @@ eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 	lightTech->m_camera = camera;
 
 	// Add mesh for pointlight
-	lightTech->mesh = eastl::make_shared<Mesh>(device, "Sphere");
+	lightTech->mesh = Mesh::CreateGeosphereMesh(device, obj->pointLightData->Range, 1);
 
 	lightTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
 		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightVShader.hlsl"));

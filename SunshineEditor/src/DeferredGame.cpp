@@ -213,12 +213,12 @@ DeferredGame::DeferredGame()
 	UpdateWindow(displayWindow.hWnd);
 
 	auto factory = GameObjectFactory();
-	defaultGameObject = factory.CreateDefaultCubeObject(renderer->GetDevice());
+	defaultGameObject = factory.CreateDefaultBoxObject(renderer->GetDevice());
 	defaultGameObject->GetComponent<TransformComponent>()->m_position.x += 3;
 
 	scene.AddGameObject(eastl::move(defaultGameObject));
 
-	scene.AddGameObject(eastl::move(factory.CreateDefaultCubeObject(renderer->GetDevice())));
+	scene.AddGameObject(eastl::move(factory.CreateDefaultBoxObject(renderer->GetDevice())));
 	scene.AddGameObject(eastl::move(factory.CreateDefaultSphereObject(renderer->GetDevice())));
 
 	scene.gameObjects[2]->GetComponent<TransformComponent>()->m_position.x -= 3;

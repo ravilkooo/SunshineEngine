@@ -15,6 +15,7 @@
 #include <filesystem>
 
 #include <EASTL/unique_ptr.h>
+#include <EASTL/shared_ptr.h>
 #include <EASTL/vector.h>
 
 #include "Bindable/VertexBuffer.h"
@@ -53,6 +54,27 @@ public:
         const std::string& path,
         UINT attrFlags = VertexAttributesFlags::POSITION);
 
+    static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh(
+        ID3D11Device* device,
+        float width = 1.0f, float height = 1.0f, float length = 1.0f
+        );
+
+    static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh_repeat(
+        ID3D11Device* device,
+        float width = 1.0f, float height = 1.0f, float length = 1.0f);
+
+    static eastl::shared_ptr<Mesh> CreateSphereMesh(
+        ID3D11Device* device,
+        float radius = 1.0f, uint32_t sliceCount = 10, uint32_t stackCount = 10);
+
+    static eastl::shared_ptr<Mesh> CreateGeosphereMesh(
+        ID3D11Device* device,
+        float radius = 1.0f,
+        UINT numSubdivisions = 6u);
+
+    static eastl::shared_ptr<Mesh> CreateScreenAlignedQuad(
+        ID3D11Device* device);
+
     static Vertex MidPoint(
         const Vertex& v0, const Vertex& v1);
 
@@ -60,26 +82,28 @@ public:
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices);
 
-    static void CreateUnwrappedCubeMesh(
+    static void FillUnwrappedBoxMesh(
         eastl::vector<Vertex>& vertices,
-        eastl::vector<uint32_t>& indices);
+        eastl::vector<uint32_t>& indices,
+        float width = 1.0f, float height = 1.0f, float length = 1.0f);
 
-    static void CreateUnwrappedCubeMesh_repeat(
+    static void FillUnwrappedBoxMesh_repeat(
         eastl::vector<Vertex>& vertices,
-        eastl::vector<uint32_t>& indices);
+        eastl::vector<uint32_t>& indices,
+        float width = 1.0f, float height = 1.0f, float length = 1.0f);
 
-    static void CreateSphereMesh(
+    static void FillSphereMesh(
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices,
         float radius = 1.0f, uint32_t sliceCount=10, uint32_t stackCount=10);
 
-    static void CreateGeosphereMesh(
+    static void FillGeosphereMesh(
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices,
         float radius = 1.0f,
         UINT numSubdivisions = 6u);
 
-    static void CreateScreenAlignedQuad(
+    static void FillScreenAlignedQuad(
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices);
 

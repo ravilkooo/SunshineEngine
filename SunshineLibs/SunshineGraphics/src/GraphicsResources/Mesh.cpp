@@ -10,27 +10,27 @@ Mesh::Mesh(ID3D11Device* device, const std::string& path)
     UINT attrFlags = VertexAttributesFlags::POSITION | VertexAttributesFlags::UV | VertexAttributesFlags::NORMAL;
 
     if (path == "CubeMesh") {
-        CreateUnwrappedCubeMesh(vertices, indices);
+        FillUnwrappedBoxMesh(vertices, indices);
         m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
     else if (path == "Sphere") {
-        CreateSphereMesh(vertices, indices);
+        FillSphereMesh(vertices, indices);
         m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
     else if (path == "Geosphere") {
-        CreateGeosphereMesh(vertices, indices);
+        FillGeosphereMesh(vertices, indices, 1.0f, 0u);
         m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
     else if (path == "CubeMesh_repeat") {
-        CreateUnwrappedCubeMesh_repeat(vertices, indices);
+        FillUnwrappedBoxMesh_repeat(vertices, indices);
         m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
     else if (path == "ScreenAlignedQuad") {
-        CreateScreenAlignedQuad(vertices, indices);
+        FillScreenAlignedQuad(vertices, indices);
         m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     }
     else if (!LoadModel(vertices, indices, path, attrFlags)) {
-        CreateUnwrappedCubeMesh_repeat(vertices, indices);
+        FillUnwrappedBoxMesh_repeat(vertices, indices);
         m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
@@ -45,7 +45,10 @@ Mesh::~Mesh()
     Release();
 }
 
-void Mesh::CreateUnwrappedCubeMesh(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
+void Mesh::FillUnwrappedBoxMesh(
+    eastl::vector<Vertex>& vertices,
+    eastl::vector<uint32_t>& indices,
+    float width, float height, float length)
 {
     // Развёртка "крестом" (UV-карта 3x4 квадрата, каждая грань в своём прямоугольнике)
     // Текстурные координаты (U, V) для каждой из 6 граней
@@ -107,9 +110,9 @@ void Mesh::CreateUnwrappedCubeMesh(eastl::vector<Vertex>& vertices, eastl::vecto
         for (int i = 0; i < 4; ++i)
         {
             Vertex vert;
-            vert.position.x = pos[i].x;
-            vert.position.y = pos[i].y;
-            vert.position.z = pos[i].z;
+            vert.position.x = pos[i].x * width;
+            vert.position.y = pos[i].y * height;
+            vert.position.z = pos[i].z * length;
             vert.normal.x = faces[f].normal.x;
             vert.normal.y = faces[f].normal.y;
             vert.normal.z = faces[f].normal.z;
@@ -128,7 +131,9 @@ void Mesh::CreateUnwrappedCubeMesh(eastl::vector<Vertex>& vertices, eastl::vecto
     }
 }
 
-void Mesh::CreateUnwrappedCubeMesh_repeat(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
+void Mesh::FillUnwrappedBoxMesh_repeat(eastl::vector<Vertex>& vertices,
+    eastl::vector<uint32_t>& indices,
+    float width, float height, float length)
 {
     // Развёртка "крестом" (UV-карта 3x4 квадрата, каждая грань в своём прямоугольнике)
     // Текстурные координаты (U, V) для каждой из 6 граней
@@ -169,9 +174,9 @@ void Mesh::CreateUnwrappedCubeMesh_repeat(eastl::vector<Vertex>& vertices, eastl
         for (int i = 0; i < 4; ++i)
         {
             Vertex vert;
-            vert.position.x = pos[i].x;
-            vert.position.y = pos[i].y;
-            vert.position.z = pos[i].z;
+            vert.position.x = pos[i].x * width;
+            vert.position.y = pos[i].y * height;
+            vert.position.z = pos[i].z * length;
             vert.normal.x = faces[f].normal.x;
             vert.normal.y = faces[f].normal.y;
             vert.normal.z = faces[f].normal.z;
@@ -190,7 +195,7 @@ void Mesh::CreateUnwrappedCubeMesh_repeat(eastl::vector<Vertex>& vertices, eastl
     }
 }
 
-void Mesh::CreateSphereMesh(
+void Mesh::FillSphereMesh(
     eastl::vector<Vertex>& vertices,
     eastl::vector<uint32_t>& indices,
     float radius, uint32_t sliceCount, uint32_t stackCount)
@@ -280,7 +285,7 @@ void Mesh::CreateSphereMesh(
     return;
 }
 
-void Mesh::CreateGeosphereMesh(eastl::vector<Vertex>& vertices,
+void Mesh::FillGeosphereMesh(eastl::vector<Vertex>& vertices,
     eastl::vector<UINT>& indices,
     float radius,
     UINT numSubdivisions)
@@ -463,8 +468,7 @@ Vertex Mesh::MidPoint(const Vertex& v0, const Vertex& v1)
     return Vertex(pos, color, tex, normal);
 }
 
-
-void Mesh::CreateScreenAlignedQuad(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
+void Mesh::FillScreenAlignedQuad(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
 {
     indices.push_back(0);
     indices.push_back(1);
@@ -544,6 +548,85 @@ bool Mesh::LoadModel(eastl::vector<Vertex>& vertices,
         }
     }
     return true;
+}
+
+eastl::shared_ptr<Mesh> Mesh::CreateUnwrappedBoxMesh(
+    ID3D11Device* device,
+    float width, float height, float length)
+{
+    eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
+    eastl::vector<Vertex> vertices;
+    eastl::vector<uint32_t> indices;
+
+    FillUnwrappedBoxMesh(vertices, indices, width, height, length);
+    mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    mesh->m_indexCount = static_cast<UINT>(indices.size());
+    mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
+    mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
+    return mesh;
+}
+
+eastl::shared_ptr<Mesh> Mesh::CreateUnwrappedBoxMesh_repeat(
+    ID3D11Device* device,
+    float width, float height, float length)
+{
+    eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
+    eastl::vector<Vertex> vertices;
+    eastl::vector<uint32_t> indices;
+
+    FillUnwrappedBoxMesh_repeat(vertices, indices, width, height, length);
+    mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    mesh->m_indexCount = static_cast<UINT>(indices.size());
+    mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
+    mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
+    return mesh;
+}
+
+eastl::shared_ptr<Mesh> Mesh::CreateSphereMesh(ID3D11Device* device, float radius, uint32_t sliceCount, uint32_t stackCount)
+{
+    eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
+    eastl::vector<Vertex> vertices;
+    eastl::vector<uint32_t> indices;
+
+    FillSphereMesh(vertices, indices, radius, sliceCount, stackCount);
+    mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    mesh->m_indexCount = static_cast<UINT>(indices.size());
+    mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
+    mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
+    return mesh;
+}
+
+eastl::shared_ptr<Mesh> Mesh::CreateGeosphereMesh(ID3D11Device* device, float radius, UINT numSubdivisions)
+{
+    eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
+    eastl::vector<Vertex> vertices;
+    eastl::vector<uint32_t> indices;
+
+    FillGeosphereMesh(vertices, indices, radius, numSubdivisions);
+    mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    mesh->m_indexCount = static_cast<UINT>(indices.size());
+    mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
+    mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
+    return mesh;
+}
+
+eastl::shared_ptr<Mesh> Mesh::CreateScreenAlignedQuad(ID3D11Device* device)
+{
+    eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
+    eastl::vector<Vertex> vertices;
+    eastl::vector<uint32_t> indices;
+
+    FillScreenAlignedQuad(vertices, indices);
+    mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+    mesh->m_indexCount = static_cast<UINT>(indices.size());
+    mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
+    mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
+    return mesh;
 }
 
 void Mesh::Draw(ID3D11DeviceContext* context) const

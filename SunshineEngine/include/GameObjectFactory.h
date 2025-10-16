@@ -14,9 +14,11 @@ class PointLight;
 class GameObjectFactory
 {
 public:
-	eastl::unique_ptr<GameObject> CreateDefaultCubeObject(ID3D11Device* device);
+	eastl::unique_ptr<GameObject> CreateDefaultBoxObject(
+		ID3D11Device* device,
+		float width = 1.0f, float height = 1.0f, float length = 1.0f);
 
-	eastl::unique_ptr<GameObject> CreateDefaultSphereObject(ID3D11Device* device);
+	eastl::unique_ptr<GameObject> CreateDefaultSphereObject(ID3D11Device* device, float radius = 1.0f);
 
 	eastl::unique_ptr<GameObject> CreateFinalPassQuad(ID3D11Device* device);
 
