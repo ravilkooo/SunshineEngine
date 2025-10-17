@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Use find_dependency to find this project's dependencies.
+find_dependency(imgui 1.89.9 EXACT)
+
+# Include the file that defines the actual library target (sol2_ImGui_Bindings::sol2_ImGui_Bindings)
+include("${CMAKE_CURRENT_LIST_DIR}/sol2_ImGui_Bindings_Targets.cmake")
