@@ -1,11 +1,14 @@
 // dear imgui: Renderer for WebGPU
-// This needs to be used along with a Platform Binding (e.g. GLFW)
-// (Please note that WebGPU is currently experimental, will not run on non-beta browsers, and may break.)
+// This needs to be used along with a Platform Binding (e.g. GLFW, SDL2, SDL3)
+// (Please note that WebGPU is a recent API, may not be supported by all browser, and its ecosystem is generally a mess)
 
-// Important note to dawn and/or wgpu users: when targeting native platforms (i.e. NOT emscripten),
-// one of IMGUI_IMPL_WEBGPU_BACKEND_DAWN or IMGUI_IMPL_WEBGPU_BACKEND_WGPU must be provided.
+// When targeting native platforms:
+//  - One of IMGUI_IMPL_WEBGPU_BACKEND_DAWN or IMGUI_IMPL_WEBGPU_BACKEND_WGPU *must* be provided.
+// When targeting Emscripten:
+//  - We now defaults to IMGUI_IMPL_WEBGPU_BACKEND_DAWN is Emscripten version is 4.0.10+, which correspond to using Emscripten '--use-port=emdawnwebgpu'.
+//  - We can still define IMGUI_IMPL_WEBGPU_BACKEND_WGPU to use Emscripten '-s USE_WEBGPU=1' which is marked as obsolete by Emscripten.
 // Add #define to your imconfig.h file, or as a compilation flag in your build system.
-// This requirement will be removed once WebGPU stabilizes and backends converge on a unified interface.
+// This requirement may be removed once WebGPU stabilizes and backends converge on a unified interface.
 //#define IMGUI_IMPL_WEBGPU_BACKEND_DAWN
 //#define IMGUI_IMPL_WEBGPU_BACKEND_WGPU
 
@@ -14,6 +17,8 @@
 //  [X] Renderer: Large meshes support (64k+ vertices) even with 16-bit indices (ImGuiBackendFlags_RendererHasVtxOffset).
 //  [X] Renderer: Expose selected render state for draw callbacks to use. Access in '(ImGui_ImplXXXX_RenderState*)GetPlatformIO().Renderer_RenderState'.
 //  [X] Renderer: Texture updates support for dynamic font system (ImGuiBackendFlags_RendererHasTextures).
+// Missing features or Issues:
+//  [ ] Renderer: Multi-viewport support (multiple windows), useful for desktop.
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
 // Prefer including the entire imgui/ repository into your project (either as a copy or as a submodule), and only build the backends you need.
@@ -27,12 +32,22 @@
 #include "imgui.h"          // IMGUI_IMPL_API
 #ifndef IMGUI_DISABLE
 
+// Setup Emscripten default if not specified.
+#if defined(__EMSCRIPTEN__) && !defined(IMGUI_IMPL_WEBGPU_BACKEND_DAWN) && !defined(IMGUI_IMPL_WEBGPU_BACKEND_WGPU)
+#include <emscripten/version.h>
+#if (__EMSCRIPTEN_major__ >= 4) && (__EMSCRIPTEN_minor__ >= 0) && (__EMSCRIPTEN_tiny__ >= 10)
+#define IMGUI_IMPL_WEBGPU_BACKEND_DAWN
+#else
+#define IMGUI_IMPL_WEBGPU_BACKEND_WGPU
+#endif
+#endif
+
 #include <webgpu/webgpu.h>
 
 // Initialization data, for ImGui_ImplWGPU_Init()
 struct ImGui_ImplWGPU_InitInfo
 {
-    WGPUDevice              Device;
+    WGPUDevice              Device = nullptr;
     int                     NumFramesInFlight = 3;
     WGPUTextureFormat       RenderTargetFormat = WGPUTextureFormat_Undefined;
     WGPUTextureFormat       DepthStencilFormat = WGPUTextureFormat_Undefined;
