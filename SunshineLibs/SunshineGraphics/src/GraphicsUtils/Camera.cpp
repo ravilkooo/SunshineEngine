@@ -29,13 +29,13 @@ void Camera::InitBuffer(ID3D11Device* device)
     //DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
     DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
     //CameraBuffer{ viewProjMat };
-    cameraBuffer = new Bind::VertexConstantBuffer<CameraBuffer>(device, { viewProjMat }, 1u);
+    cameraBuffer = new Bind::VertexConstantBuffer<CameraBuffer>(device, { viewProjMat, GetPosition(), 1.0f }, 1u);
 }
 
 void Camera::UpdateBuffer(ID3D11DeviceContext* context)
 {
     DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
-    cameraBuffer->Update(context, { viewProjMat });
+    cameraBuffer->Update(context, { viewProjMat, GetPosition(), 1.0f });
 }
 
 void Camera::BindBuffer(ID3D11DeviceContext* context)

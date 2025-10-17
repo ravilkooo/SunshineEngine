@@ -6,19 +6,17 @@
 #include <EASTL/shared_ptr.h>
 
 #include "GameObject.h"
-
 #include "LightObject.h"
 #include "LightData.h"
 
 namespace DXSM = DirectX::SimpleMath;
 
-class AmbientLight :
+class SkyBox :
     public LightObject
 {
 public:
-    eastl::shared_ptr<AmbientLightData> ambientLightData;
+    eastl::shared_ptr<SkyBoxData> skyBoxData;
 
-    AmbientLight(AmbientLightData initData = { DXSM::Vector4::One });
+    SkyBox(SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
 };
-
 

@@ -1,4 +1,5 @@
 #include "DeferredGame.h"
+#include <Windows/DisplayWindow.h>
 
 // Win32 message handler
 LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -17,8 +18,11 @@ LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
+	default:
+		return DisplayWindow::WndProc(hwnd, msg, wParam, lParam);
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+	
 }
 
 DeferredGame::DeferredGame()
@@ -239,7 +243,11 @@ DeferredGame::DeferredGame()
 		)));
 
 	scene.AddGameObject(eastl::move(factory.CreateDirectionalLightObject(renderer->GetDevice(), renderer->GetMainCamera())));
-
+	auto skyBox = factory.CreateSkyBox(
+		renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector3::One, 0.0f }, L"Default"
+		//renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector3(1, 1, 1), 0.0f }
+	);
+	scene.AddGameObject(eastl::move(skyBox));
 
 	scene.AddGameObject(eastl::move(factory.CreateFinalPassQuad(renderer->GetDevice())));
 

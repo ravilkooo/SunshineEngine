@@ -40,3 +40,8 @@ struct SpotLightData {
     DXSM::Vector3 Att;
     float pad;
 };
+
+struct SkyBoxData {
+    DXSM::Vector3 Tint;
+    float brightness;
+};

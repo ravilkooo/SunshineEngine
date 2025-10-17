@@ -11,6 +11,7 @@ class GameObject;
 class AmbientLight;
 class DirectionalLight;
 class PointLight;
+class SkyBox;
 
 class GameObjectFactory
 {
@@ -22,6 +23,13 @@ public:
 	eastl::unique_ptr<GameObject> CreateDefaultSphereObject(ID3D11Device* device, float radius = 1.0f);
 
 	eastl::unique_ptr<GameObject> CreateFinalPassQuad(ID3D11Device* device);
+
+	eastl::unique_ptr<SkyBox> CreateSkyBox(
+		ID3D11Device* device,
+		eastl::shared_ptr<Camera> camera,
+		SkyBoxData initData = { DXSM::Vector3::One, 0.0f },
+		eastl::wstring texturePath = eastl::wstring(L"Default")
+);
 
 	eastl::unique_ptr<AmbientLight> CreateAmbientLightObject(
 		ID3D11Device* device,

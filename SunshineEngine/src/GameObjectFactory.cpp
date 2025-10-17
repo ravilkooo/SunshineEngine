@@ -5,11 +5,14 @@
 #include "Graphics/Lighting/AmbientLight.h"
 #include "Graphics/Lighting/PointLight.h"
 #include "Graphics/Lighting/DirectionalLight.h"
+#include "Graphics/Lighting/SkyBox.h"
 
 #include "Graphics/LightTechnique.h"
 #include "Graphics/AmbientLightTechnique.h"
 #include "Graphics/DirectionalLightTechnique.h"
 #include "Graphics/PointLightTechnique.h"
+#include "Graphics/SkyBoxTechnique.h"
+
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
 	ID3D11Device* device,
@@ -101,6 +104,72 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateFinalPassQuad(ID3D11Devic
 		device, MakeEngineAssetPath_Wchar(L"Shaders/FinalPass/FinalPassPS.hlsl"));
 
 	auto p = eastl::make_pair(eastl::string("FinalPass"), gBufferTech);
+	rc->techniques.insert(eastl::move(p));
+
+	return obj;
+}
+
+eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
+	ID3D11Device* device,
+	eastl::shared_ptr<Camera> camera,
+	SkyBoxData initData, eastl::wstring texturePath)
+{
+	auto obj = eastl::make_unique<SkyBox>(initData);
+	obj->AddComponent<TransformComponent>(device);
+	auto rc = obj->AddComponent<RenderComponent>();
+
+	// LightPass - LightTechnique
+	SkyBoxTechnique* lightTech = new SkyBoxTechnique(device, "LightPass");
+
+	lightTech->lightData = obj->skyBoxData;
+	lightTech->lightDataBuffer =
+		eastl::make_shared<Bind::PixelConstantBuffer<SkyBoxData>>(
+			device,
+			*(obj->skyBoxData),
+			1u
+		);
+
+	lightTech->m_camera = camera;
+
+	float toHalfDiag = 1.15; //   2 / sqrt(3) =1,15470053838
+	// Add mesh for Ambient
+	lightTech->mesh = Mesh::CreateUnwrappedBoxMesh(device,
+		camera->GetFarZ() * toHalfDiag,
+		camera->GetFarZ() * toHalfDiag,
+		camera->GetFarZ() * toHalfDiag);
+
+	if (texturePath.empty() || texturePath == L"Default") {
+		lightTech->texture = eastl::make_shared<Bind::Texture>(
+			device,
+			MakeEngineAssetPath_Wchar(L"DefaultSkybox.dds"),
+			4u,
+			Bind::PipelineStage::PIXEL_SHADER
+		);
+	}
+	else
+	{
+		lightTech->texture = eastl::make_shared<Bind::Texture>(
+			device,
+			texturePath,
+			4u,
+			Bind::PipelineStage::PIXEL_SHADER
+		);
+	}
+
+	lightTech->textureSampler = eastl::make_shared<Bind::Sampler>(
+		device,
+		CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
+		1u,
+		Bind::PipelineStage::PIXEL_SHADER
+	);
+
+	lightTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
+		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxVShader.hlsl"));
+
+	lightTech->pixelShader = eastl::make_shared<Bind::PixelShader>(
+		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxPShader.hlsl"));
+
+	auto p = eastl::make_pair(eastl::string("LightPass"), lightTech);
 	rc->techniques.insert(eastl::move(p));
 
 	return obj;

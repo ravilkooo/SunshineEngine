@@ -15,6 +15,8 @@ class Camera
 public:
     struct CameraBuffer {
         DXSM::Matrix viewProjMatrix;
+        DXSM::Vector3 camPos;
+        float pad;
     };
 
     Bind::VertexConstantBuffer<CameraBuffer>* cameraBuffer;
