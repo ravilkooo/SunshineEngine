@@ -3,6 +3,10 @@
 #include <d3d11.h>
 #include <wrl.h>
 
+#include <EASTL/shared_ptr.h>
+
+#include <stdexcept>
+
 class GBuffer
 {
 public:
@@ -52,5 +56,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pAmbientLightRTV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pAmbientLightSRV;
 	*/
+
+	GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight);
 };
 

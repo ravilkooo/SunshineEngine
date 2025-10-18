@@ -1,0 +1,20 @@
+{
+  "name": "sol2-imgui-bindings",
+  "version-string": "1.91.8",
+  "dependencies": [
+    {
+      "name": "imgui",
+      "version>=": "1.91.8"
+    },
+    {
+      "name": "sol2",
+      "version>=": "3.5.0"
+    }
+  ],
+  "overrides": [
+    {
+      "name": "imgui",
+      "version": "1.91.8"
+    }
+  ]
+}

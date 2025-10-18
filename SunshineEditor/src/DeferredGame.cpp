@@ -1,4 +1,5 @@
 #include "DeferredGame.h"
+#include <Windows/DisplayWindow.h>
 
 // Win32 message handler
 LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -17,8 +18,11 @@ LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
+	default:
+		return DisplayWindow::WndProc(hwnd, msg, wParam, lParam);
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+	
 }
 
 DeferredGame::DeferredGame()
@@ -39,72 +43,23 @@ DeferredGame::DeferredGame()
 	renderer = new DeferredRenderer(displayWindow.hWnd, winWidth, winHeight);
 
 	// GPass
-	GPass* gPass;
 	{
-		gPass = new GPass(renderer->GetDevice(), renderer->GetDeviceContext(),
-			renderer->GetBackBuffer(), winWidth, winHeight);
 
-		renderer->SetMainCamera(gPass->GetCamera());
-		renderer->mainCamera->SetPosition({ 0, 0, -10 });
+		GPass* gPass = new GPass(renderer->GetDevice(), renderer->GetDeviceContext(),
+			renderer->GetBackBuffer(), winWidth, winHeight, renderer->pGBuffer, renderer->GetMainCamera());
 
 		renderer->AddPass(gPass);
 	}
 	{
 		gLightPass = new LightPass(renderer->GetDevice(), renderer->GetDeviceContext(),
-			renderer->GetBackBuffer(), winWidth, winHeight, gPass->pGBuffer, gPass->GetCamera());
-
-
-		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pNormalSRV.Get(), 0u));
-		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pAlbedoSRV.Get(), 1u));
-		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pSpecularSRV.Get(), 2u));
-		gLightPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pWorldPosSRV.Get(), 3u));
-
-		// Usual sampler for all SRV
-		D3D11_SAMPLER_DESC samplerDesc;
-		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-		samplerDesc.MipLODBias = 0.0f;
-		samplerDesc.MaxAnisotropy = 1;
-		samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-		samplerDesc.BorderColor[0] = 0;
-		samplerDesc.BorderColor[1] = 0;
-		samplerDesc.BorderColor[2] = 0;
-		samplerDesc.BorderColor[3] = 0;
-		samplerDesc.MinLOD = 0;
-		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-		gLightPass->AddPerFrameBind(new Bind::Sampler(renderer->GetDevice(), samplerDesc, 0u));
+			renderer->GetBackBuffer(), winWidth, winHeight, renderer->pGBuffer, renderer->GetMainCamera());
 
 		renderer->AddPass(gLightPass);
 	}
 	// FinalPass
 	{
 		FinalPass* colorPass = new FinalPass(renderer->GetDevice(), renderer->GetDeviceContext(),
-			renderer->GetBackBuffer(), winWidth, winHeight);
-
-		colorPass->SetCamera(renderer->GetMainCamera());
-
-		colorPass->AddPerFrameBind(new Bind::Texture(renderer->GetDevice(), gPass->pGBuffer->pLightSRV.Get(), 0u));
-
-		// Usual sampler for all SRV
-		D3D11_SAMPLER_DESC samplerDesc;
-		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-		samplerDesc.MipLODBias = 0.0f;
-		samplerDesc.MaxAnisotropy = 1;
-		samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-		samplerDesc.BorderColor[0] = 0;
-		samplerDesc.BorderColor[1] = 0;
-		samplerDesc.BorderColor[2] = 0;
-		samplerDesc.BorderColor[3] = 0;
-		samplerDesc.MinLOD = 0;
-		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-		colorPass->AddPerFrameBind(new Bind::Sampler(renderer->GetDevice(), samplerDesc, 0u));
+			renderer->GetBackBuffer(), winWidth, winHeight, renderer->pGBuffer, renderer->GetMainCamera());
 
 		renderer->AddPass(colorPass);
 	}
@@ -228,18 +183,24 @@ DeferredGame::DeferredGame()
 	scene.gameObjects[3]->GetComponent<TransformComponent>()->m_rotation = DXSM::Vector3::One * DX::XM_PIDIV2*0.3;
 
 
-	scene.AddGameObject(eastl::move(factory.CreateAmbientLightObject(renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector4::One * 0.5 })));
+	scene.AddGameObject(eastl::move(factory.CreateAmbientLightObject(
+		renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector3::One * 0.5f, 1.0f })
+	));
 	scene.AddGameObject(eastl::move(factory.CreatePointLightObject(renderer->GetDevice(), renderer->GetMainCamera(),
 		{
-			DXSM::Vector4(0.0, 0.0, 0.9, 1.0),
-			DXSM::Vector4(0.0, 0.0, 0.9, 1.0),
+			DXSM::Vector3(0.0, 0.0, 0.9), 1.0f,
+			DXSM::Vector3(0.0, 0.0, 0.9), 1.0f,
 			DXSM::Vector3(-1.0, 0.0, -0.9), 20,
 			DXSM::Vector3(0.1, 0.1, 0.1), 0
 		}
 		)));
 
 	scene.AddGameObject(eastl::move(factory.CreateDirectionalLightObject(renderer->GetDevice(), renderer->GetMainCamera())));
-
+	auto skyBox = factory.CreateSkyBox(
+		renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector3::One, 0.0f }, L"Default"
+		//renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector3(1, 1, 1), 0.0f }
+	);
+	scene.AddGameObject(eastl::move(skyBox));
 
 	scene.AddGameObject(eastl::move(factory.CreateFinalPassQuad(renderer->GetDevice())));
 

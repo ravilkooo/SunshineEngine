@@ -1,13 +1,14 @@
 #include "Graphics/MainColorPass.h"
 
 FinalPass::FinalPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
-	UINT screenWidth, UINT screenHeight)
+	UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera)
 	:
 	RenderPass("FinalPass", device, context)
 {
 	this->backBuffer = backBuffer;
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
+	this->camera = camera;
 
 	// rtv
 	HRESULT hr = device->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView);
@@ -43,7 +44,26 @@ FinalPass::FinalPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11T
 	viewport.MinDepth = 0;
 	viewport.MaxDepth = 1.0f;
 
-	camera = eastl::make_shared<Camera>(device, screenWidth * 1.0f / screenHeight);
+
+	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pLightSRV.Get(), 0u));
+
+	// Usual sampler for all SRV
+	D3D11_SAMPLER_DESC samplerDesc;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	AddPerFrameBind(new Bind::Sampler(device, samplerDesc, 0u));
 }
 
 void FinalPass::StartFrame()

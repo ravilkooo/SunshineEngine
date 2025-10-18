@@ -21,8 +21,8 @@ public:
     DirectionalLight(
         DirectionalLightData directionalLightData =
         {
-            DXSM::Vector4(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f, 1.0f),
-            DXSM::Vector4(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f, 1.0f),
+            DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+            DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3::Zero, 0,
             DXSM::Vector3(0, -1, 0), 0
         });

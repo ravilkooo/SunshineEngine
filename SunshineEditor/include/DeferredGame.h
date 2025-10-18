@@ -56,7 +56,8 @@ public:
     eastl::unique_ptr<GameObject> defaultGameObject;
 };
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 // Forward declare helper functions
 LRESULT CALLBACK WndProcImGui(HWND, UINT, WPARAM, LPARAM);
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+

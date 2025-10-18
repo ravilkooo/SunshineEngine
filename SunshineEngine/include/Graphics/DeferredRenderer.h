@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <EASTL/shared_ptr.h>
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -21,6 +21,6 @@ public:
     void RenderScene(const Scene& scene) override;
     void AddPass(RenderPass* pass) override;
 
-    //GBuffer gBuffer;
+    eastl::shared_ptr<GBuffer> pGBuffer;
 };
 

@@ -6,6 +6,7 @@
 
 #include "Scene.h"
 #include <Graphics/RenderingSystem.h>
+#include <Graphics/DeferredRenderer.h>
 #include <Windows/DisplayWindow.h>
 
 
@@ -15,6 +16,7 @@ public:
     Game();
     virtual ~Game();
 
+    virtual void InitGame() {};
     virtual void Run();
 
     virtual void Update(float deltaTime) = 0;
@@ -23,7 +25,7 @@ public:
 
     GameTimer timer;
     Scene scene;
-    RenderingSystem* renderer;
+    DeferredRenderer* renderer;
 
     DisplayWindow displayWindow;
 
