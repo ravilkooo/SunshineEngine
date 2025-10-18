@@ -8,8 +8,9 @@
 namespace DXSM = DirectX::SimpleMath;
 
 // : public GameObject
-class FullScreenQuad
+class FullScreenQuad : public GameObject
 {
+
     /*
 public:
     FullScreenQuad();

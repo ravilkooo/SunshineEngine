@@ -8,9 +8,9 @@ FullScreenQuad::FullScreenQuad()
 
 FullScreenQuad::FullScreenQuad(ID3D11Device* device)
 {
-    // MainColorPass
+    // FinalPass
     {
-        RenderTechnique* colorPass = new RenderTechnique("MainColorPass");
+        RenderTechnique* colorPass = new RenderTechnique("FinalPass");
         colorPass->AddBind(new Bind::Topology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP));
         
         wchar_t vsFilePath[250];
@@ -34,7 +34,7 @@ FullScreenQuad::FullScreenQuad(ID3D11Device* device)
         rastDesc.CullMode = D3D11_CULL_NONE;
         rastDesc.FillMode = D3D11_FILL_SOLID;
         colorPass->AddBind(new Bind::Rasterizer(device, rastDesc));
-        techniñs.insert({ "MainColorPass", colorPass });
+        techniñs.insert({ "FinalPass", colorPass });
     }
 }
 */

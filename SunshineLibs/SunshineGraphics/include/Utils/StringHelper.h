@@ -1,15 +1,12 @@
 #pragma once
 
-
-
-#include <string>
+#include <EASTL/string.h>
 
 class StringHelper
 {
 public:
-	static std::wstring StringToWide(std::string str);
-	static std::string GetFileExtension(const std::string& filename);
-	static std::string GetDirectoryFromPath(const std::string& filepath);
-	static std::string GetFileNameWithoutExtension(const std::string& filename);
+	static eastl::wstring GetFileExtension(const eastl::wstring& filename);
+	static eastl::wstring GetDirectoryFromPath(const eastl::wstring& filepath);
+	static eastl::wstring GetFileNameWithoutExtension(const eastl::wstring& filename);
 };
 

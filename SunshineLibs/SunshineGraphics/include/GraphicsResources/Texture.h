@@ -10,6 +10,8 @@
 #include "Bindable/Bindable.h"
 #include "Bindable/Sampler.h"
 
+#include <EASTL/string.h>
+
 
 namespace Bind
 {
@@ -17,7 +19,7 @@ namespace Bind
 		public Bindable, Resource
 	{
 	public:
-		Texture(ID3D11Device* device, const std::string& filePath, UINT slot = 0u,
+		Texture(ID3D11Device* device, const eastl::wstring& filePath, UINT slot = 0u,
 			Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER);
 
 		Texture(ID3D11Device* device, ID3D11Resource* pTexture, D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc,
@@ -42,7 +44,7 @@ namespace Bind
 		void InitializeColorTexture(ID3D11Device* device, const SE_Color* colorData, UINT width, UINT height);
 
 		UINT slot;
-		std::string filePath;
+		eastl::wstring filePath;
 		bool hasAlpha = false;
 		Microsoft::WRL::ComPtr<ID3D11Resource> pTexture;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView;

@@ -48,23 +48,20 @@ target_link_libraries(SunshineEngine
 
 message(STATUS "FMOD_LIB_DIR (from engine) = ${FMOD_LIB_DIR}")
 
-add_custom_command(TARGET SunshineEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodL.dll>
-        $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmod.dll>
-        $<TARGET_FILE_DIR:SunshineEngine>
-)
+# add_custom_command(TARGET SunshineEngine POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodL.dll>
+#         $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmod.dll>
+#         $<TARGET_FILE_DIR:SunshineEngine>
+# )
 
-message(STATUS $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/bin/Debug> $<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/bin/Release> )
+# message(STATUS $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/bin/Debug> $<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/bin/Release> )
 
-add_custom_command(TARGET SunshineEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodL.dll>
-        $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmod.dll>
-        ${CMAKE_BINARY_DIR}/bin
-        $<$<CONFIG:Debug>:${CMAKE_BINARY_DIR}/bin/Debug>
-        $<$<CONFIG:Release>:${CMAKE_BINARY_DIR}/bin/Release> 
-)
+# add_custom_command(TARGET SunshineEngine POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         $<$<CONFIG:Debug>:${FMOD_LIB_DIR}/fmodL.dll ${CMAKE_BINARY_DIR}/bin ${CMAKE_BINARY_DIR}/bin/Debug>
+#         $<$<CONFIG:Release>:${FMOD_LIB_DIR}/fmod.dll ${CMAKE_BINARY_DIR}/bin ${CMAKE_BINARY_DIR}/bin/Release>
+# )
 
 
 # -------------- JoltPhysics --------------

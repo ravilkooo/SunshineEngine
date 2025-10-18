@@ -2,7 +2,7 @@
 
 LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	ID3D11Texture2D* backBuffer,
-	UINT screenWidth, UINT screenHeight, GBuffer* pGBuffer, Camera* camera)
+	UINT screenWidth, UINT screenHeight, GBuffer* pGBuffer, eastl::shared_ptr<Camera> camera)
 	:
 	RenderPass("LightPass", device, context)
 {
@@ -94,7 +94,7 @@ void LightPass::Pass(const Scene& scene)
 
 			auto renderComponent = gameObject->GetComponent<RenderComponent>();
 
-			if (!renderComponent-> HasTechnique(techniqueTag))
+			if (!renderComponent->HasTechnique(techniqueTag))
 				continue;
 
 			gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
@@ -114,12 +114,12 @@ void LightPass::Pass(const Scene& scene)
 			lObj->UpdateBuffers(context);
 			LightObject::LightPosition lightPos = lObj->GetLightPositionInFrustum(GetCamera());
 
-			auto dsDesc = lObj->GetDepthStencilDesc(lightPos);
+			auto dsDesc = lObj->ChooseDepthStencilState(lightPos);
 			auto rastDesc = lObj->GetRasterizerDesc(lightPos);
 
 			ID3D11RasterizerState* rasterState;
 			ID3D11DepthStencilState* depthState;
-			device->CreateRasterizerState(&rastDesc, &rasterState);
+			device->ChooseRasterizer(&rastDesc, &rasterState);
 			device->CreateDepthStencilState(&dsDesc, &depthState);
 
 			context->OMSetDepthStencilState(depthState, 0);
@@ -154,12 +154,12 @@ void LightPass::EndFrame()
 	context->OMSetRenderTargets(0, NULL, NULL);
 }
 
-Camera* LightPass::GetCamera()
+eastl::shared_ptr<Camera> LightPass::GetCamera()
 {
 	return camera;
 }
 
-void LightPass::SetCamera(Camera* camera)
+void LightPass::SetCamera(eastl::shared_ptr<Camera> camera)
 {
 	this->camera = camera;
 }

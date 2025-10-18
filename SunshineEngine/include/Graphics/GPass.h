@@ -20,9 +20,9 @@ public:
     void Pass(const Scene& scene) override;
     void EndFrame() override;
 
-    Camera* GetCamera();
-    void SetCamera(Camera* camera);
-    Camera* camera;
+    eastl::shared_ptr<Camera> GetCamera();
+    void SetCamera(eastl::shared_ptr<Camera> camera);
+    eastl::shared_ptr<Camera> camera;
 
     UINT screenWidth = 800;
     UINT screenHeight = 800;

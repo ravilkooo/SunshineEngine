@@ -1,18 +1,19 @@
 #include "Graphics/Lighting/DirectionalLight.h"
-#include "Utils/wcharUtils.h"
+
+DirectionalLight::DirectionalLight(
+    DirectionalLightData directionalLightData)
+{
+    directionalLightData.Direction.Normalize();
+    
+    this->directionalLightData = eastl::make_shared<DirectionalLightData>(directionalLightData);
+}
+
+//void DirectionalLight::UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+//{
+//    //directionalLightPBuffer->Update(context.Get(), directionalLightData);
+//}
 
 /*
-DirectionalLight::DirectionalLight(ID3D11Device* device, Vector3 position,
-    Vector3 direction, Vector4 ambient,
-    Vector4 diffuse, Vector4 specular)
-{
-    direction.Normalize();
-    this->ambient = ambient;
-    directionalLightData = {
-        diffuse, specular, position, 0.0f,
-        direction, 0.0f
-    };
-
     indices = (int*)calloc(4, sizeof(int));
     indices[0] = 0;
     indices[1] = 1;
@@ -49,7 +50,7 @@ DirectionalLight::DirectionalLight(ID3D11Device* device, Vector3 position,
     }
 }
 
-D3D11_DEPTH_STENCIL_DESC DirectionalLight::GetDepthStencilDesc(LightObject::LightPosition lightPos)
+D3D11_DEPTH_STENCIL_DESC DirectionalLight::ChooseDepthStencilState(LightObject::LightPosition lightPos)
 {
     D3D11_DEPTH_STENCIL_DESC dsDesc = {};
     dsDesc.DepthEnable = TRUE;
@@ -64,20 +65,5 @@ D3D11_RASTERIZER_DESC DirectionalLight::GetRasterizerDesc(LightObject::LightPosi
     rasterDesc.CullMode = D3D11_CULL_NONE;
     rasterDesc.FillMode = D3D11_FILL_SOLID;
     return rasterDesc;
-}
-
-LightObject::LightPosition DirectionalLight::GetLightPositionInFrustum(Camera* camera)
-{
-    return LightPosition::FILL;
-}
-
-bool DirectionalLight::IsFrustumInsideOfLight(Camera* camera)
-{
-    return true;
-}
-
-void DirectionalLight::UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
-{
-    directionalLightPBuffer->Update(context.Get(), directionalLightData);
 }
 */

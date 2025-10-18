@@ -3,34 +3,33 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <GraphicsResources/VertexShader.h>
+
+#include <EASTL/shared_ptr.h>
+
 #include "GameObject.h"
 
-namespace DXSM = DirectX::SimpleMath;
-
 #include "LightObject.h"
+#include "LightData.h"
+
+namespace DXSM = DirectX::SimpleMath;
 
 class AmbientLight :
     public LightObject
 {
-    /*
 public:
-    AmbientLight(ID3D11Device* device, DXSM::Vector4 ambient);
+    eastl::shared_ptr<AmbientLightData> ambientLightData;
 
-    struct AmbientLightPCB {
-        DirectX::XMFLOAT4 Ambient;
-    } ambientLightData;
+    AmbientLight(AmbientLightData initData = { DXSM::Vector4::One });
 
+    // Unnecessary?
+    //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+/*
     DXSM::Vector4 ambient;
 
     Bind::PixelConstantBuffer<AmbientLightPCB>* ambientLightPBuffer;
 
-    D3D11_DEPTH_STENCIL_DESC GetDepthStencilDesc(LightObject::LightPosition lightPos) override;
+    D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos) override;
     D3D11_RASTERIZER_DESC GetRasterizerDesc(LightObject::LightPosition lightPos) override;
-
-    LightPosition GetLightPositionInFrustum(Camera* camera) override;
-    bool IsFrustumInsideOfLight(Camera* camera) override;
-
-    void UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
     */
 };
 

@@ -24,11 +24,7 @@ public:
     RenderComponent(RenderComponent&&) noexcept = default;
     RenderComponent& operator=(RenderComponent&&) noexcept = default;
 
-    //void Render(ID3D11DeviceContext* context);
-
     bool HasTechnique(eastl::string technique);
-
-    virtual void DrawTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) const noexcept;
 
     void PassTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 

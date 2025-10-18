@@ -7,19 +7,19 @@
 
 #include "RenderPass.h"
 
-class MainColorPass :
+class FinalPass :
     public RenderPass
 {
 public:
-    MainColorPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
+    FinalPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
         UINT screenWidth, UINT screenHeight);
     
     void StartFrame() override;
     void EndFrame() override;
 
-    Camera* GetCamera();
-    void SetCamera(Camera* camera);
-    Camera* camera;
+    eastl::shared_ptr<Camera> GetCamera();
+    void SetCamera(eastl::shared_ptr<Camera> camera);
+    eastl::shared_ptr<Camera> camera;
 protected:
     UINT screenWidth = 800;
     UINT screenHeight = 800;

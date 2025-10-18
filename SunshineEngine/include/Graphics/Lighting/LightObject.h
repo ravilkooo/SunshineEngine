@@ -1,16 +1,15 @@
 #pragma once
 
-#include "GraphicsUtils/Camera.h"
+#include "GameObject.h"
 
-// : public GameObject
-class LightObject
+class LightObject : public GameObject
 {
 public:
-    enum class LightPosition {
-        INSIDE, INTERSECT_FAR_PLANE, OUTSIDE, FILL, BEHIND_NEAR_PLANE
-    };
-    
-    virtual D3D11_DEPTH_STENCIL_DESC GetDepthStencilDesc(LightObject::LightPosition lightPos)
+    // Unnecessary?
+    //virtual void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) = 0;
+
+    /*
+    virtual D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos)
     {
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
         dsDesc.DepthEnable = TRUE;
@@ -25,10 +24,5 @@ public:
         rasterDesc.FillMode = D3D11_FILL_SOLID;
         return rasterDesc;
     };
-
-    virtual LightPosition GetLightPositionInFrustum(Camera* camera) { return LightPosition::FILL; };
-    virtual bool IsFrustumInsideOfLight(Camera* camera) { return true; };
-
-    virtual void UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) = 0;
+    */
 };
-

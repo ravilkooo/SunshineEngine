@@ -35,7 +35,7 @@ public:
 
     Vector4 ambient;
 
-    D3D11_DEPTH_STENCIL_DESC GetDepthStencilDesc(LightPosition lightPos) override;
+    D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightPosition lightPos) override;
     D3D11_RASTERIZER_DESC GetRasterizerDesc(LightPosition lightPos) override;
 
     LightPosition GetLightPositionInFrustum(Camera* camera) override;

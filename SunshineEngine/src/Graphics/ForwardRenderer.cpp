@@ -80,12 +80,12 @@ void ForwardRenderer::AddPass(RenderPass* pass)
 	passes.push_back(pass);
 }
 
-void ForwardRenderer::SetMainCamera(Camera* camera)
+void ForwardRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)
 {
 	mainCamera = camera;
 }
 
-Camera* ForwardRenderer::GetMainCamera()
+eastl::shared_ptr<Camera> ForwardRenderer::GetMainCamera()
 {
 	return mainCamera;
 }

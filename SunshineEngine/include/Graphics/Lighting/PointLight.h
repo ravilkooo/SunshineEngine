@@ -19,39 +19,37 @@
 #include <d3d11.h>
 #include <directxmath.h>
 
+#include <EASTL/shared_ptr.h>
+
 #include "GraphicsUtils/Camera.h"
+#include "LightData.h"
 
 namespace DXSM = DirectX::SimpleMath;
 
 class PointLight :
     public LightObject
 {
-    /*
 public:
-    PointLight();
-    PointLight(ID3D11Device* device, Vector3 position,
-        float range, Vector3 att, Vector4 ambient, Vector4 diffuse, Vector4 specular);
+    eastl::shared_ptr<PointLightData> pointLightData;
 
-    struct PointLightPCB {
-        XMFLOAT4 Diffuse;
-        XMFLOAT4 Specular;
-        XMFLOAT3 Position;
-        float Range;
+    PointLight(
+        PointLightData pointLightData =
+        {
+            DXSM::Vector4::One,
+            DXSM::Vector4::One,
+            DXSM::Vector3::Zero, 20,
+            DXSM::Vector3::One, 0
+        });
 
-        XMFLOAT3 Att;
-        float pad;
-    } pointLightData;
+    // Unnecessary?
+    //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 
+    /*
     Vector4 ambient;
 
     Bind::PixelConstantBuffer<PointLightPCB>* pointLightPBuffer;
 
-    D3D11_DEPTH_STENCIL_DESC GetDepthStencilDesc(LightObject::LightPosition lightPos) override;
+    D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos) override;
     D3D11_RASTERIZER_DESC GetRasterizerDesc(LightObject::LightPosition lightPos) override;
-
-    LightPosition GetLightPositionInFrustum(Camera* camera) override;
-    bool IsFrustumInsideOfLight(Camera* camera) override;
-
-    void UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
     */
 };

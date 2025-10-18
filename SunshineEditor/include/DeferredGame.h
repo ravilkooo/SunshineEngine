@@ -14,22 +14,22 @@
 #include <Component/TransformComponent.h>
 #include <Component/RenderComponent.h>
 
+#include <Utils/StringUtils.h>
+
+#include <GameObjectFactory.h>
+
 #include <windows.h>
 #include <d3d11.h>
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
+#include <SimpleMath.h>
+
+namespace DXSM = DirectX::SimpleMath;
+namespace DX = DirectX;
+
 #define DEBUG_LIGHT_OBJECTS
-
-class MyGo : public GameObject {
-public:
-    MyGo() {};
-
-    void Update(float deltaTime) override {
-        return;
-    }
-};
 
 class DeferredGame :
     public Game
@@ -53,7 +53,7 @@ public:
     LightPass* gLightPass;
 
     // GameObject
-    eastl::unique_ptr<GameObject> gobj;
+    eastl::unique_ptr<GameObject> defaultGameObject;
 };
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

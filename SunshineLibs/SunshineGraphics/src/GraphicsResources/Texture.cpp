@@ -29,14 +29,14 @@ namespace Bind
 		this->pTextureView = pTextureView;
 	}
 
-	Texture::Texture(ID3D11Device* device, const std::string& filePath, UINT slot, Bind::PipelineStage pipelineStage)
+	Texture::Texture(ID3D11Device* device, const eastl::wstring& filePath, UINT slot, Bind::PipelineStage pipelineStage)
 		: slot(slot), filePath(filePath), pipelineStage(pipelineStage)
 	{
-		if (StringHelper::GetFileExtension(filePath) == "dds")
+		if (StringHelper::GetFileExtension(filePath) == L"dds")
 		{
 			//std::cout << "DDS loaded!!! " << filePath << " :: " << StringHelper::GetFileExtension(filePath) << "\n";
 			HRESULT hr = DirectX::CreateDDSTextureFromFile(device,
-				StringHelper::StringToWide(filePath).c_str(), &pTexture, &pTextureView);
+				(filePath).c_str(), &pTexture, &pTextureView);
 			if (FAILED(hr))
 			{
 				this->Initialize1x1ColorTexture(device, SE_Colors::UnloadedTextureColor);
@@ -45,7 +45,7 @@ namespace Bind
 		}
 		else
 		{
-			std::cout << "Wrong texture file extension: " << StringHelper::GetFileExtension(filePath) << "\n";
+			wprintf(L"Wrong texture file extension: %ls\n", StringHelper::GetFileExtension(filePath));
 			this->Initialize1x1ColorTexture(device, SE_Colors::UnloadedTextureColor);
 			/*
 			HRESULT hr = DirectX::CreateWICTextureFromFile(device, StringHelper::StringToWide(filePath).c_str(), *pTexture, GetTextureResourceViewAddress());

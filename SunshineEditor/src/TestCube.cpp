@@ -1,8 +1,6 @@
 #include "TestCube.h"
 
 /*
-#include <Utils/ShapeGenerator.h>
-
 TestCube::TestCube()
 {
 }
@@ -91,28 +89,5 @@ TestCube::TestCube(ID3D11Device* device, float width, float height, float depth,
         techniñs.insert({ "GPass", gPass });
     }
 
-}
-
-
-void TestCube::Update(float deltaTime)
-{
-    //Vector3 new_pos = position;
-    // new_pos = Vector3::Transform(new_pos, Matrix::CreateRotationY(deltaTime * speed));
-    //new_pos.y = position.y;
-    //new_pos.z = position.z;
-    angle += deltaTime * speed;
-    worldMat = initTransform * Matrix::CreateTranslation(position)
-        * Matrix::CreateRotationY(angle);
-
-}
-
-Vector3 TestCube::GetCenterLocation()
-{
-    return position;
-}
-
-void TestCube::SetInitTransform(Matrix transformMat)
-{
-    initTransform = transformMat;
 }
 */

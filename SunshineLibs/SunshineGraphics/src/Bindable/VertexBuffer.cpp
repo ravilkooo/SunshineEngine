@@ -16,7 +16,7 @@ Bind::VertexBuffer::VertexBuffer(ID3D11Device* device, const void* data,
 
     if (type == Bind::VertexBuffer::VBType::SINGLE)
     {
-        bd.Usage = D3D11_USAGE_IMMUTABLE;
+        bd.Usage = D3D11_USAGE_DEFAULT;
         bd.ByteWidth = count * stride;
         bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         bd.CPUAccessFlags = 0;
