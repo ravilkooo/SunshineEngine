@@ -1,10 +1,10 @@
 #pragma once
 
-
+#include <EASTL/shared_ptr.h>
 
 #include <stdexcept>
 #include <GraphicsUtils/Camera.h>
-
+#include "GBuffer.h"
 #include "RenderPass.h"
 
 class FinalPass :
@@ -12,7 +12,7 @@ class FinalPass :
 {
 public:
     FinalPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
-        UINT screenWidth, UINT screenHeight);
+        UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera);
     
     void StartFrame() override;
     void EndFrame() override;

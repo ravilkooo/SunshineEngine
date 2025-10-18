@@ -34,14 +34,14 @@ public:
 	eastl::unique_ptr<AmbientLight> CreateAmbientLightObject(
 		ID3D11Device* device,
 		eastl::shared_ptr<Camera> camera,
-		AmbientLightData initData = { DXSM::Vector4::One * 0.1 });
+		AmbientLightData initData = { DXSM::Vector3::One * 0.1f, 1.0f });
 
 	eastl::unique_ptr<DirectionalLight> CreateDirectionalLightObject(
 		ID3D11Device* device,
 		eastl::shared_ptr<Camera> camera,
 		DirectionalLightData initData = {
-			DXSM::Vector4(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f, 1.0f),
-			DXSM::Vector4(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f, 1.0f),
+			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
 			DXSM::Vector3::Zero, 0,
 			DXSM::Vector3(0, -1, 0), 0
 		});
@@ -50,8 +50,8 @@ public:
 		ID3D11Device* device,
 		eastl::shared_ptr<Camera> camera,
 		PointLightData initData = {
-			DXSM::Vector4::One,
-			DXSM::Vector4::One,
+			DXSM::Vector3::One, 1.0f,
+			DXSM::Vector3::One, 1.0f,
 			DXSM::Vector3::Zero, 20,
 			DXSM::Vector3::One, 0
 		});

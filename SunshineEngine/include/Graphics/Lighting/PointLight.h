@@ -35,8 +35,8 @@ public:
     PointLight(
         PointLightData pointLightData =
         {
-            DXSM::Vector4::One,
-            DXSM::Vector4::One,
+            DXSM::Vector3::One, 1,
+            DXSM::Vector3::One, 1,
             DXSM::Vector3::Zero, 20,
             DXSM::Vector3::One, 0
         });

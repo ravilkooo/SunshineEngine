@@ -6,8 +6,10 @@ SamplerState Sam : register(s0);
 
 struct DirectionalLight
 {
-    float4 Diffuse;
-    float4 Specular;
+    float3 Diffuse;
+    float DiffusePad;
+    float3 Specular;
+    float SpecularPad;
     float3 Position;
     float pad1;
     
@@ -25,7 +27,7 @@ struct CameraData
 
 struct Material
 {
-    float4 Diffuse;
+    float3 Diffuse;
     float2 Specular;
 };
 
@@ -41,11 +43,11 @@ cbuffer LightBuffer : register(b1) // per frame
 
 void calcDirectionalLight(float3 wPos, float3 normal, float3 toEye, Material mat,
     DirectionalLight dirLight,
-    out float4 dl_diffuse,
-    out float4 dl_spec)
+    out float3 dl_diffuse,
+    out float3 dl_spec)
 {
-    dl_diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    dl_spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    dl_diffuse = float3(0.0f, 0.0f, 0.0f);
+    dl_spec = float3(0.0f, 0.0f, 0.0f);
     
     {
         float3 lightVec = -dirLight.Direction;
@@ -78,12 +80,12 @@ float4 PSMain(PS_IN input) : SV_Target
     float y = input.pos.y / SMAP_SIZE_Y;
     Material mat =
     {
-        float4(AlbedoMap.Sample(Sam, float2(x, y)).rgb, 1.0f),
+        float3(AlbedoMap.Sample(Sam, float2(x, y)).rgb),
         float2(SpecularMap.Sample(Sam, float2(x, y)).rg)
     };
     
-    float4 dl_diffuse;
-    float4 dl_spec;
+    float3 dl_diffuse;
+    float3 dl_spec;
     
     float4 normal = float4(NormalMap.Sample(Sam, float2(x, y)).rgb, 1.0f);
     /*
@@ -102,6 +104,6 @@ float4 PSMain(PS_IN input) : SV_Target
     calcDirectionalLight(pixelWorldPos.xyz, normal.xyz, toEye, mat, directionalLight,
         dl_diffuse, dl_spec);
     
-    return saturate(dl_diffuse + dl_spec);
+    return saturate(float4(dl_diffuse + dl_spec, 1.0f));
     //return float4(1.0f, 1.0f, 0.0f, 0.5f);
 }

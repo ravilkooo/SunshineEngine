@@ -23,7 +23,7 @@ struct CameraData
 
 struct Material
 {
-    float4 Diffuse;
+    float3 Diffuse;
     float2 Specular;
 };
 
@@ -51,9 +51,9 @@ static const float SMAP_SIZE_Y = 800.0f;
 
 float4 PSMain(PS_IN input) : SV_Target
 {
-    float4 sampledColor = SkyBoxMap.Sample(SkyBoxSam, input.texCoord);
-    float3 delta = skyBox.Tint - sampledColor.xyz;
-    float4 newColor = sampledColor + float4(delta * skyBox.Power.xxx, 0.0f);
+    float3 sampledColor = SkyBoxMap.Sample(SkyBoxSam, input.texCoord).xyz;
+    float3 delta = skyBox.Tint - sampledColor;
+    float3 newColor = sampledColor + delta * skyBox.Power.xxx;
     
-    return saturate(newColor);
+    return saturate(float4(newColor, 1.0f));
 }

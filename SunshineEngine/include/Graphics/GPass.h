@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <EASTL/shared_ptr.h>
 
 #include <stdexcept>
 
@@ -13,7 +13,7 @@ class GPass :
 {
 public:
     GPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
-        UINT screenWidth, UINT screenHeight);
+        UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera);
 
     // Inherited via RenderPass
     void StartFrame() override;
@@ -31,6 +31,7 @@ public:
 
     ID3D11RenderTargetView* gBufferRTVs[4];
     D3D11_VIEWPORT viewport;
-    GBuffer* pGBuffer;
+
+    eastl::shared_ptr<GBuffer> pGBuffer;
 };
 

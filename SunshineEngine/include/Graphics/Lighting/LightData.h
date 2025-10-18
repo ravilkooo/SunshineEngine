@@ -5,12 +5,15 @@
 namespace DXSM = DirectX::SimpleMath;
 
 struct AmbientLightData {
-    DXSM::Vector4 Ambient;
+    DXSM::Vector3 Ambient;
+    float AmbientPad;
 };
 
 struct DirectionalLightData {
-    DXSM::Vector4 Diffuse;
-    DXSM::Vector4 Specular;
+    DXSM::Vector3 Diffuse;
+    float DiffusePad;
+    DXSM::Vector3 Specular;
+    float SpecularPad;
     DXSM::Vector3 Position;
     float pad1;
 
@@ -19,8 +22,10 @@ struct DirectionalLightData {
 };
 
 struct PointLightData {
-    DXSM::Vector4 Diffuse;
-    DXSM::Vector4 Specular;
+    DXSM::Vector3 Diffuse;
+    float DiffusePad;
+    DXSM::Vector3 Specular;
+    float SpecularPad;
     DXSM::Vector3 Position;
     float Range;
 
@@ -29,8 +34,10 @@ struct PointLightData {
 };
 
 struct SpotLightData {
-    DXSM::Vector4 Diffuse;
-    DXSM::Vector4 Specular;
+    DXSM::Vector3 Diffuse;
+    float DiffusePad;
+    DXSM::Vector3 Specular;
+    float SpecularPad;
     DXSM::Vector3 Position;
     float Range;
 
@@ -43,5 +50,5 @@ struct SpotLightData {
 
 struct SkyBoxData {
     DXSM::Vector3 Tint;
-    float brightness;
+    float Power;
 };

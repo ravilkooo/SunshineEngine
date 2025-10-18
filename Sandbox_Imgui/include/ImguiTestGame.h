@@ -1,8 +1,8 @@
 #pragma once
 
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
 
 #include <Game.h>
 
@@ -21,6 +21,13 @@ public:
 	void Update(float deltaTime) override;
 	void Render() override;
 	void InitGame();
+
+	void RenderGameWorld();
+	void ShowSceneHierarchy();
+	void ShowContentBrowser();
+	void ShowProperties();
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> resultSRV;
 };
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

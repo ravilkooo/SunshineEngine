@@ -54,6 +54,10 @@ DeferredRenderer::DeferredRenderer(HWND hWnd,
 		throw std::runtime_error("Failed to get back buffer");
 
 
+	this->pGBuffer = eastl::make_shared<GBuffer>(device.Get(), screenWidth, screenHeight);
+	mainCamera = eastl::make_shared<Camera>(device.Get(), screenWidth * 1.0f / screenHeight);
+	mainCamera->SetPosition({ 0, 0, -10 });
+
 }
 
 void DeferredRenderer::RenderScene(const Scene& scene)

@@ -6,7 +6,8 @@ SamplerState Sam : register(s0);
 
 struct AmbientLight
 {
-    float4 Ambient;
+    float3 Ambient;
+    float AmbientPad;
 };
 
 struct CameraData
@@ -19,7 +20,7 @@ struct CameraData
 
 struct Material
 {
-    float4 Diffuse;
+    float3 Diffuse;
     float2 Specular;
 };
 
@@ -34,7 +35,7 @@ cbuffer LightBuffer : register(b1) // per frame
 };
 
 void calcAmbientLight(Material mat, AmbientLight ambLight,
-    out float4 al_ambient)
+    out float3 al_ambient)
 {
     //al_ambient = mat.Ambient * ambientLight.Ambient;
     al_ambient = mat.Diffuse * ambLight.Ambient * 0.5;
@@ -56,14 +57,14 @@ float4 PSMain(PS_IN input) : SV_Target
     float y = input.pos.y / SMAP_SIZE_Y;
     Material mat =
     {
-        float4(AlbedoMap.Sample(Sam, float2(x, y)).rgb, 1.0f),
+        float3(AlbedoMap.Sample(Sam, float2(x, y)).rgb),
         float2(SpecularMap.Sample(Sam, float2(x, y)).rg)
     };
     
-    float4 al_ambient;
+    float3 al_ambient;
     calcAmbientLight(mat, ambientLight,
         al_ambient);
     
-    return saturate(al_ambient);
+    return saturate(float4(al_ambient, 1.0f));
     //return float4(1.0f, 1.0f, 0.0f, 0.5f);
 }
