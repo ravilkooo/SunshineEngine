@@ -55,6 +55,9 @@ void RenderTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> contex
 
 	// Bind depthState
 	depthStencilState->Bind(context.Get());
+
+	if (blendState)
+		blendState->Bind(context.Get());
 }
 
 void RenderTechnique::DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

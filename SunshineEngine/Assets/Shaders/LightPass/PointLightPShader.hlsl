@@ -6,8 +6,10 @@ SamplerState Sam : register(s0);
 
 struct PointLight
 {
-    float4 Diffuse;
-    float4 Specular;
+    float3 Diffuse;
+    float DiffusePad;
+    float3 Specular;
+    float SpecularPad;
     float3 Position;
     float Range;
 
@@ -25,7 +27,7 @@ struct CameraData
 
 struct Material
 {
-    float4 Diffuse;
+    float3 Diffuse;
     float2 Specular;
 };
 
@@ -41,12 +43,12 @@ cbuffer LightBuffer : register(b1) // per frame
 
 void calcPointLight(float3 wPos, float3 normal, float3 toEye, Material mat,
     PointLight pointLight,
-    out float4 pl_diffuse,
-    out float4 pl_spec)
+    out float3 pl_diffuse,
+    out float3 pl_spec)
 {
-    //pl_ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    pl_diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    pl_spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    //pl_ambient = float3(0.0f, 0.0f, 0.0f);
+    pl_diffuse = float3(0.0f, 0.0f, 0.0f);
+    pl_spec = float3(0.0f, 0.0f, 0.0f);
     
     float3 lightVec = pointLight.Position - wPos;
     float d = length(lightVec);
@@ -86,12 +88,12 @@ float4 PSMain(PS_IN input) : SV_Target
     float y = input.pos.y / SMAP_SIZE_Y;
     Material mat =
     {
-        float4(AlbedoMap.Sample(Sam, float2(x, y)).rgb, 1.0f),
+        float3(AlbedoMap.Sample(Sam, float2(x, y)).rgb),
         float2(SpecularMap.Sample(Sam, float2(x, y)).rg)
     };
     
-    float4 pl_diffuse;
-    float4 pl_spec;
+    float3 pl_diffuse;
+    float3 pl_spec;
     
     float4 normal = float4(NormalMap.Sample(Sam, float2(x, y)).rgb, 1.0f);
     /*
@@ -110,6 +112,6 @@ float4 PSMain(PS_IN input) : SV_Target
     calcPointLight(pixelWorldPos.xyz, normal.xyz, toEye, mat, pointLight1,
         pl_diffuse, pl_spec);
     
-    return saturate(pl_diffuse + pl_spec);
+    return saturate(float4(pl_diffuse + pl_spec, 1.0f));
     //return float4(1.0f, 1.0f, 0.0f, 0.5f);
 }

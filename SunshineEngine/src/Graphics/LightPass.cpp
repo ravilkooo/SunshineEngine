@@ -2,36 +2,12 @@
 
 LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	ID3D11Texture2D* backBuffer,
-	UINT screenWidth, UINT screenHeight, GBuffer* pGBuffer, eastl::shared_ptr<Camera> camera)
+	UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera)
 	:
 	RenderPass("LightPass", device, context)
 {
 	this->pGBuffer = pGBuffer;
 	this->camera = camera;
-
-	D3D11_TEXTURE2D_DESC lightDesc = {};
-	lightDesc.Width = screenWidth;
-	lightDesc.Height = screenHeight;
-	lightDesc.MipLevels = 1;
-	lightDesc.ArraySize = 1;
-	lightDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	lightDesc.SampleDesc.Count = 1;
-	lightDesc.Usage = D3D11_USAGE_DEFAULT;
-	lightDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	device->CreateTexture2D(&lightDesc, nullptr, pGBuffer->pLightBuffer.GetAddressOf());
-	// Normal SRV
-	D3D11_SHADER_RESOURCE_VIEW_DESC descSRV = {};
-	descSRV.Format = lightDesc.Format;
-	descSRV.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	descSRV.Texture2DArray.MostDetailedMip = 0;
-	descSRV.Texture2DArray.MipLevels = 1;
-	descSRV.Texture2DArray.FirstArraySlice = 0;
-	descSRV.Texture2DArray.ArraySize = 1;
-	device->CreateShaderResourceView(pGBuffer->pLightBuffer.Get(), &descSRV, pGBuffer->pLightSRV.GetAddressOf());
-	// Normal RTV
-	HRESULT hr = device->CreateRenderTargetView(pGBuffer->pLightBuffer.Get(), nullptr, pGBuffer->pLightRTV.GetAddressOf());
-	if (FAILED(hr))
-		throw std::runtime_error("Failed to create Render Target View");
 
 	gBufferRTV = pGBuffer->pLightRTV.Get();
 
@@ -61,6 +37,31 @@ LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	AddPerFrameBind(new Bind::BlendState(device, blendDesc));
+
+
+	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pNormalSRV.Get(), 0u));
+	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pAlbedoSRV.Get(), 1u));
+	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pSpecularSRV.Get(), 2u));
+	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pWorldPosSRV.Get(), 3u));
+
+	// Usual sampler for all SRV
+	D3D11_SAMPLER_DESC samplerDesc;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	AddPerFrameBind(new Bind::Sampler(device, samplerDesc, 0u));
+	
 }
 
 void LightPass::StartFrame()
@@ -102,40 +103,6 @@ void LightPass::Pass(const Scene& scene)
 
 		}
 	}
-
-	/*
-	for (SceneNode* node : scene.nodes) {
-		if (!node->HasTechnique(techniqueTag))
-			continue;
-		// Turn off depth write
-		// Prepare Lights (depthstencil desc and rast desc) and bind (depthstencil and rast)
-		LightObject* lObj = dynamic_cast<LightObject*>(node);
-		if (lObj) {
-			lObj->UpdateBuffers(context);
-			LightObject::LightPosition lightPos = lObj->GetLightPositionInFrustum(GetCamera());
-
-			auto dsDesc = lObj->ChooseDepthStencilState(lightPos);
-			auto rastDesc = lObj->GetRasterizerDesc(lightPos);
-
-			ID3D11RasterizerState* rasterState;
-			ID3D11DepthStencilState* depthState;
-			device->ChooseRasterizer(&rastDesc, &rasterState);
-			device->CreateDepthStencilState(&dsDesc, &depthState);
-
-			context->OMSetDepthStencilState(depthState, 0);
-			context->RSSetState(rasterState);
-
-			node->PassTechnique(techniqueTag, GetDeviceContext());
-
-			context->OMSetDepthStencilState(nullptr, 0);
-			context->RSSetState(nullptr);
-
-		}
-		else {
-			continue;
-		}
-	}
-	*/
 
 	ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr, nullptr, nullptr };
 	context->PSSetShaderResources(0, 4, nullSRVs);

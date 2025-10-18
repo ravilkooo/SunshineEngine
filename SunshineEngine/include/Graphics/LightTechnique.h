@@ -39,3 +39,6 @@ template void LightTechnique<DirectionalLightData>::BindAll(Microsoft::WRL::ComP
 
 template class LightTechnique<PointLightData>;
 template void LightTechnique<PointLightData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);
+
+template class LightTechnique<SkyBoxData>;
+template void LightTechnique<SkyBoxData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);

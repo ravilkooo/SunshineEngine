@@ -65,7 +65,7 @@ public:
 
     static eastl::shared_ptr<Mesh> CreateSphereMesh(
         ID3D11Device* device,
-        float radius = 1.0f, uint32_t sliceCount = 10, uint32_t stackCount = 10);
+        float radius = 1.0f, uint32_t sliceCount = 10, uint32_t stackCount = 20);
 
     static eastl::shared_ptr<Mesh> CreateGeosphereMesh(
         ID3D11Device* device,
@@ -96,6 +96,11 @@ public:
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices,
         float radius = 1.0f, uint32_t sliceCount=10, uint32_t stackCount=10);
+
+    static void FillSphereMesh_old(
+        eastl::vector<Vertex>& vertices,
+        eastl::vector<uint32_t>& indices,
+        float radius = 1.0f, uint32_t sliceCount = 10, uint32_t stackCount = 10);
 
     static void FillGeosphereMesh(
         eastl::vector<Vertex>& vertices,

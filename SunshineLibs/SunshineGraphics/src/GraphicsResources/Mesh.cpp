@@ -71,8 +71,8 @@ void Mesh::FillUnwrappedBoxMesh(
         {0 * du, 1 * dv}, // -X
         {1 * du, 0 * dv}, // +Y
         {1 * du, 2 * dv}, // -Y
-        {1 * du, 1 * dv}, // +Z
-        {3 * du, 1 * dv}  // -Z
+        {3 * du, 1 * dv}, // -Z
+        {1 * du, 1 * dv}  // +Z
     };
 
     // ¬спомогательные данные дл€ каждой грани
@@ -196,6 +196,100 @@ void Mesh::FillUnwrappedBoxMesh_repeat(eastl::vector<Vertex>& vertices,
 }
 
 void Mesh::FillSphereMesh(
+    eastl::vector<Vertex>& vertices,
+    eastl::vector<uint32_t>& indices,
+    float radius, uint32_t sliceCount, uint32_t stackCount)
+{
+    sliceCount = eastl::max(sliceCount, 4u);
+    stackCount = eastl::max(stackCount, 1u);
+
+    vertices.resize(2 + (2 * stackCount + 1) * (sliceCount + 1));
+    indices.resize(6 * (sliceCount + 1) + 2 * 6 * stackCount * (sliceCount + 1));
+
+    float sliceStep = DX::XM_2PI / sliceCount;
+    float elevationStep = DX::XM_PIDIV2 / (stackCount + 1);
+
+
+    UINT _offsetCommonVertexIdx = 0;
+    // top vertex
+    vertices[_offsetCommonVertexIdx++] = { DXSM::Vector3(0.0f, radius, 0.0f), DXSM::Vector4::One, DXSM::Vector2(0, 0),
+    DXSM::Vector3(0,1,0) };
+    // other vertices
+    for (UINT i = 1; i <= 2 * stackCount + 1; ++i)
+    {
+        for (UINT j = 0; j <= sliceCount; ++j) {
+            vertices[_offsetCommonVertexIdx++] =
+            { DXSM::Vector3(
+                radius * sinf(elevationStep * i) * cosf(sliceStep * j),
+                radius * cosf(elevationStep * i),
+                radius * sinf(elevationStep * i) * sinf(sliceStep * j)
+            ),
+                DXSM::Vector4::One,
+                DXSM::Vector2(j * 1.0f / sliceCount , (i * 1.0f) / (2 * stackCount + 2)),
+                DXSM::Vector3(
+                    sinf(elevationStep * i) * cosf(sliceStep * j),
+                    cosf(elevationStep * i),
+                    sinf(elevationStep * i) * sinf(sliceStep * j)
+                ) };
+        }
+    }
+    // bottom vertex
+    vertices[_offsetCommonVertexIdx++] = { DXSM::Vector3(0.0f, -radius, 0.0f), DXSM::Vector4::One, DXSM::Vector2(1, 1),
+    DXSM::Vector3(0,-1,0) };
+
+    UINT indexIndex = 0;
+
+    for (UINT j = 0; j < sliceCount; ++j) {
+        indices[indexIndex++] = 0;
+        indices[indexIndex++] = j + 2;
+        indices[indexIndex++] = j + 1;
+    }
+
+    indices[indexIndex++] = 0;
+    indices[indexIndex++] = 1;
+    indices[indexIndex++] = sliceCount;
+
+
+    for (UINT i = 0; i < 2 * stackCount; ++i) {
+        UINT startIndex = 1 + i * (sliceCount + 1);
+        UINT nextStartIndex = startIndex + (sliceCount + 1);
+        for (UINT j = 0; j < sliceCount; ++j) {
+
+            indices[indexIndex++] = startIndex + j;
+            indices[indexIndex++] = startIndex + j + 1;
+            indices[indexIndex++] = nextStartIndex + j;
+
+            indices[indexIndex++] = startIndex + j + 1;
+            indices[indexIndex++] = nextStartIndex + j + 1;
+            indices[indexIndex++] = nextStartIndex + j;
+        }
+
+        indices[indexIndex++] = startIndex + sliceCount;
+        indices[indexIndex++] = startIndex;
+        indices[indexIndex++] = nextStartIndex + sliceCount;
+
+        indices[indexIndex++] = startIndex;
+        indices[indexIndex++] = nextStartIndex;
+        indices[indexIndex++] = nextStartIndex + sliceCount;
+    }
+
+
+    UINT bottomIndex = _offsetCommonVertexIdx - 1;
+    UINT startIndex = 1 + 2 * stackCount * (sliceCount + 1);
+    for (UINT j = 0; j < sliceCount; ++j) {
+        indices[indexIndex++] = bottomIndex;
+        indices[indexIndex++] = startIndex + j;
+        indices[indexIndex++] = startIndex + j + 1;
+    }
+
+    indices[indexIndex++] = bottomIndex;
+    indices[indexIndex++] = startIndex + sliceCount;
+    indices[indexIndex++] = startIndex;
+
+    return;
+}
+
+void Mesh::FillSphereMesh_old(
     eastl::vector<Vertex>& vertices,
     eastl::vector<uint32_t>& indices,
     float radius, uint32_t sliceCount, uint32_t stackCount)

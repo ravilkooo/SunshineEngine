@@ -2,7 +2,6 @@
 
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include <GraphicsResources/VertexShader.h>
 
 #include <EASTL/shared_ptr.h>
 
@@ -19,18 +18,7 @@ class AmbientLight :
 public:
     eastl::shared_ptr<AmbientLightData> ambientLightData;
 
-    AmbientLight(AmbientLightData initData = { DXSM::Vector4::One });
-
-    // Unnecessary?
-    //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-/*
-    DXSM::Vector4 ambient;
-
-    Bind::PixelConstantBuffer<AmbientLightPCB>* ambientLightPBuffer;
-
-    D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos) override;
-    D3D11_RASTERIZER_DESC GetRasterizerDesc(LightObject::LightPosition lightPos) override;
-    */
+    AmbientLight(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
 };
 
 
