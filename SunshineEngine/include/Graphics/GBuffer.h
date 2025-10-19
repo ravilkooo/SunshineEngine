@@ -10,6 +10,9 @@
 class GBuffer
 {
 public:
+	UINT m_screenWidth = 800u;
+	UINT m_screenHeight = 800u;
+
 	// Depth
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthBuffer;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthDSV;

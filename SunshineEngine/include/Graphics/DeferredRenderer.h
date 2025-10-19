@@ -17,7 +17,8 @@ public:
     DeferredRenderer();
     DeferredRenderer(HWND hWnd, UINT screenWidth, UINT screenHeight);
 
-    // Inherited via RenderingSystem
+    void InitGBuffer(UINT screenWidth, UINT screenHeight);
+    
     void RenderScene(const Scene& scene) override;
     void AddPass(RenderPass* pass) override;
 

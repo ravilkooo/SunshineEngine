@@ -16,13 +16,21 @@
 
 // SunshineLibs
 #include <Graphics/RenderingSystem.h>
-#include <Windows/DisplayWindow.h>
+#include <Windows/WindowsApp.h>
 #include <GameTimer.h>
+#include <Project.h>
+#include <ResourceManager.h>
+#include <WorldEditor.h>
+#include <Game.h>
+#include <Graphics/RenderPass.h>
+#include <ImguiEditorPass.h>
 
 
-class EditorApp
+class EditorApp : public WindowsApp
 {
+public:
     EditorApp();
+    void InitEditorApp(UINT winWidth = 1600u, UINT winHeight = 800u);
     ~EditorApp();
 
     void Run();
@@ -30,17 +38,19 @@ class EditorApp
     void Update(float deltaTime);
     void Render();
 
-    eastl::unique_ptr<RenderingSystem> renderer;
+    eastl::shared_ptr<DeferredRenderer> m_renderer;
+    
+    eastl::unique_ptr<WorldEditor> m_worldEditor;
+    eastl::unique_ptr<Project> m_openedProject;
+    eastl::unique_ptr<Game> m_currentGame;
 
-    GameTimer timer;
-    DisplayWindow displayWindow;
+    GameTimer m_timer;
 
-    HINSTANCE hInstance;
-    LPCWSTR applicationName;
+    float m_deltaTime = 0.0f;
 
-    int winWidth = 800;
-    int winHeight = 800;
+    sol::state m_lua;
 
-    float deltaTime = 0.0f;
+private:
+    bool is_layout_initialized = false;
 };
 

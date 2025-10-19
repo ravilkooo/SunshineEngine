@@ -1,13 +1,15 @@
 #include "Graphics/GPass.h"
 
-GPass::GPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
-	UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera)
+GPass::GPass(ID3D11Device* device, ID3D11DeviceContext* context,
+	ID3D11Texture2D* backBuffer,
+	eastl::shared_ptr<GBuffer> pGBuffer,
+	eastl::shared_ptr<Camera> camera)
 	:
 	RenderPass("GPass", device, context)
 {
 	this->backBuffer = backBuffer;
-	this->screenWidth = screenWidth;
-	this->screenHeight = screenHeight;
+	this->screenWidth = pGBuffer->m_screenWidth;
+	this->screenHeight = pGBuffer->m_screenHeight;
 	this->pGBuffer = pGBuffer;
 	this->camera = camera;
 

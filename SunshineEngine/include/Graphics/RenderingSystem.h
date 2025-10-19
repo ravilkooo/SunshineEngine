@@ -40,7 +40,7 @@ protected:
 
 	D3D_FEATURE_LEVEL featureLevels[1] = { D3D_FEATURE_LEVEL_11_1 };
 
-	UINT screenWidth = 800;
-	UINT screenHeight = 800;
+	UINT m_screenWidth = 800;
+	UINT m_screenHeight = 800;
 
 };

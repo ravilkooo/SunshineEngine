@@ -126,7 +126,7 @@ eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
 		eastl::make_shared<Bind::PixelConstantBuffer<SkyBoxData>>(
 			device,
 			*(obj->skyBoxData),
-			1u
+			2u
 		);
 
 	lightTech->m_camera = camera;
@@ -192,7 +192,7 @@ eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 		eastl::make_shared<Bind::PixelConstantBuffer<AmbientLightData>>(
 			device,
 			*(obj->ambientLightData),
-			1u
+			2u
 	);
 
 	lightTech->m_camera = camera;
@@ -228,7 +228,7 @@ eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObj
 		eastl::make_shared<Bind::PixelConstantBuffer<DirectionalLightData>>(
 			device,
 			*(obj->directionalLightData),
-			1u
+			2u
 		);
 
 	lightTech->m_camera = camera;
@@ -266,7 +266,7 @@ eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 		eastl::make_shared<Bind::PixelConstantBuffer<PointLightData>>(
 			device,
 			*(obj->pointLightData),
-			1u
+			2u
 		);
 
 	lightTech->m_camera = camera;

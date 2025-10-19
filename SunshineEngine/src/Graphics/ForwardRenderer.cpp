@@ -9,8 +9,8 @@ ForwardRenderer::ForwardRenderer(HWND hWnd, UINT screenWidth, UINT screenHeight)
 	LPCWSTR applicationName = L"SunshineEngine";
 	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
-	this->screenWidth = screenWidth;
-	this->screenHeight = screenHeight;
+	this->m_screenWidth = screenWidth;
+	this->m_screenHeight = screenHeight;
 
 	// swapChain
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};

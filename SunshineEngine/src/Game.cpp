@@ -33,13 +33,13 @@ void Game::Run()
 		}
 
 
-		timer.Tick();
-		deltaTime = timer.GetDeltaTime();
-		accumulator += deltaTime;
+		m_timer.Tick();
+		m_deltaTime = m_timer.GetDeltaTime();
+		accumulator += m_deltaTime;
 		accumulator = eastl::min(4.0f * physicsUpdateMs, accumulator);
 	
 		// FPS statistic
-		FPSstatisticTimer += deltaTime;
+		FPSstatisticTimer += m_deltaTime;
 		frameCount++;
 		if (FPSstatisticTimer > 1.0f) {
 			float fps = frameCount * 1.0f / FPSstatisticTimer;
@@ -48,7 +48,7 @@ void Game::Run()
 
 			WCHAR text[256];
 			swprintf_s(text, TEXT("FPS: %f"), fps);
-			SetWindowText(displayWindow.hWnd, text);
+			SetWindowText(m_displayWindow.m_hWnd, text);
 
 			frameCount = 0;
 		}
@@ -64,7 +64,7 @@ void Game::Run()
 
 void Game::Render()
 {
-	renderer->RenderScene(scene);
+	m_renderer->RenderScene(m_scene);
 }
 
 Game::~Game()

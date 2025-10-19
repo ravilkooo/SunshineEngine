@@ -1,27 +1,38 @@
 #ifndef DISPLAY_WIN_H
 #define DISPLAY_WIN_H
 
+// SunshineLibs
+
 #include "SunshineEngineAPI.h"
+#include "InputDevice.h"
 
 #include <windows.h>
 #include <iostream>
-#include "InputDevice.h"
+
+// ThirdPartyLibs
+
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
+
 
 class SUNSHINE_ENGINE_API DisplayWindow
 {
-	friend class Game;
+	friend class WindowsApp;
 
 public:
-	UINT screenWidth = 800;
-	UINT screenHeight = 800;
-	HWND hWnd;
+	UINT m_screenWidth = 800;
+	UINT m_screenHeight = 800;
+	HWND m_hWnd;
 
 	DisplayWindow();
-	DisplayWindow(Game* inGame, LPCWSTR applicationName,
-		HINSTANCE hInstance, int screenWidth, int screenHeight,
+	DisplayWindow(WindowsApp* winApp, LPCWSTR applicationName,
+		HINSTANCE hInstance, UINT screenWidth, UINT screenHeight,
 		WNDPROC lpfnWndProc = WndProc);
 
 	static LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
+	// Imgui proc (temporaly?)
+	static LRESULT CALLBACK WndProcImGui(HWND, UINT, WPARAM, LPARAM);
 	
 	// My custom method
 	// static LRESULT CALLBACK WndProc_RawInput(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam);
@@ -41,5 +52,7 @@ private:
 
 	// void Initialize(LPCWSTR applicationName, HINSTANCE hInstance, int screenWidth, int screenHeight);
 };
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #endif // DISPLAY_WIN_H

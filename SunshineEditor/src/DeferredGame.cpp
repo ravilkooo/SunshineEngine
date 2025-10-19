@@ -4,8 +4,8 @@
 // Win32 message handler
 LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
-		return true;
+	// if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+	// 	return true;
 
 	switch (msg)
 	{
@@ -27,41 +27,42 @@ LRESULT CALLBACK WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 DeferredGame::DeferredGame()
 {
-	applicationName = L"DeferredGame";
-	hInstance = GetModuleHandle(nullptr);
+	m_applicationName = L"DeferredGame";
+	m_hInstance = GetModuleHandle(nullptr);
 
-	winWidth = 1000;
-	winHeight = 800;
+	m_winWidth = 1700;
+	m_winHeight = 1000;
 
-	timer = GameTimer();
+	m_timer = GameTimer();
 
-	scene = Scene();
+	m_scene = Scene();
 
-	displayWindow = DisplayWindow(this, applicationName, hInstance,
-		winWidth, winHeight, WndProcImGui);
+	m_displayWindow = DisplayWindow(this, m_applicationName, m_hInstance,
+		m_winWidth, m_winHeight, WndProcImGui);
 
-	renderer = new DeferredRenderer(displayWindow.hWnd, winWidth, winHeight);
+	m_renderer = eastl::make_unique<DeferredRenderer>(m_displayWindow.m_hWnd, m_winWidth, m_winHeight);
+	m_renderer->InitGBuffer(m_winWidth, m_winHeight);
 
 	// GPass
 	{
 
-		GPass* gPass = new GPass(renderer->GetDevice(), renderer->GetDeviceContext(),
-			renderer->GetBackBuffer(), winWidth, winHeight, renderer->pGBuffer, renderer->GetMainCamera());
+		GPass* gPass = new GPass(m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+			m_renderer->GetBackBuffer(), m_winWidth, m_winHeight, m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
-		renderer->AddPass(gPass);
+		m_renderer->AddPass(gPass);
 	}
 	{
-		gLightPass = new LightPass(renderer->GetDevice(), renderer->GetDeviceContext(),
-			renderer->GetBackBuffer(), winWidth, winHeight, renderer->pGBuffer, renderer->GetMainCamera());
+		gLightPass = new LightPass(m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+			m_renderer->GetBackBuffer(), m_winWidth, m_winHeight, m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
-		renderer->AddPass(gLightPass);
+		m_renderer->AddPass(gLightPass);
 	}
 	// FinalPass
 	{
-		FinalPass* colorPass = new FinalPass(renderer->GetDevice(), renderer->GetDeviceContext(),
-			renderer->GetBackBuffer(), winWidth, winHeight, renderer->pGBuffer, renderer->GetMainCamera());
+		FinalPass* colorPass = new FinalPass(m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+			m_renderer->GetBackBuffer(), m_winWidth, m_winHeight, m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
-		renderer->AddPass(colorPass);
+		m_renderer->AddPass(colorPass);
 	}
 	/*
 	TestCube* _tc = new TestCube(renderer->GetDevice(), 0.2, 0.2, 0.2, { 0,0,0 }, { 1,0,0,1 });
@@ -126,7 +127,7 @@ DeferredGame::DeferredGame()
 		{ 0, 1, 0, 0 }
 	};
 	gLightPass->particleSystems.push_back(
-		new ParticleSystem(renderer->GetDevice(), renderer->GetDeviceContext(), emitterDesc, simulatorDesc));
+		new ParticleSystem(m_renderer->GetDevice(), m_renderer->GetDeviceContext(), emitterDesc, simulatorDesc));
 	gLightPass->particleSystems[0]->camera = gLightPass->GetCamera();
 
 	D3D11_BLEND_DESC particleBlendDesc = CD3D11_BLEND_DESC(CD3D11_DEFAULT{});
@@ -141,18 +142,18 @@ DeferredGame::DeferredGame()
 	FLOAT* particleBlendFactor = NULL;
 	UINT sampleMask = 0xffffffff;
 	gLightPass->particleSystems[0]->SetBlendState(
-		new Bind::BlendState(renderer->GetDevice(), particleBlendDesc, particleBlendFactor, sampleMask));
+		new Bind::BlendState(m_renderer->GetDevice(), particleBlendDesc, particleBlendFactor, sampleMask));
 
 	//new Bind::Texture(device, "bubbleBC7.dds", aiTextureType_DIFFUSE, 0u);
 	
 	gLightPass->particleSystems[0]->SetTexture(
-		new Bind::Texture(renderer->GetDevice(),
+		new Bind::Texture(m_renderer->GetDevice(),
 		JoinWchar_Wstring(EDITOR_ASSETS_DIR, L"bubble24bpp.dds")));
 
 
 	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &DeferredGame::HandleKeyDown);
 	InputDevice::getInstance().MouseMove.AddRaw(this, &DeferredGame::HandleMouseMove);
-
+	/*
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -160,33 +161,34 @@ DeferredGame::DeferredGame()
 	(void)io;
 	ImGui::StyleColorsDark();
 
-	ImGui_ImplWin32_Init(displayWindow.hWnd);
-	ImGui_ImplDX11_Init(renderer->GetDevice(), renderer->GetDeviceContext());
+	ImGui_ImplWin32_Init(m_displayWindow.m_hWnd);
+	ImGui_ImplDX11_Init(m_renderer->GetDevice(), m_renderer->GetDeviceContext());
 
 	// Show window
-	ShowWindow(displayWindow.hWnd, SW_SHOWDEFAULT);
-	UpdateWindow(displayWindow.hWnd);
+	ShowWindow(m_displayWindow.m_hWnd, SW_SHOWDEFAULT);
+	UpdateWindow(m_displayWindow.m_hWnd);
+	*/
 
 	auto factory = GameObjectFactory();
-	defaultGameObject = factory.CreateDefaultBoxObject(renderer->GetDevice());
+	defaultGameObject = factory.CreateDefaultBoxObject(m_renderer->GetDevice());
 	defaultGameObject->GetComponent<TransformComponent>()->m_position.x += 3;
 
-	scene.AddGameObject(eastl::move(defaultGameObject));
+	m_scene.AddGameObject(eastl::move(defaultGameObject));
 
-	scene.AddGameObject(eastl::move(factory.CreateDefaultBoxObject(renderer->GetDevice())));
-	scene.AddGameObject(eastl::move(factory.CreateDefaultSphereObject(renderer->GetDevice())));
+	m_scene.AddGameObject(eastl::move(factory.CreateDefaultBoxObject(m_renderer->GetDevice())));
+	m_scene.AddGameObject(eastl::move(factory.CreateDefaultSphereObject(m_renderer->GetDevice())));
 
-	scene.gameObjects[2]->GetComponent<TransformComponent>()->m_position.x -= 3;
+	m_scene.gameObjects[2]->GetComponent<TransformComponent>()->m_position.x -= 3;
 
-	scene.AddGameObject(eastl::move(factory.CreateDefaultBoxObject(renderer->GetDevice(), 20.0f, 20.0f)));
-	scene.gameObjects[3]->GetComponent<TransformComponent>()->m_position.z += 10.0f;
-	scene.gameObjects[3]->GetComponent<TransformComponent>()->m_rotation = DXSM::Vector3::One * DX::XM_PIDIV2*0.3;
+	m_scene.AddGameObject(eastl::move(factory.CreateDefaultBoxObject(m_renderer->GetDevice(), 20.0f, 20.0f)));
+	m_scene.gameObjects[3]->GetComponent<TransformComponent>()->m_position.z += 10.0f;
+	m_scene.gameObjects[3]->GetComponent<TransformComponent>()->m_rotation = DXSM::Vector3::One * DX::XM_PIDIV2*0.3;
 
 
-	scene.AddGameObject(eastl::move(factory.CreateAmbientLightObject(
-		renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector3::One * 0.5f, 1.0f })
+	m_scene.AddGameObject(eastl::move(factory.CreateAmbientLightObject(
+		m_renderer->GetDevice(), m_renderer->GetMainCamera(), { DXSM::Vector3::One * 0.5f, 1.0f })
 	));
-	scene.AddGameObject(eastl::move(factory.CreatePointLightObject(renderer->GetDevice(), renderer->GetMainCamera(),
+	m_scene.AddGameObject(eastl::move(factory.CreatePointLightObject(m_renderer->GetDevice(), m_renderer->GetMainCamera(),
 		{
 			DXSM::Vector3(0.0, 0.0, 0.9), 1.0f,
 			DXSM::Vector3(0.0, 0.0, 0.9), 1.0f,
@@ -195,23 +197,23 @@ DeferredGame::DeferredGame()
 		}
 		)));
 
-	scene.AddGameObject(eastl::move(factory.CreateDirectionalLightObject(renderer->GetDevice(), renderer->GetMainCamera())));
+	m_scene.AddGameObject(eastl::move(factory.CreateDirectionalLightObject(m_renderer->GetDevice(), m_renderer->GetMainCamera())));
 	auto skyBox = factory.CreateSkyBox(
-		renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector3::One, 0.0f }, L"Default"
+		m_renderer->GetDevice(), m_renderer->GetMainCamera(), { DXSM::Vector3::One, 0.0f }, L"Default"
 		//renderer->GetDevice(), renderer->GetMainCamera(), { DXSM::Vector3(1, 1, 1), 0.0f }
 	);
-	scene.AddGameObject(eastl::move(skyBox));
+	m_scene.AddGameObject(eastl::move(skyBox));
 
-	scene.AddGameObject(eastl::move(factory.CreateFinalPassQuad(renderer->GetDevice())));
+	m_scene.AddGameObject(eastl::move(factory.CreateFinalPassQuad(m_renderer->GetDevice())));
 
 }
 
 DeferredGame::~DeferredGame()
 {
 	// Cleanup
-	ImGui_ImplDX11_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	// ImGui_ImplDX11_Shutdown();
+	// ImGui_ImplWin32_Shutdown();
+	// ImGui::DestroyContext();
 }
 
 void DeferredGame::Update(float deltaTime) 
@@ -230,9 +232,9 @@ void DeferredGame::Update(float deltaTime)
 	physEngine->Update(deltaTime);
 	*/;
 
-	scene.gameObjects[0]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
-	scene.gameObjects[1]->GetComponent<TransformComponent>()->m_localRotation.x += deltaTime;
-	scene.gameObjects[2]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
+	m_scene.gameObjects[0]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
+	m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_localRotation.x += deltaTime;
+	m_scene.gameObjects[2]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
 
 
 	//renderer->mainCamera->RotateYaw(deltaTime);
@@ -242,6 +244,7 @@ void DeferredGame::Update(float deltaTime)
 void DeferredGame::Render()
 {
 	// Start the Dear ImGui frame
+	/*
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
@@ -256,51 +259,52 @@ void DeferredGame::Render()
 
 	// Rendering
 	ImGui::Render();
+	*/
 	
 	// Passes
-	for (int i = 0; i < renderer->passes.size() - 1; i++) {
-		renderer->GetDeviceContext()->ClearState();
-		RenderPass* pass = renderer->passes[i];
+	for (int i = 0; i < m_renderer->passes.size() - 1; i++) {
+		m_renderer->GetDeviceContext()->ClearState();
+		RenderPass* pass = m_renderer->passes[i];
 		pass->StartFrame();
-		pass->Pass(scene);
+		pass->Pass(m_scene);
 		pass->EndFrame();
 	}
 
-	renderer->GetDeviceContext()->ClearState();
-	RenderPass* pass = renderer->passes.back();
+	m_renderer->GetDeviceContext()->ClearState();
+	RenderPass* pass = m_renderer->passes.back();
 	pass->StartFrame();
-	pass->Pass(scene);
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	pass->Pass(m_scene);
+	//ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	pass->EndFrame();
 
-	renderer->PresentFrame();
+	m_renderer->PresentFrame();
 }
 
 void DeferredGame::HandleKeyDown(Keys key) {
 	if (key == Keys::W)
 	{
-		renderer->mainCamera->MoveForward(deltaTime * 10.0f);
+		m_renderer->mainCamera->MoveForward(m_deltaTime * 10.0f);
 	}
 	if (key == Keys::S)
 	{
-		renderer->mainCamera->MoveBackward(deltaTime * 10.0f);
+		m_renderer->mainCamera->MoveBackward(m_deltaTime * 10.0f);
 	}
 	if (key == Keys::A)
 	{
-		renderer->mainCamera->MoveLeft(deltaTime * 10.0f);
+		m_renderer->mainCamera->MoveLeft(m_deltaTime * 10.0f);
 	}
 	if (key == Keys::D)
 	{
-		renderer->mainCamera->MoveRight(deltaTime * 10.0f);
+		m_renderer->mainCamera->MoveRight(m_deltaTime * 10.0f);
 	}
 	if (key == Keys::Space)
 	{
-		renderer->mainCamera->MoveUp(deltaTime * 10.0f);
+		m_renderer->mainCamera->MoveUp(m_deltaTime * 10.0f);
 	}
 
 	if (key == Keys::LeftShift)
 	{
-		renderer->mainCamera->MoveDown(deltaTime * 10.0f);
+		m_renderer->mainCamera->MoveDown(m_deltaTime * 10.0f);
 	}
 	if (key == Keys::Q)
 	{
@@ -315,6 +319,6 @@ void DeferredGame::HandleKeyDown(Keys key) {
 
 void DeferredGame::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
-	renderer->mainCamera->RotateYaw(deltaTime * args.Offset.x * 0.1);
-	renderer->mainCamera->RotatePitch(-deltaTime * args.Offset.y * 0.1);
+	m_renderer->mainCamera->RotateYaw(m_deltaTime * args.Offset.x * 0.1);
+	m_renderer->mainCamera->RotatePitch(-m_deltaTime * args.Offset.y * 0.1);
 }

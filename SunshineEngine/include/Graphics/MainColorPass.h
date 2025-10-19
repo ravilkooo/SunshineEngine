@@ -12,7 +12,7 @@ class FinalPass :
 {
 public:
     FinalPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
-        UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera);
+        eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera);
     
     void StartFrame() override;
     void EndFrame() override;

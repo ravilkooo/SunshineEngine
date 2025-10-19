@@ -9,14 +9,14 @@
 #include <SimpleMath.h>
 
 
-class Game;
+class WindowsApp;
 
 class SUNSHINE_ENGINE_API InputDevice
 {
-	friend class Game;
+	friend class WindowsApp;
 	friend class DisplayWindow;
 	
-	Game* game;
+	WindowsApp* winApp;
 	HWND hWnd;
 
 	std::unordered_set<Keys>* keys;
@@ -42,7 +42,7 @@ public:
 	
 public:
 	
-	InputDevice(Game* inGame, HWND hWnd);
+	InputDevice(WindowsApp* winApp, HWND hWnd);
 	~InputDevice();
 
 

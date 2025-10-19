@@ -2,29 +2,39 @@
 
 LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	ID3D11Texture2D* backBuffer,
-	UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera)
+	eastl::shared_ptr<GBuffer> pGBuffer,
+	eastl::shared_ptr<Camera> camera)
 	:
 	RenderPass("LightPass", device, context)
 {
-	this->pGBuffer = pGBuffer;
-	this->camera = camera;
+	this->m_GBuffer = pGBuffer;
+	this->m_camera = camera;
+	this->m_screenWidth = pGBuffer->m_screenWidth;
+	this->m_screenHeight = pGBuffer->m_screenHeight;
 
-	gBufferRTV = pGBuffer->pLightRTV.Get();
+	m_GBufferRTV = pGBuffer->pLightRTV.Get();
 
 	// Viewport
-	viewport = {};
-	viewport.Width = static_cast<float>(screenWidth);
-	viewport.Height = static_cast<float>(screenHeight);
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0;
-	viewport.MaxDepth = 1.0f;
+	m_viewport = {};
+	m_viewport.Width = static_cast<float>(m_screenWidth);
+	m_viewport.Height = static_cast<float>(m_screenHeight);
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.MinDepth = 0;
+	m_viewport.MaxDepth = 1.0f;
 
-	camPCB = new Bind::PixelConstantBuffer<CamPCB>(device,
+	m_camPCB = new Bind::PixelConstantBuffer<CamPCB>(device,
 		{ XMMatrixIdentity(), XMMatrixIdentity(),
 		(XMFLOAT3)camera->GetPosition(), 0 },
 		0u);
-	AddPerFrameBind(camPCB);
+	AddPerFrameBind(m_camPCB);
+
+	m_screenInfoPCB = new Bind::PixelConstantBuffer<ScreenInfoPCB>(device,
+		{ DXSM::Vector2(
+			static_cast<float>(m_screenWidth),
+			static_cast<float>(m_screenHeight)) },
+		1u);
+	AddPerFrameBind(m_screenInfoPCB);
 
 	D3D11_BLEND_DESC blendDesc = {};
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -66,22 +76,22 @@ LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 
 void LightPass::StartFrame()
 {
-	context->OMSetRenderTargets(1, &gBufferRTV, pGBuffer->pDepthDSV.Get());
+	context->OMSetRenderTargets(1, &m_GBufferRTV, m_GBuffer->pDepthDSV.Get());
 	float colorBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	context->ClearRenderTargetView(gBufferRTV, colorBlack);
+	context->ClearRenderTargetView(m_GBufferRTV, colorBlack);
 	//context->ClearDepthStencilView(pGBuffer->pDepthDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
-	context->RSSetViewports(1, &viewport);
+	context->RSSetViewports(1, &m_viewport);
 
-	XMFLOAT3 camPos = camera->GetPosition();
+	XMFLOAT3 camPos = m_camera->GetPosition();
 	XMMATRIX vMatInverse = DirectX::XMMatrixTranspose(XMMatrixInverse(nullptr,
-		camera->GetViewMatrix()));
+		m_camera->GetViewMatrix()));
 	XMMATRIX pMatInverse = DirectX::XMMatrixTranspose(XMMatrixInverse(nullptr,
-		camera->GetProjectionMatrix()));
+		m_camera->GetProjectionMatrix()));
 	// camera->GetProjectionMatrix()
-	camPCB->Update(GetDeviceContext(), { vMatInverse, pMatInverse, camPos, 0 });
+	m_camPCB->Update(GetDeviceContext(), { vMatInverse, pMatInverse, camPos, 0 });
 
-	camera->UpdateBuffer(context.Get());
-	camera->BindBuffer(context.Get());
+	m_camera->UpdateBuffer(context.Get());
+	m_camera->BindBuffer(context.Get());
 }
 
 void LightPass::Pass(const Scene& scene)
@@ -123,10 +133,10 @@ void LightPass::EndFrame()
 
 eastl::shared_ptr<Camera> LightPass::GetCamera()
 {
-	return camera;
+	return m_camera;
 }
 
 void LightPass::SetCamera(eastl::shared_ptr<Camera> camera)
 {
-	this->camera = camera;
+	this->m_camera = camera;
 }

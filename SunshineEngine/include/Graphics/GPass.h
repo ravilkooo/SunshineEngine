@@ -12,8 +12,10 @@ class GPass :
     public RenderPass
 {
 public:
-    GPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
-        UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera);
+    GPass(ID3D11Device* device, ID3D11DeviceContext* context,
+        ID3D11Texture2D* backBuffer,
+        eastl::shared_ptr<GBuffer> pGBuffer,
+        eastl::shared_ptr<Camera> camera);
 
     // Inherited via RenderPass
     void StartFrame() override;

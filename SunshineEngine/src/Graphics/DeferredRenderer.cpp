@@ -10,14 +10,14 @@ DeferredRenderer::DeferredRenderer(HWND hWnd,
 	LPCWSTR applicationName = L"SunshineEngine";
 	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
-	this->screenWidth = screenWidth;
-	this->screenHeight = screenHeight;
+	this->m_screenWidth = screenWidth;
+	this->m_screenHeight = screenHeight;
 
 	// swapChain
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	swapChainDesc.BufferCount = 2;
-	swapChainDesc.BufferDesc.Width = screenWidth;
-	swapChainDesc.BufferDesc.Height = screenHeight;
+	swapChainDesc.BufferDesc.Width = m_screenWidth;
+	swapChainDesc.BufferDesc.Height = m_screenHeight;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
@@ -53,11 +53,13 @@ DeferredRenderer::DeferredRenderer(HWND hWnd,
 	if (FAILED(hr))
 		throw std::runtime_error("Failed to get back buffer");
 
+}
 
+void DeferredRenderer::InitGBuffer(UINT screenWidth, UINT screenHeight)
+{
 	this->pGBuffer = eastl::make_shared<GBuffer>(device.Get(), screenWidth, screenHeight);
 	mainCamera = eastl::make_shared<Camera>(device.Get(), screenWidth * 1.0f / screenHeight);
 	mainCamera->SetPosition({ 0, 0, -10 });
-
 }
 
 void DeferredRenderer::RenderScene(const Scene& scene)
