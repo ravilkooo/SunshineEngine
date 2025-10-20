@@ -38,6 +38,7 @@ public:
     void Update(float deltaTime);
     void Render();
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
+    void SetIcon(HWND hwnd) override;
 
     eastl::shared_ptr<DeferredRenderer> m_renderer;
     

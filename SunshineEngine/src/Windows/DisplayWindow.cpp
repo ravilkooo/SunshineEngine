@@ -64,6 +64,7 @@ DisplayWindow::DisplayWindow(WindowsApp* winApp, LPCWSTR applicationName,
 		posX, posY,
 		winW, winH,
 		nullptr, nullptr, hInstance, nullptr);
+	mApp->SetIcon(m_hWnd);
 
 	InputDevice::instance = new InputDevice(winApp, m_hWnd);
 

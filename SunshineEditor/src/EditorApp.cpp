@@ -151,3 +151,29 @@ void EditorApp::OnResize(UINT resizeWidth, UINT resizeHeight)
 		imguiEditorPass->OnResize(resizeWidth, resizeHeight, m_renderer->GetBackBuffer());
 	}
 }
+
+void EditorApp::SetIcon(HWND hwnd)
+{
+	// Load a .ico file from your executable directory
+	HICON hIconLarge = (HICON)LoadImage(
+		NULL,                 // No instance handle (load from file)
+		// Path to .ico file
+		JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"Icons/SunshineLogo_transparent_256.ico"),
+		IMAGE_ICON,           // Load an icon
+		256, 256,               // Desired icon size (large)
+		LR_LOADFROMFILE       // Load from file
+	);
+
+	HICON hIconSmall = (HICON)LoadImage(
+		NULL,
+		// Path to .ico file
+		JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"Icons/SunshineLogo_transparent_32.ico"),
+		IMAGE_ICON,
+		32, 32,
+		LR_LOADFROMFILE
+	);
+
+	// Assign to window
+	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIconLarge);
+	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIconSmall);
+}

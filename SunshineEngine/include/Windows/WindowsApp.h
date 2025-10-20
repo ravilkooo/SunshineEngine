@@ -13,4 +13,5 @@ public:
     UINT m_winHeight = 800;
 
     virtual void OnResize(UINT resizeWidth, UINT resizeHeight) = 0;
+    virtual void SetIcon(HWND hwnd) = 0;
 };
