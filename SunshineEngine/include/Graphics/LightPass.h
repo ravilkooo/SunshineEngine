@@ -18,7 +18,6 @@ class LightPass :
 {
 public:
     LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
-        ID3D11Texture2D* backBuffer,
         eastl::shared_ptr<GBuffer> pGBuffer,
         eastl::shared_ptr<Camera> camera);
 
@@ -29,16 +28,16 @@ public:
     eastl::shared_ptr<Camera> GetCamera();
     void SetCamera(eastl::shared_ptr<Camera> camera);
 
+    void OnResize(UINT resizeWidth, UINT resizeHeight,
+        eastl::shared_ptr<GBuffer> pGBuffer);
+
     eastl::shared_ptr<Camera> m_camera;
 
-    UINT m_screenWidth = 800;
-    UINT m_screenHeight = 800;
-
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+    UINT m_screenWidth = 800u;
+    UINT m_screenHeight = 800u;
 
     eastl::shared_ptr<GBuffer> m_GBuffer;
 
-    ID3D11RenderTargetView* m_GBufferRTV;
     D3D11_VIEWPORT m_viewport;
 
     struct CamPCB {
@@ -53,6 +52,11 @@ public:
         DXSM::Vector2 screenSize;
     } m_screenData;
     Bind::PixelConstantBuffer<ScreenInfoPCB>* m_screenInfoPCB;
+
+    eastl::shared_ptr<Bind::Texture> m_NormalTexture;
+    eastl::shared_ptr<Bind::Texture> m_AlbedoTexture;
+    eastl::shared_ptr<Bind::Texture> m_SpecularTexture;
+    eastl::shared_ptr<Bind::Texture> m_WorldPosTexture;
 
 public:
     eastl::vector<ParticleSystem*> particleSystems;

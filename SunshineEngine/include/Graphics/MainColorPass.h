@@ -11,7 +11,8 @@ class FinalPass :
     public RenderPass
 {
 public:
-    FinalPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
+    FinalPass(ID3D11Device* device, ID3D11DeviceContext* context,
+        ID3D11Texture2D* backBuffer,
         eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera);
     
     void StartFrame() override;

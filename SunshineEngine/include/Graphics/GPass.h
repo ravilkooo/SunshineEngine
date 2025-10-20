@@ -13,7 +13,6 @@ class GPass :
 {
 public:
     GPass(ID3D11Device* device, ID3D11DeviceContext* context,
-        ID3D11Texture2D* backBuffer,
         eastl::shared_ptr<GBuffer> pGBuffer,
         eastl::shared_ptr<Camera> camera);
 
@@ -24,6 +23,9 @@ public:
 
     eastl::shared_ptr<Camera> GetCamera();
     void SetCamera(eastl::shared_ptr<Camera> camera);
+
+    void OnResize(UINT resizeWidth, UINT resizeHeight);
+
     eastl::shared_ptr<Camera> camera;
 
     UINT screenWidth = 800;

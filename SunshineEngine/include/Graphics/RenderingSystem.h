@@ -27,9 +27,9 @@ public:
 
 	ID3D11Texture2D* GetBackBuffer() { return backBuffer.Get(); }
 
-	virtual void AddPass(RenderPass* pass) = 0;
+	virtual void AddPass(eastl::shared_ptr<RenderPass> pass) = 0;
 
-	eastl::vector<RenderPass*> passes;
+	eastl::vector<eastl::shared_ptr<RenderPass>> passes;
 	eastl::shared_ptr<Camera> mainCamera;
 protected:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;

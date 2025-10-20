@@ -1,6 +1,15 @@
-
-
 #include "Windows/DisplayWindow.h"
+#include "Windows/WindowsApp.h"
+
+UINT DisplayWindow::g_resizeWidth = 0u;
+UINT DisplayWindow::g_resizeHeight = 0u;
+
+WindowsApp* DisplayWindow::mApp = nullptr;
+WindowsApp* DisplayWindow::GetApp()
+{
+	return mApp;
+}
+
 
 DisplayWindow::DisplayWindow() {
 
@@ -10,16 +19,14 @@ DisplayWindow::DisplayWindow(WindowsApp* winApp, LPCWSTR applicationName,
 	HINSTANCE hInstance, UINT screenWidth, UINT screenHeight,
 	WNDPROC lpfnWndProc)
 {
-	// My custom
-	// inputHandler = new InputHandler()
+	//assert(mApp == nullptr);
+	mApp = winApp;
 
 	WNDCLASSEX wc;
 
 	//wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	// for imgui
 	wc.style = CS_CLASSDC;
-	// My custom method
-	//wc.lpfnWndProc = WndProc_RawInput;
 	wc.lpfnWndProc = lpfnWndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -34,9 +41,6 @@ DisplayWindow::DisplayWindow(WindowsApp* winApp, LPCWSTR applicationName,
 
 	// Register the window class.
 	RegisterClassEx(&wc);
-
-	this->m_screenWidth = screenWidth;
-	this->m_screenHeight = screenHeight;
 
 	//auto dwStyle = WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX | WS_THICKFRAME;
 	// for imgui
@@ -139,7 +143,11 @@ LRESULT CALLBACK DisplayWindow::WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam,
 	switch (msg)
 	{
 	case WM_SIZE:
-		if (wParam != SIZE_MINIMIZED) {}
+		if (wParam != SIZE_MINIMIZED) {
+			DisplayWindow::g_resizeWidth = (UINT)LOWORD(lParam);
+			DisplayWindow::g_resizeHeight = (UINT)HIWORD(lParam);
+			mApp->OnResize(g_resizeWidth, g_resizeHeight);
+		}
 		return 0;
 	case WM_SYSCOMMAND:
 		if ((wParam & 0xfff0) == SC_KEYMENU) return 0;

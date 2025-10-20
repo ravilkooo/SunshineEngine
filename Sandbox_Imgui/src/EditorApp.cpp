@@ -27,7 +27,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	//m_renderer->InitGBuffer(m_winWidth, m_winHeight);
 
 	// Init WorldEditor with all it's passes
-	m_worldEditor = eastl::make_unique<WorldEditor>();
+	m_worldEditor = eastl::make_shared<WorldEditor>();
 	m_worldEditor->InitWorldEditor(m_renderer, worldEditorWidth, worldEditorHeight);
 	//m_worldEditor->InitWorldEditor(m_renderer, m_winWidth, m_winHeight);
 
@@ -40,9 +40,9 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	ImGui::CreateContext();
 
 	// enable docking
-	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
 	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplWin32_Init(m_displayWindow.m_hWnd);
@@ -51,14 +51,17 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 		m_renderer->GetDeviceContext());
 
 	// Imgui Pass
-	ImguiEditorPass* imguiEditorPass = new ImguiEditorPass(
+	imguiEditorPass = eastl::make_shared<ImguiEditorPass>(
 		m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 		m_renderer->GetBackBuffer(),
 		m_winWidth,
 		m_winHeight,
-		m_renderer->pGBuffer
+		m_renderer->pGBuffer,
+		m_worldEditor
 	);
 	m_renderer->AddPass(imguiEditorPass);
+
+	m_initialized = true;
 
 	// Show window
 	// ShowWindow(m_displayWindow.m_hWnd, SW_SHOWDEFAULT);
@@ -136,4 +139,15 @@ void EditorApp::Render() {
 	// Passes
 	m_renderer->RenderScene(m_worldEditor->m_scene);
 	m_renderer->PresentFrame();
+}
+
+void EditorApp::OnResize(UINT resizeWidth, UINT resizeHeight)
+{
+	if (m_initialized)
+	{
+		m_renderer->PreResize();
+		imguiEditorPass->PreResize();
+		m_renderer->OnResize(resizeWidth, resizeHeight);
+		imguiEditorPass->OnResize(resizeWidth, resizeHeight, m_renderer->GetBackBuffer());
+	}
 }

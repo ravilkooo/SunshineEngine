@@ -27,7 +27,6 @@ void ImguiTestGame::InitGame() {
 	{
 		GPass* gPass = new GPass(
 			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->GetBackBuffer(),
 			m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
 		m_renderer->AddPass(gPass);
@@ -35,7 +34,6 @@ void ImguiTestGame::InitGame() {
 	{
 		LightPass* lightPass = new LightPass(
 			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->GetBackBuffer(),
 			m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
 		m_renderer->AddPass(lightPass);

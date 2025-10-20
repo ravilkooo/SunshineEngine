@@ -37,10 +37,11 @@ public:
 
     void Update(float deltaTime);
     void Render();
+    void OnResize(UINT resizeWidth, UINT resizeHeight) override;
 
     eastl::shared_ptr<DeferredRenderer> m_renderer;
     
-    eastl::unique_ptr<WorldEditor> m_worldEditor;
+    eastl::shared_ptr<WorldEditor> m_worldEditor;
     eastl::unique_ptr<Project> m_openedProject;
     eastl::unique_ptr<Game> m_currentGame;
 
@@ -52,5 +53,8 @@ public:
 
 private:
     bool is_layout_initialized = false;
+
+    eastl::shared_ptr<ImguiEditorPass> imguiEditorPass;
+    bool m_initialized = false;
 };
 

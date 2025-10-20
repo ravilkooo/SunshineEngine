@@ -21,8 +21,12 @@ class SUNSHINE_ENGINE_API DisplayWindow
 	friend class WindowsApp;
 
 public:
-	UINT m_screenWidth = 800;
-	UINT m_screenHeight = 800;
+	static UINT g_resizeWidth;
+	static UINT g_resizeHeight;
+
+	static WindowsApp* mApp;
+	static WindowsApp* GetApp();
+
 	HWND m_hWnd;
 
 	DisplayWindow();

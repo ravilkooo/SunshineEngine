@@ -36,13 +36,16 @@ public:
     Scene m_scene;
     eastl::shared_ptr<DeferredRenderer> m_renderer;
 
-    
+    void OnResize(UINT resizeWidth, UINT resizeHeight);
 
     // Change to (Index + generation handle (robust for inserts/erases))
     // eastl::shared_ptr<GameObject> m_acticeGameObject;
 
-    UINT m_screenWidth = 800;
-    UINT m_screenHeight = 800;
+    UINT m_screenWidth = 800u;
+    UINT m_screenHeight = 800u;
+
+    eastl::shared_ptr<GPass> m_gPass;
+    eastl::shared_ptr<LightPass> m_lightPass;
 
     float m_deltaTime = 0.0f;
 };

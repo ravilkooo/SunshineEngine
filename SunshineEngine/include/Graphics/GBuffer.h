@@ -42,24 +42,9 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pLightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pLightRTV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pLightSRV;
-	
-
-	// Don't need it
-	/*
-	// Diffuse
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDiffuseLightBuffer;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pDiffuseLightRTV;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pDiffuseLightSRV;
-	// Specular
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> pSpecularLightBuffer;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pSpecularLightRTV;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pSpecularLightSRV;
-	// Ambient
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> pAmbientLightBuffer;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pAmbientLightRTV;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pAmbientLightSRV;
-	*/
 
 	GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight);
+
+	void OnResize(ID3D11Device* device, UINT screenWidth, UINT screenHeight);
 };
 

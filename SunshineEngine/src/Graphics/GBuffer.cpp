@@ -4,7 +4,39 @@ GBuffer::GBuffer(ID3D11Device* device,
 	UINT screenWidth, UINT screenHeight) :
 	m_screenWidth(screenWidth), m_screenHeight(screenHeight)
 {	
-	
+	OnResize(device, screenWidth, screenHeight);
+}
+
+void GBuffer::OnResize(ID3D11Device* device, UINT resizeWidth, UINT resizeHeight)
+{
+	m_screenWidth = resizeWidth;
+	m_screenHeight = resizeHeight;
+
+	pDepthBuffer.ReleaseAndGetAddressOf();
+	pDepthDSV.ReleaseAndGetAddressOf();
+	pDepthSRV.ReleaseAndGetAddressOf();
+
+	pWorldPosBuffer.ReleaseAndGetAddressOf();
+	pWorldPosRTV.ReleaseAndGetAddressOf();
+	pWorldPosSRV.ReleaseAndGetAddressOf();
+
+	pNormalBuffer.ReleaseAndGetAddressOf();
+	pNormalRTV.ReleaseAndGetAddressOf();
+	pNormalSRV.ReleaseAndGetAddressOf();
+
+	pAlbedoBuffer.ReleaseAndGetAddressOf();
+	pAlbedoRTV.ReleaseAndGetAddressOf();
+	pAlbedoSRV.ReleaseAndGetAddressOf();
+
+	pSpecularBuffer.ReleaseAndGetAddressOf();
+	pSpecularRTV.ReleaseAndGetAddressOf();
+	pSpecularSRV.ReleaseAndGetAddressOf();
+
+	pLightBuffer.ReleaseAndGetAddressOf();
+	pLightRTV.ReleaseAndGetAddressOf();
+	pLightSRV.ReleaseAndGetAddressOf();
+
+
 	// Depth Texture
 	D3D11_TEXTURE2D_DESC depthDesc = {};
 	depthDesc.Width = m_screenWidth;

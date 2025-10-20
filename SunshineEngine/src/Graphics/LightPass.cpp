@@ -1,7 +1,6 @@
 #include "Graphics/LightPass.h"
 
 LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
-	ID3D11Texture2D* backBuffer,
 	eastl::shared_ptr<GBuffer> pGBuffer,
 	eastl::shared_ptr<Camera> camera)
 	:
@@ -11,8 +10,6 @@ LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	this->m_camera = camera;
 	this->m_screenWidth = pGBuffer->m_screenWidth;
 	this->m_screenHeight = pGBuffer->m_screenHeight;
-
-	m_GBufferRTV = pGBuffer->pLightRTV.Get();
 
 	// Viewport
 	m_viewport = {};
@@ -48,11 +45,15 @@ LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 
 	AddPerFrameBind(new Bind::BlendState(device, blendDesc));
 
+	m_NormalTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pNormalSRV.Get(), 0u);
+	m_AlbedoTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pAlbedoSRV.Get(), 1u);
+	m_SpecularTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pSpecularSRV.Get(), 2u);
+	m_WorldPosTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pWorldPosSRV.Get(), 3u);
 
-	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pNormalSRV.Get(), 0u));
-	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pAlbedoSRV.Get(), 1u));
-	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pSpecularSRV.Get(), 2u));
-	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pWorldPosSRV.Get(), 3u));
+	AddPerFrameBind(m_NormalTexture.get());
+	AddPerFrameBind(m_AlbedoTexture.get());
+	AddPerFrameBind(m_SpecularTexture.get());
+	AddPerFrameBind(m_WorldPosTexture.get());
 
 	// Usual sampler for all SRV
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -76,9 +77,9 @@ LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 
 void LightPass::StartFrame()
 {
-	context->OMSetRenderTargets(1, &m_GBufferRTV, m_GBuffer->pDepthDSV.Get());
+	context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
 	float colorBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	context->ClearRenderTargetView(m_GBufferRTV, colorBlack);
+	context->ClearRenderTargetView(m_GBuffer->pLightRTV.Get(), colorBlack);
 	//context->ClearDepthStencilView(pGBuffer->pDepthDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 	context->RSSetViewports(1, &m_viewport);
 
@@ -89,6 +90,9 @@ void LightPass::StartFrame()
 		m_camera->GetProjectionMatrix()));
 	// camera->GetProjectionMatrix()
 	m_camPCB->Update(GetDeviceContext(), { vMatInverse, pMatInverse, camPos, 0 });
+	m_screenInfoPCB->Update(GetDeviceContext(), { DXSM::Vector2(
+			static_cast<float>(m_screenWidth),
+			static_cast<float>(m_screenHeight)) });
 
 	m_camera->UpdateBuffer(context.Get());
 	m_camera->BindBuffer(context.Get());
@@ -139,4 +143,28 @@ eastl::shared_ptr<Camera> LightPass::GetCamera()
 void LightPass::SetCamera(eastl::shared_ptr<Camera> camera)
 {
 	this->m_camera = camera;
+}
+
+
+void LightPass::OnResize(UINT resizeWidth, UINT resizeHeight,
+	eastl::shared_ptr<GBuffer> pGBuffer)
+{
+	m_screenWidth = resizeWidth;
+	m_screenHeight = resizeHeight;
+
+	m_GBuffer = pGBuffer;
+
+	m_NormalTexture->UpdateTextureView(pGBuffer->pNormalSRV.Get());
+	m_AlbedoTexture->UpdateTextureView(pGBuffer->pAlbedoSRV.Get());
+	m_SpecularTexture->UpdateTextureView(pGBuffer->pSpecularSRV.Get());
+	m_WorldPosTexture->UpdateTextureView(pGBuffer->pWorldPosSRV.Get());
+
+	// Viewport
+	m_viewport = {};
+	m_viewport.Width = static_cast<float>(m_screenWidth);
+	m_viewport.Height = static_cast<float>(m_screenHeight);
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.MinDepth = 0;
+	m_viewport.MaxDepth = 1.0f;
 }

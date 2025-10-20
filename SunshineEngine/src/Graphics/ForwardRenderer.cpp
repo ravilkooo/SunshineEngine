@@ -65,7 +65,7 @@ ForwardRenderer::~ForwardRenderer()
 void ForwardRenderer::RenderScene(const Scene& scene)
 {
 	// Passes
-	for (RenderPass* pass : passes) {
+	for (auto pass : passes) {
 		pass->StartFrame();
 		pass->Pass(scene);
 		pass->EndFrame();
@@ -75,7 +75,7 @@ void ForwardRenderer::RenderScene(const Scene& scene)
 }
 
 
-void ForwardRenderer::AddPass(RenderPass* pass)
+void ForwardRenderer::AddPass(eastl::shared_ptr<RenderPass> pass)
 {
 	passes.push_back(pass);
 }
