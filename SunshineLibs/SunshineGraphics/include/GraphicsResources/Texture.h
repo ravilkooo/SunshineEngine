@@ -38,6 +38,9 @@ namespace Bind
 
 		void Bind(ID3D11DeviceContext* context) noexcept override;
 		void Unbind(ID3D11DeviceContext* context) noexcept override;
+
+		void UpdateTextureView(ID3D11ShaderResourceView* pTextureView);
+
 		bool HasAlpha() const noexcept;
 	private:
 		void Initialize1x1ColorTexture(ID3D11Device* device, const SE_Color& colorData);

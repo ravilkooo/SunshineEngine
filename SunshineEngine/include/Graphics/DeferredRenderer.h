@@ -17,10 +17,16 @@ public:
     DeferredRenderer();
     DeferredRenderer(HWND hWnd, UINT screenWidth, UINT screenHeight);
 
-    // Inherited via RenderingSystem
+    void InitGBuffer(UINT screenWidth, UINT screenHeight);
+    
     void RenderScene(const Scene& scene) override;
-    void AddPass(RenderPass* pass) override;
+    void AddPass(eastl::shared_ptr<RenderPass> pass) override;
 
     eastl::shared_ptr<GBuffer> pGBuffer;
+
+    void PreResize();
+    void OnResize(UINT resizeWidth, UINT resizeHeight);
+
+    DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 };
 

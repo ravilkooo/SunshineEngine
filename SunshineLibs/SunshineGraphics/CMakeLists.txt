@@ -52,18 +52,6 @@ target_link_libraries(SunshineGraphics PUBLIC
     dxguid
 )
 
-# Collect all HLSL shader files
-file(GLOB_RECURSE SHADERS "Assets/Shaders/*.hlsl")
-
-# Add shaders to the project so they appear in VS
-source_group("Assets\\Shaders" FILES ${SHADERS})
-
-# Add shaders as "sources" just for IDE visibility, not for compilation
-set_property(SOURCE ${SHADERS} PROPERTY HEADER_FILE_ONLY TRUE)
-
-# Add shaders to the target as "header only" so VS sees them
-target_sources(SunshineGraphics PRIVATE ${SHADERS})
-
 # DirectXTK integration
 target_link_libraries(SunshineGraphics PUBLIC DirectXTK)
 

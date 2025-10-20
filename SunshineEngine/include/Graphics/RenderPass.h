@@ -24,6 +24,7 @@ public:
 
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
+
 protected:
 	eastl::string techniqueTag;
 	eastl::vector<Bind::Bindable*> perFrameBindables;

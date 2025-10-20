@@ -1,25 +1,32 @@
-
-
 #include "Windows/DisplayWindow.h"
+#include "Windows/WindowsApp.h"
+
+UINT DisplayWindow::g_resizeWidth = 0u;
+UINT DisplayWindow::g_resizeHeight = 0u;
+
+WindowsApp* DisplayWindow::mApp = nullptr;
+WindowsApp* DisplayWindow::GetApp()
+{
+	return mApp;
+}
+
 
 DisplayWindow::DisplayWindow() {
 
 }
 
-DisplayWindow::DisplayWindow(Game* inGame, LPCWSTR applicationName,
-	HINSTANCE hInstance, int screenWidth, int screenHeight,
+DisplayWindow::DisplayWindow(WindowsApp* winApp, LPCWSTR applicationName,
+	HINSTANCE hInstance, UINT screenWidth, UINT screenHeight,
 	WNDPROC lpfnWndProc)
 {
-	// My custom
-	// inputHandler = new InputHandler()
+	//assert(mApp == nullptr);
+	mApp = winApp;
 
 	WNDCLASSEX wc;
 
 	//wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	// for imgui
 	wc.style = CS_CLASSDC;
-	// My custom method
-	//wc.lpfnWndProc = WndProc_RawInput;
 	wc.lpfnWndProc = lpfnWndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -35,40 +42,38 @@ DisplayWindow::DisplayWindow(Game* inGame, LPCWSTR applicationName,
 	// Register the window class.
 	RegisterClassEx(&wc);
 
-	this->screenWidth = screenWidth;
-	this->screenHeight = screenHeight;
-
-	RECT windowRect = { 0, 0, static_cast<LONG>(screenWidth), static_cast<LONG>(screenHeight) };
-	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
-
 	//auto dwStyle = WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX | WS_THICKFRAME;
 	// for imgui
 	auto dwStyle = WS_OVERLAPPEDWINDOW;
+	//auto dwStyle = WS_EX_APPWINDOW;
 
-	auto posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
-	auto posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
+	RECT windowRect = { 0, 0, static_cast<LONG>(screenWidth), static_cast<LONG>(screenHeight) };
+	//AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+	UINT dpi = GetDpiForSystem();
+	AdjustWindowRectExForDpi(&windowRect, dwStyle, FALSE, WS_EX_APPWINDOW, dpi);
 
-	hWnd = CreateWindowEx(WS_EX_APPWINDOW, applicationName, applicationName,
+	int winW = windowRect.right - windowRect.left;
+	int winH = windowRect.bottom - windowRect.top;
+
+	auto posX = (GetSystemMetrics(SM_CXSCREEN) - winW) / 2;
+	auto posY = (GetSystemMetrics(SM_CYSCREEN) - winH) / 2;
+	
+	SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
+	m_hWnd = CreateWindowEx(WS_EX_APPWINDOW, applicationName, applicationName,
 		dwStyle,
 		posX, posY,
-		windowRect.right - windowRect.left,
-		windowRect.bottom - windowRect.top,
+		winW, winH,
 		nullptr, nullptr, hInstance, nullptr);
+	mApp->SetIcon(m_hWnd);
 
-	InputDevice::instance = new InputDevice(inGame, hWnd);
-	// My custom method
-	// SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(inputHandler));
+	InputDevice::instance = new InputDevice(winApp, m_hWnd);
 
-	ShowWindow(hWnd, SW_SHOW);
-	SetForegroundWindow(hWnd);
-	SetFocus(hWnd);
-
-	// My custom method
-	// RegisterRawInput(hWnd);
+	ShowWindow(m_hWnd, SW_SHOWDEFAULT);
+	UpdateWindow(m_hWnd);
+	SetForegroundWindow(m_hWnd);
+	SetFocus(m_hWnd);
 
 	ShowCursor(true);
-
-	//std::cout << "Zdarova vsem!\n";
 }
 
 LRESULT CALLBACK DisplayWindow::WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
@@ -128,6 +133,33 @@ LRESULT CALLBACK DisplayWindow::WndProc(HWND hwnd, UINT umessage, WPARAM wparam,
 		return DefWindowProc(hwnd, umessage, wparam, lparam);
 	}
 	}
+}
+
+// Win32 message handler using Imgui
+LRESULT CALLBACK DisplayWindow::WndProcImGui(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+		return true;
+
+	switch (msg)
+	{
+	case WM_SIZE:
+		if (wParam != SIZE_MINIMIZED) {
+			DisplayWindow::g_resizeWidth = (UINT)LOWORD(lParam);
+			DisplayWindow::g_resizeHeight = (UINT)HIWORD(lParam);
+			mApp->OnResize(g_resizeWidth, g_resizeHeight);
+		}
+		return 0;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU) return 0;
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	default:
+		return DisplayWindow::WndProc(hwnd, msg, wParam, lParam);
+	}
+	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 /*

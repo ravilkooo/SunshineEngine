@@ -1,16 +1,21 @@
 #pragma once
 
+// ThirdPartyLibs
+#include <EASTL/algorithm.h>
+#include <EASTL/unique_ptr.h>
+#include <EASTL/shared_ptr.h>
+
+// SunshineLibs
 #include "SunshineEngineAPI.h"
 #include "GameTimer.h"
-#include <EASTL/algorithm.h>
 
 #include "Scene.h"
 #include <Graphics/RenderingSystem.h>
 #include <Graphics/DeferredRenderer.h>
-#include <Windows/DisplayWindow.h>
+#include <Windows/WindowsApp.h>
 
 
-class SUNSHINE_ENGINE_API Game
+class SUNSHINE_ENGINE_API Game : public WindowsApp
 {
 public:
     Game();
@@ -22,19 +27,10 @@ public:
     virtual void Update(float deltaTime) = 0;
     virtual void Render();
 
+    GameTimer m_timer;
+    Scene m_scene;
+    eastl::unique_ptr<DeferredRenderer> m_renderer;
 
-    GameTimer timer;
-    Scene scene;
-    DeferredRenderer* renderer;
-
-    DisplayWindow displayWindow;
-
-    HINSTANCE hInstance;
-    LPCWSTR applicationName;
-
-    int winWidth = 800;
-    int winHeight = 800;
-
-    float deltaTime = 0.0f;
+    float m_deltaTime = 0.0f;
 };
 

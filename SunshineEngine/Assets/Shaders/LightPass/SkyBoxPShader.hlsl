@@ -21,18 +21,28 @@ struct CameraData
     float pad;
 };
 
+struct ScreenInfo
+{
+    float2 sceenSize;
+};
+
 struct Material
 {
     float3 Diffuse;
     float2 Specular;
 };
 
-cbuffer CameraBuffer : register(b0) // per object
+cbuffer CameraBuffer : register(b0) // per frame
 {
     CameraData camData;
 };
 
-cbuffer LightBuffer : register(b1) // per frame
+cbuffer ScreenInfoBuffer : register(b1) // per frame
+{
+    ScreenInfo screenInfo;
+};
+
+cbuffer LightBuffer : register(b2) // per object
 {
     SkyBox skyBox;
 };
@@ -45,9 +55,6 @@ struct PS_IN
     float3 wPos : POSITION;
     float2 texCoord : TEXCOORD0;
 };
-
-static const float SMAP_SIZE_X = 1000.0f;
-static const float SMAP_SIZE_Y = 800.0f;
 
 float4 PSMain(PS_IN input) : SV_Target
 {

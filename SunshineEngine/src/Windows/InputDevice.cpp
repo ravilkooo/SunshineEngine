@@ -8,7 +8,7 @@ using namespace DirectX::SimpleMath;
 
 InputDevice* InputDevice::instance = nullptr;
 
-InputDevice::InputDevice(Game* inGame, HWND hWnd) : game(inGame), hWnd(hWnd)
+InputDevice::InputDevice(WindowsApp* winApp, HWND hWnd) : winApp(winApp), hWnd(hWnd)
 {
 	keys = new std::unordered_set<Keys>();
 	
@@ -100,7 +100,7 @@ void InputDevice::OnMouseMove(RawMouseEventArgs args)
 
 void InputDevice::AddPressedKey(Keys key)
 {
-	//if (!game->isActive) {
+	//if (!winApi->isActive) {
 	//	return;
 	//}
 	keys->insert(key);

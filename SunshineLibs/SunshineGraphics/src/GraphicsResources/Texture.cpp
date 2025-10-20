@@ -133,4 +133,9 @@ namespace Bind
 			throw std::runtime_error("Failed to create shader resource view from texture generated from color data.");
 		}
 	}
+	void Texture::UpdateTextureView(ID3D11ShaderResourceView* pTextureView)
+	{
+		this->pTextureView.ReleaseAndGetAddressOf();
+		this->pTextureView = pTextureView;
+	}
 }

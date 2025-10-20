@@ -17,8 +17,9 @@ class LightPass :
     public RenderPass
 {
 public:
-    LightPass(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Texture2D* backBuffer,
-        UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera);
+    LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
+        eastl::shared_ptr<GBuffer> pGBuffer,
+        eastl::shared_ptr<Camera> camera);
 
     void StartFrame() override;
     void Pass(const Scene& scene) override;
@@ -26,25 +27,36 @@ public:
 
     eastl::shared_ptr<Camera> GetCamera();
     void SetCamera(eastl::shared_ptr<Camera> camera);
-    eastl::shared_ptr<Camera> camera;
 
-    UINT screenWidth = 800;
-    UINT screenHeight = 800;
+    void OnResize(UINT resizeWidth, UINT resizeHeight,
+        eastl::shared_ptr<GBuffer> pGBuffer);
 
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+    eastl::shared_ptr<Camera> m_camera;
 
-    eastl::shared_ptr<GBuffer> pGBuffer;
+    UINT m_screenWidth = 800u;
+    UINT m_screenHeight = 800u;
 
-    ID3D11RenderTargetView* gBufferRTV;
-    D3D11_VIEWPORT viewport;
+    eastl::shared_ptr<GBuffer> m_GBuffer;
+
+    D3D11_VIEWPORT m_viewport;
 
     struct CamPCB {
         XMMATRIX viewMatInverse;
         XMMATRIX projMatInverse;
         XMFLOAT3 camPos;
         float pad;
-    } cameraData;
-    Bind::PixelConstantBuffer<CamPCB>* camPCB;
+    } m_cameraData;
+    Bind::PixelConstantBuffer<CamPCB>* m_camPCB;
+
+    struct ScreenInfoPCB {
+        DXSM::Vector2 screenSize;
+    } m_screenData;
+    Bind::PixelConstantBuffer<ScreenInfoPCB>* m_screenInfoPCB;
+
+    eastl::shared_ptr<Bind::Texture> m_NormalTexture;
+    eastl::shared_ptr<Bind::Texture> m_AlbedoTexture;
+    eastl::shared_ptr<Bind::Texture> m_SpecularTexture;
+    eastl::shared_ptr<Bind::Texture> m_WorldPosTexture;
 
 public:
     eastl::vector<ParticleSystem*> particleSystems;

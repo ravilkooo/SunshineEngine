@@ -1,30 +1,37 @@
 #include "Graphics/LightPass.h"
 
 LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
-	ID3D11Texture2D* backBuffer,
-	UINT screenWidth, UINT screenHeight, eastl::shared_ptr<GBuffer> pGBuffer, eastl::shared_ptr<Camera> camera)
+	eastl::shared_ptr<GBuffer> pGBuffer,
+	eastl::shared_ptr<Camera> camera)
 	:
 	RenderPass("LightPass", device, context)
 {
-	this->pGBuffer = pGBuffer;
-	this->camera = camera;
-
-	gBufferRTV = pGBuffer->pLightRTV.Get();
+	this->m_GBuffer = pGBuffer;
+	this->m_camera = camera;
+	this->m_screenWidth = pGBuffer->m_screenWidth;
+	this->m_screenHeight = pGBuffer->m_screenHeight;
 
 	// Viewport
-	viewport = {};
-	viewport.Width = static_cast<float>(screenWidth);
-	viewport.Height = static_cast<float>(screenHeight);
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.MinDepth = 0;
-	viewport.MaxDepth = 1.0f;
+	m_viewport = {};
+	m_viewport.Width = static_cast<float>(m_screenWidth);
+	m_viewport.Height = static_cast<float>(m_screenHeight);
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.MinDepth = 0;
+	m_viewport.MaxDepth = 1.0f;
 
-	camPCB = new Bind::PixelConstantBuffer<CamPCB>(device,
+	m_camPCB = new Bind::PixelConstantBuffer<CamPCB>(device,
 		{ XMMatrixIdentity(), XMMatrixIdentity(),
 		(XMFLOAT3)camera->GetPosition(), 0 },
 		0u);
-	AddPerFrameBind(camPCB);
+	AddPerFrameBind(m_camPCB);
+
+	m_screenInfoPCB = new Bind::PixelConstantBuffer<ScreenInfoPCB>(device,
+		{ DXSM::Vector2(
+			static_cast<float>(m_screenWidth),
+			static_cast<float>(m_screenHeight)) },
+		1u);
+	AddPerFrameBind(m_screenInfoPCB);
 
 	D3D11_BLEND_DESC blendDesc = {};
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -38,11 +45,15 @@ LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 
 	AddPerFrameBind(new Bind::BlendState(device, blendDesc));
 
+	m_NormalTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pNormalSRV.Get(), 0u);
+	m_AlbedoTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pAlbedoSRV.Get(), 1u);
+	m_SpecularTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pSpecularSRV.Get(), 2u);
+	m_WorldPosTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pWorldPosSRV.Get(), 3u);
 
-	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pNormalSRV.Get(), 0u));
-	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pAlbedoSRV.Get(), 1u));
-	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pSpecularSRV.Get(), 2u));
-	AddPerFrameBind(new Bind::Texture(device, pGBuffer->pWorldPosSRV.Get(), 3u));
+	AddPerFrameBind(m_NormalTexture.get());
+	AddPerFrameBind(m_AlbedoTexture.get());
+	AddPerFrameBind(m_SpecularTexture.get());
+	AddPerFrameBind(m_WorldPosTexture.get());
 
 	// Usual sampler for all SRV
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -66,22 +77,25 @@ LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 
 void LightPass::StartFrame()
 {
-	context->OMSetRenderTargets(1, &gBufferRTV, pGBuffer->pDepthDSV.Get());
+	context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
 	float colorBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	context->ClearRenderTargetView(gBufferRTV, colorBlack);
+	context->ClearRenderTargetView(m_GBuffer->pLightRTV.Get(), colorBlack);
 	//context->ClearDepthStencilView(pGBuffer->pDepthDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
-	context->RSSetViewports(1, &viewport);
+	context->RSSetViewports(1, &m_viewport);
 
-	XMFLOAT3 camPos = camera->GetPosition();
+	XMFLOAT3 camPos = m_camera->GetPosition();
 	XMMATRIX vMatInverse = DirectX::XMMatrixTranspose(XMMatrixInverse(nullptr,
-		camera->GetViewMatrix()));
+		m_camera->GetViewMatrix()));
 	XMMATRIX pMatInverse = DirectX::XMMatrixTranspose(XMMatrixInverse(nullptr,
-		camera->GetProjectionMatrix()));
+		m_camera->GetProjectionMatrix()));
 	// camera->GetProjectionMatrix()
-	camPCB->Update(GetDeviceContext(), { vMatInverse, pMatInverse, camPos, 0 });
+	m_camPCB->Update(GetDeviceContext(), { vMatInverse, pMatInverse, camPos, 0 });
+	m_screenInfoPCB->Update(GetDeviceContext(), { DXSM::Vector2(
+			static_cast<float>(m_screenWidth),
+			static_cast<float>(m_screenHeight)) });
 
-	camera->UpdateBuffer(context.Get());
-	camera->BindBuffer(context.Get());
+	m_camera->UpdateBuffer(context.Get());
+	m_camera->BindBuffer(context.Get());
 }
 
 void LightPass::Pass(const Scene& scene)
@@ -123,10 +137,34 @@ void LightPass::EndFrame()
 
 eastl::shared_ptr<Camera> LightPass::GetCamera()
 {
-	return camera;
+	return m_camera;
 }
 
 void LightPass::SetCamera(eastl::shared_ptr<Camera> camera)
 {
-	this->camera = camera;
+	this->m_camera = camera;
+}
+
+
+void LightPass::OnResize(UINT resizeWidth, UINT resizeHeight,
+	eastl::shared_ptr<GBuffer> pGBuffer)
+{
+	m_screenWidth = resizeWidth;
+	m_screenHeight = resizeHeight;
+
+	m_GBuffer = pGBuffer;
+
+	m_NormalTexture->UpdateTextureView(pGBuffer->pNormalSRV.Get());
+	m_AlbedoTexture->UpdateTextureView(pGBuffer->pAlbedoSRV.Get());
+	m_SpecularTexture->UpdateTextureView(pGBuffer->pSpecularSRV.Get());
+	m_WorldPosTexture->UpdateTextureView(pGBuffer->pWorldPosSRV.Get());
+
+	// Viewport
+	m_viewport = {};
+	m_viewport.Width = static_cast<float>(m_screenWidth);
+	m_viewport.Height = static_cast<float>(m_screenHeight);
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.MinDepth = 0;
+	m_viewport.MaxDepth = 1.0f;
 }

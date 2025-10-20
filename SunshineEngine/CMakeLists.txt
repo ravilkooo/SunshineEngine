@@ -40,6 +40,7 @@ target_link_libraries(SunshineEngine
         SunshineGraphics
         assimp
         ViennaGameJobSystem
+        imgui
         lua
         FMOD
         sol2
@@ -68,9 +69,24 @@ message(STATUS "FMOD_LIB_DIR (from engine) = ${FMOD_LIB_DIR}")
 
 target_link_libraries(SunshineEngine PUBLIC Jolt)
 
-# -------------- JoltPhysics --------------
+# -------------- Assets --------------
 
 target_compile_definitions(SunshineEngine PUBLIC ENGINE_ASSETS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Assets/")
+
+
+# Collect all HLSL shader files
+file(GLOB_RECURSE SHADERS "Assets/Shaders/*.hlsl")
+
+# Add shaders to the project so they appear in VS
+source_group("Assets\\Shaders" FILES ${SHADERS})
+
+# Add shaders as "sources" just for IDE visibility, not for compilation
+set_property(SOURCE ${SHADERS} PROPERTY HEADER_FILE_ONLY TRUE)
+
+# Add shaders to the target as "header only" so VS sees them
+target_sources(SunshineEngine PRIVATE ${SHADERS})
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SHADERS})
 
 # Collect all Lua scripts files
 file(GLOB_RECURSE SCRIPTS "Assets/Scripts/*.lua")
@@ -83,5 +99,7 @@ set_property(SOURCE ${SCRIPTS} PROPERTY HEADER_FILE_ONLY TRUE)
 
 # Add scripts to the target as "header only" so VS sees them
 target_sources(SunshineEngine PRIVATE ${SCRIPTS})
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SCRIPTS})
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR})
