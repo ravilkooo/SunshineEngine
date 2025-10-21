@@ -1,15 +1,21 @@
 #pragma once
+#include "Component.h"
 #include <string>
 #include <vector>
-#include <array>
+#include <memory>
 #include "sol/sol.hpp"
-#include <Component/LuaComponent.h>
 
+struct ParamEntry {
+    std::string name;
+    std::string type;
+    std::array<char, 128> value = {};
+};
 
-class LuaLogic {
+class LuaComponent : public Component
+{
 public:
-    LuaLogic();
-    ~LuaLogic();
+    LuaComponent();
+    ~LuaComponent();
 
     void Init();
     void Cleanup();
@@ -47,3 +53,4 @@ private:
     void ClearState();
     void LoadParamsFromLua();
 };
+

@@ -1,13 +1,10 @@
 #include <filesystem>
 #include <TestGameObjects.h>
 
-
-namespace fs = std::filesystem;
-
-TestGameObjects testGameObjects;
+//TestGameObjects testGameObjects;
 
 int main() 
 {	
-	testGameObjects.Run();	
+	//testGameObjects.Run();	
 	return 0;
 }

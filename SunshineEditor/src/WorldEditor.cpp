@@ -1,4 +1,5 @@
 #include "WorldEditor.h"
+#include <Component/LuaComponent.h>
 
 
 WorldEditor::WorldEditor()
@@ -7,6 +8,7 @@ WorldEditor::WorldEditor()
 
 WorldEditor::~WorldEditor()
 {
+	//m_scene.gameObjects[1]->GetComponent<LuaComponent>()->Cleanup();
 }
 
 
@@ -50,6 +52,8 @@ void WorldEditor::InitWorldEditor(
 		m_renderer->GetMainCamera(),
 		{ DXSM::Vector3::One, 1.0f }
 		));
+	//m_scene.gameObjects[1]->GetComponent<LuaComponent>()->Init();
+	//m_scene.gameObjects[1]->GetComponent<LuaComponent>()->LoadScript();
 }
 void WorldEditor::Run() {
 	
