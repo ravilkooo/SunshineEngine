@@ -34,6 +34,7 @@ public:
     void ShowSceneHierarchy();
     void ShowContentBrowser();
     void ShowProperties();
+    void LuaImgui(GameObject*);
 
     UINT m_editorAppWidth = 800;
     UINT m_editorAppHeight = 800;
@@ -56,5 +57,8 @@ public:
 
     ImVec2 m_lastGameViewportSize = ImVec2(0, 0);
     bool m_gameViewportJustResized = false;
+
+private:
+    int selectedIdx = -1;
 };
 

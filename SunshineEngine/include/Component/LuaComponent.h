@@ -45,6 +45,10 @@ public:
     std::string errorMessage;
     std::vector<ParamEntry> params;
 
+    const std::type_info& getType() const override {
+        return typeid(LuaComponent);
+    }
+
 private:
     std::unique_ptr<sol::state> lua;
 

@@ -1,6 +1,6 @@
 #include "ImguiEditorPass.h"
 #include "WorldEditor.h"
-
+#include <Component/LuaComponent.h>
 
 ImguiEditorPass::ImguiEditorPass(
 	ID3D11Device* device,
@@ -131,7 +131,7 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ImVec2 contentSize = ImGui::GetContentRegionAvail();
 	m_gameViewportJustResized = (contentSize.x != m_lastGameViewportSize.x) || (contentSize.y != m_lastGameViewportSize.y);
 	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0) {
-		
+
 		m_GBuffer->OnResize(GetDevice(), (UINT)contentSize.x, (UINT)contentSize.y);
 		m_worldEditor->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
 		//ResizeGBuffer((UINT)contentSize.x, (UINT)contentSize.y); // Your resize call
@@ -173,8 +173,20 @@ void ImguiEditorPass::ShowSceneHierarchy()
 	ImGui::Text("Scene Hierarchy");
 	if (ImGui::TreeNode("Root"))
 	{
-		ImGui::BulletText("Object A");
-		ImGui::BulletText("Object B");
+		auto& objects = m_worldEditor->m_scene.gameObjects;
+		for (size_t i = 0; i < objects.size(); ++i)
+		{
+			ImGui::PushID((int)i);
+			bool isSelected = (selectedIdx == (int)i);
+
+			std::string objLabel = "GameObject " + std::to_string(i);
+
+			if (ImGui::Selectable(objLabel.c_str(), isSelected))
+			{
+				selectedIdx = (int)i;
+			}
+			ImGui::PopID();
+		}
 		ImGui::TreePop();
 	}
 }
@@ -187,8 +199,73 @@ void ImguiEditorPass::ShowContentBrowser()
 
 void ImguiEditorPass::ShowProperties()
 {
-	ImGui::Text("Properties");
-	//ImGui::InputText("Name", nullptr, 0); // Пример
+	if (selectedIdx == -1)
+		return;
+
+	GameObject* obj = m_worldEditor->m_scene.gameObjects[selectedIdx].get();
+
+	if (!obj->HasComponent<LuaComponent>())
+	{
+		if (ImGui::Button("Add Lua Script")) {
+			obj->AddComponent<LuaComponent>();
+			auto lua2 = obj->GetComponent<LuaComponent>();
+			lua2->Init();
+			lua2->LoadScript();
+		}
+		return;
+	}
+	else 
+	{
+		LuaImgui(obj);
+	}
+}
+
+void ImguiEditorPass::LuaImgui(GameObject* obj)
+{
+	eastl::shared_ptr<LuaComponent> testComponent = obj->GetComponent<LuaComponent>();
+
+	if (ImGui::BeginCombo("##LuaFile", testComponent->luaFiles.empty() ? "" : testComponent->luaFiles[testComponent->selectedLuaFile].c_str())) {
+		for (int i = 0; i < testComponent->luaFiles.size(); ++i) {
+			bool is_selected = (i == testComponent->selectedLuaFile);
+			if (ImGui::Selectable(testComponent->luaFiles[i].c_str(), is_selected))
+				testComponent->selectedLuaFile = i;
+			if (is_selected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+	if (ImGui::Button("Load Script")) {
+		testComponent->LoadScript();
+	}
+
+	if (testComponent->scriptLoaded)
+	{
+		ImGui::Text("Function Name:"); ImGui::SameLine();
+		ImGui::InputText("##FunctionName", testComponent->functionName, IM_ARRAYSIZE(testComponent->functionName));
+		if (ImGui::Button("Find")) {
+			testComponent->FindFunction();
+		}
+
+		if (testComponent->foundFunction) {
+			ImGui::Text("Parameters:");
+			for (int i = 0; i < testComponent->params.size(); ++i) {
+				ImGui::Text("%s (%s) =", testComponent->params[i].name.c_str(), testComponent->params[i].type.c_str());
+				ImGui::SameLine();
+				ImGui::InputText(("##p" + std::to_string(i)).c_str(), testComponent->params[i].value.data(), testComponent->params[i].value.size());
+			}
+
+			if (ImGui::Button("Call")) {
+				testComponent->CallFunction();
+			}
+			if (!testComponent->lastResult.empty()) {
+				ImGui::Text("%s", testComponent->lastResult.c_str());
+			}
+
+		}
+		else if (!testComponent->errorMessage.empty()) {
+			ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", testComponent->errorMessage.c_str());
+		}
+	}
 }
 
 void ImguiEditorPass::PreResize()
@@ -210,7 +287,7 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	HRESULT hr = device->CreateRenderTargetView(m_backBuffer.Get(), nullptr, m_renderTargetView.GetAddressOf());
 	if (FAILED(hr))
 		throw std::runtime_error("Failed to create Render Target View");
-	
+
 	D3D11_TEXTURE2D_DESC descDepth = {};
 	descDepth.Width = m_editorAppWidth;
 	descDepth.Height = m_editorAppHeight;
