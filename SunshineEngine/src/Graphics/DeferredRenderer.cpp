@@ -10,15 +10,15 @@ DeferredRenderer::DeferredRenderer(HWND hWnd,
 	LPCWSTR applicationName = L"SunshineEngine";
 	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
-	this->screenWidth = screenWidth;
-	this->screenHeight = screenHeight;
+	this->m_screenWidth = screenWidth;
+	this->m_screenHeight = screenHeight;
 
 	// swapChain
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	swapChainDesc.BufferCount = 2;
-	swapChainDesc.BufferDesc.Width = screenWidth;
-	swapChainDesc.BufferDesc.Height = screenHeight;
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainDesc.BufferDesc.Width = m_screenWidth;
+	swapChainDesc.BufferDesc.Height = m_screenHeight;
+	swapChainDesc.BufferDesc.Format = m_BackBufferFormat;
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -53,17 +53,19 @@ DeferredRenderer::DeferredRenderer(HWND hWnd,
 	if (FAILED(hr))
 		throw std::runtime_error("Failed to get back buffer");
 
+}
 
+void DeferredRenderer::InitGBuffer(UINT screenWidth, UINT screenHeight)
+{
 	this->pGBuffer = eastl::make_shared<GBuffer>(device.Get(), screenWidth, screenHeight);
 	mainCamera = eastl::make_shared<Camera>(device.Get(), screenWidth * 1.0f / screenHeight);
 	mainCamera->SetPosition({ 0, 0, -10 });
-
 }
 
 void DeferredRenderer::RenderScene(const Scene& scene)
 {
 	// Passes
-	for (RenderPass* pass : passes) {
+	for (auto pass : passes) {
 		context->ClearState();
 		pass->StartFrame();
 		pass->Pass(scene);
@@ -73,7 +75,32 @@ void DeferredRenderer::RenderScene(const Scene& scene)
 	//swapChain->Present(1, /*DXGI_PRESENT_DO_NOT_WAIT*/ 0);
 }
 
-void DeferredRenderer::AddPass(RenderPass* pass)
+void DeferredRenderer::AddPass(eastl::shared_ptr<RenderPass> pass)
 {
 	passes.push_back(pass);
+}
+
+void DeferredRenderer::PreResize()
+{
+	ID3D11RenderTargetView* nullRTVs[] = { nullptr };
+	context->OMSetRenderTargets(1, nullRTVs, nullptr);
+}
+
+void DeferredRenderer::OnResize(UINT resizeWidth, UINT resizeHeight)
+{
+	m_screenWidth = resizeWidth;
+	m_screenHeight = resizeHeight;
+	
+
+	backBuffer.ReleaseAndGetAddressOf();
+	swapChain->ResizeBuffers(
+		2,
+		m_screenWidth, m_screenHeight,
+		m_BackBufferFormat,
+		DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
+	);
+
+	HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
+	if (FAILED(hr))
+		throw std::runtime_error("Failed to get back buffer");
 }

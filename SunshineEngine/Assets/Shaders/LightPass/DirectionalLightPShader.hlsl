@@ -25,18 +25,28 @@ struct CameraData
     float pad;
 };
 
+struct ScreenInfo
+{
+    float2 sceenSize;
+};
+
 struct Material
 {
     float3 Diffuse;
     float2 Specular;
 };
 
-cbuffer CameraBuffer : register(b0) // per object
+cbuffer CameraBuffer : register(b0) // per frame
 {
     CameraData camData;
 };
 
-cbuffer LightBuffer : register(b1) // per frame
+cbuffer ScreenInfoBuffer : register(b1) // per frame
+{
+    ScreenInfo screenInfo;
+};
+
+cbuffer LightBuffer : register(b2) // per object
 {
     DirectionalLight directionalLight;
 };
@@ -70,14 +80,10 @@ struct PS_IN
     float2 tex : TEXCOORD;
 };
 
-static const float SMAP_SIZE_X = 1000.0f;
-static const float SMAP_SIZE_Y = 800.0f;
-
 float4 PSMain(PS_IN input) : SV_Target
 {
-    
-    float x = input.pos.x / SMAP_SIZE_X;
-    float y = input.pos.y / SMAP_SIZE_Y;
+    float x = input.pos.x / screenInfo.sceenSize.x;
+    float y = input.pos.y / screenInfo.sceenSize.y;
     Material mat =
     {
         float3(AlbedoMap.Sample(Sam, float2(x, y)).rgb),

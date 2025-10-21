@@ -10,13 +10,15 @@ Camera::Camera(ID3D11Device* device) : Camera(device, 1.0f) {
 
 Camera::Camera(ID3D11Device* device, float aspectRatio)
     : position(0.0f, 0.0f, -5.0f), target(0.0f, 0.0f, 1.0f), up(0.0f, 1.0f, 0.0f),
-    fov(XM_PIDIV4), aspectRatio(aspectRatio), nearZ(0.1f), farZ(1000.0f),
+    aspectRatio(aspectRatio), nearZ(0.1f), farZ(1000.0f),
     orthZ(10.0f), isPerspective(true),
     cameraMode(CAMERA_MODE::FPS), orbitalTarget(0.0f, 0.0f, 0.0f),
     orbitalDistance(5.0f), minOrbitalDistance(5.0f),
     orbitalPitch(0.0f), orbitalYaw(0.0f),
     spinAxis(0.0f, 1.0f, 0.0f), orbitalAngleSpeed(0.0f)
 {
+    SetUpCameraViewByAspectRatio(aspectRatio);
+    //fov = 2.0f * atan(aspectRatio * 0.5625f); 
     InitBuffer(device);
 }
 
@@ -101,6 +103,48 @@ void Camera::SetFarZ(float farZ)
 float Camera::GetFarZ()
 {
     return farZ;
+}
+
+void Camera::SetUpCameraViewByAspectRatio(float newAspectRatio)
+{
+    SetAspectRatio(newAspectRatio);
+    SetFOV(2.0f * atan(aspectRatio * 0.5625f)); // 2 * atan(9x/16)
+    SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+    SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+}
+
+void Camera::SetUpCameraViewByFOV(float newFOV)
+{
+    SetFOV(newFOV);
+    SetAspectRatio(16.0f * tan(fov * 0.5f) / 9.0f);
+    SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+    SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+
+}
+
+void Camera::SetUpCameraViewByAspectRatio_horizontal(float newAspectRatio)
+{
+    //SetFOV(fov); // stay the same
+    SetAspectRatio(newAspectRatio);
+    SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+    SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+}
+
+void Camera::SetUpCameraViewByAspectRatio_vertical(float newAspectRatio)
+{
+    SetFOV(2.0f * atan(tan(fov *0.5f) * aspectRatio / newAspectRatio));
+    SetAspectRatio(newAspectRatio);
+
+    SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+    SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+}
+
+void Camera::ResetCameraView(float newAspectRatio)
+{
+    SetAspectRatio(newAspectRatio);
+    SetFOV(XM_PIDIV2); // 2 * atan(1)
+    SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+    SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
 }
 
 void Camera::SetViewWidth(float viewWidth)

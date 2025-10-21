@@ -43,19 +43,19 @@ public:
     void SetUp(DXSM::Vector3 up);
     DXSM::Vector3 GetUp();
 
-    void SetFOV(float fov);
-    void SetAspectRatio(float aspectRatio);
-
     void SetNearZ(float nearZ);
     float GetNearZ();
 
     void SetFarZ(float farZ);
     float GetFarZ();
 
-    void SetViewWidth(float viewWidth);
-    float GetViewWidth();
+    void SetUpCameraViewByAspectRatio(float newAspectRatio);
+    void SetUpCameraViewByFOV(float newFOV);
+    void SetUpCameraViewByAspectRatio_horizontal(float newAspectRatio);
+    void SetUpCameraViewByAspectRatio_vertical(float newAspectRatio);
+    void ResetCameraView(float newAspectRatio);
 
-    void SetViewHeight(float viewHeight);
+    float GetViewWidth();
     float GetViewHeight();
 
     void SetReferenceLen(float referenceLen);
@@ -107,6 +107,11 @@ public:
     FrustumCorners GetFrustumCorners();
 
 private:
+    void SetFOV(float fov);
+    void SetAspectRatio(float aspectRatio);
+    void SetViewWidth(float viewWidth);
+    void SetViewHeight(float viewHeight);
+
     DXSM::Vector3 position;
     DXSM::Vector3 target;
     DXSM::Vector3 up;

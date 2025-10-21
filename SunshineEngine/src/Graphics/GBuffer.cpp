@@ -1,13 +1,46 @@
 #include "Graphics/GBuffer.h"
 
-GBuffer::GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight) {
+GBuffer::GBuffer(ID3D11Device* device,
+	UINT screenWidth, UINT screenHeight) :
+	m_screenWidth(screenWidth), m_screenHeight(screenHeight)
+{	
+	OnResize(device, screenWidth, screenHeight);
+}
 
-	// GPass stuff
-	
+void GBuffer::OnResize(ID3D11Device* device, UINT resizeWidth, UINT resizeHeight)
+{
+	m_screenWidth = resizeWidth;
+	m_screenHeight = resizeHeight;
+
+	pDepthBuffer.ReleaseAndGetAddressOf();
+	pDepthDSV.ReleaseAndGetAddressOf();
+	pDepthSRV.ReleaseAndGetAddressOf();
+
+	pWorldPosBuffer.ReleaseAndGetAddressOf();
+	pWorldPosRTV.ReleaseAndGetAddressOf();
+	pWorldPosSRV.ReleaseAndGetAddressOf();
+
+	pNormalBuffer.ReleaseAndGetAddressOf();
+	pNormalRTV.ReleaseAndGetAddressOf();
+	pNormalSRV.ReleaseAndGetAddressOf();
+
+	pAlbedoBuffer.ReleaseAndGetAddressOf();
+	pAlbedoRTV.ReleaseAndGetAddressOf();
+	pAlbedoSRV.ReleaseAndGetAddressOf();
+
+	pSpecularBuffer.ReleaseAndGetAddressOf();
+	pSpecularRTV.ReleaseAndGetAddressOf();
+	pSpecularSRV.ReleaseAndGetAddressOf();
+
+	pLightBuffer.ReleaseAndGetAddressOf();
+	pLightRTV.ReleaseAndGetAddressOf();
+	pLightSRV.ReleaseAndGetAddressOf();
+
+
 	// Depth Texture
 	D3D11_TEXTURE2D_DESC depthDesc = {};
-	depthDesc.Width = screenWidth;
-	depthDesc.Height = screenHeight;
+	depthDesc.Width = m_screenWidth;
+	depthDesc.Height = m_screenHeight;
 	depthDesc.MipLevels = 1;
 	depthDesc.ArraySize = 1;
 	depthDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -35,8 +68,8 @@ GBuffer::GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight) {
 
 	// WorldPos Texture
 	D3D11_TEXTURE2D_DESC worldPosDesc = {};
-	worldPosDesc.Width = screenWidth;
-	worldPosDesc.Height = screenHeight;
+	worldPosDesc.Width = m_screenWidth;
+	worldPosDesc.Height = m_screenHeight;
 	worldPosDesc.MipLevels = 1;
 	worldPosDesc.ArraySize = 1;
 	worldPosDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT; // World Position
@@ -61,8 +94,8 @@ GBuffer::GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight) {
 
 	// Normal Texture
 	D3D11_TEXTURE2D_DESC normalDesc = {};
-	normalDesc.Width = screenWidth;
-	normalDesc.Height = screenHeight;
+	normalDesc.Width = m_screenWidth;
+	normalDesc.Height = m_screenHeight;
 	normalDesc.MipLevels = 1;
 	normalDesc.ArraySize = 1;
 	normalDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT; // Normals
@@ -86,8 +119,8 @@ GBuffer::GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight) {
 
 	// Albedo Texture
 	D3D11_TEXTURE2D_DESC albedoDesc = {};
-	albedoDesc.Width = screenWidth;
-	albedoDesc.Height = screenHeight;
+	albedoDesc.Width = m_screenWidth;
+	albedoDesc.Height = m_screenHeight;
 	albedoDesc.MipLevels = 1;
 	albedoDesc.ArraySize = 1;
 	albedoDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // Albedo
@@ -111,8 +144,8 @@ GBuffer::GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight) {
 
 	// Specular
 	D3D11_TEXTURE2D_DESC specularDesc = {};
-	specularDesc.Width = screenWidth;
-	specularDesc.Height = screenHeight;
+	specularDesc.Width = m_screenWidth;
+	specularDesc.Height = m_screenHeight;
 	specularDesc.MipLevels = 1;
 	specularDesc.ArraySize = 1;
 	specularDesc.Format = DXGI_FORMAT_R16G16_FLOAT; // Specular (Intensity; Power)
@@ -137,8 +170,8 @@ GBuffer::GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight) {
 	// LightPass stuff
 
 	D3D11_TEXTURE2D_DESC lightDesc = {};
-	lightDesc.Width = screenWidth;
-	lightDesc.Height = screenHeight;
+	lightDesc.Width = m_screenWidth;
+	lightDesc.Height = m_screenHeight;
 	lightDesc.MipLevels = 1;
 	lightDesc.ArraySize = 1;
 	lightDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;

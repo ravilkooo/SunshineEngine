@@ -27,9 +27,9 @@ public:
 
 	ID3D11Texture2D* GetBackBuffer() { return backBuffer.Get(); }
 
-	virtual void AddPass(RenderPass* pass) = 0;
+	virtual void AddPass(eastl::shared_ptr<RenderPass> pass) = 0;
 
-	eastl::vector<RenderPass*> passes;
+	eastl::vector<eastl::shared_ptr<RenderPass>> passes;
 	eastl::shared_ptr<Camera> mainCamera;
 protected:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
@@ -40,7 +40,7 @@ protected:
 
 	D3D_FEATURE_LEVEL featureLevels[1] = { D3D_FEATURE_LEVEL_11_1 };
 
-	UINT screenWidth = 800;
-	UINT screenHeight = 800;
+	UINT m_screenWidth = 800;
+	UINT m_screenHeight = 800;
 
 };

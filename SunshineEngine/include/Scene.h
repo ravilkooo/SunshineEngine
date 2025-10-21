@@ -19,6 +19,7 @@ public:
     void Update(float deltaTime);
     void Draw();
 
+    // change to shared_ptr? to link to game objects
     eastl::vector <eastl::unique_ptr<GameObject>> gameObjects;
 private:
 };

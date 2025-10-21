@@ -9,8 +9,8 @@ ForwardRenderer::ForwardRenderer(HWND hWnd, UINT screenWidth, UINT screenHeight)
 	LPCWSTR applicationName = L"SunshineEngine";
 	HINSTANCE hInstance = GetModuleHandle(nullptr);
 
-	this->screenWidth = screenWidth;
-	this->screenHeight = screenHeight;
+	this->m_screenWidth = screenWidth;
+	this->m_screenHeight = screenHeight;
 
 	// swapChain
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -65,7 +65,7 @@ ForwardRenderer::~ForwardRenderer()
 void ForwardRenderer::RenderScene(const Scene& scene)
 {
 	// Passes
-	for (RenderPass* pass : passes) {
+	for (auto pass : passes) {
 		pass->StartFrame();
 		pass->Pass(scene);
 		pass->EndFrame();
@@ -75,7 +75,7 @@ void ForwardRenderer::RenderScene(const Scene& scene)
 }
 
 
-void ForwardRenderer::AddPass(RenderPass* pass)
+void ForwardRenderer::AddPass(eastl::shared_ptr<RenderPass> pass)
 {
 	passes.push_back(pass);
 }

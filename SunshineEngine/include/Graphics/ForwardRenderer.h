@@ -53,7 +53,7 @@ public:
 
     void RenderScene(const Scene& scene);
 
-    void AddPass(RenderPass* pass) override;
+    void AddPass(eastl::shared_ptr<RenderPass> pass) override;
 
     void SetMainCamera(eastl::shared_ptr<Camera> camera);
     eastl::shared_ptr<Camera> GetMainCamera();
