@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "sol/sol.hpp"
+#include <GameObject.h>
 
 struct ParamEntry {
     std::string name;
@@ -17,7 +18,7 @@ public:
     LuaComponent();
     ~LuaComponent();
 
-    void Init();
+    void Init(GameObject*);
     void Cleanup();
 
     void LoadScript();
@@ -51,8 +52,10 @@ public:
 
 private:
     std::unique_ptr<sol::state> lua;
+    GameObject* obj;
 
     void InitLuaFile();
+    void registerComponents();
     void ScanLuaFiles(const std::string& dirPath);
     void ClearState();
     void LoadParamsFromLua();

@@ -30,6 +30,8 @@ public:
     */
     // ================
 
+    std::string Name;
+
     template<typename T, typename... Args>
     eastl::shared_ptr<T> AddComponent(Args&&... args);
     //T& AddComponent(Args&&... args);

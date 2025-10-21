@@ -2,6 +2,7 @@
 #include <cstring>
 #include <filesystem>
 #include <Component/LuaComponent.h>
+#include <Component/TransformComponent.h>
 
 namespace fs = std::filesystem;
 
@@ -28,11 +29,16 @@ LuaComponent::~LuaComponent() {
     Cleanup();
 }
 
-void LuaComponent::Init() {
+void LuaComponent::Init(GameObject* obj) {
+
+    this->obj = obj;
+
     InitLuaFile();
 
     lua = std::make_unique<sol::state>();
     lua->open_libraries(sol::lib::base);
+
+    registerComponents();
 
 
     auto result = lua->script_file(scriptPath);
@@ -43,6 +49,27 @@ void LuaComponent::Init() {
     else {
         scriptLoaded = true;
     }
+}
+
+void LuaComponent::registerComponents() 
+{
+    lua->new_usertype<DXSM::Vector3>("Vector3",
+        "x", &DXSM::Vector3::x,
+        "y", &DXSM::Vector3::y,
+        "z", &DXSM::Vector3::z
+    );
+
+    lua->new_usertype<TransformComponent>("TransformComponent",
+        "m_position", &TransformComponent::m_position
+    );
+
+    auto getTransform = [](GameObject* go) -> TransformComponent* {
+        return go->GetComponent<TransformComponent>().get();
+        };
+
+    lua->new_usertype<GameObject>("GameObject",
+        "getTransform", getTransform
+    );
 }
 
 void LuaComponent::InitLuaFile()
@@ -74,7 +101,7 @@ void LuaComponent::LoadScript() {
     scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
     std::cout << scriptPath << " is loaded!" << std::endl;
     Cleanup();
-    Init();
+    Init(obj);
     errorMessage.clear();
     foundFunction = false;
     params.clear();
@@ -110,6 +137,7 @@ bool LuaComponent::FindFunction() {
     }
     else {
         errorMessage = "No such function";
+        std::cout << errorMessage << std::endl;
         return false;
     }
 }
@@ -130,17 +158,22 @@ void LuaComponent::LoadParamsFromLua() {
 }
 
 bool LuaComponent::CallFunction() {
+
     sol::function func = (*lua)[functionName];
     if (!func.valid())
     {
         errorMessage = "No such function";
+        std::cout << errorMessage << std::endl;
         return false;
     }
 
     std::vector<sol::object> args;
     for (const auto& p : params) {
         std::string val(p.value.data());
-        if (p.type == "number") {
+        if (p.type == "userdata") {
+            args.push_back(sol::make_object(*lua, obj));
+        }
+        else if (p.type == "number") {
             args.push_back(sol::make_object(*lua, std::stod(val)));
         }
         else if (p.type == "bool") {
@@ -155,6 +188,7 @@ bool LuaComponent::CallFunction() {
     if (!result.valid()) {
         sol::error err = result;
         errorMessage = "Lua error: " + std::string(err.what());
+        std::cout << errorMessage << std::endl;
         return false;
     }
 

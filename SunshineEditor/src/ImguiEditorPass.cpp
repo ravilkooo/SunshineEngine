@@ -180,6 +180,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			bool isSelected = (selectedIdx == (int)i);
 
 			std::string objLabel = "GameObject " + std::to_string(i);
+			objects[i]->Name = objLabel;
 
 			if (ImGui::Selectable(objLabel.c_str(), isSelected))
 			{
@@ -209,7 +210,7 @@ void ImguiEditorPass::ShowProperties()
 		if (ImGui::Button("Add Lua Script")) {
 			obj->AddComponent<LuaComponent>();
 			auto lua2 = obj->GetComponent<LuaComponent>();
-			lua2->Init();
+			lua2->Init(obj);
 			lua2->LoadScript();
 		}
 		return;
@@ -248,10 +249,19 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 
 		if (testComponent->foundFunction) {
 			ImGui::Text("Parameters:");
+
 			for (int i = 0; i < testComponent->params.size(); ++i) {
-				ImGui::Text("%s (%s) =", testComponent->params[i].name.c_str(), testComponent->params[i].type.c_str());
+				auto& param = testComponent->params[i];
+				ImGui::Text("%s (%s) =", param.name.c_str(), param.type.c_str());
 				ImGui::SameLine();
-				ImGui::InputText(("##p" + std::to_string(i)).c_str(), testComponent->params[i].value.data(), testComponent->params[i].value.size());
+
+				if (param.type != "userdata") {
+					ImGui::InputText(("##p" + std::to_string(i)).c_str(), param.value.data(), param.value.size());
+				}
+				else {
+					std::string objName = obj->Name;
+					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), objName.c_str());
+				}
 			}
 
 			if (ImGui::Button("Call")) {
