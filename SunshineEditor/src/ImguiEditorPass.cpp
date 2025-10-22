@@ -108,8 +108,6 @@ void ImguiEditorPass::Pass(const Scene& scene)
 		ImGui::DockBuilderDockWindow("Content Browser", dock_id_down);
 
 		ImGui::DockBuilderFinish(dockspace_id);
-
-		m_isLayoutInitialized = true;
 	}
 
 	ImGui::End();
@@ -118,19 +116,61 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ShowSceneHierarchy();  // Scene Hierarchy
 	ImGui::End();
 
-	ImGui::Begin("Content Browser");
-	ShowContentBrowser();  // Content Browser
-	ImGui::End();
-
 	// Properties
 	ImGui::Begin("Properties");
 	ShowProperties();
 	ImGui::End();
 
-	// Main Game Viewport
-	ImGui::Begin("Main Game Viewport");
+	ImGui::Begin("Content Browser");
+	ShowContentBrowser();  // Content Browser
+	ImGui::End();
 
-	ImVec2 contentSize = ImGui::GetContentRegionAvail();
+	// Main Game Viewport
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	// Optional: zero item spacing if you want widgets to butt together
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+	ImGuiWindowFlags vp_flags =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoBringToFrontOnFocus |
+		ImGuiWindowFlags_NoNavFocus;
+
+	ImGui::Begin("Main Game Viewport", nullptr, vp_flags);
+
+	IsFocusedGameViewport = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+	IsHoveredGameViewport = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
+
+	ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+	ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+
+	if (IsHoveredGameViewport)
+	{
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		{
+			ImVec2 MousePosScreen = ImGui::GetMousePos();
+			ImVec2 WindowPos = ImGui::GetWindowPos();
+
+			MouseScreenCoords = ImVec2(
+				MousePosScreen.x - WindowPos.x - vMin.x,
+				MousePosScreen.y - WindowPos.y - vMin.y
+			);
+			m_worldEditor->DeprojectScreenToWorld(
+				DXSM::Vector2(MouseScreenCoords.x, MouseScreenCoords.y),
+				DXSM::Vector2(m_lastGameViewportSize.x, m_lastGameViewportSize.y)
+			);
+		}
+	}
+
+	//ImVec2 contentSize = ImGui::GetContentRegionAvail();
+	ImVec2 contentSize = ImVec2(
+		vMax.x - vMin.x,
+		vMax.y - vMin.y
+	);
 	m_gameViewportJustResized = (contentSize.x != m_lastGameViewportSize.x) || (contentSize.y != m_lastGameViewportSize.y);
 	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0) {
 
@@ -139,9 +179,18 @@ void ImguiEditorPass::Pass(const Scene& scene)
 		//ResizeGBuffer((UINT)contentSize.x, (UINT)contentSize.y); // Your resize call
 	}
 	m_lastGameViewportSize = contentSize;
+
 	RenderGameWorld();
 
 	ImGui::End();
+	ImGui::PopStyleVar(4);
+
+	if (!m_isLayoutInitialized)
+	{
+		m_isLayoutInitialized = true;
+
+		ImGui::FocusWindow(NULL);
+	}
 
 	// -----------------
 

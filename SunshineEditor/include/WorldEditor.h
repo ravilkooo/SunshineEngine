@@ -48,5 +48,11 @@ public:
     eastl::shared_ptr<LightPass> m_lightPass;
 
     float m_deltaTime = 0.0f;
+
+
+    // track ray from mouse click
+    DXSM::Vector4 rayDirection;
+
+    void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
 };
 

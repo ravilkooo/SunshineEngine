@@ -41,9 +41,9 @@ public:
     D3D11_VIEWPORT m_viewport;
 
     struct CamPCB {
-        XMMATRIX viewMatInverse;
-        XMMATRIX projMatInverse;
-        XMFLOAT3 camPos;
+        DX::XMMATRIX viewMatInverse;
+        DX::XMMATRIX projMatInverse;
+        DX::XMFLOAT3 camPos;
         float pad;
     } m_cameraData;
     Bind::PixelConstantBuffer<CamPCB>* m_camPCB;

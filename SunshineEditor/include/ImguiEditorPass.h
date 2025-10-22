@@ -58,6 +58,11 @@ public:
     ImVec2 m_lastGameViewportSize = ImVec2(0, 0);
     bool m_gameViewportJustResized = false;
 
+    bool IsFocusedGameViewport = false;
+    bool IsHoveredGameViewport = false;
+
+    // track mouse clicks on world editor
+    ImVec2 MouseScreenCoords = ImVec2(0, 0);
 private:
     int selectedIdx = -1;
 };

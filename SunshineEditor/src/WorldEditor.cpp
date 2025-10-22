@@ -58,6 +58,9 @@ void WorldEditor::Run() {
 
 void WorldEditor::Update(float deltaTime) {
 	m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
+	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.x += rayDirection.x * deltaTime * 10.0f;
+	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.y += rayDirection.y * deltaTime * 10.0f;
+	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.z += rayDirection.z * deltaTime * 10.0f;
 }
 
 void WorldEditor::Render() {
@@ -81,4 +84,29 @@ void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
 
 	m_gPass->OnResize(resizeWidth, resizeHeight);
 	m_lightPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
+}
+
+void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize)
+{
+	float x = (2.0f * mouseScreenCoords.x) / lastGameViewportSize.x - 1.0f;
+	float y = 1.0f - (2.0f * mouseScreenCoords.y) / lastGameViewportSize.y;
+	float z = 0.0f;
+	//printf("%f, %f :: %f, %f\n", mouseScreenCoords.x, mouseScreenCoords.y, lastGameViewportSize.x, lastGameViewportSize.y);
+
+	DXSM::Vector4 ndcPosition(x, y, z, 1.0f);
+
+	DXSM::Matrix viewProjMatrix =
+		m_renderer->GetMainCamera()->GetViewMatrix() *
+		m_renderer->GetMainCamera()->GetProjectionMatrix();
+	DX::XMMATRIX invViewProj = XMMatrixInverse(nullptr, viewProjMatrix);
+	DXSM::Vector4 worldPos = XMVector3TransformCoord(ndcPosition, invViewProj);
+
+	DXSM::Vector4 ndcPositionFar(x, y, 1.0f, 1.0f);
+	DXSM::Vector4 worldPosFar = XMVector3TransformCoord(ndcPositionFar, invViewProj);
+
+	rayDirection = worldPosFar - worldPos;
+	rayDirection.Normalize();
+
+	// auto trComp = m_scene.gameObjects[1]->GetComponent<TransformComponent>();
+	// trComp->m_position = DXSM::Vector3(worldPos);
 }
