@@ -58,5 +58,8 @@ public:
     bool m_gameViewportJustResized = false;
 
     bool IsFocusedGameViewport = false;
+    bool IsHoveredGameViewport = false;
+
+    ImVec2 MouseScreenCoords = ImVec2(0, 0);
 };
 

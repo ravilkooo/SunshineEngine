@@ -225,7 +225,27 @@ void EditorApp::HandleKeyDown(Keys key)
 			break;
 		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true; 
 			break;
+
 		case Keys::RightButton: IsRightMousePressed = true; 
+			break;
+		case Keys::LeftButton: 
+			if (imguiEditorPass->IsHoveredGameViewport) 
+			{
+				std::cout << "Mouse: X = " << imguiEditorPass->MouseScreenCoords.x <<
+					", Y = " << imguiEditorPass->MouseScreenCoords.y << std::endl;
+
+				XMVECTOR Origin, Dir;
+				DeprojectScreenToWorld(imguiEditorPass->MouseScreenCoords.x, imguiEditorPass->MouseScreenCoords.y,
+					imguiEditorPass->m_lastGameViewportSize.x, imguiEditorPass->m_lastGameViewportSize.y,
+					m_renderer->mainCamera->GetViewMatrix(), m_renderer->mainCamera->GetProjectionMatrix(),
+					Origin, Dir);
+
+				XMFLOAT3 origin3, dir3;
+				XMStoreFloat3(&origin3, Origin);
+				XMStoreFloat3(&dir3, Dir);
+				std::cout << "Origin: (" << origin3.x << ", " << origin3.y << ", " << origin3.z << ")\n";
+				std::cout << "Direction: (" << dir3.x << ", " << dir3.y << ", " << dir3.z << ")\n";
+			}
 			break;
 	}
 }
@@ -249,6 +269,7 @@ void EditorApp::HandleKeyUp(Keys key)
 			break;
 		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
 			break;
+
 		case Keys::RightButton: IsRightMousePressed = false;
 			break;
 	}
@@ -278,4 +299,30 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 		else if (CameraSpeed > MaxCameraSpeed)
 			CameraSpeed = MaxCameraSpeed;
 	}
+}
+
+void EditorApp::DeprojectScreenToWorld( float screenX, float screenY, float viewportWidth, float viewportHeight,
+	const XMMATRIX& viewMatrix, const XMMATRIX& projMatrix, XMVECTOR& outOrigin, XMVECTOR& outDirection)
+{
+	// 1. Normalized device coordinates (-1..1)
+	float x = (2.0f * screenX) / viewportWidth - 1.0f;
+	float y = 1.0f - (2.0f * screenY) / viewportHeight;
+	float z = 1.0f; 
+
+	XMVECTOR rayClip = XMVectorSet(x, y, z, 1.0f);
+
+	// 2. View space
+	XMMATRIX projInv = XMMatrixInverse(nullptr, projMatrix);
+	XMVECTOR rayView = XMVector4Transform(rayClip, projInv);
+	rayView = XMVectorSetZ(rayView, 1.0f);
+	rayView = XMVectorSetW(rayView, 0.0f);
+
+	// 3. World space
+	XMMATRIX viewInv = XMMatrixInverse(nullptr, viewMatrix);
+	XMVECTOR rayWorld = XMVector4Transform(rayView, viewInv);
+	rayWorld = XMVector3Normalize(rayWorld);
+
+	// 4. Camera position
+	outOrigin = viewInv.r[3];
+	outDirection = rayWorld;
 }

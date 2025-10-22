@@ -106,8 +106,6 @@ void ImguiEditorPass::Pass(const Scene& scene)
 		ImGui::DockBuilderDockWindow("Content Browser", dock_id_down);
 
 		ImGui::DockBuilderFinish(dockspace_id);
-
-		m_isLayoutInitialized = true;
 	}
 
 	ImGui::End();
@@ -116,19 +114,31 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ShowSceneHierarchy();  // Scene Hierarchy
 	ImGui::End();
 
-	ImGui::Begin("Content Browser");
-	ShowContentBrowser();  // Content Browser
-	ImGui::End();
-
 	// Properties
 	ImGui::Begin("Properties");
 	ShowProperties();
+	ImGui::End();
+
+	ImGui::Begin("Content Browser");
+	ShowContentBrowser();  // Content Browser
 	ImGui::End();
 
 	// Main Game Viewport
 	ImGui::Begin("Main Game Viewport");
 
 	IsFocusedGameViewport = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+	IsHoveredGameViewport = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
+
+	if (IsHoveredGameViewport)
+	{
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		{
+			ImVec2 MousePosScreen = ImGui::GetMousePos();
+			ImVec2 WindowPos = ImGui::GetWindowPos();
+
+			MouseScreenCoords = ImVec2(MousePosScreen.x - WindowPos.x, MousePosScreen.y - WindowPos.y);
+		}
+	}
 
 	ImVec2 contentSize = ImGui::GetContentRegionAvail();
 	m_gameViewportJustResized = (contentSize.x != m_lastGameViewportSize.x) || (contentSize.y != m_lastGameViewportSize.y);
@@ -140,12 +150,16 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	}
 	m_lastGameViewportSize = contentSize;
 
-	//Tut
-
-
 	RenderGameWorld();
 
 	ImGui::End();
+
+	if (!m_isLayoutInitialized)
+	{
+		m_isLayoutInitialized = true;
+
+		ImGui::FocusWindow(NULL);
+	}
 
 	// -----------------
 
