@@ -82,6 +82,7 @@ target_include_directories(EASTL PUBLIC include)
 # Sunshine specific
 # add_subdirectory(${CMAKE_SOURCE_DIR}/ThirdParty/EABase)
 target_link_libraries(EASTL PUBLIC EABase)
+target_link_libraries(EASTL PUBLIC EAStdC)
 
 #-------------------------------------------------------------------------------------------
 # Deprecations

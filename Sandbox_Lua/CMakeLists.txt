@@ -1,27 +1,24 @@
 # Editor project
-set(EDITOR_SOURCES
-    src/main.cpp
-    src/TestCube.cpp
-    src/common.cpp
-    src/common_platform.cpp
-    src/play_sound.cpp
-    src/LuaLogic.cpp
+
+# Root paths
+set(SB_LUA_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SB_LUA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+# Tell CMake to reconfigure if files change
+set_property(GLOBAL PROPERTY CMAKE_CONFIGURE_DEPENDS
+    "${SB_LUA_SRC_DIR}/*.cpp"
+    "${SB_LUA_INCLUDE_DIR}/*.h"
 )
 
-set(EDITOR_HEADERS
-    include/TestCube.h
-    include/common.h
-    include/common_platform.h
-    include/LuaLogic.h
-)
+# Collect sources and headers
+file(GLOB_RECURSE SB_LUA_SOURCES "${SB_LUA_SRC_DIR}/*.cpp")
+file(GLOB_RECURSE SB_LUA_HEADERS "${SB_LUA_INCLUDE_DIR}/*.h")
 
 add_executable(Sandbox_Lua
-    ${EDITOR_SOURCES}
-    ${EDITOR_HEADERS}
+    ${SB_LUA_SOURCES}
+    ${SB_LUA_HEADERS}
 )
 
-# source_group("Source Files" FILES ${EDITOR_SOURCES})
-# source_group("Header Files" FILES ${EDITOR_HEADERS})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(Sandbox_Lua PRIVATE SunshineEngine)
