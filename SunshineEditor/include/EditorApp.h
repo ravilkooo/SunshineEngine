@@ -26,6 +26,16 @@
 #include <ImguiEditorPass.h>
 
 
+enum class MoveKey
+{
+    W,
+    S, 
+    D, 
+    A,
+    Shift, 
+    Ctrl 
+};
+
 class EditorApp : public WindowsApp
 {
 public:
@@ -53,6 +63,24 @@ public:
     sol::state m_lua;
 
 private:
+    // Camera movings
+    void HandleKeyDown(Keys key);
+    void HandleKeyUp(Keys key);
+
+    void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
+
+    bool MovingPressed[6] = { false };
+
+    float CameraSpeed = 20.0f;
+    float const MaxCameraSpeed = 100.0f;
+    float const MinCameraSpeed = 10.0f;
+    float const CameraSpeedStep = 10.0f;
+
+    bool IsRightMousePressed = false;
+
+    float const CameraRotateSpeed = 0.5f;
+    //
+
     bool is_layout_initialized = false;
 
     eastl::shared_ptr<ImguiEditorPass> imguiEditorPass;

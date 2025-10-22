@@ -128,6 +128,8 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	// Main Game Viewport
 	ImGui::Begin("Main Game Viewport");
 
+	IsFocusedGameViewport = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+
 	ImVec2 contentSize = ImGui::GetContentRegionAvail();
 	m_gameViewportJustResized = (contentSize.x != m_lastGameViewportSize.x) || (contentSize.y != m_lastGameViewportSize.y);
 	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0) {
@@ -137,6 +139,10 @@ void ImguiEditorPass::Pass(const Scene& scene)
 		//ResizeGBuffer((UINT)contentSize.x, (UINT)contentSize.y); // Your resize call
 	}
 	m_lastGameViewportSize = contentSize;
+
+	//Tut
+
+
 	RenderGameWorld();
 
 	ImGui::End();

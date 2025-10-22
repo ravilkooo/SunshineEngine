@@ -1,8 +1,7 @@
 #include "EditorApp.h"
 
-EditorApp::EditorApp() {
 
-}
+EditorApp::EditorApp() { }
 
 void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 {
@@ -67,7 +66,11 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// ShowWindow(m_displayWindow.m_hWnd, SW_SHOWDEFAULT);
 	// UpdateWindow(m_displayWindow.m_hWnd);
 
+	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &EditorApp::HandleKeyDown);
+	InputDevice::getInstance().OnKeyReleased.AddRaw(this, &EditorApp::HandleKeyUp);
+	InputDevice::getInstance().MouseMove.AddRaw(this, &EditorApp::HandleMouseMove);
 }
+
 EditorApp::~EditorApp() {
 	// Cleanup
 	ImGui_ImplDX11_Shutdown();
@@ -130,7 +133,32 @@ void EditorApp::Run()
 	}
 }
 
-void EditorApp::Update(float deltaTime) {
+void EditorApp::Update(float deltaTime) 
+{
+	if (!imguiEditorPass->IsFocusedGameViewport)
+	{
+		for (int i = 0; i < 6; ++i)
+			MovingPressed[i] = false;
+
+		IsRightMousePressed = false;
+	}
+	else
+	{
+		if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f) 
+			- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
+			m_renderer->mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
+		}
+		if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
+			- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
+			m_renderer->mainCamera->MoveRight(right * CameraSpeed * deltaTime);
+		}
+		if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
+			- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
+			m_renderer->mainCamera->MoveUp(up * CameraSpeed * deltaTime);
+		}
+	}
+
+
 	m_worldEditor->Update(deltaTime);
 }
 
@@ -176,4 +204,78 @@ void EditorApp::SetIcon(HWND hwnd)
 	// Assign to window
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIconLarge);
 	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIconSmall);
+}
+
+void EditorApp::HandleKeyDown(Keys key) 
+{
+	if (!imguiEditorPass->IsFocusedGameViewport)
+		return;
+
+	switch (key)
+	{
+		case Keys::W: MovingPressed[(int)MoveKey::W] = true;
+			break;
+		case Keys::S: MovingPressed[(int)MoveKey::S] = true; 
+			break;
+		case Keys::D: MovingPressed[(int)MoveKey::D] = true;
+			break;
+		case Keys::A: MovingPressed[(int)MoveKey::A] = true;
+			break;
+		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = true;
+			break;
+		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true; 
+			break;
+		case Keys::RightButton: IsRightMousePressed = true; 
+			break;
+	}
+}
+
+void EditorApp::HandleKeyUp(Keys key)
+{
+	if (!imguiEditorPass->IsFocusedGameViewport)
+		return;
+
+	switch (key)
+	{
+		case Keys::W: MovingPressed[(int)MoveKey::W] = false; 
+			break;
+		case Keys::S: MovingPressed[(int)MoveKey::S] = false; 
+			break;
+		case Keys::D: MovingPressed[(int)MoveKey::D] = false;
+			break;
+		case Keys::A: MovingPressed[(int)MoveKey::A] = false; 
+			break;
+		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = false; 
+			break;
+		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
+			break;
+		case Keys::RightButton: IsRightMousePressed = false;
+			break;
+	}
+}
+
+void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
+{
+	if (!imguiEditorPass->IsFocusedGameViewport)
+		return;
+
+	if (IsRightMousePressed)
+	{
+		float deltaTime = m_timer.GetDeltaTime();
+
+		m_renderer->mainCamera->RotateYaw(deltaTime * args.Offset.x * CameraRotateSpeed);
+		m_renderer->mainCamera->RotatePitch(-deltaTime * args.Offset.y * CameraRotateSpeed);
+	}
+
+	if (args.WheelDelta != 0.0f)
+	{
+		float deltaTime = m_timer.GetDeltaTime();
+
+		CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
+
+		if (CameraSpeed < MinCameraSpeed)
+			CameraSpeed = MinCameraSpeed;
+		else if (CameraSpeed > MaxCameraSpeed)
+			CameraSpeed = MaxCameraSpeed;
+	}
 }

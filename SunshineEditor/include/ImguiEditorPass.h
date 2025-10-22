@@ -56,5 +56,7 @@ public:
 
     ImVec2 m_lastGameViewportSize = ImVec2(0, 0);
     bool m_gameViewportJustResized = false;
+
+    bool IsFocusedGameViewport = false;
 };
 

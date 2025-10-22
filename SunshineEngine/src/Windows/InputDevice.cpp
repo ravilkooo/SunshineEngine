@@ -1,5 +1,3 @@
-
-
 #include "Windows/InputDevice.h"
 #include <iostream>
 
@@ -38,10 +36,12 @@ InputDevice::~InputDevice()
 
 InputDevice& InputDevice::getInstance()
 {
-	if (!instance) {
+	if (!instance) 
+	{
 		// instance = new InputDevice();
 		instance = nullptr;
 	}
+
 	return *instance;
 }
 
@@ -54,29 +54,77 @@ void InputDevice::OnKeyDown(KeyboardInputEventArgs args)
 	if (args.MakeCode == 42) key = Keys::LeftShift;
 	if (args.MakeCode == 54) key = Keys::RightShift;
 	
-	if(Break) {
-		OnKeyReleased.Broadcast(key); // Отправляем событие отпускания
-		if(keys->count(key))	RemovePressedKey(key);
-	} else {
-		OnKeyPressed.Broadcast(key);  // Отправляем событие нажатия
-		if (!keys->count(key))	AddPressedKey(key);
+	if (Break) 
+	{
+		if (keys->count(key))
+		{
+			RemovePressedKey(key);
+			OnKeyReleased.Broadcast(key);
+		}
+			
+	} else 
+	{
+		if (!keys->count(key))
+		{
+			AddPressedKey(key);
+			OnKeyPressed.Broadcast(key);
+		}	
 	}
 }
 
 void InputDevice::OnMouseMove(RawMouseEventArgs args)
 {
-	if(args.ButtonFlags & static_cast<int>(MouseButtonFlags::LeftButtonDown))
-		AddPressedKey(Keys::LeftButton);
+	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::LeftButtonDown))
+	{	
+		if (!keys->count(Keys::LeftButton))
+		{
+			AddPressedKey(Keys::LeftButton);
+			OnKeyPressed.Broadcast(Keys::LeftButton);
+		}		
+	}
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::LeftButtonUp))
-		RemovePressedKey(Keys::LeftButton);
+	{
+		if (keys->count(Keys::LeftButton))
+		{
+			RemovePressedKey(Keys::LeftButton);
+			OnKeyReleased.Broadcast(Keys::LeftButton);
+		}		
+	}
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::RightButtonDown))
-		AddPressedKey(Keys::RightButton);
+	{ 	
+		if (!keys->count(Keys::RightButton))
+		{
+			AddPressedKey(Keys::RightButton);
+			OnKeyPressed.Broadcast(Keys::RightButton);
+		}
+			
+	}
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::RightButtonUp))
-		RemovePressedKey(Keys::RightButton);
+	{
+		if (keys->count(Keys::RightButton))
+		{
+			RemovePressedKey(Keys::RightButton);
+			OnKeyReleased.Broadcast(Keys::RightButton);
+		}		
+	}
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::MiddleButtonDown))
-		AddPressedKey(Keys::MiddleButton);
+	{ 	
+		if (!keys->count(Keys::MiddleButton))
+		{
+			AddPressedKey(Keys::MiddleButton);
+			OnKeyPressed.Broadcast(Keys::MiddleButton);
+		}
+
+	}
 	if (args.ButtonFlags & static_cast<int>(MouseButtonFlags::MiddleButtonUp))
-		RemovePressedKey(Keys::MiddleButton);
+	{
+		if (!keys->count(Keys::MiddleButton))
+		{
+			RemovePressedKey(Keys::MiddleButton);
+			OnKeyReleased.Broadcast(Keys::MiddleButton);
+		}
+	}
+
 
 	POINT p;
 	GetCursorPos(&p);
