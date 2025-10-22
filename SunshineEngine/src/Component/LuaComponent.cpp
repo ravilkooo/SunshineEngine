@@ -1,21 +1,30 @@
+#include "Component/LuaComponent.h"
+
 #include <iostream>
 #include <filesystem>
-#include <Component/LuaComponent.h>
-#include <Component/TransformComponent.h>
-#include <Utils/StringUtils.h>
-#include <Utils/DebugUtils.h>
-#include <Utils/FileSystemWrapper.h>
 #include <EASTL/string.h>
+
+#include "Component/TransformComponent.h"
+#include "Utils/StringUtils.h"
+#include "Utils/DebugUtils.h"
+#include "Utils/FileSystemWrapper.h"
 
 void LuaComponent::ScanLuaFiles(const eastl::string& dirPath) {
 	luaFiles.clear();
-	for (eastlfs::directory_iterator it(dirPath); it != eastlfs::directory_iterator(""); ++it) {
+	std::error_code ec;
+	//for (eastlfs::directory_iterator it(dirPath); it != eastlfs::directory_iterator(""); ++it) {
+	eastlfs::directory_iterator end;
+	for (eastlfs::directory_iterator it(dirPath, ec); it != end; ++it) {
 		auto& entry = it.entry();
 		if (eastlfs::is_regular_file(entry)) {
 			eastl::string filename = eastlfs::filename(entry);
-			if (filename.size() > 4 && EASTLStringEquals(filename.substr(filename.size() - 4), ".lua"))
+			if (filename.size() > 4 && EASTLStringEqualsChar(filename.substr(filename.size() - 4), ".lua"))
 				luaFiles.push_back(filename);
 		}
+	}
+	if (ec)
+	{
+		// handle failure
 	}
 }
 
@@ -152,8 +161,8 @@ void LuaComponent::LoadParamsFromLua() {
 		for (auto& pair : tbl) {
 			ParamEntry entry;
 			sol::table paramEntry = pair.second.as<sol::table>();
-			entry.name = paramEntry["name"].get<eastl::string>();
-			entry.type = paramEntry["type"].get<eastl::string>();
+			entry.name = eastl::string(paramEntry["name"].get<std::string>().c_str());
+			entry.type = eastl::string(paramEntry["type"].get<std::string>().c_str());
 			params.push_back(entry);
 		}
 	}
@@ -172,18 +181,18 @@ bool LuaComponent::CallFunction() {
 	eastl::vector<sol::object> args;
 	for (const ParamEntry& p : params) {
 		eastl::string val(p.value);
-		if (EASTLStringEquals(p.type, "userdata")) {
+		if (EASTLStringEqualsChar(p.type, "userdata")) {
 			args.push_back(sol::make_object(*lua, obj));
 		}
-		else if (EASTLStringEquals(p.type, "number")) {
+		else if (EASTLStringEqualsChar(p.type, "number")) {
 			double valDbl = strtod(val.c_str(), nullptr);
 			args.push_back(sol::make_object(*lua, valDbl));
 		}
-		else if (EASTLStringEquals(p.type, "bool")) {
-			args.push_back(sol::make_object(*lua, EASTLStringEquals(val, "true") || EASTLStringEquals(val, "1")));
+		else if (EASTLStringEqualsChar(p.type, "bool")) {
+			args.push_back(sol::make_object(*lua, EASTLStringEqualsChar(val, "true") || EASTLStringEqualsChar(val, "1")));
 		}
 		else {
-			args.push_back(sol::make_object(*lua, val));
+			args.push_back(sol::make_object(*lua, EASTLToStdString(val)));
 		}
 	}
 
@@ -197,9 +206,10 @@ bool LuaComponent::CallFunction() {
 
 	sol::object res = result.get<sol::object>();
 	if (!res.valid() || res.is<sol::nil_t>()) lastResult = "";
-	else if (res.is<eastl::string>()) lastResult = res.as<eastl::string>();
+	else if (res.is<std::string>()) lastResult = eastl::string(res.as<std::string>().c_str());
 	else if (res.is<double>()) lastResult = eastl::to_string(res.as<double>());
 	else if (res.is<bool>()) lastResult = res.as<bool>() ? "true" : "false";
 	else lastResult = "<unsupported return type>";
 	return true;
 }
+

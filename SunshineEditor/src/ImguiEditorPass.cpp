@@ -222,7 +222,7 @@ void ImguiEditorPass::ShowProperties()
 		LuaImgui(obj);
 	}
 }
-
+	
 void ImguiEditorPass::LuaImgui(GameObject* obj)
 {
 	eastl::shared_ptr<LuaComponent> testComponent = obj->GetComponent<LuaComponent>();
@@ -257,7 +257,7 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 				ImGui::Text("%s (%s) =", param.name, param.type);
 				ImGui::SameLine();
 
-				if (!EASTLStringEquals(param.type,"userdata")) {
+				if (!EASTLStringEqualsChar(param.type,"userdata")) {
 					ImGui::InputText(("##p" + to_string_eastl(i)).c_str(), param.value, sizeof(param.value));
 				}
 				else {

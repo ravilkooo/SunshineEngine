@@ -1,5 +1,7 @@
 #pragma once
+
 #include <EASTL/string.h>
+#include <string>
 
 inline eastl::wstring JoinWchar_Wstring(const wchar_t* a, const wchar_t* b) {
     eastl::wstring s;
@@ -54,9 +56,14 @@ inline eastl::string to_string_eastl(int value) {
     return eastl::string(buffer);
 }
 
-inline bool EASTLStringEquals(const eastl::string& a, const char* b) {
+inline bool EASTLStringEqualsChar(const eastl::string& a, const char* b) {
     return a.compare(b) == 0;
 }
-inline bool EASTLStringEquals(const eastl::string& a, const eastl::string& b) {
+
+inline bool EASTLStringEqualsString(const eastl::string& a, const eastl::string& b) {
     return a == b;
+}
+
+inline std::string EASTLToStdString(const eastl::string& s) {
+    return std::string(s.data(), s.size());
 }

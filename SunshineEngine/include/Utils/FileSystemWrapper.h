@@ -10,11 +10,15 @@ namespace eastlfs {
         std::filesystem::directory_iterator end;
 
     public:
+        directory_iterator() = default;
         directory_iterator(const eastl::string& dir)
             : it(std::filesystem::directory_iterator(dir.c_str())) {
         }
+        directory_iterator(const eastl::string& dir, std::error_code& ec)
+            : it(std::filesystem::directory_iterator(dir.c_str(), ec)) {
+        }
 
-        bool operator!=(const directory_iterator&) const { return it != end; }
+        bool operator!=(const directory_iterator& rhs) const { return it != rhs.it; }
         void operator++() { ++it; }
         auto& operator*() { return *it; }
         auto* operator->() { return &(*it); }

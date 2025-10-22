@@ -18,6 +18,12 @@ public:
     LuaComponent();
     ~LuaComponent();
 
+    LuaComponent(const LuaComponent&) = delete;
+    LuaComponent& operator=(const LuaComponent&) = delete;
+
+    LuaComponent(LuaComponent&&) noexcept = default;
+    LuaComponent& operator=(LuaComponent&&) noexcept = default;
+
     void Init(GameObject*);
     void Cleanup();
 
@@ -58,4 +64,3 @@ private:
     void ClearState();
     void LoadParamsFromLua();
 };
-
