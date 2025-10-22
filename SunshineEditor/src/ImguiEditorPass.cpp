@@ -1,6 +1,8 @@
 #include "ImguiEditorPass.h"
 #include "WorldEditor.h"
 #include <Component/LuaComponent.h>
+#include <EASTL/string.h>
+#include <Utils/DebugUtils.h>
 
 ImguiEditorPass::ImguiEditorPass(
 	ID3D11Device* device,
@@ -179,7 +181,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			ImGui::PushID((int)i);
 			bool isSelected = (selectedIdx == (int)i);
 
-			std::string objLabel = "GameObject " + std::to_string(i);
+			eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
 			objects[i]->Name = objLabel;
 
 			if (ImGui::Selectable(objLabel.c_str(), isSelected))
@@ -252,14 +254,14 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 
 			for (int i = 0; i < testComponent->params.size(); ++i) {
 				auto& param = testComponent->params[i];
-				ImGui::Text("%s (%s) =", param.name.c_str(), param.type.c_str());
+				ImGui::Text("%s (%s) =", param.name, param.type);
 				ImGui::SameLine();
 
-				if (param.type != "userdata") {
-					ImGui::InputText(("##p" + std::to_string(i)).c_str(), param.value.data(), param.value.size());
+				if (!EASTLStringEquals(param.type,"userdata")) {
+					ImGui::InputText(("##p" + to_string_eastl(i)).c_str(), param.value, sizeof(param.value));
 				}
 				else {
-					std::string objName = obj->Name;
+					eastl::string objName = obj->Name;
 					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), objName.c_str());
 				}
 			}
@@ -268,12 +270,12 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 				testComponent->CallFunction();
 			}
 			if (!testComponent->lastResult.empty()) {
-				ImGui::Text("%s", testComponent->lastResult.c_str());
+				ImGui::Text("%s", testComponent->lastResult);
 			}
 
 		}
-		else if (!testComponent->errorMessage.empty()) {
-			ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", testComponent->errorMessage.c_str());
+		else if (!sunshineErrorMessage.empty()) {
+			ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", sunshineErrorMessage);
 		}
 	}
 }

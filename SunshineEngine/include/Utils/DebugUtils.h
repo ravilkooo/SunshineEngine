@@ -1,19 +1,16 @@
 #pragma once
 #include <EASTL/string.h>
 
-namespace sunshinedebug 
+eastl::string sunshineErrorMessage;
+
+void printSunshineErrorMessage()
 {
-	eastl::string errorMessage;
+	printf("%s\n", sunshineErrorMessage.c_str());
+}
 
-	void printErrorMessage()
-	{
-		printf("%s\n", errorMessage.c_str());
-	}
-
-	void printMessage(eastl::string message)
-	{
-		printf("%s\n", message.c_str());
-	}
+void printSunshineMessage(eastl::string message)
+{
+	printf("%s\n", message.c_str());
 }
 
 

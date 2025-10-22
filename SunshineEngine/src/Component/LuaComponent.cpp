@@ -1,202 +1,205 @@
 #include <iostream>
-#include <cstring>
 #include <filesystem>
 #include <Component/LuaComponent.h>
 #include <Component/TransformComponent.h>
+#include <Utils/StringUtils.h>
+#include <Utils/DebugUtils.h>
+#include <Utils/FileSystemWrapper.h>
+#include <EASTL/string.h>
 
-namespace fs = std::filesystem;
-
-std::string wstringToString(const std::wstring& wideStr)
-{
-    return std::string(wideStr.begin(), wideStr.end());
-}
-void LuaComponent::ScanLuaFiles(const std::string& dirPath) {
-    luaFiles.clear();
-    for (auto& entry : fs::directory_iterator(dirPath)) {
-        if (entry.is_regular_file()) {
-            std::string filename = entry.path().filename().string();
-            if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".lua")
-                luaFiles.push_back(filename);
-        }
-    }
+void LuaComponent::ScanLuaFiles(const eastl::string& dirPath) {
+	luaFiles.clear();
+	for (eastlfs::directory_iterator it(dirPath); it != eastlfs::directory_iterator(""); ++it) {
+		auto& entry = it.entry();
+		if (eastlfs::is_regular_file(entry)) {
+			eastl::string filename = eastlfs::filename(entry);
+			if (filename.size() > 4 && EASTLStringEquals(filename.substr(filename.size() - 4), ".lua"))
+				luaFiles.push_back(filename);
+		}
+	}
 }
 
 LuaComponent::LuaComponent()
-    : lua(nullptr), scriptLoaded(false), foundFunction(false) {
+	: lua(nullptr), scriptLoaded(false), foundFunction(false) {
 }
 
 LuaComponent::~LuaComponent() {
-    Cleanup();
+	Cleanup();
 }
 
 void LuaComponent::Init(GameObject* obj) {
 
-    this->obj = obj;
+	this->obj = obj;
 
-    InitLuaFile();
+	InitLuaFile();
 
-    lua = std::make_unique<sol::state>();
-    lua->open_libraries(sol::lib::base);
+	lua = eastl::make_unique<sol::state>();
+	lua->open_libraries(sol::lib::base);
 
-    registerComponents();
+	registerComponents();
 
 
-    auto result = lua->script_file(scriptPath);
-    if (!result.valid()) {
-        sol::error err = result;
-        errorMessage = std::string("Error running Lua script: ") + err.what();
-    }
-    else {
-        scriptLoaded = true;
-    }
+	auto result = lua->script_file(scriptPath.c_str());
+	if (!result.valid()) {
+		sol::error err = result;
+		sunshineErrorMessage = eastl::string("Error running Lua script: ") + err.what();
+		printSunshineErrorMessage();
+	}
+	else {
+		scriptLoaded = true;
+	}
 }
 
-void LuaComponent::registerComponents() 
+void LuaComponent::registerComponents()
 {
-    lua->new_usertype<DXSM::Vector3>("Vector3",
-        "x", &DXSM::Vector3::x,
-        "y", &DXSM::Vector3::y,
-        "z", &DXSM::Vector3::z
-    );
+	lua->new_usertype<DXSM::Vector3>("Vector3",
+		"x", &DXSM::Vector3::x,
+		"y", &DXSM::Vector3::y,
+		"z", &DXSM::Vector3::z
+	);
 
-    lua->new_usertype<TransformComponent>("TransformComponent",
-        "m_position", &TransformComponent::m_position
-    );
+	lua->new_usertype<TransformComponent>("TransformComponent",
+		"m_position", &TransformComponent::m_position
+	);
 
-    auto getTransform = [](GameObject* go) -> TransformComponent* {
-        return go->GetComponent<TransformComponent>().get();
-        };
+	auto getTransform = [](GameObject* go) -> TransformComponent* {
+		return go->GetComponent<TransformComponent>().get();
+		};
 
-    lua->new_usertype<GameObject>("GameObject",
-        "getTransform", getTransform
-    );
+	lua->new_usertype<GameObject>("GameObject",
+		"getTransform", getTransform
+	);
 }
 
 void LuaComponent::InitLuaFile()
 {
-    assetsPath = wstringToString(ENGINE_ASSETS_DIR) + "Scripts";
-    ScanLuaFiles(assetsPath);
-    if (!luaFiles.empty()) {
-        scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
-    }
-    std::cout << scriptPath << "\n";
+	eastl::wstring wpath = MakeEngineAssetPath_Wstring(L"Scripts");
+	assetsPath = wstringToString(wpath); 
+	ScanLuaFiles(assetsPath);
+	if (!luaFiles.empty()) {
+		scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
+	}
+	printSunshineMessage(scriptPath.c_str());
 }
 
 void LuaComponent::Cleanup() {
-    if (lua) {
-        lua = nullptr;
-    }
-    ClearState();
+	if (lua) {
+		lua = nullptr;
+	}
+	ClearState();
 }
 
 void LuaComponent::ClearState() {
-    scriptLoaded = false;
-    foundFunction = false;
-    params.clear();
-    lastResult.clear();
-    errorMessage.clear();
+	scriptLoaded = false;
+	foundFunction = false;
+	params.clear();
+	lastResult.clear();
+	sunshineErrorMessage.clear();
 }
 
 void LuaComponent::LoadScript() {
-    scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
-    std::cout << scriptPath << " is loaded!" << std::endl;
-    Cleanup();
-    Init(obj);
-    errorMessage.clear();
-    foundFunction = false;
-    params.clear();
-    lastResult.clear();
-    scriptLoaded = (lua != nullptr);
+	scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
+	printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
+	Cleanup();
+	Init(obj);
+	sunshineErrorMessage.clear();
+	foundFunction = false;
+	params.clear();
+	lastResult.clear();
+	scriptLoaded = (lua != nullptr);
 }
 
-void LuaComponent::SetFunctionName(const std::string& name) {
-    //functionName = name;
+void LuaComponent::SetFunctionName(const eastl::string& name) {
+	//functionName = name;
 }
 
-std::string LuaComponent::GetFunctionName() const {
-    return functionName;
+eastl::string LuaComponent::GetFunctionName() const {
+	return functionName;
 }
 
 bool LuaComponent::FindFunction() {
-    if (!scriptLoaded) { //|| functionName.empty()
-        errorMessage = "Lua not initialized or function name empty!";
-        return false;
-    }
+	if (!scriptLoaded) { //|| functionName.empty()
+		sunshineErrorMessage = "Lua not initialized or function name empty!";
+		printSunshineErrorMessage();
+		return false;
+	}
 
-    //callSolFunction(functionName, 2, 3);
+	//callSolFunction(functionName, 2, 3);
 
-    foundFunction = false;
-    errorMessage.clear();
-    params.clear();
+	foundFunction = false;
+	sunshineErrorMessage.clear();
+	params.clear();
 
-    sol::function func = (*lua)[functionName];
-    if (func.valid()) {
-        foundFunction = true;
-        LoadParamsFromLua();
-        return true;
-    }
-    else {
-        errorMessage = "No such function";
-        std::cout << errorMessage << std::endl;
-        return false;
-    }
+	sol::function func = (*lua)[functionName];
+	if (func.valid()) {
+		foundFunction = true;
+		LoadParamsFromLua();
+		return true;
+	}
+	else {
+		sunshineErrorMessage = "No such function";
+		printSunshineErrorMessage();
+		return false;
+	}
 }
 
 void LuaComponent::LoadParamsFromLua() {
-    params.clear();
-    sol::object paramTable = (*lua)[(std::string(functionName) + "_params").c_str()];
-    if (paramTable.valid() && paramTable.get_type() == sol::type::table) {
-        sol::table tbl = paramTable;
-        for (auto& pair : tbl) {
-            ParamEntry entry;
-            sol::table paramEntry = pair.second.as<sol::table>();
-            entry.name = paramEntry["name"].get<std::string>();
-            entry.type = paramEntry["type"].get<std::string>();
-            params.push_back(entry);
-        }
-    }
+	params.clear();
+	sol::object paramTable = (*lua)[(eastl::string(functionName) + "_params").c_str()];
+	if (paramTable.valid() && paramTable.get_type() == sol::type::table) 
+	{
+		sol::table tbl = paramTable;
+		for (auto& pair : tbl) {
+			ParamEntry entry;
+			sol::table paramEntry = pair.second.as<sol::table>();
+			entry.name = paramEntry["name"].get<eastl::string>();
+			entry.type = paramEntry["type"].get<eastl::string>();
+			params.push_back(entry);
+		}
+	}
 }
 
 bool LuaComponent::CallFunction() {
 
-    sol::function func = (*lua)[functionName];
-    if (!func.valid())
-    {
-        errorMessage = "No such function";
-        std::cout << errorMessage << std::endl;
-        return false;
-    }
+	sol::function func = (*lua)[functionName];
+	if (!func.valid())
+	{
+		sunshineErrorMessage = "No such function";
+		printSunshineErrorMessage();
+		return false;
+	}
 
-    std::vector<sol::object> args;
-    for (const auto& p : params) {
-        std::string val(p.value.data());
-        if (p.type == "userdata") {
-            args.push_back(sol::make_object(*lua, obj));
-        }
-        else if (p.type == "number") {
-            args.push_back(sol::make_object(*lua, std::stod(val)));
-        }
-        else if (p.type == "bool") {
-            args.push_back(sol::make_object(*lua, val == "true" || val == "1"));
-        }
-        else {
-            args.push_back(sol::make_object(*lua, val));
-        }
-    }
+	eastl::vector<sol::object> args;
+	for (const ParamEntry& p : params) {
+		eastl::string val(p.value);
+		if (EASTLStringEquals(p.type, "userdata")) {
+			args.push_back(sol::make_object(*lua, obj));
+		}
+		else if (EASTLStringEquals(p.type, "number")) {
+			double valDbl = strtod(val.c_str(), nullptr);
+			args.push_back(sol::make_object(*lua, valDbl));
+		}
+		else if (EASTLStringEquals(p.type, "bool")) {
+			args.push_back(sol::make_object(*lua, EASTLStringEquals(val, "true") || EASTLStringEquals(val, "1")));
+		}
+		else {
+			args.push_back(sol::make_object(*lua, val));
+		}
+	}
 
-    sol::protected_function_result result = func(sol::as_args(args));
-    if (!result.valid()) {
-        sol::error err = result;
-        errorMessage = "Lua error: " + std::string(err.what());
-        std::cout << errorMessage << std::endl;
-        return false;
-    }
+	sol::protected_function_result result = func(sol::as_args(args));
+	if (!result.valid()) {
+		sol::error err = result;
+		sunshineErrorMessage = "Lua error: " + eastl::string(err.what());
+		printSunshineErrorMessage();
+		return false;
+	}
 
-    sol::object res = result.get<sol::object>();
-    if (!res.valid() || res.is<sol::nil_t>()) lastResult = "";
-    else if (res.is<std::string>()) lastResult = res.as<std::string>();
-    else if (res.is<double>()) lastResult = std::to_string(res.as<double>());
-    else if (res.is<bool>()) lastResult = res.as<bool>() ? "true" : "false";
-    else lastResult = "<unsupported return type>";
-    return true;
+	sol::object res = result.get<sol::object>();
+	if (!res.valid() || res.is<sol::nil_t>()) lastResult = "";
+	else if (res.is<eastl::string>()) lastResult = res.as<eastl::string>();
+	else if (res.is<double>()) lastResult = eastl::to_string(res.as<double>());
+	else if (res.is<bool>()) lastResult = res.as<bool>() ? "true" : "false";
+	else lastResult = "<unsupported return type>";
+	return true;
 }
