@@ -34,6 +34,7 @@ public:
     void ShowSceneHierarchy();
     void ShowContentBrowser();
     void ShowProperties();
+    void LuaImgui(GameObject*);
 
     UINT m_editorAppWidth = 800;
     UINT m_editorAppHeight = 800;
@@ -61,5 +62,7 @@ public:
     bool IsHoveredGameViewport = false;
 
     ImVec2 MouseScreenCoords = ImVec2(0, 0);
+private:
+    int selectedIdx = -1;
 };
 

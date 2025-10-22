@@ -1,5 +1,7 @@
 #pragma once
+
 #include <EASTL/string.h>
+#include <string>
 
 inline eastl::wstring JoinWchar_Wstring(const wchar_t* a, const wchar_t* b) {
     eastl::wstring s;
@@ -38,4 +40,30 @@ inline eastl::wstring MakeEngineAssetPath_Wstring(const wchar_t* sub) {
 
 inline eastl::wstring MakeEngineAssetPath_Wchar(const wchar_t* sub) {
     return JoinWchar_Wchar(ENGINE_ASSETS_DIR, sub);
+}
+
+inline eastl::string wstringToString(const eastl::wstring& wideStr) {
+    eastl::string result;
+    result.reserve(wideStr.size());
+    for (auto wc : wideStr)
+        result.push_back(static_cast<char>(wc));
+    return result;
+}
+
+inline eastl::string to_string_eastl(int value) {
+    char buffer[32];
+    snprintf(buffer, sizeof(buffer), "%d", value);
+    return eastl::string(buffer);
+}
+
+inline bool EASTLStringEqualsChar(const eastl::string& a, const char* b) {
+    return a.compare(b) == 0;
+}
+
+inline bool EASTLStringEqualsString(const eastl::string& a, const eastl::string& b) {
+    return a == b;
+}
+
+inline std::string EASTLToStdString(const eastl::string& s) {
+    return std::string(s.data(), s.size());
 }

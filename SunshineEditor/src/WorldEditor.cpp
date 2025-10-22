@@ -1,4 +1,5 @@
 #include "WorldEditor.h"
+#include <Component/LuaComponent.h>
 
 
 WorldEditor::WorldEditor()

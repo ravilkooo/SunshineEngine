@@ -6,6 +6,7 @@
 #include <EASTL/memory.h>
 #include <EASTL/unique_ptr.h>
 #include <EASTL/weak_ptr.h>
+#include <EASTL/string.h>
 
 #include "Component/Component.h"
 
@@ -29,6 +30,8 @@ public:
     GameObject& operator=(const GameObject&) = delete;
     */
     // ================
+
+    eastl::string Name;
 
     template<typename T, typename... Args>
     eastl::shared_ptr<T> AddComponent(Args&&... args);
