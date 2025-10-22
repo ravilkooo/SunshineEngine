@@ -107,6 +107,6 @@ void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::
 	rayDirection = worldPosFar - worldPos;
 	rayDirection.Normalize();
 
-	auto trComp = m_scene.gameObjects[1]->GetComponent<TransformComponent>();
-	trComp->m_position = DXSM::Vector3(worldPos);
+	// auto trComp = m_scene.gameObjects[1]->GetComponent<TransformComponent>();
+	// trComp->m_position = DXSM::Vector3(worldPos);
 }
