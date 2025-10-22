@@ -7,7 +7,7 @@
 
 #include "Bindable/ConstantBuffer.h"
 
-using namespace DirectX;
+namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
 class Camera
@@ -65,8 +65,8 @@ public:
     void Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
     void Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen);
 
-    XMMATRIX GetViewMatrix() const;
-    XMMATRIX GetProjectionMatrix() const;
+    DX::XMMATRIX GetViewMatrix() const;
+    DX::XMMATRIX GetProjectionMatrix() const;
 
     void MoveForward(float speed);
     void MoveBackward(float speed);
@@ -89,19 +89,19 @@ public:
     void SwitchProjection();
 
     struct FrustumPlanes {
-        XMVECTOR Left;
-        XMVECTOR Right;
-        XMVECTOR Top;
-        XMVECTOR Bottom;
-        XMVECTOR Near;
-        XMVECTOR Far;
+        DX::XMVECTOR Left;
+        DX::XMVECTOR Right;
+        DX::XMVECTOR Top;
+        DX::XMVECTOR Bottom;
+        DX::XMVECTOR Near;
+        DX::XMVECTOR Far;
     };
 
     FrustumPlanes GetFrustumPlanes();
 
     struct FrustumCorners {
-        XMVECTOR Near[4];
-        XMVECTOR Far[4];
+        DX::XMVECTOR Near[4];
+        DX::XMVECTOR Far[4];
     };
 
     FrustumCorners GetFrustumCorners();

@@ -61,6 +61,7 @@ public:
     bool IsFocusedGameViewport = false;
     bool IsHoveredGameViewport = false;
 
+    // track mouse clicks on world editor
     ImVec2 MouseScreenCoords = ImVec2(0, 0);
 private:
     int selectedIdx = -1;

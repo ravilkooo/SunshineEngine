@@ -141,8 +141,10 @@ void Camera::SetUpCameraViewByAspectRatio_vertical(float newAspectRatio)
 
 void Camera::ResetCameraView(float newAspectRatio)
 {
+    SetFOV(2.0f * atan(tan(DX::XM_PIDIV2 * 0.5f) * 16.0f / 9.0f / newAspectRatio ));
     SetAspectRatio(newAspectRatio);
-    SetFOV(XM_PIDIV2); // 2 * atan(1)
+    //SetAspectRatio(newAspectRatio);
+    //SetFOV(DX::XM_PIDIV2); // 2 * atan(1)
     SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
     SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
 }
@@ -203,7 +205,7 @@ void Camera::Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::V
         //orbitalYaw += orbitalAngleSpeed * deltaTime;
 
         target = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
-        
+
         float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
         position = target - cam2targetDist * (direction + sinf(followPitch) * up);
     }
@@ -223,17 +225,17 @@ void Camera::Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::V
     }
 }
 
-XMMATRIX Camera::GetViewMatrix() const
+DX::XMMATRIX Camera::GetViewMatrix() const
 {
     return XMMatrixLookAtLH(position, target, up);
 }
 
-XMMATRIX Camera::GetProjectionMatrix() const
+DX::XMMATRIX Camera::GetProjectionMatrix() const
 {
     if (isPerspective)
-        return XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
+        return DX::XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
     else
-        return XMMatrixOrthographicLH(viewWidth, viewHeight, nearZ, farZ);
+        return DX::XMMatrixOrthographicLH(viewWidth, viewHeight, nearZ, farZ);
 }
 
 void Camera::MoveForward(float speed)
@@ -244,7 +246,7 @@ void Camera::MoveForward(float speed)
     }
     else
     {
-        //XMVECTOR forward = XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position));
+        //DX::XMVECTOR forward = XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position));
         DXSM::Vector3 forward = target - position;
         forward.Normalize();
         position.x += speed * forward.x;
@@ -256,7 +258,7 @@ void Camera::MoveForward(float speed)
     }
     if (!isPerspective)
     {
-        orthZ = eastl::max(orthZ + speed, nearZ*1.1f);
+        orthZ = eastl::max(orthZ + speed, nearZ * 1.1f);
     }
 }
 
@@ -274,7 +276,7 @@ void Camera::MoveLeft(float speed)
     else
     {
         /*
-        XMVECTOR right = XMVector3Cross(
+        DX::XMVECTOR right = XMVector3Cross(
             XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position)),
             MLoadFloat3(&up)
         );
@@ -335,7 +337,7 @@ void Camera::RotatePitch(float angle)
     }
     else if (cameraMode == CAMERA_MODE::FOLLOW)
     {
-        followPitch = eastl::min(eastl::max(-XM_PIDIV2 * 0.9f, followPitch + angle), 0.0f);
+        followPitch = eastl::min(eastl::max(-DX::XM_PIDIV2 * 0.9f, followPitch + angle), 0.0f);
         float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
         DXSM::Vector3 direction = (target - position);
         direction.y = 0; direction.Normalize();
@@ -359,7 +361,7 @@ void Camera::SwitchToFPSMode()
 void Camera::SwitchToFollowMode(DXSM::Vector3 followTarget, DXSM::Vector3 direction, float referenceLen)
 {
     cameraMode = CAMERA_MODE::FOLLOW;
-    followPitch = -XM_PI * 0.166f;
+    followPitch = -DX::XM_PI * 0.166f;
     target = followTarget;
     this->referenceLen = referenceLen;
     up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
@@ -386,7 +388,7 @@ void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spin
     minOrbitalDistance = orbitalDistance;
     orthZ = 2.0f * referenceLen / tanf(fov * 0.5);
     orbitalYaw = 0.0f;
-    orbitalPitch = XM_PIDIV4;
+    orbitalPitch = DX::XM_PIDIV4;
     this->orbitalTarget = orbitalTarget;
     target = orbitalTarget;
     this->spinAxis = spinAxis;
@@ -427,27 +429,27 @@ Camera::FrustumPlanes Camera::GetFrustumPlanes()
     FrustumPlanes planes;
 
     // Левая плоскость
-    planes.Left = XMVectorSet(mat._14 + mat._11, mat._24 + mat._21, mat._34 + mat._31, mat._44 + mat._41);
+    planes.Left = DX::XMVectorSet(mat._14 + mat._11, mat._24 + mat._21, mat._34 + mat._31, mat._44 + mat._41);
     planes.Left = DirectX::XMPlaneNormalize(planes.Left);
 
     // Правая плоскость
-    planes.Right = XMVectorSet(mat._14 - mat._11, mat._24 - mat._21, mat._34 - mat._31, mat._44 - mat._41);
+    planes.Right = DX::XMVectorSet(mat._14 - mat._11, mat._24 - mat._21, mat._34 - mat._31, mat._44 - mat._41);
     planes.Right = DirectX::XMPlaneNormalize(planes.Right);
 
     // Верхняя плоскость
-    planes.Top = XMVectorSet(mat._14 - mat._12, mat._24 - mat._22, mat._34 - mat._32, mat._44 - mat._42);
+    planes.Top = DX::XMVectorSet(mat._14 - mat._12, mat._24 - mat._22, mat._34 - mat._32, mat._44 - mat._42);
     planes.Top = DirectX::XMPlaneNormalize(planes.Top);
 
     // Нижняя плоскость
-    planes.Bottom = XMVectorSet(mat._14 + mat._12, mat._24 + mat._22, mat._34 + mat._32, mat._44 + mat._42);
+    planes.Bottom = DX::XMVectorSet(mat._14 + mat._12, mat._24 + mat._22, mat._34 + mat._32, mat._44 + mat._42);
     planes.Bottom = DirectX::XMPlaneNormalize(planes.Bottom);
 
     // Ближняя плоскость
-    planes.Near = XMVectorSet(mat._14 + mat._13, mat._24 + mat._23, mat._34 + mat._33, mat._44 + mat._43);
+    planes.Near = DX::XMVectorSet(mat._14 + mat._13, mat._24 + mat._23, mat._34 + mat._33, mat._44 + mat._43);
     planes.Near = DirectX::XMPlaneNormalize(planes.Near);
 
     // Дальняя плоскость
-    planes.Far = XMVectorSet(mat._14 - mat._13, mat._24 - mat._23, mat._34 - mat._33, mat._44 - mat._43);
+    planes.Far = DX::XMVectorSet(mat._14 - mat._13, mat._24 - mat._23, mat._34 - mat._33, mat._44 - mat._43);
     planes.Far = DirectX::XMPlaneNormalize(planes.Far);
 
     return planes;
@@ -456,23 +458,23 @@ Camera::FrustumPlanes Camera::GetFrustumPlanes()
 Camera::FrustumCorners Camera::GetFrustumCorners()
 {
     FrustumCorners corners;
-    
-    DXSM::Matrix viewProjMatrix = GetViewMatrix() * GetProjectionMatrix();
-    XMMATRIX invViewProj = XMMatrixInverse(nullptr, viewProjMatrix);
 
-    XMVECTOR ndcCorners[8] = {
-        XMVectorSet(-1, -1, 0, 1),
-        XMVectorSet(1, -1, 0, 1),
-        XMVectorSet(-1, 1, 0, 1),
-        XMVectorSet(1, 1, 0, 1),
-        XMVectorSet(-1, -1, 1, 1),
-        XMVectorSet(1, -1, 1, 1),
-        XMVectorSet(-1, 1, 1, 1),
-        XMVectorSet(1, 1, 1, 1)
+    DXSM::Matrix viewProjMatrix = GetViewMatrix() * GetProjectionMatrix();
+    DX::XMMATRIX invViewProj = XMMatrixInverse(nullptr, viewProjMatrix);
+
+    DX::XMVECTOR ndcCorners[8] = {
+        DX::XMVectorSet(-1, -1, 0, 1),
+        DX::XMVectorSet(1, -1, 0, 1),
+        DX::XMVectorSet(-1, 1, 0, 1),
+        DX::XMVectorSet(1, 1, 0, 1),
+        DX::XMVectorSet(-1, -1, 1, 1),
+        DX::XMVectorSet(1, -1, 1, 1),
+        DX::XMVectorSet(-1, 1, 1, 1),
+        DX::XMVectorSet(1, 1, 1, 1)
     };
 
     for (int i = 0; i < 8; ++i) {
-        XMVECTOR worldPos = XMVector3TransformCoord(ndcCorners[i], invViewProj);
+        DX::XMVECTOR worldPos = XMVector3TransformCoord(ndcCorners[i], invViewProj);
         if (i < 4) {
             corners.Near[i] = worldPos;
         }

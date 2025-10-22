@@ -8,6 +8,7 @@
 #include "Bindable/BindableCollection.h"
 #include "GraphicsUtils/Camera.h"
 
+namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
 class ParticleSystem
@@ -16,10 +17,10 @@ class ParticleSystem
 public:
 
     struct Particle {
-        DirectX::XMFLOAT4 Position;
-        DirectX::XMFLOAT4 Velocity;
-        DirectX::XMFLOAT4 ColorStart;
-        DirectX::XMFLOAT4 ColorEnd;
+        DX::XMFLOAT4 Position;
+        DX::XMFLOAT4 Velocity;
+        DX::XMFLOAT4 ColorStart;
+        DX::XMFLOAT4 ColorEnd;
 
         float SizeStart;
         float SizeEnd;
@@ -31,11 +32,11 @@ public:
         float WorldSpin;
         float WorldSpinSpeed;
 
-        XMFLOAT3 WorldSpinAxis;
+        DX::XMFLOAT3 WorldSpinAxis;
         float Mass;
 
         float orientation;
-        XMFLOAT3 padding;
+        DX::XMFLOAT3 padding;
     };
 
 
@@ -185,9 +186,9 @@ private:
     Bind::BlendState* m_blendState; // tool
     struct TransformsParticles
     {
-        DirectX::XMMATRIX viewMat;
-        DirectX::XMMATRIX projMat;
-        DirectX::XMMATRIX viewProjMat;
+        DX::XMMATRIX viewMat;
+        DX::XMMATRIX projMat;
+        DX::XMMATRIX viewProjMat;
     };
     Microsoft::WRL::ComPtr<ID3D11Buffer> m_viewProjBuffer;
 

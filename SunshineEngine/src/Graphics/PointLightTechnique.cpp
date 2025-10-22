@@ -68,18 +68,18 @@ LightPosition PointLightTechnique::GetLightPositionInFrustum()
         return LightPosition::FILL;
 
     Camera::FrustumPlanes planes = m_camera->GetFrustumPlanes();
-    XMVECTOR lightPosition = XMLoadFloat3(&(lightData->Position));
+    DX::XMVECTOR lightPosition = DX::XMLoadFloat3(&(lightData->Position));
 
     bool isOutside = false;
     bool intersectsFarPlane = false;
     bool behindNearPlane = false;
 
     // Проверка каждой плоскости фрустума
-    XMVECTOR planesArray[] = { planes.Near, planes.Far, planes.Left, planes.Right, planes.Top, planes.Bottom };
+    DX::XMVECTOR planesArray[] = { planes.Near, planes.Far, planes.Left, planes.Right, planes.Top, planes.Bottom };
 
     for (int i = 0; i < 6; i++) {
         // Расстояние от центра сферы до плоскости
-        float distance = XMVectorGetX(XMPlaneDotCoord(planesArray[i], lightPosition));
+        float distance = DX::XMVectorGetX(DX::XMPlaneDotCoord(planesArray[i], lightPosition));
 
         // Если расстояние меньше -radius, сфера полностью вне плоскости
         if (distance <= -lightData->Range) {
@@ -117,13 +117,13 @@ bool PointLightTechnique::IsFrustumInsideOfLight()
 {
     Camera::FrustumCorners frustum = m_camera->GetFrustumCorners();
     for (int i = 0; i < 4; ++i) {
-        DX::XMVECTOR vecToCorner = XMVectorSubtract(frustum.Near[i], DXSM::Vector3(lightData->Position));
-        float distance = XMVectorGetX(XMVector3Length(vecToCorner));
+        DX::XMVECTOR vecToCorner = DX::XMVectorSubtract(frustum.Near[i], DXSM::Vector3(lightData->Position));
+        float distance = DX::XMVectorGetX(DX::XMVector3Length(vecToCorner));
         if (distance > lightData->Range) return false;
     }
     for (int i = 0; i < 4; ++i) {
-        DX::XMVECTOR vecToCorner = XMVectorSubtract(frustum.Far[i], DXSM::Vector3(lightData->Position));
-        float distance = XMVectorGetX(XMVector3Length(vecToCorner));
+        DX::XMVECTOR vecToCorner = DX::XMVectorSubtract(frustum.Far[i], DXSM::Vector3(lightData->Position));
+        float distance = DX::XMVectorGetX(DX::XMVector3Length(vecToCorner));
         if (distance > lightData->Range) return false;
     }
     return true;

@@ -21,8 +21,8 @@ LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	m_viewport.MaxDepth = 1.0f;
 
 	m_camPCB = new Bind::PixelConstantBuffer<CamPCB>(device,
-		{ XMMatrixIdentity(), XMMatrixIdentity(),
-		(XMFLOAT3)camera->GetPosition(), 0 },
+		{ DX::XMMatrixIdentity(), DX::XMMatrixIdentity(),
+		(DX::XMFLOAT3)camera->GetPosition(), 0 },
 		0u);
 	AddPerFrameBind(m_camPCB);
 
@@ -83,10 +83,10 @@ void LightPass::StartFrame()
 	//context->ClearDepthStencilView(pGBuffer->pDepthDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 	context->RSSetViewports(1, &m_viewport);
 
-	XMFLOAT3 camPos = m_camera->GetPosition();
-	XMMATRIX vMatInverse = DirectX::XMMatrixTranspose(XMMatrixInverse(nullptr,
+	DX::XMFLOAT3 camPos = m_camera->GetPosition();
+	DX::XMMATRIX vMatInverse = DX::XMMatrixTranspose(DX::XMMatrixInverse(nullptr,
 		m_camera->GetViewMatrix()));
-	XMMATRIX pMatInverse = DirectX::XMMatrixTranspose(XMMatrixInverse(nullptr,
+	DX::XMMATRIX pMatInverse = DX::XMMatrixTranspose(DX::XMMatrixInverse(nullptr,
 		m_camera->GetProjectionMatrix()));
 	// camera->GetProjectionMatrix()
 	m_camPCB->Update(GetDeviceContext(), { vMatInverse, pMatInverse, camPos, 0 });

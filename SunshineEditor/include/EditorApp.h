@@ -38,8 +38,8 @@ enum class MoveKey
 
 struct Ray
 {
-    XMVECTOR Origin;
-    XMVECTOR Direction;
+    DX::XMVECTOR Origin;
+    DX::XMVECTOR Direction;
 };
 
 class EditorApp : public WindowsApp
@@ -74,9 +74,6 @@ private:
     void HandleKeyUp(Keys key);
 
     void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
-
-    void DeprojectScreenToWorld(float screenX, float screenY, float viewportWidth, float viewportHeight,
-        const XMMATRIX& viewMatrix, const XMMATRIX& projMatrix, XMVECTOR& outOrigin, XMVECTOR& outDirection);
 
     bool MovingPressed[6] = { false };
 
