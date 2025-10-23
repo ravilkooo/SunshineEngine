@@ -230,10 +230,10 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			ImGui::PushID((int)i);
 			bool isSelected = (selectedIdx == (int)i);
 
-			eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
-			objects[i]->Name = objLabel;
+			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
+			//m_worldEditor->m_scene.GetGameObjectByUUID(objects[i])->Name = objLabel;
 
-			if (ImGui::Selectable(objLabel.c_str(), isSelected))
+			if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
 			{
 				selectedIdx = (int)i;
 			}
@@ -254,7 +254,9 @@ void ImguiEditorPass::ShowProperties()
 	if (selectedIdx == -1)
 		return;
 
-	GameObject* obj = m_worldEditor->m_scene.gameObjects[selectedIdx].get();
+	GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
+		m_worldEditor->m_scene.gameObjects[selectedIdx]
+	);
 
 	if (!obj->HasComponent<LuaComponent>())
 	{

@@ -65,5 +65,7 @@ public:
     ImVec2 MouseScreenCoords = ImVec2(0, 0);
 private:
     int selectedIdx = -1;
+    bool objectSelected = false;
+    Sunshine::UUID selectedUUID;
 };
 
