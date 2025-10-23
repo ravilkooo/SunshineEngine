@@ -43,21 +43,23 @@ void WorldEditor::InitWorldEditor(
 
 	m_scene.AddGameObject(factory.CreateSkyBox(
 		m_renderer->GetDevice(),
-		m_renderer->GetMainCamera()));
+		m_renderer->GetMainCamera())
+	);
 	m_scene.AddGameObject(factory.CreateDefaultBoxObject(
-		m_renderer->GetDevice()));
+		m_renderer->GetDevice())
+	);
 	m_scene.AddGameObject(factory.CreateAmbientLightObject(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera(),
-		{ DXSM::Vector3::One, 1.0f }
-		));
+		{ DXSM::Vector3::One, 1.0f })
+	);
 }
 void WorldEditor::Run() {
 	
 }
 
 void WorldEditor::Update(float deltaTime) {
-	m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
+	//m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.x += rayDirection.x * deltaTime * 10.0f;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.y += rayDirection.y * deltaTime * 10.0f;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.z += rayDirection.z * deltaTime * 10.0f;

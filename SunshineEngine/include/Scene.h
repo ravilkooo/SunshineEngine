@@ -1,6 +1,11 @@
 #pragma once
 
 #include "GameObject.h"
+#include "Utils/UUID.h"
+#include <EASTL/hash_map.h>
+#include <EASTL/unique_ptr.h>
+
+#include <unordered_map>
 
 class Scene
 {
@@ -14,10 +19,13 @@ public:
     Scene& operator=(Scene&&) noexcept = default;
 
     void AddGameObject(eastl::unique_ptr<GameObject> gameObject);
-    void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
-    void Update(float deltaTime);
-    void Draw();
+    GameObject* GetGameObjectByUUID(Sunshine::UUID uuid) const;
+    //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
+    eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(Sunshine::UUID uuid);
 
-    eastl::vector <eastl::unique_ptr<GameObject>> gameObjects;
+    // чтобы быстро итероваться последовательно
+    eastl::vector<Sunshine::UUID> gameObjects;
+    // владеет объектами. чтобы быстро находить по UUID
+    std::unordered_map<Sunshine::UUID, eastl::unique_ptr<GameObject>> uuidToObjectMap;
 private:
 };

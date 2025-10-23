@@ -9,6 +9,7 @@
 #include <EASTL/string.h>
 
 #include "Component/Component.h"
+#include "Utils/UUID.h"
 
 
 class GameObjectImpl;
@@ -32,6 +33,7 @@ public:
     // ================
 
     eastl::string Name;
+    Sunshine::UUID m_UUID;
 
     template<typename T, typename... Args>
     eastl::shared_ptr<T> AddComponent(Args&&... args);

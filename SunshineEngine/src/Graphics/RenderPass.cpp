@@ -16,7 +16,8 @@ void RenderPass::Pass(const Scene& scene)
 {
 	BindAllPerFrame();
 
-	for (const auto& gameObject : scene.gameObjects) {
+	for (const auto& gameObjectUUID : scene.gameObjects) {
+		const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
 		if (gameObject->HasComponent<RenderComponent>() &&
 			gameObject->HasComponent<TransformComponent>()) {
 
