@@ -39,24 +39,7 @@ LuaComponent::~LuaComponent() {
 void LuaComponent::Init(GameObject* obj) {
 
 	this->obj = obj;
-
 	InitLuaFile();
-
-	lua = eastl::make_unique<sol::state>();
-	lua->open_libraries(sol::lib::base);
-
-	registerComponents();
-
-
-	auto result = lua->script_file(scriptPath.c_str());
-	if (!result.valid()) {
-		sol::error err = result;
-		sunshineErrorMessage = eastl::string("Error running Lua script: ") + err.what();
-		printSunshineErrorMessage();
-	}
-	else {
-		scriptLoaded = true;
-	}
 }
 
 void LuaComponent::registerComponents()
@@ -107,15 +90,34 @@ void LuaComponent::ClearState() {
 }
 
 void LuaComponent::LoadScript() {
+
+	Cleanup();
+
+	InitLuaFile();
+
+	lua = eastl::make_unique<sol::state>();
+	lua->open_libraries(sol::lib::base);
+
+	registerComponents();
+
+
+	auto result = lua->script_file(scriptPath.c_str());
+	if (!result.valid()) {
+		sol::error err = result;
+		sunshineErrorMessage = eastl::string("Error running Lua script: ") + err.what();
+		printSunshineErrorMessage();
+	}
+	else {
+		scriptLoaded = true;
+	}
+
 	scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
 	printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
-	Cleanup();
-	Init(obj);
+
 	sunshineErrorMessage.clear();
 	foundFunction = false;
 	params.clear();
 	lastResult.clear();
-	scriptLoaded = (lua != nullptr);
 }
 
 void LuaComponent::SetFunctionName(const eastl::string& name) {
