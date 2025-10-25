@@ -6,9 +6,11 @@
 #include <EASTL/shared_ptr.h>
 #include <EASTL/functional.h>
 
-#include "MemoryBoard.h"
+#include "AI/Behavior/MemoryBoard.h"
 
 using TransitionCallback = eastl::function<void(const eastl::string& ToState)>;
+
+class State;
 
 
 class FiniteStateMachine

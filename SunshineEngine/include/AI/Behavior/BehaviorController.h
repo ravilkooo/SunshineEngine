@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MemoryBoard.h"
-#include "FiniteStateMachine.h"
-#include "ActionPatternSystem.h"
+#include "AI/Behavior/MemoryBoard.h"
+#include "AI/Behavior/FiniteStateMachine.h"
+#include "AI/Behavior/ActionPatternSystem.h"
 
 
 class BehaviorController

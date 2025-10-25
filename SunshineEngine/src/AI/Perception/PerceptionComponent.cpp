@@ -1,7 +1,7 @@
-#include "PerceptionComponent.h"
+#include "AI/Perception/PerceptionComponent.h"
 
 #include <iostream>
-#include "PerceptionSystem.h"
+#include "AI/Perception/PerceptionSystem.h"
 
 
 void PerceptionComponent::SetSightStruct(SightStruct NewSightSettings)
@@ -47,3 +47,11 @@ void PerceptionComponent::ChangeHearingRange(float NewHearingRange)
 
 	HearingSettings.HearingRange = NewHearingRange;
 }
+
+void PerceptionComponent::MakeNoise(float Loudness) {
+	PerceptionSystem::Get().ReportNoise(this, TeamId, Loudness);
+};
+
+void PerceptionComponent::DealDamage(PerceptionComponent* Source, float DamageAmount) {
+	PerceptionSystem::Get().ReportDamage(Source, this, DamageAmount);
+};

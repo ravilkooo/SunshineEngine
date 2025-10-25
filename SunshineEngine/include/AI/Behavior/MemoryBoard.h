@@ -3,9 +3,6 @@
 #include <EASTL/hash_map.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/string.h>
-#include <EASTL/utility.h>
-#include <EASTL/unique_ptr.h>
-#include <EASTL/type_traits.h>
 #include <EASTL/vector.h>
 #include <EASTL/functional.h>
 
@@ -17,7 +14,7 @@ class MemoryBoard
 {
 public:
     template<typename T>
-    void Set(const eastl::string& Key, const T& Value) { Data[Key] = eastl::make_shared<HolderStruct<T>>(Value); };
+    void Set(const eastl::string& Key, const T& Value);
     template<typename T>
     bool Get(const eastl::string& Key, T& OutValue) const;
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "MemoryBoard.h"
+#include "AI/Behavior/MemoryBoard.h"
+
 
 class ActionPatternSystem
 {

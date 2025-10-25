@@ -3,7 +3,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/hash_map.h>
 
-#include "PerceptionComponent.h"
+#include "AI/Perception/PerceptionComponent.h"
 
 
 struct TeamSctruct
@@ -36,7 +36,6 @@ public:
 
 private:
     eastl::hash_map<uint32_t, TeamSctruct> Teams;
-    eastl::vector<uint32_t> TeamIds;
 };
 
 

@@ -32,12 +32,8 @@ public:
     const HearingStruct& GetHearingSettings() const { return HearingSettings; };
     void ChangeHearingRange(float NewHearingRange);
 
-    void MakeNoise(float Loudness) { 
-        PerceptionSystem::Get().ReportNoise(this, TeamId, Loudness); 
-    };
-    void DealDamage(PerceptionComponent* Source, float DamageAmount) { 
-        PerceptionSystem::Get().ReportDamage(Source, this, DamageAmount);
-    };
+    void MakeNoise(float Loudness);
+    void DealDamage(PerceptionComponent* Source, float DamageAmount);
 
     bool CanSee = false;
     bool CanHear = false;

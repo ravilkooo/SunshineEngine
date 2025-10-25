@@ -1,4 +1,4 @@
-#include "PerceptionSystem.h"
+#include "AI/Perception/PerceptionSystem.h"
 
 #include <iostream>
 
@@ -35,8 +35,6 @@ void PerceptionSystem::RegisterTeam(uint32_t Id)
     }  
 
     Teams.emplace(Id, TeamSctruct{});
-
-    TeamIds.push_back(Id);
 }
 
 void PerceptionSystem::UnregisterTeam(uint32_t Id)
@@ -56,15 +54,6 @@ void PerceptionSystem::UnregisterTeam(uint32_t Id)
     }
     
     Teams.erase(it);
-
-    for (auto itId = TeamIds.begin(); itId != TeamIds.end(); ++itId)
-    {
-        if (*itId == Id)
-        {
-            TeamIds.erase(itId);
-            break;
-        }
-    }
 }
 
 void PerceptionSystem::AddToTeam(PerceptionComponent* Perception, uint32_t TeamId)

@@ -1,8 +1,10 @@
-#include "MemoryBoard.h"
+#include "AI/Behavior/MemoryBoard.h"
+
+#include <iostream>
 
 
 template<typename T>
-void Set(const eastl::string& Key, const T& Value)
+void MemoryBoard::Set(const eastl::string& Key, const T& Value)
 {
     bool HasChanged = true;
 

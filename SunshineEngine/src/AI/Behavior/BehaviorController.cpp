@@ -1,4 +1,4 @@
-#include "BehaviorController.h"
+#include "AI/Behavior/BehaviorController.h"
 
 
 void BehaviorController::Initialize()
