@@ -167,6 +167,31 @@ void GBuffer::OnResize(ID3D11Device* device, UINT resizeWidth, UINT resizeHeight
 	if (FAILED(hr))
 		throw std::runtime_error("Failed to create Render Target View");
 
+	// UUID Texture
+	D3D11_TEXTURE2D_DESC UUIDDesc = {};
+	UUIDDesc.Width = m_screenWidth;
+	UUIDDesc.Height = m_screenHeight;
+	UUIDDesc.MipLevels = 1;
+	UUIDDesc.ArraySize = 1;
+	UUIDDesc.Format = DXGI_FORMAT_R32G32_UINT; // UUID
+	UUIDDesc.SampleDesc.Count = 1;
+	UUIDDesc.Usage = D3D11_USAGE_DEFAULT;
+	UUIDDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	device->CreateTexture2D(&UUIDDesc, nullptr, pUUIDBuffer.GetAddressOf());
+	// UUID SRV
+	descSRV = {};
+	descSRV.Format = UUIDDesc.Format;
+	descSRV.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	descSRV.Texture2DArray.MostDetailedMip = 0;
+	descSRV.Texture2DArray.MipLevels = 1;
+	descSRV.Texture2DArray.FirstArraySlice = 0;
+	descSRV.Texture2DArray.ArraySize = 1;
+	device->CreateShaderResourceView(pUUIDBuffer.Get(), &descSRV, pUUIDSRV.GetAddressOf());
+	// UUID RTV
+	hr = device->CreateRenderTargetView(pUUIDBuffer.Get(), nullptr, pUUIDRTV.GetAddressOf());
+	if (FAILED(hr))
+		throw std::runtime_error("Failed to create Render Target View");
+
 	// LightPass stuff
 
 	D3D11_TEXTURE2D_DESC lightDesc = {};

@@ -62,9 +62,12 @@ public:
     bool IsHoveredGameViewport = false;
 
     // track mouse clicks on world editor
-    ImVec2 MouseScreenCoords = ImVec2(0, 0);
+    struct MouseScreenCoords {
+        UINT x;
+        UINT y;
+    } m_mouseClickCoords = { 0u, 0u };
 private:
-    int selectedIdx = -1;
+    //int selectedIdx = -1;
     bool objectSelected = false;
     Sunshine::UUID selectedUUID;
 };

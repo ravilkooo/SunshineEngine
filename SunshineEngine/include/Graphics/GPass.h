@@ -33,7 +33,7 @@ public:
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
 
-    ID3D11RenderTargetView* gBufferRTVs[4];
+    ID3D11RenderTargetView* gBufferRTVs[5];
     D3D11_VIEWPORT viewport;
 
     eastl::shared_ptr<GBuffer> pGBuffer;

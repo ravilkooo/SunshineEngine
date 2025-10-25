@@ -1,3 +1,9 @@
+cbuffer UUIDCBuf : register(b0)
+{
+    uint hi;
+    uint lo;
+}
+
 struct PS_IN
 {
     float4 pos : SV_POSITION;
@@ -13,6 +19,7 @@ struct PSOutput
     float4 Albedo : SV_Target1;
     float2 Specular : SV_Target2;
     float4 WorldPos : SV_Target3;
+    uint2 UUID : SV_Target4;
 };
 
 PSOutput PSMain(PS_IN input)
@@ -24,5 +31,6 @@ PSOutput PSMain(PS_IN input)
         saturate(dot(input.col.xyz, float(1).xxx).x) * 0.5,
         10);
     output.WorldPos = float4(input.wPos, 1.0f);
+    output.UUID = uint2(hi, lo);
     return output;
 }

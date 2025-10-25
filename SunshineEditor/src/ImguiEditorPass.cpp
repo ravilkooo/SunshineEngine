@@ -52,6 +52,8 @@ ImguiEditorPass::ImguiEditorPass(
 	m_viewport.TopLeftY = 0;
 	m_viewport.MinDepth = 0;
 	m_viewport.MaxDepth = 1.0f;
+
+	selectedUUID = Sunshine::UUID(0u);
 }
 
 void ImguiEditorPass::StartFrame()
@@ -155,14 +157,17 @@ void ImguiEditorPass::Pass(const Scene& scene)
 			ImVec2 MousePosScreen = ImGui::GetMousePos();
 			ImVec2 WindowPos = ImGui::GetWindowPos();
 
-			MouseScreenCoords = ImVec2(
-				MousePosScreen.x - WindowPos.x - vMin.x,
-				MousePosScreen.y - WindowPos.y - vMin.y
-			);
+			m_mouseClickCoords = {
+				(UINT) (MousePosScreen.x - WindowPos.x - vMin.x),
+				(UINT) (MousePosScreen.y - WindowPos.y - vMin.y)
+			};
+			/*
 			m_worldEditor->DeprojectScreenToWorld(
 				DXSM::Vector2(MouseScreenCoords.x, MouseScreenCoords.y),
 				DXSM::Vector2(m_lastGameViewportSize.x, m_lastGameViewportSize.y)
 			);
+			*/
+			selectedUUID = m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
 		}
 	}
 
@@ -227,15 +232,19 @@ void ImguiEditorPass::ShowSceneHierarchy()
 		auto& objects = m_worldEditor->m_scene.gameObjects;
 		for (size_t i = 0; i < objects.size(); ++i)
 		{
+			// selectedIdx
 			ImGui::PushID((int)i);
-			bool isSelected = (selectedIdx == (int)i);
+			bool isSelected = (selectedUUID == objects[i].m_UUID);
+
+			// выделяем если кликнули по списку и если мы не кликали по объектам на экране
+			// выделяем если кликнули по объекту
 
 			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
 			//m_worldEditor->m_scene.GetGameObjectByUUID(objects[i])->Name = objLabel;
 
 			if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
 			{
-				selectedIdx = (int)i;
+				selectedUUID = objects[i];
 			}
 			ImGui::PopID();
 		}
@@ -251,11 +260,11 @@ void ImguiEditorPass::ShowContentBrowser()
 
 void ImguiEditorPass::ShowProperties()
 {
-	if (selectedIdx == -1)
+	if (selectedUUID == Sunshine::UUID(0u))
 		return;
 
 	GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
-		m_worldEditor->m_scene.gameObjects[selectedIdx]
+		selectedUUID
 	);
 
 	if (!obj->HasComponent<LuaComponent>())

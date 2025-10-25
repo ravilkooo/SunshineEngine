@@ -35,6 +35,9 @@ void WorldEditor::InitWorldEditor(
 		m_renderer->AddPass(m_lightPass);
 	}
 
+	m_pixelUUIDHandler = new PixelUUIDHandler();
+	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
+
 	/*
 	TestObjects
 	*/
@@ -48,11 +51,44 @@ void WorldEditor::InitWorldEditor(
 	m_scene.AddGameObject(factory.CreateDefaultBoxObject(
 		m_renderer->GetDevice())
 	);
+
+	for (size_t i = 0; i < 6; i++)
+	{
+		m_scene.AddGameObject(factory.CreateDefaultSphereObject(
+			m_renderer->GetDevice())
+		);
+		auto obj = m_scene.GetGameObjectByUUID(m_scene.gameObjects.back());
+		auto tr = obj->GetComponent<TransformComponent>();
+		tr->m_localPosition = DXSM::Vector3(-3.0f, 0.0f, 0.0f);
+		tr->m_rotation.z = DX::XM_2PI * i / 6.0f;
+
+	}
+
 	m_scene.AddGameObject(factory.CreateAmbientLightObject(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera(),
-		{ DXSM::Vector3::One, 1.0f })
+		{ DXSM::Vector3::One * 0.5f, 1.0f })
 	);
+	m_scene.AddGameObject(factory.CreateDirectionalLightObject(
+		m_renderer->GetDevice(),
+		m_renderer->GetMainCamera(),
+		{
+			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+			DXSM::Vector3::Zero, 0,
+			DXSM::Vector3(1, -2, 0.5), 0
+		})
+	);
+	m_scene.AddGameObject(factory.CreatePointLightObject(
+		m_renderer->GetDevice(),
+		m_renderer->GetMainCamera(),
+		{
+			DXSM::Vector3(0.0f, 0.0f, 1.0f), 1.0f,
+			DXSM::Vector3(0.0f, 0.0f, 1.0f), 1.0f,
+			DXSM::Vector3(1.0f, 0.0f, 0.0f), 20,
+			DXSM::Vector3::One, 0
+		}
+	));
 }
 void WorldEditor::Run() {
 	
@@ -111,4 +147,10 @@ void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::
 
 	// auto trComp = m_scene.gameObjects[1]->GetComponent<TransformComponent>();
 	// trComp->m_position = DXSM::Vector3(worldPos);
+}
+
+Sunshine::UUID WorldEditor::ChooseObjectByClick(UINT x, UINT y)
+{
+	return Sunshine::UUID(m_pixelUUIDHandler->GetUUID(m_renderer->GetDeviceContext(),
+		m_gPass->pGBuffer->pUUIDSRV.Get(), x, y));
 }
