@@ -2,7 +2,13 @@
 
 #include <xhash>
 #include <EASTL/hash_map.h>
-#include <EASTL/hash_map.h>
+
+struct UUIDhilo
+{
+    uint32_t hi;
+    uint32_t lo;
+};
+
 
 namespace Sunshine
 {

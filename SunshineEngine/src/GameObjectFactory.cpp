@@ -7,6 +7,7 @@
 #include "Graphics/Lighting/DirectionalLight.h"
 #include "Graphics/Lighting/SkyBox.h"
 
+#include "Graphics/GPassTechnique.h"
 #include "Graphics/LightTechnique.h"
 #include "Graphics/AmbientLightTechnique.h"
 #include "Graphics/DirectionalLightTechnique.h"
@@ -22,7 +23,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
     obj->AddComponent<TransformComponent>(device);
     auto rc = obj->AddComponent<RenderComponent>();
 
-	RenderTechnique* gBufferTech = new RenderTechnique(device, "GPass");
+	GPassTechnique* gBufferTech = new GPassTechnique(device, "GPass");
 	gBufferTech->mesh = Mesh::CreateUnwrappedBoxMesh_repeat(device, width, height, length);
 
 	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
@@ -46,10 +47,20 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
 		Bind::PipelineStage::PIXEL_SHADER
 	);
 
+	gBufferTech->AddBind(eastl::make_shared<Bind::PixelConstantBuffer<UUIDhilo>>(
+		device,
+		UUIDhilo{
+			(uint32_t)(obj->m_UUID >> 32),
+			(uint32_t)(obj->m_UUID & 0xFFFFFFFF)
+		},
+		0u
+	));
+
+
 	auto p = eastl::make_pair(eastl::string("GPass"), gBufferTech);
 	rc->techniques.insert(eastl::move(p));
 
-    return obj;
+	return obj;
 }
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(ID3D11Device* device, float radius)
@@ -58,7 +69,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(ID3D1
 	obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>();
 
-	RenderTechnique* gBufferTech = new RenderTechnique(device, "GPass");
+	GPassTechnique* gBufferTech = new GPassTechnique(device, "GPass");
 	gBufferTech->mesh = Mesh::CreateSphereMesh(device, radius);
 
 	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
@@ -81,6 +92,15 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(ID3D1
 		0u,
 		Bind::PipelineStage::PIXEL_SHADER
 	);
+
+	gBufferTech->AddBind(eastl::make_shared<Bind::PixelConstantBuffer<UUIDhilo>>(
+		device,
+		UUIDhilo{
+			(uint32_t)(obj->m_UUID >> 32),
+			(uint32_t)(obj->m_UUID & 0xFFFFFFFF)
+		},
+		0u
+	));
 
 	auto p = eastl::make_pair(eastl::string("GPass"), gBufferTech);
 	rc->techniques.insert(eastl::move(p));
