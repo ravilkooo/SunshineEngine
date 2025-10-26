@@ -7,6 +7,30 @@
 //EventTransition toCombat("Combat", [&fsm](const eastl::string& state) {
 //    fsm.ChangeState(state); });
 
+bool ConditionTransition::ConditionTransitionCheck(MemoryBoard* MBoard, float DeltaTime)
+{
+	if (ConditionCheck(MBoard, DeltaTime))
+	{
+		Callback(ToState);
+
+		return true;
+	}
+
+	return false;
+}
+
+bool EventTransition::Trigger(MemoryBoard* MBoard)
+{
+	if (TriggerCheck(MBoard))
+	{
+		Callback(ToState);
+
+		return true;
+	}
+
+	return false;
+}
+
 void FiniteStateMachine::SetInitialState(const eastl::string& Name)
 {
 	auto it = States.find(Name);
@@ -38,28 +62,4 @@ void FiniteStateMachine::Update(float DeltaTime)
 void FiniteStateMachine::ChangeState(const eastl::string& newState)
 {
 
-}
-
-bool ConditionTransition::ConditionTransitionCheck(MemoryBoard* MBoard, float DeltaTime)
-{
-	if (ConditionCheck(MBoard, DeltaTime))
-	{
-		Callback(ToState);
-
-		return true;
-	}
-
-	return false;
-}
-
-bool EventTransition::Trigger(MemoryBoard* MBoard)
-{
-	if (TriggerCheck(MBoard))
-	{
-		Callback(ToState);
-
-		return true;
-	}
-
-	return false;
 }

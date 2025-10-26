@@ -23,7 +23,7 @@ public:
         return instance;
     }
 
-    void Update();
+    void CheckSights();
 
     void RegisterTeam(uint32_t Id);
     void UnregisterTeam(uint32_t Id);
@@ -32,7 +32,6 @@ public:
     void RemoveFromTeam(PerceptionComponent* Perception, uint32_t TeamId);
 
     void ReportNoise(PerceptionComponent* Source, uint32_t TeamId, float Loudness);
-    void ReportDamage(PerceptionComponent* Instigator, PerceptionComponent* Target, float DamageAmount);
 
 private:
     eastl::hash_map<uint32_t, TeamSctruct> Teams;

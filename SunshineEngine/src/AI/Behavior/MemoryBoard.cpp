@@ -7,26 +7,33 @@ template<typename T>
 void MemoryBoard::Set(const eastl::string& Key, const T& Value)
 {
     bool HasChanged = true;
+    bool IsNew = true;
 
     auto it = Data.find(Key);
 
+    // Check if key already exists
     if (it != Data.end())
     {
+        IsNew = false;
+
         auto holder = eastl::dynamic_shared_pointer_cast<HolderStruct<T>>(it->second);
 
         if (holder && holder->Value == Value)
             HasChanged = false;
     }
 
+    // Store new value
     Data[Key] = eastl::make_shared<HolderStruct<T>>(Value);
 
-    if (HasChanged)
+    // Notify listeners if the value has changed
+    if (HasChanged && !IsNew)
     {
-        auto listenersIt = Listeners.find(Key);
-        if (listenersIt != Listeners.end())
+        auto ListenersIt = Listeners.find(Key);
+
+        if (ListenersIt != Listeners.end())
         {
-            for (auto& callback : listenersIt->second)
-                callback(Key);
+            for (auto& callback : ListenersIt->second)
+                callback(Data[Key].get());
         }
     }
 }
@@ -43,17 +50,49 @@ bool MemoryBoard::Get(const eastl::string& Key, T& OutValue) const
 
     if (!Holder)
     {
-        std::cerr << "[Warning]\n";
+        std::cerr << "[Warning] Type mismatch in MemoryBoard::Get for key: " << Key.c_str() << "\n";
         return false;
     }
 
     OutValue = Holder->value;
 }
 
-eastl::string MemoryBoard::DumpSnapshot() const
+uint64_t MemoryBoard::AddListener(const eastl::string& Key, MemoryChangedCallback Callback)
+{
+    auto itData = Data.find(Key);
+
+    // If key does not exist yet, cannot attach listener
+    if (itData == Data.end())
+        return UINT64_MAX;
+
+    ListenerWrapper LW{ NextListenerId++, Callback };
+    Listeners[Key].push_back(LW);
+
+    return LW.Id;
+}
+
+void MemoryBoard::RemoveListener(const eastl::string& Key, uint64_t Id)
+{
+    auto it = Listeners.find(Key);
+
+    if (it == Listeners.end())
+        return;
+
+    auto& Vec = it->second;
+
+    // Remove all listeners with given ID
+    Vec.erase( eastl::remove_if(Vec.begin(), Vec.end(), 
+        [Id](const ListenerWrapper& wrapper) { return wrapper.Id == Id; }), Vec.end() );
+
+    if (Vec.empty())
+        Listeners.erase(it);
+}
+
+eastl::string MemoryBoard::GetState() const
 {
     eastl::string Result = "{ ";
 
+    // Iterate over all stored values and convert to string
     for (auto& [Key, Value] : Data)
     {
         Result += "\"" + Key + "\": ";
@@ -72,6 +111,7 @@ eastl::string MemoryBoard::DumpSnapshot() const
         Result += ", ";
     }
 
+    // Remove last comma
     if (Result.size() > 2)
         Result.pop_back(), Result.pop_back();
 

@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-void PerceptionSystem::Update()
+void PerceptionSystem::CheckSights()
 {
     for (auto& [TeamId, Team] : Teams)
     {
@@ -15,7 +15,7 @@ void PerceptionSystem::Update()
             if (!Perceiver->CanSee)
                 continue;
 
-            //Perceiver->GetSightSettings().SightRange;
+            //Perceiver->GetSightSettings();
         }
     }
 }
@@ -138,25 +138,42 @@ void PerceptionSystem::ReportNoise(PerceptionComponent* Source, uint32_t TeamId,
 {
     if (!Source)
     {
-        std::cerr << "[Warning]\n";
+        std::cerr << "[Warning] Source is null\n";
         return;
     }
 
     if (TeamId == UINT32_MAX)
     {
-        std::cerr << "[Warning]\n";
+        std::cerr << "[Warning] TeamId is invalid\n";
         return;
     }
 
     if (Loudness <= 0.0f)
     {
-        std::cerr << "[Warning]\n";
+        std::cerr << "[Warning] Loudness must be positive\n";
         return;
     }
 
-    for (auto& [OtherTeamId, Team] : Teams)
+    auto itSourceTeam = Teams.find(TeamId);
+
+    if (itSourceTeam == Teams.end())
     {
-        for (auto* perceiver : Team.Perceivers)
+        std::cerr << "[Warning] Source team not found\n";
+        return;
+    }
+
+    const TeamSctruct& SourceTeam = itSourceTeam->second;
+
+    for (uint32_t HearingTeamId : SourceTeam.HearingSourceTeamIDs)
+    {
+        auto itHearingTeam = Teams.find(HearingTeamId);
+
+        if (itHearingTeam == Teams.end())
+            continue;
+
+        TeamSctruct& HearingTeam = itHearingTeam->second;
+
+        for (auto* perceiver : HearingTeam.Perceivers)
         {
             if (!perceiver)
                 continue;
@@ -164,16 +181,20 @@ void PerceptionSystem::ReportNoise(PerceptionComponent* Source, uint32_t TeamId,
             if (!perceiver->CanHear)
                 continue;
 
-            //Perceiver->GetHearingSettings().HearingRange;
-        }
-    }
-}
+            auto HS = perceiver->GetHearingSettings();
 
-void PerceptionSystem::ReportDamage(PerceptionComponent* Instigator, PerceptionComponent* Target, float DamageAmount)
-{
-    if (!Instigator || !Target)
-    {
-        std::cerr << "[Warning]\n";
-        return;
+            // In progress
+            if (HS.HearingRadius > 0)
+            {
+                auto NewLoudness = Loudness* HS.Sensitivity;
+
+                if (NewLoudness >= HS.Threshold)
+                {
+                    // In progress
+                    bool Location = true;
+                    perceiver->Heard(Location, NewLoudness);
+                }
+            }
+        }
     }
 }
