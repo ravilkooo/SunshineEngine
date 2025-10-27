@@ -3,6 +3,7 @@
 
 #include <d3d11.h>
 #include <SimpleMath.h>
+#include <EASTL/shared_ptr.h>
 #include <GraphicsResources/VertexShader.h>
 #include "GameObject.h"
 

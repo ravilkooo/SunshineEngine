@@ -27,8 +27,8 @@ public:
     RenderTechnique(ID3D11Device* device, eastl::string technique);
     virtual ~RenderTechnique() = default;
 
-    void AddBind(Bind::Bindable* bind);
-    eastl::vector<Bind::Bindable*> bindables;
+    void AddBind(eastl::shared_ptr<Bind::Bindable> bind);
+    eastl::vector<eastl::shared_ptr<Bind::Bindable>> bindables;
 
     virtual void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
     virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);

@@ -38,6 +38,11 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pSpecularRTV;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pSpecularSRV;
 
+	// UUID
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> pUUIDBuffer;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pUUIDRTV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pUUIDSRV;
+
 	// --- Light ---
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pLightBuffer;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pLightRTV;
