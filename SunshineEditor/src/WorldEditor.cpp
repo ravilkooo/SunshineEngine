@@ -95,6 +95,14 @@ void WorldEditor::Run() {
 }
 
 void WorldEditor::Update(float deltaTime) {
+
+	for (Sunshine::UUID objUUID : m_scene.gameObjects) {
+		auto obj = m_scene.GetGameObjectByUUID(objUUID);
+		if (obj->HasComponent<LuaComponent>())
+		{
+			obj->GetComponent<LuaComponent>()->LuaUpdate(deltaTime);
+		}
+	}
 	//m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.x += rayDirection.x * deltaTime * 10.0f;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.y += rayDirection.y * deltaTime * 10.0f;

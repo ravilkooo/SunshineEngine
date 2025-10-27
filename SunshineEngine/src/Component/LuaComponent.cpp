@@ -66,7 +66,7 @@ void LuaComponent::registerComponents()
 void LuaComponent::InitLuaFile()
 {
 	eastl::wstring wpath = MakeEngineAssetPath_Wstring(L"Scripts");
-	assetsPath = wstringToString(wpath); 
+	assetsPath = wstringToString(wpath);
 	ScanLuaFiles(assetsPath);
 	if (!luaFiles.empty()) {
 		scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
@@ -75,6 +75,11 @@ void LuaComponent::InitLuaFile()
 }
 
 void LuaComponent::Cleanup() {
+	if (behaviorInitialized && scriptComponent.destroy.valid())
+	{
+		scriptComponent.destroy(scriptComponent.self);
+	}
+
 	if (lua) {
 		lua = nullptr;
 	}
@@ -100,16 +105,18 @@ void LuaComponent::LoadScript() {
 
 	registerComponents();
 
-
 	auto result = lua->script_file(scriptPath.c_str());
-	if (!result.valid()) {
+	if (!result.valid()) 
+	{
 		sol::error err = result;
 		sunshineErrorMessage = eastl::string("Error running Lua script: ") + err.what();
 		printSunshineErrorMessage();
+		return;
 	}
-	else {
-		scriptLoaded = true;
-	}
+
+	scriptLoaded = true;
+
+	InitializeBehavior();
 
 	scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
 	printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
@@ -126,6 +133,18 @@ void LuaComponent::SetFunctionName(const eastl::string& name) {
 
 eastl::string LuaComponent::GetFunctionName() const {
 	return functionName;
+}
+
+void LuaComponent::LuaUpdate(float deltaTime)
+{
+	if (!behaviorInitialized || !scriptComponent.update.valid()){return;}
+	auto result = scriptComponent.update(scriptComponent.self, deltaTime);
+	if (!result.valid())
+	{
+		sol::error err = result;
+		sunshineErrorMessage = eastl::string("Error in update hook: ") + err.what();
+		printSunshineErrorMessage();
+	}
 }
 
 bool LuaComponent::FindFunction() {
@@ -157,7 +176,7 @@ bool LuaComponent::FindFunction() {
 void LuaComponent::LoadParamsFromLua() {
 	params.clear();
 	sol::object paramTable = (*lua)[(eastl::string(functionName) + "_params").c_str()];
-	if (paramTable.valid() && paramTable.get_type() == sol::type::table) 
+	if (paramTable.valid() && paramTable.get_type() == sol::type::table)
 	{
 		sol::table tbl = paramTable;
 		for (auto& pair : tbl) {
@@ -168,6 +187,34 @@ void LuaComponent::LoadParamsFromLua() {
 			params.push_back(entry);
 		}
 	}
+}
+
+void LuaComponent::InitializeBehavior()
+{
+	if (!scriptLoaded)	{ return; }
+
+	sol::object behaviorObj = (*lua)["behavior"];
+	if (!behaviorObj.valid() || behaviorObj.get_type() != sol::type::table) { return;	}
+
+	scriptComponent.self = behaviorObj.as<sol::table>();
+	scriptComponent.self["id"] = reinterpret_cast<uintptr_t>(obj);
+	scriptComponent.self["owner"] = obj;
+
+	scriptComponent.start = scriptComponent.self["start"];
+	scriptComponent.update = scriptComponent.self["update"];
+	scriptComponent.destroy = scriptComponent.self["destroy"];
+
+	if (scriptComponent.start.valid())
+	{
+		auto result = scriptComponent.start(scriptComponent.self);
+		if (!result.valid())
+		{
+			sol::error err = result;
+			sunshineErrorMessage = eastl::string("Error in start hook: ") + err.what();
+			printSunshineErrorMessage();
+		}
+	}
+	behaviorInitialized = true;
 }
 
 bool LuaComponent::CallFunction() {

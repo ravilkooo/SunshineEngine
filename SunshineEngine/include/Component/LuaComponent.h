@@ -5,6 +5,7 @@
 #include <EASTL/memory.h>
 #include "sol/sol.hpp"
 #include <GameObject.h>
+#include "ScriptComponent.h"
 
 struct ParamEntry {
     eastl::string name;
@@ -40,6 +41,9 @@ public:
     void SetFunctionName(const eastl::string& name);
     eastl::string GetFunctionName() const;
 
+    //runtime
+    void LuaUpdate(float deltaTime);
+
     eastl::string scriptPath;
     eastl::string assetsPath;
     int selectedLuaFile = 0;
@@ -58,9 +62,15 @@ private:
     eastl::unique_ptr<sol::state> lua;
     GameObject* obj;
 
+    ScriptComponent scriptComponent;
+    bool behaviorInitialized;
+
     void InitLuaFile();
     void registerComponents();
     void ScanLuaFiles(const eastl::string& dirPath);
     void ClearState();
     void LoadParamsFromLua();
+
+    //runtime
+    void InitializeBehavior();
 };
