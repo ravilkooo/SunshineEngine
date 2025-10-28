@@ -273,7 +273,6 @@ void ImguiEditorPass::ShowProperties()
 			obj->AddComponent<LuaComponent>();
 			auto lua2 = obj->GetComponent<LuaComponent>();
 			lua2->Init(obj);
-			lua2->LoadScript();
 		}
 		return;
 	}

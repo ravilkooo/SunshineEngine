@@ -15,6 +15,7 @@
 #include <Graphics/LightPass.h>
 
 #include <GameObjectFactory.h>
+#include <Scripting/LuaManager.h>
 
 
 class WorldEditor
@@ -134,6 +135,7 @@ public:
     GameTimer m_timer;
     Scene m_scene;
     eastl::shared_ptr<DeferredRenderer> m_renderer;
+    LuaManager m_luaManager;
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 

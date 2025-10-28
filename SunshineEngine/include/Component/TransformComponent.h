@@ -72,3 +72,14 @@ public:
         return typeid(TransformComponent);
     }
 };
+
+// Macro listing fields of TransformComponent to expose in Lua bindings
+#ifndef TRANSFORMCOMPONENT_LUA_FIELDS_APPLY
+#define TRANSFORMCOMPONENT_LUA_FIELDS_APPLY(F) \
+    F(m_position) ,                         \
+    F(m_rotation) ,                         \
+    F(m_scaleFactor) ,                      \
+    F(m_localPosition) ,                    \
+    F(m_localRotation) ,                    \
+    F(m_localScaleFactor)
+#endif

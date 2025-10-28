@@ -1,4 +1,6 @@
 #include "Component/RenderComponent.h"
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
 
 bool RenderComponent::HasTechnique(eastl::string technique)
 {
@@ -9,3 +11,12 @@ void RenderComponent::PassTechnique(eastl::string technique, Microsoft::WRL::Com
 {
 	techniques[technique]->Pass(context);
 }
+
+#define RC_ADD_METHOD(k, fn) k, fn
+LUA_REGISTER_COMPONENT(
+    RenderComponent,
+    "RenderComponent",
+    /* no fields */ ,
+    RENDERCOMPONENT_LUA_METHODS_APPLY(RC_ADD_METHOD),
+    "getRender")
+#undef RC_ADD_METHOD

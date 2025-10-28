@@ -36,3 +36,10 @@ public:
 
 };
 
+// Methods of RenderComponent to expose in Lua bindings
+#ifndef RENDERCOMPONENT_LUA_METHODS_APPLY
+#define RENDERCOMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("hasTechnique", [](RenderComponent* self, const char* technique) -> bool { \
+        return self->HasTechnique(eastl::string(technique));                       \
+    })
+#endif
