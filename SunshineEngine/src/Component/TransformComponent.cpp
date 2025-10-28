@@ -1,4 +1,6 @@
 #include "Component/TransformComponent.h"
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
 
 TransformComponent::TransformComponent(ID3D11Device* device) {
     SetupBuffer(device);
@@ -53,3 +55,9 @@ DXSM::Matrix TransformComponent::GetWorldMatrix() const
 {
     return GetLocalTransformMatrix() * GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
 }
+
+#define TC_ADD_FIELD(name) #name, &TransformComponent::name
+#define TC_FIELD_PAIRS TRANSFORMCOMPONENT_LUA_FIELDS_APPLY(TC_ADD_FIELD)
+#define TC_METHOD_PAIRS
+LUA_REGISTER_COMPONENT(TransformComponent, "TransformComponent", TC_FIELD_PAIRS, TC_METHOD_PAIRS, "getTransform")
+#undef TC_ADD_FIELD

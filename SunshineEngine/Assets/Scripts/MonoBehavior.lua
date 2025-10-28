@@ -7,7 +7,7 @@ function behavior:start()
 end
 
 function behavior:update(dt)
-    
+
     local rc = self.owner:getRender()
     if rc and rc:hasTechnique("GPass") and self.checkTechnique == false then
         print("Use GPass!")
@@ -15,7 +15,7 @@ function behavior:update(dt)
     end
 
     local tr = self.owner:getTransform()
-    tr.m_rotation.x = tr.m_rotation.x - self.speedMyY * dt
+    tr.m_position.x = tr.m_position.x - self.speedMyY * dt
 end
 
 function behavior:destroy()

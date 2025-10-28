@@ -1,8 +1,8 @@
 #pragma once
 
 #include <sol/sol.hpp>
+#include <GameObject.h>
 
-class GameObject;
 class TransformComponent;
 class RenderComponent;
 
@@ -12,7 +12,7 @@ namespace ScriptingBindings {
 
     // Generic helper: returns a raw component pointer for Lua from a GameObject
     template<typename C>
-    inline C* GO_Get(GameObject* go);
+    inline C* GO_Get(GameObject* go) { return go->GetComponent<C>().get(); }
 }
 
 // Macro list of GameObject getters to expose in Lua
