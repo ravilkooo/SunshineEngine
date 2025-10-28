@@ -1,27 +1,35 @@
 #include "AI/Perception/PerceptionComponent.h"
 
-#include <iostream>
 #include "AI/Perception/PerceptionSystem.h"
 
+#ifdef _DEBUG
+#include <iostream>
+#endif
 
 // ---------------- Sight ----------------
 void PerceptionComponent::SetSightStruct(SightStruct NewSightSettings)
 {
 	if (NewSightSettings.SightRadius < 0 || NewSightSettings.LoseRadius < 0)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] Negative sight values are invalid. SightRadius and LoseRadius must be >= 0.\n";
+#endif
 		return;
 	}
 
 	if (NewSightSettings.LoseRadius < NewSightSettings.SightRadius)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] LoseRadius cannot be smaller than SightRadius.\n";
+#endif
 		return;
 	}
 
 	if (NewSightSettings.FieldOfView > 180 || NewSightSettings.FieldOfView < 0)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] FieldOfView must be between 0 and 180 degrees.\n";
+#endif
 		return;
 	}
 
@@ -32,13 +40,17 @@ void PerceptionComponent::ChangeSightRadius(float NewSightRaduis)
 {
 	if (NewSightRaduis < 0) 
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] SightRadius cannot be negative.\n";
+#endif
 		return;
 	}
 
 	if (NewSightRaduis < SightSettings.LoseRadius)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] SightRadius is smaller than current LoseRadius. LoseRadius automatically adjusted.\n";
+#endif
 		
 		SightSettings.LoseRadius = NewSightRaduis;
 	}
@@ -50,7 +62,9 @@ void PerceptionComponent::ChangeLoseRadius(float NewLoseRadius)
 {
 	if (NewLoseRadius < SightSettings.SightRadius)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] LoseRadius cannot be smaller than SightRadius.\n";
+#endif
 		return;
 	}
 
@@ -61,7 +75,9 @@ void PerceptionComponent::ChangeFieldOfView(float NewFieldOfView)
 {
 	if (NewFieldOfView > 180 || NewFieldOfView < 0)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] FieldOfView must be between 0 and 180 degrees.\n";
+#endif
 		return;
 	}
 
@@ -73,19 +89,25 @@ void PerceptionComponent::SetHearingStruct(HearingStruct NewHearingSettings)
 {
 	if (NewHearingSettings.HearingRadius < 0)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] HearingRadius cannot be negative.\n";
+#endif
 		return;
 	}
 
 	if (NewHearingSettings.Threshold < 0)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] Threshold cannot be negative.\n";
+#endif
 		return;
 	}
 
 	if (NewHearingSettings.Sensitivity < 0)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] Sensitivity cannot be negative.\n";
+#endif
 		return;
 	}
 
@@ -96,7 +118,9 @@ void PerceptionComponent::ChangeHearingRange(float NewHearingRange)
 {
 	if (NewHearingRange < 0) 
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] HearingRadius cannot be negative.\n";
+#endif
 		return;
 	}
 
@@ -107,7 +131,9 @@ void PerceptionComponent::ChangeThreshold(float NewThreshold)
 {
 	if (NewThreshold < 0)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] Threshold cannot be negative.\n";
+#endif
 		return;
 	}
 
@@ -118,67 +144,69 @@ void PerceptionComponent::ChangeSensitivity(float NewSensitivity)
 {
 	if (NewSensitivity < 0)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] Sensitivity cannot be negative.\n";
+#endif
 		return;
 	}
 
 	HearingSettings.Sensitivity = NewSensitivity;
 }
 
-// ---------------- Listeners ----------------
-uint64_t PerceptionComponent::AddSightListener(SightCallback Callback)
+// ---------------- Callbacks ----------------
+uint64_t PerceptionComponent::AddSightCallback(SightCallback Callback)
 {
-	ListenerWrapperSight LW { NextListenerId++, Callback };
-	SightListeners.push_back(LW);
+	CallbackWrapperSight CWS { NextCallbackId++, Callback };
+	SightCallbacks.push_back(CWS);
 
-	return LW.Id;
+	return CWS.Id;
 }
 
-void PerceptionComponent::RemoveSightListener(uint64_t Id)
+void PerceptionComponent::RemoveSightCallback(uint64_t Id)
 {
-	SightListeners.erase( eastl::remove_if(SightListeners.begin(), SightListeners.end(),
-			[Id](const ListenerWrapperSight& LWS) { return LWS.Id == Id; }), SightListeners.end() );
+	SightCallbacks.erase( eastl::remove_if(SightCallbacks.begin(), SightCallbacks.end(),
+			[Id](const CallbackWrapperSight& CWS) { return CWS.Id == Id; }), SightCallbacks.end() );
 }
 
-uint64_t PerceptionComponent::AddHearingListener(HearingCallback Callback)
+uint64_t PerceptionComponent::AddHearingCallback(HearingCallback Callback)
 {
-	ListenerWrapperHearing LW { NextListenerId++, Callback };
-	HearingListeners.push_back(LW);
+	CallbackWrapperHearing CWH { NextCallbackId++, Callback };
+	HearingCallbacks.push_back(CWH);
 
-	return LW.Id;
+	return CWH.Id;
 }
 
-void PerceptionComponent::RemoveHearingListener(uint64_t Id)
+void PerceptionComponent::RemoveHearingCallback(uint64_t Id)
 {
-	HearingListeners.erase( eastl::remove_if(HearingListeners.begin(), HearingListeners.end(),
-			[Id](const ListenerWrapperHearing& LWH) { return LWH.Id == Id; }), HearingListeners.end() );
+	HearingCallbacks.erase( eastl::remove_if(HearingCallbacks.begin(), HearingCallbacks.end(),
+			[Id](const CallbackWrapperHearing& CWH) { return CWH.Id == Id; }), HearingCallbacks.end() );
 }
 
-uint64_t PerceptionComponent::AddDamageListener(DamageCallback Callback)
+uint64_t PerceptionComponent::AddDamageCallback(DamageCallback Callback)
 {
-	ListenerWrapperDamage LW { NextListenerId++, Callback };
-	DamageListeners.push_back(LW);
+	CallbackWrapperDamage CWD { NextCallbackId++, Callback };
+	DamageCallbacks.push_back(CWD);
 
-	return LW.Id;
+	return CWD.Id;
 }
 
-void PerceptionComponent::RemoveDamageListener(uint64_t Id)
+void PerceptionComponent::RemoveDamageCallback(uint64_t Id)
 {
-	DamageListeners.erase( eastl::remove_if(DamageListeners.begin(), DamageListeners.end(), 
-		[Id](const ListenerWrapperDamage& LWD) { return LWD.Id == Id; }), DamageListeners.end() );
+	DamageCallbacks.erase( eastl::remove_if(DamageCallbacks.begin(), DamageCallbacks.end(), 
+		[Id](const CallbackWrapperDamage& CWD) { return CWD.Id == Id; }), DamageCallbacks.end() );
 }
 
 // ---------------- Actions ----------------
-void PerceptionComponent::MakeNoise(float Loudness) {
-	PerceptionSystem::Get().ReportNoise(this, TeamId, Loudness);
+bool PerceptionComponent::MakeNoise(float Loudness) {
+	return PerceptionSystem::Get().ReportNoise(this, TeamId, Loudness);
 };
 
-void PerceptionComponent::Heard(bool& Location, float Loudness)
+void PerceptionComponent::Heard(DXSM::Vector3& Location, float Loudness)
 {
-	for (auto& LW : HearingListeners)
+	for (auto& CWH : HearingCallbacks)
 	{
-		if (LW.Func)
-			LW.Func(Location, Loudness);
+		if (CWH.Callback)
+			CWH.Callback(Location, Loudness);
 	}
 }
 
@@ -186,13 +214,15 @@ void PerceptionComponent::DealDamage(PerceptionComponent* Instigator, float Dama
 {
 	if (!Instigator)
 	{
+#ifdef _DEBUG
 		std::cerr << "[Warning] Cannot deal damage: Instigator is null.\n";
+#endif
 		return;
 	}
 
-	for (auto& LW : DamageListeners)
+	for (auto& CWD : DamageCallbacks)
 	{
-		if (LW.Func)
-			LW.Func(Instigator->GetOwner(), DamageAmount);
+		if (CWD.Callback)
+			CWD.Callback(Instigator->GetOwnerId(), DamageAmount);
 	}
 };

@@ -1,47 +1,82 @@
 #include "AI/Perception/PerceptionSystem.h"
 
+#include <Component/TransformComponent.h>
+
+#ifdef _DEBUG
 #include <iostream>
+#endif
 
-
+//In progress
 void PerceptionSystem::CheckSights()
 {
-    for (auto& [TeamId, Team] : Teams)
-    {
-        for (auto* Perceiver : Team.Perceivers)
-        {
-            if (!Perceiver)
-                continue;
+    //for (auto& [TeamId, Team] : Teams)
+    //{
+    //    for (auto* Perceiver : Team.Perceivers)
+    //    {
+    //        if (!Perceiver)
+    //            continue;
 
-            if (!Perceiver->CanSee)
-                continue;
-
-            //Perceiver->GetSightSettings();
-        }
-    }
+    //        if (!Perceiver->CanSee)
+    //            continue;
+    //    }
+    //}
 }
 
-void PerceptionSystem::RegisterTeam(uint32_t Id)
+bool PerceptionSystem::RegisterTeam(uint32_t Id)
 {
     if (Id == UINT32_MAX)
     {
-        std::cerr << "[Warning]\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot register team: invalid ID (UINT32_MAX).\n";
+#endif
+        return false;
     }
 
     if (Teams.find(Id) != Teams.end())
     {
-        std::cerr << "[Warning]\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot register team: ID already exists.\n";
+#endif
+        return false;
     }  
 
     Teams.emplace(Id, TeamSctruct{});
+
+    return true;
 }
 
-void PerceptionSystem::UnregisterTeam(uint32_t Id)
+bool PerceptionSystem::UnregisterTeam(uint32_t Id)
 {
     if (Id == UINT32_MAX)
     {
-        std::cerr << "[Warning]\n";
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot unregister team: invalid ID (UINT32_MAX).\n";
+#endif
+        return false;
+    }
+
+    auto it = Teams.find(Id);
+
+    if (it == Teams.end())
+    {
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot unregister team: ID not found.\n";
+#endif
+        return false;
+    }
+    
+    Teams.erase(it);
+
+    return true;
+}
+
+void PerceptionSystem::CleanupInvalidPerceiversInTeam(uint32_t Id)
+{
+    if (Id == UINT32_MAX)
+    {
+#ifdef _DEBUG
+        std::cerr << "[Warning] CleanupInvalidPerceiversInTeam: invalid team ID (UINT32_MAX).\n";
+#endif
         return;
     }
 
@@ -49,33 +84,64 @@ void PerceptionSystem::UnregisterTeam(uint32_t Id)
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning]\n";
+#ifdef _DEBUG
+        std::cerr << "[Warning] CleanupInvalidPerceiversInTeam: team not found.\n";
+#endif
         return;
     }
-    
-    Teams.erase(it);
+
+    TeamSctruct& Team = it->second;
+
+#ifdef _DEBUG
+    size_t SizeBefore = Team.Perceivers.size();
+#endif
+
+    Team.Perceivers.erase( eastl::remove(Team.Perceivers.begin(), Team.Perceivers.end(), nullptr), Team.Perceivers.end() );
+
+#ifdef _DEBUG
+    size_t removed = SizeBefore - Team.Perceivers.size();
+
+    if (removed > 0)
+        std::cout << "[Info] CleanupInvalidPerceiversInTeam: removed " << removed << " invalid perceivers from team " << Id << ".\n";
+#endif
 }
 
-void PerceptionSystem::AddToTeam(PerceptionComponent* Perception, uint32_t TeamId)
+void PerceptionSystem::CleanupInvalidPerceivers()
+{
+    for (auto& [TeamId, _] : Teams)
+        CleanupInvalidPerceiversInTeam(TeamId);
+
+#ifdef _DEBUG
+    std::cout << "[Info] CleanupInvalidPerceivers: all teams checked for invalid perceivers.\n";
+#endif
+}
+
+bool PerceptionSystem::AddToTeam(PerceptionComponent* Perception, uint32_t TeamId)
 {
     if (!Perception)
     {
-        std::cerr << "[Warning]\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot add to team: PerceptionComponent is null.\n";
+#endif
+        return false;
     }
 
     if (TeamId == UINT32_MAX)
     {
-        std::cerr << "[Warning]\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot add to team: invalid team ID.\n";
+#endif
+        return false;
     }
 
     auto it = Teams.find(TeamId);
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning]\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot add to team: invalid team ID.\n";
+#endif
+        return false;
     }
 
     TeamSctruct& Team = it->second;
@@ -95,29 +161,37 @@ void PerceptionSystem::AddToTeam(PerceptionComponent* Perception, uint32_t TeamI
     {
         Perception->SetTeamId(TeamId);
         Team.Perceivers.push_back(Perception);
-    }      
+    }  
+
+    return true;
 }
 
-void PerceptionSystem::RemoveFromTeam(PerceptionComponent* Perception, uint32_t TeamId)
+bool PerceptionSystem::RemoveFromTeam(PerceptionComponent* Perception, uint32_t TeamId)
 {
     if (!Perception)
     {
-        std::cerr << "[Warning]\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot remove from team: PerceptionComponent is null.\n";
+#endif
+        return false;
     }
 
     if (TeamId == UINT32_MAX)
     {
-        std::cerr << "[Warning]\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot remove from team: PerceptionComponent is null.\n";
+#endif
+        return false;
     }
 
     auto it = Teams.find(TeamId);
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning]\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] Cannot remove from team: team not found.\n";
+#endif
+        return false;
     }
 
     TeamSctruct& Team = it->second;
@@ -132,35 +206,57 @@ void PerceptionSystem::RemoveFromTeam(PerceptionComponent* Perception, uint32_t 
             break;
         }
     }
+
+    return true;
 }
 
-void PerceptionSystem::ReportNoise(PerceptionComponent* Source, uint32_t TeamId, float Loudness)
+bool PerceptionSystem::ReportNoise(PerceptionComponent* Source, uint32_t TeamId, float Loudness)
 {
     if (!Source)
     {
-        std::cerr << "[Warning] Source is null\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] ReportNoise failed: Source component is null.\n";
+#endif
+        return false;
     }
 
     if (TeamId == UINT32_MAX)
     {
-        std::cerr << "[Warning] TeamId is invalid\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] ReportNoise failed: Invalid team ID.\n";
+#endif
+        return false;
     }
 
     if (Loudness <= 0.0f)
     {
-        std::cerr << "[Warning] Loudness must be positive\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] ReportNoise failed: Loudness must be positive.\n";
+#endif
+        return false;
     }
 
     auto itSourceTeam = Teams.find(TeamId);
 
     if (itSourceTeam == Teams.end())
     {
-        std::cerr << "[Warning] Source team not found\n";
-        return;
+#ifdef _DEBUG
+        std::cerr << "[Warning] ReportNoise failed: Source team not found.\n";
+#endif
+        return false;
     }
+
+    auto SourceObj = SceneSP->GetGameObjectByUUID(Source->GetOwnerId());
+
+    if (!SourceObj->HasComponent<TransformComponent>())
+    {
+#ifdef _DEBUG
+        std::cerr << "[Warning] Source has no TransformComponent\n";
+#endif
+        return false;
+    }
+
+    auto SourceTC = SourceObj->GetComponent<TransformComponent>();
 
     const TeamSctruct& SourceTeam = itSourceTeam->second;
 
@@ -183,18 +279,22 @@ void PerceptionSystem::ReportNoise(PerceptionComponent* Source, uint32_t TeamId,
 
             auto HS = perceiver->GetHearingSettings();
 
-            // In progress
-            if (HS.HearingRadius > 0)
+            auto Obj = SceneSP->GetGameObjectByUUID(Source->GetOwnerId());
+
+            if (!Obj->HasComponent<TransformComponent>())
+                continue;
+
+            auto ObjTC = Obj->GetComponent<TransformComponent>();
+
+            if (HS.HearingRadius > (ObjTC->m_position - SourceTC->m_position).Length())
             {
                 auto NewLoudness = Loudness* HS.Sensitivity;
 
                 if (NewLoudness >= HS.Threshold)
-                {
-                    // In progress
-                    bool Location = true;
-                    perceiver->Heard(Location, NewLoudness);
-                }
+                    perceiver->Heard(SourceTC->m_position, NewLoudness);
             }
         }
     }
+
+    return true;
 }

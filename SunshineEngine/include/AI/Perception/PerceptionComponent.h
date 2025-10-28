@@ -3,8 +3,12 @@
 #include <EASTL/vector.h>
 #include <EASTL/functional.h>
 
+#include <Utils/UUID.h>
+#include <SimpleMath.h>
+#include <Component/Component.h>
 
-class GameObject;
+
+namespace DXSM = DirectX::SimpleMath;
 
 
 struct SightStruct
@@ -32,18 +36,17 @@ struct HearingStruct
 
 // Perception component attached to a GameObject
 // Handles sight, hearing, and damage events
-class PerceptionComponent
+class PerceptionComponent : public Component
 {
     friend class PerceptionSystem;
 
 public:
-    PerceptionComponent(GameObject* GO): Owner(GO) {}
+    explicit PerceptionComponent(Sunshine::UUID Id): OwnerId(Id) {}
 
-    GameObject* GetOwner() const { return Owner; }
+    Sunshine::UUID GetOwnerId() const { return OwnerId; }
 
 
     // --- Sight settings ---
-
     void SetSightStruct(SightStruct NewSightStruct);
     const SightStruct& GetSightSettings() const { return SightSettings; };
 
@@ -64,37 +67,39 @@ public:
 
 
     // --- Sight listeners ---
-    using SightCallback = eastl::function<void(GameObject* Target)>;
-    struct ListenerWrapperSight { uint64_t Id; SightCallback Func; };
+    using SightCallback = eastl::function<void(Sunshine::UUID TargetId)>;
+    struct CallbackWrapperSight { uint64_t Id; SightCallback Callback; };
 
-    uint64_t AddSightListener(SightCallback Callback);
-    void RemoveSightListener(uint64_t Id);
-    void ClearSightListeners() { SightListeners.clear(); };
+    uint64_t AddSightCallback(SightCallback Callback);
+    void RemoveSightCallback(uint64_t Id);
+    void ClearSightCallbacks() { SightCallbacks.clear(); };
 
     // --- Hearing listeners ---
-    using HearingCallback = eastl::function<void(bool& Location, float Loudness)>;
-    struct ListenerWrapperHearing { uint64_t Id; HearingCallback Func; };
+    using HearingCallback = eastl::function<void(DXSM::Vector3 Location, float Loudness)>;
+    struct CallbackWrapperHearing { uint64_t Id; HearingCallback Callback; };
 
-    uint64_t AddHearingListener(HearingCallback Callback);
-    void RemoveHearingListener(uint64_t Id);
-    void ClearHearingListeners() { HearingListeners.clear(); };
+    uint64_t AddHearingCallback(HearingCallback Callback);
+    void RemoveHearingCallback(uint64_t Id);
+    void ClearHearingCallbacks() { HearingCallbacks.clear(); };
 
     // --- Damage listeners ---
-    using DamageCallback = eastl::function<void(GameObject* Source, float DamageAmount)>;
-    struct ListenerWrapperDamage { uint64_t Id; DamageCallback Func; };
+    using DamageCallback = eastl::function<void(Sunshine::UUID, float DamageAmount)>;
+    struct CallbackWrapperDamage { uint64_t Id; DamageCallback Callback; };
 
-    uint64_t AddDamageListener(DamageCallback Callback);
-    void RemoveDamageListener(uint64_t Id);
-    void ClearDamageListeners() { DamageListeners.clear(); };
+    uint64_t AddDamageCallback(DamageCallback Callback);
+    void RemoveDamageCallback(uint64_t Id);
+    void ClearDamageCallbacks() { DamageCallbacks.clear(); };
 
+  
     // --- Event triggers ---
     // Trigger a noise event to be broadcast globally
-    void MakeNoise(float Loudness);
+    bool MakeNoise(float Loudness);
 
+    //
     //void ChangeInSight();
 
     // Notify listeners that a sound was heard
-    void Heard(bool& Location, float Loudness);
+    void Heard(DXSM::Vector3& Location, float Loudness);
 
     // Notify listeners that damage was received
     void DealDamage(PerceptionComponent* Instigator, float DamageAmount);
@@ -107,16 +112,16 @@ private:
     void SetTeamId(uint32_t NewId) { TeamId = NewId; }
 
 
-    GameObject* Owner = nullptr;
+    Sunshine::UUID OwnerId;
 
     SightStruct SightSettings;
     HearingStruct HearingSettings;
 
     uint32_t TeamId = UINT32_MAX;
 
-    eastl::vector<ListenerWrapperSight> SightListeners;
-    eastl::vector<ListenerWrapperHearing> HearingListeners;
-    eastl::vector<ListenerWrapperDamage> DamageListeners;
+    eastl::vector<CallbackWrapperSight> SightCallbacks;
+    eastl::vector<CallbackWrapperHearing> HearingCallbacks;
+    eastl::vector<CallbackWrapperDamage> DamageCallbacks;
 
-    uint64_t NextListenerId = 1u;
+    uint64_t NextCallbackId = 1u;
 };
