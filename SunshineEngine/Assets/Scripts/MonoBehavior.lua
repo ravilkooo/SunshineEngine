@@ -1,14 +1,21 @@
 behavior = {}
 
 function behavior:start()
-    self.speedY = 1.0
+    self.speedMyY = 1.0
+    self.checkTechnique = false
     print("Behavior started", self.id)
 end
 
 function behavior:update(dt)
-    print("Update:", self.id, dt)
+    
+    local rc = self.owner:getRender()
+    if rc and rc:hasTechnique("GPass") and self.checkTechnique == false then
+        print("Use GPass!")
+        self.checkTechnique = true
+    end
+
     local tr = self.owner:getTransform()
-    tr.m_position.y = tr.m_position.y - self.speedY * dt
+    tr.m_rotation.x = tr.m_rotation.x - self.speedMyY * dt
 end
 
 function behavior:destroy()

@@ -8,6 +8,7 @@
 #include "Utils/StringUtils.h"
 #include "Utils/DebugUtils.h"
 #include "Utils/FileSystemWrapper.h"
+#include "Scripting/ComponentBindings.h"
 
 void LuaComponent::ScanLuaFiles(const eastl::string& dirPath) {
 	luaFiles.clear();
@@ -44,23 +45,7 @@ void LuaComponent::Init(GameObject* obj) {
 
 void LuaComponent::registerComponents()
 {
-	lua->new_usertype<DXSM::Vector3>("Vector3",
-		"x", &DXSM::Vector3::x,
-		"y", &DXSM::Vector3::y,
-		"z", &DXSM::Vector3::z
-	);
-
-	lua->new_usertype<TransformComponent>("TransformComponent",
-		"m_position", &TransformComponent::m_position
-	);
-
-	auto getTransform = [](GameObject* go) -> TransformComponent* {
-		return go->GetComponent<TransformComponent>().get();
-		};
-
-	lua->new_usertype<GameObject>("GameObject",
-		"getTransform", getTransform
-	);
+    ScriptingBindings::RegisterAll(*lua);
 }
 
 void LuaComponent::InitLuaFile()
