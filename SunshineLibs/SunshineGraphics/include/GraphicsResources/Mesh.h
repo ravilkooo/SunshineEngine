@@ -112,6 +112,7 @@ public:
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices);
 
+    void Bind(ID3D11DeviceContext* context) const;
     void Draw(ID3D11DeviceContext* context) const;
     void Release();
 

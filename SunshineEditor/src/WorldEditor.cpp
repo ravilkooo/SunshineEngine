@@ -34,6 +34,13 @@ void WorldEditor::InitWorldEditor(
 
 		m_renderer->AddPass(m_lightPass);
 	}
+	{
+		m_selectionPass = eastl::make_shared<SelectionPass>(
+			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+			m_renderer->pGBuffer, m_renderer->GetMainCamera());
+
+		m_renderer->AddPass(m_selectionPass);
+	}
 
 	m_pixelUUIDHandler = new PixelUUIDHandler();
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
@@ -124,6 +131,7 @@ void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
 
 	m_gPass->OnResize(resizeWidth, resizeHeight);
 	m_lightPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
+	m_selectionPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
 }
 
 void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize)
