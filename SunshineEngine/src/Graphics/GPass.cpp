@@ -42,7 +42,7 @@ void GPass::StartFrame()
 	context->ClearRenderTargetView(gBufferRTVs[2], colorNone);
 	context->ClearRenderTargetView(gBufferRTVs[3], colorFar);
 	context->ClearRenderTargetView(gBufferRTVs[4], colorNone);
-	context->ClearDepthStencilView(pGBuffer->pDepthDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	context->ClearDepthStencilView(pGBuffer->pDepthDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 	context->RSSetViewports(1, &viewport);
 
 	// Bind camera buffer to 1u slot

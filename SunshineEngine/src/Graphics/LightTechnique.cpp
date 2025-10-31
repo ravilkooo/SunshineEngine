@@ -31,6 +31,9 @@ void LightTechnique<T>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> cont
 	if (blendState)
 		blendState->Bind(context.Get());
 
+	if (mesh)
+		mesh->Bind(context.Get());
+
 	LightPosition lightPos = GetLightPositionInFrustum();
 	// Choose rasterizer
 	ChooseRasterizer(lightPos);

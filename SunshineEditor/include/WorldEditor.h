@@ -13,6 +13,7 @@
 
 #include <Graphics/GPass.h>
 #include <Graphics/LightPass.h>
+#include <Graphics/SelectionPass.h>
 
 #include <GameObjectFactory.h>
 #include <Scripting/LuaManager.h>
@@ -147,6 +148,7 @@ public:
 
     eastl::shared_ptr<GPass> m_gPass;
     eastl::shared_ptr<LightPass> m_lightPass;
+    eastl::shared_ptr<SelectionPass> m_selectionPass;
 
     float m_deltaTime = 0.0f;
 

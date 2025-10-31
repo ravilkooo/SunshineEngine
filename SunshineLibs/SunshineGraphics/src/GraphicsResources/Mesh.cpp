@@ -723,7 +723,7 @@ eastl::shared_ptr<Mesh> Mesh::CreateScreenAlignedQuad(ID3D11Device* device)
     return mesh;
 }
 
-void Mesh::Draw(ID3D11DeviceContext* context) const
+void Mesh::Bind(ID3D11DeviceContext* context) const
 {
     //UINT stride = sizeof(Vertex);
     //UINT offset = 0;
@@ -732,7 +732,10 @@ void Mesh::Draw(ID3D11DeviceContext* context) const
     m_vertexBuffer->Bind(context);
     m_indexBuffer->Bind(context);
     m_topology->Bind(context);
+}
 
+void Mesh::Draw(ID3D11DeviceContext* context) const
+{
     context->DrawIndexed(m_indexCount, 0, 0);
 }
 

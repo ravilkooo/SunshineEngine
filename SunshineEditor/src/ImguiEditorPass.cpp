@@ -168,6 +168,7 @@ void ImguiEditorPass::Pass(const Scene& scene)
 			);
 			*/
 			selectedUUID = m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
+			m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 		}
 	}
 
