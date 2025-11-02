@@ -246,6 +246,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
 			{
 				selectedUUID = objects[i];
+				m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 			}
 			ImGui::PopID();
 		}

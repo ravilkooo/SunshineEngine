@@ -1,7 +1,9 @@
 #include "Graphics/AmbientLightTechnique.h"
 
-AmbientLightTechnique::AmbientLightTechnique(ID3D11Device* device, eastl::string technique)
-    : LightTechnique(device, technique) {
+AmbientLightTechnique::AmbientLightTechnique(ID3D11Device* device, eastl::string technique,
+    eastl::shared_ptr<Camera> camera,
+    eastl::shared_ptr<AmbientLightData> lightData)
+    : LightTechnique(device, technique, camera, lightData) {
 
     D3D11_DEPTH_STENCIL_DESC dsDesc = {};
     dsDesc.DepthEnable = TRUE;

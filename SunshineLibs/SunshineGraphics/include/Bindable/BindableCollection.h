@@ -10,6 +10,7 @@
 #include "GraphicsResources/VertexShader.h"
 #include "InputLayout.h"
 #include "GraphicsResources/PixelShader.h"
+#include "GraphicsResources/GeometryShader.h"
 #include "TransformCBuffer.h"
 #include "ConstantBuffer.h"
 #include "Rasterizer.h"

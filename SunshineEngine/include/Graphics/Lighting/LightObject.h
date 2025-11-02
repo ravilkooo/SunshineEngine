@@ -2,9 +2,11 @@
 
 #include "GameObject.h"
 
+template <class T>
 class LightObject : public GameObject
 {
 public:
+    eastl::shared_ptr<T> m_lightData;
     // Unnecessary?
     //virtual void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) = 0;
 
@@ -26,3 +28,13 @@ public:
     };
     */
 };
+
+/*
+template class LightObject<AmbientLightData>;
+
+template class LightObject<DirectionalLightData>;
+
+template class LightObject<PointLightData>;
+
+template class LightObject<SkyBoxData>;
+*/

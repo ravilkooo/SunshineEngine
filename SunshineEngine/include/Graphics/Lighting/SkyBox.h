@@ -12,11 +12,9 @@
 namespace DXSM = DirectX::SimpleMath;
 
 class SkyBox :
-    public LightObject
+    public LightObject<SkyBoxData>
 {
 public:
-    eastl::shared_ptr<SkyBoxData> skyBoxData;
-
     SkyBox(SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
 };
 

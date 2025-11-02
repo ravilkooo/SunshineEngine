@@ -729,9 +729,12 @@ void Mesh::Bind(ID3D11DeviceContext* context) const
     //UINT offset = 0;
     //context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
     //context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-    m_vertexBuffer->Bind(context);
-    m_indexBuffer->Bind(context);
-    m_topology->Bind(context);
+    if (m_vertexBuffer)
+        m_vertexBuffer->Bind(context);
+    if (m_indexBuffer)
+        m_indexBuffer->Bind(context);
+    if (m_topology)
+        m_topology->Bind(context);
 }
 
 void Mesh::Draw(ID3D11DeviceContext* context) const

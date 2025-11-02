@@ -13,7 +13,7 @@
 namespace DXSM = DirectX::SimpleMath;
 
 class PointLightInstanced :
-    public LightObject
+    public LightObject<PointLightData>
 {
     /*
 public:

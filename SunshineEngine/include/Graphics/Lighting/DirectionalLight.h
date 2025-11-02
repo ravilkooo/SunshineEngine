@@ -13,11 +13,9 @@
 namespace DXSM = DirectX::SimpleMath;
 
 class DirectionalLight :
-    public LightObject
+    public LightObject<DirectionalLightData>
 {
 public:
-
-    eastl::shared_ptr<DirectionalLightData> directionalLightData;
 
     DirectionalLight(
         DirectionalLightData directionalLightData =

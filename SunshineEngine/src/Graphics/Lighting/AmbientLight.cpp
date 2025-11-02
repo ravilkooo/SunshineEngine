@@ -2,5 +2,5 @@
 
 AmbientLight::AmbientLight(AmbientLightData initData)
 {
-    ambientLightData = eastl::make_shared<AmbientLightData>(initData);
+    m_lightData = eastl::make_shared<AmbientLightData>(initData);
 }

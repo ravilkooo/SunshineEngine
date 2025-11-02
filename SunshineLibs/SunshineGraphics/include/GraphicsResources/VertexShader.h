@@ -15,6 +15,17 @@ namespace Bind
         VertexShader() {};
         VertexShader(ID3D11Device* device, eastl::wstring filePath) : VertexShader(device, std::wstring(filePath.begin(), filePath.end()).c_str()) {};
         VertexShader(ID3D11Device* device, LPCWSTR filePath);
+        VertexShader(ID3D11Device* device, eastl::wstring filePath,
+            UINT numInputElements,
+            D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements)
+            : VertexShader(device,
+                std::wstring(filePath.begin(), filePath.end()).c_str(),
+                numInputElements,
+                IALayoutInputElements) {
+        };
+        VertexShader(ID3D11Device* device, LPCWSTR filePath,
+            UINT numInputElements,
+            D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements);
         ~VertexShader();
         void Release();
 

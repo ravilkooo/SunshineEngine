@@ -13,11 +13,9 @@
 namespace DXSM = DirectX::SimpleMath;
 
 class AmbientLight :
-    public LightObject
+    public LightObject<AmbientLightData>
 {
 public:
-    eastl::shared_ptr<AmbientLightData> ambientLightData;
-
     AmbientLight(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
 };
 

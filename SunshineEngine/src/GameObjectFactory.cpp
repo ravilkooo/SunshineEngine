@@ -13,6 +13,7 @@
 #include "Graphics/DirectionalLightTechnique.h"
 #include "Graphics/PointLightTechnique.h"
 #include "Graphics/SkyBoxTechnique.h"
+#include "Graphics/IconTechnique.h"
 
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
@@ -23,7 +24,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
     obj->AddComponent<TransformComponent>(device);
     auto rc = obj->AddComponent<RenderComponent>();
 
-	GPassTechnique* gBufferTech = new GPassTechnique(device, "GPass");
+	GPassTechnique* gBufferTech = new GPassTechnique(device, "GPass", obj->m_UUID);
 	gBufferTech->mesh = Mesh::CreateUnwrappedBoxMesh_repeat(device, width, height, length);
 
 	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
@@ -47,16 +48,6 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
 		Bind::PipelineStage::PIXEL_SHADER
 	);
 
-	gBufferTech->AddBind(eastl::make_shared<Bind::PixelConstantBuffer<UUIDhilo>>(
-		device,
-		UUIDhilo{
-			(uint32_t)(obj->m_UUID >> 32),
-			(uint32_t)(obj->m_UUID & 0xFFFFFFFF)
-		},
-		0u
-	));
-
-
 	auto p = eastl::make_pair(eastl::string("GPass"), gBufferTech);
 	rc->techniques.insert(eastl::move(p));
 
@@ -69,7 +60,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(ID3D1
 	obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>();
 
-	GPassTechnique* gBufferTech = new GPassTechnique(device, "GPass");
+	GPassTechnique* gBufferTech = new GPassTechnique(device, "GPass", obj->m_UUID);
 	gBufferTech->mesh = Mesh::CreateSphereMesh(device, radius);
 
 	gBufferTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
@@ -92,15 +83,6 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(ID3D1
 		0u,
 		Bind::PipelineStage::PIXEL_SHADER
 	);
-
-	gBufferTech->AddBind(eastl::make_shared<Bind::PixelConstantBuffer<UUIDhilo>>(
-		device,
-		UUIDhilo{
-			(uint32_t)(obj->m_UUID >> 32),
-			(uint32_t)(obj->m_UUID & 0xFFFFFFFF)
-		},
-		0u
-	));
 
 	auto p = eastl::make_pair(eastl::string("GPass"), gBufferTech);
 	rc->techniques.insert(eastl::move(p));
@@ -139,17 +121,7 @@ eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
 	auto rc = obj->AddComponent<RenderComponent>();
 
 	// LightPass - LightTechnique
-	SkyBoxTechnique* lightTech = new SkyBoxTechnique(device, "LightPass");
-
-	lightTech->lightData = obj->skyBoxData;
-	lightTech->lightDataBuffer =
-		eastl::make_shared<Bind::PixelConstantBuffer<SkyBoxData>>(
-			device,
-			*(obj->skyBoxData),
-			2u
-		);
-
-	lightTech->m_camera = camera;
+	SkyBoxTechnique* lightTech = new SkyBoxTechnique(device, "LightPass", camera, obj->m_lightData);
 
 	float toHalfDiag = 1.15; //   2 / sqrt(3) =1,15470053838
 	// Add mesh for Ambient
@@ -192,6 +164,11 @@ eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
 	auto p = eastl::make_pair(eastl::string("LightPass"), lightTech);
 	rc->techniques.insert(eastl::move(p));
 
+	// IconPass
+	IconTechnique* iconTech = new IconTechnique(device, "IconPass",
+		{ 0u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
+	rc->techniques.insert(eastl::move(eastl::make_pair(eastl::string("IconPass"), iconTech)));
+	
 	return obj;
 }
 
@@ -205,17 +182,7 @@ eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 	auto rc = obj->AddComponent<RenderComponent>();
 
 	// LightPass - LightTechnique
-	AmbientLightTechnique* lightTech = new AmbientLightTechnique(device, "LightPass");
-	
-	lightTech->lightData = obj->ambientLightData;
-	lightTech->lightDataBuffer =
-		eastl::make_shared<Bind::PixelConstantBuffer<AmbientLightData>>(
-			device,
-			*(obj->ambientLightData),
-			2u
-	);
-
-	lightTech->m_camera = camera;
+	AmbientLightTechnique* lightTech = new AmbientLightTechnique(device, "LightPass", camera, obj->m_lightData);
 
 	// Add mesh for Ambient
 	lightTech->mesh = Mesh::CreateScreenAlignedQuad(device);
@@ -229,6 +196,11 @@ eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 	auto p = eastl::make_pair(eastl::string("LightPass"), lightTech);
 	rc->techniques.insert(eastl::move(p));
 
+	// IconPass
+	IconTechnique* iconTech = new IconTechnique(device, "IconPass",
+		{ 1u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
+	rc->techniques.insert(eastl::move(eastl::make_pair(eastl::string("IconPass"), iconTech)));
+
 	return obj;
 }
 
@@ -241,17 +213,7 @@ eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObj
 	auto rc = obj->AddComponent<RenderComponent>();
 
 	// LightPass - LightTechnique
-	DirectionalLightTechnique* lightTech = new DirectionalLightTechnique(device, "LightPass");
-
-	lightTech->lightData = obj->directionalLightData;
-	lightTech->lightDataBuffer =
-		eastl::make_shared<Bind::PixelConstantBuffer<DirectionalLightData>>(
-			device,
-			*(obj->directionalLightData),
-			2u
-		);
-
-	lightTech->m_camera = camera;
+	DirectionalLightTechnique* lightTech = new DirectionalLightTechnique(device, "LightPass", camera, obj->m_lightData);
 
 	// Add mesh for Ambient
 	lightTech->mesh = Mesh::CreateScreenAlignedQuad(device);
@@ -265,6 +227,11 @@ eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObj
 	auto p = eastl::make_pair(eastl::string("LightPass"), lightTech);
 	rc->techniques.insert(eastl::move(p));
 
+	// IconPass
+	IconTechnique* iconTech = new IconTechnique(device, "IconPass",
+		{ 2u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
+	rc->techniques.insert(eastl::move(eastl::make_pair(eastl::string("IconPass"), iconTech)));
+
 	return obj;
 }
 
@@ -275,24 +242,15 @@ eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 {
 	auto obj = eastl::make_unique<PointLight>(initData);
 	auto tc = obj->AddComponent<TransformComponent>(device);
-	tc->m_position = obj->pointLightData->Position;
+	tc->m_position = obj->m_lightData->Position;
 	auto rc = obj->AddComponent<RenderComponent>();
 
 	// LightPass - LightTechnique
-	PointLightTechnique* lightTech = new PointLightTechnique(device, "LightPass");
-	
-	lightTech->lightData = obj->pointLightData;
-	lightTech->lightDataBuffer =
-		eastl::make_shared<Bind::PixelConstantBuffer<PointLightData>>(
-			device,
-			*(obj->pointLightData),
-			2u
-		);
+	PointLightTechnique* lightTech = new PointLightTechnique(device, "LightPass", camera, obj->m_lightData);
 
-	lightTech->m_camera = camera;
+	lightTech->m_assignedTransform = tc;
 
-	// Add mesh for pointlight
-	lightTech->mesh = Mesh::CreateGeosphereMesh(device, obj->pointLightData->Range, 1);
+	lightTech->mesh = Mesh::CreateGeosphereMesh(device, obj->m_lightData->Range, 1);
 
 	lightTech->vertexShader = eastl::make_shared<Bind::VertexShader>(
 		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightVShader.hlsl"));
@@ -302,6 +260,11 @@ eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 
 	auto p = eastl::make_pair(eastl::string("LightPass"), lightTech);
 	rc->techniques.insert(eastl::move(p));
+
+	// IconPass
+	IconTechnique* iconTech = new IconTechnique(device, "IconPass",
+		{ 3u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
+	rc->techniques.insert(eastl::move(eastl::make_pair(eastl::string("IconPass"), iconTech)));
 
 	return obj;
 }

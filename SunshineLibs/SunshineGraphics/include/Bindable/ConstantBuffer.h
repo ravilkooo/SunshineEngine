@@ -53,6 +53,26 @@ namespace Bind
 	};
 
 	template<typename C>
+	class GeometryConstantBuffer : public ConstantBuffer<C>
+	{
+		using ConstantBuffer<C>::pConstantBuffer;
+		using ConstantBuffer<C>::slot;
+	public:
+		using ConstantBuffer<C>::ConstantBuffer;
+		void Bind(ID3D11DeviceContext* context) noexcept override
+		{
+			context->GSSetConstantBuffers(slot, 1u, &pConstantBuffer);
+		}
+		void Update(ID3D11DeviceContext* context, const C& consts) override {
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			context->Map(pConstantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
+			memcpy(mappedResource.pData, &consts, sizeof(consts) + (16 - (sizeof(consts) % 16))); // aligned size
+			context->Unmap(pConstantBuffer, 0);
+			//context->VSSetConstantBuffers(slot, 1u, &pConstantBuffer);
+		}
+	};
+
+	template<typename C>
 	class VertexConstantBuffer : public ConstantBuffer<C>
 	{
 		using ConstantBuffer<C>::pConstantBuffer;

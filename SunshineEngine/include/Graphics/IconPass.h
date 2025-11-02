@@ -4,13 +4,14 @@
 #include <GraphicsUtils/Camera.h>
 #include <Utils/UUID.h>
 #include <Graphics/Lighting/LightCollection.h>
-#include <Graphics/IconPass.h>
+#include <GraphicsResources/Texture.h>
+#include <Bindable/DepthStencilState.h>
 
-class SelectionPass :
+class IconPass :
     public RenderPass
 {
 public:
-    SelectionPass(ID3D11Device* device, ID3D11DeviceContext* context,
+    IconPass(ID3D11Device* device, ID3D11DeviceContext* context,
         eastl::shared_ptr<GBuffer> pGBuffer,
         eastl::shared_ptr<Camera> camera);
 
@@ -18,10 +19,7 @@ public:
     void StartFrame() override;
     void Pass(const Scene& scene) override;
     void EndFrame() override;
-
-    void WriteToStencilStep(const Scene& scene);
-    void WriteToBackBufferStep(const Scene& scene);
-
+    
     eastl::shared_ptr<Camera> GetCamera();
     void SetCamera(eastl::shared_ptr<Camera> camera);
 
@@ -35,27 +33,30 @@ public:
 
     eastl::shared_ptr<GBuffer> m_GBuffer;
 
+    ID3D11RenderTargetView* m_bufferRTVs[2];
     D3D11_VIEWPORT m_viewport;
-
-    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilWriteMask;
-    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilReadMask;
-    Sunshine::UUID m_selectedObjectUUID;
-
-    eastl::shared_ptr<Bind::VertexShader> m_meshVertexShader;
 
     eastl::shared_ptr<Bind::VertexShader> m_iconVertexShader;
     eastl::shared_ptr<Bind::GeometryShader> m_iconGeometryShader;
-    eastl::shared_ptr<Bind::GeometryConstantBuffer<float>> m_selectionBuffer;
-    IconPass* m_iconPass;
+    eastl::shared_ptr<Bind::PixelShader> m_iconPixelShader;
+    eastl::shared_ptr<Bind::Texture> m_iconSprites;
+    eastl::shared_ptr<Bind::DepthStencilState> m_depthStencilState;
 
-    eastl::shared_ptr<Bind::PixelShader> m_pixelShader;
+    struct CamGCB {
+        DX::XMMATRIX viewProjMat;
+        DX::XMFLOAT3 camPos;
+        float pad;
+    };
+    eastl::shared_ptr<Bind::GeometryConstantBuffer<CamGCB>> m_camGCB;
 
-    
-    /*
-    struct ScreenInfoPCB {
-        DXSM::Vector2 screenSize;
-    } m_screenData;
-    Bind::PixelConstantBuffer<ScreenInfoPCB>* m_screenInfoPCB;
-    */
+    struct SpritesheetInfoPCB {
+        UINT width = 1024u;
+        UINT height = 1024u;
+        UINT uStep = 128u;
+        UINT vStep = 128u;
+        UINT uSteps = 8u;
+        UINT vSteps = 8u;
+    } m_spritesheetData;
+    eastl::shared_ptr<Bind::PixelConstantBuffer<SpritesheetInfoPCB>> m_spritesheetInfoPCB;
 };
 

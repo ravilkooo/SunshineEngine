@@ -35,10 +35,17 @@ void WorldEditor::InitWorldEditor(
 		m_renderer->AddPass(m_lightPass);
 	}
 	{
-		m_selectionPass = eastl::make_shared<SelectionPass>(
+		m_iconPass = eastl::make_shared<IconPass>(
 			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 			m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
+		m_renderer->AddPass(m_iconPass);
+	}
+	{
+		m_selectionPass = eastl::make_shared<SelectionPass>(
+			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+			m_renderer->pGBuffer, m_renderer->GetMainCamera());
+		m_selectionPass->m_iconPass = m_iconPass.get();
 		m_renderer->AddPass(m_selectionPass);
 	}
 
@@ -49,19 +56,17 @@ void WorldEditor::InitWorldEditor(
 	TestObjects
 	*/
 
-	GameObjectFactory factory;
-
-	m_scene.AddGameObject(factory.CreateSkyBox(
+	m_scene.AddGameObject(GameObjectFactory::CreateSkyBox(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera())
 	);
-	m_scene.AddGameObject(factory.CreateDefaultBoxObject(
+	m_scene.AddGameObject(GameObjectFactory::CreateDefaultBoxObject(
 		m_renderer->GetDevice())
 	);
 
 	for (size_t i = 0; i < 6; i++)
 	{
-		m_scene.AddGameObject(factory.CreateDefaultSphereObject(
+		m_scene.AddGameObject(GameObjectFactory::CreateDefaultSphereObject(
 			m_renderer->GetDevice())
 		);
 		auto obj = m_scene.GetGameObjectByUUID(m_scene.gameObjects.back());
@@ -71,29 +76,29 @@ void WorldEditor::InitWorldEditor(
 
 	}
 
-	m_scene.AddGameObject(factory.CreateAmbientLightObject(
+	m_scene.AddGameObject(GameObjectFactory::CreateAmbientLightObject(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera(),
 		{ DXSM::Vector3::One * 0.5f, 1.0f })
 	);
-	m_scene.AddGameObject(factory.CreateDirectionalLightObject(
+	m_scene.AddGameObject(GameObjectFactory::CreateDirectionalLightObject(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera(),
 		{
-			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
-			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f) * 0.5f, 1.0f,
+			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f) * 0.5f, 1.0f,
 			DXSM::Vector3::Zero, 0,
 			DXSM::Vector3(1, -2, 0.5), 0
 		})
 	);
-	m_scene.AddGameObject(factory.CreatePointLightObject(
+	m_scene.AddGameObject(GameObjectFactory::CreatePointLightObject(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera(),
 		{
-			DXSM::Vector3(0.0f, 0.0f, 1.0f), 1.0f,
-			DXSM::Vector3(0.0f, 0.0f, 1.0f), 1.0f,
+			DXSM::Vector3(1.0f, 1.0f, 1.0f), 1.0f,
+			DXSM::Vector3(1.0f, 1.0f, 1.0f), 1.0f,
 			DXSM::Vector3(1.0f, 0.0f, 0.0f), 20,
-			DXSM::Vector3::One, 0
+			DXSM::Vector3(0.0f, 0.0f, 0.1f), 0
 		})
 	);
 }
@@ -132,6 +137,7 @@ void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_gPass->OnResize(resizeWidth, resizeHeight);
 	m_lightPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
 	m_selectionPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
+	m_iconPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
 }
 
 void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize)

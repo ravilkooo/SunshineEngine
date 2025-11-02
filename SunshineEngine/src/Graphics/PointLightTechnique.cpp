@@ -1,7 +1,9 @@
 #include "Graphics/PointLightTechnique.h"
 
-PointLightTechnique::PointLightTechnique(ID3D11Device* device, eastl::string technique)
-    : LightTechnique(device, technique)
+PointLightTechnique::PointLightTechnique(ID3D11Device* device, eastl::string technique,
+    eastl::shared_ptr<Camera> camera,
+    eastl::shared_ptr<PointLightData> lightData)
+    : LightTechnique(device, technique, camera, lightData)
 {
     // Depth
     D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -28,6 +30,14 @@ PointLightTechnique::PointLightTechnique(ID3D11Device* device, eastl::string tec
     rasterDesc.CullMode = D3D11_CULL_FRONT;
     rasterDesc.FillMode = D3D11_FILL_SOLID;
     rastCullFront = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
+}
+
+void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+{
+    m_lightData->Position = m_assignedTransform->m_position;
+    m_lightDataBuffer->Update(context.Get(), *m_lightData);
+    BindAll(context);
+    DrawTechnique(context);
 }
 
 void PointLightTechnique::ChooseDepthStencilState(LightPosition lightPos)
@@ -68,7 +78,7 @@ LightPosition PointLightTechnique::GetLightPositionInFrustum()
         return LightPosition::FILL;
 
     Camera::FrustumPlanes planes = m_camera->GetFrustumPlanes();
-    DX::XMVECTOR lightPosition = DX::XMLoadFloat3(&(lightData->Position));
+    DX::XMVECTOR lightPosition = DX::XMLoadFloat3(&(m_lightData->Position));
 
     bool isOutside = false;
     bool intersectsFarPlane = false;
@@ -82,7 +92,7 @@ LightPosition PointLightTechnique::GetLightPositionInFrustum()
         float distance = DX::XMVectorGetX(DX::XMPlaneDotCoord(planesArray[i], lightPosition));
 
         // Если расстояние меньше -radius, сфера полностью вне плоскости
-        if (distance <= -lightData->Range) {
+        if (distance <= -m_lightData->Range) {
             return LightPosition::OUTSIDE;
         }
 
@@ -92,12 +102,12 @@ LightPosition PointLightTechnique::GetLightPositionInFrustum()
         }
 
         // Если пересекает дальнюю плоскость
-        if (i == 1 && abs(distance) < lightData->Range) {
+        if (i == 1 && abs(distance) < m_lightData->Range) {
             intersectsFarPlane = true;
         }
 
         // Если пересекает хотя бы одну плоскость, но не полностью вне
-        if (abs(distance) < lightData->Range) {
+        if (abs(distance) < m_lightData->Range) {
             isOutside = true;
         }
     }
@@ -117,14 +127,14 @@ bool PointLightTechnique::IsFrustumInsideOfLight()
 {
     Camera::FrustumCorners frustum = m_camera->GetFrustumCorners();
     for (int i = 0; i < 4; ++i) {
-        DX::XMVECTOR vecToCorner = DX::XMVectorSubtract(frustum.Near[i], DXSM::Vector3(lightData->Position));
+        DX::XMVECTOR vecToCorner = DX::XMVectorSubtract(frustum.Near[i], DXSM::Vector3(m_lightData->Position));
         float distance = DX::XMVectorGetX(DX::XMVector3Length(vecToCorner));
-        if (distance > lightData->Range) return false;
+        if (distance > m_lightData->Range) return false;
     }
     for (int i = 0; i < 4; ++i) {
-        DX::XMVECTOR vecToCorner = DX::XMVectorSubtract(frustum.Far[i], DXSM::Vector3(lightData->Position));
+        DX::XMVECTOR vecToCorner = DX::XMVectorSubtract(frustum.Far[i], DXSM::Vector3(m_lightData->Position));
         float distance = DX::XMVectorGetX(DX::XMVector3Length(vecToCorner));
-        if (distance > lightData->Range) return false;
+        if (distance > m_lightData->Range) return false;
     }
     return true;
 }

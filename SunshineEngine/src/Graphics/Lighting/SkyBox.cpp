@@ -2,5 +2,5 @@
 
 SkyBox::SkyBox(SkyBoxData initData)
 {
-	skyBoxData = eastl::make_shared<SkyBoxData>(initData);
+	m_lightData = eastl::make_shared<SkyBoxData>(initData);
 }
