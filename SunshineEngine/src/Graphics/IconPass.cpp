@@ -56,7 +56,7 @@ IconPass::IconPass(ID3D11Device* device, ID3D11DeviceContext* context,
 
 	m_iconSprites = eastl::make_shared<Bind::Texture>(
 		device,
-		MakeEngineAssetPath_Wstring(L"sprites_exampe.dds"),
+		MakeEngineAssetPath_Wstring(L"EditorIcons.dds"),
 		0u,
 		Bind::PipelineStage::PIXEL_SHADER
 	);
@@ -107,7 +107,8 @@ void IconPass::Pass(const Scene& scene)
 	m_spritesheetInfoPCB->Bind(context.Get());
 
 	m_camGCB->Update(GetDeviceContext(), {
-		m_camera->GetViewMatrix() * m_camera->GetProjectionMatrix(),
+		m_camera->GetViewMatrix(),
+		m_camera->GetProjectionMatrix(),
 		m_camera->GetPosition(), 0.0f });
 	m_camGCB->Bind(context.Get());
 

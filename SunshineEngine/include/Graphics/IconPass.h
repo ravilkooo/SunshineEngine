@@ -43,7 +43,8 @@ public:
     eastl::shared_ptr<Bind::DepthStencilState> m_depthStencilState;
 
     struct CamGCB {
-        DX::XMMATRIX viewProjMat;
+        DX::XMMATRIX viewMat;
+        DX::XMMATRIX projMat;
         DX::XMFLOAT3 camPos;
         float pad;
     };

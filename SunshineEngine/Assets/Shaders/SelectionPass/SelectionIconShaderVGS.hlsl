@@ -34,7 +34,8 @@ GS_IN VSMain(VS_IN input)
 
 struct CameraData
 {
-    row_major float4x4 viewProjMat;
+    row_major float4x4 viewMat;
+    row_major float4x4 projMat;
     float3 camPos;
     float pad;
 };
@@ -53,26 +54,26 @@ cbuffer SelectionBuffer : register(b1) // per frame
 void GSMain(point GS_IN input[1], inout TriangleStream<PS_IN> output)
 {
 	// Shorten variables
-    float4 pos = input[0].pos;
-    float width = input[0].size.x * 10.0f * scaleFactor;
-    float height = input[0].size.y * 10.0f * scaleFactor;
-    
-	// Calculate vector perpendicular to the camera
-    float3 plane_normal = pos.xyz - camData.camPos;
-    // plane_normal.y = 0.0f;
-    plane_normal = normalize(plane_normal);
-    // plane_normal = float3(0.0f, 0.0f, 1.0f);
-
-    float3 up_vector = float3(0.0f, 1.0f, 0.0f);
-    float3 right_vector = normalize(cross(plane_normal, up_vector));
-    // right_vector = float3(1.0f, 0.0f, 0.0f);
+    float4 viewPos = mul(float4(input[0].pos.xyz, 1.0f), camData.viewMat);
+    float width = 0.5f * input[0].size.x * 10.0f * scaleFactor;
+    float height = 0.5f * input[0].size.y * 10.0f * scaleFactor;
 
 	// Create rectangle vertices that face the camera
+    float3 up_vector = float3(0.0f, 1.0f, 0.0f);
+    float3 right_vector = float3(1.0f, 0.0f, 0.0f);
+    
     float3 vertices[4];
-    vertices[0] = pos.xyz + width * right_vector - height * up_vector;
-    vertices[1] = pos.xyz + width * right_vector + height * up_vector;
-    vertices[2] = pos.xyz - width * right_vector - height * up_vector;
-    vertices[3] = pos.xyz - width * right_vector + height * up_vector;
+    vertices[0] = -width * right_vector - height * up_vector;
+    vertices[1] = -width * right_vector + height * up_vector;
+    vertices[2] = +width * right_vector - height * up_vector;
+    vertices[3] = +width * right_vector + height * up_vector;
+    
+    // UV
+    float2 uv[4];
+    uv[0] = float2(0.0f, 1.0f);
+    uv[1] = float2(0.0f, 0.0f);
+    uv[2] = float2(1.0f, 1.0f);
+    uv[3] = float2(1.0f, 0.0f);
     
 	// Append output stream with our 4 new rectangle vertices
 	[unroll]
@@ -80,8 +81,8 @@ void GSMain(point GS_IN input[1], inout TriangleStream<PS_IN> output)
     {
         PS_IN element;
 
-        element.pos = float4(vertices[i], 1.0f);
-        element.pos = mul(element.pos, camData.viewProjMat);
+        element.pos = float4(viewPos.xyz + vertices[i], 1.0f);
+        element.pos = mul(element.pos, camData.projMat);
         
         output.Append(element);
     }
