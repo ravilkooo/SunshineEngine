@@ -17,6 +17,14 @@ namespace Sunshine {
     {
     }
 
+    UUIDhilo UUID::GetHilo()
+    {
+        return UUIDhilo{
+            (uint32_t)(m_UUID >> 32),
+            (uint32_t)(m_UUID & 0xFFFFFFFF)
+        };
+    }
+
     UUID::operator uint64_t() const { return m_UUID; }
 
     bool UUID::operator==(const UUID& other) const noexcept { return m_UUID == other.m_UUID; }

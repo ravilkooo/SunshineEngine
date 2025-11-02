@@ -1,5 +1,6 @@
 #include "Graphics/SelectionPass.h"
 #include <Utils/StringUtils.h>
+#include <Graphics/IconTechnique.h>
 
 SelectionPass::SelectionPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	eastl::shared_ptr<GBuffer> pGBuffer,
@@ -77,6 +78,21 @@ SelectionPass::SelectionPass(ID3D11Device* device, ID3D11DeviceContext* context,
 	m_meshVertexShader = eastl::make_shared<Bind::VertexShader>(device,
 		MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionMeshShaderVS.hlsl"));
 
+	UINT numInputElements = 2;
+	D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+	m_iconVertexShader = eastl::make_shared<Bind::VertexShader>(device,
+		MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl"),
+		numInputElements, IALayoutInputElements);
+
+	m_selectionBuffer = eastl::make_shared<Bind::GeometryConstantBuffer<float>>(device, 1u);
+
+	m_iconGeometryShader = eastl::make_shared<Bind::GeometryShader>(device,
+		MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl"));
+
 	m_pixelShader = eastl::make_shared<Bind::PixelShader>(device,
 		MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionMeshShaderPS.hlsl"));
 	
@@ -116,7 +132,6 @@ void SelectionPass::WriteToStencilStep(const Scene& scene)
 
 	context->RSSetViewports(1, &m_viewport);
 
-	m_camera->UpdateBuffer(context.Get());
 	m_camera->BindBuffer(context.Get());
 
 	/*
@@ -143,20 +158,33 @@ void SelectionPass::WriteToStencilStep(const Scene& scene)
 
 		context->PSSetShader(nullptr, nullptr, 0u);
 
-		// Don't need PixelShader like in ShadowMap Pass
-		// Choose "IconsPass" stuff if has IconPass Tag or "GPass" stuff techniqueTag
-		// 
-		// If Icon
-		// Bind IconSelectionShader (VertexShader)
-		// Don't bind object texture and sampler for this
-		// 
-		// Else if not Icon (Usual Mesh)
-		// Bind Mesh
-		// Bind MeshSelectionShader (VertexShader)
-		// Don't bind object texture and sampler for this
+		if (renderComponent->HasTechnique("IconPass")) {
+			// Bind IconSelectionShader (VertexShader)
+			// Don't bind object texture and sampler for this
+			m_iconVertexShader->Bind(context.Get());
+			m_iconGeometryShader->Bind(context.Get());
+			m_iconPass->m_camGCB->Bind(context.Get());
 
-		if (renderComponent->HasTechnique("IconsPass")) {
-			//renderComponent->techniques["IconsPass"]->mesh->Bind(context.Get());
+			m_selectionBuffer->Update(context.Get(), { 1.0f });
+			m_selectionBuffer->Bind(context.Get());
+
+			renderComponent->techniques["IconPass"]->Pass(context.Get());
+
+			// Step2 (draw color and mask out)
+			// MaskOut
+			context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
+			context->RSSetViewports(1, &m_viewport);
+
+			context->OMSetDepthStencilState(m_depthStencilReadMask.Get(), 1);
+			m_pixelShader->Bind(context.Get());
+
+			// scale width and height
+			m_selectionBuffer->Update(context.Get(), { 1.08f });
+			m_selectionBuffer->Bind(context.Get());
+
+			renderComponent->techniques["IconPass"]->Pass(context.Get());
+
+			transformComponent->m_localScaleFactor = actualLocalScaleFactor;
 		}
 		else if (renderComponent->HasTechnique("GPass")) {
 			renderComponent->techniques["GPass"]->mesh->Bind(context.Get());
@@ -165,15 +193,6 @@ void SelectionPass::WriteToStencilStep(const Scene& scene)
 			renderComponent->techniques["GPass"]->mesh->Draw(context.Get());
 
 			// Step2 (draw color and mask out)
-			/*
-			context->OMSetDepthStencilState(m_depthStencilWriteMask.Get(), 0); // draw usual
-			transformComponent->BindToGraphicsPipeline(
-				GetDeviceContext()
-			);
-
-			renderComponent->techniques["GPass"]->mesh->Draw(context.Get());
-			*/
-
 			// MaskOut
 			context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
 			context->RSSetViewports(1, &m_viewport);

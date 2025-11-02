@@ -6,7 +6,9 @@ class DirectionalLightTechnique :
     public LightTechnique<DirectionalLightData>
 {
 public:
-    DirectionalLightTechnique(ID3D11Device* device, eastl::string technique);
+    DirectionalLightTechnique(ID3D11Device* device, eastl::string technique,
+        eastl::shared_ptr<Camera> camera,
+        eastl::shared_ptr<DirectionalLightData> lightData);
 
     void ChooseDepthStencilState(LightPosition lightPos) override;
     void ChooseRasterizer(LightPosition lightPos) override;

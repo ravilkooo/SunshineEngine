@@ -16,27 +16,27 @@ class SkyBox;
 class GameObjectFactory
 {
 public:
-	eastl::unique_ptr<GameObject> CreateDefaultBoxObject(
+	static eastl::unique_ptr<GameObject> CreateDefaultBoxObject(
 		ID3D11Device* device,
 		float width = 1.0f, float height = 1.0f, float length = 1.0f);
 
-	eastl::unique_ptr<GameObject> CreateDefaultSphereObject(ID3D11Device* device, float radius = 1.0f);
+	static eastl::unique_ptr<GameObject> CreateDefaultSphereObject(ID3D11Device* device, float radius = 1.0f);
 
-	eastl::unique_ptr<GameObject> CreateFinalPassQuad(ID3D11Device* device);
+	static eastl::unique_ptr<GameObject> CreateFinalPassQuad(ID3D11Device* device);
 
-	eastl::unique_ptr<SkyBox> CreateSkyBox(
+	static eastl::unique_ptr<SkyBox> CreateSkyBox(
 		ID3D11Device* device,
 		eastl::shared_ptr<Camera> camera,
 		SkyBoxData initData = { DXSM::Vector3::One, 0.0f },
 		eastl::wstring texturePath = eastl::wstring(L"Default")
 );
 
-	eastl::unique_ptr<AmbientLight> CreateAmbientLightObject(
+	static eastl::unique_ptr<AmbientLight> CreateAmbientLightObject(
 		ID3D11Device* device,
 		eastl::shared_ptr<Camera> camera,
 		AmbientLightData initData = { DXSM::Vector3::One * 0.1f, 1.0f });
 
-	eastl::unique_ptr<DirectionalLight> CreateDirectionalLightObject(
+	static eastl::unique_ptr<DirectionalLight> CreateDirectionalLightObject(
 		ID3D11Device* device,
 		eastl::shared_ptr<Camera> camera,
 		DirectionalLightData initData = {
@@ -46,7 +46,7 @@ public:
 			DXSM::Vector3(1, -1, 1), 0
 		});
 
-	eastl::unique_ptr<PointLight> CreatePointLightObject(
+	static eastl::unique_ptr<PointLight> CreatePointLightObject(
 		ID3D11Device* device,
 		eastl::shared_ptr<Camera> camera,
 		PointLightData initData = {

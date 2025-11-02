@@ -6,7 +6,9 @@ class AmbientLightTechnique :
     public LightTechnique<AmbientLightData>
 {
 public:
-    AmbientLightTechnique(ID3D11Device* device, eastl::string technique);
+    AmbientLightTechnique(ID3D11Device* device, eastl::string technique,
+        eastl::shared_ptr<Camera> camera,
+        eastl::shared_ptr<AmbientLightData> lightData);
 
     void ChooseDepthStencilState(LightPosition lightPos) override;
     void ChooseRasterizer(LightPosition lightPos) override;

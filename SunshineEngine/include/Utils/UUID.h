@@ -19,6 +19,8 @@ namespace Sunshine
         explicit UUID(uint64_t uuid);
         UUID(const UUID&) = default;
 
+        UUIDhilo GetHilo();
+
         operator uint64_t() const;
 
         bool operator==(const UUID& other) const noexcept;

@@ -1,6 +1,7 @@
 #include "Graphics/GPassTechnique.h"
 
-GPassTechnique::GPassTechnique(ID3D11Device* device, eastl::string technique)
+GPassTechnique::GPassTechnique(ID3D11Device* device, eastl::string technique,
+	Sunshine::UUID uuid)
 	: RenderTechnique(device, technique)
 {
 	D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
@@ -30,4 +31,12 @@ GPassTechnique::GPassTechnique(ID3D11Device* device, eastl::string technique)
 	blendDesc.RenderTarget[4].BlendEnable = TRUE;
 
 	blendState = eastl::make_shared<Bind::BlendState>(device, blendDesc);
+
+	m_uuidBuffer = eastl::make_shared<Bind::PixelConstantBuffer<UUIDhilo>>(
+		device,
+		uuid.GetHilo(),
+		0u
+	);
+
+	AddBind(m_uuidBuffer);
 }

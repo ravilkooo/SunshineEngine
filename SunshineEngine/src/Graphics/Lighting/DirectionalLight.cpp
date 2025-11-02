@@ -5,7 +5,7 @@ DirectionalLight::DirectionalLight(
 {
     directionalLightData.Direction.Normalize();
     
-    this->directionalLightData = eastl::make_shared<DirectionalLightData>(directionalLightData);
+    m_lightData = eastl::make_shared<DirectionalLightData>(directionalLightData);
 }
 
 //void DirectionalLight::UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

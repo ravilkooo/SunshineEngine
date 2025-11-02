@@ -24,8 +24,8 @@ void LightTechnique<T>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> cont
 		textureSampler->Bind(context.Get());
 	}
 
-	if (lightDataBuffer) {
-		lightDataBuffer->Bind(context.Get());
+	if (m_lightDataBuffer) {
+		m_lightDataBuffer->Bind(context.Get());
 	}
 
 	if (blendState)
@@ -48,7 +48,9 @@ void LightTechnique<T>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> cont
 }
 
 template <class T>
-LightTechnique<T>::LightTechnique(ID3D11Device* device, eastl::string technique)
+LightTechnique<T>::LightTechnique(ID3D11Device* device, eastl::string technique,
+	eastl::shared_ptr<Camera> camera,
+	eastl::shared_ptr<T> lightData)
 	: RenderTechnique(device, technique)
 {
 	D3D11_BLEND_DESC blendDesc = {};
@@ -62,4 +64,14 @@ LightTechnique<T>::LightTechnique(ID3D11Device* device, eastl::string technique)
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	blendState = eastl::make_shared<Bind::BlendState>(device, blendDesc);
+
+	m_lightData = lightData;
+	m_lightDataBuffer =
+		eastl::make_shared<Bind::PixelConstantBuffer<T>>(
+			device,
+			*(lightData),
+			2u
+		);
+
+	m_camera = camera;
 }

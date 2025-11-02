@@ -78,6 +78,7 @@ void calcPointLight(float3 wPos, float3 normal, float3 toEye, Material mat,
     }
 
     float att = 1.0f / dot(pointLight.Att, float3(1.0f, d, d * d));
+    //float att = dot(1.0f.xxx / float3(1.0f, d, d * d), pointLight.Att);
     pl_diffuse *= att;
     pl_spec *= att;
 }

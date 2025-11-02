@@ -13,14 +13,16 @@ class LightTechnique :
     public RenderTechnique
 {
 public:
-    eastl::shared_ptr<T> lightData;
-    eastl::shared_ptr<Bind::PixelConstantBuffer<T>> lightDataBuffer;
+    eastl::shared_ptr<T> m_lightData;
+    eastl::shared_ptr<Bind::PixelConstantBuffer<T>> m_lightDataBuffer;
     eastl::shared_ptr<Camera> m_camera;
 
-    LightTechnique(ID3D11Device* device, eastl::string technique);
+    LightTechnique(ID3D11Device* device, eastl::string technique,
+        eastl::shared_ptr<Camera> camera,
+        eastl::shared_ptr<T> lightData);
     ~LightTechnique() = default;
 
-    void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+    virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 
     // Update right before draw
     // Need camera?

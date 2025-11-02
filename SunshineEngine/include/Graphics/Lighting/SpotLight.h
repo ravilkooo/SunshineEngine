@@ -15,11 +15,12 @@
 
 #include "Bindable/BindableCollection.h"
 #include "Graphics/RenderTechnique.h"
+#include "LightData.h"
 
 namespace DXSM = DirectX::SimpleMath;
 
 class SpotLight :
-    public LightObject
+    public LightObject<SpotLightData>
 {
 public:
     /*

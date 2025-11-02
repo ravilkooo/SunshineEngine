@@ -27,10 +27,9 @@
 namespace DXSM = DirectX::SimpleMath;
 
 class PointLight :
-    public LightObject
+    public LightObject<PointLightData>
 {
 public:
-    eastl::shared_ptr<PointLightData> pointLightData;
 
     PointLight(
         PointLightData pointLightData =
