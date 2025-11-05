@@ -8,7 +8,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-// #include "GraphicsUtils/SceneNode.h"
+// #include "Graphics/Utils/SceneNode.h"
 
 class ModelLoader
 {

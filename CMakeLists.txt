@@ -35,5 +35,3 @@ add_subdirectory(SunshineEngine)
 add_subdirectory(SunshineEditor)
 
 add_subdirectory(ThirdParty)
-
-add_subdirectory(SunshineLibs)
