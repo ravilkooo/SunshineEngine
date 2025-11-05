@@ -12,11 +12,11 @@
 
 namespace DXSM = DirectX::SimpleMath;
 
-class AmbientLight :
-    public LightObject<AmbientLightData>
-{
-public:
-    AmbientLight(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
-};
-
-
+namespace SE_G {
+    class AmbientLight :
+        public LightObject<AmbientLightData>
+    {
+    public:
+        AmbientLight(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
+    };
+}

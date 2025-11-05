@@ -3,13 +3,12 @@
 #include "Component.h"
 #include <SimpleMath.h>
 #include <d3d11.h>
-#include <Bindable/TransformCBuffer.h>
-#include <GraphicsUtils/Transformable.h>
+#include <Graphics/Bindable/TransformCBuffer.h>
 
 namespace DXSM = DirectX::SimpleMath;
 
 class SUNSHINE_ENGINE_API TransformComponent :
-    public Component, Transformable
+    public Component
 {
 public:
     TransformComponent() {};
@@ -19,7 +18,7 @@ public:
     void SetupBuffer(ID3D11Device* device);
 
     // To-do ptr
-    Bind::TransformCBuffer* transformBuffer;
+    SE_G::Bind::TransformCBuffer* transformBuffer;
 
     void BindToGraphicsPipeline(ID3D11DeviceContext* context);
 
@@ -54,7 +53,7 @@ public:
     DXSM::Matrix GetLocalTransformMatrix() const;
 
     // World Transform
-    DXSM::Matrix GetWorldMatrix() const override; // include LocalTransfrom
+    DXSM::Matrix GetWorldMatrix() const; // include LocalTransfrom
 
     // Transform
     DXSM::Vector3 m_position = { 0, 0, 0 };

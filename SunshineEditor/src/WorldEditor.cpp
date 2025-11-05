@@ -12,7 +12,7 @@ WorldEditor::~WorldEditor()
 
 
 void WorldEditor::InitWorldEditor(
-	eastl::shared_ptr<DeferredRenderer> renderer,
+	eastl::shared_ptr<SE_G::DeferredRenderer> renderer,
 	UINT screenWidth,
 	UINT screenHeight)
 {
@@ -21,28 +21,28 @@ void WorldEditor::InitWorldEditor(
 	this->m_screenWidth = screenWidth;
 
 	{
-		m_gPass = eastl::make_shared<GPass>(
+		m_gPass = eastl::make_shared<SE_G::GPass>(
 			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 			m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
 		m_renderer->AddPass(m_gPass);
 	}
 	{
-		m_lightPass = eastl::make_shared<LightPass>(
+		m_lightPass = eastl::make_shared<SE_G::LightPass>(
 			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 			m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
 		m_renderer->AddPass(m_lightPass);
 	}
 	{
-		m_iconPass = eastl::make_shared<IconPass>(
+		m_iconPass = eastl::make_shared<SE_G::IconPass>(
 			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 			m_renderer->pGBuffer, m_renderer->GetMainCamera());
 
 		m_renderer->AddPass(m_iconPass);
 	}
 	{
-		m_selectionPass = eastl::make_shared<SelectionPass>(
+		m_selectionPass = eastl::make_shared<SE_G::SelectionPass>(
 			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 			m_renderer->pGBuffer, m_renderer->GetMainCamera());
 		m_selectionPass->m_iconPass = m_iconPass.get();

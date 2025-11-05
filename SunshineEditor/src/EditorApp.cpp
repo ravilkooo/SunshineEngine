@@ -16,7 +16,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_displayWindow = DisplayWindow(this, m_applicationName, m_hInstance,
 		m_winWidth, m_winHeight, DisplayWindow::WndProcImGui);
 
-	m_renderer = eastl::make_shared<DeferredRenderer>(
+	m_renderer = eastl::make_shared<SE_G::DeferredRenderer>(
 		m_displayWindow.m_hWnd,
 		m_winWidth, m_winHeight);
 	
