@@ -1,0 +1,418 @@
+#include "ContentBrowserPanel.h"
+#include <imgui.h>
+#include <iostream>
+#include <filesystem>
+#include <chrono>
+#include <sstream>
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <commdlg.h>
+#include <shlobj.h>
+
+
+std::filesystem::path ContentBrowserPanel::s_AssetsDirectory =
+    std::filesystem::current_path().parent_path().parent_path() / "SunshineEngine" / "Assets";
+
+ContentBrowserPanel::ContentBrowserPanel()
+    : m_CurrentDirectory(s_AssetsDirectory)
+{}
+
+
+bool ContentBrowserPanel::FileCopy(const std::filesystem::path& src, const std::filesystem::path& dst)
+{
+    // If dst is directory, copy into it
+    if (std::filesystem::is_directory(dst)) {
+        std::filesystem::path target = dst / src.filename();
+        std::filesystem::copy_file(src, target, std::filesystem::copy_options::skip_existing);
+    } else {
+        // Copy file to dst (could be full file path)
+        std::filesystem::copy_file(src, dst, std::filesystem::copy_options::skip_existing);
+    }
+    return true;
+}
+
+bool ContentBrowserPanel::FileMove(const std::filesystem::path& src, const std::filesystem::path& dst)
+{
+    std::filesystem::rename(src, dst);
+    return true;
+}
+
+bool ContentBrowserPanel::FileDelete(const std::filesystem::path& p)
+{
+    if (std::filesystem::is_directory(p))
+        std::filesystem::remove_all(p);
+    else
+        std::filesystem::remove(p);
+    return true;
+}
+
+std::filesystem::path ContentBrowserPanel::MakeUniquePath(const std::filesystem::path& dst)
+{
+    if (!std::filesystem::exists(dst)) return dst;
+
+    auto parent = dst.parent_path();
+    auto stem = dst.stem().string();
+    auto ext = dst.extension().string();
+
+    int counter = 1;
+    while (true) {
+        std::ostringstream oss;
+        oss << stem << " (" << counter << ")" << ext;
+        std::filesystem::path candidate = parent / oss.str();
+        if (!std::filesystem::exists(candidate)) return candidate;
+        ++counter;
+    }
+}
+
+// System clipboard path copy (only text).
+bool ContentBrowserPanel::CopyPathToClipboardSystem(const std::string& text)
+{
+    if (!OpenClipboard(NULL)) return false;
+    EmptyClipboard();
+    size_t sizeInBytes = (text.size() + 1) * sizeof(char);
+    HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, sizeInBytes);
+    if (!hGlob) { CloseClipboard(); return false; }
+    void* pData = GlobalLock(hGlob);
+    memcpy(pData, text.c_str(), sizeInBytes);
+    GlobalUnlock(hGlob);
+    SetClipboardData(CF_TEXT, hGlob);
+    CloseClipboard();
+    return true;
+}
+
+std::string ContentBrowserPanel::OpenFileDialog()
+{
+    OPENFILENAMEA ofn;       
+    CHAR szFile[260] = { 0 };
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = NULL;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = sizeof(szFile);
+    ofn.lpstrFilter = filter;
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    if (GetOpenFileNameA(&ofn))
+        return std::string(ofn.lpstrFile);
+    return {};
+}
+
+std::string ContentBrowserPanel::SaveFileDialog()
+{
+    OPENFILENAMEA ofn;
+    CHAR szFile[260] = { 0 };
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = NULL;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = sizeof(szFile);
+    ofn.lpstrFilter = filter;
+    ofn.nFilterIndex = 1;
+    ofn.lpstrInitialDir = NULL;
+
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+
+    if (GetSaveFileNameA(&ofn))
+        return std::string(ofn.lpstrFile);
+    return {};
+}
+
+// ---------------- UI Actions ----------------
+
+void ContentBrowserPanel::Action_CreateFolder()
+{
+    // Create "NewFolder" or "NewFolder (n)"
+    std::filesystem::path newFolder = m_CurrentDirectory / "New Folder";
+    int counter = 1;
+    while (std::filesystem::exists(newFolder)) {
+        std::ostringstream oss;
+        oss << "New Folder (" << counter << ")";
+        newFolder = m_CurrentDirectory / oss.str();
+        ++counter;
+    }
+    std::filesystem::create_directory(newFolder);
+}
+
+void ContentBrowserPanel::Action_Rename(const std::filesystem::path& p)
+{
+    // Open rename popup and prefill buffer with filename
+    m_ShowRenamePopup = true;
+    std::string filename = p.filename().string();
+    strncpy(m_RenameBuffer, filename.c_str(), sizeof(m_RenameBuffer)-1);
+    m_RenameBuffer[sizeof(m_RenameBuffer)-1] = '\0';
+    m_SelectedPath = p;
+}
+
+void ContentBrowserPanel::Action_Delete(const std::filesystem::path& p)
+{
+    m_ShowDeleteConfirm = true;
+    m_SelectedPath = p;
+}
+
+void ContentBrowserPanel::Action_Copy(const std::filesystem::path& p, bool cut)
+{
+    m_Clipboard.path = p;
+    m_Clipboard.isCut = cut;
+    m_Clipboard.hasValue = true;
+}
+
+void ContentBrowserPanel::Action_PasteToCurrent()
+{
+    if (!m_Clipboard.hasValue) return;
+    std::filesystem::path src = m_Clipboard.path;
+    std::filesystem::path dst = m_CurrentDirectory / src.filename();
+    dst = MakeUniquePath(dst);
+
+    if (m_Clipboard.isCut) {
+        FileMove(src, dst);
+    } else {
+            if (std::filesystem::is_directory(src)) {
+                std::filesystem::copy(src, dst, std::filesystem::copy_options::recursive | std::filesystem::copy_options::skip_existing);
+            } else {
+                std::filesystem::copy_file(src, dst, std::filesystem::copy_options::skip_existing);
+            }
+    }
+    
+    if (m_Clipboard.isCut)
+    {
+        m_Clipboard.hasValue = false; // Clear after move
+    }
+}
+
+void ContentBrowserPanel::Action_Duplicate(const std::filesystem::path& p)
+{
+    std::filesystem::path dst = p.parent_path() / p.filename();
+    dst = MakeUniquePath(dst);
+    if (std::filesystem::is_directory(p)) {
+        std::filesystem::copy(p, dst, std::filesystem::copy_options::recursive);
+    } else {
+        std::filesystem::copy_file(p, dst);
+    }
+
+}
+
+void ContentBrowserPanel::Action_Import()
+{
+    std::string selectedFile = OpenFileDialog();
+    if (!selectedFile.empty())
+    {
+        auto src = std::filesystem::path(selectedFile);
+        std::filesystem::path dst = m_CurrentDirectory / src.filename();
+        
+        dst = MakeUniquePath(dst);
+        FileCopy(src, dst);
+    }
+        
+}
+
+void ContentBrowserPanel::Action_Export()
+{
+    if (m_SelectedPath.has_value())
+    {
+        std::string savePath = SaveFileDialog();
+        if (!savePath.empty())
+        {
+            auto src = *m_SelectedPath;
+            auto dst = std::filesystem::path(savePath);
+            
+            if (dst.extension().empty())
+                dst.replace_extension(src.extension());
+            
+            std::filesystem::path target = dst;
+            if (std::filesystem::is_directory(dst))
+                target = dst / src.filename();
+            target = MakeUniquePath(target);
+            FileCopy(src, target);
+        }
+    }
+}
+
+// ---------------- Render / UI ----------------
+
+void ContentBrowserPanel::DrawToolbar()
+{
+    ImGui::SameLine();
+    if (ImGui::Button("Import"))
+    {
+        Action_Import();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("New Folder"))
+    {
+        Action_CreateFolder();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Paste"))
+    {
+        Action_PasteToCurrent();
+    }
+    ImGui::SameLine();
+    ImGui::InputTextWithHint("##search", "Search...", m_SearchBuffer, sizeof(m_SearchBuffer));
+}
+
+void ContentBrowserPanel::ShowContextMenuFor(const std::filesystem::path& path)
+{
+    if (ImGui::BeginPopupContextItem(("context_" + path.string()).c_str()))
+    {
+        if (ImGui::MenuItem("Copy")) { Action_Copy(path, false); }
+        if (ImGui::MenuItem("Cut")) { Action_Copy(path, true); }
+        if (ImGui::MenuItem("Paste", nullptr, false, m_Clipboard.hasValue)) { Action_PasteToCurrent(); }
+        if (ImGui::MenuItem("Duplicate")) { Action_Duplicate(path); }
+        if (ImGui::MenuItem("Rename")) { Action_Rename(path); }
+        if (ImGui::MenuItem("Delete")) { Action_Delete(path); }
+        if (ImGui::MenuItem("Copy Path")) { CopyPathToClipboardSystem(path.string()); }
+        if (ImGui::MenuItem("Export...")) { Action_Export(); }
+        ImGui::EndPopup();
+    }
+}
+
+void ContentBrowserPanel::DrawItems()
+{
+    // Walk directory and show items; apply search filter
+    std::vector<std::filesystem::directory_entry> entries;
+    for (auto& e : std::filesystem::directory_iterator(m_CurrentDirectory))
+        entries.push_back(e);
+
+    // Sort: folders first then files
+    std::sort(entries.begin(), entries.end(), [](auto &a, auto &b) {
+        if (a.is_directory() != b.is_directory()) return a.is_directory();
+        return a.path().filename().string() < b.path().filename().string();
+    });
+
+    // Iterate
+    ImGui::BeginChild("##content_browser_items", ImVec2(0, 0), false);
+    for (auto& directoryEntry : entries)
+    {
+        auto& path = directoryEntry.path();
+        auto filename = path.filename().string();
+
+        // Search filter
+        std::string filter(m_SearchBuffer);
+        if (!filter.empty()) {
+            std::string lowerName = filename;
+            std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+            std::transform(filter.begin(), filter.end(), filter.begin(), ::tolower);
+            if (lowerName.find(filter) == std::string::npos) continue;
+        }
+
+        // Show icon/text as button
+        ImGui::PushID(filename.c_str());
+        ImGui::BeginGroup();
+        if (directoryEntry.is_directory())
+        {
+            // Folder icon (text) and clickable
+            if (ImGui::Button((std::string("[DIR] ") + filename).c_str()))
+            {
+                m_CurrentDirectory /= path.filename();
+            }
+        }
+        else
+        {
+            if (ImGui::Button(filename.c_str()))
+            {
+                // Select file
+                m_SelectedPath = path;
+            }
+        }
+
+        // Right-click context menu for the item
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+        {
+            ImGui::OpenPopup(("context_" + path.string()).c_str());
+        }
+        ShowContextMenuFor(path);
+
+        ImGui::SameLine();
+        // Show small metadata: size 
+        if (!directoryEntry.is_directory())
+        {
+            auto fsize = std::filesystem::file_size(path);
+            ImGui::Text("(%llu bytes)", (unsigned long long)fsize);
+        }
+
+        ImGui::EndGroup();
+        ImGui::PopID();
+    }
+    ImGui::EndChild();
+}
+
+void ContentBrowserPanel::OnImGuiRender()
+{
+    //ImGui::Begin("Content Browser");
+
+    // Up button
+    if (m_CurrentDirectory != s_AssetsDirectory)
+    {
+        if (ImGui::Button("<-"))
+        {
+            m_CurrentDirectory = m_CurrentDirectory.parent_path();
+        }
+        ImGui::SameLine();
+    }
+    ImGui::Text("%s", std::filesystem::relative(m_CurrentDirectory, s_AssetsDirectory.parent_path()).string().c_str());
+
+    // Toolbar
+    DrawToolbar();
+
+    // Items
+    DrawItems();
+
+    // ---- Rename popup ----
+    if (m_ShowRenamePopup && m_SelectedPath.has_value())
+    {
+        ImGui::OpenPopup("Rename");
+        if (ImGui::BeginPopupModal("Rename", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Rename:");
+            ImGui::InputText("##rename", m_RenameBuffer, sizeof(m_RenameBuffer));
+            if (ImGui::Button("OK"))
+            {
+                std::string newName(m_RenameBuffer);
+                auto oldPath = *m_SelectedPath;
+                auto newPath = oldPath.parent_path() / newName;
+                newPath = MakeUniquePath(newPath);
+                FileMove(oldPath, newPath);
+                m_ShowRenamePopup = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel"))
+            {
+                m_ShowRenamePopup = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+    }
+
+    // ---- Delete confirm popup ----
+    if (m_ShowDeleteConfirm && m_SelectedPath.has_value())
+    {
+        ImGui::OpenPopup("Delete?");
+        if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Delete %s ?", m_SelectedPath->filename().string().c_str());
+            if (ImGui::Button("Yes"))
+            {
+                FileDelete(*m_SelectedPath);
+                m_ShowDeleteConfirm = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("No"))
+            {
+                m_ShowDeleteConfirm = false;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+    }
+
+    //ImGui::End();
+}
+
