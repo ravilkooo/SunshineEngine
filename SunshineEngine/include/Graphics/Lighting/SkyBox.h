@@ -5,16 +5,17 @@
 
 #include <EASTL/shared_ptr.h>
 
-#include "GameObject.h"
+#include <GameObject.h>
 #include "LightObject.h"
 #include "LightData.h"
 
 namespace DXSM = DirectX::SimpleMath;
 
-class SkyBox :
-    public LightObject<SkyBoxData>
-{
-public:
-    SkyBox(SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
-};
-
+namespace SE_G {
+    class SkyBox :
+        public LightObject<SkyBoxData>
+    {
+    public:
+        SkyBox(SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
+    };
+}

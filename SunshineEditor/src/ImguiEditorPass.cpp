@@ -9,7 +9,7 @@ ImguiEditorPass::ImguiEditorPass(
 	ID3D11DeviceContext* context,
 	ID3D11Texture2D* backBuffer,
 	UINT editorAppWidth, UINT editorAppHeight,
-	eastl::shared_ptr<GBuffer> pGBuffer,
+	eastl::shared_ptr<SE_G::GBuffer> pGBuffer,
 	eastl::shared_ptr<WorldEditor> worldEditor)
 	: RenderPass("LightPass", device, context)
 {

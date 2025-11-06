@@ -11,19 +11,19 @@
 #include <sol_ImGui.h>
 
 // SunshineLibs
-#include <Graphics/RenderPass.h>
-#include <Graphics/GBuffer.h>
+#include <Graphics/Renderer/Pass/RenderPass.h>
+#include <Graphics/Renderer/GBuffer.h>
 
 class WorldEditor;
 
 class ImguiEditorPass :
-    public RenderPass
+    public SE_G::RenderPass
 {
 public:
     ImguiEditorPass(ID3D11Device* device, ID3D11DeviceContext* context,
         ID3D11Texture2D* backBuffer,
         UINT screenWidth, UINT screenHeight,
-        eastl::shared_ptr<GBuffer> pGBuffer,
+        eastl::shared_ptr<SE_G::GBuffer> pGBuffer,
         eastl::shared_ptr<WorldEditor> worldEditor);
 
     void StartFrame() override;
@@ -41,7 +41,7 @@ public:
 
     bool m_isLayoutInitialized = false;
 
-    eastl::shared_ptr<GBuffer> m_GBuffer;
+    eastl::shared_ptr<SE_G::GBuffer> m_GBuffer;
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_backBuffer;
 

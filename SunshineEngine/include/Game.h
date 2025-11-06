@@ -10,8 +10,8 @@
 #include "GameTimer.h"
 
 #include "Scene.h"
-#include <Graphics/RenderingSystem.h>
-#include <Graphics/DeferredRenderer.h>
+#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Windows/WindowsApp.h>
 
 
@@ -29,7 +29,7 @@ public:
 
     GameTimer m_timer;
     Scene m_scene;
-    eastl::unique_ptr<DeferredRenderer> m_renderer;
+    eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
 
     float m_deltaTime = 0.0f;
 };
