@@ -18,7 +18,7 @@ public:
     Scene(Scene&&) noexcept = default;
     Scene& operator=(Scene&&) noexcept = default;
 
-    void AddGameObject(eastl::unique_ptr<GameObject> gameObject);
+    Sunshine::UUID AddGameObject(eastl::unique_ptr<GameObject> gameObject);
     GameObject* GetGameObjectByUUID(Sunshine::UUID uuid) const;
     //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
     eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(Sunshine::UUID uuid);

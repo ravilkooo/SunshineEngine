@@ -8,6 +8,7 @@ WorldEditor::WorldEditor()
 
 WorldEditor::~WorldEditor()
 {
+	physSystem->RemoveSimpleScene();
 }
 
 
@@ -101,6 +102,23 @@ void WorldEditor::InitWorldEditor(
 			DXSM::Vector3(0.0f, 0.0f, 0.1f), 0
 		})
 	);
+
+	// Floor
+	floorId = m_scene.AddGameObject(GameObjectFactory::CreateDefaultBoxObject(
+		m_renderer->GetDevice(), 100.0f, 0.1f, 100.0f)
+	);
+
+	m_scene.GetGameObjectByUUID(floorId)->GetComponent<TransformComponent>()->m_position.y = -5.0f;
+
+	// Ball
+
+	ballId = m_scene.AddGameObject(GameObjectFactory::CreateDefaultSphereObject(
+		m_renderer->GetDevice(), 0.5f)
+	);
+	m_scene.GetGameObjectByUUID(ballId)->GetComponent<TransformComponent>()->m_position.y = 2.0f;
+
+	physSystem = new PhysicsSystem();
+	physSystem->AddSimpleScene();
 }
 void WorldEditor::Run() {
 	
@@ -113,6 +131,13 @@ void WorldEditor::Update(float deltaTime) {
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.x += rayDirection.x * deltaTime * 10.0f;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.y += rayDirection.y * deltaTime * 10.0f;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.z += rayDirection.z * deltaTime * 10.0f;
+	physSystem->Step(deltaTime);
+	auto ballPos = physSystem->SpherePosition();
+
+	m_scene.GetGameObjectByUUID(ballId)->GetComponent<TransformComponent>()->m_position =
+	{ballPos.GetX(), ballPos.GetY(), ballPos.GetZ()};
+
+
 }
 
 void WorldEditor::Render() {

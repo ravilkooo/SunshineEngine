@@ -18,6 +18,8 @@
 #include <GameObjectFactory.h>
 #include <Scripting/LuaManager.h>
 
+#include <Physics/PhysicsSystem.h>
+
 
 class WorldEditor
 {
@@ -160,5 +162,11 @@ public:
     void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
 
     Sunshine::UUID ChooseObjectByClick(UINT x, UINT y);
+
+private:
+    PhysicsSystem* physSystem;
+    // testing
+    Sunshine::UUID floorId;
+    Sunshine::UUID ballId;
 };
 
