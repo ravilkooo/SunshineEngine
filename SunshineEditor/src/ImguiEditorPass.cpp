@@ -79,10 +79,20 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	// Main Menu Bar
+	m_MainMenuBarPanel.OnImGuiRender();
+
+	// Toolbar
+	m_ToolbarPanel.OnImGuiRender(m_MainMenuBarPanel.GetHeight());
+
+	float menuHeight = m_MainMenuBarPanel.GetHeight();
+	float toolbarHeight = m_ToolbarPanel.getHeight();
+	float topOffset = menuHeight + toolbarHeight;
+
 	// Create DockSpace above main viewport
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + topOffset));
+	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - topOffset));
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 	// ----- Docking -------
@@ -121,7 +131,7 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	}
 
 	ImGui::End();
-
+	
 	ImGui::Begin("Scene Hierarchy");
 	ShowSceneHierarchy();  // Scene Hierarchy
 	ImGui::End();
