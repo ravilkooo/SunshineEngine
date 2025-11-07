@@ -1,0 +1,63 @@
+#ifndef RENDERER_H
+#define RENDERER_H
+
+
+#include <d3d11.h>
+#include <wrl.h>    
+#include <directxmath.h>
+#include "RenderingSystem.h"
+
+#include "Graphics/Renderer/Pass/RenderPass.h"
+
+#include "GBuffer.h"
+#include <Scene.h>
+
+#include <chrono>
+
+/*
+RenderPass (Color, Shadow,..)
+
+
+
+1. PerFrameBindable
+2. PerObjectBindable
+2.1. Base (VertexBuufer, IndexBuffer, ...)
+2.2. Specific for current render pass
+
+RenderPass -?- Drawable
+
+Drawable has Bindables for each RenderPass (Technique)
+
+Drawable {}
+map<string, Technique*> techniñs;
+
+RenderPass {}
+string tag;
+
+void Pass() {}
+BindPerFrame();
+for every Drawable obj:
+    obj.BindBase();
+    obj.BindTecnique(RenderPass.GetTag());
+    obj.Draw();
+
+*/
+
+namespace SE_G {
+    class ForwardRenderer : public RenderingSystem
+    {
+        friend class Bindable;
+    public:
+        ForwardRenderer();
+        ForwardRenderer(HWND hWnd, UINT screenWidth, UINT screenHeight);
+        ~ForwardRenderer();
+
+        void RenderScene(const Scene& scene);
+
+        void AddPass(eastl::shared_ptr<RenderPass> pass) override;
+
+        void SetMainCamera(eastl::shared_ptr<Camera> camera);
+        eastl::shared_ptr<Camera> GetMainCamera();
+    };
+}
+#endif // RENDERER_H

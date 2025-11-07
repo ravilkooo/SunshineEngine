@@ -27,6 +27,21 @@ set_target_properties(SunshineEngine PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
+# ---------- Graphics ----------
+
+# Link to system DirectX libraries
+target_link_libraries(SunshineEngine PUBLIC
+    d3d11
+    dxgi
+    d3dcompiler
+    dxguid
+)
+
+# DirectXTK integration
+target_link_libraries(SunshineEngine PUBLIC DirectXTK)
+
+# ---------- Other Libs ----------
+
 # target_compile_definitions(SunshineEngine PUBLIC EASTL_USER_DEFINED_ALLOCATOR=1)
 
 # Define ENGINE_EXPORTS when compiling Engine itself
@@ -37,7 +52,6 @@ target_include_directories(SunshineEngine PUBLIC "${SE_INCLUDE_DIR}")
 
 target_link_libraries(SunshineEngine
     PUBLIC
-        SunshineGraphics
         assimp
         ViennaGameJobSystem
         imgui
@@ -78,7 +92,7 @@ target_compile_definitions(SunshineEngine PUBLIC ENGINE_ASSETS_DIR=L"${CMAKE_CUR
 file(GLOB_RECURSE SHADERS "Assets/Shaders/*.hlsl")
 
 # Add shaders to the project so they appear in VS
-source_group("Assets\\Shaders" FILES ${SHADERS})
+# source_group("Assets\\Shaders" FILES ${SHADERS})
 
 # Add shaders as "sources" just for IDE visibility, not for compilation
 set_property(SOURCE ${SHADERS} PROPERTY HEADER_FILE_ONLY TRUE)
@@ -92,7 +106,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SHADERS})
 file(GLOB_RECURSE SCRIPTS "Assets/Scripts/*.lua")
 
 # Add scripts to the project so they appear in VS
-source_group("Assets\\Scripts" FILES ${SCRIPTS})
+# source_group("Assets\\Scripts" FILES ${SCRIPTS})
 
 # Add scripts as "sources" just for IDE visibility, not for compilation
 set_property(SOURCE ${SCRIPTS} PROPERTY HEADER_FILE_ONLY TRUE)

@@ -8,7 +8,7 @@ TransformComponent::TransformComponent(ID3D11Device* device) {
 
 void TransformComponent::SetupBuffer(ID3D11Device* device)
 {
-    transformBuffer = new Bind::TransformCBuffer(device, this, 0u);
+    transformBuffer = new SE_G::Bind::TransformCBuffer(device, this, 0u);
 }
 
 void TransformComponent::BindToGraphicsPipeline(ID3D11DeviceContext* context) {

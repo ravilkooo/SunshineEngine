@@ -9,10 +9,10 @@
 
 #include <sol_ImGui.h>
 
-#include <Graphics/DeferredRenderer.h>
-#include <Graphics/GPass.h>
-#include <Graphics/LightPass.h>
-#include <Graphics/MainColorPass.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/FinalPass.h>
 
 #include <GameObjectFactory.h>
 

@@ -15,14 +15,14 @@
 #include <sol_ImGui.h>
 
 // SunshineLibs
-#include <Graphics/RenderingSystem.h>
+#include <Graphics/Renderer/RenderingSystem.h>
 #include <Windows/WindowsApp.h>
 #include <GameTimer.h>
 #include <Project.h>
-#include <ResourceManager.h>
+//#include <ResourceManager.h>
 #include <WorldEditor.h>
 #include <Game.h>
-#include <Graphics/RenderPass.h>
+#include <Graphics/Renderer/Pass/RenderPass.h>
 #include <ImguiEditorPass.h>
 
 
@@ -56,7 +56,7 @@ public:
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
 
-    eastl::shared_ptr<DeferredRenderer> m_renderer;
+    eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;
     eastl::unique_ptr<Project> m_openedProject;

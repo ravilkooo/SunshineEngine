@@ -6,8 +6,8 @@
 #include <EASTL/map.h>
 #include <EASTL/unique_ptr.h>
 
-#include <Graphics/RenderTechnique.h>
-#include <Bindable/Bindable.h>
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
+#include <Graphics/Bindable/Bindable.h>
 
 #include "Component.h"
 
@@ -28,7 +28,7 @@ public:
 
     void PassTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 
-    eastl::map<eastl::string, eastl::unique_ptr<RenderTechnique>> techniques;
+    eastl::map<eastl::string, eastl::unique_ptr<SE_G::RenderTechnique>> techniques;
 
     const std::type_info& getType() const override {
         return typeid(RenderComponent);

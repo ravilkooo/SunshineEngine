@@ -5,16 +5,15 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
-// SunshineLibs
-#include <Graphics/DeferredRenderer.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <GameObject.h>
 #include <GameTimer.h>
 
-#include <Graphics/GPass.h>
-#include <Graphics/LightPass.h>
-#include <Graphics/SelectionPass.h>
-#include <Graphics/IconPass.h>
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
+#include <Graphics/Renderer/Pass/IconPass.h>
 
 #include <GameObjectFactory.h>
 #include <Scripting/LuaManager.h>
@@ -126,7 +125,7 @@ public:
     ~WorldEditor();
 
     void InitWorldEditor(
-        eastl::shared_ptr<DeferredRenderer> renderer,
+        eastl::shared_ptr<SE_G::DeferredRenderer> renderer,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
     void Run();
@@ -136,7 +135,7 @@ public:
 
     GameTimer m_timer;
     Scene m_scene;
-    eastl::shared_ptr<DeferredRenderer> m_renderer;
+    eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
     LuaManager m_luaManager;
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
@@ -147,10 +146,10 @@ public:
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
-    eastl::shared_ptr<GPass> m_gPass;
-    eastl::shared_ptr<LightPass> m_lightPass;
-    eastl::shared_ptr<SelectionPass> m_selectionPass;
-    eastl::shared_ptr<IconPass> m_iconPass;
+    eastl::shared_ptr<SE_G::GPass> m_gPass;
+    eastl::shared_ptr<SE_G::LightPass> m_lightPass;
+    eastl::shared_ptr<SE_G::SelectionPass> m_selectionPass;
+    eastl::shared_ptr<SE_G::IconPass> m_iconPass;
 
     float m_deltaTime = 0.0f;
 
