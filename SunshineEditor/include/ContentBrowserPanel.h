@@ -51,10 +51,10 @@ private:
     
     std::filesystem::path MakeUniquePath(const std::filesystem::path& dst);
     
-    std::string OpenFileDialog();
-    std::string SaveFileDialog(const char* filter, int filterIndex);
+    std::filesystem::path OpenFileDialog();
+    std::filesystem::path SaveFileDialog(const wchar_t* filter, int filterIndex);
     
-    std::pair<const char* , int> BuildFilterForType(const std::string& extension);
+    std::pair<const wchar_t* , int> BuildFilterForType(const std::string& extension);
 
     // UI actions
     void Action_CreateFolder();

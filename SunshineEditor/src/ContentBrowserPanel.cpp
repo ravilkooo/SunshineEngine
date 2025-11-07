@@ -18,6 +18,22 @@ ContentBrowserPanel::ContentBrowserPanel()
     : m_CurrentDirectory(s_AssetsDirectory)
 {}
 
+inline std::wstring UTF8ToWString(const std::string& str)
+{
+    if (str.empty()) return {};
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), nullptr, 0);
+    std::wstring wstr(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), (int)str.size(), wstr.data(), size_needed);
+    return wstr;
+}
+
+inline std::string WStringToUTF8(const std::wstring& wstr)
+{
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    std::string str(size_needed - 1, 0);
+    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, str.data(), size_needed, nullptr, nullptr);
+    return str;
+}
 
 bool ContentBrowserPanel::FileCopy(const std::filesystem::path& src, const std::filesystem::path& dst)
 {
@@ -81,15 +97,15 @@ bool ContentBrowserPanel::CopyPathToClipboardSystem(const std::string& text)
     return true;
 }
 
-std::string ContentBrowserPanel::OpenFileDialog()
+std::filesystem::path ContentBrowserPanel::OpenFileDialog()
 {
-    OPENFILENAMEA ofn;       
-    CHAR szFile[260] = { 0 };
+    OPENFILENAMEW ofn;       
+    wchar_t szFile[260] = { 0 };
     ZeroMemory(&ofn, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = NULL;
     ofn.lpstrFile = szFile;
-    ofn.nMaxFile = sizeof(szFile);
+    ofn.nMaxFile = _countof(szFile);
     ofn.lpstrFilter = FileCategories::GetAllFilter();
     ofn.nFilterIndex = 1;
     ofn.lpstrFileTitle = NULL;
@@ -97,33 +113,33 @@ std::string ContentBrowserPanel::OpenFileDialog()
     ofn.lpstrInitialDir = NULL;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    if (GetOpenFileNameA(&ofn))
-        return std::string(ofn.lpstrFile);
+    if (GetOpenFileNameW(&ofn))
+        return std::filesystem::u8path(WStringToUTF8(szFile));
     return {};
 }
 
-std::string ContentBrowserPanel::SaveFileDialog(const char* filter, int filterIndex)
+std::filesystem::path ContentBrowserPanel::SaveFileDialog(const wchar_t* filter, int filterIndex)
 {
-    OPENFILENAMEA ofn;
-    CHAR szFile[260] = { 0 };
+    OPENFILENAMEW ofn;
+    wchar_t szFile[260] = { 0 };
     ZeroMemory(&ofn, sizeof(ofn));
 
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = NULL;
     ofn.lpstrFile = szFile;
-    ofn.nMaxFile = sizeof(szFile);
+    ofn.nMaxFile = _countof(szFile);
     ofn.lpstrFilter = filter;
     ofn.lpstrInitialDir = NULL;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
     ofn.nFilterIndex = filterIndex;
 
-    if (GetSaveFileNameA(&ofn))
-        return std::string(ofn.lpstrFile);
+    if (GetSaveFileNameW(&ofn))
+        return std::filesystem::u8path(WStringToUTF8(szFile));
 
     return {};
 }
 
-std::pair<const char* , int> ContentBrowserPanel::BuildFilterForType(const std::string& extension)
+std::pair<const wchar_t* , int> ContentBrowserPanel::BuildFilterForType(const std::string& extension)
 {
     std::string lowerExt = extension;
     std::transform(lowerExt.begin(), lowerExt.end(), lowerExt.begin(), ::tolower);
@@ -140,7 +156,7 @@ std::pair<const char* , int> ContentBrowserPanel::BuildFilterForType(const std::
         }
     }
 
-    return { "All Files (*.*)\0*.*\0\0", 1 };
+    return { L"All Files (*.*)\0*.*\0\0", 1 };
 }
 
 
@@ -164,9 +180,12 @@ void ContentBrowserPanel::Action_Rename(const std::filesystem::path& p)
 {
     // Open rename popup and prefill buffer with filename
     m_ShowRenamePopup = true;
-    std::string filename = p.filename().string();
+    std::string filename = WStringToUTF8(p.filename().wstring());
+    //std::string filename = p.filename().u8string();
+    
     strncpy(m_RenameBuffer, filename.c_str(), sizeof(m_RenameBuffer)-1);
     m_RenameBuffer[sizeof(m_RenameBuffer)-1] = '\0';
+    
     m_SelectedPath = p;
 }
 
@@ -220,16 +239,14 @@ void ContentBrowserPanel::Action_Duplicate(const std::filesystem::path& p)
 
 void ContentBrowserPanel::Action_Import()
 {
-    std::string selectedFile = OpenFileDialog();
+    auto selectedFile = OpenFileDialog();
     if (!selectedFile.empty())
     {
-        auto src = std::filesystem::path(selectedFile);
-        std::filesystem::path dst = m_CurrentDirectory / src.filename();
+        std::filesystem::path dst = m_CurrentDirectory / selectedFile.filename();
         
         dst = MakeUniquePath(dst);
-        FileCopy(src, dst);
+        FileCopy(selectedFile, dst);
     }
-        
 }
 
 void ContentBrowserPanel::Action_Export(const std::filesystem::path& p)
@@ -238,7 +255,7 @@ void ContentBrowserPanel::Action_Export(const std::filesystem::path& p)
     
     auto [filter, index] = BuildFilterForType(ext);
     
-    std::string dstPath = SaveFileDialog(filter, index);
+    auto dstPath = SaveFileDialog(filter, index);
     if (!dstPath.empty())
     {
         if (std::filesystem::path(dstPath).extension().empty())
@@ -273,11 +290,14 @@ void ContentBrowserPanel::DrawToolbar()
     }
     ImGui::SameLine();
     ImGui::InputTextWithHint("##search", "Search...", m_SearchBuffer, sizeof(m_SearchBuffer));
+
+
 }
 
 void ContentBrowserPanel::ShowContextMenuFor(const std::filesystem::path& path)
 {
-    if (ImGui::BeginPopupContextItem(("context_" + path.string()).c_str()))
+    // if (ImGui::BeginPopupContextItem(("context_" + path.string()).c_str()))
+    if (ImGui::BeginPopupContextItem(("context_" + WStringToUTF8(path.filename().wstring())).c_str()))
     {
         if (ImGui::MenuItem("Copy")) { Action_Copy(path, false); }
         if (ImGui::MenuItem("Cut")) { Action_Copy(path, true); }
@@ -309,7 +329,8 @@ void ContentBrowserPanel::DrawItems()
     for (auto& directoryEntry : entries)
     {
         auto& path = directoryEntry.path();
-        auto filename = path.filename().string();
+        // auto filename = path.filename().string();
+        auto filename = WStringToUTF8(path.filename().wstring());
 
         // Search filter
         std::string filter(m_SearchBuffer);
@@ -374,7 +395,8 @@ void ContentBrowserPanel::OnImGuiRender()
         }
         ImGui::SameLine();
     }
-    ImGui::Text("%s", std::filesystem::relative(m_CurrentDirectory, s_AssetsDirectory.parent_path()).string().c_str());
+    // ImGui::Text("%s", std::filesystem::relative(m_CurrentDirectory, s_AssetsDirectory.parent_path()).string().c_str());
+    ImGui::Text("%s", WStringToUTF8(std::filesystem::relative(m_CurrentDirectory, s_AssetsDirectory.parent_path()).wstring()).c_str());
 
     // Toolbar
     DrawToolbar();
@@ -392,11 +414,13 @@ void ContentBrowserPanel::OnImGuiRender()
             ImGui::InputText("##rename", m_RenameBuffer, sizeof(m_RenameBuffer));
             if (ImGui::Button("OK"))
             {
-                std::string newName(m_RenameBuffer);
+                // std::string newName(m_RenameBuffer);
                 auto oldPath = *m_SelectedPath;
-                auto newPath = oldPath.parent_path() / newName;
+                // auto newPath = oldPath.parent_path() / std::filesystem::u8path(m_RenameBuffer);
+                auto newPath = oldPath.parent_path() / UTF8ToWString(m_RenameBuffer);
                 newPath = MakeUniquePath(newPath);
                 FileMove(oldPath, newPath);
+                
                 m_ShowRenamePopup = false;
                 ImGui::CloseCurrentPopup();
             }
@@ -416,7 +440,9 @@ void ContentBrowserPanel::OnImGuiRender()
         ImGui::OpenPopup("Delete?");
         if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::Text("Delete %s ?", m_SelectedPath->filename().string().c_str());
+            // ImGui::Text("Delete %s ?", m_SelectedPath->filename().string().c_str());
+            ImGui::Text("Delete %s ?", WStringToUTF8(m_SelectedPath->filename().wstring()).c_str());
+
             if (ImGui::Button("Yes"))
             {
                 FileDelete(*m_SelectedPath);
@@ -432,7 +458,7 @@ void ContentBrowserPanel::OnImGuiRender()
             ImGui::EndPopup();
         }
     }
-
+    
     //ImGui::End();
 }
 

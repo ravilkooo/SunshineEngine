@@ -54,6 +54,14 @@ ImguiEditorPass::ImguiEditorPass(
 	m_viewport.MaxDepth = 1.0f;
 
 	selectedUUID = Sunshine::UUID(0u);
+
+	// Change font to Arial to support Russian
+	ImGuiIO& io = ImGui::GetIO();
+	ImFont* fontArial = io.Fonts->AddFontFromFileTTF("..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf", 13.0f);
+	io.FontDefault = fontArial;
+	ImGui_ImplDX11_InvalidateDeviceObjects();
+	ImGui_ImplDX11_CreateDeviceObjects();
+
 }
 
 void ImguiEditorPass::StartFrame()
@@ -124,7 +132,7 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ImGui::End();
 
 	ImGui::Begin("Content Browser");
-	m_ContentBrowserPanel.OnImGuiRender();
+	ShowContentBrowser();
 	ImGui::End();
 
 	// Main Game Viewport
@@ -252,6 +260,11 @@ void ImguiEditorPass::ShowSceneHierarchy()
 		}
 		ImGui::TreePop();
 	}
+}
+
+void ImguiEditorPass::ShowContentBrowser()
+{
+	m_ContentBrowserPanel.OnImGuiRender();
 }
 
 void ImguiEditorPass::ShowProperties()

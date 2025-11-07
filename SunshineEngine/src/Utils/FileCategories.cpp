@@ -2,16 +2,16 @@
 
 // --- FILE FILTER STRINGS ---
 
-static const char MODEL_FILTER[] =
-    "3D Models (*.fbx;*.obj;*.abc;*.usd)\0*.fbx;*.obj;*.abc;*.usd\0"
+static const wchar_t MODEL_FILTER[] =
+    L"3D Models (*.fbx;*.obj;*.abc;*.usd)\0*.fbx;*.obj;*.abc;*.usd\0"
     "FBX (*.fbx)\0*.fbx\0"
     "OBJ (*.obj)\0*.obj\0"
     "ABC (*.abc)\0*.abc\0"
     "USD (*.usd)\0*.usd\0"
     "All Files (*.*)\0*.*\0\0";
 
-static const char TEXTURE_FILTER[] =
-    "Textures (*.jpg;*.jpeg;*.png;*.tga;*.bmp;*.psd;*.dds;*.tiff;*.gif;*.hdr)\0*.jpg;*.jpeg;*.png;*.tga;*.bmp;*.psd;*.dds;*.tiff;*.gif;*.hdr\0"
+static const wchar_t TEXTURE_FILTER[] =
+    L"Textures (*.jpg;*.jpeg;*.png;*.tga;*.bmp;*.psd;*.dds;*.tiff;*.gif;*.hdr)\0*.jpg;*.jpeg;*.png;*.tga;*.bmp;*.psd;*.dds;*.tiff;*.gif;*.hdr\0"
     "JPG (*.jpg)\0*.jpg\0"
     "JPEG (*.jpeg)\0*.jpeg\0"
     "PNG (*.png)\0*.png\0"
@@ -24,25 +24,25 @@ static const char TEXTURE_FILTER[] =
     "HDR (*.hdr)\0*.hdr\0"
     "All Files (*.*)\0*.*\0\0";
 
-static const char AUDIO_FILTER[] =
-    "Audio (*.wav;*.mp3;*.ogg)\0*.wav;*.mp3;*.ogg\0"
+static const wchar_t AUDIO_FILTER[] =
+    L"Audio (*.wav;*.mp3;*.ogg)\0*.wav;*.mp3;*.ogg\0"
     "WAV (*.wav)\0*.wav\0"
     "MP3 (*.mp3)\0*.mp3\0"
     "OGG (*.ogg)\0*.ogg\0"
     "All Files (*.*)\0*.*\0\0";
 
-static const char FONT_FILTER[] =
-    "Fonts (*.ttf;*.otf)\0*.ttf;*.otf\0"
+static const wchar_t FONT_FILTER[] =
+    L"Fonts (*.ttf;*.otf)\0*.ttf;*.otf\0"
     "TTF (*.ttf)\0*.ttf\0"
     "OTF (*.otf)\0*.otf\0"
     "All Files (*.*)\0*.*\0\0";
 
-static const char SCRIPT_FILTER[] =
-    "Scripts (*.lua)\0*.lua\0"
+static const wchar_t SCRIPT_FILTER[] =
+    L"Scripts (*.lua)\0*.lua\0"
     "All Files (*.*)\0*.*\0\0";
 
-static const char SHADER_FILTER[] =
-    "Shaders (*.hlsl;*.glsl;*.vert;*.frag;*.shader)\0*.hlsl;*.glsl;*.vert;*.frag;*.shader\0"
+static const wchar_t SHADER_FILTER[] =
+    L"Shaders (*.hlsl;*.glsl;*.vert;*.frag;*.shader)\0*.hlsl;*.glsl;*.vert;*.frag;*.shader\0"
     "HLSL (*.hlsl)\0*.hlsl\0"
     "GLSL (*.glsl)\0*.glsl\0"
     "VERT (*.vert)\0*.vert\0"
@@ -50,8 +50,8 @@ static const char SHADER_FILTER[] =
     "SHADER (*.shader)\0*.shader\0"
     "All Files (*.*)\0*.*\0\0";
 
-static const char ALL_FILTER[] =
-    "All Supported Files (*.fbx;*.obj;*.abc;*.usd;"
+static const wchar_t ALL_FILTER[] =
+    L"All Supported Files (*.fbx;*.obj;*.abc;*.usd;"
     "*.jpg;*.jpeg;*.png;*.tga;*.bmp;*.psd;*.dds;*.tiff;*.gif;*.hdr;"
     "*.wav;*.mp3;*.ogg;"
     "*.ttf;*.otf;"
@@ -88,7 +88,7 @@ const std::vector<FileCategory>& FileCategories::Get()
     return categories;
 }
 
-const char* FileCategories::GetAllFilter()
+const wchar_t* FileCategories::GetAllFilter()
 {
     return ALL_FILTER;
 }
