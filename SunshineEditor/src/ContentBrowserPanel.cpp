@@ -90,7 +90,7 @@ std::string ContentBrowserPanel::OpenFileDialog()
     ofn.hwndOwner = NULL;
     ofn.lpstrFile = szFile;
     ofn.nMaxFile = sizeof(szFile);
-    ofn.lpstrFilter = filter;
+    ofn.lpstrFilter = FileCategories::GetAllFilter();
     ofn.nFilterIndex = 1;
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;
@@ -102,25 +102,47 @@ std::string ContentBrowserPanel::OpenFileDialog()
     return {};
 }
 
-std::string ContentBrowserPanel::SaveFileDialog()
+std::string ContentBrowserPanel::SaveFileDialog(const char* filter, int filterIndex)
 {
     OPENFILENAMEA ofn;
     CHAR szFile[260] = { 0 };
     ZeroMemory(&ofn, sizeof(ofn));
+
     ofn.lStructSize = sizeof(ofn);
     ofn.hwndOwner = NULL;
     ofn.lpstrFile = szFile;
     ofn.nMaxFile = sizeof(szFile);
     ofn.lpstrFilter = filter;
-    ofn.nFilterIndex = 1;
     ofn.lpstrInitialDir = NULL;
-
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+    ofn.nFilterIndex = filterIndex;
 
     if (GetSaveFileNameA(&ofn))
         return std::string(ofn.lpstrFile);
+
     return {};
 }
+
+std::pair<const char* , int> ContentBrowserPanel::BuildFilterForType(const std::string& extension)
+{
+    std::string lowerExt = extension;
+    std::transform(lowerExt.begin(), lowerExt.end(), lowerExt.begin(), ::tolower);
+
+    const auto& categories = FileCategories::Get();
+
+    for (const auto& cat : categories)
+    {
+        auto it = std::find(cat.patterns.begin(), cat.patterns.end(), lowerExt);
+        if (it != cat.patterns.end())
+        {
+            int index = static_cast<int>(std::distance(cat.patterns.begin(), it)) + 2;
+            return { cat.filter, index };
+        }
+    }
+
+    return { "All Files (*.*)\0*.*\0\0", 1 };
+}
+
 
 // ---------------- UI Actions ----------------
 
@@ -210,25 +232,23 @@ void ContentBrowserPanel::Action_Import()
         
 }
 
-void ContentBrowserPanel::Action_Export()
+void ContentBrowserPanel::Action_Export(const std::filesystem::path& p)
 {
-    if (m_SelectedPath.has_value())
+    std::string ext = p.extension().string();
+    
+    auto [filter, index] = BuildFilterForType(ext);
+    
+    std::string dstPath = SaveFileDialog(filter, index);
+    if (!dstPath.empty())
     {
-        std::string savePath = SaveFileDialog();
-        if (!savePath.empty())
-        {
-            auto src = *m_SelectedPath;
-            auto dst = std::filesystem::path(savePath);
-            
-            if (dst.extension().empty())
-                dst.replace_extension(src.extension());
-            
-            std::filesystem::path target = dst;
-            if (std::filesystem::is_directory(dst))
-                target = dst / src.filename();
-            target = MakeUniquePath(target);
-            FileCopy(src, target);
-        }
+        if (std::filesystem::path(dstPath).extension().empty())
+            dstPath += ext;
+    
+        std::filesystem::path target = dstPath;
+        if (std::filesystem::is_directory(dstPath))
+            target = dstPath / p.filename();
+        target = MakeUniquePath(target);
+        FileCopy(p, target);
     }
 }
 
@@ -266,7 +286,7 @@ void ContentBrowserPanel::ShowContextMenuFor(const std::filesystem::path& path)
         if (ImGui::MenuItem("Rename")) { Action_Rename(path); }
         if (ImGui::MenuItem("Delete")) { Action_Delete(path); }
         if (ImGui::MenuItem("Copy Path")) { CopyPathToClipboardSystem(path.string()); }
-        if (ImGui::MenuItem("Export...")) { Action_Export(); }
+        if (ImGui::MenuItem("Export...")) { Action_Export(path); }
         ImGui::EndPopup();
     }
 }
