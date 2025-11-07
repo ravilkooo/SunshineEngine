@@ -26,11 +26,27 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
     float buttonHeight = ImGui::GetFrameHeight(); 
     ImGui::SetCursorPosY((windowHeight - buttonHeight) / 2.0f);
 
-    if (ImGui::Button("Play")) { std::cout << "Play\n"; }
-    ImGui::SameLine();
-    if (ImGui::Button("Pause")) { std::cout << "Pause\n"; }
-    ImGui::SameLine();
-    if (ImGui::Button("Stop")) { std::cout << "Stop\n"; }
+    if (!isPlaying)
+    {
+        if (ImGui::Button("Play"))
+        {
+            isPlaying = true; 
+            std::cout << "Play\n";
+        }
+    }
+    else
+    {
+        if (ImGui::Button("Pause"))
+        {
+            std::cout << "Pause\n";
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Stop"))
+        {
+            isPlaying = false; 
+            std::cout << "Stop\n";
+        }
+    }
 
     ImGui::End();
     ImGui::PopStyleVar(3);
