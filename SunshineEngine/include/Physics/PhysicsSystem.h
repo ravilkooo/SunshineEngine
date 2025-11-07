@@ -274,7 +274,7 @@ public:
         // Output current position and velocity of the sphere
         JPH::RVec3 position = bodyInterface->GetCenterOfMassPosition(sphere_id);
         JPH::Vec3 velocity = bodyInterface->GetLinearVelocity(sphere_id);
-        std::cout << " :: Position = (" << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "), Velocity = (" << velocity.GetX() << ", " << velocity.GetY() << ", " << velocity.GetZ() << ")" << std::endl;
+        //std::cout << " :: Position = (" << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "), Velocity = (" << velocity.GetX() << ", " << velocity.GetY() << ", " << velocity.GetZ() << ")" << std::endl;
 
         physicsSystem->Update(
             dt, /*collisionSteps*/1,
