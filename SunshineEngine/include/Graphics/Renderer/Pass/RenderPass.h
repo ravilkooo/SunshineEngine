@@ -25,6 +25,9 @@ namespace SE_G {
 
 		ID3D11Device* GetDevice();
 		ID3D11DeviceContext* GetDeviceContext();
+		bool IsEnabled();
+		void Disable();
+		void Enable();
 
 	protected:
 		eastl::string techniqueTag;
@@ -32,5 +35,8 @@ namespace SE_G {
 
 		Microsoft::WRL::ComPtr<ID3D11Device> device;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
+
+	private:
+		bool m_enabled = true;
 	};
 }
