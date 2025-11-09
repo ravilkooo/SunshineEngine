@@ -1,14 +1,11 @@
 #include "UI/ToolBarPanel.h"
 
-#include <iostream>
-#include <ostream>
-
 void ToolbarPanel::OnImGuiRender(float menuBarHeight)
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + menuBarHeight));
-    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, m_ToolbarHeight));
+    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, m_Height));
     ImGui::SetNextWindowViewport(viewport->ID);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -31,20 +28,20 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
         if (ImGui::Button("Play"))
         {
             isPlaying = true; 
-            std::cout << "Play\n";
+            LogManager::Get().AddLog(LogManager::LogTarget::Game, LogManager::LogType::Info, "Game started");
         }
     }
     else
     {
         if (ImGui::Button("Pause"))
         {
-            std::cout << "Pause\n";
+            LogManager::Get().AddLog(LogManager::LogTarget::Game, LogManager::LogType::Info, "Game paused");
         }
         ImGui::SameLine();
         if (ImGui::Button("Stop"))
         {
             isPlaying = false; 
-            std::cout << "Stop\n";
+            LogManager::Get().AddLog(LogManager::LogTarget::Game, LogManager::LogType::Info, "Game stopped");
         }
     }
 
@@ -52,12 +49,12 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
     ImGui::PopStyleVar(3);
 }
 
-float ToolbarPanel::getHeight()
+float ToolbarPanel::GetHeight()
 {
-    return m_ToolbarHeight;
+    return m_Height;
 }
 
-void ToolbarPanel::setHeight(float toolbarHeight)
+void ToolbarPanel::SetHeight(float toolbarHeight)
 {
-    m_ToolbarHeight = toolbarHeight;
+    m_Height = toolbarHeight;
 }

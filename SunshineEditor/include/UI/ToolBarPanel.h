@@ -1,15 +1,16 @@
 #pragma once
 #include <imgui.h>
+#include "LogManager.h"
 
 class ToolbarPanel
 {
 public:
     void OnImGuiRender(float menuBarHeight);
-    float getHeight();
-    void setHeight(float toolbarHeight);
+    float GetHeight();
+    void SetHeight(float toolbarHeight);
 
     bool isPlaying = false;
     
 private:
-    float m_ToolbarHeight = 25.0f;
+    float m_Height = 25.0f;
 };

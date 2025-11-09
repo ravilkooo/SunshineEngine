@@ -2,11 +2,11 @@
 
 void MainMenuBarPanel::OnImGuiRender()
 {
-    m_MainMenuHeight = 0.0f;
+    m_Height = 0.0f;
 
     if (ImGui::BeginMainMenuBar())
     {
-        m_MainMenuHeight = ImGui::GetWindowSize().y;
+        m_Height = ImGui::GetWindowSize().y;
 
         if (ImGui::BeginMenu("File"))
         {

@@ -84,15 +84,13 @@ void ImguiEditorPass::Pass(const Scene& scene)
 
 	// Toolbar
 	m_ToolbarPanel.OnImGuiRender(m_MainMenuBarPanel.GetHeight());
-
-	float menuHeight = m_MainMenuBarPanel.GetHeight();
-	float toolbarHeight = m_ToolbarPanel.getHeight();
-	float topOffset = menuHeight + toolbarHeight;
+	
+	float topOffset = m_MainMenuBarPanel.GetHeight() + m_ToolbarPanel.GetHeight();
 
 	// Create DockSpace above main viewport
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + topOffset));
-	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - topOffset));
+	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - topOffset - m_BottomPanel.GetHeight()));
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 	// ----- Docking -------
@@ -131,9 +129,10 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	}
 
 	ImGui::End();
-	
+
+	//Scene Hierarchy
 	ImGui::Begin("Scene Hierarchy");
-	ShowSceneHierarchy();  // Scene Hierarchy
+	ShowSceneHierarchy();
 	ImGui::End();
 
 	// Properties
@@ -141,9 +140,17 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ShowProperties();
 	ImGui::End();
 
+	// Content Browser
 	ImGui::Begin("Content Browser");
 	ShowContentBrowser();
 	ImGui::End();
+
+	// Bottom Bar Panel
+	ShowBottomPanel();
+
+	// Output Log 
+	ShowOutputLog();
+
 
 	// Main Game Viewport
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -298,6 +305,28 @@ void ImguiEditorPass::ShowProperties()
 	else 
 	{
 		LuaImgui(obj);
+	}
+}
+
+void ImguiEditorPass::ShowBottomPanel()
+{
+	m_BottomPanel.OnImGuiRender(&m_ShowEditorLogPanel, &m_ShowGameLogPanel);
+}
+
+void ImguiEditorPass::ShowOutputLog()
+{
+	m_EditorLogPanel.SetBottomOffset(m_BottomPanel.GetHeight());
+	
+	if (m_ShowEditorLogPanel)
+	{
+		m_EditorLogPanel.OnImguiRender(m_ShowEditorLogPanel);
+	}
+
+	m_GameLogPanel.SetBottomOffset(m_BottomPanel.GetHeight());
+	
+	if (m_ShowGameLogPanel)
+	{
+		m_GameLogPanel.OnImguiRender(m_ShowGameLogPanel);
 	}
 }
 	
