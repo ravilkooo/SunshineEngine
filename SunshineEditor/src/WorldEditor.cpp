@@ -120,6 +120,7 @@ void WorldEditor::InitWorldEditor(
 	physSystem = new PhysicsSystem();
 	physSystem->AddSimpleScene();
 }
+
 void WorldEditor::Run() {
 	
 }

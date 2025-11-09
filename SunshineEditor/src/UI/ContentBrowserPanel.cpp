@@ -1,4 +1,4 @@
-#include "ContentBrowserPanel.h"
+#include "UI/ContentBrowserPanel.h"
 #include <imgui.h>
 #include <iostream>
 #include <filesystem>
