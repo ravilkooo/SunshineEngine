@@ -3,6 +3,8 @@
 #include <iostream>
 #include <ostream>
 
+#include <EditorApp.h>
+
 void ToolbarPanel::OnImGuiRender(float menuBarHeight)
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -32,6 +34,8 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
         {
             isPlaying = true; 
             std::cout << "Play\n";
+            if (m_editorApp)
+                m_editorApp->LaunchGame();
         }
     }
     else
@@ -45,6 +49,8 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
         {
             isPlaying = false; 
             std::cout << "Stop\n";
+            if (m_editorApp)
+                m_editorApp->StopGame();
         }
     }
 
@@ -60,4 +66,9 @@ float ToolbarPanel::getHeight()
 void ToolbarPanel::setHeight(float toolbarHeight)
 {
     m_ToolbarHeight = toolbarHeight;
+}
+
+void ToolbarPanel::SetEditorApp(EditorApp* editorApp)
+{
+    m_editorApp = editorApp;
 }

@@ -54,4 +54,17 @@ namespace SE_G {
 	{
 		return context.Get();
 	}
+
+	bool RenderPass::IsEnabled() {
+		return m_enabled;
+	}
+
+	void RenderPass::Disable() {
+		m_enabled = false;
+	}
+
+	void RenderPass::Enable() {
+		m_enabled = true;
+	}
+
 }

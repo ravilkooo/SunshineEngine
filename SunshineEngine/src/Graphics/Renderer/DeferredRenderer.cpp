@@ -67,6 +67,8 @@ namespace SE_G {
 	{
 		// Passes
 		for (auto pass : passes) {
+			if (!pass->IsEnabled())
+				continue;
 			context->ClearState();
 			pass->StartFrame();
 			pass->Pass(scene);
