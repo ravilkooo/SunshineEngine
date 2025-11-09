@@ -14,6 +14,10 @@
 #include <Graphics/Renderer/Pass/RenderPass.h>
 #include <Graphics/Renderer/GBuffer.h>
 
+#include "UI/ContentBrowserPanel.h"
+#include "UI/MainMenuBarPanel.h"
+#include "UI/ToolbarPanel.h"
+
 class WorldEditor;
 
 class ImguiEditorPass :
@@ -51,6 +55,10 @@ public:
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDSV;
 
     eastl::shared_ptr<WorldEditor> m_worldEditor;
+    
+    ContentBrowserPanel m_ContentBrowserPanel;
+    MainMenuBarPanel m_MainMenuBarPanel;
+    ToolbarPanel m_ToolbarPanel;
 
     void PreResize();
     void OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Texture2D* backBuffer);

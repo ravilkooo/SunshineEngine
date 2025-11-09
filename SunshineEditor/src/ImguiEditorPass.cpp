@@ -54,6 +54,14 @@ ImguiEditorPass::ImguiEditorPass(
 	m_viewport.MaxDepth = 1.0f;
 
 	selectedUUID = Sunshine::UUID(0u);
+
+	// Change font to Arial to support Russian
+	ImGuiIO& io = ImGui::GetIO();
+	ImFont* fontArial = io.Fonts->AddFontFromFileTTF("..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf", 13.0f);
+	io.FontDefault = fontArial;
+	ImGui_ImplDX11_InvalidateDeviceObjects();
+	ImGui_ImplDX11_CreateDeviceObjects();
+
 }
 
 void ImguiEditorPass::StartFrame()
@@ -71,10 +79,20 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	// Main Menu Bar
+	m_MainMenuBarPanel.OnImGuiRender();
+
+	// Toolbar
+	m_ToolbarPanel.OnImGuiRender(m_MainMenuBarPanel.GetHeight());
+
+	float menuHeight = m_MainMenuBarPanel.GetHeight();
+	float toolbarHeight = m_ToolbarPanel.getHeight();
+	float topOffset = menuHeight + toolbarHeight;
+
 	// Create DockSpace above main viewport
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + topOffset));
+	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - topOffset));
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 	// ----- Docking -------
@@ -113,7 +131,7 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	}
 
 	ImGui::End();
-
+	
 	ImGui::Begin("Scene Hierarchy");
 	ShowSceneHierarchy();  // Scene Hierarchy
 	ImGui::End();
@@ -124,7 +142,7 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ImGui::End();
 
 	ImGui::Begin("Content Browser");
-	ShowContentBrowser();  // Content Browser
+	ShowContentBrowser();
 	ImGui::End();
 
 	// Main Game Viewport
@@ -221,7 +239,7 @@ void ImguiEditorPass::RenderGameWorld()
 {
 	ImVec2 avail = ImGui::GetContentRegionAvail();
 	ImGui::Image((ImTextureID)m_GBuffer->pLightSRV.Get(), avail);
-	// Здесь нужно отобразить ваше игровое содержимое, пока заглушка
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	//ImGui::Text("Game World Render Here");
 }
 
@@ -237,8 +255,8 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			ImGui::PushID((int)i);
 			bool isSelected = (selectedUUID == objects[i].m_UUID);
 
-			// выделяем если кликнули по списку и если мы не кликали по объектам на экране
-			// выделяем если кликнули по объекту
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
 			//m_worldEditor->m_scene.GetGameObjectByUUID(objects[i])->Name = objLabel;
@@ -256,8 +274,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 
 void ImguiEditorPass::ShowContentBrowser()
 {
-	ImGui::Text("Content Browser");
-	ImGui::Button("Import Asset");
+	m_ContentBrowserPanel.OnImGuiRender();
 }
 
 void ImguiEditorPass::ShowProperties()
