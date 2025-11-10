@@ -45,16 +45,21 @@ struct Ray
 class EditorApp : public WindowsApp
 {
 public:
+
     EditorApp();
     void InitEditorApp(UINT winWidth = 1600u, UINT winHeight = 800u);
     ~EditorApp();
 
-    void Run();
+    void RunEditor();
+    void RunGame();
 
-    void Update(float deltaTime);
+    void UpdateEditor(float deltaTime);
+    void UpdateGame(float deltaTime);
     void Render();
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
+    void LaunchGame();
+    void StopGame();
 
     eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
     
@@ -91,5 +96,12 @@ private:
 
     eastl::shared_ptr<ImguiEditorPass> imguiEditorPass;
     bool m_initialized = false;
+
+
+    enum class RuntimeMode {
+        GAME_MODE, WORLD_EDITOR_MODE
+    };
+
+    RuntimeMode m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
 };
 

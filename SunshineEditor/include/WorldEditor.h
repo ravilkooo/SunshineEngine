@@ -18,6 +18,8 @@
 #include <GameObjectFactory.h>
 #include <Scripting/LuaManager.h>
 
+#include <Physics/PhysicsSystem.h>
+
 
 class WorldEditor
 {
@@ -131,7 +133,9 @@ public:
     void Run();
 
     void Update(float deltaTime);
+    void SyncronizeTransforms();
     void Render();
+    void ClearScene();
 
     GameTimer m_timer;
     Scene m_scene;
@@ -160,5 +164,10 @@ public:
     void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
 
     Sunshine::UUID ChooseObjectByClick(UINT x, UINT y);
-};
 
+private:
+    eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
+    // testing
+    // Sunshine::UUID floorId;
+    // Sunshine::UUID ballId;
+};

@@ -1,6 +1,7 @@
 #pragma once
 #include "SunshineEngineAPI.h"
 #include <typeinfo>
+#include <EASTL/shared_ptr.h>
 
 // SUNSHINE_ENGINE_API
 class Component
@@ -16,4 +17,23 @@ public:
     Component& operator=(Component&&) noexcept = default;
 
     virtual const std::type_info& getType() const = 0;
+};
+
+class Component_Info
+{
+public:
+    Component_Info() = default;
+    virtual ~Component_Info() = default;
+
+    Component_Info(const Component_Info&) = delete;
+    Component_Info& operator=(const Component_Info&) = delete;
+
+    Component_Info(Component_Info&&) noexcept = default;
+    Component_Info& operator=(Component_Info&&) noexcept = default;
+
+    virtual const std::type_info& getType() const = 0;
+
+    virtual bool IsAssigned() = 0;
+
+    eastl::shared_ptr<Component> m_assignedComponent;
 };

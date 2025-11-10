@@ -11,7 +11,7 @@ class SUNSHINE_ENGINE_API TransformComponent :
     public Component
 {
 public:
-    TransformComponent() {};
+    TransformComponent() {};    
 
     TransformComponent(ID3D11Device* device);
 
@@ -66,7 +66,7 @@ public:
     DXSM::Vector3 m_localScaleFactor = { 1, 1, 1 };
 
     DXSM::Matrix localTransfrom = DXSM::Matrix::Identity;
-    
+
     const std::type_info& getType() const override {
         return typeid(TransformComponent);
     }
