@@ -143,8 +143,10 @@ void EditorApp::RunEditor()
 				accumulator -= physicsUpdateMs;
 			}
 		}
+		m_worldEditor->SyncronizeTransforms();
 		Render();
 	}
+	m_worldEditor->ClearScene();
 }
 
 void EditorApp::UpdateGame(float deltaTime) {

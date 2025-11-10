@@ -133,7 +133,9 @@ public:
     void Run();
 
     void Update(float deltaTime);
+    void SyncronizeTransforms();
     void Render();
+    void ClearScene();
 
     GameTimer m_timer;
     Scene m_scene;
@@ -164,9 +166,8 @@ public:
     Sunshine::UUID ChooseObjectByClick(UINT x, UINT y);
 
 private:
-    PhysicsSystem* physSystem;
+    eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
     // testing
-    Sunshine::UUID floorId;
-    Sunshine::UUID ballId;
+    // Sunshine::UUID floorId;
+    // Sunshine::UUID ballId;
 };
-

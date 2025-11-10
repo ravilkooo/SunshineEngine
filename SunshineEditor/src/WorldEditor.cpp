@@ -8,7 +8,7 @@ WorldEditor::WorldEditor()
 
 WorldEditor::~WorldEditor()
 {
-	physSystem->RemoveSimpleScene();
+	m_physicsSystem->ClearScene();
 }
 
 
@@ -53,6 +53,8 @@ void WorldEditor::InitWorldEditor(
 	m_pixelUUIDHandler = new PixelUUIDHandler();
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
 
+	m_physicsSystem = eastl::make_shared<PhysicsSystem>();
+
 	/*
 	TestObjects
 	*/
@@ -61,20 +63,68 @@ void WorldEditor::InitWorldEditor(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera())
 	);
-	m_scene.AddGameObject(GameObjectFactory::CreateDefaultBoxObject(
-		m_renderer->GetDevice())
-	);
+
+	{
+		Sunshine::UUID boxId = m_scene.AddGameObject(GameObjectFactory::CreateDefaultBoxObject(
+			m_renderer->GetDevice())
+		);
+
+		auto physicsComp = m_scene.GetGameObjectByUUID(boxId)->AddComponent<PhysicsComponent>();
+
+		physicsComp->SetObjecUUID(boxId);
+		physicsComp->SetObjectLayer(Layers::MOVING); // Example ObjectLayer
+		physicsComp->SetPosition(JPH::RVec3(0.0f, 0.0f, 0.0f));
+		auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(0.4f, 0.3f, 0.333f);
+		physicsComp->SetOrientation(JPH::Quat(quat.x, quat.y, quat.z, quat.w));
+		physicsComp->SetMotionType(JPH::EMotionType::Dynamic);
+		physicsComp->SetActivation(JPH::EActivation::Activate);
+
+		// Create a box shape for the physics body
+		JPH::BoxShapeSettings boxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
+		boxSettings.SetEmbedded();
+		JPH::ShapeRefC boxShape = boxSettings.Create().Get();
+
+		// Set the shape to the component
+		physicsComp->SetShape(boxShape);
+		
+		physicsComp->CreateBody(m_physicsSystem);
+	}
 
 	for (size_t i = 0; i < 6; i++)
 	{
-		m_scene.AddGameObject(GameObjectFactory::CreateDefaultSphereObject(
+		Sunshine::UUID ballId = m_scene.AddGameObject(GameObjectFactory::CreateDefaultSphereObject(
 			m_renderer->GetDevice())
 		);
 		auto obj = m_scene.GetGameObjectByUUID(m_scene.gameObjects.back());
 		auto tr = obj->GetComponent<TransformComponent>();
-		tr->m_localPosition = DXSM::Vector3(-3.0f, 0.0f, 0.0f);
-		tr->m_rotation.z = DX::XM_2PI * i / 6.0f;
+		tr->m_position = DXSM::Vector3(
+			3.0f * cos(DX::XM_2PI * i / 6.0f),
+			3.0f * sin(DX::XM_2PI * i / 6.0f),
+			0.0f);
 
+		auto physicsComp = m_scene.GetGameObjectByUUID(ballId)->AddComponent<PhysicsComponent>();
+
+		physicsComp->SetObjecUUID(ballId);
+		physicsComp->SetObjectLayer(Layers::MOVING); // Example ObjectLayer
+		physicsComp->SetPosition(JPH::RVec3(
+			3.0f * cos(DX::XM_2PI * i / 6.0f),
+			3.0f * sin(DX::XM_2PI * i / 6.0f),
+			0.0f));
+		physicsComp->SetOrientation(JPH::Quat::sIdentity());
+		physicsComp->SetMotionType(JPH::EMotionType::Dynamic);
+		physicsComp->SetActivation(JPH::EActivation::Activate);
+
+		// Create a box shape for the physics body
+		JPH::SphereShapeSettings settings(1.0f);
+		settings.SetEmbedded();
+		JPH::ShapeRefC sphereShape = settings.Create().Get();
+
+		// Set the shape to the component
+		physicsComp->SetShape(sphereShape);
+
+		physicsComp->CreateBody(m_physicsSystem);
+
+		tr->m_physicsComponent = physicsComp.get();
 	}
 
 	m_scene.AddGameObject(GameObjectFactory::CreateAmbientLightObject(
@@ -102,23 +152,71 @@ void WorldEditor::InitWorldEditor(
 			DXSM::Vector3(0.0f, 0.0f, 0.1f), 0
 		})
 	);
-
+	
+	// ----------------------------------------------------
 	// Floor
-	floorId = m_scene.AddGameObject(GameObjectFactory::CreateDefaultBoxObject(
-		m_renderer->GetDevice(), 100.0f, 0.1f, 100.0f)
-	);
+	{
+		Sunshine::UUID floorId = m_scene.AddGameObject(GameObjectFactory::CreateDefaultBoxObject(
+			m_renderer->GetDevice(), 100.0f, 0.1f, 100.0f)
+		);
+		auto physicsComp = m_scene.GetGameObjectByUUID(floorId)->AddComponent<PhysicsComponent>();
 
-	m_scene.GetGameObjectByUUID(floorId)->GetComponent<TransformComponent>()->m_position.y = -5.0f;
+		physicsComp->SetObjecUUID(floorId);
+		physicsComp->SetObjectLayer(Layers::NON_MOVING); // Example ObjectLayer
+		physicsComp->SetPosition(JPH::RVec3(0.0f, -5.0f, 0.0f));
+		physicsComp->SetOrientation(JPH::Quat::sIdentity());
+		physicsComp->SetMotionType(JPH::EMotionType::Static);
+		physicsComp->SetActivation(JPH::EActivation::DontActivate);
+
+		// Create a box shape for the physics body
+		JPH::BoxShapeSettings boxSettings(JPH::Vec3(50.0f, 0.05f, 50.0f));
+		boxSettings.SetEmbedded();
+		JPH::ShapeRefC boxShape = boxSettings.Create().Get();
+
+		// Set the shape to the component
+		physicsComp->SetShape(boxShape);
+
+		physicsComp->CreateBody(m_physicsSystem);
+
+		auto tr = m_scene.GetGameObjectByUUID(floorId)->GetComponent<TransformComponent>();
+		tr->m_physicsComponent = physicsComp.get();
+
+		tr->m_position.y = -5.0f;
+	}
+	// ----------------------------------------------------
 
 	// Ball
+	{
+		Sunshine::UUID ballId = m_scene.AddGameObject(GameObjectFactory::CreateDefaultSphereObject(
+			m_renderer->GetDevice(), 0.5f)
+		);
 
-	ballId = m_scene.AddGameObject(GameObjectFactory::CreateDefaultSphereObject(
-		m_renderer->GetDevice(), 0.5f)
-	);
-	m_scene.GetGameObjectByUUID(ballId)->GetComponent<TransformComponent>()->m_position.y = 2.0f;
+		auto physicsComp = m_scene.GetGameObjectByUUID(ballId)->AddComponent<PhysicsComponent>();
 
-	physSystem = new PhysicsSystem();
-	physSystem->AddSimpleScene();
+		physicsComp->SetObjecUUID(ballId);
+		physicsComp->SetObjectLayer(Layers::MOVING); // Example ObjectLayer
+		physicsComp->SetPosition(JPH::RVec3(0.0f, 2.0f, 0.0f));
+		physicsComp->SetOrientation(JPH::Quat::sIdentity());
+		physicsComp->SetMotionType(JPH::EMotionType::Dynamic);
+		physicsComp->SetActivation(JPH::EActivation::Activate);
+
+		// Create a box shape for the physics body
+		JPH::SphereShapeSettings settings(0.5f);
+		settings.SetEmbedded();
+		JPH::ShapeRefC sphereShape = settings.Create().Get();
+
+		// Set the shape to the component
+		physicsComp->SetShape(sphereShape);
+
+		physicsComp->CreateBody(m_physicsSystem);
+		
+		auto tr = m_scene.GetGameObjectByUUID(ballId)->GetComponent<TransformComponent>();
+		tr->m_physicsComponent = physicsComp.get();
+		tr->m_position.y = 2.0f;
+	}
+	// ----------------------------------------------------
+
+	m_physicsSystem->FinalizeScene();
 }
 
 void WorldEditor::Run() {
@@ -132,17 +230,26 @@ void WorldEditor::Update(float deltaTime) {
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.x += rayDirection.x * deltaTime * 10.0f;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.y += rayDirection.y * deltaTime * 10.0f;
 	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.z += rayDirection.z * deltaTime * 10.0f;
-	physSystem->Step(deltaTime);
+	m_physicsSystem->Step(deltaTime);
+	
+	/*
 	auto ballPos = physSystem->SpherePosition();
 
 	m_scene.GetGameObjectByUUID(ballId)->GetComponent<TransformComponent>()->m_position =
 	{ballPos.GetX(), ballPos.GetY(), ballPos.GetZ()};
+	*/
+}
 
-
+void WorldEditor::SyncronizeTransforms() {
+	m_physicsSystem->SyncronizeTransforms(&m_scene);
 }
 
 void WorldEditor::Render() {
 	
+}
+
+void WorldEditor::ClearScene() {
+	m_physicsSystem->ClearScene();
 }
 
 void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
