@@ -123,8 +123,6 @@ void WorldEditor::InitWorldEditor(
 		physicsComp->SetShape(sphereShape);
 
 		physicsComp->CreateBody(m_physicsSystem);
-
-		tr->m_physicsComponent = physicsComp.get();
 	}
 
 	m_scene.AddGameObject(GameObjectFactory::CreateAmbientLightObject(
@@ -179,7 +177,6 @@ void WorldEditor::InitWorldEditor(
 		physicsComp->CreateBody(m_physicsSystem);
 
 		auto tr = m_scene.GetGameObjectByUUID(floorId)->GetComponent<TransformComponent>();
-		tr->m_physicsComponent = physicsComp.get();
 
 		tr->m_position.y = -5.0f;
 	}
@@ -211,7 +208,6 @@ void WorldEditor::InitWorldEditor(
 		physicsComp->CreateBody(m_physicsSystem);
 		
 		auto tr = m_scene.GetGameObjectByUUID(ballId)->GetComponent<TransformComponent>();
-		tr->m_physicsComponent = physicsComp.get();
 		tr->m_position.y = 2.0f;
 	}
 	// ----------------------------------------------------
