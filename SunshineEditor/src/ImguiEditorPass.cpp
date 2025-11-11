@@ -4,6 +4,8 @@
 #include <EASTL/string.h>
 #include <Utils/DebugUtils.h>
 
+#include "assimp/SceneCombiner.h"
+
 ImguiEditorPass::ImguiEditorPass(
 	ID3D11Device* device,
 	ID3D11DeviceContext* context,
@@ -136,14 +138,10 @@ void ImguiEditorPass::Pass(const Scene& scene)
 	ImGui::End();
 
 	// Properties
-	ImGui::Begin("Properties");
 	ShowProperties();
-	ImGui::End();
 
 	// Content Browser
-	ImGui::Begin("Content Browser");
 	ShowContentBrowser();
-	ImGui::End();
 
 	// Bottom Bar Panel
 	ShowBottomPanel();
@@ -268,7 +266,11 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
 			//m_worldEditor->m_scene.GetGameObjectByUUID(objects[i])->Name = objLabel;
 
-			if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
+			eastl::string objName = m_worldEditor->m_scene.GetGameObjectByUUID(objects[i])->Name;
+			if (objName == "")
+				objName = std::to_string(objects[i].m_UUID).c_str();
+			// if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
+			if (ImGui::Selectable(objName.c_str(), isSelected))
 			{
 				selectedUUID = objects[i];
 				m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
@@ -286,26 +288,32 @@ void ImguiEditorPass::ShowContentBrowser()
 
 void ImguiEditorPass::ShowProperties()
 {
-	if (selectedUUID == Sunshine::UUID(0u))
-		return;
+	m_PropertyPanel.SetWorldEditor(m_worldEditor);
+	m_PropertyPanel.SetSelectedUUID(selectedUUID);
+	m_PropertyPanel.OnImGuiRender();
 
-	GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
-		selectedUUID
-	);
-
-	if (!obj->HasComponent<LuaComponent>())
-	{
-		if (ImGui::Button("Add Lua Script")) {
-			obj->AddComponent<LuaComponent>();
-			auto lua2 = obj->GetComponent<LuaComponent>();
-			lua2->Init(obj);
-		}
-		return;
-	}
-	else 
-	{
-		LuaImgui(obj);
-	}
+	//ImGui::Begin("Properties);
+	// if (selectedUUID == Sunshine::UUID(0u))
+	// 	return;
+	//
+	// GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
+	// 	selectedUUID
+	// );
+	//
+	// if (!obj->HasComponent<LuaComponent>())
+	// {
+	// 	if (ImGui::Button("Add Lua Script")) {
+	// 		obj->AddComponent<LuaComponent>();
+	// 		auto lua2 = obj->GetComponent<LuaComponent>();
+	// 		lua2->Init(obj);
+	// 	}
+	// 	return;
+	// }
+	// else 
+	// {
+	// 	LuaImgui(obj);
+	// }
+	//ImGui::End();
 }
 
 void ImguiEditorPass::ShowBottomPanel()

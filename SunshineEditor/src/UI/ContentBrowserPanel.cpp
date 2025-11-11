@@ -384,7 +384,7 @@ void ContentBrowserPanel::DrawItems()
 
 void ContentBrowserPanel::OnImGuiRender()
 {
-    //ImGui::Begin("Content Browser");
+    ImGui::Begin("Content Browser");
 
     // Up button
     if (m_CurrentDirectory != s_AssetsDirectory)
@@ -459,6 +459,6 @@ void ContentBrowserPanel::OnImGuiRender()
         }
     }
     
-    //ImGui::End();
+    ImGui::End();
 }
 

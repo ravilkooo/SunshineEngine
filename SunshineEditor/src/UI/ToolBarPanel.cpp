@@ -28,20 +28,20 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
         if (ImGui::Button("Play"))
         {
             isPlaying = true; 
-            LogManager::Get().AddLog(LogManager::LogTarget::Game, LogManager::LogType::Info, "Game started");
+            LOG_GAME_INFO("Game started");
         }
     }
     else
     {
         if (ImGui::Button("Pause"))
         {
-            LogManager::Get().AddLog(LogManager::LogTarget::Game, LogManager::LogType::Info, "Game paused");
+            LOG_GAME_INFO("Game paused");
         }
         ImGui::SameLine();
         if (ImGui::Button("Stop"))
         {
             isPlaying = false; 
-            LogManager::Get().AddLog(LogManager::LogTarget::Game, LogManager::LogType::Info, "Game stopped");
+            LOG_GAME_INFO("Game stopped");
         }
     }
 

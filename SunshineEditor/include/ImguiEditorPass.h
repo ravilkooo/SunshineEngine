@@ -19,6 +19,7 @@
 #include "UI/ToolbarPanel.h"
 #include "UI/BottomBarPanel.h"
 #include "UI/LogPanel.h"
+#include "UI/PropertyPanel.h"
 
 class WorldEditor;
 
@@ -66,6 +67,7 @@ public:
     LogPanel m_EditorLogPanel = LogPanel{"Editor Output Log", LogManager::LogTarget::Editor};
     LogPanel m_GameLogPanel = LogPanel{"Game Output Log", LogManager::LogTarget::Game};
     BottomBarPanel m_BottomPanel;
+    PropertyPanel m_PropertyPanel;
 
     bool m_ShowEditorLogPanel = false;
     bool m_ShowGameLogPanel = false;
