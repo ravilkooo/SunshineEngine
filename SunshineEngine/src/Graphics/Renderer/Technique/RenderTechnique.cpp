@@ -1,11 +1,12 @@
-#include "Graphics/Renderer/Technique/RenderTechnique.h"
-#include "Graphics/Bindable/Bindable.h"
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
+#include <Graphics/Bindable/Bindable.h>
+#include <Component/TransformComponent.h>
 
 namespace SE_G {
 	using namespace Bind;
 
-	RenderTechnique::RenderTechnique(ID3D11Device* device, eastl::string technique)
-		: techniqueTag(technique)
+	RenderTechnique::RenderTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique)
+		: techniqueTag(technique), m_assignedTransform(assignedTransform)
 	{
 	}
 
@@ -61,7 +62,7 @@ namespace SE_G {
 
 	}
 
-	eastl::string RenderTechnique::GetTechnique()
+	eastl::string RenderTechnique::GetTechniqueTag()
 	{
 		return techniqueTag;
 	}

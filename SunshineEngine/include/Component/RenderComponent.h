@@ -5,17 +5,27 @@
 #include <EASTL/string.h>
 #include <EASTL/map.h>
 #include <EASTL/unique_ptr.h>
+#include <EASTL/unordered_set.h>
 
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 #include <Graphics/Bindable/Bindable.h>
 
-#include "Component.h"
+#include <Component/Component.h>
+#include <Utils/UUID.h>
+
+namespace SE_G {
+    class DeferredRenderer;
+}
 
 class RenderComponent :
     public Component
 {
+
+    friend class RenderComponent_Info;
 public:
+
     RenderComponent() = default;
+    RenderComponent(SE_G::DeferredRenderer* renderSystem) : m_renderSystem(renderSystem) {}
     ~RenderComponent() = default;
 
     RenderComponent(const RenderComponent&) = delete;
@@ -24,18 +34,60 @@ public:
     RenderComponent(RenderComponent&&) noexcept = default;
     RenderComponent& operator=(RenderComponent&&) noexcept = default;
 
+    void AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique>);
+
+    /*
     bool HasTechnique(eastl::string technique);
 
     void PassTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
-
-    eastl::map<eastl::string, eastl::unique_ptr<SE_G::RenderTechnique>> techniques;
+    */
 
     const std::type_info& getType() const override {
         return typeid(RenderComponent);
     }
 
+    SE_G::DeferredRenderer* m_renderSystem;
+    Sunshine::UUID m_objectUUID;
 };
 
+class RenderComponent_Info : public Component_Info
+{
+public:
+    static ComponentType StaticComponentType() {
+        return ComponentType::RENDER;
+    }
+
+    const std::type_info& getType() const override {
+        return typeid(RenderComponent_Info);
+    }
+
+    bool IsAssigned() override { return true; }
+
+    void AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> tech)
+    {
+        if (tech->GetTechniqueTag() == "IconPass") {
+            m_selectionTechnique = tech.get();
+        }
+        else if (tech->GetTechniqueTag() == "GPass") {
+            m_selectionTechnique = tech.get();
+        }
+
+        techniques.insert(tech->GetTechniqueTag());
+        m_assignedComponent->AddTechnique(eastl::move(tech));
+
+    }
+    
+    bool HasTechnique(eastl::string technique) {
+        return (techniques.find(technique) != techniques.end());
+    }
+    
+    eastl::unordered_set<eastl::string> techniques;
+    eastl::shared_ptr<RenderComponent> m_assignedComponent;
+
+    SE_G::RenderTechnique* m_selectionTechnique;
+};
+
+/*
 // Methods of RenderComponent to expose in Lua bindings
 #ifndef RENDERCOMPONENT_LUA_METHODS_APPLY
 #define RENDERCOMPONENT_LUA_METHODS_APPLY(FM) \
@@ -43,3 +95,4 @@ public:
         return self->HasTechnique(eastl::string(technique));                       \
     })
 #endif
+*/

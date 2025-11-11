@@ -11,7 +11,7 @@ namespace SE_G {
     public:
         eastl::shared_ptr<Bind::PixelConstantBuffer<UUIDhilo>> m_uuidBuffer;
 
-        GPassTechnique(ID3D11Device* device, eastl::string technique,
+        GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             Sunshine::UUID uuid);
         ~GPassTechnique() = default;
 

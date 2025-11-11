@@ -2,6 +2,7 @@
 #include "SunshineEngineAPI.h"
 #include <typeinfo>
 #include <EASTL/shared_ptr.h>
+#include <Component/ComponentType.h>
 
 // SUNSHINE_ENGINE_API
 class Component

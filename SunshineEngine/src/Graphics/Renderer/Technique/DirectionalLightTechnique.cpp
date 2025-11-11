@@ -1,10 +1,10 @@
 #include "Graphics/Renderer/Technique/DirectionalLightTechnique.h"
 
 namespace SE_G {
-    DirectionalLightTechnique::DirectionalLightTechnique(ID3D11Device* device, eastl::string technique,
+    DirectionalLightTechnique::DirectionalLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
         eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<DirectionalLightData> lightData)
-        : LightTechnique(device, technique, camera, lightData) {
+        : LightTechnique(device, assignedTransform, technique, camera, lightData) {
 
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
         dsDesc.DepthEnable = TRUE;

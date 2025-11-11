@@ -41,14 +41,23 @@ namespace SE_G {
 
         // Unnecessary?
         //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+    };
+    
+    class PointLight_Info :
+        public LightObject_Info<PointLightData>
+    {
+    public:
 
-        /*
-        Vector4 ambient;
+        PointLight_Info(
+            PointLightData pointLightData =
+            {
+                DXSM::Vector3::One, 1,
+                DXSM::Vector3::One, 1,
+                DXSM::Vector3::Zero, 20,
+                DXSM::Vector3::One, 0
+            });
 
-        Bind::PixelConstantBuffer<PointLightPCB>* pointLightPBuffer;
-
-        D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos) override;
-        D3D11_RASTERIZER_DESC GetRasterizerDesc(LightObject::LightPosition lightPos) override;
-        */
+        // Unnecessary?
+        //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
     };
 }

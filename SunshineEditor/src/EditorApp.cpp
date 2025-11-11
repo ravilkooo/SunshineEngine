@@ -143,7 +143,7 @@ void EditorApp::RunEditor()
 				accumulator -= physicsUpdateMs;
 			}
 		}
-		m_worldEditor->SyncronizeTransforms();
+		//m_worldEditor->SyncronizeTransforms();
 		Render();
 	}
 	m_worldEditor->ClearScene();
@@ -185,7 +185,12 @@ void EditorApp::UpdateEditor(float deltaTime)
 void EditorApp::Render() {
 
 	// Passes
-	m_renderer->RenderScene(m_worldEditor->m_scene);
+	if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+		m_renderer->RenderScene();
+	}
+	else {
+		m_renderer->RenderScene();
+	}
 	m_renderer->PresentFrame();
 }
 

@@ -18,7 +18,7 @@ namespace SE_G {
 
         // Inherited via RenderPass
         void StartFrame() override;
-        void Pass(const Scene& scene) override;
+        void Pass() override;
         void EndFrame() override;
 
         eastl::shared_ptr<Camera> GetCamera();

@@ -19,4 +19,11 @@ namespace SE_G {
     public:
         AmbientLight(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
     };
+
+    class AmbientLight_Info :
+        public LightObject_Info<AmbientLightData>
+    {
+    public:
+        AmbientLight_Info(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
+    };
 }

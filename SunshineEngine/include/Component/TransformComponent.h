@@ -10,6 +10,7 @@ namespace DXSM = DirectX::SimpleMath;
 class SUNSHINE_ENGINE_API TransformComponent :
     public Component
 {
+    friend class TransformComponent_Info;
 public:
     TransformComponent() {};    
 
@@ -70,6 +71,22 @@ public:
     const std::type_info& getType() const override {
         return typeid(TransformComponent);
     }
+};
+
+class TransformComponent_Info : public Component_Info
+{
+public:
+    static ComponentType StaticComponentType() {
+        return ComponentType::TRANSFORM;
+    }
+
+    const std::type_info& getType() const override {
+        return typeid(TransformComponent_Info);
+    }
+
+    bool IsAssigned() override { return true; }
+
+    eastl::shared_ptr<TransformComponent> m_assignedComponent;
 };
 
 // Macro listing fields of TransformComponent to expose in Lua bindings

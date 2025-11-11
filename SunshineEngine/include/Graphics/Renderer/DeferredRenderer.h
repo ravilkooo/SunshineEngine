@@ -1,14 +1,16 @@
 #pragma once
 
 #include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
 
 #include <d3d11.h>
 #include <wrl.h>
 #include <directxmath.h>
 
-#include "RenderingSystem.h"
-#include "GBuffer.h"
-#include "Scene.h"
+#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
+#include <Graphics/Renderer/GBuffer.h>
+//#include <Scene.h>
 
 namespace SE_G {
     class DeferredRenderer :
@@ -20,8 +22,10 @@ namespace SE_G {
 
         void InitGBuffer(UINT screenWidth, UINT screenHeight);
 
-        void RenderScene(const Scene& scene) override;
+        //void RenderScene(const Scene& scene) override;
+        void RenderScene() override;
         void AddPass(eastl::shared_ptr<RenderPass> pass) override;
+        void AddTechnique(eastl::unique_ptr<RenderTechnique> tech);
 
         eastl::shared_ptr<GBuffer> pGBuffer;
 

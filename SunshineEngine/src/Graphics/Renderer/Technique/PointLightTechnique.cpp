@@ -1,10 +1,11 @@
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 
 namespace SE_G {
-    PointLightTechnique::PointLightTechnique(ID3D11Device* device, eastl::string technique,
+    PointLightTechnique::PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
+        eastl::string technique,
         eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<PointLightData> lightData)
-        : LightTechnique(device, technique, camera, lightData)
+        : LightTechnique(device, assignedTransform, technique, camera, lightData)
     {
         // Depth
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};

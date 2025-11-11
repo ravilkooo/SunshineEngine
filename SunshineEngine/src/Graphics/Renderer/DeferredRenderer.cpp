@@ -63,15 +63,16 @@ namespace SE_G {
 		mainCamera->SetPosition({ 0, 0, -10 });
 	}
 
-	void DeferredRenderer::RenderScene(const Scene& scene)
+	
+	void DeferredRenderer::RenderScene()
 	{
 		// Passes
-		for (auto pass : passes) {
+		for (auto pass : m_passes) {
 			if (!pass->IsEnabled())
 				continue;
 			context->ClearState();
 			pass->StartFrame();
-			pass->Pass(scene);
+			pass->Pass();
 			pass->EndFrame();
 		}
 
@@ -80,7 +81,20 @@ namespace SE_G {
 
 	void DeferredRenderer::AddPass(eastl::shared_ptr<RenderPass> pass)
 	{
-		passes.push_back(pass);
+		m_passes.push_back(pass);
+	}
+
+	void DeferredRenderer::AddTechnique(eastl::unique_ptr<RenderTechnique> tech)
+	{
+		for (auto pass : m_passes)
+		{
+			if (pass->GetTechniqueTag() == tech->GetTechniqueTag())
+			{
+				pass->AddTechnique(eastl::move(tech));
+				return;
+			}
+		}
+		// log << "Pass [rt.name] not found\n";
 	}
 
 	void DeferredRenderer::PreResize()

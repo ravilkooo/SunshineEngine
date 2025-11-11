@@ -17,11 +17,8 @@ namespace SE_G {
 
         // Inherited via RenderPass
         void StartFrame() override;
-        void Pass(const Scene& scene) override;
+        void Pass() override;
         void EndFrame() override;
-
-        void WriteToStencilStep(const Scene& scene);
-        void WriteToBackBufferStep(const Scene& scene);
 
         eastl::shared_ptr<Camera> GetCamera();
         void SetCamera(eastl::shared_ptr<Camera> camera);
@@ -50,6 +47,8 @@ namespace SE_G {
         IconPass* m_iconPass;
 
         eastl::shared_ptr<Bind::PixelShader> m_pixelShader;
+
+        eastl::shared_ptr<Scene_Info> m_scene;
 
 
         /*

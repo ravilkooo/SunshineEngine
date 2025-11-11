@@ -57,7 +57,9 @@ ImguiEditorPass::ImguiEditorPass(
 
 	// Change font to Arial to support Russian
 	ImGuiIO& io = ImGui::GetIO();
-	ImFont* fontArial = io.Fonts->AddFontFromFileTTF("..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf", 13.0f);
+	ImFont* fontArial = io.Fonts->AddFontFromFileTTF(
+		MakeEngineAssetPath_Char("Fonts/Arial.ttf"), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
+		13.0f);
 	io.FontDefault = fontArial;
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
@@ -73,7 +75,7 @@ void ImguiEditorPass::StartFrame()
 	context->RSSetViewports(1, &m_viewport);
 }
 
-void ImguiEditorPass::Pass(const Scene& scene)
+void ImguiEditorPass::Pass()
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -248,7 +250,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 	ImGui::Text("Scene Hierarchy");
 	if (ImGui::TreeNode("Root"))
 	{
-		auto& objects = m_worldEditor->m_scene.gameObjects;
+		auto& objects = m_worldEditor->m_scene->gameObjects;
 		for (size_t i = 0; i < objects.size(); ++i)
 		{
 			// selectedIdx
@@ -259,7 +261,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			// �������� ���� �������� �� �������
 
 			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
-			//m_worldEditor->m_scene.GetGameObjectByUUID(objects[i])->Name = objLabel;
+			//m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->Name = objLabel;
 
 			if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
 			{
@@ -282,15 +284,16 @@ void ImguiEditorPass::ShowProperties()
 	if (selectedUUID == Sunshine::UUID(0u))
 		return;
 
-	GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
+	GameObject_Info* obj = m_worldEditor->m_scene->GetGameObjectByUUID(
 		selectedUUID
 	);
 
-	if (!obj->HasComponent<LuaComponent>())
+	/*
+	if (!obj->HasComponent<LuaComponent_Info>())
 	{
 		if (ImGui::Button("Add Lua Script")) {
-			obj->AddComponent<LuaComponent>();
-			auto lua2 = obj->GetComponent<LuaComponent>();
+			obj->AddComponent<LuaComponent_Info>();
+			auto lua2 = obj->GetComponent<LuaComponent_Info>();
 			lua2->Init(obj);
 		}
 		return;
@@ -299,6 +302,7 @@ void ImguiEditorPass::ShowProperties()
 	{
 		LuaImgui(obj);
 	}
+	*/
 }
 	
 void ImguiEditorPass::LuaImgui(GameObject* obj)
@@ -339,7 +343,7 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 					ImGui::InputText(("##p" + to_string_eastl(i)).c_str(), param.value, sizeof(param.value));
 				}
 				else {
-					eastl::string objName = obj->Name;
+					eastl::string objName = obj->m_name;
 					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), objName.c_str());
 				}
 			}

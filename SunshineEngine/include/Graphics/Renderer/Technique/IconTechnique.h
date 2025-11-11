@@ -21,7 +21,7 @@ namespace SE_G {
         public RenderTechnique
     {
     public:
-        IconTechnique(ID3D11Device* device, eastl::string technique,
+        IconTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             IconData iconData, float iconSizeX = 0.1f, float iconSizeY = 0.1f);
 
         void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;

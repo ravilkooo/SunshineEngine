@@ -74,3 +74,17 @@ private:
     //runtime
     void InitializeBehavior();
 };
+
+class LuaComponent_Info : public Component_Info {
+public:
+    static ComponentType StaticComponentType() {
+        return ComponentType::SCRIPT;
+    }
+
+    const std::type_info& getType() const override {
+        return typeid(LuaComponent_Info);
+    }
+
+    bool IsAssigned() override { return false; }
+
+};

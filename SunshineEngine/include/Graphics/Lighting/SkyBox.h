@@ -18,4 +18,12 @@ namespace SE_G {
     public:
         SkyBox(SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
     };
+
+
+    class SkyBox_Info :
+        public LightObject_Info<SkyBoxData>
+    {
+    public:
+        SkyBox_Info(SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
+    };
 }

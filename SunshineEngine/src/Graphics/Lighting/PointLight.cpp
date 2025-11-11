@@ -22,6 +22,26 @@ namespace SE_G {
         */
     }
 
+    PointLight_Info::PointLight_Info(PointLightData pointLightData)
+    {
+        if (pointLightData.Att.z < 0.0001) {
+            float c = eastl::max(eastl::max(pointLightData.Diffuse.x, pointLightData.Diffuse.y), pointLightData.Diffuse.z) / pointLightData.Att.y;
+            pointLightData.Range = eastl::max(pointLightData.Range, (256.0f * c)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+        }
+        else {
+            float c = eastl::max(eastl::max(pointLightData.Diffuse.x, pointLightData.Diffuse.y), pointLightData.Diffuse.z) / pointLightData.Att.z;
+            pointLightData.Range = eastl::max(pointLightData.Range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+        }
+
+        m_lightData = eastl::make_shared<PointLightData>(pointLightData);
+
+        /*
+        CreateSimpleSphereMesh(range, 6, 2,
+            diffuse,
+            &vertices, &verticesNum, &indices, &indicesNum);
+        */
+    }
+
     //void PointLight::UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
     //{
     //    //pointLightPBuffer->Update(context.Get(), pointLightData);

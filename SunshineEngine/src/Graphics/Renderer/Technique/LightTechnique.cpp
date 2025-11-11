@@ -49,10 +49,10 @@ namespace SE_G {
 	}
 
 	template <class T>
-	LightTechnique<T>::LightTechnique(ID3D11Device* device, eastl::string technique,
+	LightTechnique<T>::LightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
 		eastl::shared_ptr<Camera> camera,
 		eastl::shared_ptr<T> lightData)
-		: RenderTechnique(device, technique)
+		: RenderTechnique(device, assignedTransform, technique)
 	{
 		D3D11_BLEND_DESC blendDesc = {};
 		blendDesc.RenderTarget[0].BlendEnable = TRUE;

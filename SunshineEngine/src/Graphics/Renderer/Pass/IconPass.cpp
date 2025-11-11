@@ -96,7 +96,7 @@ namespace SE_G {
 		context->RSSetViewports(1, &m_viewport);
 	}
 
-	void IconPass::Pass(const Scene& scene)
+	void IconPass::Pass()
 	{
 		BindAllPerFrame();
 		m_iconVertexShader->Bind(context.Get());
@@ -112,7 +112,7 @@ namespace SE_G {
 			m_camera->GetProjectionMatrix(),
 			m_camera->GetPosition(), 0.0f });
 		m_camGCB->Bind(context.Get());
-
+		/*
 		for (const auto& gameObjectUUID : scene.gameObjects) {
 			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
 			if (gameObject->HasComponent<RenderComponent>() &&
@@ -123,14 +123,15 @@ namespace SE_G {
 				if (!renderComponent->HasTechnique(techniqueTag))
 					continue;
 
-				// m_geometryCB->Update(context.Get(), gameObject->GetComponent<TransformComponent>()->m_position);
-				// m_geometryCB->Bind(context.Get());
 				gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
-
 				renderComponent->PassTechnique(techniqueTag, GetDeviceContext()); // Bind + Draw
 			}
 		}
-
+		*/
+		for (auto& tech : m_techniques) {
+			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech->Pass(GetDeviceContext());
+		}
 	}
 
 	void IconPass::EndFrame()

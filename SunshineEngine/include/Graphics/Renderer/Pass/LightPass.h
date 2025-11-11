@@ -21,7 +21,7 @@ namespace SE_G {
             eastl::shared_ptr<Camera> camera);
 
         void StartFrame() override;
-        void Pass(const Scene& scene) override;
+        void Pass() override;
         void EndFrame() override;
 
         eastl::shared_ptr<Camera> GetCamera();

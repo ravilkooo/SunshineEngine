@@ -5,4 +5,9 @@ namespace SE_G {
 	{
 		m_lightData = eastl::make_shared<SkyBoxData>(initData);
 	}
+
+	SkyBox_Info::SkyBox_Info(SkyBoxData initData)
+	{
+		m_lightData = eastl::make_shared<SkyBoxData>(initData);
+	}
 }

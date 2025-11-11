@@ -17,8 +17,9 @@ class PhysicsSystem;
 class PhysicsComponent :
     public Component
 {
-
+    friend class PhysicsComponent_Info;
 public:
+
     PhysicsComponent() = default;
     ~PhysicsComponent() = default;
 
@@ -68,6 +69,9 @@ class PhysicsComponent_Info :
     public Component_Info
 {
 public:
+    static ComponentType StaticComponentType() {
+        return ComponentType::PHYSICS;
+    }
 
     const std::type_info& getType() const override {
         return typeid(PhysicsComponent_Info);

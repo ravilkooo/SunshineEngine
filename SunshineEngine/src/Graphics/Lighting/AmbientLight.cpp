@@ -5,4 +5,9 @@ namespace SE_G {
     {
         m_lightData = eastl::make_shared<AmbientLightData>(initData);
     }
+
+    AmbientLight_Info::AmbientLight_Info(AmbientLightData initData)
+    {
+        m_lightData = eastl::make_shared<AmbientLightData>(initData);
+    }
 }

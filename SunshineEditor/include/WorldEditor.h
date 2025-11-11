@@ -15,7 +15,7 @@
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
 
-#include <GameObjectFactory.h>
+#include <EditorObjectFactory.h>
 #include <Scripting/LuaManager.h>
 
 #include <Physics/PhysicsSystem.h>
@@ -133,12 +133,12 @@ public:
     void Run();
 
     void Update(float deltaTime);
-    void SyncronizeTransforms();
+    //void SyncronizeTransforms();
     void Render();
     void ClearScene();
 
     GameTimer m_timer;
-    Scene m_scene;
+    eastl::shared_ptr<Scene_Info> m_scene;
     eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
     LuaManager m_luaManager;
 
@@ -166,7 +166,7 @@ public:
     Sunshine::UUID ChooseObjectByClick(UINT x, UINT y);
 
 private:
-    eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
+    //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
     // testing
     // Sunshine::UUID floorId;
     // Sunshine::UUID ballId;

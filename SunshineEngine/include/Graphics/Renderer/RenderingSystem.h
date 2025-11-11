@@ -17,7 +17,7 @@ namespace SE_G {
 		ID3D11Device* GetDevice() { return device.Get(); }
 		ID3D11DeviceContext* GetDeviceContext() { return context.Get(); }
 
-		virtual void RenderScene(const Scene& scene) = 0;
+		virtual void RenderScene() = 0;
 		virtual void PresentFrame() {
 			swapChain->Present(1, /*DXGI_PRESENT_DO_NOT_WAIT*/ 0);
 			return;
@@ -30,7 +30,7 @@ namespace SE_G {
 
 		virtual void AddPass(eastl::shared_ptr<RenderPass> pass) = 0;
 
-		eastl::vector<eastl::shared_ptr<RenderPass>> passes;
+		eastl::vector<eastl::shared_ptr<RenderPass>> m_passes;
 		eastl::shared_ptr<Camera> mainCamera;
 	protected:
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;

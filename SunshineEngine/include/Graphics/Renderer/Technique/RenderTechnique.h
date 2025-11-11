@@ -16,6 +16,8 @@
 #include <EASTL/vector.h>
 #include <EASTL/shared_ptr.h>
 
+class TransformComponent;
+
 namespace SE_G {
     namespace Bind {
         class Bindable;
@@ -24,7 +26,7 @@ namespace SE_G {
     class RenderTechnique
     {
     public:
-        RenderTechnique(ID3D11Device* device, eastl::string technique);
+        RenderTechnique(ID3D11Device* device, TransformComponent* assignedTransform,  eastl::string technique);
         virtual ~RenderTechnique() = default;
 
         void AddBind(eastl::shared_ptr<Bind::Bindable> bind);
@@ -46,8 +48,10 @@ namespace SE_G {
         eastl::shared_ptr<Bind::Rasterizer> rasterizer;
         eastl::shared_ptr<Bind::DepthStencilState> depthStencilState;
 
-        virtual eastl::string GetTechnique();
+        virtual eastl::string GetTechniqueTag();
 
         eastl::string techniqueTag;
+
+        TransformComponent* m_assignedTransform;
     };
 }

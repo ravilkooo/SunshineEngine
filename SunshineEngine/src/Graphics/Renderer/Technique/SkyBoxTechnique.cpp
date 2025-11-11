@@ -1,10 +1,11 @@
 #include "Graphics/Renderer/Technique/SkyBoxTechnique.h"
 
 namespace SE_G {
-    SkyBoxTechnique::SkyBoxTechnique(ID3D11Device* device, eastl::string technique,
+    SkyBoxTechnique::SkyBoxTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
+        eastl::string technique,
         eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<SkyBoxData> lightData)
-        : LightTechnique(device, technique, camera, lightData) {
+        : LightTechnique(device, assignedTransform, technique, camera, lightData) {
 
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
         dsDesc.DepthEnable = TRUE;

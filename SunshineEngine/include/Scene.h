@@ -29,3 +29,25 @@ public:
     std::unordered_map<Sunshine::UUID, eastl::unique_ptr<GameObject>> uuidToObjectMap;
 private:
 };
+
+class Scene_Info {
+public:
+
+    Scene_Info();
+    ~Scene_Info();
+
+    Scene_Info(const Scene_Info&) = delete;
+    Scene_Info& operator=(const Scene_Info&) = delete;
+    Scene_Info(Scene_Info&&) noexcept = default;
+    Scene_Info& operator=(Scene_Info&&) noexcept = default;
+
+    Sunshine::UUID AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject);
+    GameObject_Info* GetGameObjectByUUID(Sunshine::UUID uuid) const;
+    //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
+    eastl::unique_ptr<GameObject_Info> RemoveGameObjectByUUID(Sunshine::UUID uuid);
+
+    // чтобы быстро итероваться последовательно
+    eastl::vector<Sunshine::UUID> gameObjects;
+    // владеет объектами. чтобы быстро находить по UUID
+    std::unordered_map<Sunshine::UUID, eastl::unique_ptr<GameObject_Info>> uuidToObjectMap;
+};

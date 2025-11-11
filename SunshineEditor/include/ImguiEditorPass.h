@@ -31,7 +31,7 @@ public:
         eastl::shared_ptr<WorldEditor> worldEditor);
 
     void StartFrame() override;
-    void Pass(const Scene& scene) override;
+    void Pass() override;
     void EndFrame() override;
 
     void RenderGameWorld();
