@@ -13,6 +13,8 @@
 #include <Component/ComponentType.h>
 #include "Utils/UUID.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class GameObjectImpl {
 public:
@@ -134,6 +136,10 @@ public:
         ComponentType type = T::StaticComponentType();
         impl->components.erase(type);
     }
+
+    // Serialization
+    json ToJson() const;
+    static eastl::unique_ptr<GameObject_Info> FromJson(const json& j);
 
 protected:
     eastl::unique_ptr<GameObject_InfoImpl> impl;

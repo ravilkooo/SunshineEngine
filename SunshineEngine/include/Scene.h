@@ -7,6 +7,9 @@
 
 #include <unordered_map>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 class Scene
 {
 public:
@@ -23,9 +26,9 @@ public:
     //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
     eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(Sunshine::UUID uuid);
 
-    // чтобы быстро итероваться последовательно
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     eastl::vector<Sunshine::UUID> gameObjects;
-    // владеет объектами. чтобы быстро находить по UUID
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ UUID
     std::unordered_map<Sunshine::UUID, eastl::unique_ptr<GameObject>> uuidToObjectMap;
 private:
 };
@@ -46,8 +49,12 @@ public:
     //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
     eastl::unique_ptr<GameObject_Info> RemoveGameObjectByUUID(Sunshine::UUID uuid);
 
-    // чтобы быстро итероваться последовательно
+    // Serialization
+    json ToJson() const;
+    static eastl::shared_ptr<Scene_Info> FromJson(const json& j);
+
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     eastl::vector<Sunshine::UUID> gameObjects;
-    // владеет объектами. чтобы быстро находить по UUID
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ UUID
     std::unordered_map<Sunshine::UUID, eastl::unique_ptr<GameObject_Info>> uuidToObjectMap;
 };

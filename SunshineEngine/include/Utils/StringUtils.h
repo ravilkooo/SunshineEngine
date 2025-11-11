@@ -132,3 +132,7 @@ inline bool EASTLStringEqualsString(const eastl::string& a, const eastl::string&
 inline std::string EASTLToStdString(const eastl::string& s) {
     return std::string(s.data(), s.size());
 }
+
+inline eastl::string StdToEASTLString(const std::string& s) {
+    return eastl::string(s.data(), s.size());
+}

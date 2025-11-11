@@ -12,6 +12,7 @@
 #include <Physics/CollisionUtils.h>
 #include <Utils/UUID.h>
 
+
 class PhysicsSystem;
 
 class PhysicsComponent :
@@ -80,4 +81,8 @@ public:
     bool IsAssigned() override { return false; }
 
     CollisionLayer m_collisionLayer;
+
+    // Serialization
+    json ToJson() const override;
+    void FromJson(const json& j) override;
 };

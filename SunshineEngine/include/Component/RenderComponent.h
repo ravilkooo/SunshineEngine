@@ -85,6 +85,10 @@ public:
     eastl::shared_ptr<RenderComponent> m_assignedComponent;
 
     SE_G::RenderTechnique* m_selectionTechnique;
+    
+    // Serialization
+    json ToJson() const override;
+    void FromJson(const json& j) override;
 };
 
 /*

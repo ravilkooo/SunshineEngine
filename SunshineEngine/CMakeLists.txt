@@ -40,6 +40,12 @@ target_link_libraries(SunshineEngine PUBLIC
 # DirectXTK integration
 target_link_libraries(SunshineEngine PUBLIC DirectXTK)
 
+# -------- nlohmann_json ---------
+
+# find_package(nlohmann_json 3.12.0 REQUIRED)
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+target_link_libraries(SunshineEngine PUBLIC nlohmann_json::nlohmann_json)
+
 # ---------- Other Libs ----------
 
 # target_compile_definitions(SunshineEngine PUBLIC EASTL_USER_DEFINED_ALLOCATOR=1)

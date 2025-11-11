@@ -71,6 +71,9 @@ public:
     const std::type_info& getType() const override {
         return typeid(TransformComponent);
     }
+
+    // Serialization
+    void FromJson(const json& j) override;
 };
 
 class TransformComponent_Info : public Component_Info
@@ -87,6 +90,10 @@ public:
     bool IsAssigned() override { return true; }
 
     eastl::shared_ptr<TransformComponent> m_assignedComponent;
+
+    // Serialization
+    json ToJson() const override;
+    void FromJson(const json& j) override;
 };
 
 // Macro listing fields of TransformComponent to expose in Lua bindings
