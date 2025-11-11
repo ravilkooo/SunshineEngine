@@ -60,10 +60,14 @@ void WorldEditor::InitWorldEditor(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera())
 	);
+	auto obj = m_scene.GetGameObjectByUUID(m_scene.gameObjects.back());
+	obj->Name = "SkyBox";
+	
 	m_scene.AddGameObject(GameObjectFactory::CreateDefaultBoxObject(
 		m_renderer->GetDevice())
 	);
-
+	obj = m_scene.GetGameObjectByUUID(m_scene.gameObjects.back());
+	obj->Name = "Box";
 	for (size_t i = 0; i < 6; i++)
 	{
 		m_scene.AddGameObject(GameObjectFactory::CreateDefaultSphereObject(
@@ -73,7 +77,7 @@ void WorldEditor::InitWorldEditor(
 		auto tr = obj->GetComponent<TransformComponent>();
 		tr->m_localPosition = DXSM::Vector3(-3.0f, 0.0f, 0.0f);
 		tr->m_rotation.z = DX::XM_2PI * i / 6.0f;
-
+		obj->Name = "Sphere " + eastl::to_string(i);
 	}
 
 	m_scene.AddGameObject(GameObjectFactory::CreateAmbientLightObject(
@@ -81,6 +85,8 @@ void WorldEditor::InitWorldEditor(
 		m_renderer->GetMainCamera(),
 		{ DXSM::Vector3::One * 0.5f, 1.0f })
 	);
+	obj = m_scene.GetGameObjectByUUID(m_scene.gameObjects.back());
+	obj->Name = "Ambient Light";
 	m_scene.AddGameObject(GameObjectFactory::CreateDirectionalLightObject(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera(),
@@ -91,6 +97,8 @@ void WorldEditor::InitWorldEditor(
 			DXSM::Vector3(1, -2, 0.5), 0
 		})
 	);
+	obj = m_scene.GetGameObjectByUUID(m_scene.gameObjects.back());
+	obj->Name = "Directional Light";
 	m_scene.AddGameObject(GameObjectFactory::CreatePointLightObject(
 		m_renderer->GetDevice(),
 		m_renderer->GetMainCamera(),
@@ -101,6 +109,8 @@ void WorldEditor::InitWorldEditor(
 			DXSM::Vector3(0.0f, 0.0f, 0.1f), 0
 		})
 	);
+	obj = m_scene.GetGameObjectByUUID(m_scene.gameObjects.back());
+	obj->Name = "Point Light";
 }
 void WorldEditor::Run() {
 	
