@@ -109,9 +109,6 @@ public:
     bool CanHear = false;
 
 private:
-    void SetTeamId(uint32_t NewId) { TeamId = NewId; }
-
-
     Sunshine::UUID OwnerId;
 
     SightStruct SightSettings;

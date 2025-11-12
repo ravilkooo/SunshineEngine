@@ -105,7 +105,7 @@ private:
                 if (cbIt != Callbacks.end())
                 {
                     for (auto& Callback : cbIt->second)
-                        Callback(Data[Key].get());
+                        Callback.Callback(Data[Key].get());
                 }
             }
         }

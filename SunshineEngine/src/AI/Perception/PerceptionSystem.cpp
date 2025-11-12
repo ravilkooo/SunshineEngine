@@ -159,7 +159,7 @@ bool PerceptionSystem::AddToTeam(PerceptionComponent* Perception, uint32_t TeamI
 
     if (!AlreadyIn)
     {
-        Perception->SetTeamId(TeamId);
+        Perception->TeamId = TeamId;
         Team.Perceivers.push_back(Perception);
     }  
 
@@ -200,7 +200,7 @@ bool PerceptionSystem::RemoveFromTeam(PerceptionComponent* Perception, uint32_t 
     {
         if (*itP == Perception)
         {
-            Perception->SetTeamId(UINT32_MAX);
+            Perception->TeamId = UINT32_MAX;
             Team.Perceivers.erase(itP);
 
             break;

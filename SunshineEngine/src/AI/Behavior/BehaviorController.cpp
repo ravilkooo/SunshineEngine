@@ -1,22 +1,15 @@
 #include "AI/Behavior/BehaviorController.h"
 
 
-void BehaviorController::Initialize()
+BehaviorController::~BehaviorController()
 {
-    FSM = eastl::make_unique<FiniteStateMachine>();
-    APS = eastl::make_unique<ActionPatternSystem>();
-
-    FSM->SetMemory(&MBoard);
-    APS->SetMemory(&MBoard);
+    MBoard.Clear();
 }
 
-void BehaviorController::Tick(float DeltaTime)
+void BehaviorController::Update(float DeltaTime)
 {
     if (!IsEnabled)
         return;
-}
 
-void BehaviorController::Reset()
-{
-    MBoard.Clear();
+    FSM->Update(GOID, &MBoard, DeltaTime);
 }

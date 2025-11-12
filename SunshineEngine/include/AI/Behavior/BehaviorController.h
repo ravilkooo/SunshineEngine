@@ -1,32 +1,25 @@
 #pragma once
 
-#include "AI/Behavior/MemoryBoard.h"
 #include "AI/Behavior/FiniteStateMachine.h"
-#include "AI/Behavior/ActionPatternSystem.h"
 
 
 class BehaviorController
 {
 public:
-    BehaviorController() { Initialize(); };
-    ~BehaviorController() { Reset(); };
-
-    void Initialize();    
-    void Reset();
-
-    void Tick(float DeltaTime);                 
+    explicit BehaviorController(const Sunshine::UUID& InGOID) : GOID(InGOID) { };
+    ~BehaviorController();
 
     MemoryBoard& GetMemory() { return MBoard; };
     FiniteStateMachine* GetFiniteStateMachine() { return FSM.get(); }
-    ActionPatternSystem* GetActionSystem() { return APS.get(); }
 
-    void SetEnabled(bool NewEnable) { IsEnabled = NewEnable; };
-    bool GetIsEnabled() const { return IsEnabled; };
+    void Update(float DeltaTime);          
 
-private:
     bool IsEnabled = true;
 
+private:
+    Sunshine::UUID GOID;
+
     MemoryBoard MBoard; 
-    eastl::unique_ptr<FiniteStateMachine> FSM;
-    eastl::unique_ptr<ActionPatternSystem> APS; 
+
+    eastl::unique_ptr<FiniteStateMachine> FSM = eastl::make_unique<FiniteStateMachine>();;
 };
