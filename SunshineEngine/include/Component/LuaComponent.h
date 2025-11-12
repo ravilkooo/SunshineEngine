@@ -94,4 +94,7 @@ public:
 
     bool IsAssigned() override { return false; }
 
+    eastl::string scriptPath;
+    bool scriptLoaded;
+
 };

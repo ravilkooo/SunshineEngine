@@ -13,10 +13,10 @@
 
 #include "Utils/UUID.h"
 
-class GameObject;
-class TransformComponent;
-class RenderComponent;
-class LuaComponent;
+class GameObject_Info;
+class TransformComponent_Info;
+class RenderComponent_Info;
+class LuaComponent_Info;
 class WorldEditor;
 
 class PropertyPanel
@@ -38,11 +38,11 @@ private:
     eastl::shared_ptr<WorldEditor> m_WorldEditor;
     Sunshine::UUID m_SelectedUUID = Sunshine::UUID(0u);
     
-    void DrawGameObjectHeader(GameObject* obj);
+    void DrawGameObjectHeader(GameObject_Info* obj);
 
-    void DrawTransformComponent(GameObject* obj);
-    void DrawRenderComponent(GameObject* obj);
-    void DrawComponentAddPopup(GameObject* obj);
+    void DrawTransformComponent(GameObject_Info* obj);
+    void DrawRenderComponent(GameObject_Info* obj);
+    void DrawComponentAddPopup(GameObject_Info* obj);
     
     
     void DrawAmbientLightTechniqueDetails(SE_G::LightTechnique<SE_G::AmbientLightData>* light_technique);
@@ -53,8 +53,8 @@ private:
     void DrawGPassTechniqueDetails(SE_G::GPassTechnique* pass_technique);
     void DrawIconTechniqueDetails(SE_G::IconTechnique* icon_technique);
     
-    void DrawLuaComponent(GameObject* obj);
-    void DrawLuaFunctions(LuaComponent* luaComp);
+    void DrawLuaComponent(GameObject_Info* obj);
+    void DrawLuaFunctions(LuaComponent_Info* luaComp);
 
     bool DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 };

@@ -341,7 +341,10 @@ void EditorApp::SaveSceneToFile(const std::string& filename)
 {
 	json j = m_worldEditor->m_scene->ToJson();
 	std::ofstream file(filename);
-	if (file)
+	if (file) {
 		file << j.dump(4);
-	// log << "Scene saved\n";
+		LOG_EDITOR_INFO("Scene saved");
+	}
+	else 
+		LOG_EDITOR_ERROR("File output error\n");
 }

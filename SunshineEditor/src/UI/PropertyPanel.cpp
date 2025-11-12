@@ -25,7 +25,7 @@ void PropertyPanel::OnImGuiRender()
         return;
     }
 
-    GameObject* obj = m_WorldEditor->m_scene.GetGameObjectByUUID(m_SelectedUUID);
+    GameObject_Info* obj = m_WorldEditor->m_scene->GetGameObjectByUUID(m_SelectedUUID);
     if (!obj)
     {
         ImGui::Text("Object not found");
@@ -45,29 +45,29 @@ void PropertyPanel::OnImGuiRender()
     ImGui::End();
 }
 
-void PropertyPanel::DrawGameObjectHeader(GameObject* obj)
+void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
 {
     ImGui::Text("GameObject");
     ImGui::SameLine();
     
     static char nameBuffer[256] = {0};
-    strncpy(nameBuffer, obj->Name.c_str(), sizeof(nameBuffer) - 1);
+    strncpy(nameBuffer, obj->m_name.c_str(), sizeof(nameBuffer) - 1);
     
     ImGui::SetNextItemWidth(-FLT_MIN);
     if (ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer)))
     {
-        obj->Name = nameBuffer;
+        obj->m_name = nameBuffer;
     }
     
     ImGui::TextDisabled("UUID: %llu", obj->m_UUID.m_UUID);
 }
 
-void PropertyPanel::DrawTransformComponent(GameObject* obj)
+void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
 {
-    if (!obj->HasComponent<TransformComponent>()) 
+    if (!obj->HasComponent<TransformComponent_Info>()) 
         return;
 
-    auto transform = obj->GetComponent<TransformComponent>();
+    auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent;
     
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
@@ -104,12 +104,12 @@ void PropertyPanel::DrawTransformComponent(GameObject* obj)
     }
 }
 
-void PropertyPanel::DrawRenderComponent(GameObject* obj)
+void PropertyPanel::DrawRenderComponent(GameObject_Info* obj)
 {
-    if (!obj->HasComponent<RenderComponent>()) 
+    if (!obj->HasComponent<RenderComponent_Info>()) 
         return;
 
-    auto render = obj->GetComponent<RenderComponent>();
+    auto render = obj->GetComponent<RenderComponent_Info>();
     
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
@@ -125,26 +125,15 @@ void PropertyPanel::DrawRenderComponent(GameObject* obj)
         
         ImGui::BeginChild("TechniquesList", ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 6), true);
         {
-            for (auto& techPair : render->techniques)
+            for (auto& tech : render->techniques)
             {
-                ImGui::PushID(techPair.first.c_str());
+                ImGui::PushID(tech.c_str());
                 
-                bool isSelected = (selectedTechnique == techPair.first);
+                bool isSelected = (selectedTechnique == tech);
                 
                 const char* type = "";
                 
-                if (auto gpass = dynamic_cast<SE_G::GPassTechnique*>(techPair.second.get())) 
-                    type = "Geometry";
-                else if (auto iconTech = dynamic_cast<SE_G::IconTechnique*>(techPair.second.get())) 
-                    type = "Icon";
-                if (auto ambient = dynamic_cast<SE_G::LightTechnique<SE_G::AmbientLightData>*>(techPair.second.get())) 
-                    type = "Ambient Light";
-                else if (auto directional = dynamic_cast<SE_G::LightTechnique<SE_G::DirectionalLightData>*>(techPair.second.get())) 
-                    type = "Directional Light";
-                else if (auto point = dynamic_cast<SE_G::LightTechnique<SE_G::PointLightData>*>(techPair.second.get())) 
-                    type = "Point Light";
-                else if (auto skybox = dynamic_cast<SE_G::LightTechnique<SE_G::SkyBoxData>*>(techPair.second.get())) 
-                    type = "Skybox";
+                type = tech.c_str();
                 
                 if (isSelected)
                 {
@@ -154,7 +143,7 @@ void PropertyPanel::DrawRenderComponent(GameObject* obj)
                 
                 if (ImGui::Selectable(type, isSelected))
                 {
-                    selectedTechnique = techPair.first;
+                    selectedTechnique = tech;
                 }
                 
                 if (isSelected)
@@ -177,8 +166,8 @@ void PropertyPanel::DrawRenderComponent(GameObject* obj)
             ImGui::SameLine();
             ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.5f, 1.0f), "%s", selectedTechnique.c_str());
             
-            auto& tech = render->techniques[selectedTechnique];
-            DrawTechniqueDetails(tech.get(), selectedTechnique);
+            // auto& tech = render->m_assignedComponent->techniques[selectedTechnique];
+            // DrawTechniqueDetails(tech.get(), selectedTechnique);
         }
         else if (!render->techniques.empty())
         {
@@ -292,12 +281,12 @@ void PropertyPanel::DrawIconTechniqueDetails(SE_G::IconTechnique* tech)
     ImGui::Text("Editor Icon");
 }
 
-void PropertyPanel::DrawLuaComponent(GameObject* obj)
+void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
 {
-    if (!obj->HasComponent<LuaComponent>()) 
+    if (!obj->HasComponent<LuaComponent_Info>()) 
         return;
 
-    auto luaComp = obj->GetComponent<LuaComponent>();
+    auto luaComp = obj->GetComponent<LuaComponent_Info>();
     
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
@@ -308,6 +297,7 @@ void PropertyPanel::DrawLuaComponent(GameObject* obj)
         ImGui::Text("Script Selection");
         ImGui::Separator();
         
+        /*
         if (!luaComp->luaFiles.empty())
         {
             ImGui::Text("Script File:");
@@ -333,6 +323,7 @@ void PropertyPanel::DrawLuaComponent(GameObject* obj)
             }
         }
         else
+        */
         {
             ImGui::TextDisabled("No Lua files found");
         }
@@ -341,6 +332,7 @@ void PropertyPanel::DrawLuaComponent(GameObject* obj)
         ImGui::Text("Script Control");
         ImGui::Separator();
         
+        /*
         eastl::string currentScriptPath = luaComp->assetsPath + "/" + luaComp->luaFiles[luaComp->selectedLuaFile];
         bool isCurrentFileLoaded = luaComp->scriptLoaded && (luaComp->scriptPath == currentScriptPath);
         
@@ -376,16 +368,18 @@ void PropertyPanel::DrawLuaComponent(GameObject* obj)
             ImGui::Spacing();
             DrawLuaFunctions(luaComp.get());
         }
+        */
         
         ImGui::TreePop();
     }
 }
 
-void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
+void PropertyPanel::DrawLuaFunctions(LuaComponent_Info* luaComp)
 {
     ImGui::Text("Script Functions");
     ImGui::Separator();
 
+    /*
     auto availableFunctions = luaComp->GetAvailableFunctions();
 
     if (availableFunctions.empty())
@@ -479,9 +473,10 @@ void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
             ImGui::EndGroup();
         }
     }
+    */
 }
 
-void PropertyPanel::DrawComponentAddPopup(GameObject* obj)
+void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
 {
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
     
@@ -495,22 +490,24 @@ void PropertyPanel::DrawComponentAddPopup(GameObject* obj)
         ImGui::Text("Add Component");
         ImGui::Separator();
         
-        if (!obj->HasComponent<LuaComponent>())
+        if (!obj->HasComponent<LuaComponent_Info>())
         {
             if (ImGui::MenuItem("Lua Script", nullptr, false, true))
             {
-                obj->AddComponent<LuaComponent>();
-                auto luaComp = obj->GetComponent<LuaComponent>();
-                luaComp->Init(obj);
+                obj->AddComponent<LuaComponent_Info>();
+                auto luaComp = obj->GetComponent<LuaComponent_Info>();
+                //luaComp->Init(obj);
             }
         }
-        else if (!obj->HasComponent<RenderComponent>())
+        /*
+        else if (!obj->HasComponent<RenderComponent_Info>())
         {
             if (ImGui::MenuItem("Render Component", nullptr, false, true))
             {
-                obj->AddComponent<RenderComponent>();
+                obj->AddComponent<RenderComponent_Info>();
             }
         }
+        */
         else
         {
             ImGui::TextDisabled("All available components added");

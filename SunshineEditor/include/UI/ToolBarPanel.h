@@ -1,6 +1,8 @@
 #pragma once
 #include <imgui.h>
 
+class EditorApp;
+
 class ToolbarPanel
 {
 public:

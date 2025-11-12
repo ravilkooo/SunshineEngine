@@ -93,12 +93,8 @@ target_link_libraries(SunshineEngine PUBLIC Jolt)
 
 target_compile_definitions(SunshineEngine PUBLIC ENGINE_ASSETS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Assets/")
 
-
 # Collect all HLSL shader files
 file(GLOB_RECURSE SHADERS "Assets/Shaders/*.hlsl")
-
-# Add shaders to the project so they appear in VS
-# source_group("Assets\\Shaders" FILES ${SHADERS})
 
 # Add shaders as "sources" just for IDE visibility, not for compilation
 set_property(SOURCE ${SHADERS} PROPERTY HEADER_FILE_ONLY TRUE)
@@ -110,9 +106,6 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SHADERS})
 
 # Collect all Lua scripts files
 file(GLOB_RECURSE SCRIPTS "Assets/Scripts/*.lua")
-
-# Add scripts to the project so they appear in VS
-# source_group("Assets\\Scripts" FILES ${SCRIPTS})
 
 # Add scripts as "sources" just for IDE visibility, not for compilation
 set_property(SOURCE ${SCRIPTS} PROPERTY HEADER_FILE_ONLY TRUE)
