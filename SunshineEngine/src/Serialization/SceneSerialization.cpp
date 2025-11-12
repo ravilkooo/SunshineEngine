@@ -12,6 +12,8 @@
 
 #include <GameObject/Lighting/LightCollection.h>
 
+#include <Serialization/LightDataSerialization.h>
+
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -206,11 +208,14 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(const json& j) {
 // ----------------- AmbientLight_Info -----------------
 json AmbientLight_Info::ToJson() const {
     json j = GameObject_Info::ToJson();
+    j["m_lightData"] = *(m_lightData.get());
     return j;
 }
 
 eastl::unique_ptr<AmbientLight_Info> AmbientLight_Info::FromJson(const json& j) {
     auto out = eastl::make_unique<AmbientLight_Info>();
+
+    if (j.contains("m_lightData")) out->m_lightData = eastl::make_shared<SE_G::AmbientLightData>(j["m_lightData"]);
     if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
     if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
     if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
@@ -255,11 +260,13 @@ eastl::unique_ptr<AmbientLight_Info> AmbientLight_Info::FromJson(const json& j) 
 // ----------------- PointLight_Info -----------------
 json PointLight_Info::ToJson() const {
     json j = GameObject_Info::ToJson();
+    j["m_lightData"] = *(m_lightData.get());
     return j;
 }
 
 eastl::unique_ptr<PointLight_Info> PointLight_Info::FromJson(const json& j) {
     auto out = eastl::make_unique<PointLight_Info>();
+    if (j.contains("m_lightData")) out->m_lightData = eastl::make_shared<SE_G::PointLightData>(j["m_lightData"]);
     if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
     if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
     if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
@@ -304,11 +311,13 @@ eastl::unique_ptr<PointLight_Info> PointLight_Info::FromJson(const json& j) {
 // ----------------- DirectionalLight_Info -----------------
 json DirectionalLight_Info::ToJson() const {
     json j = GameObject_Info::ToJson();
+    j["m_lightData"] = *(m_lightData.get());
     return j;
 }
 
 eastl::unique_ptr<DirectionalLight_Info> DirectionalLight_Info::FromJson(const json& j) {
     auto out = eastl::make_unique<DirectionalLight_Info>();
+    if (j.contains("m_lightData")) out->m_lightData = eastl::make_shared<SE_G::DirectionalLightData>(j["m_lightData"]);
     if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
     if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
     if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
@@ -353,11 +362,13 @@ eastl::unique_ptr<DirectionalLight_Info> DirectionalLight_Info::FromJson(const j
 // ----------------- SkyBox_Info -----------------
 json SkyBox_Info::ToJson() const {
     json j = GameObject_Info::ToJson();
+    j["m_lightData"] = *(m_lightData.get());
     return j;
 }
 
 eastl::unique_ptr<SkyBox_Info> SkyBox_Info::FromJson(const json& j) {
     auto out = eastl::make_unique<SkyBox_Info>();
+    if (j.contains("m_lightData")) out->m_lightData = eastl::make_shared<SE_G::SkyBoxData>(j["m_lightData"]);
     if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
     if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
     if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
