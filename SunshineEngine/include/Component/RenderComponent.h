@@ -45,6 +45,11 @@ public:
     const std::type_info& getType() const override {
         return typeid(RenderComponent);
     }
+    
+    static const SE::ComponentType s_componentType = SE::ComponentType::RENDER;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
 
     SE_G::DeferredRenderer* m_renderSystem;
     Sunshine::UUID m_objectUUID;
@@ -53,8 +58,9 @@ public:
 class RenderComponent_Info : public Component_Info
 {
 public:
-    static ComponentType StaticComponentType() {
-        return ComponentType::RENDER;
+    static const SE::ComponentType s_componentType = SE::ComponentType::RENDER;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
     }
 
     const std::type_info& getType() const override {

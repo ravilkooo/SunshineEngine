@@ -20,6 +20,7 @@ public:
     Component& operator=(Component&&) noexcept = default;
 
     virtual const std::type_info& getType() const = 0;
+    virtual const SE::ComponentType ComponentType() const = 0;
     
     // JSON serialization hooks. Default implementations do nothing.
     virtual json ToJson() const { return json::object(); }
@@ -39,6 +40,7 @@ public:
     Component_Info& operator=(Component_Info&&) noexcept = default;
 
     virtual const std::type_info& getType() const = 0;
+    virtual const SE::ComponentType ComponentType() const = 0;
 
     virtual bool IsAssigned() = 0;
 

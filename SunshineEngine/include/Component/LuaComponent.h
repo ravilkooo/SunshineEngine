@@ -57,6 +57,10 @@ public:
     const std::type_info& getType() const override {
         return typeid(LuaComponent);
     }
+    static const SE::ComponentType s_componentType = SE::ComponentType::LUA;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
 
 private:
     eastl::unique_ptr<sol::state> lua;
@@ -77,8 +81,9 @@ private:
 
 class LuaComponent_Info : public Component_Info {
 public:
-    static ComponentType StaticComponentType() {
-        return ComponentType::SCRIPT;
+    static const SE::ComponentType s_componentType = SE::ComponentType::LUA;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
     }
 
     const std::type_info& getType() const override {

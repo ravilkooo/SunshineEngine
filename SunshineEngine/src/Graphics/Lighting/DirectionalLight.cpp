@@ -15,5 +15,7 @@ namespace SE_G {
         directionalLightData.Direction.Normalize();
 
         m_lightData = eastl::make_shared<DirectionalLightData>(directionalLightData);
+        m_name = "DirectionalLight";
+        m_group = GameObjectGroup::Lighting;
     }
 }

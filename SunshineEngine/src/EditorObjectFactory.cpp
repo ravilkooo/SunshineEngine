@@ -26,6 +26,8 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateDefaultBoxObject(
 	auto device = renderSystem->GetDevice();
 
 	auto obj = eastl::make_unique<GameObject_Info>();
+	obj->m_group = GameObjectGroup::Shapes;
+	obj->m_name = "Box";
 
 	// TransformComponent
 	auto tr_info = obj->AddComponent<TransformComponent_Info>();
@@ -68,6 +70,8 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateDefaultSphereObjec
 	auto device = renderSystem->GetDevice();
 
 	auto obj = eastl::make_unique<GameObject_Info>();
+	obj->m_group = GameObjectGroup::Shapes;
+	obj->m_name = "Sphere";
 
 	// TransformComponent
 	auto tr_info = obj->AddComponent<TransformComponent_Info>();
@@ -110,6 +114,8 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateFinalPassQuad(SE_G
 	auto device = renderSystem->GetDevice();
 
 	auto obj = eastl::make_unique<GameObject_Info>();
+	obj->m_group = GameObjectGroup::Other;
+	obj->m_name = "FinalPass";
 
 	// TransformComponent
 	auto tr_info = obj->AddComponent<TransformComponent_Info>();

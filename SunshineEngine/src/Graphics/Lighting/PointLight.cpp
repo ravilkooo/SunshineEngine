@@ -34,6 +34,8 @@ namespace SE_G {
         }
 
         m_lightData = eastl::make_shared<PointLightData>(pointLightData);
+        m_name = "PointLight";
+        m_group = GameObjectGroup::Lighting;
 
         /*
         CreateSimpleSphereMesh(range, 6, 2,

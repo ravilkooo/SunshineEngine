@@ -25,5 +25,9 @@ namespace SE_G {
     {
     public:
         SkyBox_Info(SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
+
+        // Serialization
+        json ToJson() const override;
+        static eastl::unique_ptr<SkyBox_Info> FromJson(const json& j);
     };
 }

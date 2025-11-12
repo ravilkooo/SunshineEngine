@@ -79,12 +79,19 @@ protected:
 };
 
 enum class GameObjectGroup {
-    Lighting, Shapes, CustomMesh
+    Lighting, Shapes, CustomMesh, Other
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(GameObjectGroup, {
+    {GameObjectGroup::Lighting,    "Lighting"},
+    {GameObjectGroup::Shapes, "Shapes"},
+    {GameObjectGroup::CustomMesh,   "CustomMesh"},
+    {GameObjectGroup::Other,   "Other"},
+    })
 
 class GameObject_InfoImpl {
 public:
-    eastl::map<ComponentType, eastl::shared_ptr<Component_Info>> components;
+    eastl::map<SE::ComponentType, eastl::shared_ptr<Component_Info>> components;
 };
 
 class GameObject_Info {
@@ -100,7 +107,7 @@ public:
     template<typename T, typename... Args,
         typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>
     eastl::shared_ptr<T> AddComponent(Args&&... args) {
-        ComponentType type = T::StaticComponentType();
+        //SE::ComponentType type = T::StaticComponentType();
         // Check if already has this type
         if (HasComponent<T>()) {
             // log << "Object already has this Component\n";
@@ -108,21 +115,21 @@ public:
         }
 
         auto component = eastl::make_shared<T>(eastl::forward<Args>(args)...);
-        impl->components[type] = component;
+        impl->components[component->ComponentType()] = component;
         return component;
     }
 
     template<typename T,
         typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>
     bool HasComponent() const {
-        ComponentType type = T::StaticComponentType();
+        SE::ComponentType type = T::s_componentType;
         return impl->components.find(type) != impl->components.end();
     }
 
     template<typename T,
         typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>
     eastl::shared_ptr<T> GetComponent() {
-        ComponentType type = T::StaticComponentType();
+        SE::ComponentType type = T::s_componentType;
         auto it = impl->components.find(type);
         if (it != impl->components.end())
             return eastl::static_pointer_cast<T>(it->second);
@@ -133,12 +140,12 @@ public:
     template<typename T,
         typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>
     void RemoveComponent() {
-        ComponentType type = T::StaticComponentType();
+        SE::ComponentType type = T::s_componentType;
         impl->components.erase(type);
     }
 
     // Serialization
-    json ToJson() const;
+    virtual json ToJson() const;
     static eastl::unique_ptr<GameObject_Info> FromJson(const json& j);
 
 protected:

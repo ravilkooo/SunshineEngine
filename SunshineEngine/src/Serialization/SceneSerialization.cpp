@@ -5,15 +5,18 @@
 #include "Component/TransformComponent.h"
 #include "Component/RenderComponent.h"
 #include "Component/PhysicsComponent.h"
+#include "Component/LuaComponent.h"
 #include <EASTL/shared_ptr.h>
 #include <EASTL/string.h>
 #include <Utils/StringUtils.h>
+
+#include <Graphics/Lighting/LightCollection.h>
 
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-// ----------------- TransformComponent_Info -----------------
+// ----------------- TransformComponent -----------------
 json TransformComponent_Info::ToJson() const {
     json j;
     // prefer assigned component values if present
@@ -78,7 +81,7 @@ void TransformComponent::FromJson(const json& j) {
     }
 }
 
-// ----------------- RenderComponent_Info -----------------
+// ----------------- RenderComponent -----------------
 json RenderComponent_Info::ToJson() const {
     json j;
     j["techniques"] = json::array();
@@ -95,15 +98,48 @@ void RenderComponent_Info::FromJson(const json& j) {
     }
 }
 
-// ----------------- PhysicsComponent_Info -----------------
+// ----------------- PhysicsComponent -----------------
 json PhysicsComponent_Info::ToJson() const {
     json j;
-    j["collisionLayer"] = m_collisionLayer.c_str();
+    j = nlohmann::json{
+        {"m_shape",         m_shape},
+        {"m_motion",        m_motion},
+        {"m_activation",    m_activation},
+        {"m_collisionLayer",  std::string{m_collisionLayer.c_str()}}
+    };
     return j;
 }
 
 void PhysicsComponent_Info::FromJson(const json& j) {
-    if (j.contains("collisionLayer")) m_collisionLayer = j["collisionLayer"].get<std::string>().c_str();
+    
+    j.at("m_shape").get_to(m_shape);
+    j.at("m_motion").get_to(m_motion);
+    j.at("m_activation").get_to(m_activation);
+    m_collisionLayer = CollisionLayer{ j.at("m_collisionLayer").get<std::string>().c_str() };
+
+}
+
+void PhysicsComponent::FromJson(const json& j) {
+
+    PhysicsComponent_Info info; info.FromJson(j);
+
+    if (info.m_collisionLayer == "NON_MOVING")  m_objectLayer = Layers::NON_MOVING;
+    else if (info.m_collisionLayer == "MOVING")      m_objectLayer = Layers::MOVING;
+    else                                         m_objectLayer = Layers::NON_MOVING;
+
+    switch (info.m_motion) {
+        case EditorMotionType::Static:    m_motionType = JPH::EMotionType::Static; break;
+        case EditorMotionType::Kinematic: m_motionType = JPH::EMotionType::Kinematic; break;
+        case EditorMotionType::Dynamic:   m_motionType = JPH::EMotionType::Dynamic; break;
+    }
+
+    switch (info.m_activation) {
+        case EditorActivation::Activate:     m_activation = JPH::EActivation::Activate; break;
+        case EditorActivation::DontActivate: m_activation = JPH::EActivation::DontActivate; break;
+    }
+
+    // m_shape = MyShapeFactory::CreateJoltShape(info.shape, ...);
+
 }
 
 // ----------------- GameObject_Info -----------------
@@ -117,12 +153,7 @@ json GameObject_Info::ToJson() const {
     for (auto& [ctype, compPtr] : impl->components) {
         if (!compPtr) continue;
         json compJ;
-        /*
-        switch (compPtr->StaticComponentType()) {
-            compJ["type"] = static_cast<int>(ctype);
-        }
-        */
-        compJ["type"] = "type";
+        compJ["type"] = compPtr->ComponentType();
         compJ["data"] = compPtr->ToJson();
         j["components"].push_back(compJ);
     }
@@ -138,23 +169,27 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(const json& j) {
     if (j.contains("components") && j["components"].is_array()) {
         for (const auto& compJ : j["components"]) {
             if (!compJ.contains("type")) continue;
-            int t = compJ["type"].get<int>();
-            ComponentType ctype = static_cast<ComponentType>(t);
+            SE::ComponentType ctype = compJ["type"];
             const json& data = compJ.contains("data") ? compJ["data"] : json::object();
 
             switch (ctype) {
-            case ComponentType::TRANSFORM: {
+            case SE::ComponentType::TRANSFORM: {
                 auto c = out->AddComponent<TransformComponent_Info>();
                 c->FromJson(data);
                 break;
             }
-            case ComponentType::RENDER: {
+            case SE::ComponentType::RENDER: {
                 auto c = out->AddComponent<RenderComponent_Info>();
                 c->FromJson(data);
                 break;
             }
-            case ComponentType::PHYSICS: {
+            case SE::ComponentType::PHYSICS: {
                 auto c = out->AddComponent<PhysicsComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::LUA: {
+                auto c = out->AddComponent<LuaComponent_Info>();
                 c->FromJson(data);
                 break;
             }
@@ -168,6 +203,201 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(const json& j) {
     return out;
 }
 
+// ----------------- AmbientLight_Info -----------------
+json SE_G::AmbientLight_Info::ToJson() const {
+    json j = GameObject_Info::ToJson();
+    return j;
+}
+
+eastl::unique_ptr<SE_G::AmbientLight_Info> SE_G::AmbientLight_Info::FromJson(const json& j) {
+    auto out = eastl::make_unique<SE_G::AmbientLight_Info>();
+    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
+    if (j.contains("m_UUID")) out->m_UUID = Sunshine::UUID(j["m_UUID"].get<uint64_t>());
+    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
+
+    if (j.contains("components") && j["components"].is_array()) {
+        for (const auto& compJ : j["components"]) {
+            if (!compJ.contains("type")) continue;
+            SE::ComponentType ctype = compJ["type"];
+            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
+
+            switch (ctype) {
+            case SE::ComponentType::TRANSFORM: {
+                auto c = out->AddComponent<TransformComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::RENDER: {
+                auto c = out->AddComponent<RenderComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::PHYSICS: {
+                auto c = out->AddComponent<PhysicsComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::LUA: {
+                auto c = out->AddComponent<LuaComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            default:
+                // Unknown/unsupported component type - skip
+                break;
+            }
+        }
+    }
+
+    return out;
+}
+
+// ----------------- PointLight_Info -----------------
+json SE_G::PointLight_Info::ToJson() const {
+    json j = GameObject_Info::ToJson();
+    return j;
+}
+
+eastl::unique_ptr<SE_G::PointLight_Info> SE_G::PointLight_Info::FromJson(const json& j) {
+    auto out = eastl::make_unique<SE_G::PointLight_Info>();
+    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
+    if (j.contains("m_UUID")) out->m_UUID = Sunshine::UUID(j["m_UUID"].get<uint64_t>());
+    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
+
+    if (j.contains("components") && j["components"].is_array()) {
+        for (const auto& compJ : j["components"]) {
+            if (!compJ.contains("type")) continue;
+            SE::ComponentType ctype = compJ["type"];
+            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
+
+            switch (ctype) {
+            case SE::ComponentType::TRANSFORM: {
+                auto c = out->AddComponent<TransformComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::RENDER: {
+                auto c = out->AddComponent<RenderComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::PHYSICS: {
+                auto c = out->AddComponent<PhysicsComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::LUA: {
+                auto c = out->AddComponent<LuaComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            default:
+                // Unknown/unsupported component type - skip
+                break;
+            }
+        }
+    }
+
+    return out;
+}
+
+// ----------------- DirectionalLight_Info -----------------
+json SE_G::DirectionalLight_Info::ToJson() const {
+    json j = GameObject_Info::ToJson();
+    return j;
+}
+
+eastl::unique_ptr<SE_G::DirectionalLight_Info> SE_G::DirectionalLight_Info::FromJson(const json& j) {
+    auto out = eastl::make_unique<SE_G::DirectionalLight_Info>();
+    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
+    if (j.contains("m_UUID")) out->m_UUID = Sunshine::UUID(j["m_UUID"].get<uint64_t>());
+    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
+
+    if (j.contains("components") && j["components"].is_array()) {
+        for (const auto& compJ : j["components"]) {
+            if (!compJ.contains("type")) continue;
+            SE::ComponentType ctype = compJ["type"];
+            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
+
+            switch (ctype) {
+            case SE::ComponentType::TRANSFORM: {
+                auto c = out->AddComponent<TransformComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::RENDER: {
+                auto c = out->AddComponent<RenderComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::PHYSICS: {
+                auto c = out->AddComponent<PhysicsComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::LUA: {
+                auto c = out->AddComponent<LuaComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            default:
+                // Unknown/unsupported component type - skip
+                break;
+            }
+        }
+    }
+
+    return out;
+}
+
+// ----------------- SkyBox_Info -----------------
+json SE_G::SkyBox_Info::ToJson() const {
+    json j = GameObject_Info::ToJson();
+    return j;
+}
+
+eastl::unique_ptr<SE_G::SkyBox_Info> SE_G::SkyBox_Info::FromJson(const json& j) {
+    auto out = eastl::make_unique<SE_G::SkyBox_Info>();
+    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
+    if (j.contains("m_UUID")) out->m_UUID = Sunshine::UUID(j["m_UUID"].get<uint64_t>());
+    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
+
+    if (j.contains("components") && j["components"].is_array()) {
+        for (const auto& compJ : j["components"]) {
+            if (!compJ.contains("type")) continue;
+            SE::ComponentType ctype = compJ["type"];
+            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
+
+            switch (ctype) {
+            case SE::ComponentType::TRANSFORM: {
+                auto c = out->AddComponent<TransformComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::RENDER: {
+                auto c = out->AddComponent<RenderComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::PHYSICS: {
+                auto c = out->AddComponent<PhysicsComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            case SE::ComponentType::LUA: {
+                auto c = out->AddComponent<LuaComponent_Info>();
+                c->FromJson(data);
+                break;
+            }
+            default:
+                // Unknown/unsupported component type - skip
+                break;
+            }
+        }
+    }
+
+    return out;
+}
 // ----------------- Scene_Info -----------------
 json Scene_Info::ToJson() const {
     json j;

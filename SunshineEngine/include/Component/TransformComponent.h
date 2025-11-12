@@ -71,6 +71,10 @@ public:
     const std::type_info& getType() const override {
         return typeid(TransformComponent);
     }
+    static const SE::ComponentType s_componentType = SE::ComponentType::TRANSFORM;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
 
     // Serialization
     void FromJson(const json& j) override;
@@ -79,8 +83,9 @@ public:
 class TransformComponent_Info : public Component_Info
 {
 public:
-    static ComponentType StaticComponentType() {
-        return ComponentType::TRANSFORM;
+    static const SE::ComponentType s_componentType = SE::ComponentType::TRANSFORM;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
     }
 
     const std::type_info& getType() const override {

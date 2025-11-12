@@ -1,8 +1,20 @@
 #pragma once
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
-enum class ComponentType {
-	TRANSFORM,
-	RENDER,
-	SCRIPT,
-	PHYSICS
-};
+namespace SE {
+	enum class ComponentType {
+		TRANSFORM,
+		RENDER,
+		LUA,
+		PHYSICS
+	};
+}
+
+
+NLOHMANN_JSON_SERIALIZE_ENUM(SE::ComponentType, {
+	{SE::ComponentType::TRANSFORM, "TRANSFORM"},
+	{SE::ComponentType::RENDER, "RENDER"},
+	{SE::ComponentType::LUA,   "LUA"},
+	{SE::ComponentType::PHYSICS,   "PHYSICS"},
+})

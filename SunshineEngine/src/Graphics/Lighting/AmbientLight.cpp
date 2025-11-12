@@ -9,5 +9,7 @@ namespace SE_G {
     AmbientLight_Info::AmbientLight_Info(AmbientLightData initData)
     {
         m_lightData = eastl::make_shared<AmbientLightData>(initData);
+        m_name = "AmbientLight";
+        m_group = GameObjectGroup::Lighting;
     }
 }

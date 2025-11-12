@@ -25,5 +25,9 @@ namespace SE_G {
     {
     public:
         AmbientLight_Info(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
+
+        // Serialization
+        json ToJson() const override;
+        static eastl::unique_ptr<AmbientLight_Info> FromJson(const json& j);
     };
 }

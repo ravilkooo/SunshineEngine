@@ -26,9 +26,9 @@ public:
     //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
     eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(Sunshine::UUID uuid);
 
-    // ����� ������ ����������� ���������������
+    // Чтобы быстро и последовательно итероваться
     eastl::vector<Sunshine::UUID> gameObjects;
-    // ������� ���������. ����� ������ �������� �� UUID
+    // Владеет объектами. Нужен чтобы быстро находить по UUID
     std::unordered_map<Sunshine::UUID, eastl::unique_ptr<GameObject>> uuidToObjectMap;
 private:
 };
@@ -53,8 +53,8 @@ public:
     json ToJson() const;
     static eastl::shared_ptr<Scene_Info> FromJson(const json& j);
 
-    // ����� ������ ����������� ���������������
+    // Чтобы быстро и последовательно итероваться
     eastl::vector<Sunshine::UUID> gameObjects;
-    // ������� ���������. ����� ������ �������� �� UUID
+    // Владеет объектами. Нужен чтобы быстро находить по UUID
     std::unordered_map<Sunshine::UUID, eastl::unique_ptr<GameObject_Info>> uuidToObjectMap;
 };

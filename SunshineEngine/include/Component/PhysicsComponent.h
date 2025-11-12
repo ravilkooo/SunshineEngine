@@ -10,8 +10,10 @@
 #include <Jolt/Physics/EActivation.h>
 
 #include <Physics/CollisionUtils.h>
+#include <Physics/PhysicsEnums.h>
 #include <Utils/UUID.h>
 
+class TransformComponent;
 
 class PhysicsSystem;
 
@@ -33,6 +35,10 @@ public:
     const std::type_info& getType() const override {
         return typeid(PhysicsComponent);
     }
+    static const SE::ComponentType s_componentType = SE::ComponentType::PHYSICS;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
     
     // Setters for configuration before adding body
     void SetObjecUUID(Sunshine::UUID objectUUID);
@@ -46,6 +52,8 @@ public:
     // Create and add body to physics system
     void CreateBody(eastl::shared_ptr<PhysicsSystem> physicsSystem);
 
+    void InitTransforms(TransformComponent* tc);
+
     JPH::Body* GetBody() const;
     JPH::BodyID GetBodyID() const;
 
@@ -56,22 +64,24 @@ private:
     JPH::BodyID m_joltBodyId;
 
     // Configuration properties before creating body
-    JPH::ObjectLayer m_objectLayer = Layers::NON_MOVING; // default layer
     JPH::RVec3 m_position = JPH::RVec3::sZero();
     JPH::Quat m_orientation = JPH::Quat::sIdentity();
     JPH::EMotionType m_motionType = JPH::EMotionType::Static;
     JPH::EActivation m_activation = JPH::EActivation::Activate;
+    JPH::ObjectLayer m_objectLayer = Layers::NON_MOVING; // default layer
     JPH::ShapeRefC m_shape = nullptr;
 
     eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
+    void FromJson(const json& j) override;
 };
 
 class PhysicsComponent_Info :
     public Component_Info
 {
 public:
-    static ComponentType StaticComponentType() {
-        return ComponentType::PHYSICS;
+    static const SE::ComponentType s_componentType = SE::ComponentType::PHYSICS;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
     }
 
     const std::type_info& getType() const override {
@@ -80,7 +90,10 @@ public:
 
     bool IsAssigned() override { return false; }
 
-    CollisionLayer m_collisionLayer;
+    EditorShape m_shape = EditorShape::Box;
+    EditorMotionType m_motion = EditorMotionType::Dynamic;
+    EditorActivation m_activation = EditorActivation::Activate;
+    CollisionLayer m_collisionLayer = {};
 
     // Serialization
     json ToJson() const override;

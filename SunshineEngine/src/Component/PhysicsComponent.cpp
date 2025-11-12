@@ -1,5 +1,6 @@
 #include <Component/PhysicsComponent.h>
 #include <Physics/PhysicsSystem.h>
+#include <Component/TransformComponent.h>
 
 void PhysicsComponent::SetObjecUUID(Sunshine::UUID objectUUID) {
     m_objectUUID = objectUUID;
@@ -39,6 +40,14 @@ void PhysicsComponent::CreateBody(eastl::shared_ptr<PhysicsSystem> physicsSystem
     joltBodyId = bodyInterface.CreateAndAddBody(settings, activation);
     joltBody = bodyInterface.GetBody(joltBodyId);
     */
+}
+
+void PhysicsComponent::InitTransforms(TransformComponent* tc) {
+    m_position.Set(tc->m_position.x, tc->m_position.y, tc->m_position.z);
+
+    auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(tc->m_rotation.y, tc->m_rotation.x, tc->m_rotation.z);
+
+    m_orientation.Set(quat.x, quat.y, quat.z, quat.w);
 }
 
 JPH::Body* PhysicsComponent::GetBody() const { return m_joltBody; }

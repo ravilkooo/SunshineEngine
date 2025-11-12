@@ -1,0 +1,658 @@
+{
+    "gameObjects": [
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "LightPass",
+                            "IconPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 11617920132076067431,
+            "m_group": 0,
+            "m_name": "SkyBox"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 11534457624964506544,
+            "m_group": 1,
+            "m_name": "Box"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            3.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 1768827547076181126,
+            "m_group": 1,
+            "m_name": "Sphere"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            1.4999998807907104,
+                            2.598076343536377,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 9178872262231392949,
+            "m_group": 1,
+            "m_name": "Sphere"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            -1.500000238418579,
+                            2.598076105117798,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 4072895551821277085,
+            "m_group": 1,
+            "m_name": "Sphere"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            -3.0,
+                            -2.6226831550957286e-07,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 15950270317408511668,
+            "m_group": 1,
+            "m_name": "Sphere"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            -1.499999761581421,
+                            -2.598076343536377,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 15301481464703092442,
+            "m_group": 1,
+            "m_name": "Sphere"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            1.500001072883606,
+                            -2.5980756282806396,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 7143238356498181893,
+            "m_group": 1,
+            "m_name": "Sphere"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "LightPass",
+                            "IconPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 11318785699720288703,
+            "m_group": 0,
+            "m_name": "AmbientLight"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "LightPass",
+                            "IconPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 5644763395107090539,
+            "m_group": 0,
+            "m_name": "DirectionalLight"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            1.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "LightPass",
+                            "IconPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 7622702042445619017,
+            "m_group": 0,
+            "m_name": "PointLight"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            0.0,
+                            -5.0,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 12624798683644887862,
+            "m_group": 1,
+            "m_name": "Box"
+        },
+        {
+            "components": [
+                {
+                    "data": {
+                        "m_localPosition": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localRotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_localScaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "m_position": [
+                            0.0,
+                            2.0,
+                            0.0
+                        ],
+                        "m_rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "m_scaleFactor": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "type": 0
+                },
+                {
+                    "data": {
+                        "techniques": [
+                            "GPass"
+                        ]
+                    },
+                    "type": 1
+                }
+            ],
+            "m_UUID": 10236185541686030391,
+            "m_group": 1,
+            "m_name": "Sphere"
+        }
+    ]
+}

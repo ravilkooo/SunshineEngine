@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <Utils/StringUtils.h>
 
 #include <EditorApp.h>
 
@@ -36,6 +37,16 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
             std::cout << "Play\n";
             if (m_editorApp)
                 m_editorApp->LaunchGame();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Save"))
+        {
+            std::cout << "Saved scene\n";
+            if (m_editorApp) {
+                //m_editorApp->m_worldEditor->m_scene->ToJson();
+                m_editorApp->SaveSceneToFile(WcharToChar(JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"../scene.json")));
+            }
         }
     }
     else

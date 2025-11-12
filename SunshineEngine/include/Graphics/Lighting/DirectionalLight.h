@@ -41,5 +41,9 @@ namespace SE_G {
                 DXSM::Vector3::Zero, 0,
                 DXSM::Vector3(0, -1, 0), 0
             });
+
+        // Serialization
+        json ToJson() const override;
+        static eastl::unique_ptr<DirectionalLight_Info> FromJson(const json& j);
     };
 }
