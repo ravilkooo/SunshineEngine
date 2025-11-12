@@ -38,6 +38,8 @@ public:
     const eastl::vector<ParamEntry>& GetParams() const { return params; }
     eastl::vector<ParamEntry>& GetParams() { return params; }
 
+    eastl::vector<eastl::string> GetAvailableFunctions() const;
+    
     void SetFunctionName(const eastl::string& name);
     eastl::string GetFunctionName() const;
 

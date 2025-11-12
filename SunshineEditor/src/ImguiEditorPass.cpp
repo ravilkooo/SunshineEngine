@@ -4,6 +4,8 @@
 #include <EASTL/string.h>
 #include <Utils/DebugUtils.h>
 
+#include "assimp/SceneCombiner.h"
+
 ImguiEditorPass::ImguiEditorPass(
 	ID3D11Device* device,
 	ID3D11DeviceContext* context,
@@ -86,15 +88,13 @@ void ImguiEditorPass::Pass()
 
 	// Toolbar
 	m_ToolbarPanel.OnImGuiRender(m_MainMenuBarPanel.GetHeight());
-
-	float menuHeight = m_MainMenuBarPanel.GetHeight();
-	float toolbarHeight = m_ToolbarPanel.getHeight();
-	float topOffset = menuHeight + toolbarHeight;
+	
+	float topOffset = m_MainMenuBarPanel.GetHeight() + m_ToolbarPanel.GetHeight();
 
 	// Create DockSpace above main viewport
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + topOffset));
-	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - topOffset));
+	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - topOffset - m_BottomPanel.GetHeight()));
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 	// ----- Docking -------
@@ -133,19 +133,24 @@ void ImguiEditorPass::Pass()
 	}
 
 	ImGui::End();
-	
+
+	//Scene Hierarchy
 	ImGui::Begin("Scene Hierarchy");
-	ShowSceneHierarchy();  // Scene Hierarchy
+	ShowSceneHierarchy();
 	ImGui::End();
 
 	// Properties
-	ImGui::Begin("Properties");
 	ShowProperties();
-	ImGui::End();
 
-	ImGui::Begin("Content Browser");
+	// Content Browser
 	ShowContentBrowser();
-	ImGui::End();
+
+	// Bottom Bar Panel
+	ShowBottomPanel();
+
+	// Output Log 
+	ShowOutputLog();
+
 
 	// Main Game Viewport
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -263,7 +268,11 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
 			//m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->Name = objLabel;
 
-			if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
+			eastl::string objName = m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->m_name;
+			if (objName == "")
+				objName = std::to_string(objects[i].m_UUID).c_str();
+			// if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
+			if (ImGui::Selectable(objName.c_str(), isSelected))
 			{
 				selectedUUID = objects[i];
 				m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
@@ -281,8 +290,9 @@ void ImguiEditorPass::ShowContentBrowser()
 
 void ImguiEditorPass::ShowProperties()
 {
-	if (selectedUUID == Sunshine::UUID(0u))
-		return;
+	m_PropertyPanel.SetWorldEditor(m_worldEditor);
+	m_PropertyPanel.SetSelectedUUID(selectedUUID);
+	m_PropertyPanel.OnImGuiRender();
 
 	GameObject_Info* obj = m_worldEditor->m_scene->GetGameObjectByUUID(
 		selectedUUID
@@ -298,11 +308,51 @@ void ImguiEditorPass::ShowProperties()
 		}
 		return;
 	}
-	else 
-	{
-		LuaImgui(obj);
-	}
 	*/
+	//ImGui::Begin("Properties);
+	// if (selectedUUID == Sunshine::UUID(0u))
+	// 	return;
+	//
+	// GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
+	// 	selectedUUID
+	// );
+	//
+	// if (!obj->HasComponent<LuaComponent>())
+	// {
+	// 	if (ImGui::Button("Add Lua Script")) {
+	// 		obj->AddComponent<LuaComponent>();
+	// 		auto lua2 = obj->GetComponent<LuaComponent>();
+	// 		lua2->Init(obj);
+	// 	}
+	// 	return;
+	// }
+	// else 
+	// {
+	// 	LuaImgui(obj);
+	// }
+	//ImGui::End();
+}
+
+void ImguiEditorPass::ShowBottomPanel()
+{
+	m_BottomPanel.OnImGuiRender(&m_ShowEditorLogPanel, &m_ShowGameLogPanel);
+}
+
+void ImguiEditorPass::ShowOutputLog()
+{
+	m_EditorLogPanel.SetBottomOffset(m_BottomPanel.GetHeight());
+	
+	if (m_ShowEditorLogPanel)
+	{
+		m_EditorLogPanel.OnImguiRender(m_ShowEditorLogPanel);
+	}
+
+	m_GameLogPanel.SetBottomOffset(m_BottomPanel.GetHeight());
+	
+	if (m_ShowGameLogPanel)
+	{
+		m_GameLogPanel.OnImguiRender(m_ShowGameLogPanel);
+	}
 }
 	
 void ImguiEditorPass::LuaImgui(GameObject* obj)

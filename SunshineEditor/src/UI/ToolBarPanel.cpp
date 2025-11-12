@@ -1,9 +1,7 @@
 #include "UI/ToolBarPanel.h"
-
 #include <iostream>
 #include <ostream>
 #include <Utils/StringUtils.h>
-
 #include <EditorApp.h>
 
 void ToolbarPanel::OnImGuiRender(float menuBarHeight)
@@ -11,7 +9,7 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + menuBarHeight));
-    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, m_ToolbarHeight));
+    ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, m_Height));
     ImGui::SetNextWindowViewport(viewport->ID);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -34,11 +32,10 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
         if (ImGui::Button("Play"))
         {
             isPlaying = true; 
-            std::cout << "Play\n";
+            LOG_GAME_INFO("Game started");
             if (m_editorApp)
                 m_editorApp->LaunchGame();
         }
-
         ImGui::SameLine();
         if (ImGui::Button("Save"))
         {
@@ -53,15 +50,13 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
     {
         if (ImGui::Button("Pause"))
         {
-            std::cout << "Pause\n";
+            LOG_GAME_INFO("Game paused");
         }
         ImGui::SameLine();
         if (ImGui::Button("Stop"))
         {
             isPlaying = false; 
             std::cout << "Stop\n";
-            if (m_editorApp)
-                m_editorApp->StopGame();
         }
     }
 
@@ -69,14 +64,14 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
     ImGui::PopStyleVar(3);
 }
 
-float ToolbarPanel::getHeight()
+float ToolbarPanel::GetHeight()
 {
-    return m_ToolbarHeight;
+    return m_Height;
 }
 
-void ToolbarPanel::setHeight(float toolbarHeight)
+void ToolbarPanel::SetHeight(float toolbarHeight)
 {
-    m_ToolbarHeight = toolbarHeight;
+    m_Height = toolbarHeight;
 }
 
 void ToolbarPanel::SetEditorApp(EditorApp* editorApp)

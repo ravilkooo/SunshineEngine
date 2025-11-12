@@ -2,8 +2,10 @@
 
 #include <iostream>
 #include <filesystem>
+#include <fstream>
 #include <EASTL/string.h>
 
+#include "../../../SunshineEditor/include/LogManager.h"
 #include "Component/TransformComponent.h"
 #include "Utils/StringUtils.h"
 #include "Utils/DebugUtils.h"
@@ -247,3 +249,36 @@ bool LuaComponent::CallFunction() {
 	return true;
 }
 
+eastl::vector<eastl::string> LuaComponent::GetAvailableFunctions() const
+{
+	eastl::vector<eastl::string> functions;
+    
+	if (scriptPath.empty()) return functions;
+        
+	std::ifstream file(scriptPath.c_str());
+	if (!file.is_open()) return functions;
+
+	std::string stdLine;
+	while (std::getline(file, stdLine)) 
+	{
+		eastl::string line = stdLine.c_str();
+		size_t funcPos = line.find("function");
+		if (funcPos == eastl::string::npos) continue;
+        
+		size_t parenPos = line.find('(', funcPos + 8);
+		if (parenPos == eastl::string::npos) continue;
+		
+		eastl::string funcName = line.substr(funcPos + 8, parenPos - funcPos - 8);
+		
+		funcName.erase(0, funcName.find_first_not_of(" \t"));
+		funcName.erase(funcName.find_last_not_of(" \t") + 1);
+        
+		if (!funcName.empty()) 
+		{
+			functions.push_back(funcName);
+		}
+	}
+    
+	file.close();
+	return functions;
+}
