@@ -24,44 +24,42 @@
 
 namespace DXSM = DirectX::SimpleMath;
 
-namespace SE_G {
-    class PointLight :
-        public LightObject<PointLightData>
-    {
-    public:
+class PointLight :
+    public LightObject<SE_G::PointLightData>
+{
+public:
 
-        PointLight(
-            PointLightData pointLightData =
-            {
-                DXSM::Vector3::One, 1,
-                DXSM::Vector3::One, 1,
-                DXSM::Vector3::Zero, 20,
-                DXSM::Vector3::One, 0
-            });
+    PointLight(
+        SE_G::PointLightData pointLightData =
+        {
+            DXSM::Vector3::One, 1,
+            DXSM::Vector3::One, 1,
+            DXSM::Vector3::Zero, 20,
+            DXSM::Vector3::One, 0
+        });
 
-        // Unnecessary?
-        //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-    };
+    // Unnecessary?
+    //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+};
     
-    class PointLight_Info :
-        public LightObject_Info<PointLightData>
-    {
-    public:
+class PointLight_Info :
+    public LightObject_Info<SE_G::PointLightData>
+{
+public:
 
-        PointLight_Info(
-            PointLightData pointLightData =
-            {
-                DXSM::Vector3::One, 1,
-                DXSM::Vector3::One, 1,
-                DXSM::Vector3::Zero, 20,
-                DXSM::Vector3::One, 0
-            });
+    PointLight_Info(
+        SE_G::PointLightData pointLightData =
+        {
+            DXSM::Vector3::One, 1,
+            DXSM::Vector3::One, 1,
+            DXSM::Vector3::Zero, 20,
+            DXSM::Vector3::One, 0
+        });
 
-        // Unnecessary?
-        //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+    // Unnecessary?
+    //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 
-        // Serialization
-        json ToJson() const override;
-        static eastl::unique_ptr<PointLight_Info> FromJson(const json& j);
-    };
-}
+    // Serialization
+    json ToJson() const override;
+    static eastl::unique_ptr<PointLight_Info> FromJson(const json& j);
+};

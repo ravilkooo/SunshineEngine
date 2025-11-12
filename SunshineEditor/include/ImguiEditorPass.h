@@ -89,6 +89,6 @@ public:
 private:
     //int selectedIdx = -1;
     bool objectSelected = false;
-    Sunshine::UUID selectedUUID;
+    SE::UUID selectedUUID;
 };
 

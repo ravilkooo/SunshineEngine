@@ -67,7 +67,7 @@ void WorldEditor::InitWorldEditor(
 	);
 
 	{
-		Sunshine::UUID boxId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultBoxObject(
+		SE::UUID boxId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultBoxObject(
 			m_renderer.get())
 		);
 
@@ -96,7 +96,7 @@ void WorldEditor::InitWorldEditor(
 
 	for (size_t i = 0; i < 6; i++)
 	{
-		Sunshine::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultSphereObject(
+		SE::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultSphereObject(
 			m_renderer.get())
 		);
 		auto obj = m_scene->GetGameObjectByUUID(m_scene->gameObjects.back());
@@ -161,7 +161,7 @@ void WorldEditor::InitWorldEditor(
 	// ----------------------------------------------------
 	// Floor
 	{
-		Sunshine::UUID floorId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultBoxObject(
+		SE::UUID floorId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultBoxObject(
 			m_renderer.get(), 100.0f, 0.1f, 100.0f)
 		);
 		/*
@@ -193,7 +193,7 @@ void WorldEditor::InitWorldEditor(
 
 	// Ball
 	{
-		Sunshine::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultSphereObject(
+		SE::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultSphereObject(
 			m_renderer.get(), 0.5f)
 		);
 
@@ -295,8 +295,8 @@ void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::
 	// trComp->m_position = DXSM::Vector3(worldPos);
 }
 
-Sunshine::UUID WorldEditor::ChooseObjectByClick(UINT x, UINT y)
+SE::UUID WorldEditor::ChooseObjectByClick(UINT x, UINT y)
 {
-	return Sunshine::UUID(m_pixelUUIDHandler->GetUUID(m_renderer->GetDeviceContext(),
+	return SE::UUID(m_pixelUUIDHandler->GetUUID(m_renderer->GetDeviceContext(),
 		m_gPass->pGBuffer->pUUIDSRV.Get(), x, y));
 }

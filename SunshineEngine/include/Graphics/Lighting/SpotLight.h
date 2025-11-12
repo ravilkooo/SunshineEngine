@@ -20,43 +20,41 @@
 namespace DXSM = DirectX::SimpleMath;
 
 
-namespace SE_G {
-    class SpotLight :
-        public LightObject<SpotLightData>
-    {
-    public:
-        /*
-        SpotLight(ID3D11Device* device, DXSM::Vector3 position,
-            float range, DXSM::Vector3 direction, float spot, DXSM::Vector3 att,
-            DXSM::Vector4 ambient, DXSM::Vector4 diffuse, DXSM::Vector4 specular);
+class SpotLight :
+    public LightObject<SE_G::SpotLightData>
+{
+public:
+    /*
+    SpotLight(ID3D11Device* device, DXSM::Vector3 position,
+        float range, DXSM::Vector3 direction, float spot, DXSM::Vector3 att,
+        DXSM::Vector4 ambient, DXSM::Vector4 diffuse, DXSM::Vector4 specular);
 
-        struct SpotLightPCB {
-            XMFLOAT4 Diffuse;
-            XMFLOAT4 Specular;
-            XMFLOAT3 Position;
-            float Range;
+    struct SpotLightPCB {
+        XMFLOAT4 Diffuse;
+        XMFLOAT4 Specular;
+        XMFLOAT3 Position;
+        float Range;
 
-            XMFLOAT3 Direction;
-            float Spot;
+        XMFLOAT3 Direction;
+        float Spot;
 
-            XMFLOAT3 Att;
-            float pad;
-        } spotLightData;
+        XMFLOAT3 Att;
+        float pad;
+    } spotLightData;
 
-        float width;
-        float depth;
+    float width;
+    float depth;
 
-        Vector4 ambient;
+    Vector4 ambient;
 
-        Bind::PixelConstantBuffer<SpotLightPCB>* spotLightPBuffer;
+    Bind::PixelConstantBuffer<SpotLightPCB>* spotLightPBuffer;
 
-        D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos) override;
-        D3D11_RASTERIZER_DESC GetRasterizerDesc(LightObject::LightPosition lightPos) override;
+    D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos) override;
+    D3D11_RASTERIZER_DESC GetRasterizerDesc(LightObject::LightPosition lightPos) override;
 
-        LightPosition GetLightPositionInFrustum(Camera* camera) override;
-        bool IsFrustumInsideOfLight(Camera* camera) override;
+    LightPosition GetLightPositionInFrustum(Camera* camera) override;
+    bool IsFrustumInsideOfLight(Camera* camera) override;
 
-        void UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-        */
-    };
-}
+    void UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+    */
+};

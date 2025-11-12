@@ -52,7 +52,7 @@ public:
     }
 
     SE_G::DeferredRenderer* m_renderSystem;
-    Sunshine::UUID m_objectUUID;
+    SE::UUID m_objectUUID;
 };
 
 class RenderComponent_Info : public Component_Info

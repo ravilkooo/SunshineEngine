@@ -13,17 +13,16 @@ class GameObject_Info;
 
 namespace SE_G {
 	class DeferredRenderer;
-
-	class AmbientLight;
-	class DirectionalLight;
-	class PointLight;
-	class SkyBox;
-
-	class AmbientLight_Info;
-	class DirectionalLight_Info;
-	class PointLight_Info;
-	class SkyBox_Info;
 }
+class AmbientLight;
+class DirectionalLight;
+class PointLight;
+class SkyBox;
+
+class AmbientLight_Info;
+class DirectionalLight_Info;
+class PointLight_Info;
+class SkyBox_Info;
 
 class EditorObjectFactory
 {
@@ -36,19 +35,19 @@ public:
 
 	static eastl::unique_ptr<GameObject_Info> CreateFinalPassQuad(SE_G::DeferredRenderer* renderSystem);
 
-	static eastl::unique_ptr<SE_G::SkyBox_Info> CreateSkyBox(
+	static eastl::unique_ptr<SkyBox_Info> CreateSkyBox(
 		SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f },
 		eastl::wstring texturePath = eastl::wstring(L"Default")
 	);
 
-	static eastl::unique_ptr<SE_G::AmbientLight_Info> CreateAmbientLightObject(
+	static eastl::unique_ptr<AmbientLight_Info> CreateAmbientLightObject(
 		SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::AmbientLightData initData = { DXSM::Vector3::One * 0.1f, 1.0f });
 
-	static eastl::unique_ptr<SE_G::DirectionalLight_Info> CreateDirectionalLightObject(
+	static eastl::unique_ptr<DirectionalLight_Info> CreateDirectionalLightObject(
 		SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::DirectionalLightData initData = {
@@ -58,7 +57,7 @@ public:
 			DXSM::Vector3(1, -1, 1), 0
 		});
 
-	static eastl::unique_ptr<SE_G::PointLight_Info> CreatePointLightObject(
+	static eastl::unique_ptr<PointLight_Info> CreatePointLightObject(
 		SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::PointLightData initData = {

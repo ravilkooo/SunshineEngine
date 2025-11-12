@@ -84,7 +84,7 @@ public:
             return;
         }
 
-        Sunshine::UUID GetUUID(ID3D11DeviceContext* context,
+        SE::UUID GetUUID(ID3D11DeviceContext* context,
             ID3D11ShaderResourceView* UUIDTextureView,
             UINT mouseClickX, UINT mouseClickY) {
             
@@ -114,9 +114,9 @@ public:
 
             context->Unmap(m_outputUUIDBufferStaged.Get(), 0);
 
-            return Sunshine::UUID(uuid);
+            return SE::UUID(uuid);
             
-            //return Sunshine::UUID(0u);
+            //return SE::UUID(0u);
         }
 
     };
@@ -163,11 +163,11 @@ public:
 
     void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
 
-    Sunshine::UUID ChooseObjectByClick(UINT x, UINT y);
+    SE::UUID ChooseObjectByClick(UINT x, UINT y);
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
     // testing
-    // Sunshine::UUID floorId;
-    // Sunshine::UUID ballId;
+    // SE::UUID floorId;
+    // SE::UUID ballId;
 };

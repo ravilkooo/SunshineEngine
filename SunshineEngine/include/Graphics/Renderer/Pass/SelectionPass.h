@@ -37,7 +37,7 @@ namespace SE_G {
 
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilWriteMask;
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilReadMask;
-        Sunshine::UUID m_selectedObjectUUID;
+        SE::UUID m_selectedObjectUUID;
 
         eastl::shared_ptr<Bind::VertexShader> m_meshVertexShader;
 

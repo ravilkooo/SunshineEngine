@@ -2,7 +2,7 @@
 
 namespace SE_G {
 	GPassTechnique::GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
-		Sunshine::UUID uuid)
+		SE::UUID uuid)
 		: RenderTechnique(device, assignedTransform, technique)
 	{
 		D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});

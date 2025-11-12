@@ -18,7 +18,7 @@ void PropertyPanel::OnImGuiRender()
 {
     ImGui::Begin("Properties");
     
-    if (m_SelectedUUID == Sunshine::UUID(0u) || !m_WorldEditor)
+    if (m_SelectedUUID == SE::UUID(0u) || !m_WorldEditor)
     {
         ImGui::Text("No object selected");
         ImGui::End();

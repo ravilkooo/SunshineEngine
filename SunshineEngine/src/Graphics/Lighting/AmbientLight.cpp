@@ -1,15 +1,13 @@
 #include "Graphics/Lighting/AmbientLight.h"
 
-namespace SE_G {
-    AmbientLight::AmbientLight(AmbientLightData initData)
-    {
-        m_lightData = eastl::make_shared<AmbientLightData>(initData);
-    }
+AmbientLight::AmbientLight(SE_G::AmbientLightData initData)
+{
+    m_lightData = eastl::make_shared<SE_G::AmbientLightData>(initData);
+}
 
-    AmbientLight_Info::AmbientLight_Info(AmbientLightData initData)
-    {
-        m_lightData = eastl::make_shared<AmbientLightData>(initData);
-        m_name = "AmbientLight";
-        m_group = GameObjectGroup::Lighting;
-    }
+AmbientLight_Info::AmbientLight_Info(SE_G::AmbientLightData initData)
+{
+    m_lightData = eastl::make_shared<SE_G::AmbientLightData>(initData);
+    m_name = "AmbientLight";
+    m_group = GameObjectGroup::Lighting;
 }

@@ -12,27 +12,27 @@ Scene::~Scene()
     }
 }
 
-Sunshine::UUID Scene::AddGameObject(eastl::unique_ptr<GameObject> gameObject)
+SE::UUID Scene::AddGameObject(eastl::unique_ptr<GameObject> gameObject)
 {
-    const Sunshine::UUID id = gameObject->m_UUID;
+    const SE::UUID id = gameObject->m_UUID;
     auto [it, inserted] = uuidToObjectMap.emplace(id, nullptr);
     if (!inserted)
     {
         printf("Duplicate UUID in Scene::AddGameObject");
-        return Sunshine::UUID(0u);
+        return SE::UUID(0u);
     }
     it->second = std::move(gameObject);
     gameObjects.push_back(id);
     return id;
 }
 
-GameObject* Scene::GetGameObjectByUUID(Sunshine::UUID uuid) const
+GameObject* Scene::GetGameObjectByUUID(SE::UUID uuid) const
 {
     auto it = uuidToObjectMap.find(uuid);
     return (it != uuidToObjectMap.end()) ? it->second.get() : nullptr;
 }
 
-eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(Sunshine::UUID uuid)
+eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
 {
     auto it = uuidToObjectMap.find(uuid);
     if (it == uuidToObjectMap.end())
@@ -68,27 +68,27 @@ Scene_Info::~Scene_Info()
     }
 }
 
-Sunshine::UUID Scene_Info::AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject)
+SE::UUID Scene_Info::AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject)
 {
-    const Sunshine::UUID id = gameObject->m_UUID;
+    const SE::UUID id = gameObject->m_UUID;
     auto [it, inserted] = uuidToObjectMap.emplace(id, nullptr);
     if (!inserted)
     {
         printf("Duplicate UUID in Scene_Info::AddGameObject");
-        return Sunshine::UUID(0u);
+        return SE::UUID(0u);
     }
     it->second = std::move(gameObject);
     gameObjects.push_back(id);
     return id;
 }
 
-GameObject_Info* Scene_Info::GetGameObjectByUUID(Sunshine::UUID uuid) const
+GameObject_Info* Scene_Info::GetGameObjectByUUID(SE::UUID uuid) const
 {
     auto it = uuidToObjectMap.find(uuid);
     return (it != uuidToObjectMap.end()) ? it->second.get() : nullptr;
 }
 
-eastl::unique_ptr<GameObject_Info> Scene_Info::RemoveGameObjectByUUID(Sunshine::UUID uuid)
+eastl::unique_ptr<GameObject_Info> Scene_Info::RemoveGameObjectByUUID(SE::UUID uuid)
 {
     auto it = uuidToObjectMap.find(uuid);
     if (it == uuidToObjectMap.end())

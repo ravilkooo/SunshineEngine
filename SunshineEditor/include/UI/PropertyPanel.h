@@ -28,7 +28,7 @@ public:
         m_WorldEditor = worldEditor; 
     }
     
-    void SetSelectedUUID(Sunshine::UUID uuid) { 
+    void SetSelectedUUID(SE::UUID uuid) { 
         m_SelectedUUID = uuid; 
     }
     
@@ -36,7 +36,7 @@ public:
 
 private:
     eastl::shared_ptr<WorldEditor> m_WorldEditor;
-    Sunshine::UUID m_SelectedUUID = Sunshine::UUID(0u);
+    SE::UUID m_SelectedUUID = SE::UUID(0u);
     
     void DrawGameObjectHeader(GameObject_Info* obj);
 

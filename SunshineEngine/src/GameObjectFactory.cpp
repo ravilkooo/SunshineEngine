@@ -115,14 +115,14 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateFinalPassQuad(SE_G::Defer
 	return obj;
 }
 
-eastl::unique_ptr<SE_G::SkyBox> GameObjectFactory::CreateSkyBox(
+eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::SkyBoxData initData, eastl::wstring texturePath)
 {
 	auto device = renderSystem->GetDevice();
 
-	auto obj = eastl::make_unique<SE_G::SkyBox>(initData);
+	auto obj = eastl::make_unique<SkyBox>(initData);
 	auto tr = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
 
@@ -179,14 +179,14 @@ eastl::unique_ptr<SE_G::SkyBox> GameObjectFactory::CreateSkyBox(
 	return obj;
 }
 
-eastl::unique_ptr<SE_G::AmbientLight> GameObjectFactory::CreateAmbientLightObject(
+eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::AmbientLightData initData)
 {
 	auto device = renderSystem->GetDevice();
 
-	auto obj = eastl::make_unique<SE_G::AmbientLight>(initData);
+	auto obj = eastl::make_unique<AmbientLight>(initData);
 	auto tr = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
 
@@ -214,13 +214,13 @@ eastl::unique_ptr<SE_G::AmbientLight> GameObjectFactory::CreateAmbientLightObjec
 	return obj;
 }
 
-eastl::unique_ptr<SE_G::DirectionalLight> GameObjectFactory::CreateDirectionalLightObject(
+eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObject(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera, SE_G::DirectionalLightData initData)
 {
 	auto device = renderSystem->GetDevice();
 
-	auto obj = eastl::make_unique<SE_G::DirectionalLight>(initData);
+	auto obj = eastl::make_unique<DirectionalLight>(initData);
 	auto tr = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
 
@@ -249,14 +249,14 @@ eastl::unique_ptr<SE_G::DirectionalLight> GameObjectFactory::CreateDirectionalLi
 	return obj;
 }
 
-eastl::unique_ptr<SE_G::PointLight> GameObjectFactory::CreatePointLightObject(
+eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::PointLightData initData)
 {
 	auto device = renderSystem->GetDevice();
 
-	auto obj = eastl::make_unique<SE_G::PointLight>(initData);
+	auto obj = eastl::make_unique<PointLight>(initData);
 	auto tc = obj->AddComponent<TransformComponent>(device);
 	tc->m_position = obj->m_lightData->Position;
 	auto rc = obj->AddComponent<RenderComponent>(renderSystem);

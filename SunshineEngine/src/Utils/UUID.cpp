@@ -1,7 +1,7 @@
 #include "Utils/UUID.h"
 #include <random>
 
-namespace Sunshine {
+namespace SE {
     static std::random_device s_randomDevice;
     static std::mt19937_64 s_rng{ s_randomDevice() };
     static std::uniform_int_distribution<uint64_t> s_dist;

@@ -55,7 +55,7 @@ ImguiEditorPass::ImguiEditorPass(
 	m_viewport.MinDepth = 0;
 	m_viewport.MaxDepth = 1.0f;
 
-	selectedUUID = Sunshine::UUID(0u);
+	selectedUUID = SE::UUID(0u);
 
 	// Change font to Arial to support Russian
 	ImGuiIO& io = ImGui::GetIO();
@@ -310,7 +310,7 @@ void ImguiEditorPass::ShowProperties()
 	}
 	*/
 	//ImGui::Begin("Properties);
-	// if (selectedUUID == Sunshine::UUID(0u))
+	// if (selectedUUID == SE::UUID(0u))
 	// 	return;
 	//
 	// GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(

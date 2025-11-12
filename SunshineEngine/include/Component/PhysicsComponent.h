@@ -41,7 +41,7 @@ public:
     }
     
     // Setters for configuration before adding body
-    void SetObjecUUID(Sunshine::UUID objectUUID);
+    void SetObjecUUID(SE::UUID objectUUID);
     void SetObjectLayer(JPH::ObjectLayer layer);
     void SetPosition(const JPH::RVec3& pos);
     void SetOrientation(const JPH::Quat& rot);
@@ -59,7 +59,7 @@ public:
 
 
 private:
-    Sunshine::UUID m_objectUUID;
+    SE::UUID m_objectUUID;
     JPH::Body* m_joltBody;
     JPH::BodyID m_joltBodyId;
 

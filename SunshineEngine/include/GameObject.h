@@ -29,7 +29,7 @@ public:
     // To make SUNSHINE_ENGINE_API work
 
     GameObject();
-    GameObject(Sunshine::UUID);
+    GameObject(SE::UUID);
     virtual ~GameObject() = default;
     /*
     GameObject(GameObject&&) noexcept = default;
@@ -41,7 +41,7 @@ public:
     // ================
 
     eastl::string m_name;
-    Sunshine::UUID m_UUID;
+    SE::UUID m_UUID;
 
     template<typename T, typename... Args,
         typename = std::enable_if_t<std::is_base_of<Component, T>::value>>
@@ -97,12 +97,12 @@ public:
 class GameObject_Info {
 public:
     GameObject_Info();
-    GameObject_Info(Sunshine::UUID uuid);
+    GameObject_Info(SE::UUID uuid);
     virtual ~GameObject_Info() = default;
 
     GameObjectGroup m_group;
     eastl::string m_name;
-    Sunshine::UUID m_UUID;
+    SE::UUID m_UUID;
 
     template<typename T, typename... Args,
         typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>

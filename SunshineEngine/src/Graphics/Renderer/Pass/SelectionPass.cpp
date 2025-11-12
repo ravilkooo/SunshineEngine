@@ -97,7 +97,7 @@ namespace SE_G {
 		m_pixelShader = eastl::make_shared<Bind::PixelShader>(device,
 			MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionMeshShaderPS.hlsl"));
 
-		m_selectedObjectUUID = Sunshine::UUID(0u);
+		m_selectedObjectUUID = SE::UUID(0u);
 	}
 
 	void SelectionPass::StartFrame()
@@ -106,7 +106,7 @@ namespace SE_G {
 
 	void SelectionPass::Pass()
 	{
-		if (m_selectedObjectUUID == Sunshine::UUID(0u))
+		if (m_selectedObjectUUID == SE::UUID(0u))
 			return;
 
 		/*

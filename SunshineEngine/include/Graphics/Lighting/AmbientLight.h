@@ -12,22 +12,20 @@
 
 namespace DXSM = DirectX::SimpleMath;
 
-namespace SE_G {
-    class AmbientLight :
-        public LightObject<AmbientLightData>
-    {
-    public:
-        AmbientLight(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
-    };
+class AmbientLight :
+    public LightObject<SE_G::AmbientLightData>
+{
+public:
+    AmbientLight(SE_G::AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
+};
 
-    class AmbientLight_Info :
-        public LightObject_Info<AmbientLightData>
-    {
-    public:
-        AmbientLight_Info(AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
+class AmbientLight_Info :
+    public LightObject_Info<SE_G::AmbientLightData>
+{
+public:
+    AmbientLight_Info(SE_G::AmbientLightData initData = { DXSM::Vector3::One, 1.0f });
 
-        // Serialization
-        json ToJson() const override;
-        static eastl::unique_ptr<AmbientLight_Info> FromJson(const json& j);
-    };
-}
+    // Serialization
+    json ToJson() const override;
+    static eastl::unique_ptr<AmbientLight_Info> FromJson(const json& j);
+};
