@@ -1,14 +1,14 @@
-#include <EditorObjectFactory.h>
-#include <GameObject.h>
+#include <GameObject/EditorObjectFactory.h>
+#include <GameObject/GameObject.h>
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
-#include <Graphics/Lighting/AmbientLight.h>
-#include <Graphics/Lighting/PointLight.h>
-#include <Graphics/Lighting/DirectionalLight.h>
-#include <Graphics/Lighting/SkyBox.h>
+#include <GameObject/Lighting/AmbientLight.h>
+#include <GameObject/Lighting/PointLight.h>
+#include <GameObject/Lighting/DirectionalLight.h>
+#include <GameObject/Lighting/SkyBox.h>
 
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Technique/LightTechnique.h>

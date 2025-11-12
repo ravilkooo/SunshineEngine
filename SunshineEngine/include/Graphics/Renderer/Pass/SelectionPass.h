@@ -3,7 +3,6 @@
 #include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Utils/Camera.h>
 #include <Utils/UUID.h>
-#include <Graphics/Lighting/LightCollection.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
 
 namespace SE_G {

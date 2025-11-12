@@ -1,4 +1,4 @@
-#include "Graphics/Lighting/DirectionalLight.h"
+#include "GameObject/Lighting/DirectionalLight.h"
 
 DirectionalLight::DirectionalLight(
     SE_G::DirectionalLightData directionalLightData)

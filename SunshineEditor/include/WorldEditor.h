@@ -7,7 +7,7 @@
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include <GameTimer.h>
 
 #include <Graphics/Renderer/Pass/GPass.h>
@@ -15,7 +15,7 @@
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
 
-#include <EditorObjectFactory.h>
+#include <GameObject/EditorObjectFactory.h>
 #include <Scripting/LuaManager.h>
 
 #include <Physics/PhysicsSystem.h>

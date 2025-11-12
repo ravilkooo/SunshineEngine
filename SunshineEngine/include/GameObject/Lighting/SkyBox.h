@@ -5,9 +5,10 @@
 
 #include <EASTL/shared_ptr.h>
 
-#include <GameObject.h>
-#include "LightObject.h"
-#include "LightData.h"
+#include <GameObject/GameObject.h>
+
+#include <GameObject/Lighting/LightObject.h>
+#include <Graphics/Lighting/LightData.h>
 
 namespace DXSM = DirectX::SimpleMath;
 

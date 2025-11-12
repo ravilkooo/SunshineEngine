@@ -1,4 +1,4 @@
-#include "Graphics/Lighting/PointLightInstanced.h"
+#include "GameObject/Lighting/PointLightInstanced.h"
 
 
 /*

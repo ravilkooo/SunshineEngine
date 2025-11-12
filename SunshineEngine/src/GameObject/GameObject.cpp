@@ -1,4 +1,4 @@
-#include "GameObject.h"
+#include "GameObject/GameObject.h"
 
 GameObject::GameObject() : impl(eastl::make_unique<GameObjectImpl>()) {
 	m_UUID = SE::UUID();

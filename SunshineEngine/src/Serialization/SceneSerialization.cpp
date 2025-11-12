@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Component/Component.h"
 #include "Component/ComponentType.h"
 #include "Component/TransformComponent.h"
@@ -10,7 +10,7 @@
 #include <EASTL/string.h>
 #include <Utils/StringUtils.h>
 
-#include <Graphics/Lighting/LightCollection.h>
+#include <GameObject/Lighting/LightCollection.h>
 
 #include <nlohmann/json.hpp>
 

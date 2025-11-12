@@ -4,7 +4,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
 #include "sol/sol.hpp"
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include "ScriptComponent.h"
 
 struct ParamEntry {

@@ -1,4 +1,4 @@
-#include "Graphics/Lighting/PointLight.h"
+#include "GameObject/Lighting/PointLight.h"
 
 
 PointLight::PointLight(SE_G::PointLightData pointLightData)

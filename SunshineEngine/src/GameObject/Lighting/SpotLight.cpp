@@ -1,4 +1,4 @@
-#include "Graphics/Lighting/SpotLight.h"
+#include "GameObject/Lighting/SpotLight.h"
 
 
 /*

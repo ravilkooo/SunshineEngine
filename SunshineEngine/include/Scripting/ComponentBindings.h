@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sol/sol.hpp>
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 
 class TransformComponent;
 class RenderComponent;

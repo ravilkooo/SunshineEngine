@@ -5,7 +5,7 @@
 #include <string>
 #include "Scene.h"
 #include <Graphics/Bindable/Bindable.h>
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 

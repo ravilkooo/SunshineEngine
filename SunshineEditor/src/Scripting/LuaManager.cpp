@@ -1,7 +1,7 @@
 #include <Scripting/LuaManager.h>
 
 #include <Scene.h>
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include <Component/LuaComponent.h>
 
 void LuaManager::Update(Scene& scene, float deltaTime) {

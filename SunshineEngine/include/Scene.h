@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Utils/UUID.h"
 #include <EASTL/hash_map.h>
 #include <EASTL/unique_ptr.h>

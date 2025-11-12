@@ -1,4 +1,4 @@
-#include "Graphics/Lighting/SkyBox.h"
+#include "GameObject/Lighting/SkyBox.h"
 
 SkyBox::SkyBox(SE_G::SkyBoxData initData)
 {

@@ -6,7 +6,7 @@
 
 #include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Utils/Camera.h>
-#include <Graphics/Lighting/LightCollection.h>
+#include <GameObject/Lighting/LightCollection.h>
 
 // temp
 #include <Graphics/ParticleSystem/ParticleSystem.h>

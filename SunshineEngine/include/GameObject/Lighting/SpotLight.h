@@ -3,9 +3,6 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
-#include <GameObject.h>
-
-#include "LightObject.h"
 
 #include "Graphics/Utils/ShapeGenerator.h"
 
@@ -15,7 +12,11 @@
 
 #include "Graphics/Bindable/BindableCollection.h"
 #include "Graphics/Renderer/Technique/RenderTechnique.h"
-#include "LightData.h"
+
+#include <GameObject/GameObject.h>
+
+#include <GameObject/Lighting/LightObject.h>
+#include <Graphics/Lighting/LightData.h>
 
 namespace DXSM = DirectX::SimpleMath;
 

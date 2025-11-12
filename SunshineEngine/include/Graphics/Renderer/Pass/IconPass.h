@@ -3,7 +3,7 @@
 #include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Utils/Camera.h>
 #include <Utils/UUID.h>
-#include <Graphics/Lighting/LightCollection.h>
+#include <GameObject/Lighting/LightCollection.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/Bindable/DepthStencilState.h>
 

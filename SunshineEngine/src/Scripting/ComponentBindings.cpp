@@ -1,6 +1,6 @@
 #include <Scripting/ComponentBindings.h>
 
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include <Scripting/AutoBindings.h>
 #include <Utils/DebugUtils.h>
 #include <SimpleMath.h>

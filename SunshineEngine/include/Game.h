@@ -11,7 +11,7 @@
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
 
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include <GameTimer.h>
 
 #include <Scene.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 
 template <class T>
 class LightObject : public GameObject

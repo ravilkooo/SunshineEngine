@@ -1,4 +1,4 @@
-#include "Graphics/Lighting/AmbientLight.h"
+#include <GameObject/Lighting/AmbientLight.h>
 
 AmbientLight::AmbientLight(SE_G::AmbientLightData initData)
 {

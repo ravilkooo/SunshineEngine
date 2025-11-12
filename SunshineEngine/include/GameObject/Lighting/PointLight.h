@@ -5,7 +5,6 @@
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
-#include <GameObject.h>
 
 #include <EASTL/algorithm.h>
 
@@ -20,7 +19,11 @@
 #include <EASTL/shared_ptr.h>
 
 #include "Graphics/Utils/Camera.h"
-#include "LightData.h"
+
+#include <GameObject/GameObject.h>
+
+#include <GameObject/Lighting/LightObject.h>
+#include <Graphics/Lighting/LightData.h>
 
 namespace DXSM = DirectX::SimpleMath;
 
