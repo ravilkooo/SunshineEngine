@@ -104,58 +104,6 @@ void PropertyPanel::DrawTransformComponent(GameObject* obj)
     }
 }
 
-// void PropertyPanel::DrawRenderComponent(GameObject* obj)
-// {
-//     if (!obj->HasComponent<RenderComponent>()) 
-//         return;
-//
-//     auto render = obj->GetComponent<RenderComponent>();
-//     
-//     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
-//                               ImGuiTreeNodeFlags_Framed |
-//                               ImGuiTreeNodeFlags_SpanAvailWidth;
-//     
-//     if (ImGui::TreeNodeEx("Render Component", flags))
-//     {   
-//         static eastl::string selectedTechnique = "";
-//         
-//         for (auto& techPair : render->techniques)
-//         {
-//             ImGui::PushID(techPair.first.c_str());
-//             
-//             bool isSelected = (selectedTechnique == techPair.first);
-//             
-//             if (auto gpass = dynamic_cast<SE_G::GPassTechnique*>(techPair.second.get()));
-//             else if (auto iconTech = dynamic_cast<SE_G::IconTechnique*>(techPair.second.get()));
-//             else if (auto ambient = dynamic_cast<SE_G::LightTechnique<SE_G::AmbientLightData>*>(techPair.second.get()));
-//             else if (auto directional = dynamic_cast<SE_G::LightTechnique<SE_G::DirectionalLightData>*>(techPair.second.get()));
-//             else if (auto point = dynamic_cast<SE_G::LightTechnique<SE_G::PointLightData>*>(techPair.second.get()));
-//             else if (auto skybox = dynamic_cast<SE_G::LightTechnique<SE_G::SkyBoxData>*>(techPair.second.get()));
-//             
-//             eastl::string displayName = techPair.first;
-//             
-//             if (ImGui::Selectable(displayName.c_str(), isSelected))
-//             {
-//                 selectedTechnique = techPair.first;
-//             }
-//             
-//             if (isSelected && !selectedTechnique.empty() && render->techniques.find(selectedTechnique) != render->techniques.end())
-//             {
-//                 ImGui::Separator();
-//             
-//                 auto& tech = render->techniques[selectedTechnique];
-//                 DrawTechniqueDetails(tech.get(), selectedTechnique);
-//
-//                 ImGui::Separator();
-//             }
-//             
-//             ImGui::PopID();
-//         }
-//         
-//         ImGui::TreePop();
-//     }
-// }
-
 void PropertyPanel::DrawRenderComponent(GameObject* obj)
 {
     if (!obj->HasComponent<RenderComponent>()) 
@@ -183,23 +131,20 @@ void PropertyPanel::DrawRenderComponent(GameObject* obj)
                 
                 bool isSelected = (selectedTechnique == techPair.first);
                 
-                eastl::string displayName = techPair.first;
-                const char* typeHint = "";
+                const char* type = "";
                 
                 if (auto gpass = dynamic_cast<SE_G::GPassTechnique*>(techPair.second.get())) 
-                    typeHint = " (Geometry)";
+                    type = "Geometry";
                 else if (auto iconTech = dynamic_cast<SE_G::IconTechnique*>(techPair.second.get())) 
-                    typeHint = " (Icon)";
-                else if (auto ambient = dynamic_cast<SE_G::LightTechnique<SE_G::AmbientLightData>*>(techPair.second.get())) 
-                    typeHint = " (Ambient Light)";
+                    type = "Icon";
+                if (auto ambient = dynamic_cast<SE_G::LightTechnique<SE_G::AmbientLightData>*>(techPair.second.get())) 
+                    type = "Ambient Light";
                 else if (auto directional = dynamic_cast<SE_G::LightTechnique<SE_G::DirectionalLightData>*>(techPair.second.get())) 
-                    typeHint = " (Directional Light)";
+                    type = "Directional Light";
                 else if (auto point = dynamic_cast<SE_G::LightTechnique<SE_G::PointLightData>*>(techPair.second.get())) 
-                    typeHint = " (Point Light)";
+                    type = "Point Light";
                 else if (auto skybox = dynamic_cast<SE_G::LightTechnique<SE_G::SkyBoxData>*>(techPair.second.get())) 
-                    typeHint = " (Skybox)";
-                
-                displayName += typeHint;
+                    type = "Skybox";
                 
                 if (isSelected)
                 {
@@ -207,7 +152,7 @@ void PropertyPanel::DrawRenderComponent(GameObject* obj)
                     ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_Text]);
                 }
                 
-                if (ImGui::Selectable(displayName.c_str(), isSelected))
+                if (ImGui::Selectable(type, isSelected))
                 {
                     selectedTechnique = techPair.first;
                 }
@@ -228,7 +173,7 @@ void PropertyPanel::DrawRenderComponent(GameObject* obj)
             ImGui::Separator();
             ImGui::Spacing();
             
-            ImGui::Text("Selected Technique:");
+            ImGui::Text("Selected type:");
             ImGui::SameLine();
             ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.5f, 1.0f), "%s", selectedTechnique.c_str());
             
@@ -238,7 +183,7 @@ void PropertyPanel::DrawRenderComponent(GameObject* obj)
         else if (!render->techniques.empty())
         {
             ImGui::Spacing();
-            ImGui::TextDisabled("Select a technique to view details");
+            ImGui::TextDisabled("Select a type to view details");
         }
         
         ImGui::TreePop();
@@ -307,7 +252,7 @@ void PropertyPanel::DrawPointLightTechniqueDetails(SE_G::LightTechnique<SE_G::Po
     {
         auto& data = *tech->m_lightData;
         
-        ImGui::Text("Point Light - Local Light Source");
+        ImGui::Text("Point Light");
         
         ImGui::ColorEdit3("Light Color", &data.Diffuse.x, ImGuiColorEditFlags_Float);
         ImGui::DragFloat("Intensity", &data.DiffusePad, 0.1f, 0.0f, 100.0f, "%.1f");
@@ -339,7 +284,7 @@ void PropertyPanel::DrawSkyBoxTechniqueDetails(SE_G::LightTechnique<SE_G::SkyBox
 
 void PropertyPanel::DrawGPassTechniqueDetails(SE_G::GPassTechnique* tech)
 {
-    ImGui::Text("Geometry Pass - Object Rendering");
+    ImGui::Text("Geometry - Object Rendering");
 }
 
 void PropertyPanel::DrawIconTechniqueDetails(SE_G::IconTechnique* tech)
