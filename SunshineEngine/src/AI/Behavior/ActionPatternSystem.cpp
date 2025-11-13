@@ -6,29 +6,49 @@
 
 // ----------------- Action -----------------
 
-EActionCondition Action::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime)
+EActionCondition Action::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
     if (IsAborted == true)
     {
-        OnActionAbort(GOID, MBoard);
+        if (OnActionAbort)
+        {
+            OnActionAbort(GOID, MBoard);
+        }
+
         IsAborted = false;
 
         return EActionCondition::Aborted;
     }
 
-    switch (OnActionUpdate(GOID, MBoard, DeltaTime))
+    EActionResult Result = EActionResult::Succeeded;
+
+    if (OnActionUpdate)
+    {
+        Result = OnActionUpdate(GOID, MBoard, DeltaTime);
+    }
+
+    switch (Result)
     {
         case EActionResult::Succeeded:
-            OnActionComplete(GOID, MBoard, EActionResult::Succeeded);
+
+            if (OnActionComplete)
+            {
+                OnActionComplete(GOID, MBoard, EActionResult::Succeeded);
+            }
 
             return EActionCondition::Succeeded;
 
         case EActionResult::Failed:
-            OnActionComplete(GOID, MBoard, EActionResult::Failed);
+
+            if (OnActionComplete)
+            {
+                OnActionComplete(GOID, MBoard, EActionResult::Failed);
+            }
 
             return EActionCondition::Failed;
 
         case EActionResult::Running:  
+
             return EActionCondition::Running;
     }
 }
@@ -59,16 +79,22 @@ void Pattern::InsertAction(eastl::shared_ptr<Action> NewAction, size_t Index)
         Actions.insert(Actions.begin() + Index, NewAction);
 }
 
-EActionCondition Pattern::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime)
+EActionCondition Pattern::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
-    OnPatternUpdate(GOID, MBoard, DeltaTime);
+    if (OnPatternUpdate)
+    {
+        OnPatternUpdate(GOID, MBoard, DeltaTime);
+    }
 
     if (Actions.empty())
         return EActionCondition::Succeeded;
 
     if (!bStarted)
     {
-        Actions[CurrentActionIndex]->OnActionStart(GOID, MBoard);
+        if (Actions[CurrentActionIndex]->OnActionStart)
+        {
+            Actions[CurrentActionIndex]->OnActionStart(GOID, MBoard);
+        }
 
         bStarted = true;
     }
@@ -82,7 +108,11 @@ EActionCondition Pattern::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard
             if (CurrentActionIndex >= Actions.size())
             {
                 Reset();
-                OnPatternComplete(GOID, MBoard, EActionResult::Succeeded);
+
+                if (OnPatternComplete)
+                {
+                    OnPatternComplete(GOID, MBoard, EActionResult::Succeeded);
+                }
 
                 return EActionCondition::Succeeded;
             }
@@ -96,7 +126,11 @@ EActionCondition Pattern::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard
         case EActionCondition::Failed:
 
             Reset();
-            OnPatternComplete(GOID, MBoard, EActionResult::Failed);
+
+            if (OnPatternComplete)
+            {
+                OnPatternComplete(GOID, MBoard, EActionResult::Failed);
+            }
 
             return EActionCondition::Failed;
 
@@ -107,7 +141,11 @@ EActionCondition Pattern::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard
         case EActionCondition::Aborted:
 
             Reset();
-            OnPatternAbort(GOID, MBoard);
+
+            if (OnPatternAbort)
+            {
+                OnPatternAbort(GOID, MBoard);
+            }
 
             return EActionCondition::Aborted;
     }
@@ -152,7 +190,7 @@ void ActionPatternSystem::RemovePattern(const eastl::string& Name)
         Patterns.erase(it);
 }
 
-EStateResult ActionPatternSystem::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime)
+EStateResult ActionPatternSystem::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
     if (Patterns.empty())
         return EStateResult::Finished;
@@ -163,7 +201,12 @@ EStateResult ActionPatternSystem::Update(const Sunshine::UUID& GOID, MemoryBoard
 
         for (auto& P : Patterns)
         {
-            float Utility = P.second->EvaluateUtility(MBoard);
+            float Utility = -eastl::numeric_limits<float>::infinity();
+
+            if (P.second->EvaluateUtility)
+            {
+                Utility = P.second->EvaluateUtility(GOID, MBoard);
+            }
 
             if (Utility >= BestUtility)
             {
@@ -172,7 +215,10 @@ EStateResult ActionPatternSystem::Update(const Sunshine::UUID& GOID, MemoryBoard
             }
         }
 
-        CurrentPattern->OnPatternStart(GOID, MBoard);
+        if (CurrentPattern->OnPatternStart)
+        {
+            CurrentPattern->OnPatternStart(GOID, MBoard);
+        } 
     }
 
     auto Result = CurrentPattern->Update(GOID, MBoard, DeltaTime);
@@ -185,7 +231,6 @@ EStateResult ActionPatternSystem::Update(const Sunshine::UUID& GOID, MemoryBoard
     {
         return EStateResult::Running;
     }
-
 
     if (Result == EActionCondition::Aborted)
     {

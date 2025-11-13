@@ -13,7 +13,7 @@ uint64_t MemoryBoard::AddCallback(const eastl::string& Key, MemoryChangedCallbac
     if (itData == Data.end())
         return UINT64_MAX;
 
-    CallbackWrapper LW{ NextCallbackId++, Callback };
+    CallbackWrapper LW { NextCallbackId++, Callback };
     Callbacks[Key].push_back(LW);
 
     return LW.CallbackId;

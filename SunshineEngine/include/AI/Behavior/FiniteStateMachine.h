@@ -5,40 +5,40 @@
 #include "AI/Behavior/ActionPatternSystem.h"
 
 
-using EventTransitionCallback = eastl::function<void(const eastl::string& ToState)>;
+using CheckFunc = eastl::function<bool(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
+using AbortFunc = eastl::function<void(const eastl::string& ToState)>;
 
 
 class ConditionTransition
 {
+    friend class State;
+
 public:
-    explicit ConditionTransition(const eastl::string& InToState) : ToState(InToState) { }
+    explicit ConditionTransition(const eastl::string& InToState, CheckFunc InCheck) : ToState(InToState), Check(InCheck) { }
 
-    virtual bool ConditionTransitionCheck(MemoryBoard* MBoard, float DeltaTime) { return false; };
 
-    void SetTargetState(const eastl::string& InToState) { ToState = InToState; };
-    const eastl::string& GetTargetState() const { return ToState; }
+    CheckFunc Check = nullptr;
 
-private:
     eastl::string ToState;
 };
 
 
 class EventTransition
 {
+    //friend class State;
+
 public:
-    EventTransition(const eastl::string& InToState, EventTransitionCallback InCallback) : ToState(InToState), Callback(InCallback) {}
+    explicit EventTransition(const eastl::string& InToState, FiniteStateMachine* FSM);
 
-    void Trigger(const Sunshine::UUID& GOID, MemoryBoard* MBoard);
-    bool virtual TriggerCheck(const Sunshine::UUID& GOID, MemoryBoard* MBoard) { return false; };
+    void Trigger(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard);
 
-    void SetTargetState(const eastl::string& NewToState) { ToState = NewToState; };
-    const eastl::string& GetTargetState() const { return ToState; };
 
-    void SetCallback(EventTransitionCallback InCallback) { Callback = InCallback; };
-private:
+    CheckFunc Check = nullptr;
+
     eastl::string ToState;
 
-    EventTransitionCallback Callback;
+private:
+    AbortFunc Abort = nullptr;
 };
 
 
@@ -49,24 +49,26 @@ class State
 public:
     State() { }
 
-    ActionPatternSystem* GetActionPatternSystem() { return APS.get(); }
 
-    void AddConditionTransition(const eastl::shared_ptr<ConditionTransition>& Transition);
-    void AddEventTransition(const eastl::shared_ptr<EventTransition>& Transition);
-
-    void RemoveConditionTransition(const eastl::string& TargetState);
-    void RemoveEventTransition(const eastl::string& TargetState);
-
-    eastl::shared_ptr<ConditionTransition> CheckConditionTransitions(MemoryBoard* MBoard, float DeltaTime);
-
-    bool Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime);
-
-    virtual void OnStateEnter(const Sunshine::UUID& GOID, MemoryBoard* MBoard) {}
-    virtual void OnStateUpdate(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime) {}
-    virtual void OnStateAbort(const Sunshine::UUID& GOID, MemoryBoard* MBoard) {}
-    virtual void OnStateExit(const Sunshine::UUID& GOID, MemoryBoard* MBoard) {}
+    OnDefaultFunc OnStateEnter = nullptr;
+    OnUpdateFunc OnStateUpdate = nullptr;
+    OnDefaultFunc OnStateAbort = nullptr;
+    OnDefaultFunc OnStateExit = nullptr;
 
 private:
+    eastl::shared_ptr<ConditionTransition> AddConditionTransition(const eastl::string& InToState);
+    eastl::shared_ptr<EventTransition> AddEventTransition(const eastl::string& InToState, FiniteStateMachine* FSM);
+
+    void RemoveConditionTransition(const eastl::string& ToState);
+    void RemoveEventTransition(const eastl::string& ToState);
+
+    bool Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
+
+    ActionPatternSystem* GetActionPatternSystem() { return APS.get(); }
+
+    eastl::shared_ptr<ConditionTransition> CheckConditionTransitions(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard);
+
+
     eastl::unique_ptr<ActionPatternSystem> APS = eastl::make_unique<ActionPatternSystem>();;
 
     eastl::vector<eastl::shared_ptr<ConditionTransition>> ConditionTransitions;
@@ -79,20 +81,29 @@ private:
 class FiniteStateMachine
 {
 public:
-    FiniteStateMachine() { }
+    FiniteStateMachine() = default;
 
-    void AddState(const eastl::string& Name, const eastl::shared_ptr<State>& NewState);
-    void RemoveState(const eastl::string& Name);
+    bool AddState(const eastl::string& Name, const eastl::shared_ptr<State>& NewState);
+    bool RemoveState(const eastl::string& Name);
 
-    void SetInitialState(const eastl::string& Name);
+    bool SetInitialState(const eastl::string& Name);
     const eastl::string& GetCurrentStateName() const { return CurrentStateName; }
 
-    void Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime);
+    eastl::shared_ptr<ConditionTransition>  AddConditionTransition(const eastl::string& FromState, const eastl::string& ToState);
+    eastl::shared_ptr<EventTransition> AddEventTransition(const eastl::string& FromState, const eastl::string& ToState);
+
+    void RemoveConditionTransition(const eastl::string& FromState, const eastl::string& ToState);
+    void RemoveEventTransition(const eastl::string& FromState, const eastl::string& ToState);
+
+
+
+    void Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
 
     void Abort(const eastl::string& ToState);
 
-private:
-    void ChangeState(const Sunshine::UUID& GOID, MemoryBoard* MBoard, const eastl::string& NewState);
+    void ChangeState(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const eastl::string& NewState);
+
+    eastl::shared_ptr<State> GetState(const eastl::string& Name);
 
 
     eastl::hash_map<eastl::string, eastl::shared_ptr<State>> States;

@@ -5,87 +5,95 @@
 
 // ----------------- EventTransition -----------------
 
-void EventTransition::Trigger(const Sunshine::UUID& GOID, MemoryBoard* MBoard)
+EventTransition::EventTransition(const eastl::string& InToState, FiniteStateMachine* FSM)
 {
-	if (TriggerCheck(GOID, MBoard) && Callback)
+	Abort = [FSM](const eastl::string& ToState)
+		{
+			if (FSM)
+				FSM->Abort(ToState);
+		};
+}
+
+void EventTransition::Trigger(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+{
+	if (Check)
 	{
-		Callback(ToState);
+		if (Check(GOID, MBoard) && Abort)
+		{
+			Abort(ToState);
+		}
 	}
 }
 
 
 // ----------------- State -----------------
 
-void State::AddConditionTransition(const eastl::shared_ptr<ConditionTransition>& Transition)
-{
-	for (auto& CT : ConditionTransitions)
-	{
-		if (CT->GetTargetState() == Transition->GetTargetState())
-		{
-			std::cerr << "[Warning] " << "\n";
-			return;
-		}
-	}
+//eastl::shared_ptr<ConditionTransition> State::AddConditionTransition(const eastl::shared_ptr<ConditionTransition>& Transition)
+//{
+//	for (auto& CT : ConditionTransitions)
+//	{
+//		if (CT->ToState == Transition->ToState)
+//		{
+//			std::cerr << "[Warning] " << "\n";
+//			return;
+//		}
+//	}
+//
+//	ConditionTransitions.push_back(Transition);
+//}
 
-	ConditionTransitions.push_back(Transition);
-}
-
-void State::AddEventTransition(const eastl::shared_ptr<EventTransition>& Transition)
+eastl::shared_ptr<EventTransition> State::AddEventTransition(const eastl::string& InToState, FiniteStateMachine* FSM)
 {
 	for (auto& ET : EventTransitions)
 	{
-		if (ET->GetTargetState() == Transition->GetTargetState())
+		if (ET->ToState == InToState)
 		{
 			std::cerr << "[Warning] " << "\n";
-			return;
+			return nullptr;
 		}
 	}
 
+	auto Transition = eastl::make_shared<EventTransition>(InToState, FSM);
+
 	EventTransitions.push_back(Transition);
+
+	return Transition;
 }
 
-void State::RemoveConditionTransition(const eastl::string& TargetState)
+void State::RemoveConditionTransition(const eastl::string& ToState)
 {
 	for (auto it = ConditionTransitions.begin(); it != ConditionTransitions.end(); ++it)
 	{
-		if ((*it)->GetTargetState() == TargetState)
+		if ((*it)->ToState == ToState)
 		{
 			ConditionTransitions.erase(it);
 			return;
 		}
 	}
 
-	std::cerr << "[Warning] Tried to remove non-existing ConditionTransition: " << TargetState.c_str() << "\n";
+	std::cerr << "[Warning] Tried to remove non-existing ConditionTransition to: " << ToState.c_str() << "\n";
 }
 
-void State::RemoveEventTransition(const eastl::string& TargetState)
+void State::RemoveEventTransition(const eastl::string& ToState)
 {
 	for (auto it = EventTransitions.begin(); it != EventTransitions.end(); ++it)
 	{
-		if ((*it)->GetTargetState() == TargetState)
+		if ((*it)->ToState == ToState)
 		{
 			EventTransitions.erase(it);
 			return;
 		}
 	}
 
-	std::cerr << "[Warning] Tried to remove non-existing EventTransition: " << TargetState.c_str() << "\n";
+	std::cerr << "[Warning] Tried to remove non-existing EventTransition to: " << ToState.c_str() << "\n";
 }
 
-eastl::shared_ptr<ConditionTransition> State::CheckConditionTransitions(MemoryBoard* MBoard, float DeltaTime)
+bool State::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
-	for (auto& CT : ConditionTransitions)
+	if (OnStateUpdate)
 	{
-		if (CT->ConditionTransitionCheck(MBoard, DeltaTime))
-			return CT;
+		OnStateUpdate(GOID, MBoard, DeltaTime);
 	}
-
-	return nullptr;
-}
-
-bool State::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime)
-{
-	OnStateUpdate(GOID, MBoard, DeltaTime);
 
 	switch (APS->Update(GOID, MBoard, DeltaTime))
 	{
@@ -95,53 +103,89 @@ bool State::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaT
 
 		case EStateResult::Finished:
 
-			OnStateExit(GOID, MBoard);
+			if (OnStateExit)
+			{
+				OnStateExit(GOID, MBoard);
+			}
+
+			IsRunning = false;
 
 			return false;
 
 		case EStateResult::Aborted:
 
-			OnStateAbort(GOID, MBoard);
+			if (OnStateAbort)
+			{
+				OnStateAbort(GOID, MBoard);
+			}
+
+			IsRunning = false;
 
 			return true;
 	}
 }
 
+eastl::shared_ptr<ConditionTransition> State::CheckConditionTransitions(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+{
+	for (auto& CT : ConditionTransitions)
+	{
+		if (CT->Check)
+		{
+			if (CT->Check(GOID, MBoard))
+			{
+				return CT;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 
 // ----------------- FiniteStateMachine -----------------
 
-void FiniteStateMachine::AddState(const eastl::string& Name, const eastl::shared_ptr<State>& NewState)
+bool FiniteStateMachine::AddState(const eastl::string& Name, const eastl::shared_ptr<State>& NewState)
 {
 	if (!NewState)
 	{
 		std::cerr << "[Warning] " << "\n";
-		return;
+		return false;
 	}
 
 	if (States.find(Name) != States.end())
 	{
 		std::cerr << "[Warning] " << "\n";
-		return;
+		return false;
 	}
 
 	States[Name] = NewState;
+
+	return true;
 }
 
-void FiniteStateMachine::RemoveState(const eastl::string& Name)
+bool FiniteStateMachine::RemoveState(const eastl::string& Name)
 {
 	auto it = States.find(Name);
 
 	if (it != States.end())
+	{
 		States.erase(it);
+	}
+	else
+	{
+		return false;
+	}
 
 	if (CurrentStateName == Name)
 	{
 		CurrentState.reset();
 		CurrentStateName.clear();
 	}
+
+	return true;
 }
 
-void FiniteStateMachine::SetInitialState(const eastl::string& Name)
+bool FiniteStateMachine::SetInitialState(const eastl::string& Name)
 {
 	auto it = States.find(Name);
 
@@ -149,14 +193,15 @@ void FiniteStateMachine::SetInitialState(const eastl::string& Name)
 	{
 		CurrentStateName = Name;
 		CurrentState = it->second;
+
+		return true;
 	}
-	else
-	{
-		std::cerr << "[Warning] " << "\n";
-	}
+
+	std::cerr << "[Warning] " << "\n";
+	return false;
 }
 
-void FiniteStateMachine::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime)
+void FiniteStateMachine::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
 	if (!CurrentState)
 	{
@@ -166,15 +211,18 @@ void FiniteStateMachine::Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard,
 
 	if (!CurrentState->IsRunning)
 	{
-		if (eastl::shared_ptr<ConditionTransition> CT = CurrentState->CheckConditionTransitions(MBoard, DeltaTime))
+		if (eastl::shared_ptr<ConditionTransition> CT = CurrentState->CheckConditionTransitions(GOID, MBoard))
 		{
-			ChangeState(GOID, MBoard, CT->GetTargetState());
+			ChangeState(GOID, MBoard, CT->ToState);
 			return;
 		}
 
 		CurrentState->IsRunning = true;
 
-		CurrentState->OnStateEnter(GOID, MBoard);
+		if (CurrentState->OnStateEnter)
+		{
+			CurrentState->OnStateEnter(GOID, MBoard);
+		}
 	}
 
 	if (CurrentState->Update(GOID, MBoard, DeltaTime))
@@ -191,7 +239,7 @@ void FiniteStateMachine::Abort(const eastl::string& ToState)
 		CurrentState->APS->CurrentPattern->AbortCurrentAction();
 }
 
-void FiniteStateMachine::ChangeState(const Sunshine::UUID& GOID, MemoryBoard* MBoard, const eastl::string& NewState)
+void FiniteStateMachine::ChangeState(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const eastl::string& NewState)
 {
 	if (NewState.empty())
 	{
@@ -199,33 +247,31 @@ void FiniteStateMachine::ChangeState(const Sunshine::UUID& GOID, MemoryBoard* MB
 		return;
 	}
 
-	if (NewState == CurrentStateName)
-		return;
-
-	if (CurrentState)
+	if (NewState != CurrentStateName)
 	{
-		CurrentState->IsRunning = false;
+		auto it = States.find(NewState);
 
-		if (AfterAbortStateName != "")
+		if (it == States.end())
 		{
-			CurrentState->OnStateAbort(GOID, MBoard);
+			std::cerr << "[Warning] " << "\n";
+			return;
+		}
 
-			AfterAbortStateName = "";
-		}
-		else
-		{
-			CurrentState->OnStateExit(GOID, MBoard);
-		}
+		CurrentStateName = NewState;
+		CurrentState = it->second;
+	}
+}
+
+eastl::shared_ptr<State> FiniteStateMachine::GetState(const eastl::string& Name)
+{
+	auto it = States.find(Name);
+
+	if (it != States.end())
+	{
+		return it->second;
 	}
 
-	auto it = States.find(NewState);
+	std::cerr << "[Warning] " << "\n";
 
-	if (it == States.end())
-	{
-		std::cerr << "[Warning] " << "\n";
-		return;
-	}
-
-	CurrentStateName = NewState;
-	CurrentState = it->second;
+	return nullptr;
 }

@@ -36,26 +36,34 @@ enum class EStateResult
 };
 
 
+using OnDefaultFunc = eastl::function<void(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
+using OnUpdateFunc = eastl::function<void(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)>;
+using OnActionUpdateFunc = eastl::function<EActionResult(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)>;
+using OnCompleteFunc = eastl::function<void(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, EActionResult Result)>;
+using EvaluateUtilityFunc = eastl::function<float(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
+
+
 class Action
 {
-    friend class FiniteStateMachine;
+    friend class Pattern;
 
 public:
     explicit Action(const eastl::string& InName) : Name(InName) {}
 
     const eastl::string& GetName() const { return Name; }
 
-    EActionCondition Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime);
+
+    OnDefaultFunc OnActionStart = nullptr;
+    OnActionUpdateFunc OnActionUpdate = nullptr;
+    OnDefaultFunc OnActionAbort = nullptr;
+    OnCompleteFunc OnActionComplete = nullptr;
+
+private:
+    EActionCondition Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
 
     void Abort() { IsAborted = true; }
 
-    //
-    virtual void OnActionStart(const Sunshine::UUID& GOID, MemoryBoard* MBoard) {}
-    virtual EActionResult OnActionUpdate(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime) { return EActionResult::Succeeded; }
-    virtual void OnActionAbort(const Sunshine::UUID& GOID, MemoryBoard* MBoard) {}
-    virtual void OnActionComplete(const Sunshine::UUID& GOID, MemoryBoard* MBoard, EActionResult Result) {}
 
-protected:
     eastl::string Name;
 
     bool IsAborted = false;
@@ -65,6 +73,7 @@ protected:
 class Pattern
 {
     friend class FiniteStateMachine;
+    friend class ActionPatternSystem;
 
 public:
     Pattern() {}
@@ -72,21 +81,22 @@ public:
     void AddAction(eastl::shared_ptr<Action> NewAction);
     void InsertAction(eastl::shared_ptr<Action> NewAction, size_t Index);
 
-    EActionCondition Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime);
+
+    EvaluateUtilityFunc EvaluateUtility = nullptr;
+
+    OnDefaultFunc OnPatternStart = nullptr;
+    OnUpdateFunc OnPatternUpdate = nullptr;
+    OnDefaultFunc OnPatternAbort = nullptr;
+    OnCompleteFunc OnPatternComplete = nullptr;
+
+private:
+    EActionCondition Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
 
     void AbortCurrentAction();
 
     void Reset();
 
-    //
-    virtual float EvaluateUtility(MemoryBoard* MBoard) { return 0.0f; }
 
-    virtual void OnPatternStart(const Sunshine::UUID& GOID, MemoryBoard* MBoard) {}
-    virtual void OnPatternUpdate(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime) {};
-    virtual void OnPatternAbort(const Sunshine::UUID& GOID, MemoryBoard* MBoard) {}
-    virtual void OnPatternComplete(const Sunshine::UUID& GOID, MemoryBoard* MBoard, EActionResult Result) {}
-
-private:
     eastl::vector<eastl::shared_ptr<Action>> Actions;
 
     size_t CurrentActionIndex = 0;
@@ -98,14 +108,16 @@ private:
 class ActionPatternSystem
 {
     friend class FiniteStateMachine;
+    friend class State;
 
 public:
     void AddPattern(const eastl::string& Name, eastl::shared_ptr<Pattern> Pattern);
     void RemovePattern(const eastl::string& PatternName);
 
-    EStateResult Update(const Sunshine::UUID& GOID, MemoryBoard* MBoard, float DeltaTime);
-
 private:
+    EStateResult Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
+
+
     eastl::hash_map<eastl::string, eastl::shared_ptr<Pattern>> Patterns;
 
     eastl::shared_ptr<Pattern> CurrentPattern = nullptr;
