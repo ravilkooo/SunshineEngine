@@ -5,18 +5,18 @@
 typedef unsigned char BYTE; // 8 bits
 
 namespace SE_G {
-	class SE_Color
+	class Color
 	{
 	public:
-		SE_Color();
-		SE_Color(unsigned int val);
-		SE_Color(BYTE r, BYTE g, BYTE b);
-		SE_Color(BYTE r, BYTE g, BYTE b, BYTE a);
-		SE_Color(const SE_Color& src);
+		Color();
+		Color(unsigned int val);
+		Color(BYTE r, BYTE g, BYTE b);
+		Color(BYTE r, BYTE g, BYTE b, BYTE a);
+		Color(const Color& src);
 
-		SE_Color& operator=(const SE_Color& src);
-		bool operator==(const SE_Color& rhs) const;
-		bool operator!=(const SE_Color& rhs) const;
+		Color& operator=(const Color& src);
+		bool operator==(const Color& rhs) const;
+		bool operator!=(const Color& rhs) const;
 
 		constexpr BYTE GetR() const;
 		void SetR(BYTE r);
@@ -38,9 +38,9 @@ namespace SE_G {
 		};
 	};
 
-	namespace SE_Colors
+	namespace Colors
 	{
-		const SE_Color UnloadedTextureColor(100, 100, 100);
-		const SE_Color UnhandledTextureColor(250, 0, 0);
+		const Color UnloadedTextureColor(100, 100, 100);
+		const Color UnhandledTextureColor(250, 0, 0);
 	}
 }

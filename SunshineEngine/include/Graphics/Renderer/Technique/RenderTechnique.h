@@ -37,20 +37,20 @@ namespace SE_G {
         virtual void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 
         // Resources
-        eastl::shared_ptr<Mesh> mesh;
-        eastl::shared_ptr<Bind::VertexShader> vertexShader;
-        eastl::shared_ptr<Bind::PixelShader> pixelShader;
-        eastl::shared_ptr<Bind::Texture> texture;
+        eastl::shared_ptr<Mesh> m_mesh;
+        eastl::shared_ptr<Bind::VertexShader> m_vertexShader;
+        eastl::shared_ptr<Bind::PixelShader> m_pixelShader;
+        eastl::shared_ptr<Bind::Texture> m_texture;
 
         // Extra (has default values)
-        eastl::shared_ptr<Bind::Sampler> textureSampler;
+        eastl::shared_ptr<Bind::Sampler> m_textureSampler;
         eastl::shared_ptr<Bind::BlendState> blendState;
         eastl::shared_ptr<Bind::Rasterizer> rasterizer;
         eastl::shared_ptr<Bind::DepthStencilState> depthStencilState;
 
         virtual eastl::string GetTechniqueTag();
 
-        eastl::string techniqueTag;
+        eastl::string m_techniqueTag;
 
         TransformComponent* m_assignedTransform;
     };

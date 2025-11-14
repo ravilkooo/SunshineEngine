@@ -27,13 +27,11 @@ public:
 
 	static eastl::unique_ptr<GameObject> CreateDefaultSphereObject(SE_G::DeferredRenderer* m_renderSystem, float radius = 1.0f);
 
-	static eastl::unique_ptr<GameObject> CreateFinalPassQuad(SE_G::DeferredRenderer* m_renderSystem);
-
 	static eastl::unique_ptr<SkyBox> CreateSkyBox(
 		SE_G::DeferredRenderer* m_renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
-		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f },
-		eastl::wstring texturePath = eastl::wstring(L"Default")
+		eastl::wstring texturePath = eastl::wstring(L"Default"),
+		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f }
 	);
 
 	static eastl::unique_ptr<AmbientLight> CreateAmbientLightObject(

@@ -3,22 +3,22 @@
 #include "Graphics/Utils/Color.h"
 
 namespace SE_G {
-	SE_Color::SE_Color()
+	Color::Color()
 		:color(0)
 	{
 	}
 
-	SE_Color::SE_Color(unsigned int val)
+	Color::Color(unsigned int val)
 		: color(val)
 	{
 	}
 
-	SE_Color::SE_Color(BYTE r, BYTE g, BYTE b)
-		: SE_Color(r, g, b, 255)
+	Color::Color(BYTE r, BYTE g, BYTE b)
+		: Color(r, g, b, 255)
 	{
 	}
 
-	SE_Color::SE_Color(BYTE r, BYTE g, BYTE b, BYTE a)
+	Color::Color(BYTE r, BYTE g, BYTE b, BYTE a)
 	{
 		rgba[0] = r;
 		rgba[1] = g;
@@ -26,59 +26,59 @@ namespace SE_G {
 		rgba[3] = a;
 	}
 
-	SE_Color::SE_Color(const SE_Color& src)
+	Color::Color(const Color& src)
 		:color(src.color)
 	{
 	}
 
-	SE_Color& SE_Color::operator=(const SE_Color& src)
+	Color& Color::operator=(const Color& src)
 	{
 		this->color = src.color;
 		return *this;
 	}
 
-	bool SE_Color::operator==(const SE_Color& rhs) const
+	bool Color::operator==(const Color& rhs) const
 	{
 		return (this->color == rhs.color);
 	}
 
-	bool SE_Color::operator!=(const SE_Color& rhs) const
+	bool Color::operator!=(const Color& rhs) const
 	{
 		return !(*this == rhs);
 	}
 
-	constexpr BYTE SE_Color::GetR() const
+	constexpr BYTE Color::GetR() const
 	{
 		return this->rgba[0];
 	}
-	void SE_Color::SetR(BYTE r)
+	void Color::SetR(BYTE r)
 	{
 		this->rgba[0] = r;
 	}
 
-	constexpr BYTE SE_Color::GetG() const
+	constexpr BYTE Color::GetG() const
 	{
 		return this->rgba[1];
 	}
-	void SE_Color::SetG(BYTE g)
+	void Color::SetG(BYTE g)
 	{
 		this->rgba[1] = g;
 	}
 
-	constexpr BYTE SE_Color::GetB() const
+	constexpr BYTE Color::GetB() const
 	{
 		return this->rgba[2];
 	}
-	void SE_Color::SetB(BYTE b)
+	void Color::SetB(BYTE b)
 	{
 		this->rgba[2] = b;
 	}
 
-	constexpr BYTE SE_Color::GetA() const
+	constexpr BYTE Color::GetA() const
 	{
 		return this->rgba[3];
 	}
-	void SE_Color::SetA(BYTE a)
+	void Color::SetA(BYTE a)
 	{
 		this->rgba[3] = a;
 	}

@@ -6,7 +6,7 @@ namespace SE_G {
 	using namespace Bind;
 
 	RenderTechnique::RenderTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique)
-		: techniqueTag(technique), m_assignedTransform(assignedTransform)
+		: m_techniqueTag(technique), m_assignedTransform(assignedTransform)
 	{
 	}
 
@@ -28,18 +28,18 @@ namespace SE_G {
 			bindables[i]->Bind(context.Get());
 		}
 
-		if (vertexShader)
-			vertexShader->Bind(context.Get());
+		if (m_vertexShader)
+			m_vertexShader->Bind(context.Get());
 
-		if (pixelShader)
-			pixelShader->Bind(context.Get());
+		if (m_pixelShader)
+			m_pixelShader->Bind(context.Get());
 
-		if (texture) {
-			texture->Bind(context.Get());
+		if (m_texture) {
+			m_texture->Bind(context.Get());
 		}
 
-		if (textureSampler) {
-			textureSampler->Bind(context.Get());
+		if (m_textureSampler) {
+			m_textureSampler->Bind(context.Get());
 		}
 
 		// Bind rasterizer
@@ -51,19 +51,19 @@ namespace SE_G {
 		if (blendState)
 			blendState->Bind(context.Get());
 
-		if (mesh)
-			mesh->Bind(context.Get());
+		if (m_mesh)
+			m_mesh->Bind(context.Get());
 	}
 
 	void RenderTechnique::DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
-		if (mesh)
-			mesh->Draw(context.Get());
+		if (m_mesh)
+			m_mesh->Draw(context.Get());
 
 	}
 
 	eastl::string RenderTechnique::GetTechniqueTag()
 	{
-		return techniqueTag;
+		return m_techniqueTag;
 	}
 }

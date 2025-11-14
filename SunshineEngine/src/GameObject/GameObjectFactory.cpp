@@ -27,29 +27,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
 	auto tr = obj->AddComponent<TransformComponent>();
     auto rc = obj->AddComponent<RenderComponent>(renderSystem);
 
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(device, tr.get(), "GPass", obj->m_UUID);
-	gBufferTech->mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, width, height, length);
-
-	gBufferTech->vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassShaderVS.hlsl"));
-
-	gBufferTech->pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassTextureShaderPS.hlsl"));
-
-	//gBufferTech->texture = eastl::make_shared<SE_G::Bind::Texture>(device, SE_Color(10, 250, 243));
-	gBufferTech->texture = eastl::make_shared<SE_G::Bind::Texture>(
-		device,
-		MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"),
-		0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER
-	);
-
-	gBufferTech->textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
-		device,
-		CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
-		0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER
-	);
+	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(renderSystem, tr.get(), "GPass", obj->m_UUID);
+	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, width, height, length);
+	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
 
 	rc->AddTechnique(eastl::move(gBufferTech));
 
@@ -64,51 +44,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(SE_G:
 	auto tr = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
 
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(device, tr.get(), "GPass", obj->m_UUID);
-	gBufferTech->mesh = SE_G::Mesh::CreateSphereMesh(device, radius);
-
-	gBufferTech->vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassShaderVS.hlsl"));
-
-	gBufferTech->pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassTextureShaderPS.hlsl"));
-
-	//gBufferTech->texture = eastl::make_shared<SE_G::Bind::Texture>(device, SE_Color(10, 250, 243));
-	gBufferTech->texture = eastl::make_shared<SE_G::Bind::Texture>(
-		device,
-		MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"),
-		0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER
-	);
-
-	gBufferTech->textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
-		device,
-		CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
-		0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER
-	);
-
-	rc->AddTechnique(eastl::move(gBufferTech));
-
-	return obj;
-}
-
-eastl::unique_ptr<GameObject> GameObjectFactory::CreateFinalPassQuad(SE_G::DeferredRenderer* renderSystem)
-{
-	auto device = renderSystem->GetDevice();
-
-	auto obj = eastl::make_unique<GameObject>();
-	auto tr = obj->AddComponent<TransformComponent>(device);
-	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
-
-	auto gBufferTech = eastl::make_unique<SE_G::RenderTechnique>(device, tr.get(), "FinalPass");
-	gBufferTech->mesh = eastl::make_shared<SE_G::Mesh>(device, "ScreenAlignedQuad");
-
-	gBufferTech->vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/FinalPass/FinalPassVS.hlsl"));
-
-	gBufferTech->pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/FinalPass/FinalPassPS.hlsl"));
+	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(renderSystem, tr.get(), "GPass", obj->m_UUID);
+	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(device, radius);
+	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
 
 	rc->AddTechnique(eastl::move(gBufferTech));
 
@@ -118,65 +56,11 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateFinalPassQuad(SE_G::Defer
 eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,
-	SE_G::SkyBoxData initData, eastl::wstring texturePath)
+	eastl::wstring texturePath,
+	SE_G::SkyBoxData initData)
 {
-	auto device = renderSystem->GetDevice();
-
-	auto obj = eastl::make_unique<SkyBox>(initData);
-	auto tr = obj->AddComponent<TransformComponent>(device);
-	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
-
-	// LightPass - LightTechnique
-	auto lightTech = eastl::make_unique<SE_G::SkyBoxTechnique>(device, tr.get(), "LightPass", camera, obj->m_lightData);
-
-	float toHalfDiag = 1.15; //   2 / sqrt(3) =1,15470053838
-	// Add mesh for Ambient
-	lightTech->mesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device,
-		camera->GetFarZ() * toHalfDiag,
-		camera->GetFarZ() * toHalfDiag,
-		camera->GetFarZ() * toHalfDiag);
-
-	if (texturePath.empty() || texturePath == L"Default") {
-		lightTech->texture = eastl::make_shared<SE_G::Bind::Texture>(
-			device,
-			MakeEngineAssetPath_Wchar(L"DefaultSkybox.dds"),
-			4u,
-			SE_G::Bind::PipelineStage::PIXEL_SHADER
-		);
-	}
-	else
-	{
-		lightTech->texture = eastl::make_shared<SE_G::Bind::Texture>(
-			device,
-			texturePath,
-			4u,
-			SE_G::Bind::PipelineStage::PIXEL_SHADER
-		);
-	}
-
-	lightTech->textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
-		device,
-		CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
-		1u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER
-	);
-
-	lightTech->vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxVShader.hlsl"));
-
-	lightTech->pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxPShader.hlsl"));
-
-	rc->AddTechnique(eastl::move(lightTech));
-
-	/*
-	// IconPass
-	SE_G::IconTechnique* iconTech = new SE_G::IconTechnique(device, "IconPass",
-		{ 0u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
-	rc->techniques.insert(eastl::move(eastl::make_pair(eastl::string("IconPass"), iconTech)));
-	*/
-
-	return obj;
+	auto obj = eastl::make_unique<SkyBox>(renderSystem, camera, texturePath, initData);
+	return eastl::move(obj);
 }
 
 eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
@@ -184,69 +68,17 @@ eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::AmbientLightData initData)
 {
-	auto device = renderSystem->GetDevice();
-
-	auto obj = eastl::make_unique<AmbientLight>(initData);
-	auto tr = obj->AddComponent<TransformComponent>(device);
-	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
-
-	// LightPass - LightTechnique
-	auto lightTech = eastl::make_unique<SE_G::AmbientLightTechnique>(device, tr.get(), "LightPass", camera, obj->m_lightData);
-
-	// Add mesh for Ambient
-	lightTech->mesh = SE_G::Mesh::CreateScreenAlignedQuad(device);
-
-	lightTech->vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/AmbientLightVShader.hlsl"));
-
-	lightTech->pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/AmbientLightPShader.hlsl"));
-
-	rc->AddTechnique(eastl::move(lightTech));
-
-	/*
-	// IconPass
-	SE_G::IconTechnique* iconTech = new SE_G::IconTechnique(device, "IconPass",
-		{ 1u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
-	rc->techniques.insert(eastl::move(eastl::make_pair(eastl::string("IconPass"), iconTech)));
-	*/
-
-	return obj;
+	auto obj = eastl::make_unique<AmbientLight>(renderSystem, camera, initData);
+	return eastl::move(obj);
 }
 
 eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera, SE_G::DirectionalLightData initData)
+	eastl::shared_ptr<SE_G::Camera> camera,
+	SE_G::DirectionalLightData initData)
 {
-	auto device = renderSystem->GetDevice();
-
-	auto obj = eastl::make_unique<DirectionalLight>(initData);
-	auto tr = obj->AddComponent<TransformComponent>(device);
-	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
-
-	// LightPass - LightTechnique
-	auto lightTech =
-		eastl::make_unique<SE_G::DirectionalLightTechnique>(device, tr.get(), "LightPass", camera, obj->m_lightData);
-
-	// Add mesh for Ambient
-	lightTech->mesh = SE_G::Mesh::CreateScreenAlignedQuad(device);
-
-	lightTech->vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/DirectionalLightVShader.hlsl"));
-
-	lightTech->pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/DirectionalLightPShader.hlsl"));
-
-	rc->AddTechnique(eastl::move(lightTech));
-
-	/*
-	// IconPass
-	SE_G::IconTechnique* iconTech = new SE_G::IconTechnique(device, "IconPass",
-		{ 2u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
-	rc->techniques.insert(eastl::move(eastl::make_pair(eastl::string("IconPass"), iconTech)));
-	*/
-
-	return obj;
+	auto obj = eastl::make_unique<DirectionalLight>(renderSystem, camera, initData);
+	return eastl::move(obj);
 }
 
 eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
@@ -254,34 +86,7 @@ eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::PointLightData initData)
 {
-	auto device = renderSystem->GetDevice();
-
-	auto obj = eastl::make_unique<PointLight>(initData);
-	auto tc = obj->AddComponent<TransformComponent>(device);
-	tc->m_position = obj->m_lightData->Position;
-	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
-
-	// LightPass - LightTechnique
-	auto lightTech =
-		eastl::make_unique<SE_G::PointLightTechnique>(device, tc.get(), "LightPass", camera, obj->m_lightData);
-
-	lightTech->mesh = SE_G::Mesh::CreateGeosphereMesh(device, obj->m_lightData->Range, 1);
-
-	lightTech->vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightVShader.hlsl"));
-
-	lightTech->pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-		device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightPShader.hlsl"));
-
-	rc->AddTechnique(eastl::move(lightTech));
-
-	/*
-	// IconPass
-	SE_G::IconTechnique* iconTech = new SE_G::IconTechnique(device, "IconPass",
-		{ 3u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
-	rc->techniques.insert(eastl::move(eastl::make_pair(eastl::string("IconPass"), iconTech)));
-	*/
-
-	return obj;
+	auto obj = eastl::make_unique<PointLight>(renderSystem, camera, initData);
+	return eastl::move(obj);
 }
 

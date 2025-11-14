@@ -16,12 +16,17 @@ namespace SE_G {
 
             VertexBuffer(ID3D11Device* device, const void* data, UINT count, UINT stride, VBType type = VBType::SINGLE, UINT slot = 0u);
 
+            ~VertexBuffer();
+
+            void Release();
+
             void Bind(ID3D11DeviceContext* context) noexcept override;
 
             void Update(ID3D11DeviceContext* context, const void* data);
             void Update(ID3D11DeviceContext* context, ID3D11Buffer* inputResource);
 
         private:
+            bool isNull = true;
             Microsoft::WRL::ComPtr<ID3D11Buffer> pVertexBuffer;
             UINT count;
             UINT slot;

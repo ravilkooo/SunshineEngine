@@ -260,7 +260,7 @@ void PropertyPanel::DrawSkyBoxTechniqueDetails(SE_G::LightTechnique<SE_G::SkyBox
         ImGui::ColorEdit3("Sky Tint", &data.Tint.x, ImGuiColorEditFlags_Float);
         ImGui::DragFloat("Brightness", &data.Power, 0.1f, 0.0f, 10.0f, "%.1f");
         
-        if (tech->texture)
+        if (tech->m_texture)
         {
             ImGui::Text("Skybox Texture: Loaded");
         }

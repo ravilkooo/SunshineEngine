@@ -1,16 +1,32 @@
 #include "Graphics/GraphicsResources/Mesh.h"
+#include <Utils/StringUtils.h>
 
 #include <SimpleMath.h>
 
 namespace SE_G {
-    Mesh::Mesh(ID3D11Device* device, const std::string& path)
+    Mesh::Mesh(ID3D11Device* device,
+        const eastl::string& path) : m_path(path)
     {
+        ChangeMesh(device, path);
+    }
+
+    Mesh::~Mesh()
+    {
+        Release();
+    }
+
+
+    void Mesh::ChangeMesh(ID3D11Device* device,
+        const eastl::string& path) {
+        ClearMesh();
+        m_path = path;
+
         eastl::vector<Vertex> vertices;
         eastl::vector<uint32_t> indices;
 
         UINT attrFlags = VertexAttributesFlags::POSITION | VertexAttributesFlags::UV | VertexAttributesFlags::NORMAL;
 
-        if (path == "CubeMesh") {
+        if (path == "Box") {
             FillUnwrappedBoxMesh(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
@@ -22,7 +38,7 @@ namespace SE_G {
             FillGeosphereMesh(vertices, indices, 1.0f, 0u);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
-        else if (path == "CubeMesh_repeat") {
+        else if (path == "Box_repeat") {
             FillUnwrappedBoxMesh_repeat(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
@@ -31,6 +47,7 @@ namespace SE_G {
             m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         }
         else if (!LoadModel(vertices, indices, path, attrFlags)) {
+            m_path = "Box_repeat";
             FillUnwrappedBoxMesh_repeat(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
@@ -38,12 +55,6 @@ namespace SE_G {
         m_indexCount = static_cast<UINT>(indices.size());
         m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), m_indexCount);
-
-    }
-
-    Mesh::~Mesh()
-    {
-        Release();
     }
 
     void Mesh::FillUnwrappedBoxMesh(
@@ -575,10 +586,11 @@ namespace SE_G {
 
     bool Mesh::LoadModel(eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices,
-        const std::string& path, UINT attrFlags)
+        const eastl::string& path, UINT attrFlags)
     {
+
         Assimp::Importer importer;
-        const aiScene* pModel = importer.ReadFile(path,
+        const aiScene* pModel = importer.ReadFile(path.c_str(),
             aiProcess_Triangulate | aiProcess_FlipUVs
             | (((attrFlags & VertexAttributesFlags::NORMAL) != 0) ? aiProcess_GenNormals : 0x0)
         );
@@ -655,7 +667,7 @@ namespace SE_G {
 
         FillUnwrappedBoxMesh(vertices, indices, width, height, length);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+        mesh->m_path = "Box";
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -673,9 +685,11 @@ namespace SE_G {
         FillUnwrappedBoxMesh_repeat(vertices, indices, width, height, length);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+        mesh->m_path = "Box_repeat";
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
+
         return mesh;
     }
 
@@ -688,6 +702,7 @@ namespace SE_G {
         FillSphereMesh(vertices, indices, radius, sliceCount, stackCount);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+        mesh->m_path = "Sphere";
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -703,6 +718,7 @@ namespace SE_G {
         FillGeosphereMesh(vertices, indices, radius, numSubdivisions);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+        mesh->m_path = "Geosphere";
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -718,6 +734,7 @@ namespace SE_G {
         FillScreenAlignedQuad(vertices, indices);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
+        mesh->m_path = "ScreenAlignedQuad";
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -743,10 +760,22 @@ namespace SE_G {
         context->DrawIndexed(m_indexCount, 0, 0);
     }
 
+    void Mesh::ClearMesh()
+    {
+        if (m_vertexBuffer)
+            m_vertexBuffer->Release();
+        if (m_indexBuffer)
+            m_indexBuffer->Release();
+        m_indexCount = 0;
+    }
+
     void Mesh::Release()
     {
-        //m_vertexBuffer.ReleaseAndGetAddressOf();
-        //m_indexBuffer.ReleaseAndGetAddressOf();
-        m_indexCount = 0;
+        ClearMesh();
+    }
+
+    eastl::string Mesh::GetCurrentMeshPath()
+    {
+        return m_path;
     }
 }

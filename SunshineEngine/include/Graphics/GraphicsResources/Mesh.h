@@ -17,6 +17,7 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/vector.h>
+#include <EASTL/string.h>
 
 #include <Graphics/Bindable/VertexBuffer.h>
 #include <Graphics/Bindable/IndexBuffer.h>
@@ -48,12 +49,16 @@ namespace SE_G {
     public:
         Mesh() {};
         Mesh(ID3D11Device* device,
-            const std::string& path);
+            const eastl::string& path);
         ~Mesh();
 
-        bool LoadModel(eastl::vector<Vertex>& vertices,
+        void ChangeMesh(ID3D11Device* device,
+            const eastl::string& path);
+        void ClearMesh();
+
+        static bool LoadModel(eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            const std::string& path,
+            const eastl::string& path,
             UINT attrFlags = VertexAttributesFlags::POSITION);
 
         static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh(
@@ -118,15 +123,16 @@ namespace SE_G {
         void Draw(ID3D11DeviceContext* context) const;
         void Release();
 
+        eastl::string GetCurrentMeshPath();
+
         //UINT GetIndexCount() const { return m_indexCount; }
 
     private:
-        // Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer;
-        // Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer;
-
         UINT m_indexCount = 0;
         eastl::unique_ptr<Bind::IndexBuffer> m_indexBuffer;
         eastl::unique_ptr<Bind::VertexBuffer> m_vertexBuffer;
         eastl::unique_ptr<Bind::Topology> m_topology;
+
+        eastl::string m_path;
     };
 }

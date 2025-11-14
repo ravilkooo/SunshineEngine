@@ -1,25 +1,27 @@
-#include <Graphics/Lighting/LightData.h>
-#include <Serialization/DXSMSerialization.h>
+#pragma once
 
+#include <Graphics/Lighting/LightData.h>
+
+#include <Serialization/DXSMSerialization.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 namespace SE_G {
     // ----------- AmbientLightData -----------
-    void to_json(json& j, const AmbientLightData& obj) {
+    inline void to_json(json& j, const AmbientLightData& obj) {
         j = json{
             {"Ambient", obj.Ambient},
             {"AmbientPad", obj.AmbientPad}
         };
     }
-    void from_json(const json& j, AmbientLightData& obj) {
+    inline void from_json(const json& j, AmbientLightData& obj) {
         j.at("Ambient").get_to(obj.Ambient);
         j.at("AmbientPad").get_to(obj.AmbientPad);
     }
 
     // ----------- DirectionalLightData -----------
 
-    void to_json(json& j, const DirectionalLightData& obj) {
+    inline void to_json(json& j, const SE_G::DirectionalLightData& obj) {
         j = json{
             {"Diffuse", obj.Diffuse},
             {"DiffusePad", obj.DiffusePad},
@@ -31,7 +33,7 @@ namespace SE_G {
             {"pad2", obj.pad2}
         };
     }
-    void from_json(const json& j, DirectionalLightData& obj) {
+    inline void from_json(const json& j, SE_G::DirectionalLightData& obj) {
         j.at("Diffuse").get_to(obj.Diffuse);
         j.at("DiffusePad").get_to(obj.DiffusePad);
         j.at("Specular").get_to(obj.Specular);
@@ -44,7 +46,7 @@ namespace SE_G {
 
     // ----------- PointLightData -----------
 
-    void to_json(json& j, const PointLightData& obj) {
+    inline void to_json(json& j, const SE_G::PointLightData& obj) {
         j = json{
             {"Diffuse", obj.Diffuse},
             {"DiffusePad", obj.DiffusePad},
@@ -56,7 +58,7 @@ namespace SE_G {
             {"pad", obj.pad}
         };
     }
-    void from_json(const json& j, PointLightData& obj) {
+    inline void from_json(const json& j, SE_G::PointLightData& obj) {
         j.at("Diffuse").get_to(obj.Diffuse);
         j.at("DiffusePad").get_to(obj.DiffusePad);
         j.at("Specular").get_to(obj.Specular);
@@ -68,7 +70,7 @@ namespace SE_G {
     }
 
     // ----------- SpotLightData -----------
-    void to_json(json& j, const SpotLightData& obj) {
+    inline void to_json(json& j, const SE_G::SpotLightData& obj) {
         j = json{
             {"Diffuse", obj.Diffuse},
             {"DiffusePad", obj.DiffusePad},
@@ -82,7 +84,7 @@ namespace SE_G {
             {"pad", obj.pad}
         };
     }
-    void from_json(const json& j, SpotLightData& obj) {
+    inline void from_json(const json& j, SE_G::SpotLightData& obj) {
         j.at("Diffuse").get_to(obj.Diffuse);
         j.at("DiffusePad").get_to(obj.DiffusePad);
         j.at("Specular").get_to(obj.Specular);
@@ -96,13 +98,13 @@ namespace SE_G {
     }
 
     // ----------- SkyBoxData -----------
-    void to_json(json& j, const SkyBoxData& obj) {
+    inline void to_json(json& j, const SE_G::SkyBoxData& obj) {
         j = json{
             {"Tint", obj.Tint},
             {"Power", obj.Power}
         };
     }
-    void from_json(const json& j, SkyBoxData& obj) {
+    inline void from_json(const json& j, SE_G::SkyBoxData& obj) {
         j.at("Tint").get_to(obj.Tint);
         j.at("Power").get_to(obj.Power);
     }

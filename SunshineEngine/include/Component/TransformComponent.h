@@ -78,6 +78,7 @@ public:
 
     // Serialization
     void FromJson(const json& j) override;
+    //void FromJson(const json& j, ID3D11Device* device);
 };
 
 class TransformComponent_Info : public Component_Info
@@ -98,7 +99,8 @@ public:
 
     // Serialization
     json ToJson() const override;
-    void FromJson(const json& j) override;
+    //void FromJson(const json& j) override;
+    void FromJson(const json& j, ID3D11Device* device);
 };
 
 // Macro listing fields of TransformComponent to expose in Lua bindings

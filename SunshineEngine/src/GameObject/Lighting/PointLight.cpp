@@ -1,51 +1,138 @@
 #include "GameObject/Lighting/PointLight.h"
 
+#include <Graphics/Renderer/Technique/PointLightTechnique.h>
+#include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
 
-PointLight::PointLight(SE_G::PointLightData pointLightData)
+#include <Component/RenderComponent.h>
+#include <Component/TransformComponent.h>
+
+
+
+PointLight::PointLight(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    SE_G::PointLightData initData)
 {
-    if (pointLightData.Att.z < 0.0001) {
-        float c = eastl::max(eastl::max(pointLightData.Diffuse.x, pointLightData.Diffuse.y), pointLightData.Diffuse.z) / pointLightData.Att.y;
-        pointLightData.Range = eastl::max(pointLightData.Range, (256.0f * c)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+    if (initData.Att.z < 0.0001) {
+        float c = eastl::max(eastl::max(initData.Diffuse.x, initData.Diffuse.y), initData.Diffuse.z) / initData.Att.y;
+        initData.Range = eastl::max(initData.Range, (256.0f * c)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
     }
     else {
-        float c = eastl::max(eastl::max(pointLightData.Diffuse.x, pointLightData.Diffuse.y), pointLightData.Diffuse.z) / pointLightData.Att.z;
-        pointLightData.Range = eastl::max(pointLightData.Range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+        float c = eastl::max(eastl::max(initData.Diffuse.x, initData.Diffuse.y), initData.Diffuse.z) / initData.Att.z;
+        initData.Range = eastl::max(initData.Range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
     }
 
-    m_lightData = eastl::make_shared<SE_G::PointLightData>(pointLightData);
+    m_lightData = eastl::make_shared<SE_G::PointLightData>(initData);
 
-    /*
-    CreateSimpleSphereMesh(range, 6, 2,
-        diffuse,
-        &vertices, &verticesNum, &indices, &indicesNum);
-    */
+    auto device = renderSystem->GetDevice();
+
+    // TransformComponent
+    auto tc = eastl::make_shared<TransformComponent>(device);
+    tc->m_position = initData.Position;
+
+    // RenderComponent and Passes
+    auto rc = eastl::make_shared<RenderComponent>(renderSystem);
+
+    // LightPass - LightTechnique
+    auto lightTech =
+        eastl::make_unique<SE_G::PointLightTechnique>(device, tc.get(), "LightPass", camera, m_lightData);
+    rc->AddTechnique(eastl::move(lightTech));
+
+    // IconPass
+    auto iconTech =
+        eastl::make_unique<SE_G::IconTechnique>(device, tc.get(), eastl::string("IconPass"),
+            SE_G::IconData{ 3u, 0u, 1u, 1u, m_UUID.GetHilo() });
+    rc->AddTechnique(eastl::move(iconTech));
+
 }
 
-PointLight_Info::PointLight_Info(SE_G::PointLightData pointLightData)
+PointLight_Info::PointLight_Info(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    SE_G::PointLightData initData)
 {
-    if (pointLightData.Att.z < 0.0001) {
-        float c = eastl::max(eastl::max(pointLightData.Diffuse.x, pointLightData.Diffuse.y), pointLightData.Diffuse.z) / pointLightData.Att.y;
-        pointLightData.Range = eastl::max(pointLightData.Range, (256.0f * c)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+    if (initData.Att.z < 0.0001) {
+        float c = eastl::max(eastl::max(initData.Diffuse.x, initData.Diffuse.y), initData.Diffuse.z) / initData.Att.y;
+        initData.Range = eastl::max(initData.Range, (256.0f * c)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
     }
     else {
-        float c = eastl::max(eastl::max(pointLightData.Diffuse.x, pointLightData.Diffuse.y), pointLightData.Diffuse.z) / pointLightData.Att.z;
-        pointLightData.Range = eastl::max(pointLightData.Range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+        float c = eastl::max(eastl::max(initData.Diffuse.x, initData.Diffuse.y), initData.Diffuse.z) / initData.Att.z;
+        initData.Range = eastl::max(initData.Range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
     }
 
-    m_lightData = eastl::make_shared<SE_G::PointLightData>(pointLightData);
+    m_lightData = eastl::make_shared<SE_G::PointLightData>(initData);
     m_name = "PointLight";
     m_group = GameObjectGroup::Lighting;
+    m_type.m_asLight = LightObjectType::PointLight;
 
-    /*
-    CreateSimpleSphereMesh(range, 6, 2,
-        diffuse,
-        &vertices, &verticesNum, &indices, &indicesNum);
-    */
+    auto device = renderSystem->GetDevice();
+
+    // TransformComponent
+    auto tc_info = AddComponent<TransformComponent_Info>();
+    tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+    tc_info->m_assignedComponent->m_position = initData.Position;
+
+    // RenderComponent and Passes
+    auto rc_info = AddComponent<RenderComponent_Info>();
+    rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+
+    // LightPass - LightTechnique
+    auto lightTech =
+        eastl::make_unique<SE_G::PointLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+    rc_info->AddTechnique(eastl::move(lightTech));
+
+    // IconPass
+    auto iconTech =
+        eastl::make_unique<SE_G::IconTechnique>(device, tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
+            SE_G::IconData{ 3u, 0u, 1u, 1u, m_UUID.GetHilo() });
+
+    rc_info->AddTechnique(eastl::move(iconTech));
+}
+
+PointLight_Info::PointLight_Info(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    const json& j)
+{
+    m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+    m_lightData = eastl::make_shared<SE_G::PointLightData>(j["m_lightData"]);
+    m_name = "PointLight";
+    m_group = GameObjectGroup::Lighting;
+    m_type.m_asLight = LightObjectType::PointLight;
+
+    auto device = renderSystem->GetDevice();
+
+    // TransformComponent
+    auto tc_info = AddComponent<TransformComponent_Info>();
+    if (j["components"].contains("Transform")) {
+        tc_info->FromJson(j["components"]["Transform"], device);
+    }
+    else {
+        tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+    }
+    tc_info->m_assignedComponent->m_position = m_lightData->Position;
+
+    // RenderComponent and Passes
+    auto rc_info = AddComponent<RenderComponent_Info>();
+    rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+
+    // LightPass - LightTechnique
+    auto lightTech =
+        eastl::make_unique<SE_G::PointLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+    rc_info->AddTechnique(eastl::move(lightTech));
+
+    // IconPass
+    auto iconTech =
+        eastl::make_unique<SE_G::IconTechnique>(device, tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
+            SE_G::IconData{ 3u, 0u, 1u, 1u, m_UUID.GetHilo() });
+
+    rc_info->AddTechnique(eastl::move(iconTech));
 }
 
 //void PointLight::UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 //{
-//    //pointLightPBuffer->Update(context.Get(), pointLightData);
+//    //pointLightPBuffer->Update(context.Get(), m_lightData);
 //}
 
 /*

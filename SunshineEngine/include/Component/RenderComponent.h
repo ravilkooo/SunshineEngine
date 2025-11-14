@@ -8,6 +8,7 @@
 #include <EASTL/unordered_set.h>
 
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Bindable/Bindable.h>
 
 #include <Component/Component.h>
@@ -15,7 +16,10 @@
 
 namespace SE_G {
     class DeferredRenderer;
+    class GPassTechnique;
 }
+
+//class GameObject_Info;
 
 class RenderComponent :
     public Component
@@ -52,7 +56,7 @@ public:
     }
 
     SE_G::DeferredRenderer* m_renderSystem;
-    SE::UUID m_objectUUID;
+    //SE::UUID m_objectUUID;
 };
 
 class RenderComponent_Info : public Component_Info
@@ -76,6 +80,8 @@ public:
         }
         else if (tech->GetTechniqueTag() == "GPass") {
             m_selectionTechnique = tech.get();
+            m_hasGPassMesh = true;
+            m_gPassTech = dynamic_cast<SE_G::GPassTechnique*>(tech.get());
         }
 
         techniques.insert(tech->GetTechniqueTag());
@@ -86,6 +92,14 @@ public:
     bool HasTechnique(eastl::string technique) {
         return (techniques.find(technique) != techniques.end());
     }
+
+    bool HasGPassMesh();
+    void SetMesh(const eastl::string& filePath);
+    void SetMeshTexture(const eastl::wstring& filePath,
+        SE_G::Bind::SamplerPreset samplerPreset = SE_G::Bind::SamplerPreset::Wrap);
+    eastl::string GetCurrentMeshPath() const;
+    eastl::wstring GetCurrentTexturePath() const;
+    SE_G::Bind::SamplerPreset GetCurrentTextureSampler() const;
     
     eastl::unordered_set<eastl::string> techniques;
     eastl::shared_ptr<RenderComponent> m_assignedComponent;
@@ -95,6 +109,10 @@ public:
     // Serialization
     json ToJson() const override;
     void FromJson(const json& j) override;
+
+private:
+    SE_G::GPassTechnique* m_gPassTech;
+    bool m_hasGPassMesh = false;
 };
 
 /*

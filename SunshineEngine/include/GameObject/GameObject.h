@@ -16,6 +16,11 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+namespace SE_G {
+    class DeferredRenderer;
+    class Camera;
+}
+
 class GameObjectImpl {
 public:
     eastl::vector<eastl::shared_ptr<Component>> components;
@@ -83,11 +88,61 @@ enum class GameObjectGroup {
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(GameObjectGroup, {
-    {GameObjectGroup::Lighting,    "Lighting"},
+    {GameObjectGroup::Lighting, "Lighting"},
     {GameObjectGroup::Shapes, "Shapes"},
-    {GameObjectGroup::CustomMesh,   "CustomMesh"},
-    {GameObjectGroup::Other,   "Other"},
+    {GameObjectGroup::CustomMesh, "CustomMesh"},
+    {GameObjectGroup::Other, "Other"},
     })
+
+
+enum class LightObjectType {
+    PointLight, DirectionalLight, SkyBox, AmbientLight, 
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM(LightObjectType, {
+    {LightObjectType::PointLight, "PointLight"},
+    {LightObjectType::DirectionalLight, "DirectionalLight"},
+    {LightObjectType::SkyBox, "SkyBox"},
+    {LightObjectType::AmbientLight, "AmbientLight"},
+    })
+
+enum class ShapeObjectType {
+    Box, Sphere, Geosphere,
+};
+
+NLOHMANN_JSON_SERIALIZE_ENUM(ShapeObjectType, {
+    {ShapeObjectType::Box, "Box"},
+    {ShapeObjectType::Sphere, "Sphere"},
+    {ShapeObjectType::Geosphere, "Geosphere"},
+    })
+
+struct ObjectType {
+    union {
+        LightObjectType m_asLight;
+        ShapeObjectType m_asShape;
+    };
+
+    ObjectType() {}
+
+    ObjectType(GameObjectGroup objGroup, const json& j)
+    {
+        switch (objGroup)
+        {
+        case GameObjectGroup::Lighting:
+            m_asLight = j; // j["m_type"];
+            break;
+        case GameObjectGroup::Shapes:
+            m_asShape = j; // j["m_type"];
+            break;
+        case GameObjectGroup::CustomMesh:
+            break;
+        case GameObjectGroup::Other:
+            break;
+        default:
+            break;
+        }
+    }
+};
 
 class GameObject_InfoImpl {
 public:
@@ -101,6 +156,7 @@ public:
     virtual ~GameObject_Info() = default;
 
     GameObjectGroup m_group;
+    ObjectType m_type;
     eastl::string m_name;
     SE::UUID m_UUID;
 
@@ -146,7 +202,11 @@ public:
 
     // Serialization
     virtual json ToJson() const;
-    static eastl::unique_ptr<GameObject_Info> FromJson(const json& j);
+    /*
+    static eastl::unique_ptr<GameObject_Info> FromJson(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera, const json& j);
+        */
 
 protected:
     eastl::unique_ptr<GameObject_InfoImpl> impl;

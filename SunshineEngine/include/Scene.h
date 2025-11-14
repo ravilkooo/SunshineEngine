@@ -51,7 +51,9 @@ public:
 
     // Serialization
     json ToJson() const;
-    static eastl::shared_ptr<Scene_Info> FromJson(const json& j);
+    static eastl::shared_ptr<Scene_Info> FromJson(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera, const json& j);
 
     // Чтобы быстро и последовательно итероваться
     eastl::vector<SE::UUID> gameObjects;

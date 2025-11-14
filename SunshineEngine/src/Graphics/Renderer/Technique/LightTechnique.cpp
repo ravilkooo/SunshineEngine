@@ -9,20 +9,20 @@ namespace SE_G {
 			bindables[i]->Bind(context.Get());
 		}
 
-		if (vertexShader) {
-			vertexShader->Bind(context.Get());
+		if (m_vertexShader) {
+			m_vertexShader->Bind(context.Get());
 		}
 
-		if (pixelShader) {
-			pixelShader->Bind(context.Get());
+		if (m_pixelShader) {
+			m_pixelShader->Bind(context.Get());
 		}
 
-		if (texture) {
-			texture->Bind(context.Get());
+		if (m_texture) {
+			m_texture->Bind(context.Get());
 		}
 
-		if (textureSampler) {
-			textureSampler->Bind(context.Get());
+		if (m_textureSampler) {
+			m_textureSampler->Bind(context.Get());
 		}
 
 		if (m_lightDataBuffer) {
@@ -32,8 +32,8 @@ namespace SE_G {
 		if (blendState)
 			blendState->Bind(context.Get());
 
-		if (mesh)
-			mesh->Bind(context.Get());
+		if (m_mesh)
+			m_mesh->Bind(context.Get());
 
 		LightPosition lightPos = GetLightPositionInFrustum();
 		// Choose rasterizer

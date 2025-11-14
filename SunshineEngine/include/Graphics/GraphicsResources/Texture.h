@@ -31,12 +31,24 @@ namespace SE_G {
 				Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER);
 			Texture(ID3D11Device* device, ID3D11ShaderResourceView* pTextureView, UINT slot = 0u,
 				Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER);
-			Texture(ID3D11Device* device, const SE_Color& color, UINT slot = 0u,
+
+			Texture(ID3D11Device* device, const Color& color, UINT slot = 0u,
 				Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER);
-			Texture(ID3D11Device* device, const SE_Color* colorData, UINT width, UINT height, UINT slot = 0u,
+			Texture(ID3D11Device* device, const Color* colorData, UINT width, UINT height, UINT slot = 0u,
 				Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER);
 
-			~Texture() override {};
+			void ChangeTexture(ID3D11Device* device, const eastl::wstring& filePath);
+			void ChangeColor(ID3D11Device* device, SE_G::Color color);
+
+			void ClearTexture();
+
+			void Release() {
+				ClearTexture();
+			};
+
+			~Texture() override {
+				Release();
+			};
 
 			void Bind(ID3D11DeviceContext* context) noexcept override;
 			void Unbind(ID3D11DeviceContext* context) noexcept override;
@@ -44,16 +56,24 @@ namespace SE_G {
 			void UpdateTextureView(ID3D11ShaderResourceView* pTextureView);
 
 			bool HasAlpha() const noexcept;
-		private:
-			void Initialize1x1ColorTexture(ID3D11Device* device, const SE_Color& colorData);
-			void InitializeColorTexture(ID3D11Device* device, const SE_Color* colorData, UINT width, UINT height);
+			void Initialize1x1ColorTexture(ID3D11Device* device, const Color& colorData);
+			void InitializeColorTexture(ID3D11Device* device, const Color* colorData, UINT width, UINT height);
 
-			UINT slot;
-			eastl::wstring filePath;
+			eastl::wstring GetCurrentTexturePath();
+			SE_G::Color GetCurrentColor();
+
+		private:
+			bool isNull = true;
+
+			UINT m_slot;
+			eastl::wstring m_filePath;
 			bool hasAlpha = false;
 			Microsoft::WRL::ComPtr<ID3D11Resource> pTexture;
 			Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView;
 
+			// otherwise textured
+			bool m_colored = true;
+			SE_G::Color m_color = SE_G::Colors::UnloadedTextureColor;
 			Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER;
 		};
 

@@ -2,21 +2,21 @@
 
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include <Graphics/GraphicsResources/VertexShader.h>
-
-#include "Graphics/Utils/ShapeGenerator.h"
-
 #include <directxmath.h>
 
+#include <Graphics/GraphicsResources/VertexShader.h>
+#include "Graphics/Utils/ShapeGenerator.h"
 #include "Graphics/Utils/Camera.h"
-
 #include "Graphics/Bindable/BindableCollection.h"
 #include "Graphics/Renderer/Technique/RenderTechnique.h"
+#include <Graphics/Lighting/LightData.h>
 
 #include <GameObject/GameObject.h>
-
 #include <GameObject/Lighting/LightObject.h>
-#include <Graphics/Lighting/LightData.h>
+
+#include <Serialization/LightDataSerialization.h>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace DXSM = DirectX::SimpleMath;
 

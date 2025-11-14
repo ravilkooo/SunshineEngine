@@ -1,10 +1,12 @@
 #include "Graphics/Renderer/Technique/SkyBoxTechnique.h"
+#include <Utils/StringUtils.h>
 
 namespace SE_G {
     SkyBoxTechnique::SkyBoxTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
         eastl::string technique,
         eastl::shared_ptr<Camera> camera,
-        eastl::shared_ptr<SkyBoxData> lightData)
+        eastl::shared_ptr<SkyBoxData> lightData,
+        eastl::wstring texturePath)
         : LightTechnique(device, assignedTransform, technique, camera, lightData) {
 
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -28,6 +30,45 @@ namespace SE_G {
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
         blendState = eastl::make_shared<Bind::BlendState>(device, blendDesc);
+
+        if (texturePath.empty() || texturePath == L"Default") {
+            m_texture = eastl::make_shared<SE_G::Bind::Texture>(
+                device,
+                MakeEngineAssetPath_Wchar(L"DefaultSkybox.dds"),
+                4u,
+                SE_G::Bind::PipelineStage::PIXEL_SHADER
+            );
+        }
+        else
+        {
+            m_texture = eastl::make_shared<SE_G::Bind::Texture>(
+                device,
+                texturePath,
+                4u,
+                SE_G::Bind::PipelineStage::PIXEL_SHADER
+            );
+        }
+
+        m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
+            device,
+            CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
+            1u,
+            SE_G::Bind::PipelineStage::PIXEL_SHADER
+        );
+
+        float toHalfDiag = 1.15; // 2 / sqrt(3) = 1,15470053838
+        // Add mesh for Ambient
+        m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device,
+            camera->GetFarZ() * toHalfDiag,
+            camera->GetFarZ() * toHalfDiag,
+            camera->GetFarZ() * toHalfDiag);
+
+        m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
+            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxVShader.hlsl"));
+
+        m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
+            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxPShader.hlsl"));
+
     }
 
     void SkyBoxTechnique::ChooseDepthStencilState(LightPosition lightPos)

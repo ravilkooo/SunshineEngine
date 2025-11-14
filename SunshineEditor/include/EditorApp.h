@@ -61,8 +61,6 @@ public:
     void LaunchGame();
     void StopGame();
 
-    void SaveSceneToFile(const std::string& filename);
-
     eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;

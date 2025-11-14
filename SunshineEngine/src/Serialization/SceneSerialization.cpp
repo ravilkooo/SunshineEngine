@@ -1,21 +1,26 @@
-#include "Scene.h"
-#include "GameObject/GameObject.h"
-#include "Component/Component.h"
-#include "Component/ComponentType.h"
-#include "Component/TransformComponent.h"
-#include "Component/RenderComponent.h"
-#include "Component/PhysicsComponent.h"
-#include "Component/LuaComponent.h"
 #include <EASTL/shared_ptr.h>
 #include <EASTL/string.h>
+
+#include <Scene.h>
+#include <Component/Component.h>
+#include <Component/ComponentType.h>
+#include <Component/TransformComponent.h>
+#include <Component/RenderComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/LuaComponent.h>
+
 #include <Utils/StringUtils.h>
 
+#include <GameObject/GameObject.h>
 #include <GameObject/Lighting/LightCollection.h>
+#include <GameObject/EditorObjectFactory.h>
 
-#include <Serialization/LightDataSerialization.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Utils/Camera.h>
+
+#include <Serialization/GraphicsSerialization.h>
 
 #include <nlohmann/json.hpp>
-
 using json = nlohmann::json;
 
 // ----------------- TransformComponent -----------------
@@ -43,8 +48,8 @@ json TransformComponent_Info::ToJson() const {
     return j;
 }
 
-void TransformComponent_Info::FromJson(const json& j) {
-    auto comp = eastl::make_shared<TransformComponent>();
+void TransformComponent_Info::FromJson(const json& j, ID3D11Device* device) {
+    auto comp = eastl::make_shared<TransformComponent>(device);
     comp->FromJson(j);
     m_assignedComponent = comp;
 }
@@ -86,10 +91,30 @@ void TransformComponent::FromJson(const json& j) {
 // ----------------- RenderComponent -----------------
 json RenderComponent_Info::ToJson() const {
     json j;
+    
     j["techniques"] = json::array();
-    for (const auto& t : techniques) j["techniques"].push_back(t.c_str());
+    for (const auto& t : techniques) {
+        json j_t;
+        j_t["Tag"] = t.c_str();
+        if (t == "GPass")
+        {
+            j_t["Mesh"] = GetCurrentMeshPath().c_str();
+            j_t["Texture"] = GetCurrentTexturePath().c_str();
+            j_t["Sampler"] = GetCurrentTextureSampler();
+        }
+        j["techniques"].push_back(j_t);
+        
+
+    }
+
     return j;
 }
+//void RenderComponent_Info::RestoreRenderTechniques(
+//    GameObject_Info* gameObject,
+//    const json& j)
+//{
+//    
+//}
 
 void RenderComponent_Info::FromJson(const json& j) {
     techniques.clear();
@@ -144,117 +169,159 @@ void PhysicsComponent::FromJson(const json& j) {
 
 }
 
+// ----------------- LuaComponent -----------------
+
+
+
 // ----------------- GameObject_Info -----------------
 json GameObject_Info::ToJson() const {
     json j;
     j["m_name"] = m_name.c_str();
     j["m_UUID"] = (uint64_t)m_UUID;
-    j["m_group"] = static_cast<int>(m_group);
+    j["m_group"] = m_group;
+    switch (m_group)
+    {
+    case GameObjectGroup::Lighting:
+        j["m_type"] = m_type.m_asLight;
+        break;
+    case GameObjectGroup::Shapes:
+        j["m_type"] = m_type.m_asShape;
+        break;
+    case GameObjectGroup::CustomMesh:
+        break;
+    case GameObjectGroup::Other:
+        break;
+    default:
+        break;
+    }
 
-    j["components"] = json::array();
+    j["components"] = json::object();
     for (auto& [ctype, compPtr] : impl->components) {
         if (!compPtr) continue;
-        json compJ;
-        compJ["type"] = compPtr->ComponentType();
-        compJ["data"] = compPtr->ToJson();
-        j["components"].push_back(compJ);
+        // Map ComponentType enum to string key
+        eastl::string key;
+        switch (ctype) {
+            case SE::ComponentType::TRANSFORM: key = "Transform"; break;
+            case SE::ComponentType::RENDER:    key = "Render"; break;
+            case SE::ComponentType::PHYSICS:   key = "Physics"; break;
+            case SE::ComponentType::LUA:       key = "Lua"; break;
+            default: continue;
+        }
+        j["components"][key.c_str()] = compPtr->ToJson();
     }
     return j;
 }
 
-eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(const json& j) {
+/*
+eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    const json& j)
+{
+    eastl::unique_ptr<GameObject_Info> out;
+    GameObjectGroup objGroup = j["m_group"];
+    ObjectType objType;
+
+    switch (objGroup)
+    {
+        // Lighting Group
+    case GameObjectGroup::Lighting:
+        objType.m_asLight = j["m_type"];
+
+        switch (objType.m_asLight)
+        {
+        case LightObjectType::SkyBox:
+            out = eastl::make_unique<SkyBox_Info>();
+            break;
+        case LightObjectType::AmbientLight:
+            out = eastl::make_unique<AmbientLight_Info>();
+            break;
+        case LightObjectType::PointLight:
+            out = eastl::make_unique<PointLight_Info>();
+            break;
+        case LightObjectType::DirectionalLight:
+            out = eastl::make_unique<DirectionalLight_Info>();
+            break;
+        }
+        out->m_type = objType;
+        break;
+
+        // Shapes Group
+    case GameObjectGroup::Shapes:
+        objType.m_asShape = j["m_type"];
+
+        switch (objType.m_asShape)
+        {
+        case ShapeObjectType::Box:
+            out = eastl::make_unique<GameObject_Info>();
+            break;
+        case ShapeObjectType::Box_repeat:
+            out = eastl::make_unique<GameObject_Info>();
+            break;
+        case ShapeObjectType::Sphere:
+            out = eastl::make_unique<GameObject_Info>();
+            break;
+        case ShapeObjectType::Geosphere:
+            out = eastl::make_unique<GameObject_Info>();
+            break;
+        }
+        out->m_type = objType;
+        break;
+        
+    // case GameObjectGroup::CustomMesh:
+    //     break;
+    // case GameObjectGroup::Other:
+    //     break;
+        
+    default:
+        out = eastl::make_unique<GameObject_Info>();
+        break;
+    }
+    out->m_group = objGroup;
+
     auto out = eastl::make_unique<GameObject_Info>();
-    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
-    if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
+    //if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
+    //if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+    //if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
+    out->m_name = j["m_name"].get<std::string>().c_str();
+    out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
 
-    if (j.contains("components") && j["components"].is_array()) {
-        for (const auto& compJ : j["components"]) {
-            if (!compJ.contains("type")) continue;
-            SE::ComponentType ctype = compJ["type"];
-            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
+    if (j.contains("components") && j["components"].is_object()) {
+        // Load components in strict order: Transform -> Render -> Physics -> Lua
+        eastl::shared_ptr<TransformComponent_Info> tc_info;
+        if (j["components"].contains("Transform")) {
+            tc_info = out->AddComponent<TransformComponent_Info>();
+            //tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(renderSystem->GetDevice());
+            tc_info->FromJson(j["components"]["Transform"], renderSystem->GetDevice());
+        }
+        if (j["components"].contains("Render")) {
+            auto rc_info = out->AddComponent<RenderComponent_Info>();
+            rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+            // Restore Render techniques
 
-            switch (ctype) {
-            case SE::ComponentType::TRANSFORM: {
-                auto c = out->AddComponent<TransformComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::RENDER: {
-                auto c = out->AddComponent<RenderComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::PHYSICS: {
-                auto c = out->AddComponent<PhysicsComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::LUA: {
-                auto c = out->AddComponent<LuaComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            default:
-                // Unknown/unsupported component type - skip
-                break;
-            }
+            
+            
+            //c->FromJson(j["components"]["Render"]);
+        }
+        if (j["components"].contains("Physics")) {
+            auto c = out->AddComponent<PhysicsComponent_Info>();
+            c->FromJson(j["components"]["Physics"]);
+        }
+        if (j["components"].contains("Lua")) {
+            auto c = out->AddComponent<LuaComponent_Info>();
+            c->FromJson(j["components"]["Lua"]);
         }
     }
 
     return out;
 }
+*/
 
 // ----------------- AmbientLight_Info -----------------
 json AmbientLight_Info::ToJson() const {
     json j = GameObject_Info::ToJson();
     j["m_lightData"] = *(m_lightData.get());
     return j;
-}
-
-eastl::unique_ptr<AmbientLight_Info> AmbientLight_Info::FromJson(const json& j) {
-    auto out = eastl::make_unique<AmbientLight_Info>();
-
-    if (j.contains("m_lightData")) out->m_lightData = eastl::make_shared<SE_G::AmbientLightData>(j["m_lightData"]);
-    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
-    if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
-
-    if (j.contains("components") && j["components"].is_array()) {
-        for (const auto& compJ : j["components"]) {
-            if (!compJ.contains("type")) continue;
-            SE::ComponentType ctype = compJ["type"];
-            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
-
-            switch (ctype) {
-            case SE::ComponentType::TRANSFORM: {
-                auto c = out->AddComponent<TransformComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::RENDER: {
-                auto c = out->AddComponent<RenderComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::PHYSICS: {
-                auto c = out->AddComponent<PhysicsComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::LUA: {
-                auto c = out->AddComponent<LuaComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            default:
-                // Unknown/unsupported component type - skip
-                break;
-            }
-        }
-    }
-
-    return out;
 }
 
 // ----------------- PointLight_Info -----------------
@@ -264,99 +331,11 @@ json PointLight_Info::ToJson() const {
     return j;
 }
 
-eastl::unique_ptr<PointLight_Info> PointLight_Info::FromJson(const json& j) {
-    auto out = eastl::make_unique<PointLight_Info>();
-    if (j.contains("m_lightData")) out->m_lightData = eastl::make_shared<SE_G::PointLightData>(j["m_lightData"]);
-    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
-    if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
-
-    if (j.contains("components") && j["components"].is_array()) {
-        for (const auto& compJ : j["components"]) {
-            if (!compJ.contains("type")) continue;
-            SE::ComponentType ctype = compJ["type"];
-            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
-
-            switch (ctype) {
-            case SE::ComponentType::TRANSFORM: {
-                auto c = out->AddComponent<TransformComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::RENDER: {
-                auto c = out->AddComponent<RenderComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::PHYSICS: {
-                auto c = out->AddComponent<PhysicsComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::LUA: {
-                auto c = out->AddComponent<LuaComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            default:
-                // Unknown/unsupported component type - skip
-                break;
-            }
-        }
-    }
-
-    return out;
-}
-
 // ----------------- DirectionalLight_Info -----------------
 json DirectionalLight_Info::ToJson() const {
     json j = GameObject_Info::ToJson();
     j["m_lightData"] = *(m_lightData.get());
     return j;
-}
-
-eastl::unique_ptr<DirectionalLight_Info> DirectionalLight_Info::FromJson(const json& j) {
-    auto out = eastl::make_unique<DirectionalLight_Info>();
-    if (j.contains("m_lightData")) out->m_lightData = eastl::make_shared<SE_G::DirectionalLightData>(j["m_lightData"]);
-    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
-    if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
-
-    if (j.contains("components") && j["components"].is_array()) {
-        for (const auto& compJ : j["components"]) {
-            if (!compJ.contains("type")) continue;
-            SE::ComponentType ctype = compJ["type"];
-            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
-
-            switch (ctype) {
-            case SE::ComponentType::TRANSFORM: {
-                auto c = out->AddComponent<TransformComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::RENDER: {
-                auto c = out->AddComponent<RenderComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::PHYSICS: {
-                auto c = out->AddComponent<PhysicsComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::LUA: {
-                auto c = out->AddComponent<LuaComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            default:
-                // Unknown/unsupported component type - skip
-                break;
-            }
-        }
-    }
-
-    return out;
 }
 
 // ----------------- SkyBox_Info -----------------
@@ -366,49 +345,6 @@ json SkyBox_Info::ToJson() const {
     return j;
 }
 
-eastl::unique_ptr<SkyBox_Info> SkyBox_Info::FromJson(const json& j) {
-    auto out = eastl::make_unique<SkyBox_Info>();
-    if (j.contains("m_lightData")) out->m_lightData = eastl::make_shared<SE_G::SkyBoxData>(j["m_lightData"]);
-    if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
-    if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-    if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
-
-    if (j.contains("components") && j["components"].is_array()) {
-        for (const auto& compJ : j["components"]) {
-            if (!compJ.contains("type")) continue;
-            SE::ComponentType ctype = compJ["type"];
-            const json& data = compJ.contains("data") ? compJ["data"] : json::object();
-
-            switch (ctype) {
-            case SE::ComponentType::TRANSFORM: {
-                auto c = out->AddComponent<TransformComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::RENDER: {
-                auto c = out->AddComponent<RenderComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::PHYSICS: {
-                auto c = out->AddComponent<PhysicsComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            case SE::ComponentType::LUA: {
-                auto c = out->AddComponent<LuaComponent_Info>();
-                c->FromJson(data);
-                break;
-            }
-            default:
-                // Unknown/unsupported component type - skip
-                break;
-            }
-        }
-    }
-
-    return out;
-}
 // ----------------- Scene_Info -----------------
 json Scene_Info::ToJson() const {
     json j;
@@ -422,11 +358,67 @@ json Scene_Info::ToJson() const {
     return j;
 }
 
-eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(const json& j) {
+eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    const json& j)
+{
     auto scene = eastl::make_shared<Scene_Info>();
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
-            auto go = GameObject_Info::FromJson(objJ);
+            GameObjectGroup objGroup = objJ["m_group"];
+            ObjectType objType = ObjectType(objGroup, objJ["m_type"]);
+            eastl::unique_ptr<GameObject_Info> go;
+            // objJ;
+            switch (objGroup)
+            {
+            case GameObjectGroup::Lighting:
+                switch (objType.m_asLight)
+                {
+                case LightObjectType::SkyBox:
+                    go = eastl::make_unique<SkyBox_Info>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::AmbientLight:
+                    go = eastl::make_unique<AmbientLight_Info>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::PointLight:
+                    go = eastl::make_unique<PointLight_Info>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::DirectionalLight:
+                    go = eastl::make_unique<DirectionalLight_Info>(
+                        renderSystem, camera, objJ);
+                    break;
+                }
+                break;
+
+            case GameObjectGroup::Shapes:
+
+                switch (objType.m_asShape)
+                {
+                case ShapeObjectType::Box:
+                    go = EditorObjectFactory::CreateDefaultBoxObject(renderSystem, objJ);
+                    break;
+                case ShapeObjectType::Sphere:
+                    go = EditorObjectFactory::CreateDefaultSphereObject(renderSystem, objJ);
+                    break;
+                case ShapeObjectType::Geosphere:
+                    go = EditorObjectFactory::CreateDefaultSphereObject(renderSystem, objJ);
+                    break;
+                }
+                break;
+            case GameObjectGroup::CustomMesh:
+                break;
+            case GameObjectGroup::Other:
+                break;
+            default:
+                break;
+            }
+
+
+            //auto go = GameObject_Info::FromJson(objJ);
             if (go) {
                 scene->AddGameObject(eastl::move(go));
             }

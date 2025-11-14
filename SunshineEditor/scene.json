@@ -1,54 +1,52 @@
 {
     "gameObjects": [
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Tag": "LightPass"
+                        },
+                        {
+                            "Tag": "IconPass"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "LightPass",
-                            "IconPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 253933021247236669,
-            "m_group": 0,
+            },
+            "m_UUID": 10969079868231081253,
+            "m_group": "Lighting",
             "m_lightData": {
                 "Power": 0.0,
                 "Tint": {
@@ -57,407 +55,406 @@
                     "z": 1.0
                 }
             },
-            "m_name": "SkyBox"
+            "m_name": "SkyBox",
+            "m_type": "SkyBox"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Box_repeat",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 15402772339732091250,
-            "m_group": 1,
-            "m_name": "Box"
+            },
+            "m_UUID": 11342774071806208097,
+            "m_group": "Shapes",
+            "m_name": "Box_repeat",
+            "m_type": "Box_repeat"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            3.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Sphere",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        3.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 582504968039170760,
-            "m_group": 1,
-            "m_name": "Sphere"
+            },
+            "m_UUID": 11290032724367437692,
+            "m_group": "Shapes",
+            "m_name": "Sphere",
+            "m_type": "Sphere"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            1.4999998807907104,
-                            2.598076343536377,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Sphere",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        1.4999998807907104,
+                        2.598076343536377,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 17286185578069524098,
-            "m_group": 1,
-            "m_name": "Sphere"
+            },
+            "m_UUID": 6407967458626699307,
+            "m_group": "Shapes",
+            "m_name": "Sphere",
+            "m_type": "Sphere"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            -1.500000238418579,
-                            2.598076105117798,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Sphere",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -1.500000238418579,
+                        2.598076105117798,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 18050123477441848826,
-            "m_group": 1,
-            "m_name": "Sphere"
+            },
+            "m_UUID": 16623186686248936082,
+            "m_group": "Shapes",
+            "m_name": "Sphere",
+            "m_type": "Sphere"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            -3.0,
-                            -2.6226831550957286e-07,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Sphere",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -3.0,
+                        -2.6226831550957286e-07,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 18027952658106940728,
-            "m_group": 1,
-            "m_name": "Sphere"
+            },
+            "m_UUID": 13379295709473826816,
+            "m_group": "Shapes",
+            "m_name": "Sphere",
+            "m_type": "Sphere"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            -1.499999761581421,
-                            -2.598076343536377,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Sphere",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -1.499999761581421,
+                        -2.598076343536377,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 7338976486950830892,
-            "m_group": 1,
-            "m_name": "Sphere"
+            },
+            "m_UUID": 10467554292884790498,
+            "m_group": "Shapes",
+            "m_name": "Sphere",
+            "m_type": "Sphere"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            1.500001072883606,
-                            -2.5980756282806396,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Sphere",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        1.500001072883606,
+                        -2.5980756282806396,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 8984589788597751951,
-            "m_group": 1,
-            "m_name": "Sphere"
+            },
+            "m_UUID": 10634754842787995377,
+            "m_group": "Shapes",
+            "m_name": "Sphere",
+            "m_type": "Sphere"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Tag": "LightPass"
+                        },
+                        {
+                            "Tag": "IconPass"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "LightPass",
-                            "IconPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 12031170492767430047,
-            "m_group": 0,
+            },
+            "m_UUID": 5383254867281021103,
+            "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
                     "x": 0.5,
@@ -466,57 +463,56 @@
                 },
                 "AmbientPad": 1.0
             },
-            "m_name": "AmbientLight"
+            "m_name": "AmbientLight",
+            "m_type": "AmbientLight"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Tag": "LightPass"
+                        },
+                        {
+                            "Tag": "IconPass"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "LightPass",
-                            "IconPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 5859551117831372358,
-            "m_group": 0,
+            },
+            "m_UUID": 6354304631325183790,
+            "m_group": "Lighting",
             "m_lightData": {
                 "Diffuse": {
                     "x": 0.4901960790157318,
@@ -543,57 +539,56 @@
                 "pad1": 0.0,
                 "pad2": 0.0
             },
-            "m_name": "DirectionalLight"
+            "m_name": "DirectionalLight",
+            "m_type": "DirectionalLight"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            1.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Tag": "LightPass"
+                        },
+                        {
+                            "Tag": "IconPass"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "LightPass",
-                            "IconPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        1.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 13275503150662677595,
-            "m_group": 0,
+            },
+            "m_UUID": 11043260032397865981,
+            "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
                     "x": 0.0,
@@ -620,107 +615,108 @@
                 "SpecularPad": 1.0,
                 "pad": 0.0
             },
-            "m_name": "PointLight"
+            "m_name": "PointLight",
+            "m_type": "PointLight"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            0.0,
-                            -5.0,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Box_repeat",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        -5.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 15741941152646792364,
-            "m_group": 1,
-            "m_name": "Box"
+            },
+            "m_UUID": 411894791684360328,
+            "m_group": "Shapes",
+            "m_name": "Box_repeat",
+            "m_type": "Box_repeat"
         },
         {
-            "components": [
-                {
-                    "data": {
-                        "m_localPosition": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localRotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_localScaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "m_position": [
-                            0.0,
-                            2.0,
-                            0.0
-                        ],
-                        "m_rotation": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "m_scaleFactor": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "type": 0
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Mesh": "Sphere",
+                            "Sampler": 0,
+                            "Tag": "GPass",
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                        }
+                    ]
                 },
-                {
-                    "data": {
-                        "techniques": [
-                            "GPass"
-                        ]
-                    },
-                    "type": 1
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        2.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
                 }
-            ],
-            "m_UUID": 12350501241952425660,
-            "m_group": 1,
-            "m_name": "Sphere"
+            },
+            "m_UUID": 13105937515649490766,
+            "m_group": "Shapes",
+            "m_name": "Sphere",
+            "m_type": "Sphere"
         }
     ]
 }

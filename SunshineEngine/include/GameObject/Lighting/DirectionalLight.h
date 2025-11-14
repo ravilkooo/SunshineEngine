@@ -1,15 +1,19 @@
 #pragma once
 
-
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <EASTL/shared_ptr.h>
-#include <Graphics/GraphicsResources/VertexShader.h>
+#include <EASTL/unique_ptr.h>
 
 #include <GameObject/GameObject.h>
-
 #include <GameObject/Lighting/LightObject.h>
+#include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/Lighting/LightData.h>
+
+#include <Serialization/LightDataSerialization.h>
+#include <Serialization/DXSMSerialization.h>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace DXSM = DirectX::SimpleMath;
 
@@ -19,12 +23,13 @@ class DirectionalLight :
 public:
 
     DirectionalLight(
-        SE_G::DirectionalLightData directionalLightData =
-        {
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        SE_G::DirectionalLightData initData = {
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3::Zero, 0,
-            DXSM::Vector3(0, -1, 0), 0
+            DXSM::Vector3(1, -1, 1), 0
         });
 };
 
@@ -34,15 +39,20 @@ class DirectionalLight_Info :
 public:
 
     DirectionalLight_Info(
-        SE_G::DirectionalLightData directionalLightData =
-        {
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        SE_G::DirectionalLightData initData = {
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3::Zero, 0,
-            DXSM::Vector3(0, -1, 0), 0
+            DXSM::Vector3(1, -1, 1), 0
         });
+    DirectionalLight_Info(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        const json& j);
 
     // Serialization
     json ToJson() const override;
-    static eastl::unique_ptr<DirectionalLight_Info> FromJson(const json& j);
+    //static eastl::unique_ptr<DirectionalLight_Info> FromJson(const json& j);
 };

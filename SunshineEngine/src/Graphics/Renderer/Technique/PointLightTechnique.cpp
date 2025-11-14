@@ -1,4 +1,5 @@
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
+#include <Utils/StringUtils.h>
 
 namespace SE_G {
     PointLightTechnique::PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
@@ -32,6 +33,12 @@ namespace SE_G {
         rasterDesc.CullMode = D3D11_CULL_FRONT;
         rasterDesc.FillMode = D3D11_FILL_SOLID;
         rastCullFront = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
+
+        m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, lightData->Range, 1);
+        m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
+            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightVShader.hlsl"));
+        m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
+            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightPShader.hlsl"));
     }
 
     void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

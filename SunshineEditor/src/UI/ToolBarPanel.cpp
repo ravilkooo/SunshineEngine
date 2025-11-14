@@ -41,7 +41,7 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
         {
             if (m_editorApp) {
                 //m_editorApp->m_worldEditor->m_scene->ToJson();
-                m_editorApp->SaveSceneToFile(WcharToChar(JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"../scene.json")));
+                m_editorApp->m_worldEditor->SaveSceneToFile(WcharToChar(JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"../scene.json")));
             }
         }
     }
@@ -55,6 +55,7 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
         if (ImGui::Button("Stop"))
         {
             isPlaying = false; 
+            m_editorApp->StopGame();
             LOG_GAME_INFO("Game stopped");
         }
     }

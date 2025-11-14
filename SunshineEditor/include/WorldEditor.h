@@ -19,6 +19,7 @@
 #include <Scripting/LuaManager.h>
 
 #include <Physics/PhysicsSystem.h>
+#include <LogManager.h>
 
 
 class WorldEditor
@@ -136,6 +137,9 @@ public:
     //void SyncronizeTransforms();
     void Render();
     void ClearScene();
+
+    void SaveSceneToFile(const std::string& filename);
+    bool ReadSceneFromFile(const std::string& filename);
 
     GameTimer m_timer;
     eastl::shared_ptr<Scene_Info> m_scene;

@@ -1,11 +1,36 @@
 #include <Component/RenderComponent.h>
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 void RenderComponent::AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> renderTech) {
 	m_renderSystem->AddTechnique(eastl::move(renderTech));
+}
+
+bool RenderComponent_Info::HasGPassMesh() {
+	return m_hasGPassMesh;
+}
+void RenderComponent_Info::SetMesh(const eastl::string& filePath) {
+	m_gPassTech->SetMesh(filePath);
+}
+
+void RenderComponent_Info::SetMeshTexture(const eastl::wstring& filePath,
+	SE_G::Bind::SamplerPreset samplerPreset) {
+	m_gPassTech->SetTexture(filePath, samplerPreset);
+}
+
+eastl::string RenderComponent_Info::GetCurrentMeshPath() const {
+	return m_gPassTech->m_mesh->GetCurrentMeshPath();
+}
+
+eastl::wstring RenderComponent_Info::GetCurrentTexturePath() const {
+	return m_gPassTech->m_texture->GetCurrentTexturePath();
+}
+
+SE_G::Bind::SamplerPreset RenderComponent_Info::GetCurrentTextureSampler() const {
+	return m_gPassTech->m_textureSampler->m_preset;
 }
 
 /*
