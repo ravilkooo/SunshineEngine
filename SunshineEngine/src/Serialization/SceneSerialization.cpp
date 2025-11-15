@@ -12,6 +12,7 @@
 #include <Utils/StringUtils.h>
 
 #include <GameObject/GameObject.h>
+#include <GameObject/Shapes/ShapeObject.h>
 #include <GameObject/Lighting/LightCollection.h>
 #include <GameObject/EditorObjectFactory.h>
 
@@ -316,34 +317,6 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
     return out;
 }
 */
-
-// ----------------- AmbientLight_Info -----------------
-json AmbientLight_Info::ToJson() const {
-    json j = GameObject_Info::ToJson();
-    j["m_lightData"] = *(m_lightData.get());
-    return j;
-}
-
-// ----------------- PointLight_Info -----------------
-json PointLight_Info::ToJson() const {
-    json j = GameObject_Info::ToJson();
-    j["m_lightData"] = *(m_lightData.get());
-    return j;
-}
-
-// ----------------- DirectionalLight_Info -----------------
-json DirectionalLight_Info::ToJson() const {
-    json j = GameObject_Info::ToJson();
-    j["m_lightData"] = *(m_lightData.get());
-    return j;
-}
-
-// ----------------- SkyBox_Info -----------------
-json SkyBox_Info::ToJson() const {
-    json j = GameObject_Info::ToJson();
-    j["m_lightData"] = *(m_lightData.get());
-    return j;
-}
 
 // ----------------- Scene_Info -----------------
 json Scene_Info::ToJson() const {

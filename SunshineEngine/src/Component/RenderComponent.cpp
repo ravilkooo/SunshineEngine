@@ -15,6 +15,9 @@ bool RenderComponent_Info::HasGPassMesh() {
 void RenderComponent_Info::SetMesh(const eastl::string& filePath) {
 	m_gPassTech->SetMesh(filePath);
 }
+void RenderComponent_Info::SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh) {
+	m_gPassTech->SetMesh(newMesh);
+}
 
 void RenderComponent_Info::SetMeshTexture(const eastl::wstring& filePath,
 	SE_G::Bind::SamplerPreset samplerPreset) {

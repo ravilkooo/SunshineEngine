@@ -59,9 +59,7 @@ namespace SE_G {
         float toHalfDiag = 1.15; // 2 / sqrt(3) = 1,15470053838
         // Add mesh for Ambient
         m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device,
-            camera->GetFarZ() * toHalfDiag,
-            camera->GetFarZ() * toHalfDiag,
-            camera->GetFarZ() * toHalfDiag);
+            DXSM::Vector3::One * camera->GetFarZ() * toHalfDiag);
 
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
             device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxVShader.hlsl"));

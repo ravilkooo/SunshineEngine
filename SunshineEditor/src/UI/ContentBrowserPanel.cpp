@@ -12,7 +12,7 @@
 
 
 std::filesystem::path ContentBrowserPanel::s_AssetsDirectory =
-    std::filesystem::current_path().parent_path().parent_path() / "SunshineEngine" / "Assets";
+    std::filesystem::path(EDITOR_ASSETS_DIR);
 
 ContentBrowserPanel::ContentBrowserPanel()
     : m_CurrentDirectory(s_AssetsDirectory)

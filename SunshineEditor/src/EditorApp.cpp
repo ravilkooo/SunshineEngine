@@ -34,6 +34,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
 	sol_ImGui::Init(m_lua);
+
 	
 	// Init imgui staff
 	IMGUI_CHECKVERSION();
@@ -72,6 +73,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	
 	imguiEditorPass->m_ToolbarPanel.SetEditorApp(this);
 
+
 	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &EditorApp::HandleKeyDown);
 	InputDevice::getInstance().OnKeyReleased.AddRaw(this, &EditorApp::HandleKeyUp);
 	InputDevice::getInstance().MouseMove.AddRaw(this, &EditorApp::HandleMouseMove);
@@ -98,6 +100,7 @@ void EditorApp::RunEditor()
 	unsigned int frameCount = 0;
 	float FPSstatisticTimer = 0;
 
+
 	while (!isExitRequested) {
 		// Handle the windows messages.
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -110,6 +113,7 @@ void EditorApp::RunEditor()
 			}
 			continue;
 		}
+
 
 		m_timer.Tick();
 		m_deltaTime = m_timer.GetDeltaTime();
@@ -131,6 +135,7 @@ void EditorApp::RunEditor()
 			frameCount = 0;
 		}
 
+
 		if (m_runtimeMode == RuntimeMode::GAME_MODE) {
 			while (accumulator >= physicsUpdateMs) {
 				// UpdateGame(physicsUpdateMs);
@@ -144,8 +149,11 @@ void EditorApp::RunEditor()
 				accumulator -= physicsUpdateMs;
 			}
 		}
+
 		//m_worldEditor->SyncronizeTransforms();
 		Render();
+
+
 	}
 	m_worldEditor->ClearScene();
 }

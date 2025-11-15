@@ -28,7 +28,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultBoxObject(
     auto rc = obj->AddComponent<RenderComponent>(renderSystem);
 
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(renderSystem, tr.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, width, height, length);
+	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, DXSM::Vector3(width, height, length));
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
 
 	rc->AddTechnique(eastl::move(gBufferTech));
@@ -45,7 +45,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateDefaultSphereObject(SE_G:
 	auto rc = obj->AddComponent<RenderComponent>(renderSystem);
 
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(renderSystem, tr.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(device, radius);
+	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(device, DXSM::Vector3::One * radius);
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
 
 	rc->AddTechnique(eastl::move(gBufferTech));

@@ -37,7 +37,7 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateDefaultBoxObject(
 
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, width, height, length);
+	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, DXSM::Vector3(width, height, length));
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
 
 	rc_info->AddTechnique(eastl::move(gBufferTech));
@@ -75,7 +75,7 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateDefaultBoxObject(
 
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, 1.0f, 1.0f, 1.0f);
+	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, DXSM::Vector3::One);
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
 
 	rc_info->AddTechnique(eastl::move(gBufferTech));
@@ -103,7 +103,7 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateDefaultSphereObjec
 	// RenderComponent and Passes
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(device, radius);
+	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(device, DXSM::Vector3::One * radius);
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 
@@ -137,7 +137,7 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateDefaultSphereObjec
 	// RenderComponent and Passes
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(device, 1.0f);
+	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(device, DXSM::Vector3::One);
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 

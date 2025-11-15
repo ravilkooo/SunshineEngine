@@ -95,6 +95,8 @@ public:
 
     bool HasGPassMesh();
     void SetMesh(const eastl::string& filePath);
+    void SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh);
+
     void SetMeshTexture(const eastl::wstring& filePath,
         SE_G::Bind::SamplerPreset samplerPreset = SE_G::Bind::SamplerPreset::Wrap);
     eastl::string GetCurrentMeshPath() const;

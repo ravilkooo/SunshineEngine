@@ -65,8 +65,4 @@ public:
 
     // Unnecessary?
     //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-
-    // Serialization
-    json ToJson() const override;
-    //static eastl::unique_ptr<PointLight_Info> FromJson(const json& j);
 };

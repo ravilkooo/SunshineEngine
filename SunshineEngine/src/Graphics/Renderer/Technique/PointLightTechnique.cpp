@@ -34,7 +34,7 @@ namespace SE_G {
         rasterDesc.FillMode = D3D11_FILL_SOLID;
         rastCullFront = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
 
-        m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, lightData->Range, 1);
+        m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, DXSM::Vector3::One * lightData->Range, 1);
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
             device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightVShader.hlsl"));
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(

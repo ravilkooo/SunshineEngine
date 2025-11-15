@@ -51,8 +51,4 @@ public:
         SE_G::DeferredRenderer* renderSystem,
         eastl::shared_ptr<SE_G::Camera> camera,
         const json& j);
-
-    // Serialization
-    json ToJson() const override;
-    //static eastl::unique_ptr<DirectionalLight_Info> FromJson(const json& j);
 };

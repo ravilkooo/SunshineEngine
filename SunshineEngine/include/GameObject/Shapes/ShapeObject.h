@@ -15,6 +15,10 @@
 #include <Utils/StringUtils.h>
 #include <Utils/UUID.h>
 
+#include <Serialization/ShapeSerialization.h>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 template <class T>
 class ShapeObject_Info : public GameObject_Info {
 protected:
@@ -37,6 +41,12 @@ public:
 		ShapeObject_Info(SE::UUID(), renderSystem, initData)
 	{
 	}
+
+	json ToJson() const override  {
+		json j = GameObject_Info::ToJson();
+		j["m_shapeData"] = m_shapeData;
+		return j;
+	}
 };
 
 class BoxShapeObject_Info :
@@ -49,7 +59,7 @@ public:
 	BoxShapeObject_Info(SE_G::DeferredRenderer* renderSystem, BoxShapeData initData);
 
 	DXSM::Vector3 GetSize();
-	void SetSize(DXSM::Vector3 newSize);
+	void SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize);
 };
 
 class SphereShapeObject_Info :
@@ -60,6 +70,14 @@ public:
 		SE_G::DeferredRenderer* renderSystem, SphereShapeData initData);
 
 	SphereShapeObject_Info(SE_G::DeferredRenderer* renderSystem, SphereShapeData initData);
+
+	DXSM::Vector3 GetSize();
+	uint32_t GetSliceCount();
+	uint32_t GetStackCount();
+
+	void SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize);
+	void SetSliceCount(SE_G::DeferredRenderer* renderSystem, uint32_t newSliceCount);
+	void SetStackCount(SE_G::DeferredRenderer* renderSystem, uint32_t newStackCount);
 };
 
 class GeosphereShapeObject_Info :
@@ -70,4 +88,10 @@ public:
 		SE_G::DeferredRenderer* renderSystem, GeosphereShapeData initData);
 
 	GeosphereShapeObject_Info(SE_G::DeferredRenderer* renderSystem, GeosphereShapeData initData);
+
+	DXSM::Vector3 GetSize();
+	uint32_t GetNumSubdivisions();
+
+	void SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize);
+	void SetNumSubdivisions(SE_G::DeferredRenderer* renderSystem, uint32_t newNumSubdivisions);
 };

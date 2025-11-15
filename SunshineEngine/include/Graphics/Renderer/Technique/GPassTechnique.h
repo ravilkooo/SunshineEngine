@@ -23,6 +23,7 @@ namespace SE_G {
         void SetColor(SE_G::Color color);
 
         void SetMesh(const eastl::string& filePath);
+        void SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh);
 
         DeferredRenderer* m_renderSystem;
 

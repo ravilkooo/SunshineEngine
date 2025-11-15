@@ -11,7 +11,7 @@
 
 #include <Component/Component.h>
 #include <Component/ComponentType.h>
-#include "Utils/UUID.h"
+#include <Utils/UUID.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;

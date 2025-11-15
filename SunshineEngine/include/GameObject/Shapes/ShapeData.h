@@ -5,16 +5,16 @@
 namespace DXSM = DirectX::SimpleMath;
 
 struct BoxShapeData {
-	DXSM::Vector3 Size;
+	DXSM::Vector3 Size = DXSM::Vector3::One;
 };
 
 struct SphereShapeData {
-	DXSM::Vector3 Size;
-	uint32_t SliceCount;
-	uint32_t StackCount;
+	DXSM::Vector3 Size = DXSM::Vector3::One;
+	uint32_t SliceCount = 10u;
+	uint32_t StackCount = 10u;
 };
 
 struct GeosphereShapeData {
-	DXSM::Vector3 Size;
-	uint32_t NumSubdivisions;
+	DXSM::Vector3 Size = DXSM::Vector3::One;
+	uint32_t NumSubdivisions = 6u;
 };

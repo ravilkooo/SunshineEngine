@@ -98,6 +98,11 @@ namespace SE_G {
 		m_mesh->ChangeMesh(m_renderSystem->GetDevice(), filePath);
 	}
 
+	void GPassTechnique::SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh) {
+		m_mesh->ClearMesh();
+		m_mesh = newMesh;
+	}
+
 	void GPassTechnique::ClearMesh() {
 		
 	}

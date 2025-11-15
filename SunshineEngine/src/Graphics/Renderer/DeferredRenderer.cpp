@@ -1,4 +1,5 @@
 #include "Graphics/Renderer/DeferredRenderer.h"
+#include <iostream>
 
 namespace SE_G {
 	DeferredRenderer::DeferredRenderer()
@@ -70,10 +71,14 @@ namespace SE_G {
 		for (auto pass : m_passes) {
 			if (!pass->IsEnabled())
 				continue;
+
 			context->ClearState();
+
 			pass->StartFrame();
 			pass->Pass();
+
 			pass->EndFrame();
+
 		}
 
 		//swapChain->Present(1, /*DXGI_PRESENT_DO_NOT_WAIT*/ 0);
