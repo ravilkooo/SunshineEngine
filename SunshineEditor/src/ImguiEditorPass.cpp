@@ -4,12 +4,14 @@
 #include <EASTL/string.h>
 #include <Utils/DebugUtils.h>
 
+#include "assimp/SceneCombiner.h"
+
 ImguiEditorPass::ImguiEditorPass(
 	ID3D11Device* device,
 	ID3D11DeviceContext* context,
 	ID3D11Texture2D* backBuffer,
 	UINT editorAppWidth, UINT editorAppHeight,
-	eastl::shared_ptr<GBuffer> pGBuffer,
+	eastl::shared_ptr<SE_G::GBuffer> pGBuffer,
 	eastl::shared_ptr<WorldEditor> worldEditor)
 	: RenderPass("LightPass", device, context)
 {
@@ -53,7 +55,17 @@ ImguiEditorPass::ImguiEditorPass(
 	m_viewport.MinDepth = 0;
 	m_viewport.MaxDepth = 1.0f;
 
-	selectedUUID = Sunshine::UUID(0u);
+	selectedUUID = SE::UUID(0u);
+
+	// Change font to Arial to support Russian
+	ImGuiIO& io = ImGui::GetIO();
+	ImFont* fontArial = io.Fonts->AddFontFromFileTTF(
+		MakeEngineAssetPath_Char("Fonts/Arial.ttf"), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
+		13.0f);
+	io.FontDefault = fontArial;
+	ImGui_ImplDX11_InvalidateDeviceObjects();
+	ImGui_ImplDX11_CreateDeviceObjects();
+
 }
 
 void ImguiEditorPass::StartFrame()
@@ -65,16 +77,24 @@ void ImguiEditorPass::StartFrame()
 	context->RSSetViewports(1, &m_viewport);
 }
 
-void ImguiEditorPass::Pass(const Scene& scene)
+void ImguiEditorPass::Pass()
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	// Main Menu Bar
+	m_MainMenuBarPanel.OnImGuiRender();
+
+	// Toolbar
+	m_ToolbarPanel.OnImGuiRender(m_MainMenuBarPanel.GetHeight());
+	
+	float topOffset = m_MainMenuBarPanel.GetHeight() + m_ToolbarPanel.GetHeight();
+
 	// Create DockSpace above main viewport
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + topOffset));
+	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - topOffset - m_BottomPanel.GetHeight()));
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 	// ----- Docking -------
@@ -114,18 +134,23 @@ void ImguiEditorPass::Pass(const Scene& scene)
 
 	ImGui::End();
 
+	//Scene Hierarchy
 	ImGui::Begin("Scene Hierarchy");
-	ShowSceneHierarchy();  // Scene Hierarchy
+	ShowSceneHierarchy();
 	ImGui::End();
 
 	// Properties
-	ImGui::Begin("Properties");
 	ShowProperties();
-	ImGui::End();
 
-	ImGui::Begin("Content Browser");
-	ShowContentBrowser();  // Content Browser
-	ImGui::End();
+	// Content Browser
+	ShowContentBrowser();
+
+	// Bottom Bar Panel
+	ShowBottomPanel();
+
+	// Output Log 
+	ShowOutputLog();
+
 
 	// Main Game Viewport
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -168,6 +193,7 @@ void ImguiEditorPass::Pass(const Scene& scene)
 			);
 			*/
 			selectedUUID = m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
+			m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 		}
 	}
 
@@ -220,7 +246,7 @@ void ImguiEditorPass::RenderGameWorld()
 {
 	ImVec2 avail = ImGui::GetContentRegionAvail();
 	ImGui::Image((ImTextureID)m_GBuffer->pLightSRV.Get(), avail);
-	// Здесь нужно отобразить ваше игровое содержимое, пока заглушка
+	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	//ImGui::Text("Game World Render Here");
 }
 
@@ -229,22 +255,27 @@ void ImguiEditorPass::ShowSceneHierarchy()
 	ImGui::Text("Scene Hierarchy");
 	if (ImGui::TreeNode("Root"))
 	{
-		auto& objects = m_worldEditor->m_scene.gameObjects;
+		auto& objects = m_worldEditor->m_scene->gameObjects;
 		for (size_t i = 0; i < objects.size(); ++i)
 		{
 			// selectedIdx
 			ImGui::PushID((int)i);
 			bool isSelected = (selectedUUID == objects[i].m_UUID);
 
-			// выделяем если кликнули по списку и если мы не кликали по объектам на экране
-			// выделяем если кликнули по объекту
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
-			//m_worldEditor->m_scene.GetGameObjectByUUID(objects[i])->Name = objLabel;
+			//m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->Name = objLabel;
 
-			if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
+			eastl::string objName = m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->m_name;
+			if (objName == "")
+				objName = std::to_string(objects[i].m_UUID).c_str();
+			// if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
+			if (ImGui::Selectable(objName.c_str(), isSelected))
 			{
 				selectedUUID = objects[i];
+				m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 			}
 			ImGui::PopID();
 		}
@@ -254,32 +285,73 @@ void ImguiEditorPass::ShowSceneHierarchy()
 
 void ImguiEditorPass::ShowContentBrowser()
 {
-	ImGui::Text("Content Browser");
-	ImGui::Button("Import Asset");
+	m_ContentBrowserPanel.OnImGuiRender();
 }
 
 void ImguiEditorPass::ShowProperties()
 {
-	if (selectedUUID == Sunshine::UUID(0u))
-		return;
+	m_PropertyPanel.SetWorldEditor(m_worldEditor);
+	m_PropertyPanel.SetSelectedUUID(selectedUUID);
+	m_PropertyPanel.OnImGuiRender();
 
-	GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
+	GameObject_Info* obj = m_worldEditor->m_scene->GetGameObjectByUUID(
 		selectedUUID
 	);
 
-	if (!obj->HasComponent<LuaComponent>())
+	/*
+	if (!obj->HasComponent<LuaComponent_Info>())
 	{
 		if (ImGui::Button("Add Lua Script")) {
-			obj->AddComponent<LuaComponent>();
-			auto lua2 = obj->GetComponent<LuaComponent>();
+			obj->AddComponent<LuaComponent_Info>();
+			auto lua2 = obj->GetComponent<LuaComponent_Info>();
 			lua2->Init(obj);
-			lua2->LoadScript();
 		}
 		return;
 	}
-	else 
+	*/
+	//ImGui::Begin("Properties);
+	// if (selectedUUID == SE::UUID(0u))
+	// 	return;
+	//
+	// GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
+	// 	selectedUUID
+	// );
+	//
+	// if (!obj->HasComponent<LuaComponent>())
+	// {
+	// 	if (ImGui::Button("Add Lua Script")) {
+	// 		obj->AddComponent<LuaComponent>();
+	// 		auto lua2 = obj->GetComponent<LuaComponent>();
+	// 		lua2->Init(obj);
+	// 	}
+	// 	return;
+	// }
+	// else 
+	// {
+	// 	LuaImgui(obj);
+	// }
+	//ImGui::End();
+}
+
+void ImguiEditorPass::ShowBottomPanel()
+{
+	m_BottomPanel.OnImGuiRender(&m_ShowEditorLogPanel, &m_ShowGameLogPanel);
+}
+
+void ImguiEditorPass::ShowOutputLog()
+{
+	m_EditorLogPanel.SetBottomOffset(m_BottomPanel.GetHeight());
+	
+	if (m_ShowEditorLogPanel)
 	{
-		LuaImgui(obj);
+		m_EditorLogPanel.OnImguiRender(m_ShowEditorLogPanel);
+	}
+
+	m_GameLogPanel.SetBottomOffset(m_BottomPanel.GetHeight());
+	
+	if (m_ShowGameLogPanel)
+	{
+		m_GameLogPanel.OnImguiRender(m_ShowGameLogPanel);
 	}
 }
 	
@@ -321,7 +393,7 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 					ImGui::InputText(("##p" + to_string_eastl(i)).c_str(), param.value, sizeof(param.value));
 				}
 				else {
-					eastl::string objName = obj->Name;
+					eastl::string objName = obj->m_name;
 					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), objName.c_str());
 				}
 			}

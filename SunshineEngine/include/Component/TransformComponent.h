@@ -3,23 +3,23 @@
 #include "Component.h"
 #include <SimpleMath.h>
 #include <d3d11.h>
-#include <Bindable/TransformCBuffer.h>
-#include <GraphicsUtils/Transformable.h>
+#include <Graphics/Bindable/TransformCBuffer.h>
 
 namespace DXSM = DirectX::SimpleMath;
 
 class SUNSHINE_ENGINE_API TransformComponent :
-    public Component, Transformable
+    public Component
 {
+    friend class TransformComponent_Info;
 public:
-    TransformComponent() {};
+    TransformComponent() {};    
 
     TransformComponent(ID3D11Device* device);
 
     void SetupBuffer(ID3D11Device* device);
 
     // To-do ptr
-    Bind::TransformCBuffer* transformBuffer;
+    SE_G::Bind::TransformCBuffer* transformBuffer;
 
     void BindToGraphicsPipeline(ID3D11DeviceContext* context);
 
@@ -54,7 +54,7 @@ public:
     DXSM::Matrix GetLocalTransformMatrix() const;
 
     // World Transform
-    DXSM::Matrix GetWorldMatrix() const override; // include LocalTransfrom
+    DXSM::Matrix GetWorldMatrix() const; // include LocalTransfrom
 
     // Transform
     DXSM::Vector3 m_position = { 0, 0, 0 };
@@ -67,8 +67,51 @@ public:
     DXSM::Vector3 m_localScaleFactor = { 1, 1, 1 };
 
     DXSM::Matrix localTransfrom = DXSM::Matrix::Identity;
-    
+
     const std::type_info& getType() const override {
         return typeid(TransformComponent);
     }
+    static const SE::ComponentType s_componentType = SE::ComponentType::TRANSFORM;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+
+    // Serialization
+    void FromJson(const json& j) override;
+    //void FromJson(const json& j, ID3D11Device* device);
 };
+
+class TransformComponent_Info : public Component_Info
+{
+public:
+    TransformComponent_Info() {};
+
+    static const SE::ComponentType s_componentType = SE::ComponentType::TRANSFORM;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+
+    const std::type_info& getType() const override {
+        return typeid(TransformComponent_Info);
+    }
+
+    bool IsAssigned() override { return true; }
+
+    eastl::shared_ptr<TransformComponent> m_assignedComponent;
+
+    // Serialization
+    json ToJson() const override;
+    //void FromJson(const json& j) override;
+    void FromJson(const json& j, ID3D11Device* device);
+};
+
+// Macro listing fields of TransformComponent to expose in Lua bindings
+#ifndef TRANSFORMCOMPONENT_LUA_FIELDS_APPLY
+#define TRANSFORMCOMPONENT_LUA_FIELDS_APPLY(F) \
+    F(m_position) ,                         \
+    F(m_rotation) ,                         \
+    F(m_scaleFactor) ,                      \
+    F(m_localPosition) ,                    \
+    F(m_localRotation) ,                    \
+    F(m_localScaleFactor)
+#endif

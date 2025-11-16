@@ -10,7 +10,7 @@ struct UUIDhilo
 };
 
 
-namespace Sunshine
+namespace SE
 {
     class UUID
     {
@@ -18,6 +18,8 @@ namespace Sunshine
         UUID();
         explicit UUID(uint64_t uuid);
         UUID(const UUID&) = default;
+
+        UUIDhilo GetHilo();
 
         operator uint64_t() const;
 
@@ -37,9 +39,9 @@ namespace Sunshine
 
 namespace std {
     template<>
-    struct hash<Sunshine::UUID>
+    struct hash<SE::UUID>
     {
-        std::size_t operator()(const Sunshine::UUID& uuid) const
+        std::size_t operator()(const SE::UUID& uuid) const
         {
             return std::hash<uint64_t>()((uint64_t)uuid);
         }
@@ -49,9 +51,9 @@ namespace std {
 /*
 namespace eastl {
     template <>
-    struct hash<Sunshine::UUID>
+    struct hash<SE::UUID>
     {
-        size_t operator()(const Sunshine::UUID& uuid) const noexcept
+        size_t operator()(const SE::UUID& uuid) const noexcept
         {
             // ƒл€ 64-бит UUID Ч просто возвращаем value
             return static_cast<size_t>(uuid.m_UUID);

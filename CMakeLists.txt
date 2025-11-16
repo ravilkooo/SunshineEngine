@@ -35,14 +35,3 @@ add_subdirectory(SunshineEngine)
 add_subdirectory(SunshineEditor)
 
 add_subdirectory(ThirdParty)
-
-add_subdirectory(SunshineLibs)
-
-# Sandbox_Editor (EXE)
-add_subdirectory(Sandbox_Editor)
-
-# Sandbox_Lua (EXE)
-add_subdirectory(Sandbox_Lua)
-
-# Sandbox_Imgui
-add_subdirectory(Sandbox_Imgui)

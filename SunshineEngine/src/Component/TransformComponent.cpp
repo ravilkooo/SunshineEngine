@@ -1,4 +1,6 @@
 #include "Component/TransformComponent.h"
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
 
 TransformComponent::TransformComponent(ID3D11Device* device) {
     SetupBuffer(device);
@@ -6,7 +8,7 @@ TransformComponent::TransformComponent(ID3D11Device* device) {
 
 void TransformComponent::SetupBuffer(ID3D11Device* device)
 {
-    transformBuffer = new Bind::TransformCBuffer(device, this, 0u);
+    transformBuffer = new SE_G::Bind::TransformCBuffer(device, this, 0u);
 }
 
 void TransformComponent::BindToGraphicsPipeline(ID3D11DeviceContext* context) {
@@ -53,3 +55,9 @@ DXSM::Matrix TransformComponent::GetWorldMatrix() const
 {
     return GetLocalTransformMatrix() * GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
 }
+
+#define TC_ADD_FIELD(name) #name, &TransformComponent::name
+#define TC_FIELD_PAIRS TRANSFORMCOMPONENT_LUA_FIELDS_APPLY(TC_ADD_FIELD)
+#define TC_METHOD_PAIRS
+LUA_REGISTER_COMPONENT(TransformComponent, "TransformComponent", TC_FIELD_PAIRS, TC_METHOD_PAIRS, "getTransform")
+#undef TC_ADD_FIELD

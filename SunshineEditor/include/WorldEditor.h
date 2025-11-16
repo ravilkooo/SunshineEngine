@@ -5,16 +5,21 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
-// SunshineLibs
-#include <Graphics/DeferredRenderer.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
 
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include <GameTimer.h>
 
-#include <Graphics/GPass.h>
-#include <Graphics/LightPass.h>
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
+#include <Graphics/Renderer/Pass/IconPass.h>
 
-#include <GameObjectFactory.h>
+#include <GameObject/EditorObjectFactory.h>
+#include <Scripting/LuaManager.h>
+
+#include <Physics/PhysicsSystem.h>
+#include <LogManager.h>
 
 
 class WorldEditor
@@ -80,7 +85,7 @@ public:
             return;
         }
 
-        Sunshine::UUID GetUUID(ID3D11DeviceContext* context,
+        SE::UUID GetUUID(ID3D11DeviceContext* context,
             ID3D11ShaderResourceView* UUIDTextureView,
             UINT mouseClickX, UINT mouseClickY) {
             
@@ -110,9 +115,9 @@ public:
 
             context->Unmap(m_outputUUIDBufferStaged.Get(), 0);
 
-            return Sunshine::UUID(uuid);
+            return SE::UUID(uuid);
             
-            //return Sunshine::UUID(0u);
+            //return SE::UUID(0u);
         }
 
     };
@@ -123,17 +128,23 @@ public:
     ~WorldEditor();
 
     void InitWorldEditor(
-        eastl::shared_ptr<DeferredRenderer> renderer,
+        eastl::shared_ptr<SE_G::DeferredRenderer> renderer,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
     void Run();
 
     void Update(float deltaTime);
+    //void SyncronizeTransforms();
     void Render();
+    void ClearScene();
+
+    void SaveSceneToFile(const std::string& filename);
+    bool ReadSceneFromFile(const std::string& filename);
 
     GameTimer m_timer;
-    Scene m_scene;
-    eastl::shared_ptr<DeferredRenderer> m_renderer;
+    eastl::shared_ptr<Scene_Info> m_scene;
+    eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
+    LuaManager m_luaManager;
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 
@@ -143,8 +154,10 @@ public:
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
-    eastl::shared_ptr<GPass> m_gPass;
-    eastl::shared_ptr<LightPass> m_lightPass;
+    eastl::shared_ptr<SE_G::GPass> m_gPass;
+    eastl::shared_ptr<SE_G::LightPass> m_lightPass;
+    eastl::shared_ptr<SE_G::SelectionPass> m_selectionPass;
+    eastl::shared_ptr<SE_G::IconPass> m_iconPass;
 
     float m_deltaTime = 0.0f;
 
@@ -154,6 +167,11 @@ public:
 
     void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
 
-    Sunshine::UUID ChooseObjectByClick(UINT x, UINT y);
-};
+    SE::UUID ChooseObjectByClick(UINT x, UINT y);
 
+private:
+    //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
+    // testing
+    // SE::UUID floorId;
+    // SE::UUID ballId;
+};

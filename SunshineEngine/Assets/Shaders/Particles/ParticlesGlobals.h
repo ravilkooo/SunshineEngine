@@ -11,7 +11,15 @@ struct Particle
     float age;
     float lifeSpan;
 
+    float screenSpin;
+    float screenSpinSpeed;
+    float worldSpin;
+    float worldSpinSpeed;
+
+    float3 worldSpinAxis;
     float mass;
+    
+    float orientaion;
     float3 padding;
 };
 

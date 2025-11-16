@@ -1,5 +1,6 @@
 #include "EditorApp.h"
 #include "Utils/DebugUtils.h"
+#include <fstream>   // std::ofstream
 
 EditorApp::EditorApp() { }
 
@@ -16,7 +17,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_displayWindow = DisplayWindow(this, m_applicationName, m_hInstance,
 		m_winWidth, m_winHeight, DisplayWindow::WndProcImGui);
 
-	m_renderer = eastl::make_shared<DeferredRenderer>(
+	m_renderer = eastl::make_shared<SE_G::DeferredRenderer>(
 		m_displayWindow.m_hWnd,
 		m_winWidth, m_winHeight);
 	
@@ -33,6 +34,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
 	sol_ImGui::Init(m_lua);
+
 	
 	// Init imgui staff
 	IMGUI_CHECKVERSION();
@@ -63,10 +65,14 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_initialized = true;
 
 	m_worldEditor->rayDirection = DXSM::Vector4(0.0f, 0.0f, 1.0f, 0.0f);
+	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
 
 	// Show window
 	// ShowWindow(m_displayWindow.m_hWnd, SW_SHOWDEFAULT);
 	// UpdateWindow(m_displayWindow.m_hWnd);
+	
+	imguiEditorPass->m_ToolbarPanel.SetEditorApp(this);
+
 
 	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &EditorApp::HandleKeyDown);
 	InputDevice::getInstance().OnKeyReleased.AddRaw(this, &EditorApp::HandleKeyUp);
@@ -80,7 +86,7 @@ EditorApp::~EditorApp() {
 	ImGui::DestroyContext();
 }
 
-void EditorApp::Run()
+void EditorApp::RunEditor()
 {
 	float physicsUpdateFPS = 120.0f;
 	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
@@ -94,6 +100,7 @@ void EditorApp::Run()
 	unsigned int frameCount = 0;
 	float FPSstatisticTimer = 0;
 
+
 	while (!isExitRequested) {
 		// Handle the windows messages.
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -106,6 +113,7 @@ void EditorApp::Run()
 			}
 			continue;
 		}
+
 
 		m_timer.Tick();
 		m_deltaTime = m_timer.GetDeltaTime();
@@ -127,15 +135,35 @@ void EditorApp::Run()
 			frameCount = 0;
 		}
 
-		while (accumulator >= physicsUpdateMs) {
-			Update(physicsUpdateMs);
-			accumulator -= physicsUpdateMs;
+
+		if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+			while (accumulator >= physicsUpdateMs) {
+				// UpdateGame(physicsUpdateMs);
+				UpdateEditor(physicsUpdateMs);
+				accumulator -= physicsUpdateMs;
+			}
 		}
+		else {
+			while (accumulator >= physicsUpdateMs) {
+				UpdateEditor(physicsUpdateMs);
+				accumulator -= physicsUpdateMs;
+			}
+		}
+
+		//m_worldEditor->SyncronizeTransforms();
 		Render();
+
+
 	}
+	m_worldEditor->ClearScene();
 }
 
-void EditorApp::Update(float deltaTime) 
+void EditorApp::UpdateGame(float deltaTime) {
+	m_currentGame->Update(deltaTime);
+}
+
+
+void EditorApp::UpdateEditor(float deltaTime) 
 {
 	if (!imguiEditorPass->IsFocusedGameViewport)
 	{
@@ -160,14 +188,18 @@ void EditorApp::Update(float deltaTime)
 		}
 	}
 
-
 	m_worldEditor->Update(deltaTime);
 }
 
 void EditorApp::Render() {
 
 	// Passes
-	m_renderer->RenderScene(m_worldEditor->m_scene);
+	if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+		m_renderer->RenderScene();
+	}
+	else {
+		m_renderer->RenderScene();
+	}
 	m_renderer->PresentFrame();
 }
 
@@ -288,4 +320,27 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 		else if (CameraSpeed > MaxCameraSpeed)
 			CameraSpeed = MaxCameraSpeed;
 	}
+}
+
+void EditorApp::LaunchGame() {
+	m_runtimeMode = RuntimeMode::GAME_MODE;
+	// m_currentGame = eastl::make_unique<Game>();
+
+	// There should be saving scene from world editor (serializing) and loading to game (deserializing)
+	// m_worldEditor->SaveScene(...);
+	// m_currentGame->LoadScene(...);
+
+	m_worldEditor->m_iconPass->Disable();
+	m_worldEditor->m_selectionPass->Disable();
+}
+
+
+void EditorApp::StopGame() {
+	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
+	// There should be loading scene to world editor (deserializing)
+	// m_currentGame->UnloadScene(...);
+	// m_worldEditor->LoadScene(...);
+
+	m_worldEditor->m_iconPass->Enable();
+	m_worldEditor->m_selectionPass->Enable();
 }
