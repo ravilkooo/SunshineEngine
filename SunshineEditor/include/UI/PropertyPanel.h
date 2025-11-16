@@ -1,8 +1,14 @@
 #pragma once
 
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 #include <EASTL/shared_ptr.h>
+#include <imgui.h>
 #include "SimpleMath.h"
+#include "Graphics/Renderer/Technique/GPassTechnique.h"
+#include "Graphics/Renderer/Technique/IconTechnique.h"
 #include "Graphics/Renderer/Technique/LightTechnique.h"
+#include "Graphics/Renderer/Technique/RenderTechnique.h"
 
 
 #include "Utils/UUID.h"
@@ -34,21 +40,18 @@ private:
     
     void DrawGameObjectHeader(GameObject* obj);
 
-<<<<<<< Updated upstream
     void DrawTransformComponent(GameObject* obj);
     void DrawRenderComponent(GameObject* obj);
     void DrawComponentAddPopup(GameObject* obj);
-=======
-    void DrawTransformComponent(GameObject_Info* obj);
-    void DrawDetails(GameObject_Info* obj);
-    void DrawComponentAddPopup(GameObject_Info* obj);
->>>>>>> Stashed changes
     
     
-    void DrawAmbientLightDetails(SE_G::AmbientLightData* lightData);
-    void DrawDirectionalLightDetails(SE_G::DirectionalLightData* lightData);
-    void DrawPointLightDetails(SE_G::PointLightData* lightData);
-    void DrawSkyBoxDetails(SE_G::SkyBoxData* lightData);
+    void DrawAmbientLightTechniqueDetails(SE_G::LightTechnique<SE_G::AmbientLightData>* light_technique);
+    void DrawDirectionalLightTechniqueDetails(SE_G::LightTechnique<SE_G::DirectionalLightData>* light_technique);
+    void DrawPointLightTechniqueDetails(SE_G::LightTechnique<SE_G::PointLightData>* light_technique);
+    void DrawSkyBoxTechniqueDetails(SE_G::LightTechnique<SE_G::SkyBoxData>* light_technique);
+    void DrawTechniqueDetails(SE_G::RenderTechnique* get, const eastl::string& string);
+    void DrawGPassTechniqueDetails(SE_G::GPassTechnique* pass_technique);
+    void DrawIconTechniqueDetails(SE_G::IconTechnique* icon_technique);
     
     void DrawLuaComponent(GameObject* obj);
     void DrawLuaFunctions(LuaComponent* luaComp);

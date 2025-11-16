@@ -1,5 +1,4 @@
 #pragma once
-#include "./Utils/ILogManager.h"
 #include <imgui.h>
 #include <string>
 #include <vector>
@@ -19,13 +18,35 @@
 
 class LogPanel;
 
-class LogManager : public ILogManager
+class LogManager
 {
 public:
+    enum class LogType
+    {
+        Info,
+        Warning,
+        Error,
+        Count
+    };
+
     struct LogTypeInfo
     {
         const char* name;
         ImVec4 color;
+    };
+    
+    enum class LogTarget
+    {
+        Editor,
+        Game
+    };
+
+    struct LogEntry
+    {
+        LogType type;
+        std::string message;
+        ImVec4 color;
+        LogTarget target;
     };
 
     inline static const LogTypeInfo s_LogTypeInfos[(int)LogType::Count] = {
@@ -40,7 +61,7 @@ public:
         return instance;
     }
     
-    void AddLog(LogTarget target, LogType type, const char* fmt, ...) IM_FMTARGS(3) override;
+    void AddLog(LogTarget target, LogType type, const char* fmt, ...) IM_FMTARGS(3);
     
     static void AddInfoToEditorLog(const char* fmt, ...) IM_FMTARGS(1);
     static void AddWarningToEditorLog(const char* fmt, ...) IM_FMTARGS(1);
@@ -50,14 +71,14 @@ public:
     static void AddWarningToGameLog(const char* fmt, ...) IM_FMTARGS(1);
     static void AddErrorToGameLog(const char* fmt, ...) IM_FMTARGS(1);
     
-    std::vector<LogEntry> GetLogs(LogTarget target) const override;
+    std::vector<LogEntry> GetLogs(LogTarget target) const;
     
-    void Clear(LogTarget target) override;
+    void Clear(LogTarget target);
 
 private:
     LogManager() = default;
     std::vector<LogEntry> logs;
-    void AddFormattedLog(LogTarget target, LogType type, const char* fmt, va_list args) override;
+    void AddFormattedLog(LogTarget target, LogType type, const char* fmt, va_list args);
 };
 
 // Editor 

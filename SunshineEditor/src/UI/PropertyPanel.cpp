@@ -2,15 +2,14 @@
 #include "WorldEditor.h"
 #include "GameObject.h"
 #include "Component/TransformComponent.h"
+#include "Component/RenderComponent.h"
 #include "Component/LuaComponent.h"
 #include "DirectXMath.h"
-<<<<<<< Updated upstream
 #include "Graphics/Renderer/Technique/LightTechnique.h"
 #include "Graphics/Lighting/LightCollection.h"
-=======
-#include "GameObject/Lighting/LightObject.h"
->>>>>>> Stashed changes
 #include "Graphics/Lighting/LightData.h"
+#include "Graphics/Renderer/Technique/GPassTechnique.h"
+#include "Graphics/Renderer/Technique/IconTechnique.h"
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 
 PropertyPanel::PropertyPanel() {}
@@ -38,7 +37,7 @@ void PropertyPanel::OnImGuiRender()
     ImGui::Separator();
     
     DrawTransformComponent(obj);
-    DrawDetails(obj);
+    DrawRenderComponent(obj);
     DrawLuaComponent(obj);
     
     DrawComponentAddPopup(obj);
@@ -105,7 +104,6 @@ void PropertyPanel::DrawTransformComponent(GameObject* obj)
     }
 }
 
-<<<<<<< Updated upstream
 void PropertyPanel::DrawRenderComponent(GameObject* obj)
 {
     if (!obj->HasComponent<RenderComponent>()) 
@@ -113,19 +111,20 @@ void PropertyPanel::DrawRenderComponent(GameObject* obj)
 
     auto render = obj->GetComponent<RenderComponent>();
     
-=======
-void PropertyPanel::DrawDetails(GameObject_Info* obj)
-{
->>>>>>> Stashed changes
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
                               ImGuiTreeNodeFlags_SpanAvailWidth;
     
-    if (ImGui::TreeNodeEx("Details", flags))
-    {  
-        if (obj->m_group == GameObjectGroup::Lighting)
+    if (ImGui::TreeNodeEx("Render Component", flags))
+    {   
+        static eastl::string selectedTechnique = "";
+        
+        ImGui::Text("Render Techniques:");
+        ImGui::SameLine();
+        ImGui::TextDisabled("(%d)", render->techniques.size());
+        
+        ImGui::BeginChild("TechniquesList", ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 6), true);
         {
-<<<<<<< Updated upstream
             for (auto& techPair : render->techniques)
             {
                 ImGui::PushID(techPair.first.c_str());
@@ -148,47 +147,24 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
                     type = "Skybox";
                 
                 if (isSelected)
-=======
-            switch (obj->m_type.m_asLight)
-            {
-            case LightObjectType::AmbientLight:
-                if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::AmbientLightData>*>(obj))
->>>>>>> Stashed changes
                 {
-                    DrawAmbientLightDetails(lightObj->m_lightData.get());
+                    ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_Text]);
                 }
-                break;
                 
-            case LightObjectType::DirectionalLight:
-                if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::DirectionalLightData>*>(obj))
+                if (ImGui::Selectable(type, isSelected))
                 {
-<<<<<<< Updated upstream
                     selectedTechnique = techPair.first;
-=======
-                    DrawDirectionalLightDetails(lightObj->m_lightData.get());
->>>>>>> Stashed changes
                 }
-                break;
                 
-            case LightObjectType::PointLight:
-                if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::PointLightData>*>(obj))
+                if (isSelected)
                 {
-                    DrawPointLightDetails(lightObj->m_lightData.get());
+                    ImGui::PopStyleColor(2);
                 }
-                break;
                 
-            case LightObjectType::SkyBox:
-                if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::SkyBoxData>*>(obj))
-                {
-                    DrawSkyBoxDetails(lightObj->m_lightData.get());
-                }
-                break;
-                
-            default:
-                break;
+                ImGui::PopID();
             }
         }
-<<<<<<< Updated upstream
         ImGui::EndChild();
         
         if (!selectedTechnique.empty() && render->techniques.find(selectedTechnique) != render->techniques.end())
@@ -209,54 +185,89 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
             ImGui::Spacing();
             ImGui::TextDisabled("Select a type to view details");
         }
-=======
->>>>>>> Stashed changes
         
         ImGui::TreePop();
     }
 }
 
-void PropertyPanel::DrawAmbientLightDetails(SE_G::AmbientLightData* lightData)
+void PropertyPanel::DrawTechniqueDetails(SE_G::RenderTechnique* tech, const eastl::string& techName)
 {
-    if (lightData)
+    if (!tech) return;
+    
+    if (auto lightTech = dynamic_cast<SE_G::LightTechnique<SE_G::AmbientLightData>*>(tech))
     {
+        DrawAmbientLightTechniqueDetails(lightTech);
+    }
+    else if (auto lightTech = dynamic_cast<SE_G::LightTechnique<SE_G::DirectionalLightData>*>(tech))
+    {
+        DrawDirectionalLightTechniqueDetails(lightTech);
+    }
+    else if (auto lightTech = dynamic_cast<SE_G::LightTechnique<SE_G::PointLightData>*>(tech))
+    {
+        DrawPointLightTechniqueDetails(lightTech);
+    }
+    else if (auto lightTech = dynamic_cast<SE_G::LightTechnique<SE_G::SkyBoxData>*>(tech))
+    {
+        DrawSkyBoxTechniqueDetails(lightTech);
+    }
+    else if (auto gPassTech = dynamic_cast<SE_G::GPassTechnique*>(tech))
+    {
+        DrawGPassTechniqueDetails(gPassTech);
+    }
+    else if (auto iconTech = dynamic_cast<SE_G::IconTechnique*>(tech))
+    {
+        DrawIconTechniqueDetails(iconTech);
+    }
+}
+
+void PropertyPanel::DrawAmbientLightTechniqueDetails(SE_G::LightTechnique<SE_G::AmbientLightData>* tech)
+{
+    if (tech->m_lightData)
+    {
+        auto& data = *tech->m_lightData;
+        
         ImGui::Text("Ambient Light");
         
-        ImGui::ColorEdit3("Light Color", &lightData->Ambient.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Intensity", &lightData->AmbientPad, 0.01f, 0.0f, 10.0f, "%.2f");
+        ImGui::ColorEdit3("Light Color", &data.Ambient.x, ImGuiColorEditFlags_Float);
+        ImGui::DragFloat("Intensity", &data.AmbientPad, 0.01f, 0.0f, 10.0f, "%.2f");
     }
 }
 
-void PropertyPanel::DrawDirectionalLightDetails(SE_G::DirectionalLightData* lightData)
+void PropertyPanel::DrawDirectionalLightTechniqueDetails(SE_G::LightTechnique<SE_G::DirectionalLightData>* tech)
 {
-    if (lightData)
+    if (tech->m_lightData)
     {
+        auto& data = *tech->m_lightData;
+        
         ImGui::Text("Directional Light");
         
-        ImGui::ColorEdit3("Light Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Intensity", &lightData->DiffusePad, 0.1f, 0.0f, 50.0f, "%.1f");
+        ImGui::ColorEdit3("Light Color", &data.Diffuse.x, ImGuiColorEditFlags_Float);
+        ImGui::DragFloat("Intensity", &data.DiffusePad, 0.1f, 0.0f, 50.0f, "%.1f");
     }
 }
 
-void PropertyPanel::DrawPointLightDetails(SE_G::PointLightData* lightData)
+void PropertyPanel::DrawPointLightTechniqueDetails(SE_G::LightTechnique<SE_G::PointLightData>* tech)
 {
-    if (lightData)
+    if (tech->m_lightData)
     {
+        auto& data = *tech->m_lightData;
+        
         ImGui::Text("Point Light");
         
-        ImGui::ColorEdit3("Light Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Intensity", &lightData->DiffusePad, 0.1f, 0.0f, 100.0f, "%.1f");
-        ImGui::DragFloat("Range", &lightData->Range, 0.5f, 0.0f, 100.0f, "%.1f m");
+        ImGui::ColorEdit3("Light Color", &data.Diffuse.x, ImGuiColorEditFlags_Float);
+        ImGui::DragFloat("Intensity", &data.DiffusePad, 0.1f, 0.0f, 100.0f, "%.1f");
+        ImGui::DragFloat("Range", &data.Range, 0.5f, 0.0f, 100.0f, "%.1f m");
     }
 }
 
-void PropertyPanel::DrawSkyBoxDetails(SE_G::SkyBoxData* lightData)
+void PropertyPanel::DrawSkyBoxTechniqueDetails(SE_G::LightTechnique<SE_G::SkyBoxData>* tech)
 {
-    if (lightData)
+    if (tech->m_lightData)
     {
+        auto& data = *tech->m_lightData;
+        
         ImGui::Text("Skybox - Environment Background");
         
-<<<<<<< Updated upstream
         ImGui::ColorEdit3("Sky Tint", &data.Tint.x, ImGuiColorEditFlags_Float);
         ImGui::DragFloat("Brightness", &data.Power, 0.1f, 0.0f, 10.0f, "%.1f");
         
@@ -282,14 +293,6 @@ void PropertyPanel::DrawIconTechniqueDetails(SE_G::IconTechnique* tech)
 }
 
 void PropertyPanel::DrawLuaComponent(GameObject* obj)
-=======
-        ImGui::ColorEdit3("Sky Tint", &lightData->Tint.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Brightness", &lightData->Power, 0.1f, 0.0f, 10.0f, "%.1f");
-    }
-}
-
-void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
->>>>>>> Stashed changes
 {
     if (!obj->HasComponent<LuaComponent>()) 
         return;
@@ -501,7 +504,6 @@ void PropertyPanel::DrawComponentAddPopup(GameObject* obj)
                 luaComp->Init(obj);
             }
         }
-<<<<<<< Updated upstream
         else if (!obj->HasComponent<RenderComponent>())
         {
             if (ImGui::MenuItem("Render Component", nullptr, false, true))
@@ -509,8 +511,6 @@ void PropertyPanel::DrawComponentAddPopup(GameObject* obj)
                 obj->AddComponent<RenderComponent>();
             }
         }
-=======
->>>>>>> Stashed changes
         else
         {
             ImGui::TextDisabled("All available components added");

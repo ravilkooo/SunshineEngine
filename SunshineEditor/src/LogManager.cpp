@@ -2,25 +2,20 @@
 
 void LogManager::AddLog(LogTarget target, LogType type, const char* fmt, ...)
 {
-    // const LogTypeInfo& info = s_LogTypeInfos[(int)type];
-    //
-    // std::string finalMsg = info.name;
-    //
-    // va_list args;
-    // va_start(args, fmt);
-    //
-    // char buffer[1024];
-    // vsnprintf(buffer, sizeof(buffer), fmt, args);
-    // finalMsg += buffer;
-    //
-    // va_end(args);
-    //
-    // logs.push_back({ type, finalMsg, info.color, target });
+    const LogTypeInfo& info = s_LogTypeInfos[(int)type];
+    
+    std::string finalMsg = info.name;
 
     va_list args;
     va_start(args, fmt);
-    AddFormattedLog(target, type, fmt, args);
+
+    char buffer[1024];
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    finalMsg += buffer;
+
     va_end(args);
+
+    logs.push_back({ type, finalMsg, info.color, target });
 }
 
 std::vector<LogManager::LogEntry> LogManager::GetLogs(LogTarget target) const
@@ -42,16 +37,6 @@ void LogManager::Clear(LogTarget target)
 
 void LogManager::AddFormattedLog(LogTarget target, LogType type, const char* fmt, va_list args)
 {
-    // const LogTypeInfo& info = s_LogTypeInfos[(int)type];
-    //
-    // char buffer[1024];
-    // vsnprintf(buffer, sizeof(buffer), fmt, args);
-    //
-    // std::string finalMsg = info.name;
-    // finalMsg += buffer;
-    //
-    // logs.push_back({ type, finalMsg, info.color, target });
-
     const LogTypeInfo& info = s_LogTypeInfos[(int)type];
 
     char buffer[1024];
@@ -59,15 +44,8 @@ void LogManager::AddFormattedLog(LogTarget target, LogType type, const char* fmt
 
     std::string finalMsg = info.name;
     finalMsg += buffer;
-    ImVec4 color = info.color;
-    
-    LogEntry entry;
-    entry.type = type;
-    entry.message = finalMsg;
-    entry.target = target;
-    entry.color = color;
-    
-    logs.push_back(entry);
+
+    logs.push_back({ type, finalMsg, info.color, target });
 }
 
 #define IMPLEMENT_LOG_METHODS(target_name, target_enum)                          \
