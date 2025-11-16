@@ -43,6 +43,7 @@ namespace SE_G {
 
     void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
     {
+        // to-do: update only when changed
         m_lightData->Position = m_assignedTransform->m_position;
         m_lightDataBuffer->Update(context.Get(), *m_lightData);
         BindAll(context);

@@ -231,11 +231,6 @@ void WorldEditor::InitWorldEditor(
 		//m_physicsSystem->FinalizeScene();
 	}
 
-	m_scene->AddGameObject(EditorObjectFactory::CreateSkyBox(
-		m_renderer.get(),
-		m_renderer->GetMainCamera())
-	);
-
 	m_selectionPass->m_scene = m_scene;
 }
 

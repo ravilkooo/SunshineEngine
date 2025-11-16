@@ -26,6 +26,14 @@ namespace SE_G {
             device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/AmbientLightPShader.hlsl"));
     }
 
+    void AmbientLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    {
+        // to-do: update only when changed
+        m_lightDataBuffer->Update(context.Get(), *m_lightData);
+        BindAll(context);
+        DrawTechnique(context);
+    }
+
     void AmbientLightTechnique::ChooseDepthStencilState(LightPosition lightPos)
     {
         return;

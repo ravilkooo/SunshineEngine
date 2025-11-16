@@ -1,15 +1,12 @@
 #include "UI/PropertyPanel.h"
 #include "WorldEditor.h"
-#include "GameObject.h"
+#include "GameObject/GameObject.h"
 #include "Component/TransformComponent.h"
 #include "Component/LuaComponent.h"
 #include "DirectXMath.h"
-<<<<<<< Updated upstream
 #include "Graphics/Renderer/Technique/LightTechnique.h"
-#include "Graphics/Lighting/LightCollection.h"
-=======
+#include "GameObject/Lighting/LightCollection.h"
 #include "GameObject/Lighting/LightObject.h"
->>>>>>> Stashed changes
 #include "Graphics/Lighting/LightData.h"
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 
@@ -19,14 +16,14 @@ void PropertyPanel::OnImGuiRender()
 {
     ImGui::Begin("Properties");
     
-    if (m_SelectedUUID == Sunshine::UUID(0u) || !m_WorldEditor)
+    if (m_SelectedUUID == SE::UUID(0u) || !m_WorldEditor)
     {
         ImGui::Text("No object selected");
         ImGui::End();
         return;
     }
 
-    GameObject* obj = m_WorldEditor->m_scene.GetGameObjectByUUID(m_SelectedUUID);
+    GameObject_Info* obj = m_WorldEditor->m_scene->GetGameObjectByUUID(m_SelectedUUID);
     if (!obj)
     {
         ImGui::Text("Object not found");
@@ -46,29 +43,29 @@ void PropertyPanel::OnImGuiRender()
     ImGui::End();
 }
 
-void PropertyPanel::DrawGameObjectHeader(GameObject* obj)
+void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
 {
     ImGui::Text("GameObject");
     ImGui::SameLine();
     
     static char nameBuffer[256] = {0};
-    strncpy(nameBuffer, obj->Name.c_str(), sizeof(nameBuffer) - 1);
+    strncpy(nameBuffer, obj->m_name.c_str(), sizeof(nameBuffer) - 1);
     
     ImGui::SetNextItemWidth(-FLT_MIN);
     if (ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer)))
     {
-        obj->Name = nameBuffer;
+        obj->m_name = nameBuffer;
     }
     
     ImGui::TextDisabled("UUID: %llu", obj->m_UUID.m_UUID);
 }
 
-void PropertyPanel::DrawTransformComponent(GameObject* obj)
+void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
 {
-    if (!obj->HasComponent<TransformComponent>()) 
+    if (!obj->HasComponent<TransformComponent_Info>()) 
         return;
 
-    auto transform = obj->GetComponent<TransformComponent>();
+    auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent;
     
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
@@ -105,113 +102,98 @@ void PropertyPanel::DrawTransformComponent(GameObject* obj)
     }
 }
 
-<<<<<<< Updated upstream
-void PropertyPanel::DrawRenderComponent(GameObject* obj)
-{
-    if (!obj->HasComponent<RenderComponent>()) 
-        return;
-
-    auto render = obj->GetComponent<RenderComponent>();
-    
-=======
 void PropertyPanel::DrawDetails(GameObject_Info* obj)
 {
->>>>>>> Stashed changes
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
-                              ImGuiTreeNodeFlags_Framed |
-                              ImGuiTreeNodeFlags_SpanAvailWidth;
-    
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
     if (ImGui::TreeNodeEx("Details", flags))
-    {  
+    {
         if (obj->m_group == GameObjectGroup::Lighting)
         {
-<<<<<<< Updated upstream
+            /*
             for (auto& techPair : render->techniques)
             {
                 ImGui::PushID(techPair.first.c_str());
-                
+
                 bool isSelected = (selectedTechnique == techPair.first);
-                
+
                 const char* type = "";
-                
-                if (auto gpass = dynamic_cast<SE_G::GPassTechnique*>(techPair.second.get())) 
+
+                if (auto gpass = dynamic_cast<SE_G::GPassTechnique*>(techPair.second.get()))
                     type = "Geometry";
-                else if (auto iconTech = dynamic_cast<SE_G::IconTechnique*>(techPair.second.get())) 
+                else if (auto iconTech = dynamic_cast<SE_G::IconTechnique*>(techPair.second.get()))
                     type = "Icon";
-                if (auto ambient = dynamic_cast<SE_G::LightTechnique<SE_G::AmbientLightData>*>(techPair.second.get())) 
+                if (auto ambient = dynamic_cast<SE_G::LightTechnique<SE_G::AmbientLightData>*>(techPair.second.get()))
                     type = "Ambient Light";
-                else if (auto directional = dynamic_cast<SE_G::LightTechnique<SE_G::DirectionalLightData>*>(techPair.second.get())) 
+                else if (auto directional = dynamic_cast<SE_G::LightTechnique<SE_G::DirectionalLightData>*>(techPair.second.get()))
                     type = "Directional Light";
-                else if (auto point = dynamic_cast<SE_G::LightTechnique<SE_G::PointLightData>*>(techPair.second.get())) 
+                else if (auto point = dynamic_cast<SE_G::LightTechnique<SE_G::PointLightData>*>(techPair.second.get()))
                     type = "Point Light";
-                else if (auto skybox = dynamic_cast<SE_G::LightTechnique<SE_G::SkyBoxData>*>(techPair.second.get())) 
+                else if (auto skybox = dynamic_cast<SE_G::LightTechnique<SE_G::SkyBoxData>*>(techPair.second.get()))
                     type = "Skybox";
-                
+
+
                 if (isSelected)
-=======
+                */
             switch (obj->m_type.m_asLight)
             {
             case LightObjectType::AmbientLight:
                 if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::AmbientLightData>*>(obj))
->>>>>>> Stashed changes
                 {
                     DrawAmbientLightDetails(lightObj->m_lightData.get());
                 }
                 break;
-                
+
             case LightObjectType::DirectionalLight:
                 if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::DirectionalLightData>*>(obj))
                 {
-<<<<<<< Updated upstream
-                    selectedTechnique = techPair.first;
-=======
                     DrawDirectionalLightDetails(lightObj->m_lightData.get());
->>>>>>> Stashed changes
                 }
                 break;
-                
+
             case LightObjectType::PointLight:
                 if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::PointLightData>*>(obj))
                 {
                     DrawPointLightDetails(lightObj->m_lightData.get());
                 }
                 break;
-                
+
             case LightObjectType::SkyBox:
                 if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::SkyBoxData>*>(obj))
                 {
                     DrawSkyBoxDetails(lightObj->m_lightData.get());
                 }
                 break;
-                
+
             default:
                 break;
             }
         }
-<<<<<<< Updated upstream
-        ImGui::EndChild();
-        
-        if (!selectedTechnique.empty() && render->techniques.find(selectedTechnique) != render->techniques.end())
-        {
-            ImGui::Spacing();
-            ImGui::Separator();
-            ImGui::Spacing();
-            
-            ImGui::Text("Selected type:");
-            ImGui::SameLine();
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.5f, 1.0f), "%s", selectedTechnique.c_str());
-            
-            auto& tech = render->techniques[selectedTechnique];
-            DrawTechniqueDetails(tech.get(), selectedTechnique);
-        }
-        else if (!render->techniques.empty())
-        {
-            ImGui::Spacing();
-            ImGui::TextDisabled("Select a type to view details");
-        }
-=======
->>>>>>> Stashed changes
-        
+        /*
+            ImGui::EndChild();
+
+            if (!selectedTechnique.empty() && render->techniques.find(selectedTechnique) != render->techniques.end())
+            {
+                ImGui::Spacing();
+                ImGui::Separator();
+                ImGui::Spacing();
+
+                ImGui::Text("Selected type:");
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.5f, 1.0f), "%s", selectedTechnique.c_str());
+
+                auto& tech = render->techniques[selectedTechnique];
+                DrawTechniqueDetails(tech.get(), selectedTechnique);
+            }
+            else if (!render->techniques.empty())
+            {
+                ImGui::Spacing();
+                ImGui::TextDisabled("Select a type to view details");
+            }
+            */
+
         ImGui::TreePop();
     }
 }
@@ -223,7 +205,6 @@ void PropertyPanel::DrawAmbientLightDetails(SE_G::AmbientLightData* lightData)
         ImGui::Text("Ambient Light");
         
         ImGui::ColorEdit3("Light Color", &lightData->Ambient.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Intensity", &lightData->AmbientPad, 0.01f, 0.0f, 10.0f, "%.2f");
     }
 }
 
@@ -233,8 +214,10 @@ void PropertyPanel::DrawDirectionalLightDetails(SE_G::DirectionalLightData* ligh
     {
         ImGui::Text("Directional Light");
         
-        ImGui::ColorEdit3("Light Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Intensity", &lightData->DiffusePad, 0.1f, 0.0f, 50.0f, "%.1f");
+        ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
+        // direction should be normalized after edditing! Use angles instead of coordinates? Hmmm...
+        // ImGui::ColorEdit3("Light Color", &lightData->Direction.x, ImGuiColorEditFlags_Float);
     }
 }
 
@@ -244,8 +227,8 @@ void PropertyPanel::DrawPointLightDetails(SE_G::PointLightData* lightData)
     {
         ImGui::Text("Point Light");
         
-        ImGui::ColorEdit3("Light Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Intensity", &lightData->DiffusePad, 0.1f, 0.0f, 100.0f, "%.1f");
+        ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
         ImGui::DragFloat("Range", &lightData->Range, 0.5f, 0.0f, 100.0f, "%.1f m");
     }
 }
@@ -256,50 +239,22 @@ void PropertyPanel::DrawSkyBoxDetails(SE_G::SkyBoxData* lightData)
     {
         ImGui::Text("Skybox - Environment Background");
         
-<<<<<<< Updated upstream
-        ImGui::ColorEdit3("Sky Tint", &data.Tint.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Brightness", &data.Power, 0.1f, 0.0f, 10.0f, "%.1f");
-        
-        if (tech->texture)
-        {
-            ImGui::Text("Skybox Texture: Loaded");
-        }
-        else
-        {
-            ImGui::TextDisabled("No skybox texture assigned");
-        }
-    }
-}
-
-void PropertyPanel::DrawGPassTechniqueDetails(SE_G::GPassTechnique* tech)
-{
-    ImGui::Text("Geometry - Object Rendering");
-}
-
-void PropertyPanel::DrawIconTechniqueDetails(SE_G::IconTechnique* tech)
-{
-    ImGui::Text("Editor Icon");
-}
-
-void PropertyPanel::DrawLuaComponent(GameObject* obj)
-=======
         ImGui::ColorEdit3("Sky Tint", &lightData->Tint.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Brightness", &lightData->Power, 0.1f, 0.0f, 10.0f, "%.1f");
+        ImGui::DragFloat("Intensity", &lightData->Power, 0.1f, 0.0f, 10.0f, "%.1f");
     }
 }
 
 void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
->>>>>>> Stashed changes
 {
-    if (!obj->HasComponent<LuaComponent>()) 
+    if (!obj->HasComponent<LuaComponent_Info>()) 
         return;
 
-    auto luaComp = obj->GetComponent<LuaComponent>();
+    auto luaComp = obj->GetComponent<LuaComponent_Info>();
     
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
                               ImGuiTreeNodeFlags_SpanAvailWidth;
-    
+    /*
     if (ImGui::TreeNodeEx("Lua Script", flags))
     {
         ImGui::Text("Script Selection");
@@ -376,6 +331,7 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
         
         ImGui::TreePop();
     }
+    */
 }
 
 void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
@@ -478,7 +434,7 @@ void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
     }
 }
 
-void PropertyPanel::DrawComponentAddPopup(GameObject* obj)
+void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
 {
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
     
@@ -491,30 +447,21 @@ void PropertyPanel::DrawComponentAddPopup(GameObject* obj)
     {
         ImGui::Text("Add Component");
         ImGui::Separator();
-        
-        if (!obj->HasComponent<LuaComponent>())
+        /*
+        if (!obj->HasComponent<LuaComponent_Info>())
         {
             if (ImGui::MenuItem("Lua Script", nullptr, false, true))
             {
-                obj->AddComponent<LuaComponent>();
-                auto luaComp = obj->GetComponent<LuaComponent>();
+                obj->AddComponent<LuaComponent_Info>();
+                auto luaComp = obj->GetComponent<LuaComponent_Info>();
                 luaComp->Init(obj);
             }
         }
-<<<<<<< Updated upstream
-        else if (!obj->HasComponent<RenderComponent>())
-        {
-            if (ImGui::MenuItem("Render Component", nullptr, false, true))
-            {
-                obj->AddComponent<RenderComponent>();
-            }
-        }
-=======
->>>>>>> Stashed changes
         else
         {
             ImGui::TextDisabled("All available components added");
         }
+        */
         ImGui::EndPopup();
     }
 }

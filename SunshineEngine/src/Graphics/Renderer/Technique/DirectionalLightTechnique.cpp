@@ -1,5 +1,6 @@
 #include "Graphics/Renderer/Technique/DirectionalLightTechnique.h"
 #include <Utils/StringUtils.h>
+#include <Component/TransformComponent.h>
 
 namespace SE_G {
     DirectionalLightTechnique::DirectionalLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
@@ -24,6 +25,15 @@ namespace SE_G {
             device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/DirectionalLightVShader.hlsl"));
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
             device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/DirectionalLightPShader.hlsl"));
+    }
+
+    void DirectionalLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    {
+        // to-do: update only when changed
+        m_lightData->Position = m_assignedTransform->m_position;
+        m_lightDataBuffer->Update(context.Get(), *m_lightData);
+        BindAll(context);
+        DrawTechnique(context);
     }
 
     void DirectionalLightTechnique::ChooseDepthStencilState(LightPosition lightPos)
