@@ -122,9 +122,9 @@ namespace SE_G {
             for (int i = 0; i < 4; ++i)
             {
                 Vertex vert;
-                vert.position.x = pos->x * size.x;
-                vert.position.y = pos->y * size.y;
-                vert.position.z = pos->z * size.z;
+                vert.position.x = pos[i].x * size.x;
+                vert.position.y = pos[i].y * size.y;
+                vert.position.z = pos[i].z * size.z;
                 vert.normal.x = faces[f].normal.x;
                 vert.normal.y = faces[f].normal.y;
                 vert.normal.z = faces[f].normal.z;
