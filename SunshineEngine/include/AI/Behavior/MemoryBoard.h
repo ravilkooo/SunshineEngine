@@ -102,10 +102,13 @@ private:
             if (HasChanged && !IsNew)
             {
                 auto cbIt = Callbacks.find(Key);
+
                 if (cbIt != Callbacks.end())
                 {
-                    for (auto& Callback : cbIt->second)
-                        Callback.Callback(Data[Key].get());
+                    for (auto& CW : cbIt->second)
+                    {
+                        CW.Callback(Data[Key].get());
+                    }
                 }
             }
         }

@@ -168,7 +168,7 @@ public:
 private:
     // Conditions
     void AddConditionTransition(const eastl::string& InToState, CheckFunc InCheck);
-    void AddEventTransition(const eastl::string& InToState, BehaviorController* FSM);
+    void AddEventTransition(const eastl::string& InToState, CheckFunc InCheck, BehaviorController* FSM);
 
     bool RemoveConditionTransition(const eastl::string& ToState);
     bool RemoveEventTransition(const eastl::string& ToState);
@@ -214,7 +214,7 @@ public:
 
     // Conditions
     bool AddConditionTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck);
-    bool AddEventTransition(const eastl::string& FromState, const eastl::string& ToState);
+    bool AddEventTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck);
 
     bool ChangeToStateInConditionTransition(const eastl::string& FromState, const eastl::string& OldToState, const eastl::string& NewToState);
     bool ChangeToStateInEventTransition(const eastl::string& FromState, const eastl::string& OldToState, const eastl::string& NewToState);

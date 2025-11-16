@@ -330,9 +330,9 @@ void State::AddConditionTransition(const eastl::string& InToState, CheckFunc InC
 	ConditionTransitions.push_back(Transition);
 }
 
-void State::AddEventTransition(const eastl::string& InToState, BehaviorController* FSM)
+void State::AddEventTransition(const eastl::string& InToState, CheckFunc InCheck, BehaviorController* FSM)
 {
-	auto Transition = eastl::make_shared<EventTransition>(InToState, FSM);
+	auto Transition = eastl::make_shared<EventTransition>(InToState, InCheck, FSM);
 
 	EventTransitions.push_back(Transition);
 }
@@ -564,7 +564,7 @@ bool BehaviorController::AddConditionTransition(const eastl::string& FromState, 
 	return true;
 }
 
-bool BehaviorController::AddEventTransition(const eastl::string& FromState, const eastl::string& ToState)
+bool BehaviorController::AddEventTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck)
 {
 	auto From = GetState(FromState);
 	auto To = GetState(ToState);
@@ -583,7 +583,7 @@ bool BehaviorController::AddEventTransition(const eastl::string& FromState, cons
 		}
 	}
 
-	From->AddEventTransition(ToState, this);
+	From->AddEventTransition(ToState, InCheck, this);
 
 	return true;
 }
