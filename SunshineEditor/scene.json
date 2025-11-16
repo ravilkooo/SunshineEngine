@@ -45,7 +45,7 @@
                     ]
                 }
             },
-            "m_UUID": 10969079868231081253,
+            "m_UUID": 9542655588339359355,
             "m_group": "Lighting",
             "m_lightData": {
                 "Power": 0.0,
@@ -103,10 +103,17 @@
                     ]
                 }
             },
-            "m_UUID": 11342774071806208097,
+            "m_UUID": 1424466117171281493,
             "m_group": "Shapes",
-            "m_name": "Box_repeat",
-            "m_type": "Box_repeat"
+            "m_name": "Box",
+            "m_shapeData": {
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            },
+            "m_type": "Box"
         },
         {
             "components": {
@@ -153,9 +160,18 @@
                     ]
                 }
             },
-            "m_UUID": 11290032724367437692,
+            "m_UUID": 11588112938971255355,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_shapeData": {
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SliceCount": 10,
+                "StackCount": 10
+            },
             "m_type": "Sphere"
         },
         {
@@ -203,9 +219,18 @@
                     ]
                 }
             },
-            "m_UUID": 6407967458626699307,
+            "m_UUID": 13809923256199016527,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_shapeData": {
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SliceCount": 10,
+                "StackCount": 10
+            },
             "m_type": "Sphere"
         },
         {
@@ -253,9 +278,18 @@
                     ]
                 }
             },
-            "m_UUID": 16623186686248936082,
+            "m_UUID": 3964217110369663957,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_shapeData": {
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SliceCount": 10,
+                "StackCount": 10
+            },
             "m_type": "Sphere"
         },
         {
@@ -303,9 +337,18 @@
                     ]
                 }
             },
-            "m_UUID": 13379295709473826816,
+            "m_UUID": 18114811131372586489,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_shapeData": {
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SliceCount": 10,
+                "StackCount": 10
+            },
             "m_type": "Sphere"
         },
         {
@@ -353,9 +396,18 @@
                     ]
                 }
             },
-            "m_UUID": 10467554292884790498,
+            "m_UUID": 5144899744862162175,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_shapeData": {
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SliceCount": 10,
+                "StackCount": 10
+            },
             "m_type": "Sphere"
         },
         {
@@ -403,9 +455,18 @@
                     ]
                 }
             },
-            "m_UUID": 10634754842787995377,
+            "m_UUID": 16928252306129811499,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_shapeData": {
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SliceCount": 10,
+                "StackCount": 10
+            },
             "m_type": "Sphere"
         },
         {
@@ -453,7 +514,7 @@
                     ]
                 }
             },
-            "m_UUID": 5383254867281021103,
+            "m_UUID": 5218894299015404965,
             "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
@@ -511,7 +572,7 @@
                     ]
                 }
             },
-            "m_UUID": 6354304631325183790,
+            "m_UUID": 5183811516246017063,
             "m_group": "Lighting",
             "m_lightData": {
                 "Diffuse": {
@@ -587,7 +648,7 @@
                     ]
                 }
             },
-            "m_UUID": 11043260032397865981,
+            "m_UUID": 11137188815868449180,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
@@ -663,10 +724,17 @@
                     ]
                 }
             },
-            "m_UUID": 411894791684360328,
+            "m_UUID": 966564696566596814,
             "m_group": "Shapes",
-            "m_name": "Box_repeat",
-            "m_type": "Box_repeat"
+            "m_name": "Box",
+            "m_shapeData": {
+                "Size": {
+                    "x": 100.0,
+                    "y": 0.10000000149011612,
+                    "z": 100.0
+                }
+            },
+            "m_type": "Box"
         },
         {
             "components": {
@@ -713,10 +781,77 @@
                     ]
                 }
             },
-            "m_UUID": 13105937515649490766,
+            "m_UUID": 7803781639373709234,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_shapeData": {
+                "Size": {
+                    "x": 0.5,
+                    "y": 0.5,
+                    "z": 0.5
+                },
+                "SliceCount": 10,
+                "StackCount": 10
+            },
             "m_type": "Sphere"
+        },
+        {
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Tag": "LightPass"
+                        },
+                        {
+                            "Tag": "IconPass"
+                        }
+                    ]
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 6570953804758726557,
+            "m_group": "Lighting",
+            "m_lightData": {
+                "Power": 0.0,
+                "Tint": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            },
+            "m_name": "SkyBox",
+            "m_type": "SkyBox"
         }
     ]
 }

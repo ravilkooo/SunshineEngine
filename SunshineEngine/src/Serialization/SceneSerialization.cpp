@@ -12,7 +12,7 @@
 #include <Utils/StringUtils.h>
 
 #include <GameObject/GameObject.h>
-#include <GameObject/Shapes/ShapeObject.h>
+#include <GameObject/Shapes/ShapeCollection.h>
 #include <GameObject/Lighting/LightCollection.h>
 #include <GameObject/EditorObjectFactory.h>
 
@@ -50,9 +50,8 @@ json TransformComponent_Info::ToJson() const {
 }
 
 void TransformComponent_Info::FromJson(const json& j, ID3D11Device* device) {
-    auto comp = eastl::make_shared<TransformComponent>(device);
-    comp->FromJson(j);
-    m_assignedComponent = comp;
+    m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+    m_assignedComponent->FromJson(j);
 }
 
 void TransformComponent::FromJson(const json& j) {
@@ -372,13 +371,16 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 switch (objType.m_asShape)
                 {
                 case ShapeObjectType::Box:
-                    go = EditorObjectFactory::CreateDefaultBoxObject(renderSystem, objJ);
+                    //go = EditorObjectFactory::CreateDefaultBoxObject(renderSystem, objJ);
+                    go = BoxShapeObject_Info::FromJson(renderSystem, objJ);
                     break;
                 case ShapeObjectType::Sphere:
-                    go = EditorObjectFactory::CreateDefaultSphereObject(renderSystem, objJ);
+                    //go = EditorObjectFactory::CreateDefaultSphereObject(renderSystem, objJ);
+                    go = SphereShapeObject_Info::FromJson(renderSystem, objJ);
                     break;
                 case ShapeObjectType::Geosphere:
-                    go = EditorObjectFactory::CreateDefaultSphereObject(renderSystem, objJ);
+                    //go = EditorObjectFactory::CreateDefaultGeosphereObject(renderSystem, objJ);
+                    go = GeosphereShapeObject_Info::FromJson(renderSystem, objJ);
                     break;
                 }
                 break;

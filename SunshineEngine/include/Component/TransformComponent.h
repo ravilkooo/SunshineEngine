@@ -84,6 +84,8 @@ public:
 class TransformComponent_Info : public Component_Info
 {
 public:
+    TransformComponent_Info() {};
+
     static const SE::ComponentType s_componentType = SE::ComponentType::TRANSFORM;
     const SE::ComponentType ComponentType() const override {
         return s_componentType;

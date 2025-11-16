@@ -1,0 +1,36 @@
+#pragma once
+
+#include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
+
+#include <GameObject/Shapes/ShapeObject.h>
+#include <GameObject/Shapes/ShapeData.h>
+
+#include <Serialization/ShapeSerialization.h>
+#include <Serialization/DXSMSerialization.h>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+class SphereShapeObject_Info :
+	public ShapeObject_Info<SphereShapeData>
+{
+public:
+
+	SphereShapeObject_Info() {};
+	explicit SphereShapeObject_Info(SE::UUID uuid,
+		SE_G::DeferredRenderer* renderSystem, SphereShapeData initData = SphereShapeData());
+	explicit SphereShapeObject_Info(
+		SE_G::DeferredRenderer* renderSystem, SphereShapeData initData = SphereShapeData());
+	
+	static eastl::unique_ptr<SphereShapeObject_Info> FromJson(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
+	DXSM::Vector3 GetSize();
+	uint32_t GetSliceCount();
+	uint32_t GetStackCount();
+
+	void SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize);
+	void SetSliceCount(SE_G::DeferredRenderer* renderSystem, uint32_t newSliceCount);
+	void SetStackCount(SE_G::DeferredRenderer* renderSystem, uint32_t newStackCount);
+};

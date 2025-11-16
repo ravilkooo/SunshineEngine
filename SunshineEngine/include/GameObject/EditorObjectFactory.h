@@ -8,40 +8,33 @@
 #include <Graphics/Utils/Camera.h>
 #include <Graphics/Lighting/LightData.h>
 
+#include <GameObject/GameObject.h>
+#include <GameObject/Lighting/LightCollection.h>
+#include <GameObject/Shapes/ShapeCollection.h>
+
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-class GameObject_Info;
-
 namespace SE_G {
 	class DeferredRenderer;
 }
-class AmbientLight;
-class DirectionalLight;
-class PointLight;
-class SkyBox;
-
-class AmbientLight_Info;
-class DirectionalLight_Info;
-class PointLight_Info;
-class SkyBox_Info;
 
 class EditorObjectFactory
 {
 public:
-	static eastl::unique_ptr<GameObject_Info> CreateDefaultBoxObject(
+	static eastl::unique_ptr<BoxShapeObject_Info> CreateDefaultBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
 		float width, float height, float length);
 
-	static eastl::unique_ptr<GameObject_Info> CreateDefaultBoxObject(
+	static eastl::unique_ptr<BoxShapeObject_Info> CreateDefaultBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
-	static eastl::unique_ptr<GameObject_Info> CreateDefaultSphereObject(
+	static eastl::unique_ptr<SphereShapeObject_Info> CreateDefaultSphereObject(
 		SE_G::DeferredRenderer* renderSystem, float radius);
 
-	static eastl::unique_ptr<GameObject_Info> CreateDefaultSphereObject(
+	static eastl::unique_ptr<SphereShapeObject_Info> CreateDefaultSphereObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 

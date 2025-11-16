@@ -1,6 +1,7 @@
 #include "WorldEditor.h"
 #include <Component/LuaComponent.h>
 
+
 #include <fstream>   // std::ofstream
 
 WorldEditor::WorldEditor()
@@ -70,9 +71,10 @@ void WorldEditor::InitWorldEditor(
 		);
 
 		{
-			SE::UUID boxId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultBoxObject(
-				m_renderer.get(), 1.0f, 1.0f, 1.0f
-			)
+			SE::UUID boxId = m_scene->AddGameObject(
+				EditorObjectFactory::CreateDefaultBoxObject(
+					m_renderer.get(), 1.0f, 1.0f, 1.0f
+				)
 			);
 
 			/*
