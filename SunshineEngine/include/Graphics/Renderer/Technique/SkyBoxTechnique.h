@@ -13,6 +13,8 @@ namespace SE_G {
             eastl::shared_ptr<SkyBoxData> lightData,
             eastl::wstring texturePath = eastl::wstring(L"Default"));
 
+        //void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+
         void ChooseDepthStencilState(LightPosition lightPos) override;
         void ChooseRasterizer(LightPosition lightPos) override;
 
