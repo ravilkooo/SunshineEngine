@@ -90,7 +90,12 @@ SkyBox_Info::SkyBox_Info(
 
 	// TransformComponent
 	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+	if (j["components"].contains("Transform")) {
+		tc_info->FromJson(j["components"]["Transform"], device);
+	}
+	else {
+		tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+	}
 
 	// RenderComponent and Passes
 	auto rc_info = AddComponent<RenderComponent_Info>();

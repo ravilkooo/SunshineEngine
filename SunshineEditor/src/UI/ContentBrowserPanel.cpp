@@ -10,9 +10,10 @@
 #include <commdlg.h>
 #include <shlobj.h>
 
+#include <Utils/StringUtils.h>
 
 std::filesystem::path ContentBrowserPanel::s_AssetsDirectory =
-    std::filesystem::path(EDITOR_ASSETS_DIR);
+    std::filesystem::path(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/"));
 
 ContentBrowserPanel::ContentBrowserPanel()
     : m_CurrentDirectory(s_AssetsDirectory)

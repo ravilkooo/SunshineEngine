@@ -61,7 +61,7 @@ void WorldEditor::InitWorldEditor(
 	/*
 	TestObjects
 	*/
-	if (!ReadSceneFromFile(WcharToChar(JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"../scene.json"))))
+	if (!ReadSceneFromFile(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json"))))
 	{
 		this->m_scene = eastl::make_shared<Scene_Info>();
 
