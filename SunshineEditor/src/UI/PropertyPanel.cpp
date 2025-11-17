@@ -112,31 +112,6 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
     {
         if (obj->m_group == GameObjectGroup::Lighting)
         {
-            /*
-            for (auto& techPair : render->techniques)
-            {
-                ImGui::PushID(techPair.first.c_str());
-
-                bool isSelected = (selectedTechnique == techPair.first);
-
-                const char* type = "";
-
-                if (auto gpass = dynamic_cast<SE_G::GPassTechnique*>(techPair.second.get()))
-                    type = "Geometry";
-                else if (auto iconTech = dynamic_cast<SE_G::IconTechnique*>(techPair.second.get()))
-                    type = "Icon";
-                if (auto ambient = dynamic_cast<SE_G::LightTechnique<SE_G::AmbientLightData>*>(techPair.second.get()))
-                    type = "Ambient Light";
-                else if (auto directional = dynamic_cast<SE_G::LightTechnique<SE_G::DirectionalLightData>*>(techPair.second.get()))
-                    type = "Directional Light";
-                else if (auto point = dynamic_cast<SE_G::LightTechnique<SE_G::PointLightData>*>(techPair.second.get()))
-                    type = "Point Light";
-                else if (auto skybox = dynamic_cast<SE_G::LightTechnique<SE_G::SkyBoxData>*>(techPair.second.get()))
-                    type = "Skybox";
-
-
-                if (isSelected)
-                */
             switch (obj->m_type.m_asLight)
             {
             case LightObjectType::AmbientLight:
@@ -171,29 +146,28 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
                 break;
             }
         }
-        /*
-            ImGui::EndChild();
-
-            if (!selectedTechnique.empty() && render->techniques.find(selectedTechnique) != render->techniques.end())
+        else if (obj->m_group == GameObjectGroup::Shapes)
+        {
+            switch (obj->m_type.m_asShape)
             {
-                ImGui::Spacing();
-                ImGui::Separator();
-                ImGui::Spacing();
+            case ShapeObjectType::Box:
+                if (auto shapeObj = dynamic_cast<BoxShapeObject_Info*>(obj))
+                {
+                    DrawBoxShapeDetails(shapeObj);
+                }
+                break;
 
-                ImGui::Text("Selected type:");
-                ImGui::SameLine();
-                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.5f, 1.0f), "%s", selectedTechnique.c_str());
-
-                auto& tech = render->techniques[selectedTechnique];
-                DrawTechniqueDetails(tech.get(), selectedTechnique);
+            case ShapeObjectType::Sphere:
+                if (auto shapeObj = dynamic_cast<SphereShapeObject_Info*>(obj))
+                {
+                    DrawSphereShapeDetails(shapeObj);
+                }
+                break;
+                
+            default:
+                break;
             }
-            else if (!render->techniques.empty())
-            {
-                ImGui::Spacing();
-                ImGui::TextDisabled("Select a type to view details");
-            }
-            */
-
+        }
         ImGui::TreePop();
     }
 }
@@ -203,7 +177,6 @@ void PropertyPanel::DrawAmbientLightDetails(SE_G::AmbientLightData* lightData)
     if (lightData)
     {
         ImGui::Text("Ambient Light");
-        
         ImGui::ColorEdit3("Light Color", &lightData->Ambient.x, ImGuiColorEditFlags_Float);
     }
 }
@@ -237,10 +210,48 @@ void PropertyPanel::DrawSkyBoxDetails(SE_G::SkyBoxData* lightData)
 {
     if (lightData)
     {
-        ImGui::Text("Skybox - Environment Background");
+        ImGui::Text("Skybox");
         
         ImGui::ColorEdit3("Sky Tint", &lightData->Tint.x, ImGuiColorEditFlags_Float);
         ImGui::DragFloat("Intensity", &lightData->Power, 0.1f, 0.0f, 10.0f, "%.1f");
+    }
+}
+
+void PropertyPanel::DrawBoxShapeDetails(BoxShapeObject_Info* obj)
+{
+    ImGui::Text("Box Shape");
+    
+    DXSM::Vector3 currentSize = obj->GetSize();
+    
+    if (DrawVector3Control("Size", currentSize, 1.0f))
+    {
+        obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
+    }
+}
+
+void PropertyPanel::DrawSphereShapeDetails(SphereShapeObject_Info* obj)
+{
+    ImGui::Text("Sphere Shape");
+    
+    DXSM::Vector3 currentSize = obj->GetSize();
+    uint32_t currentSliceCount = obj->GetSliceCount();
+    uint32_t currentStackCount = obj->GetStackCount();
+    
+     if (DrawVector3Control("Size", currentSize, 1.0f))
+     {
+         obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
+     }
+
+    uint32_t min_slice = 3, max_slice = 64;
+    if (DrawUIntControl("Slice Count", currentSliceCount, 10, 1.0f, min_slice, max_slice))
+    {
+        obj->SetSliceCount(m_WorldEditor->m_renderer.get(), currentSliceCount);
+    }
+    
+    uint32_t min_stack = 3, max_stack = 64;
+    if (DrawUIntControl("Stack Count", currentStackCount, 10, 1.0f, min_stack, max_stack))
+    {
+        obj->SetStackCount(m_WorldEditor->m_renderer.get(), currentStackCount);
     }
 }
 
@@ -466,77 +477,221 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
     }
 }
 
+bool PropertyPanel::DrawFloatControl(const char* label, float& value, float resetValue,
+                                   float speed, float min, float max, 
+                                   const char* format, float columnWidth)
+{
+    bool changed = false;
+    
+    ImGui::PushID(label);
+    
+    if (ImGui::BeginTable(label, 2, 
+                         ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV |
+                         ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoSavedSettings))
+    {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
+        ImGui::TableSetupColumn("Control", ImGuiTableColumnFlags_WidthStretch);
+        
+        ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetFrameHeight());
+        ImGui::TableNextColumn();
+        
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s", label);
+        
+        ImGui::TableNextColumn();
+        
+        ImGui::AlignTextToFramePadding();
+        
+        float availableWidth = ImGui::GetContentRegionAvail().x;
+        float inputWidth = availableWidth - 30.0f;
+        
+        ImGui::SetNextItemWidth(inputWidth);
+        if (ImGui::DragFloat("##Value", &value, speed, min, max, format))
+            changed = true;
+        
+        ImGui::SameLine(0, 4);
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.4f, 0.4f, 0.4f, 0.6f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.5f, 0.5f, 0.5f, 0.8f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.3f, 0.3f, 0.3f, 0.6f});
+        
+        if (ImGui::Button("R", ImVec2(25, ImGui::GetFrameHeight())))
+        {
+            value = resetValue;
+            changed = true;
+        }
+        
+        ImGui::PopStyleColor(3);
+        
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Reset to default");
+        
+        ImGui::EndTable();
+    }
+    
+    ImGui::PopID();
+    
+    return changed;
+}
+
+bool PropertyPanel::DrawUIntControl(const char* label, uint32_t& value, uint32_t resetValue,
+                                  float speed, uint32_t min, uint32_t max,
+                                  const char* format, float columnWidth)
+{
+    bool changed = false;
+    
+    ImGui::PushID(label);
+    
+    if (ImGui::BeginTable(label, 2, 
+                         ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV |
+                         ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoSavedSettings))
+    {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
+        ImGui::TableSetupColumn("Control", ImGuiTableColumnFlags_WidthStretch);
+        
+        ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetFrameHeight());
+        ImGui::TableNextColumn();
+        
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s", label);
+        
+        ImGui::TableNextColumn();
+        
+        ImGui::AlignTextToFramePadding();
+        
+        float availableWidth = ImGui::GetContentRegionAvail().x;
+        float inputWidth = availableWidth - 30.0f;
+        
+        ImGui::SetNextItemWidth(inputWidth);
+        if (ImGui::DragScalar("##Value", ImGuiDataType_U32, &value, speed, &min, &max, format))
+            changed = true;
+        
+        ImGui::SameLine(0, 4);
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.4f, 0.4f, 0.4f, 0.6f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.5f, 0.5f, 0.5f, 0.8f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.3f, 0.3f, 0.3f, 0.6f});
+        
+        if (ImGui::Button("R", ImVec2(25, ImGui::GetFrameHeight())))
+        {
+            value = resetValue;
+            changed = true;
+        }
+        
+        ImGui::PopStyleColor(3);
+        
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Reset to default");
+        
+        ImGui::EndTable();
+    }
+    
+    ImGui::PopID();
+    
+    return changed;
+}
+
 bool PropertyPanel::DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values, 
                                       float resetValue, float columnWidth)
 {
     bool changed = false;
     
     ImGui::PushID(label);
-    ImGui::Columns(2);
-    ImGui::SetColumnWidth(0, columnWidth);
-    ImGui::Text("%s", label);
-    ImGui::NextColumn();
     
-    float totalWidth = ImGui::CalcItemWidth();
-    float itemWidth = totalWidth / 3.0f - ImGui::GetStyle().ItemSpacing.x * 2.0f;
-    
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
-    
-    float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-    ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-    
-    // X
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
-    if (ImGui::Button("X", buttonSize))
+    if (ImGui::BeginTable(label, 2, 
+                         ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV |
+                         ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoSavedSettings))
     {
-        values.x = resetValue;
-        changed = true;
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
+        ImGui::TableSetupColumn("Control", ImGuiTableColumnFlags_WidthStretch);
+        
+        ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetFrameHeight());
+        ImGui::TableNextColumn();
+        
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s", label);
+        
+        ImGui::TableNextColumn();
+        
+        ImGui::AlignTextToFramePadding();
+        
+        float totalWidth = ImGui::GetContentRegionAvail().x;
+        float itemWidth = (totalWidth - 60.0f) / 3.0f;
+        
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{2, 0});
+        
+        float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
+        ImVec2 buttonSize = { 20.0f, lineHeight };
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
+        if (ImGui::Button("X", buttonSize))
+        {
+            values.x = resetValue;
+            changed = true;
+        }
+        ImGui::PopStyleColor(3);
+        
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(itemWidth);
+        if (ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f"))
+            changed = true;
+        ImGui::SameLine();
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
+        if (ImGui::Button("Y", buttonSize))
+        {
+            values.y = resetValue;
+            changed = true;
+        }
+        ImGui::PopStyleColor(3);
+        
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(itemWidth);
+        if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f"))
+            changed = true;
+        ImGui::SameLine();
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.2f, 0.35f, 0.9f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
+        if (ImGui::Button("Z", buttonSize))
+        {
+            values.z = resetValue;
+            changed = true;
+        }
+        ImGui::PopStyleColor(3);
+        
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(itemWidth);
+        if (ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f"))
+            changed = true;
+        
+        ImGui::SameLine(0, 4);
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.4f, 0.4f, 0.4f, 0.6f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.5f, 0.5f, 0.5f, 0.8f});
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.3f, 0.3f, 0.3f, 0.6f});
+        
+        if (ImGui::Button("R", ImVec2(25, ImGui::GetFrameHeight())))
+        {
+            values = DirectX::SimpleMath::Vector3(resetValue, resetValue, resetValue);
+            changed = true;
+        }
+        
+        ImGui::PopStyleColor(3);
+        
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Reset to default");
+        
+        ImGui::PopStyleVar();
+        
+        ImGui::EndTable();
     }
-    ImGui::PopStyleColor(3);
     
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(itemWidth);
-    if (ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f"))
-        changed = true;
-    ImGui::SameLine();
-    
-    // Y
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
-    if (ImGui::Button("Y", buttonSize))
-    {
-        values.y = resetValue;
-        changed = true;
-    }
-    ImGui::PopStyleColor(3);
-    
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(itemWidth);
-    if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f"))
-        changed = true;
-    ImGui::SameLine();
-    
-    // Z
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.2f, 0.35f, 0.9f, 1.0f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
-    if (ImGui::Button("Z", buttonSize))
-    {
-        values.z = resetValue;
-        changed = true;
-    }
-    ImGui::PopStyleColor(3);
-    
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(itemWidth);
-    if (ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f"))
-        changed = true;
-    
-    ImGui::PopStyleVar();
-    ImGui::Columns(1);
     ImGui::PopID();
     
     return changed;
