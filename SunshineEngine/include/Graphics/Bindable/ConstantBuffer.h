@@ -9,14 +9,14 @@ namespace SE_G {
 		class ConstantBuffer : public Bindable {
 		protected:
 			// To-do: make ComPtr and release in destructor ?
-			ID3D11Buffer* pConstantBuffer;
+			Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
 			UINT slot;
 		public:
 			virtual void Update(ID3D11DeviceContext* context, const C& consts) {
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				context->Map(pConstantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
+				context->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
 				memcpy(mappedResource.pData, &consts, sizeof(consts) + (16 - (sizeof(consts) % 16))); // aligned size
-				context->Unmap(pConstantBuffer, 0);
+				context->Unmap(pConstantBuffer.Get(), 0);
 				//context->VSSetConstantBuffers(0u, 1u, &pConstantBuffer);
 			}
 
@@ -34,7 +34,7 @@ namespace SE_G {
 
 				D3D11_SUBRESOURCE_DATA InitData = {};
 				InitData.pSysMem = &consts;
-				device->CreateBuffer(&cbd, &InitData, &pConstantBuffer);
+				device->CreateBuffer(&cbd, &InitData, pConstantBuffer.GetAddressOf());
 			}
 
 			ConstantBuffer(ID3D11Device* device, UINT slot = 0u)
@@ -48,12 +48,12 @@ namespace SE_G {
 				cbd.MiscFlags = 0u;
 				cbd.ByteWidth = sizeof(C) + (16 - (sizeof(C) % 16)); // aligned size
 				cbd.StructureByteStride = 0u;
-				device->CreateBuffer(&cbd, nullptr, &pConstantBuffer);
+				device->CreateBuffer(&cbd, nullptr, pConstantBuffer.GetAddressOf());
 			}
 
 			~ConstantBuffer()
 			{
-
+				pConstantBuffer.ReleaseAndGetAddressOf();
 			}
 		};
 
@@ -66,13 +66,13 @@ namespace SE_G {
 			using ConstantBuffer<C>::ConstantBuffer;
 			void Bind(ID3D11DeviceContext* context) noexcept override
 			{
-				context->GSSetConstantBuffers(slot, 1u, &pConstantBuffer);
+				context->GSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf());
 			}
 			void Update(ID3D11DeviceContext* context, const C& consts) override {
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				context->Map(pConstantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
+				context->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
 				memcpy(mappedResource.pData, &consts, sizeof(consts) + (16 - (sizeof(consts) % 16))); // aligned size
-				context->Unmap(pConstantBuffer, 0);
+				context->Unmap(pConstantBuffer.Get(), 0);
 				//context->VSSetConstantBuffers(slot, 1u, &pConstantBuffer);
 			}
 		};
@@ -86,13 +86,13 @@ namespace SE_G {
 			using ConstantBuffer<C>::ConstantBuffer;
 			void Bind(ID3D11DeviceContext* context) noexcept override
 			{
-				context->VSSetConstantBuffers(slot, 1u, &pConstantBuffer);
+				context->VSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf());
 			}
 			void Update(ID3D11DeviceContext* context, const C& consts) override {
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				context->Map(pConstantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
+				context->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
 				memcpy(mappedResource.pData, &consts, sizeof(consts) + (16 - (sizeof(consts) % 16))); // aligned size
-				context->Unmap(pConstantBuffer, 0);
+				context->Unmap(pConstantBuffer.Get(), 0);
 				//context->VSSetConstantBuffers(slot, 1u, &pConstantBuffer);
 			}
 		};
@@ -106,14 +106,14 @@ namespace SE_G {
 			using ConstantBuffer<C>::ConstantBuffer;
 			void Bind(ID3D11DeviceContext* context) noexcept override
 			{
-				context->PSSetConstantBuffers(slot, 1u, &pConstantBuffer);
+				context->PSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf());
 			}
 
 			void Update(ID3D11DeviceContext* context, const C& consts) override {
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				context->Map(pConstantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
+				context->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
 				memcpy(mappedResource.pData, &consts, sizeof(consts) + (16 - (sizeof(consts) % 16))); // aligned size
-				context->Unmap(pConstantBuffer, 0);
+				context->Unmap(pConstantBuffer.Get(), 0);
 				//context->PSSetConstantBuffers(slot, 1u, &pConstantBuffer);
 			}
 		};
@@ -127,14 +127,14 @@ namespace SE_G {
 			using ConstantBuffer<C>::ConstantBuffer;
 			void Bind(ID3D11DeviceContext* context) noexcept override
 			{
-				context->CSSetConstantBuffers(slot, 1u, &pConstantBuffer);
+				context->CSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf());
 			}
 
 			void Update(ID3D11DeviceContext* context, const C& consts) override {
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				context->Map(pConstantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
+				context->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
 				memcpy(mappedResource.pData, &consts, sizeof(consts) + (16 - (sizeof(consts) % 16))); // aligned size
-				context->Unmap(pConstantBuffer, 0);
+				context->Unmap(pConstantBuffer.Get(), 0);
 				//context->PSSetConstantBuffers(slot, 1u, &pConstantBuffer);
 			}
 		};
