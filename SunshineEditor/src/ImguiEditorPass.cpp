@@ -11,11 +11,9 @@ ImguiEditorPass::ImguiEditorPass(
 	ID3D11DeviceContext* context,
 	ID3D11Texture2D* backBuffer,
 	UINT editorAppWidth, UINT editorAppHeight,
-	eastl::shared_ptr<SE_G::GBuffer> pGBuffer,
 	eastl::shared_ptr<WorldEditor> worldEditor)
 	: RenderPass("LightPass", device, context)
 {
-	m_GBuffer = pGBuffer;
 	m_editorAppWidth = editorAppWidth;
 	m_editorAppHeight = editorAppHeight;
 	m_worldEditor = worldEditor;
@@ -47,13 +45,13 @@ ImguiEditorPass::ImguiEditorPass(
 	descDSV.Texture2D.MipSlice = 0u;
 	device->CreateDepthStencilView(m_pDepthStencil.Get(), &descDSV, m_pDSV.GetAddressOf());
 
-	m_viewport = {};
-	m_viewport.Width = static_cast<float>(m_editorAppWidth);
-	m_viewport.Height = static_cast<float>(m_editorAppHeight);
-	m_viewport.TopLeftX = 0;
-	m_viewport.TopLeftY = 0;
-	m_viewport.MinDepth = 0;
-	m_viewport.MaxDepth = 1.0f;
+	m_windowViewport = {};
+	m_windowViewport.Width = static_cast<float>(m_editorAppWidth);
+	m_windowViewport.Height = static_cast<float>(m_editorAppHeight);
+	m_windowViewport.TopLeftX = 0;
+	m_windowViewport.TopLeftY = 0;
+	m_windowViewport.MinDepth = 0;
+	m_windowViewport.MaxDepth = 1.0f;
 
 	selectedUUID = SE::UUID(0u);
 
@@ -65,7 +63,12 @@ ImguiEditorPass::ImguiEditorPass(
 	io.FontDefault = fontArial;
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
+}
 
+void ImguiEditorPass::SetVieportGBuffer(
+	eastl::shared_ptr<SE_G::GBuffer> pGBuffer) {
+	m_viewportGBuffer = pGBuffer;
+	// Call m_viewportGBuffer->OnResize() ?
 }
 
 void ImguiEditorPass::StartFrame()
@@ -74,7 +77,7 @@ void ImguiEditorPass::StartFrame()
 	float color[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	context->ClearRenderTargetView(m_renderTargetView.Get(), color);
 	context->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
-	context->RSSetViewports(1, &m_viewport);
+	context->RSSetViewports(1, &m_windowViewport);
 }
 
 void ImguiEditorPass::Pass()
@@ -203,11 +206,9 @@ void ImguiEditorPass::Pass()
 		vMax.y - vMin.y
 	);
 	m_gameViewportJustResized = (contentSize.x != m_lastGameViewportSize.x) || (contentSize.y != m_lastGameViewportSize.y);
-	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0) {
-
-		m_GBuffer->OnResize(GetDevice(), (UINT)contentSize.x, (UINT)contentSize.y);
+	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0)
+	{
 		m_worldEditor->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
-		//ResizeGBuffer((UINT)contentSize.x, (UINT)contentSize.y); // Your resize call
 	}
 	m_lastGameViewportSize = contentSize;
 
@@ -245,7 +246,7 @@ void ImguiEditorPass::EndFrame()
 void ImguiEditorPass::RenderGameWorld()
 {
 	ImVec2 avail = ImGui::GetContentRegionAvail();
-	ImGui::Image((ImTextureID)m_GBuffer->pLightSRV.Get(), avail);
+	ImGui::Image((ImTextureID)m_viewportGBuffer->pLightSRV.Get(), avail);
 	// ����� ����� ���������� ���� ������� ����������, ���� ��������
 	//ImGui::Text("Game World Render Here");
 }
@@ -452,11 +453,11 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	descDSV.Texture2D.MipSlice = 0u;
 	device->CreateDepthStencilView(m_pDepthStencil.Get(), &descDSV, m_pDSV.GetAddressOf());
 
-	m_viewport = {};
-	m_viewport.Width = static_cast<float>(m_editorAppWidth);
-	m_viewport.Height = static_cast<float>(m_editorAppHeight);
-	m_viewport.TopLeftX = 0;
-	m_viewport.TopLeftY = 0;
-	m_viewport.MinDepth = 0;
-	m_viewport.MaxDepth = 1.0f;
+	m_windowViewport = {};
+	m_windowViewport.Width = static_cast<float>(m_editorAppWidth);
+	m_windowViewport.Height = static_cast<float>(m_editorAppHeight);
+	m_windowViewport.TopLeftX = 0;
+	m_windowViewport.TopLeftY = 0;
+	m_windowViewport.MinDepth = 0;
+	m_windowViewport.MaxDepth = 1.0f;
 }

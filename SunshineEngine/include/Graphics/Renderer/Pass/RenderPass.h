@@ -21,6 +21,7 @@ namespace SE_G {
 		virtual void Pass();
 		virtual void StartFrame() = 0;
 		virtual void EndFrame() = 0;
+		virtual void OnResize(UINT resizeWidth, UINT resizeHeight) {};
 
 		void AddTechnique(eastl::unique_ptr<RenderTechnique> tech);
 

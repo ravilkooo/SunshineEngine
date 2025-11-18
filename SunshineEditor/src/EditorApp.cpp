@@ -2,7 +2,8 @@
 #include "Utils/DebugUtils.h"
 #include <fstream>   // std::ofstream
 
-EditorApp::EditorApp() { }
+EditorApp::EditorApp()
+{ }
 
 void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 {
@@ -17,25 +18,23 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_displayWindow = DisplayWindow(this, m_applicationName, m_hInstance,
 		m_winWidth, m_winHeight, DisplayWindow::WndProcImGui);
 
-	m_renderer = eastl::make_shared<SE_G::DeferredRenderer>(
+	m_renderingSystem = eastl::make_shared<SE_G::RenderingSystem>(
 		m_displayWindow.m_hWnd,
 		m_winWidth, m_winHeight);
 	
 	UINT worldEditorWidth = winWidth / 2;
 	UINT worldEditorHeight = winHeight / 2;
-	m_renderer->InitGBuffer(worldEditorWidth, worldEditorHeight);
-	//m_renderer->InitGBuffer(m_winWidth, m_winHeight);
 
 	// Init WorldEditor with all it's passes
 	m_worldEditor = eastl::make_shared<WorldEditor>();
-	m_worldEditor->InitWorldEditor(m_renderer, worldEditorWidth, worldEditorHeight);
-	//m_worldEditor->InitWorldEditor(m_renderer, m_winWidth, m_winHeight);
+	m_worldEditor->InitWorldEditor(m_renderingSystem, worldEditorWidth, worldEditorHeight);
+	
+	m_renderingSystem->AddRenderGroup(m_worldEditor->m_renderer);
 
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
 	sol_ImGui::Init(m_lua);
 
-	
 	// Init imgui staff
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -48,19 +47,20 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 
 	ImGui_ImplWin32_Init(m_displayWindow.m_hWnd);
 	ImGui_ImplDX11_Init(
-		m_renderer->GetDevice(),
-		m_renderer->GetDeviceContext());
+		m_renderingSystem->GetDevice(),
+		m_renderingSystem->GetDeviceContext());
 
 	// Imgui Pass
 	imguiEditorPass = eastl::make_shared<ImguiEditorPass>(
-		m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-		m_renderer->GetBackBuffer(),
+		m_renderingSystem->GetDevice(),
+		m_renderingSystem->GetDeviceContext(),
+		m_renderingSystem->GetBackBuffer(),
 		m_winWidth,
 		m_winHeight,
-		m_renderer->pGBuffer,
 		m_worldEditor
 	);
-	m_renderer->AddPass(imguiEditorPass);
+	imguiEditorPass->SetVieportGBuffer(
+		m_worldEditor->m_renderer->m_GBuffer);
 
 	m_initialized = true;
 
@@ -73,6 +73,11 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	
 	imguiEditorPass->m_ToolbarPanel.SetEditorApp(this);
 
+	m_imguiRenderGroup = eastl::make_shared<SE_G::RenderGroup>(
+		"ImguiEditor", m_renderingSystem->GetDevice(),
+		m_renderingSystem->GetDeviceContext());
+	m_imguiRenderGroup->AddPass(imguiEditorPass);
+	m_renderingSystem->AddRenderGroup(m_imguiRenderGroup);
 
 	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &EditorApp::HandleKeyDown);
 	InputDevice::getInstance().OnKeyReleased.AddRaw(this, &EditorApp::HandleKeyUp);
@@ -174,17 +179,21 @@ void EditorApp::UpdateEditor(float deltaTime)
 	}
 	else
 	{
-		if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f) 
-			- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
-			m_renderer->mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
-		}
-		if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
-			- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
-			m_renderer->mainCamera->MoveRight(right * CameraSpeed * deltaTime);
-		}
-		if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
-			- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
-			m_renderer->mainCamera->MoveUp(up * CameraSpeed * deltaTime);
+
+		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
+		{
+			if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
+				- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
+				m_worldEditor->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
+			}
+			if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
+				- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
+				m_worldEditor->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
+			}
+			if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
+				- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
+				m_worldEditor->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
+			}
 		}
 	}
 
@@ -194,23 +203,19 @@ void EditorApp::UpdateEditor(float deltaTime)
 void EditorApp::Render() {
 
 	// Passes
-	if (m_runtimeMode == RuntimeMode::GAME_MODE) {
-		m_renderer->RenderScene();
-	}
-	else {
-		m_renderer->RenderScene();
-	}
-	m_renderer->PresentFrame();
+	m_renderingSystem->Render();
+	m_renderingSystem->PresentFrame();
 }
 
 void EditorApp::OnResize(UINT resizeWidth, UINT resizeHeight)
 {
 	if (m_initialized)
 	{
-		m_renderer->PreResize();
+		m_renderingSystem->PreResize();
 		imguiEditorPass->PreResize();
-		m_renderer->OnResize(resizeWidth, resizeHeight);
-		imguiEditorPass->OnResize(resizeWidth, resizeHeight, m_renderer->GetBackBuffer());
+
+		m_renderingSystem->OnResize(resizeWidth, resizeHeight);
+		imguiEditorPass->OnResize(resizeWidth, resizeHeight, m_renderingSystem->GetBackBuffer());
 	}
 }
 
@@ -244,12 +249,13 @@ void EditorApp::HandleKeyDown(Keys key)
 {
 	if (!imguiEditorPass->IsFocusedGameViewport)
 		return;
-
-	switch (key)
-	{
+	
+	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
+		switch (key)
+		{
 		case Keys::W: MovingPressed[(int)MoveKey::W] = true;
 			break;
-		case Keys::S: MovingPressed[(int)MoveKey::S] = true; 
+		case Keys::S: MovingPressed[(int)MoveKey::S] = true;
 			break;
 		case Keys::D: MovingPressed[(int)MoveKey::D] = true;
 			break;
@@ -257,17 +263,18 @@ void EditorApp::HandleKeyDown(Keys key)
 			break;
 		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = true;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true; 
+		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true;
 			break;
 
-		case Keys::RightButton: IsRightMousePressed = true; 
+		case Keys::RightButton: IsRightMousePressed = true;
 			break;
-		case Keys::LeftButton: 
-			if (imguiEditorPass->IsHoveredGameViewport) 
+		case Keys::LeftButton:
+			if (imguiEditorPass->IsHoveredGameViewport)
 			{
-				
+
 			}
 			break;
+		}
 	}
 }
 
@@ -276,23 +283,25 @@ void EditorApp::HandleKeyUp(Keys key)
 	if (!imguiEditorPass->IsFocusedGameViewport)
 		return;
 
-	switch (key)
-	{
-	case Keys::W: MovingPressed[(int)MoveKey::W] = false;
-		break;
-	case Keys::S: MovingPressed[(int)MoveKey::S] = false;
-		break;
-	case Keys::D: MovingPressed[(int)MoveKey::D] = false;
-		break;
-	case Keys::A: MovingPressed[(int)MoveKey::A] = false;
-		break;
-	case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = false;
-		break;
-	case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
-		break;
+	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
+		switch (key)
+		{
+		case Keys::W: MovingPressed[(int)MoveKey::W] = false;
+			break;
+		case Keys::S: MovingPressed[(int)MoveKey::S] = false;
+			break;
+		case Keys::D: MovingPressed[(int)MoveKey::D] = false;
+			break;
+		case Keys::A: MovingPressed[(int)MoveKey::A] = false;
+			break;
+		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = false;
+			break;
+		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
+			break;
 
-	case Keys::RightButton: IsRightMousePressed = false;
-		break;
+		case Keys::RightButton: IsRightMousePressed = false;
+			break;
+		}
 	}
 }
 
@@ -301,24 +310,27 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 	if (!imguiEditorPass->IsFocusedGameViewport)
 		return;
 
-	if (IsRightMousePressed)
+	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
 	{
-		float deltaTime = m_timer.GetDeltaTime();
+		if (IsRightMousePressed)
+		{
+			float deltaTime = m_timer.GetDeltaTime();
 
-		m_renderer->mainCamera->RotateYaw(deltaTime * args.Offset.x * CameraRotateSpeed);
-		m_renderer->mainCamera->RotatePitch(-deltaTime * args.Offset.y * CameraRotateSpeed);
-	}
+			m_worldEditor->m_renderer->m_mainCamera->RotateYaw(deltaTime * args.Offset.x * CameraRotateSpeed);
+			m_worldEditor->m_renderer->m_mainCamera->RotatePitch(-deltaTime * args.Offset.y * CameraRotateSpeed);
+		}
 
-	if (args.WheelDelta != 0.0f)
-	{
-		float deltaTime = m_timer.GetDeltaTime();
+		if (args.WheelDelta != 0.0f)
+		{
+			float deltaTime = m_timer.GetDeltaTime();
 
-		CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
+			CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
 
-		if (CameraSpeed < MinCameraSpeed)
-			CameraSpeed = MinCameraSpeed;
-		else if (CameraSpeed > MaxCameraSpeed)
-			CameraSpeed = MaxCameraSpeed;
+			if (CameraSpeed < MinCameraSpeed)
+				CameraSpeed = MinCameraSpeed;
+			else if (CameraSpeed > MaxCameraSpeed)
+				CameraSpeed = MaxCameraSpeed;
+		}
 	}
 }
 

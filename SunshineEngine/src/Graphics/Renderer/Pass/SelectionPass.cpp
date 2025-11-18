@@ -214,13 +214,13 @@ namespace SE_G {
 	{
 	}
 
-	void SelectionPass::OnResize(UINT resizeWidth, UINT resizeHeight,
-		eastl::shared_ptr<GBuffer> pGBuffer)
+	void SelectionPass::OnResize(UINT resizeWidth, UINT resizeHeight)
+		//eastl::shared_ptr<GBuffer> pGBuffer)
 	{
 		m_screenWidth = resizeWidth;
 		m_screenHeight = resizeHeight;
 
-		m_GBuffer = pGBuffer;
+		//m_GBuffer = pGBuffer;
 
 		// Viewport
 		m_viewport = {};

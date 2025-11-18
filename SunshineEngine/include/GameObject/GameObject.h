@@ -75,6 +75,7 @@ public:
             }
         }
         // assert(false, "Component not found");
+        //return nullptr;
     }
 
     virtual void Update(float deltaTime) {};

@@ -5,6 +5,7 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
+#include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <GameObject/GameObject.h>
@@ -128,7 +129,7 @@ public:
     ~WorldEditor();
 
     void InitWorldEditor(
-        eastl::shared_ptr<SE_G::DeferredRenderer> renderer,
+        eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
     void Run();

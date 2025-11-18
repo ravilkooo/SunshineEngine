@@ -114,11 +114,8 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_screenWidth = resizeWidth;
 	m_screenHeight = resizeHeight;
 
-	m_lightPass->m_screenWidth = resizeWidth;
-	m_lightPass->m_screenHeight = resizeHeight;
-
 	m_gPass->OnResize(resizeWidth, resizeHeight);
-	m_lightPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
+	m_lightPass->OnResize(resizeWidth, resizeHeight);
 }
 
 Game::~Game()
