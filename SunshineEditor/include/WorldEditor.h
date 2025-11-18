@@ -128,26 +128,34 @@ public:
     WorldEditor();
     ~WorldEditor();
 
-    void InitWorldEditor(
+    void SetupRendering(
         eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
-    void Run();
+
+    // Start/Pause worldEditor and it's rendering
+    void Start();
+    void Pause();
 
     void Update(float deltaTime);
     //void SyncronizeTransforms();
     void Render();
     void ClearScene();
+    
+    void InitScene();
+    void SaveScene(const std::string& scenePath);
+    bool LoadScene(const std::string& scenePath);
 
-    void SaveSceneToFile(const std::string& filename);
-    bool ReadSceneFromFile(const std::string& filename);
+    void OnResize(UINT resizeWidth, UINT resizeHeight);
+
+    // void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
+
+    SE::UUID ChooseObjectByClick(UINT x, UINT y);
 
     GameTimer m_timer;
     eastl::shared_ptr<Scene_Info> m_scene;
-    eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
+    eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
     LuaManager m_luaManager;
-
-    void OnResize(UINT resizeWidth, UINT resizeHeight);
 
     // Change to (Index + generation handle (robust for inserts/erases))
     // eastl::shared_ptr<GameObject> m_acticeGameObject;
@@ -155,20 +163,15 @@ public:
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
-    eastl::shared_ptr<SE_G::GPass> m_gPass;
-    eastl::shared_ptr<SE_G::LightPass> m_lightPass;
-    eastl::shared_ptr<SE_G::SelectionPass> m_selectionPass;
-    eastl::shared_ptr<SE_G::IconPass> m_iconPass;
+    SE_G::GPass* m_gPass;
+    SE_G::LightPass* m_lightPass;
+    SE_G::SelectionPass* m_selectionPass;
+    SE_G::IconPass* m_iconPass;
 
     float m_deltaTime = 0.0f;
 
-
     // track ray from mouse click
     DXSM::Vector4 rayDirection;
-
-    void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
-
-    SE::UUID ChooseObjectByClick(UINT x, UINT y);
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

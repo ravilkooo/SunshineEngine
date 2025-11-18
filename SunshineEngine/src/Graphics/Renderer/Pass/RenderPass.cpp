@@ -6,6 +6,18 @@ namespace SE_G {
 	{
 	}
 
+	RenderPass::~RenderPass()
+	{
+		techniqueTag.clear();
+		for (size_t i = 0; i < perFrameBindables.size(); i++)
+		{
+			delete perFrameBindables[i];
+		}
+		perFrameBindables.clear();
+
+		m_techniques.clear();
+	}
+
 	eastl::string RenderPass::GetTechniqueTag()
 	{
 		return techniqueTag;
@@ -39,8 +51,9 @@ namespace SE_G {
 		}
 	}
 
-	void RenderPass::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
+	RenderTechnique* RenderPass::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
 		m_techniques.push_back(eastl::move(tech));
+		return m_techniques.back().get();
 	}
 
 	void RenderPass::AddPerFrameBind(Bind::Bindable* bind)

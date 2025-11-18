@@ -39,6 +39,10 @@ public:
             DXSM::Vector3::One, 0
         });
 
+    PointLight(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        const json& j);
     // Unnecessary?
     //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 };

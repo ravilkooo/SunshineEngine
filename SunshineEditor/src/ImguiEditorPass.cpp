@@ -66,7 +66,7 @@ ImguiEditorPass::ImguiEditorPass(
 }
 
 void ImguiEditorPass::SetVieportGBuffer(
-	eastl::shared_ptr<SE_G::GBuffer> pGBuffer) {
+	SE_G::GBuffer* pGBuffer) {
 	m_viewportGBuffer = pGBuffer;
 	// Call m_viewportGBuffer->OnResize() ?
 }

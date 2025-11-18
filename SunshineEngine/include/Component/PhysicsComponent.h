@@ -24,7 +24,7 @@ class PhysicsComponent :
 public:
 
     PhysicsComponent() = default;
-    ~PhysicsComponent() = default;
+    ~PhysicsComponent();
 
     PhysicsComponent(const PhysicsComponent&) = delete;
     PhysicsComponent& operator=(const PhysicsComponent&) = delete;
@@ -71,6 +71,7 @@ private:
     JPH::ObjectLayer m_objectLayer = Layers::NON_MOVING; // default layer
     JPH::ShapeRefC m_shape = nullptr;
 
+    // To-do: make weak_ptr or simple ptr?
     eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
     void FromJson(const json& j) override;
 };

@@ -2,6 +2,12 @@
 #include <Physics/PhysicsSystem.h>
 #include <Component/TransformComponent.h>
 
+PhysicsComponent::~PhysicsComponent() {
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+    bodyInterface.RemoveBody(m_joltBodyId);
+    bodyInterface.DestroyBody(m_joltBodyId);
+}
+
 void PhysicsComponent::SetObjecUUID(SE::UUID objectUUID) {
     m_objectUUID = objectUUID;
 }

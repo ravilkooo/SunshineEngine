@@ -6,6 +6,12 @@ namespace SE_G {
 		: m_groupName(name), m_device(device), m_context(context)
 	{}
 
+	RenderGroup::~RenderGroup()
+	{
+		m_groupName.clear();
+		m_passes.clear();
+	}
+
 	ID3D11Device* RenderGroup::GetDevice() {
 		return m_device;
 	}
@@ -18,7 +24,7 @@ namespace SE_G {
 	void RenderGroup::Pass()
 	{
 		// Passes
-		for (auto pass : m_passes) {
+		for (auto& pass : m_passes) {
 			if (!pass->IsEnabled())
 				continue;
 
@@ -30,19 +36,21 @@ namespace SE_G {
 		}
 	}
 
-	void RenderGroup::AddPass(eastl::shared_ptr<RenderPass> pass) {
-		m_passes.push_back(pass);
+	RenderPass* RenderGroup::AddPass(eastl::unique_ptr<RenderPass> pass) {
+		m_passes.push_back(eastl::move(pass));
+		return m_passes.back().get();
 	}
 
-	void RenderGroup::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
-		for (auto pass : m_passes)
+	RenderTechnique* RenderGroup::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
+		for (auto& pass : m_passes)
 		{
 			if (pass->GetTechniqueTag() == tech->GetTechniqueTag())
 			{
-				pass->AddTechnique(eastl::move(tech));
-				return;
+				return pass->AddTechnique(eastl::move(tech));
 			}
 		}
+		// log << ("RenderGroup %s has not pass with %s tag", m_groupName, tech->GetTechniqueTag())
+		return nullptr;
 	}
 
 	bool RenderGroup::IsEnabled() {

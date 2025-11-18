@@ -22,6 +22,7 @@ namespace SE_G {
         DeferredRenderer(
             eastl::string name, ID3D11Device* device, ID3D11DeviceContext* context,
             UINT screenWidth, UINT screenHeight);
+        ~DeferredRenderer();
 
         void InitGBuffer(UINT screenWidth, UINT screenHeight);
 

@@ -8,6 +8,7 @@ namespace SE_G {
 		template <class C>
 		class ConstantBuffer : public Bindable {
 		protected:
+			// To-do: make ComPtr and release in destructor ?
 			ID3D11Buffer* pConstantBuffer;
 			UINT slot;
 		public:
@@ -48,6 +49,11 @@ namespace SE_G {
 				cbd.ByteWidth = sizeof(C) + (16 - (sizeof(C) % 16)); // aligned size
 				cbd.StructureByteStride = 0u;
 				device->CreateBuffer(&cbd, nullptr, &pConstantBuffer);
+			}
+
+			~ConstantBuffer()
+			{
+
 			}
 		};
 

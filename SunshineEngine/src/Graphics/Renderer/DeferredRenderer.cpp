@@ -14,9 +14,13 @@ namespace SE_G {
 		InitGBuffer(m_screenWidth, m_screenHeight);
 	}
 
+	DeferredRenderer::~DeferredRenderer() {
+
+	}
+
 	void DeferredRenderer::InitGBuffer(UINT screenWidth, UINT screenHeight)
 	{
-		this->m_GBuffer = eastl::make_shared<GBuffer>(m_device, screenWidth, screenHeight);
+		m_GBuffer = eastl::make_shared<GBuffer>(m_device, screenWidth, screenHeight);
 		m_mainCamera = eastl::make_shared<Camera>(m_device, screenWidth * 1.0f / screenHeight);
 		m_mainCamera->SetPosition({ 0, 0, -10 });
 	}
@@ -28,7 +32,7 @@ namespace SE_G {
 		m_GBuffer->OnResize(GetDevice(), resizeWidth, resizeHeight);
 
 		// Passes
-		for (auto pass : m_passes) {
+		for (auto& pass : m_passes) {
 			pass->OnResize(m_screenWidth, m_screenHeight);
 
 		}

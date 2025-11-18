@@ -62,6 +62,8 @@ public:
 class RenderComponent_Info : public Component_Info
 {
 public:
+    ~RenderComponent_Info();
+
     static const SE::ComponentType s_componentType = SE::ComponentType::RENDER;
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
@@ -104,7 +106,7 @@ public:
     SE_G::Bind::SamplerPreset GetCurrentTextureSampler() const;
     
     eastl::unordered_set<eastl::string> techniques;
-    eastl::shared_ptr<RenderComponent> m_assignedComponent;
+    eastl::unique_ptr<RenderComponent> m_assignedComponent;
 
     SE_G::RenderTechnique* m_selectionTechnique;
     

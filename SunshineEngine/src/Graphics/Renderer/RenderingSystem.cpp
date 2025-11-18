@@ -5,6 +5,17 @@ namespace SE_G {
 	RenderingSystem::RenderingSystem()
 	{
 	}
+	
+	RenderingSystem::~RenderingSystem()
+	{
+		m_renderGroupsOrder.clear();
+		m_renderGroups.clear();
+
+		m_device.ReleaseAndGetAddressOf();
+		m_context.ReleaseAndGetAddressOf();
+		m_swapChain.ReleaseAndGetAddressOf();
+		m_backBuffer.ReleaseAndGetAddressOf();
+	}
 
 	RenderingSystem::RenderingSystem(HWND hWnd,
 		UINT screenWidth, UINT screenHeight)
@@ -60,7 +71,7 @@ namespace SE_G {
 	void RenderingSystem::Render()
 	{
 		// Groups
-		for (auto groupName : m_renderGroupsOrder) {
+		for (auto& groupName : m_renderGroupsOrder) {
 			if (!m_renderGroups[groupName]->IsEnabled())
 				continue;
 			m_context->ClearState();
@@ -74,8 +85,20 @@ namespace SE_G {
 		return;
 	};
 
-	void RenderingSystem::AddRenderGroup(eastl::shared_ptr<RenderGroup> renderGroup)
+	RenderGroup* RenderingSystem::AddRenderGroup(RenderGroup* renderGroup)
 	{
+		eastl::string name = renderGroup->m_groupName;
+		auto [it, inserted] = m_renderGroups.emplace(name, nullptr);
+		if (!inserted)
+		{
+			// log << "Duplicate RenderGroup in RenderingSystem::AddRenderGroup!";
+			printf("Duplicate RenderGroup in RenderingSystem::AddRenderGroup!\n");
+			return nullptr;
+		}
+		it->second = renderGroup;
+		m_renderGroupsOrder.push_back(it->second->m_groupName);
+		return it->second;
+		/*
 		if (m_renderGroups.contains(renderGroup->m_groupName)) {
 			// log << contains;
 			printf("Duplicate RenderGroup in RenderingSystem::AddRenderGroup!");
@@ -84,14 +107,19 @@ namespace SE_G {
 		m_renderGroups[renderGroup->m_groupName] = renderGroup;
 		m_renderGroupsOrder.push_back(renderGroup->m_groupName);
 		return;
+		*/
 		/*
+		eastl::string name = renderGroup->m_groupName;
 		auto [it, inserted] = m_renderGroups.emplace(name, nullptr);
 		if (!inserted)
 		{
+			// log << "Duplicate RenderGroup in RenderingSystem::AddRenderGroup!";
+			printf("Duplicate RenderGroup in RenderingSystem::AddRenderGroup!\n");
+			return nullptr;
 		}
-		it->second = renderGroup;
+		it->second = eastl::move(renderGroup);
 		m_renderGroupsOrder.push_back(it->second->m_groupName);
-		return;
+		return it->second.get();
 		*/
 	}
 

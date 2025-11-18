@@ -8,7 +8,6 @@
 
 #include "Scene.h"
 #include <Graphics/Renderer/RenderGroup.h>
-//#include "Graphics/Renderer/Pass/RenderPass.h"
 #include <Graphics/Utils/Camera.h>
 
 namespace SE_G {
@@ -16,6 +15,7 @@ namespace SE_G {
 	{
 	public:
 		RenderingSystem();
+		~RenderingSystem();
 		RenderingSystem(HWND hWnd, UINT screenWidth, UINT screenHeight);
 
 		ID3D11Device* GetDevice() { return m_device.Get(); }
@@ -24,7 +24,7 @@ namespace SE_G {
 		void Render();
 		void PresentFrame();
 
-		void AddRenderGroup(eastl::shared_ptr<RenderGroup> renderGroup);
+		RenderGroup* AddRenderGroup(RenderGroup* renderGroup);
 
 		ID3D11Texture2D* GetBackBuffer() { return m_backBuffer.Get(); }
 		void PreResize();
@@ -44,7 +44,7 @@ namespace SE_G {
 
 		eastl::vector<eastl::string> m_renderGroupsOrder;
 		eastl::unordered_map<
-			eastl::string, eastl::shared_ptr<RenderGroup>>
+			eastl::string, RenderGroup*>
 			m_renderGroups;
 	};
 }

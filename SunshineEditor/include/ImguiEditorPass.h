@@ -32,7 +32,7 @@ public:
         UINT screenWidth, UINT screenHeight,
         eastl::shared_ptr<WorldEditor> worldEditor);
 
-    void SetVieportGBuffer(eastl::shared_ptr<SE_G::GBuffer> pGBuffer);
+    void SetVieportGBuffer(SE_G::GBuffer* pGBuffer);
 
     void StartFrame() override;
     void Pass() override;
@@ -51,7 +51,7 @@ public:
 
     bool m_isLayoutInitialized = false;
 
-    eastl::shared_ptr<SE_G::GBuffer> m_viewportGBuffer;
+    SE_G::GBuffer* m_viewportGBuffer;
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_backBuffer;
 

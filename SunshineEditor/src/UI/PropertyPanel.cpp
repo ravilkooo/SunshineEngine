@@ -65,7 +65,7 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
     if (!obj->HasComponent<TransformComponent_Info>()) 
         return;
 
-    auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent;
+    auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
     
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |

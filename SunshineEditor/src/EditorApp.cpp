@@ -27,9 +27,10 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 
 	// Init WorldEditor with all it's passes
 	m_worldEditor = eastl::make_shared<WorldEditor>();
-	m_worldEditor->InitWorldEditor(m_renderingSystem, worldEditorWidth, worldEditorHeight);
-	
-	m_renderingSystem->AddRenderGroup(m_worldEditor->m_renderer);
+	m_worldEditor->SetupRendering(m_renderingSystem, worldEditorWidth, worldEditorHeight);
+	m_worldEditor->InitScene();
+
+	m_renderingSystem->AddRenderGroup(m_worldEditor->m_renderer.get());
 
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
@@ -51,16 +52,27 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 		m_renderingSystem->GetDeviceContext());
 
 	// Imgui Pass
-	imguiEditorPass = eastl::make_shared<ImguiEditorPass>(
-		m_renderingSystem->GetDevice(),
-		m_renderingSystem->GetDeviceContext(),
-		m_renderingSystem->GetBackBuffer(),
-		m_winWidth,
-		m_winHeight,
-		m_worldEditor
+	m_imguiRenderGroup = eastl::make_unique<SE_G::RenderGroup>(
+		"ImguiEditor", m_renderingSystem->GetDevice(),
+		m_renderingSystem->GetDeviceContext()
 	);
+	m_renderingSystem->AddRenderGroup(m_imguiRenderGroup.get());
+
+	imguiEditorPass = static_cast<ImguiEditorPass*>(
+		m_imguiRenderGroup->AddPass(
+			eastl::make_unique<ImguiEditorPass>(
+				m_renderingSystem->GetDevice(),
+				m_renderingSystem->GetDeviceContext(),
+				m_renderingSystem->GetBackBuffer(),
+				m_winWidth,
+				m_winHeight,
+				m_worldEditor
+			)
+		)
+	);
+
 	imguiEditorPass->SetVieportGBuffer(
-		m_worldEditor->m_renderer->m_GBuffer);
+		m_worldEditor->m_renderer->m_GBuffer.get());
 
 	m_initialized = true;
 
@@ -72,12 +84,6 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// UpdateWindow(m_displayWindow.m_hWnd);
 	
 	imguiEditorPass->m_ToolbarPanel.SetEditorApp(this);
-
-	m_imguiRenderGroup = eastl::make_shared<SE_G::RenderGroup>(
-		"ImguiEditor", m_renderingSystem->GetDevice(),
-		m_renderingSystem->GetDeviceContext());
-	m_imguiRenderGroup->AddPass(imguiEditorPass);
-	m_renderingSystem->AddRenderGroup(m_imguiRenderGroup);
 
 	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &EditorApp::HandleKeyDown);
 	InputDevice::getInstance().OnKeyReleased.AddRaw(this, &EditorApp::HandleKeyUp);
@@ -91,7 +97,7 @@ EditorApp::~EditorApp() {
 	ImGui::DestroyContext();
 }
 
-void EditorApp::RunEditor()
+void EditorApp::RunApp()
 {
 	float physicsUpdateFPS = 120.0f;
 	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
@@ -336,23 +342,26 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 
 void EditorApp::LaunchGame() {
 	m_runtimeMode = RuntimeMode::GAME_MODE;
-	// m_currentGame = eastl::make_unique<Game>();
+
+	// To-do: there should be path to opened project
+	// to-do: class Project
+	m_worldEditor->SaveScene(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json")));
+	
+	m_worldEditor->Pause();
+	
+
 
 	// There should be saving scene from world editor (serializing) and loading to game (deserializing)
 	// m_worldEditor->SaveScene(...);
 	// m_currentGame->LoadScene(...);
 
-	m_worldEditor->m_iconPass->Disable();
-	m_worldEditor->m_selectionPass->Disable();
 }
 
 
 void EditorApp::StopGame() {
 	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
+	m_worldEditor->Start();
 	// There should be loading scene to world editor (deserializing)
 	// m_currentGame->UnloadScene(...);
 	// m_worldEditor->LoadScene(...);
-
-	m_worldEditor->m_iconPass->Enable();
-	m_worldEditor->m_selectionPass->Enable();
 }

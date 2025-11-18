@@ -1,7 +1,5 @@
 #include "WorldEditor.h"
 #include <Component/LuaComponent.h>
-
-
 #include <fstream>   // std::ofstream
 
 WorldEditor::WorldEditor()
@@ -14,7 +12,7 @@ WorldEditor::~WorldEditor()
 }
 
 
-void WorldEditor::InitWorldEditor(
+void WorldEditor::SetupRendering(
 	eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
 	UINT screenWidth,
 	UINT screenHeight)
@@ -22,52 +20,56 @@ void WorldEditor::InitWorldEditor(
 	this->m_screenWidth = screenWidth;
 	this->m_screenHeight = screenHeight;
 
-	this->m_renderer = eastl::make_shared<SE_G::DeferredRenderer>(
-		"WorldEditorGPass", renderSystem->GetDevice(),
+	this->m_renderer = eastl::make_unique<SE_G::DeferredRenderer>(
+		"WorldEditorDeferred", renderSystem->GetDevice(),
 		renderSystem->GetDeviceContext(),
 		m_screenWidth, m_screenHeight
 	);
-	//m_renderer->InitGBuffer(m_screenWidth, m_screenHeight);
 
 	{
-		m_gPass = eastl::make_shared<SE_G::GPass>(
-			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->m_GBuffer, m_renderer->GetMainCamera());
-
-		m_renderer->AddPass(m_gPass);
+		m_gPass = static_cast<SE_G::GPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::GPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
 	}
 	{
-		m_lightPass = eastl::make_shared<SE_G::LightPass>(
-			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->m_GBuffer, m_renderer->GetMainCamera());
-
-		m_renderer->AddPass(m_lightPass);
+		m_lightPass = static_cast<SE_G::LightPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::LightPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
 	}
 	{
-		m_iconPass = eastl::make_shared<SE_G::IconPass>(
-			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->m_GBuffer, m_renderer->GetMainCamera());
-
-		m_renderer->AddPass(m_iconPass);
+		m_iconPass = static_cast<SE_G::IconPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::IconPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
 	}
 	{
-		m_selectionPass = eastl::make_shared<SE_G::SelectionPass>(
-			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->m_GBuffer, m_renderer->GetMainCamera());
-
-		m_selectionPass->m_iconPass = m_iconPass.get();
-		m_renderer->AddPass(m_selectionPass);
+		m_selectionPass = static_cast<SE_G::SelectionPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::SelectionPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+		m_selectionPass->m_iconPass = m_iconPass;
 	}
 
 	m_pixelUUIDHandler = new PixelUUIDHandler();
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
+}
 
+void WorldEditor::InitScene()
+{
 	//m_physicsSystem = eastl::make_shared<PhysicsSystem>();
 
 	/*
 	TestObjects
 	*/
-	if (!ReadSceneFromFile(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json"))))
+	// To-do: there should be path to opened project
+	// to-do: class Project
+	if (!LoadScene(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json"))))
 	{
 		this->m_scene = eastl::make_shared<Scene_Info>();
 
@@ -78,7 +80,7 @@ void WorldEditor::InitWorldEditor(
 
 		{
 			SE::UUID boxId = m_scene->AddGameObject(
-				EditorObjectFactory::CreateDefaultBoxObject(
+				EditorObjectFactory::CreateBoxObject(
 					m_renderer.get(), 1.0f, 1.0f, 1.0f
 				)
 			);
@@ -108,7 +110,7 @@ void WorldEditor::InitWorldEditor(
 
 		for (size_t i = 0; i < 6; i++)
 		{
-			SE::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultSphereObject(
+			SE::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateSphereObject(
 				m_renderer.get(), 1.0f)
 			);
 			auto obj = m_scene->GetGameObjectByUUID(m_scene->gameObjects.back());
@@ -173,7 +175,7 @@ void WorldEditor::InitWorldEditor(
 		// ----------------------------------------------------
 		// Floor
 		{
-			SE::UUID floorId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultBoxObject(
+			SE::UUID floorId = m_scene->AddGameObject(EditorObjectFactory::CreateBoxObject(
 				m_renderer.get(), 100.0f, 0.1f, 100.0f)
 			);
 			/*
@@ -205,7 +207,7 @@ void WorldEditor::InitWorldEditor(
 
 		// Ball
 		{
-			SE::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateDefaultSphereObject(
+			SE::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateSphereObject(
 				m_renderer.get(), 0.5f)
 			);
 
@@ -240,8 +242,12 @@ void WorldEditor::InitWorldEditor(
 	m_selectionPass->m_scene = m_scene;
 }
 
-void WorldEditor::Run() {
-	
+void WorldEditor::Start() {
+	m_renderer->Enable();
+}
+
+void WorldEditor::Pause() {
+	m_renderer->Disable();
 }
 
 void WorldEditor::Update(float deltaTime) {
@@ -279,6 +285,50 @@ void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_renderer->OnResize(resizeWidth, resizeHeight);
 }
 
+SE::UUID WorldEditor::ChooseObjectByClick(UINT x, UINT y)
+{
+	return SE::UUID(m_pixelUUIDHandler->GetUUID(m_renderer->GetDeviceContext(),
+		m_renderer->m_GBuffer->pUUIDSRV.Get(), x, y));
+}
+
+void WorldEditor::SaveScene(const std::string& scenePath)
+{
+	json j = m_scene->ToJson();
+	std::ofstream file(scenePath);
+	if (file) {
+		file << j.dump(4);
+		LOG_EDITOR_INFO("Scene saved");
+	}
+	else
+		LOG_EDITOR_ERROR("File output error");
+}
+
+bool WorldEditor::LoadScene(const std::string& scenePath) {
+	std::ifstream file(scenePath);
+	if (!file) {
+		LOG_EDITOR_ERROR("File input error");
+		return false;
+	}
+	json j;
+	try {
+		file >> j; // прочитать json из файла
+	}
+	catch (const std::exception& e) {
+		LOG_EDITOR_ERROR(JoinChar_Char("JSON parse error: ", e.what()));
+		return false;
+	}
+	m_scene = Scene_Info::FromJson(m_renderer.get(), m_renderer->GetMainCamera(), j);
+	/*
+	if (!loadedScene) {
+		LOG_EDITOR_ERROR("Scene load error\n");
+		return false;
+	}
+	*/
+	LOG_EDITOR_INFO("Scene loaded");
+	return true;
+}
+
+/*
 void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize)
 {
 	float x = (2.0f * mouseScreenCoords.x) / lastGameViewportSize.x - 1.0f;
@@ -303,46 +353,4 @@ void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::
 	// auto trComp = m_scene->gameObjects[1]->GetComponent<TransformComponent>();
 	// trComp->m_position = DXSM::Vector3(worldPos);
 }
-
-SE::UUID WorldEditor::ChooseObjectByClick(UINT x, UINT y)
-{
-	return SE::UUID(m_pixelUUIDHandler->GetUUID(m_renderer->GetDeviceContext(),
-		m_gPass->pGBuffer->pUUIDSRV.Get(), x, y));
-}
-
-void WorldEditor::SaveSceneToFile(const std::string& filename)
-{
-	json j = m_scene->ToJson();
-	std::ofstream file(filename);
-	if (file) {
-		file << j.dump(4);
-		LOG_EDITOR_INFO("Scene saved");
-	}
-	else
-		LOG_EDITOR_ERROR("File output error");
-}
-
-bool WorldEditor::ReadSceneFromFile(const std::string& filename) {
-	std::ifstream file(filename);
-	if (!file) {
-		LOG_EDITOR_ERROR("File input error");
-		return false;
-	}
-	json j;
-	try {
-		file >> j; // прочитать json из файла
-	}
-	catch (const std::exception& e) {
-		LOG_EDITOR_ERROR(JoinChar_Char("JSON parse error: ", e.what()));
-		return false;
-	}
-	m_scene = Scene_Info::FromJson(m_renderer.get(), m_renderer->GetMainCamera(), j);
-	/*
-	if (!loadedScene) {
-		LOG_EDITOR_ERROR("Scene load error\n");
-		return false;
-	}
-	*/
-	LOG_EDITOR_INFO("Scene loaded");
-	return true;
-}
+*/

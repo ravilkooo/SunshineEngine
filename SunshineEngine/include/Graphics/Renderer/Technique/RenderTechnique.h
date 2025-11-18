@@ -27,14 +27,15 @@ namespace SE_G {
     {
     public:
         RenderTechnique(ID3D11Device* device, TransformComponent* assignedTransform,  eastl::string technique);
-        virtual ~RenderTechnique() = default;
+        virtual ~RenderTechnique();
 
         void AddBind(eastl::shared_ptr<Bind::Bindable> bind);
-        eastl::vector<eastl::shared_ptr<Bind::Bindable>> bindables;
 
         virtual void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
         virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
         virtual void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
+
+        virtual eastl::string GetTechniqueTag();
 
         // Resources
         eastl::shared_ptr<Mesh> m_mesh;
@@ -48,7 +49,7 @@ namespace SE_G {
         eastl::shared_ptr<Bind::Rasterizer> rasterizer;
         eastl::shared_ptr<Bind::DepthStencilState> depthStencilState;
 
-        virtual eastl::string GetTechniqueTag();
+        eastl::vector<eastl::shared_ptr<Bind::Bindable>> bindables;
 
         eastl::string m_techniqueTag;
 

@@ -52,8 +52,8 @@ public:
     void InitEditorApp(UINT winWidth = 1600u, UINT winHeight = 800u);
     ~EditorApp();
 
-    void RunEditor();
-    void RunGame() {};
+    void RunApp();
+    //void RunGame();
 
     void UpdateEditor(float deltaTime);
     void UpdateGame(float deltaTime);
@@ -96,8 +96,8 @@ private:
 
     bool is_layout_initialized = false;
 
-    eastl::shared_ptr<SE_G::RenderGroup> m_imguiRenderGroup;
-    eastl::shared_ptr<ImguiEditorPass> imguiEditorPass;
+    eastl::unique_ptr<SE_G::RenderGroup> m_imguiRenderGroup;
+    ImguiEditorPass* imguiEditorPass;
     bool m_initialized = false;
 
 

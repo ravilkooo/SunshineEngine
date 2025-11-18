@@ -30,6 +30,11 @@ public:
         eastl::shared_ptr<SE_G::Camera> camera,
         eastl::wstring texturePath = eastl::wstring(L"Default"),
         SE_G::SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
+
+    SkyBox(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        const json& j);
 };
 
 

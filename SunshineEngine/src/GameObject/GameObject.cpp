@@ -1,17 +1,31 @@
 #include "GameObject/GameObject.h"
 
-GameObject::GameObject() : impl(eastl::make_unique<GameObjectImpl>()) {
+GameObject::GameObject() : impl(eastl::make_unique<GameObjectImpl>())
+{
 	m_UUID = SE::UUID();
 };
 
-GameObject::GameObject(SE::UUID uuid) : impl(eastl::make_unique<GameObjectImpl>()) {
+GameObject::GameObject(SE::UUID uuid) : impl(eastl::make_unique<GameObjectImpl>())
+{
 	m_UUID = uuid;
 };
 
-GameObject_Info::GameObject_Info() : impl(eastl::make_unique<GameObject_InfoImpl>()) {
+GameObject::~GameObject()
+{
+	impl->components.clear();
+}
+
+GameObject_Info::GameObject_Info() : impl(eastl::make_unique<GameObject_InfoImpl>())
+{
 	m_UUID = SE::UUID();
 };
 
-GameObject_Info::GameObject_Info(SE::UUID uuid) : impl(eastl::make_unique<GameObject_InfoImpl>()) {
+GameObject_Info::GameObject_Info(SE::UUID uuid) : impl(eastl::make_unique<GameObject_InfoImpl>())
+{
 	m_UUID = uuid;
 };
+
+GameObject_Info::~GameObject_Info()
+{
+	impl->components.clear();
+}

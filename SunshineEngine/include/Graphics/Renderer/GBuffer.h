@@ -50,6 +50,9 @@ namespace SE_G {
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pLightSRV;
 
 		GBuffer(ID3D11Device* device, UINT screenWidth, UINT screenHeight);
+		~GBuffer();
+
+		void Release();
 
 		void OnResize(ID3D11Device* device, UINT screenWidth, UINT screenHeight);
 	};

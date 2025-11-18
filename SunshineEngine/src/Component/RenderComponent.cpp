@@ -9,6 +9,10 @@ void RenderComponent::AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> rend
 	m_renderSystem->AddTechnique(eastl::move(renderTech));
 }
 
+RenderComponent_Info::~RenderComponent_Info() {
+	techniques.clear();
+}
+
 bool RenderComponent_Info::HasGPassMesh() {
 	return m_hasGPassMesh;
 }

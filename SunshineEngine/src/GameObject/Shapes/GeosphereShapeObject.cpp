@@ -12,10 +12,10 @@ GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
 
 	// TransformComponent
 	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 
 	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
 	//auto tc_info = GetComponent<TransformComponent_Info>();
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
@@ -51,12 +51,12 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 		tc_info->FromJson(j["components"]["Transform"], device);
 	}
 	else {
-		tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+		tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 	}
 
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
@@ -66,7 +66,7 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 
-	return eastl::move(obj);
+	return obj;
 }
 
 DXSM::Vector3 GeosphereShapeObject_Info::GetSize() {
