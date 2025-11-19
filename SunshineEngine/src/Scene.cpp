@@ -6,10 +6,22 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-    for (auto& gameObject : gameObjects)
+    ClearScene();
+}
+
+void Scene::ClearScene() {
+    for (size_t i = 0; i < gameObjects.size(); ++i)
     {
-        //delete &gameObject;
+        SE::UUID uuid = gameObjects[i];
+
+        auto it = uuidToObjectMap.find(uuid);
+
+        if (it == uuidToObjectMap.end())
+            continue;
+
+        uuidToObjectMap.erase(it);
     }
+    gameObjects.clear();
 }
 
 SE::UUID Scene::AddGameObject(eastl::unique_ptr<GameObject> gameObject)
@@ -62,10 +74,22 @@ Scene_Info::Scene_Info()
 
 Scene_Info::~Scene_Info()
 {
-    for (auto& gameObject : gameObjects)
+    ClearScene();
+}
+
+void Scene_Info::ClearScene() {
+    for (size_t i = 0; i < gameObjects.size(); ++i)
     {
-        //delete &gameObject;
+        SE::UUID uuid = gameObjects[i];
+
+        auto it = uuidToObjectMap.find(uuid);
+
+        if (it == uuidToObjectMap.end())
+            continue;
+
+        uuidToObjectMap.erase(it);
     }
+    gameObjects.clear();
 }
 
 SE::UUID Scene_Info::AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject)

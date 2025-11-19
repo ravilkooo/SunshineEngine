@@ -123,7 +123,7 @@ namespace SE_G {
 			gameObject_info->HasComponent<TransformComponent_Info>()) {
 
 			auto renderComp_info = gameObject_info->GetComponent<RenderComponent_Info>();
-			auto transformComponent = gameObject_info->GetComponent<TransformComponent_Info>()->m_assignedComponent;
+			auto transformComponent = gameObject_info->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
 			auto actualLocalScaleFactor = DXSM::Vector3(transformComponent->m_localScaleFactor);
 
@@ -214,13 +214,13 @@ namespace SE_G {
 	{
 	}
 
-	void SelectionPass::OnResize(UINT resizeWidth, UINT resizeHeight,
-		eastl::shared_ptr<GBuffer> pGBuffer)
+	void SelectionPass::OnResize(UINT resizeWidth, UINT resizeHeight)
+		//eastl::shared_ptr<GBuffer> pGBuffer)
 	{
 		m_screenWidth = resizeWidth;
 		m_screenHeight = resizeHeight;
 
-		m_GBuffer = pGBuffer;
+		//m_GBuffer = pGBuffer;
 
 		// Viewport
 		m_viewport = {};

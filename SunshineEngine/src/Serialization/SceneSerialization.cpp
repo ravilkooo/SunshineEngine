@@ -15,6 +15,7 @@
 #include <GameObject/Shapes/ShapeCollection.h>
 #include <GameObject/Lighting/LightCollection.h>
 #include <GameObject/EditorObjectFactory.h>
+#include <GameObject/GameObjectFactory.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Utils/Camera.h>
@@ -23,6 +24,9 @@
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
+// To-do: Modify all FromJson functions toi return pair [ bool, object ]
+// first param for checking is deserialization was succesful
 
 // ----------------- TransformComponent -----------------
 json TransformComponent_Info::ToJson() const {
@@ -50,7 +54,7 @@ json TransformComponent_Info::ToJson() const {
 }
 
 void TransformComponent_Info::FromJson(const json& j, ID3D11Device* device) {
-    m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+    m_assignedComponent = eastl::make_unique<TransformComponent>(device);
     m_assignedComponent->FromJson(j);
 }
 
@@ -316,6 +320,78 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
     return out;
 }
 */
+
+// ----------------- Scene -----------------
+
+eastl::shared_ptr<Scene> Scene::FromJson(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    const json& j)
+{
+    auto scene = eastl::make_shared<Scene>();
+
+    if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
+        for (const auto& objJ : j["gameObjects"]) {
+            GameObjectGroup objGroup = objJ["m_group"];
+            ObjectType objType = ObjectType(objGroup, objJ["m_type"]);
+            eastl::unique_ptr<GameObject> go;
+            // objJ;
+            switch (objGroup)
+            {
+            case GameObjectGroup::Lighting:
+                switch (objType.m_asLight)
+                {
+                case LightObjectType::SkyBox:
+                    go = eastl::make_unique<SkyBox>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::AmbientLight:
+                    go = eastl::make_unique<AmbientLight>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::PointLight:
+                    go = eastl::make_unique<PointLight>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::DirectionalLight:
+                    go = eastl::make_unique<DirectionalLight>(
+                        renderSystem, camera, objJ);
+                    break;
+                }
+                break;
+
+            case GameObjectGroup::Shapes:
+
+                switch (objType.m_asShape)
+                {
+                case ShapeObjectType::Box:
+                    go = GameObjectFactory::CreateBoxObject(renderSystem, objJ);
+                    break;
+                case ShapeObjectType::Sphere:
+                    go = GameObjectFactory::CreateSphereObject(renderSystem, objJ);
+                    break;
+                case ShapeObjectType::Geosphere:
+                    go = GameObjectFactory::CreateGeosphereObject(renderSystem, objJ);
+                    break;
+                }
+                break;
+            case GameObjectGroup::CustomMesh:
+                break;
+            case GameObjectGroup::Other:
+                break;
+            default:
+                break;
+            }
+
+
+            //auto go = GameObject::FromJson(objJ);
+            if (go) {
+                scene->AddGameObject(eastl::move(go));
+            }
+        }
+    }
+    return scene;
+}
 
 // ----------------- Scene_Info -----------------
 json Scene_Info::ToJson() const {

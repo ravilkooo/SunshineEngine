@@ -21,6 +21,8 @@ public:
     Scene(Scene&&) noexcept = default;
     Scene& operator=(Scene&&) noexcept = default;
 
+    void ClearScene();
+
     SE::UUID AddGameObject(eastl::unique_ptr<GameObject> gameObject);
     GameObject* GetGameObjectByUUID(SE::UUID uuid) const;
     //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
@@ -30,6 +32,10 @@ public:
     eastl::vector<SE::UUID> gameObjects;
     // Владеет объектами. Нужен чтобы быстро находить по UUID
     std::unordered_map<SE::UUID, eastl::unique_ptr<GameObject>> uuidToObjectMap;
+
+    static eastl::shared_ptr<Scene> FromJson(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera, const json& j);
 private:
 };
 
@@ -43,6 +49,8 @@ public:
     Scene_Info& operator=(const Scene_Info&) = delete;
     Scene_Info(Scene_Info&&) noexcept = default;
     Scene_Info& operator=(Scene_Info&&) noexcept = default;
+
+    void ClearScene();
 
     SE::UUID AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject);
     GameObject_Info* GetGameObjectByUUID(SE::UUID uuid) const;

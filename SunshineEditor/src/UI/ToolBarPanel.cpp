@@ -40,8 +40,9 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
         if (ImGui::Button("Save"))
         {
             if (m_editorApp) {
-                //m_editorApp->m_worldEditor->m_scene->ToJson();
-                m_editorApp->m_worldEditor->SaveSceneToFile(WcharToChar(JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"../scene.json")));
+                // To-do: there should be path to opened project
+                // to-do: class Project
+                m_editorApp->m_worldEditor->SaveScene(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json")));
             }
         }
     }

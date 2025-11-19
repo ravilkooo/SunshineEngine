@@ -1,6 +1,7 @@
 #include "Graphics/Renderer/ForwardRenderer.h"
 
 namespace SE_G {
+	/*
 	ForwardRenderer::ForwardRenderer()
 	{
 	}
@@ -71,8 +72,6 @@ namespace SE_G {
 			pass->Pass();
 			pass->EndFrame();
 		}
-
-		swapChain->Present(1, /*DXGI_PRESENT_DO_NOT_WAIT*/ 0);
 	}
 
 
@@ -90,4 +89,5 @@ namespace SE_G {
 	{
 		return mainCamera;
 	}
+	*/
 }

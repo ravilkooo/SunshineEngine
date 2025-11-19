@@ -10,6 +10,12 @@ namespace SE_G {
 	{
 	}
 
+	RenderTechnique::~RenderTechnique()
+	{
+		m_techniqueTag.clear();
+		bindables.clear();
+	}
+
 	void RenderTechnique::AddBind(eastl::shared_ptr<Bind::Bindable> bind)
 	{
 		bindables.push_back(bind);

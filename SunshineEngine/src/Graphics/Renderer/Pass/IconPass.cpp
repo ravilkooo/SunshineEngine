@@ -141,17 +141,17 @@ namespace SE_G {
 		context->OMSetRenderTargets(2, nullRTVs, *nullDSVs);
 	}
 
-	void IconPass::OnResize(UINT resizeWidth, UINT resizeHeight,
-		eastl::shared_ptr<GBuffer> pGBuffer)
+	void IconPass::OnResize(UINT resizeWidth, UINT resizeHeight)
+		//eastl::shared_ptr<GBuffer> pGBuffer)
 	{
 		m_screenWidth = resizeWidth;
 		m_screenHeight = resizeHeight;
 
-		m_GBuffer = pGBuffer;
+		//m_GBuffer = pGBuffer;
 
 		// Set RTVs
-		m_bufferRTVs[0] = pGBuffer->pLightRTV.Get();
-		m_bufferRTVs[1] = pGBuffer->pUUIDRTV.Get();
+		m_bufferRTVs[0] = m_GBuffer->pLightRTV.Get();
+		m_bufferRTVs[1] = m_GBuffer->pUUIDRTV.Get();
 
 		// Viewport
 		m_viewport = {};

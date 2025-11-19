@@ -23,6 +23,7 @@ namespace SE_G {
 
 class GameObjectImpl {
 public:
+    // to-do: make vector of unique? or not to do?
     eastl::vector<eastl::shared_ptr<Component>> components;
 };
 
@@ -35,7 +36,7 @@ public:
 
     GameObject();
     GameObject(SE::UUID);
-    virtual ~GameObject() = default;
+    virtual ~GameObject();
     /*
     GameObject(GameObject&&) noexcept = default;
     GameObject& operator=(GameObject&&) noexcept = default;
@@ -74,7 +75,9 @@ public:
                 return eastl::static_pointer_cast<T>(comp);
             }
         }
-        // assert(false, "Component not found");
+        // log << "Component not found";
+        printf("Component not found");
+        return nullptr;
     }
 
     virtual void Update(float deltaTime) {};
@@ -153,7 +156,7 @@ class GameObject_Info {
 public:
     GameObject_Info();
     GameObject_Info(SE::UUID uuid);
-    virtual ~GameObject_Info() = default;
+    virtual ~GameObject_Info();
 
     GameObjectGroup m_group;
     ObjectType m_type;

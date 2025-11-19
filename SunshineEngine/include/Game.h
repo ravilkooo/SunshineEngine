@@ -7,33 +7,47 @@
 
 #include <SunshineEngineAPI.h>
 
+#include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
 
+#include <GameObject/GameObjectFactory.h>
 #include <GameObject/GameObject.h>
+
 #include <GameTimer.h>
 
 #include <Scene.h>
 
-#include <Windows/WindowsApp.h>
+#include <Physics/PhysicsSystem.h>
+
+#include <Utils/ILogManager.h>
+
+// To-do: move lua manager from Editor to Engine
+//#include <Scripting/LuaManager.h>
 
 
-class SUNSHINE_ENGINE_API Game : public WindowsApp
+class SUNSHINE_ENGINE_API Game
 {
 public:
     Game();
     virtual ~Game();
-
-    void InitGame(
-        eastl::shared_ptr<SE_G::DeferredRenderer> renderer,
+    
+    void SetupRendering(
+        eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
 
-    virtual void Run();
+    void Run();
+
+    void Start();
+    void Stop();
 
     virtual void Update(float deltaTime);
-    virtual void Render();
+    void Render();
+    void ClearScene();
+
+    bool LoadScene(const std::string& scenePath);
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 
@@ -41,11 +55,13 @@ public:
     UINT m_screenHeight = 800u;
 
     GameTimer m_timer;
-    Scene m_scene;
-    eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
+    eastl::shared_ptr<Scene> m_scene;
+    eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
 
-    eastl::shared_ptr<SE_G::GPass> m_gPass;
-    eastl::shared_ptr<SE_G::LightPass> m_lightPass;
+    // LuaManager m_luaManager;
+
+    SE_G::GPass* m_gPass;
+    SE_G::LightPass* m_lightPass;
 
     float m_deltaTime = 0.0f;
 };

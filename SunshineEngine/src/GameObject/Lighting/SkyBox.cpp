@@ -40,6 +40,34 @@ SkyBox::SkyBox(
 	rc->AddTechnique(eastl::move(iconTech));
 }
 
+SkyBox::SkyBox(
+	SE_G::DeferredRenderer* renderSystem,
+	eastl::shared_ptr<SE_G::Camera> camera,
+	const json& j)
+{
+	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+	m_lightData = eastl::make_shared<SE_G::SkyBoxData>(j["m_lightData"]);
+	m_name = "SkyBox";
+
+	auto device = renderSystem->GetDevice();
+
+	// TransformComponent
+	auto tc = AddComponent<TransformComponent>(device);
+	if (j["components"].contains("Transform")) {
+		tc->FromJson(j["components"]["Transform"]);
+	}
+
+	// RenderComponent and Passes
+	auto rc = AddComponent<RenderComponent>(renderSystem);
+
+	// LightPass - LightTechnique
+	auto lightTech =
+		eastl::make_unique<SE_G::SkyBoxTechnique>(
+			device, tc.get(), "LightPass", camera, m_lightData);
+	rc->AddTechnique(eastl::move(lightTech));
+}
+
+
 SkyBox_Info::SkyBox_Info(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,
@@ -55,11 +83,11 @@ SkyBox_Info::SkyBox_Info(
 
 	// TransformComponent
 	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 
 	// RenderComponent and Passes
 	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
 	// LightPass - LightTechnique
 	auto lightTech =
@@ -94,12 +122,12 @@ SkyBox_Info::SkyBox_Info(
 		tc_info->FromJson(j["components"]["Transform"], device);
 	}
 	else {
-		tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+		tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 	}
 
 	// RenderComponent and Passes
 	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
 	// LightPass - LightTechnique
 	auto lightTech =

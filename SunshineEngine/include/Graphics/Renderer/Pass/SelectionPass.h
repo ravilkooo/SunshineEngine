@@ -22,8 +22,8 @@ namespace SE_G {
         eastl::shared_ptr<Camera> GetCamera();
         void SetCamera(eastl::shared_ptr<Camera> camera);
 
-        void OnResize(UINT resizeWidth, UINT resizeHeight,
-            eastl::shared_ptr<GBuffer> pGBuffer);
+        void OnResize(UINT resizeWidth, UINT resizeHeight) override;
+            //eastl::shared_ptr<GBuffer> pGBuffer);
 
         eastl::shared_ptr<Camera> m_camera;
 
