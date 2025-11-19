@@ -8,10 +8,10 @@
 class ResourceLoaderFactory
 {
 public:
-    static void RegisterLoader(ResourceType type,
+    static void RegisterLoader(SunshineResource::ResourceType type,
         eastl::unique_ptr<IResourceLoader> loader);
 
-    static IResourceLoader* GetLoader(ResourceType type);
+    static IResourceLoader* GetLoader(SunshineResource::ResourceType type);
     static IResourceLoader* GetLoaderForFile(const eastl::string& path);
 
 private:

@@ -3,7 +3,7 @@
 
 eastl::hash_map<int, eastl::unique_ptr<IResourceLoader>> ResourceLoaderFactory::m_Loaders;
 
-void ResourceLoaderFactory::RegisterLoader(ResourceType type, eastl::unique_ptr<IResourceLoader> loader)
+void ResourceLoaderFactory::RegisterLoader(SunshineResource::ResourceType type, eastl::unique_ptr<IResourceLoader> loader)
 {
     int typeId = static_cast<int>(type);
     // ћожно добавить защиту от двойной регистрации
@@ -11,7 +11,7 @@ void ResourceLoaderFactory::RegisterLoader(ResourceType type, eastl::unique_ptr<
     m_Loaders[typeId] = eastl::move(loader);
 }
 
-IResourceLoader* ResourceLoaderFactory::GetLoader(ResourceType type)
+IResourceLoader* ResourceLoaderFactory::GetLoader(SunshineResource::ResourceType type)
 {
     int typeId = static_cast<int>(type);
     auto it = m_Loaders.find(typeId);

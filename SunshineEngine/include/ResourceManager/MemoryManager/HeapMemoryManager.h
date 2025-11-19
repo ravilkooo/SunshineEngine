@@ -7,7 +7,7 @@
 class HeapMemoryManager : public ResourceMemoryManager
 {
 public:
-    void* Allocate(size_t size, ResourceType type) override;
+    void* Allocate(size_t size, SunshineResource::ResourceType type) override;
     void Deallocate(void* ptr, size_t size) override;
 
 private:

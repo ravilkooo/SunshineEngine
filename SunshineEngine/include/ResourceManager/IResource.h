@@ -7,7 +7,7 @@ class IResource
 public:
     virtual ~IResource() = default;
 
-    virtual ResourceType GetType() const = 0;
+    virtual SunshineResource::ResourceType GetType() const = 0;
 
     virtual ResourceGUID GetGUID() const = 0;
 

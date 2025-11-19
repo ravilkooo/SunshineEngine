@@ -2,8 +2,7 @@
 
 #include <EASTL/atomic.h>
 #include <cstddef>
-
-enum class ResourceType : uint8_t;
+#include <ResourceManager/Enums/ResourceType.h>
 
 class ResourceMemoryManager
 {
@@ -15,7 +14,7 @@ public:
 
     virtual ~ResourceMemoryManager() = default;
 
-    virtual void* Allocate(size_t size, ResourceType type);
+    virtual void* Allocate(size_t size, SunshineResource::ResourceType type);
     virtual void Deallocate(void* ptr, size_t size);
 
     size_t GetUsedMemory() const { return m_UsedMemory; }

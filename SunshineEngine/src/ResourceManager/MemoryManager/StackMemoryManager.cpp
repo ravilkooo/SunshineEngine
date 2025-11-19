@@ -14,7 +14,7 @@ StackMemoryManager::StackMemoryManager(size_t maxMemory)
 
 StackMemoryManager::~StackMemoryManager() { free(m_StackMemory); }
 
-void* StackMemoryManager::Allocate(size_t size, ResourceType /*type*/)
+void* StackMemoryManager::Allocate(size_t size, SunshineResource::ResourceType /*type*/)
 {
     if (m_StackTop + size > m_MaxMemory)
         return nullptr; // Out of memory

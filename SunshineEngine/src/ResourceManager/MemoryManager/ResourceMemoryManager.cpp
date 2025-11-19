@@ -1,8 +1,9 @@
 #include <cstdlib> 
 #include <cassert>
 #include <ResourceManager/MemoryManager/ResourceMemoryManager.h>
+#include <ResourceManager/Enums/ResourceType.h>
 
-void* ResourceMemoryManager::Allocate(size_t size, ResourceType /*type*/)
+void* ResourceMemoryManager::Allocate(size_t size, SunshineResource::ResourceType /*type*/)
 {
     // Basic heap allocation with accounting. Replace with custom strategy if needed.
     void* ptr = std::malloc(size);
