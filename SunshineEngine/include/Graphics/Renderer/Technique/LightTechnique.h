@@ -33,7 +33,7 @@ namespace SE_G {
 			blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 			blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-			blendState = eastl::make_shared<Bind::BlendState>(device, blendDesc);
+			m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 
 			m_lightData = lightData;
 			m_lightDataBuffer =
@@ -45,13 +45,13 @@ namespace SE_G {
 
 			m_camera = camera;
 		}
-        ~LightTechnique() = default;
+		virtual ~LightTechnique() = default;
 
         virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override
 		{
-			for (size_t i = 0; i < bindables.size(); i++)
+			for (size_t i = 0; i < m_bindables.size(); i++)
 			{
-				bindables[i]->Bind(context.Get());
+				m_bindables[i]->Bind(context.Get());
 			}
 
 			if (m_vertexShader) {
@@ -74,23 +74,25 @@ namespace SE_G {
 				m_lightDataBuffer->Bind(context.Get());
 			}
 
-			if (blendState)
-				blendState->Bind(context.Get());
+			if (m_blendState)
+				m_blendState->Bind(context.Get());
 
 			if (m_mesh)
 				m_mesh->Bind(context.Get());
 
 			LightPosition lightPos = GetLightPositionInFrustum();
 			// Choose rasterizer
-			ChooseRasterizer(lightPos);
+			ChooseRasterizer(context.Get(), lightPos);
 			// Choose depthState
-			ChooseDepthStencilState(lightPos);
+			ChooseDepthStencilState(context.Get(), lightPos);
 
 			// Bind rasterizer
-			rasterizer->Bind(context.Get());
+			if (m_rasterizer)
+				m_rasterizer->Bind(context.Get());
 
 			// Bind depthState
-			depthStencilState->Bind(context.Get());
+			if (m_depthStencilState)
+				m_depthStencilState->Bind(context.Get());
 		}
 
         // Update right before draw
@@ -98,8 +100,8 @@ namespace SE_G {
         virtual LightPosition GetLightPositionInFrustum() { return LightPosition::FILL; };
         virtual bool IsFrustumInsideOfLight() { return true; };
 
-        virtual void ChooseDepthStencilState(LightPosition lightPos) = 0;
-        virtual void ChooseRasterizer(LightPosition lightPos) = 0;
+        virtual void ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos) = 0;
+        virtual void ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos) = 0;
     };
     /*
     template class LightTechnique<AmbientLightData>;

@@ -4,45 +4,42 @@
 #include <string>
 #include <windows.h>
 
-inline char* WcharToChar(const wchar_t* wstr) {
-    if (!wstr) return nullptr;
+inline eastl::string WcharToChar(const wchar_t* wstr) {
+    if (!wstr) return eastl::string();
 
-    // Calculate required buffer size (in bytes) for UTF-8 encoding
     int size_needed = WideCharToMultiByte(
-        CP_UTF8,               // Convert to UTF-8
-        0,                     // No special flags
-        wstr,                  // Source wchar_t string
-        -1,                    // Null-terminated input string
-        NULL,                  // No output buffer yet
-        0,                     // Request buffer size
-        NULL, NULL             // No default char or used flag
+        CP_UTF8,
+        0,
+        wstr,
+        -1,
+        NULL,
+        0,
+        NULL, NULL
     );
-    if (size_needed == 0) return nullptr;
+    if (size_needed == 0) return eastl::string();
 
-    // Allocate buffer for converted string
-    char* buffer = static_cast<char*>(malloc(size_needed));
-    if (!buffer) return nullptr;
-
-    // Perform the conversion
+    // Use a temporary std::string as a writable buffer, then construct eastl::string
+    std::string tmp;
+    tmp.resize(size_needed);
     int converted_chars = WideCharToMultiByte(
         CP_UTF8,
         0,
         wstr,
         -1,
-        buffer,
+        tmp.data(),
         size_needed,
         NULL, NULL
     );
 
-    if (converted_chars == 0) {
-        free(buffer);
-        return nullptr;
-    }
+    if (converted_chars == 0) return eastl::string();
 
-    return buffer;
+    // converted_chars includes the null terminator; omit it in the returned string
+    return eastl::string(tmp.c_str(), static_cast<size_t>(converted_chars - 1));
 }
 
 inline eastl::wstring JoinWchar_Wstring(const wchar_t* a, const wchar_t* b) {
+    if (!a) a = L"";
+    if (!b) b = L"";
     eastl::wstring s;
     s.reserve(wcslen(a) + wcslen(b));
     s.append(a);
@@ -50,61 +47,25 @@ inline eastl::wstring JoinWchar_Wstring(const wchar_t* a, const wchar_t* b) {
     return s;
 }
 
-inline wchar_t* JoinWchar_Wchar(const wchar_t* a, const wchar_t* b) {
-    if (!a) a = L"";
-    if (!b) b = L"";
-
-    const size_t lenA = wcslen(a);
-    const size_t lenB = wcslen(b);
-    const size_t total = lenA + lenB + 1;
-
-    wchar_t* out = static_cast<wchar_t*>(malloc(total * sizeof(wchar_t)));
-    if (!out) return nullptr;
-
-#if defined(_MSC_VER)
-    // Copy and append with bounds checking on MSVC
-    wcscpy_s(out, total, a);
-    wcscat_s(out, total, b);
-#else
-    // Standard C functions (ensure buffer is large enough)
-    wcscpy(out, a);
-    wcscat(out, b);
-#endif
-    return out;
-}
-
-inline char* JoinChar_Char(const char* a, const char* b) {
+inline eastl::string JoinChar_Char(const char* a, const char* b) {
     if (!a) a = "";
     if (!b) b = "";
-
-    const size_t lenA = strlen(a);
-    const size_t lenB = strlen(b);
-    const size_t total = lenA + lenB + 1; // +1 for null terminator
-
-    char* out = static_cast<char*>(malloc(total * sizeof(char)));
-    if (!out) return nullptr;
-
-#if defined(_MSC_VER)
-    strcpy_s(out, total, a);
-    strcat_s(out, total, b);
-#else
-    strcpy(out, a);
-    strcat(out, b);
-#endif
-
-    return out;
+    eastl::string s;
+    s.reserve(strlen(a) + strlen(b));
+    s.append(a);
+    s.append(b);
+    return s;
 }
 
 inline eastl::wstring MakeEngineAssetPath_Wstring(const wchar_t* sub) {
     return JoinWchar_Wstring(ENGINE_ASSETS_DIR, sub);
 }
 
-inline wchar_t* MakeEngineAssetPath_Wchar(const wchar_t* sub) {
-    return JoinWchar_Wchar(ENGINE_ASSETS_DIR, sub);
-}
 
-inline char* MakeEngineAssetPath_Char(const char* sub) {
-    return JoinChar_Char(WcharToChar(ENGINE_ASSETS_DIR), sub);
+inline eastl::string MakeEngineAssetPath_Char(const char* sub) {
+    // Convert ENGINE_ASSETS_DIR to UTF-8 string and join
+    eastl::string dirUtf8 = WcharToChar(ENGINE_ASSETS_DIR);
+    return JoinChar_Char(dirUtf8.c_str(), sub);
 }
 
 inline eastl::string wstringToString(const eastl::wstring& wideStr) {

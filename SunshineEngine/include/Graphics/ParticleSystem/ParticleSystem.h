@@ -2,6 +2,8 @@
 
 #include <EASTL/algorithm.h>
 #include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
+
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <SimpleMath.h>
@@ -121,6 +123,8 @@ namespace SE_G {
         ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* context,
             EmitterPointConstantBuffer emitterDesc,
             SimulateParticlesConstantBuffer simulatorDesc);
+        ~ParticleSystem();
+
         void LoadCS(LPCWSTR computeFilename, ID3D11ComputeShader* m_computeShader);
         void ResetParticles();
 
@@ -136,8 +140,8 @@ namespace SE_G {
         void IncrementEmissionRate(float deltaEmissionRate);
         void DecrementEmissionRate(float deltaEmissionRate);
 
-        void SetBlendState(Bind::BlendState* newBlendState);
-        void SetTexture(Bind::Texture* newTexture);
+        void SetBlendState(eastl::unique_ptr<Bind::BlendState> newBlendState);
+        void SetTexture(eastl::unique_ptr<Bind::Texture> newTexture);
 
         void SetEmitPosition(DXSM::Vector4 newPosition);
         void SetEmitDir(DXSM::Vector3 newEmitDir);
@@ -182,10 +186,9 @@ namespace SE_G {
         };
         SceneConstantBuffer m_sceneConstantBufferData;
         Microsoft::WRL::ComPtr<ID3D11Buffer> m_sceneConstantBuffer;
-
-        ID3D11RasterizerState* rasterState;
-        ID3D11DepthStencilState* depthState;
-        Bind::BlendState* m_blendState; // tool
+        Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterState;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthState;
+        eastl::unique_ptr<Bind::BlendState> m_blendState; // tool
         struct TransformsParticles
         {
             DX::XMMATRIX viewMat;
@@ -200,8 +203,8 @@ namespace SE_G {
         Microsoft::WRL::ComPtr<ID3D11PixelShader>       m_renderParticlePS;
 
         // texture
-        Bind::Texture* m_texture;    // tool
-        Bind::Sampler* textureSampler;
+        eastl::unique_ptr<Bind::Texture> m_texture;    // tool
+        eastl::unique_ptr<Bind::Sampler> textureSampler;
 
     public:
         std::vector<Bind::Bindable*> additionalBindablesForSimulationPass;

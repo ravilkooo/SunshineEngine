@@ -82,6 +82,7 @@ namespace SE_G {
 				return;
 				*/
 			}
+			isNull = false;
 		}
 
 		void Texture::ChangeColor(ID3D11Device* device, SE_G::Color color) {
@@ -89,13 +90,15 @@ namespace SE_G {
 			m_color = color;
 			m_colored = true;
 			Initialize1x1ColorTexture(device, m_color);
+			isNull = false;
 		}
 
 		void Texture::ClearTexture() {
 			m_filePath.clear();
 			if (!isNull) {
-				pTexture.ReleaseAndGetAddressOf();
-				pTextureView.ReleaseAndGetAddressOf();
+				pTexture.Reset();
+				pTextureView.Reset();
+				isNull = true;
 			}
 		}
 
@@ -145,13 +148,13 @@ namespace SE_G {
 			initialData.pSysMem = colorData;
 			initialData.SysMemPitch = width * sizeof(Color);
 
-			ID3D11Texture2D* p2DTexture = nullptr;
+			Microsoft::WRL::ComPtr<ID3D11Texture2D> p2DTexture;
 			HRESULT hr = device->CreateTexture2D(&textureDesc, &initialData, &p2DTexture);
 			if (FAILED(hr)) {
 				throw std::runtime_error("Failed to initialize texture from color data.");
 			}
 
-			pTexture = static_cast<ID3D11Texture2D*>(p2DTexture);
+			pTexture = p2DTexture;
 			/*D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 			srvDesc.Format = textureDesc.Format;
 			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -166,7 +169,7 @@ namespace SE_G {
 		}
 		void Texture::UpdateTextureView(ID3D11ShaderResourceView* pTextureView)
 		{
-			this->pTextureView.ReleaseAndGetAddressOf();
+			this->pTextureView.Reset();
 			this->pTextureView = pTextureView;
 		}
 

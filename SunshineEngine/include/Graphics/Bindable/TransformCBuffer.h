@@ -3,6 +3,7 @@
 #include <directxmath.h>
 #include "Bindable.h"
 #include "ConstantBuffer.h"
+#include <EASTL/unique_ptr.h>
 
 class TransformComponent;
 
@@ -21,10 +22,11 @@ namespace SE_G {
 			};
 		public:
 			TransformCBuffer(ID3D11Device* device, TransformComponent* parent, UINT slot = 0u);
+			~TransformCBuffer();
 			void Bind(ID3D11DeviceContext* context) noexcept override;
 		private:
 			// static
-			VertexConstantBuffer<Transforms>* pVcbuf;
+			eastl::unique_ptr<VertexConstantBuffer<Transforms>> pVcbuf;
 			TransformComponent* pParent = nullptr;
 		};
 	}

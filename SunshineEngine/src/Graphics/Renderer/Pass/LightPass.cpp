@@ -22,18 +22,20 @@ namespace SE_G {
 		m_viewport.MinDepth = 0;
 		m_viewport.MaxDepth = 1.0f;
 
-		m_camPCB = new Bind::PixelConstantBuffer<CamPCB>(device,
-			{ DX::XMMatrixIdentity(), DX::XMMatrixIdentity(),
+		m_camPCB = eastl::make_unique<Bind::PixelConstantBuffer<CamPCB>>(
+			device,
+			CamPCB{ DX::XMMatrixIdentity(), DX::XMMatrixIdentity(),
 			(DX::XMFLOAT3)camera->GetPosition(), 0 },
 			0u);
-		AddPerFrameBind(m_camPCB);
+		AddPerFrameBind(m_camPCB.get());
 
-		m_screenInfoPCB = new Bind::PixelConstantBuffer<ScreenInfoPCB>(device,
-			{ DXSM::Vector2(
+		m_screenInfoPCB = eastl::make_unique<Bind::PixelConstantBuffer<ScreenInfoPCB>>(
+			device,
+			ScreenInfoPCB{ DXSM::Vector2(
 				static_cast<float>(m_screenWidth),
 				static_cast<float>(m_screenHeight)) },
 			1u);
-		AddPerFrameBind(m_screenInfoPCB);
+		AddPerFrameBind(m_screenInfoPCB.get());
 
 		D3D11_BLEND_DESC blendDesc = {};
 		blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -45,7 +47,8 @@ namespace SE_G {
 		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-		AddPerFrameBind(new Bind::BlendState(device, blendDesc));
+		m_defaultBlendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
+		AddPerFrameBind(m_defaultBlendState.get());
 
 		m_NormalTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pNormalSRV.Get(), 0u);
 		m_AlbedoTexture = eastl::make_shared<Bind::Texture>(device, pGBuffer->pAlbedoSRV.Get(), 1u);
@@ -73,8 +76,14 @@ namespace SE_G {
 		samplerDesc.MinLOD = 0;
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-		AddPerFrameBind(new Bind::Sampler(device, samplerDesc, 0u));
+		m_GBufferSampler = eastl::make_unique<Bind::Sampler>(device, samplerDesc, 0u);
+		AddPerFrameBind(m_GBufferSampler.get());
 
+	}
+
+	LightPass::~LightPass()
+	{
+		particleSystems.clear();
 	}
 
 	void LightPass::StartFrame()

@@ -2,43 +2,32 @@
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
+    bool PointLightTechnique::m_staticDataInitializated = false;
+
+    eastl::shared_ptr<Bind::DepthStencilState> PointLightTechnique::depthCompLess;
+    eastl::shared_ptr<Bind::DepthStencilState> PointLightTechnique::depthCompGreater;
+
+    eastl::shared_ptr<Bind::Rasterizer> PointLightTechnique::rastCullNone;
+    eastl::shared_ptr<Bind::Rasterizer> PointLightTechnique::rastCullBack;
+    eastl::shared_ptr<Bind::Rasterizer> PointLightTechnique::rastCullFront;
+
     PointLightTechnique::PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
         eastl::string technique,
         eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<PointLightData> lightData)
         : LightTechnique(device, assignedTransform, technique, camera, lightData)
     {
-        // Depth
-        D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        depthCompLess = eastl::make_shared<Bind::DepthStencilState>(device, dsDesc);
-
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_GREATER;
-        depthCompGreater = eastl::make_shared<Bind::DepthStencilState>(device, dsDesc);
-
-        // Rasterizer
-        D3D11_RASTERIZER_DESC rasterDesc = {};
-        rasterDesc.CullMode = D3D11_CULL_NONE;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-        rastCullNone = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
-
-        rasterDesc.CullMode = D3D11_CULL_BACK;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-        rastCullBack = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
-
-        rasterDesc.CullMode = D3D11_CULL_FRONT;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-        rastCullFront = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
-
+        if (!PointLightTechnique::m_staticDataInitializated)
+        {
+            PointLightTechnique::InitStaticData(device);
+        }
+        m_depthStencilState.reset(NULL);
+        m_rasterizer.reset(NULL);
         m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, DXSM::Vector3::One * lightData->Range, 1);
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightVShader.hlsl"));
+            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/PointLightVShader.hlsl").c_str());
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightPShader.hlsl"));
+            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/PointLightPShader.hlsl").c_str());
     }
 
     void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -50,35 +39,35 @@ namespace SE_G {
         DrawTechnique(context);
     }
 
-    void PointLightTechnique::ChooseDepthStencilState(LightPosition lightPos)
+    void PointLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         if (lightPos == LightPosition::INSIDE) {
-            depthStencilState = depthCompGreater;
+            PointLightTechnique::depthCompGreater->Bind(context);
         }
         else if (lightPos == LightPosition::FILL || lightPos == LightPosition::BEHIND_NEAR_PLANE) {
-            depthStencilState = depthCompLess;
+            PointLightTechnique::depthCompGreater->Bind(context);
         }
         else if (lightPos == LightPosition::INTERSECT_FAR_PLANE) {
-            depthStencilState = depthCompLess;
+            PointLightTechnique::depthCompLess->Bind(context);
         }
         else { // I dont know why, just... whatever
-            depthStencilState = depthCompGreater;
+            PointLightTechnique::depthCompGreater->Bind(context);
         }
     }
 
-    void PointLightTechnique::ChooseRasterizer(LightPosition lightPos)
+    void PointLightTechnique::ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         if (lightPos == LightPosition::INSIDE) {
-            rasterizer = rastCullFront;
+            PointLightTechnique::rastCullFront->Bind(context);
         }
         else if (lightPos == LightPosition::FILL || lightPos == LightPosition::BEHIND_NEAR_PLANE) {
-            rasterizer = rastCullNone;
+            PointLightTechnique::rastCullNone->Bind(context);
         }
         else if (lightPos == LightPosition::INTERSECT_FAR_PLANE) {
-            rasterizer = rastCullBack;
+            PointLightTechnique::rastCullBack->Bind(context);
         }
         else { // I dont know why, just... whatever
-            rasterizer = rastCullFront;
+            PointLightTechnique::rastCullNone->Bind(context);
         }
     }
 
@@ -147,5 +136,35 @@ namespace SE_G {
             if (distance > m_lightData->Range) return false;
         }
         return true;
+    }
+
+    void PointLightTechnique::InitStaticData(ID3D11Device* device) {
+        // Depth
+        D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+        dsDesc.DepthEnable = TRUE;
+        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+        dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+        depthCompLess = eastl::make_shared<Bind::DepthStencilState>(device, dsDesc);
+
+        dsDesc.DepthEnable = TRUE;
+        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+        dsDesc.DepthFunc = D3D11_COMPARISON_GREATER;
+        depthCompGreater = eastl::make_shared<Bind::DepthStencilState>(device, dsDesc);
+
+        // Rasterizer
+        D3D11_RASTERIZER_DESC rasterDesc = {};
+        rasterDesc.CullMode = D3D11_CULL_NONE;
+        rasterDesc.FillMode = D3D11_FILL_SOLID;
+        rastCullNone = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
+
+        rasterDesc.CullMode = D3D11_CULL_BACK;
+        rasterDesc.FillMode = D3D11_FILL_SOLID;
+        rastCullBack = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
+
+        rasterDesc.CullMode = D3D11_CULL_FRONT;
+        rasterDesc.FillMode = D3D11_FILL_SOLID;
+        rastCullFront = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
+
+        m_staticDataInitializated = true;
     }
 }

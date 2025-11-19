@@ -17,30 +17,7 @@ namespace SE_G {
 		m_screenWidth = resizeWidth;
 		m_screenHeight = resizeHeight;
 
-		pDepthBuffer.ReleaseAndGetAddressOf();
-		pDepthDSV.ReleaseAndGetAddressOf();
-		pDepthSRV.ReleaseAndGetAddressOf();
-
-		pWorldPosBuffer.ReleaseAndGetAddressOf();
-		pWorldPosRTV.ReleaseAndGetAddressOf();
-		pWorldPosSRV.ReleaseAndGetAddressOf();
-
-		pNormalBuffer.ReleaseAndGetAddressOf();
-		pNormalRTV.ReleaseAndGetAddressOf();
-		pNormalSRV.ReleaseAndGetAddressOf();
-
-		pAlbedoBuffer.ReleaseAndGetAddressOf();
-		pAlbedoRTV.ReleaseAndGetAddressOf();
-		pAlbedoSRV.ReleaseAndGetAddressOf();
-
-		pSpecularBuffer.ReleaseAndGetAddressOf();
-		pSpecularRTV.ReleaseAndGetAddressOf();
-		pSpecularSRV.ReleaseAndGetAddressOf();
-
-		pLightBuffer.ReleaseAndGetAddressOf();
-		pLightRTV.ReleaseAndGetAddressOf();
-		pLightSRV.ReleaseAndGetAddressOf();
-
+		Release();
 
 		// Depth Texture
 		D3D11_TEXTURE2D_DESC depthDesc = {};
@@ -225,32 +202,32 @@ namespace SE_G {
 	}
 
 	void GBuffer::Release() {
-		pDepthBuffer.ReleaseAndGetAddressOf();
-		pDepthDSV.ReleaseAndGetAddressOf();
-		pDepthSRV.ReleaseAndGetAddressOf();
+		pDepthBuffer.Reset();
+		pDepthDSV.Reset();
+		pDepthSRV.Reset();
 
-		pWorldPosBuffer.ReleaseAndGetAddressOf();
-		pWorldPosRTV.ReleaseAndGetAddressOf();
-		pWorldPosSRV.ReleaseAndGetAddressOf();
+		pWorldPosBuffer.Reset();
+		pWorldPosRTV.Reset();
+		pWorldPosSRV.Reset();
 
-		pNormalBuffer.ReleaseAndGetAddressOf();
-		pNormalRTV.ReleaseAndGetAddressOf();
-		pNormalSRV.ReleaseAndGetAddressOf();
+		pNormalBuffer.Reset();
+		pNormalRTV.Reset();
+		pNormalSRV.Reset();
 
-		pAlbedoBuffer.ReleaseAndGetAddressOf();
-		pAlbedoRTV.ReleaseAndGetAddressOf();
-		pAlbedoSRV.ReleaseAndGetAddressOf();
+		pAlbedoBuffer.Reset();
+		pAlbedoRTV.Reset();
+		pAlbedoSRV.Reset();
 
-		pSpecularBuffer.ReleaseAndGetAddressOf();
-		pSpecularRTV.ReleaseAndGetAddressOf();
-		pSpecularSRV.ReleaseAndGetAddressOf();
+		pSpecularBuffer.Reset();
+		pSpecularRTV.Reset();
+		pSpecularSRV.Reset();
 
-		pUUIDBuffer.ReleaseAndGetAddressOf();
-		pUUIDRTV.ReleaseAndGetAddressOf();
-		pUUIDSRV.ReleaseAndGetAddressOf();
+		pUUIDBuffer.Reset();
+		pUUIDRTV.Reset();
+		pUUIDSRV.Reset();
 
-		pLightBuffer.ReleaseAndGetAddressOf();
-		pLightRTV.ReleaseAndGetAddressOf();
-		pLightSRV.ReleaseAndGetAddressOf();
+		pLightBuffer.Reset();
+		pLightRTV.Reset();
+		pLightSRV.Reset();
 	}
 }

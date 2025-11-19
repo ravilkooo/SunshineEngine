@@ -13,7 +13,7 @@
 #include <Utils/StringUtils.h>
 
 std::filesystem::path ContentBrowserPanel::s_AssetsDirectory =
-    std::filesystem::path(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/"));
+    std::filesystem::path(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/").c_str());
 
 ContentBrowserPanel::ContentBrowserPanel()
     : m_CurrentDirectory(s_AssetsDirectory)

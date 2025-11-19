@@ -47,7 +47,7 @@ public:
     void Render();
     void ClearScene();
 
-    bool LoadScene(const std::string& scenePath);
+    bool LoadScene(const wchar_t* scenePath);
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 

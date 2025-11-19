@@ -15,22 +15,23 @@ namespace SE_G {
 				"vs_5_0",
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
 				0,
-				&pShaderBytecodeBlob,
+				pShaderBytecodeBlob.GetAddressOf(),
 				&errorVertexCode);
 
 			if (FAILED(hr)) {
 				// If the shader failed to compile it should have written something to the error message.
 				if (errorVertexCode) {
 					char* compileErrors = (char*)(errorVertexCode->GetBufferPointer());
-
 					std::cout << compileErrors << std::endl;
+					errorVertexCode->Release();
 				}
-				// If there was  nothing in the error message then it simply could not find the shader file itself.
+				// If there was nothing in the error message then it simply could not find the shader file itself.
 				else
 				{
 					std::wcout << filePath << L" - Missing Shader File\n";
 				}
-
+				// Compilation failed; avoid using null bytecode blob
+				return;
 			}
 
 			device->CreateVertexShader(
@@ -87,6 +88,8 @@ namespace SE_G {
 				pShaderBytecodeBlob->GetBufferPointer(),
 				pShaderBytecodeBlob->GetBufferSize(),
 				&pInputLayout);
+
+			free(IALayoutInputElements);
 		}
 
 		VertexShader::VertexShader(ID3D11Device* device, LPCWSTR filePath,
@@ -102,22 +105,22 @@ namespace SE_G {
 				"vs_5_0",
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
 				0,
-				&pShaderBytecodeBlob,
+				pShaderBytecodeBlob.GetAddressOf(),
 				&errorVertexCode);
 
 			if (FAILED(hr)) {
 				// If the shader failed to compile it should have written something to the error message.
 				if (errorVertexCode) {
 					char* compileErrors = (char*)(errorVertexCode->GetBufferPointer());
-
 					std::cout << compileErrors << std::endl;
+					errorVertexCode->Release();
 				}
 				// If there was  nothing in the error message then it simply could not find the shader file itself.
 				else
 				{
 					std::wcout << filePath << L" - Missing Shader File\n";
 				}
-
+				return;
 			}
 
 			device->CreateVertexShader(
@@ -137,6 +140,13 @@ namespace SE_G {
 
 		VertexShader::~VertexShader()
 		{
+			Release();
+		}
+
+		void VertexShader::Release() {
+			pShaderBytecodeBlob.Reset();
+			pVertexShader.Reset();
+			pInputLayout.Reset();
 		}
 
 		void VertexShader::Bind(ID3D11DeviceContext* context) noexcept

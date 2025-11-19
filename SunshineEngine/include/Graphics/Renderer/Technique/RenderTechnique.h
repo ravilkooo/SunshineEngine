@@ -44,12 +44,12 @@ namespace SE_G {
         eastl::shared_ptr<Bind::Texture> m_texture;
 
         // Extra (has default values)
-        eastl::shared_ptr<Bind::Sampler> m_textureSampler;
-        eastl::shared_ptr<Bind::BlendState> blendState;
-        eastl::shared_ptr<Bind::Rasterizer> rasterizer;
-        eastl::shared_ptr<Bind::DepthStencilState> depthStencilState;
+        eastl::unique_ptr<Bind::Sampler> m_textureSampler;
+        eastl::unique_ptr<Bind::BlendState> m_blendState;
+        eastl::unique_ptr<Bind::Rasterizer> m_rasterizer;
+        eastl::unique_ptr<Bind::DepthStencilState> m_depthStencilState;
 
-        eastl::vector<eastl::shared_ptr<Bind::Bindable>> bindables;
+        eastl::vector<eastl::shared_ptr<Bind::Bindable>> m_bindables;
 
         eastl::string m_techniqueTag;
 

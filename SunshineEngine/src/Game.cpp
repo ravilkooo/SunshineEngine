@@ -40,7 +40,7 @@ void Game::SetupRendering(
 	}
 }
 
-bool Game::LoadScene(const std::string& scenePath)
+bool Game::LoadScene(const wchar_t* scenePath)
 {
 	std::ifstream file(scenePath);
 	if (!file) {

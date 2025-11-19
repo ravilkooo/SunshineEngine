@@ -223,7 +223,7 @@ namespace SE_G {
 
 		//wchar_t resetCsFilePath[250];
 		//getEnfiAssetPath(resetCsFilePath, 250, L"Shaders/Particles/ResetCShader.hlsl");
-		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/ResetCShader.hlsl"),
+		D3DCompileFromFile(MakeEngineAssetPath_Wstring(L"Shaders/Particles/ResetCShader.hlsl").c_str(),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			"main", "cs_5_0",
@@ -238,7 +238,7 @@ namespace SE_G {
 
 		// wchar_t initSimDispCsFilePath[250];
 		// getGraphicsAssetPath(initSimDispCsFilePath, 250, L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl");
-		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl"),
+		D3DCompileFromFile(MakeEngineAssetPath_Wstring(L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl").c_str(),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			"main", "cs_5_0",
@@ -253,7 +253,7 @@ namespace SE_G {
 
 		// wchar_t emitCsFilePath[250];
 		// getGraphicsAssetPath(emitCsFilePath, 250, L"Shaders/Particles/EmitParticlesCShader.hlsl");
-		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/EmitParticlesCShader.hlsl"),
+		D3DCompileFromFile(MakeEngineAssetPath_Wstring(L"Shaders/Particles/EmitParticlesCShader.hlsl").c_str(),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			"main", "cs_5_0",
@@ -268,7 +268,7 @@ namespace SE_G {
 
 		// wchar_t simCsFilePath[250];
 		// getGraphicsAssetPath(simCsFilePath, 250, L"Shaders/Particles/SimulateParticlesCShader.hlsl");
-		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/SimulateParticlesCShader.hlsl"),
+		D3DCompileFromFile(MakeEngineAssetPath_Wstring(L"Shaders/Particles/SimulateParticlesCShader.hlsl").c_str(),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			"main", "cs_5_0",
@@ -287,7 +287,7 @@ namespace SE_G {
 			// m_renderParticle shaders
 			Microsoft::WRL::ComPtr<ID3DBlob> vs_blob;
 			D3DCompileFromFile(
-				MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_VS.hlsl"),
+				MakeEngineAssetPath_Wstring(L"Shaders/Particles/RenderParticles_VS.hlsl").c_str(),
 				nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 				"main", "vs_5_0",
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0,
@@ -308,7 +308,7 @@ namespace SE_G {
 			ID3DBlob* errorVertexCode = nullptr;
 			HRESULT hr =
 				D3DCompileFromFile(
-					MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_GS.hlsl"),
+					MakeEngineAssetPath_Wstring(L"Shaders/Particles/RenderParticles_GS.hlsl").c_str(),
 					nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 					"main", "gs_5_0",
 					D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0,
@@ -340,7 +340,7 @@ namespace SE_G {
 			// m_renderParticle shaders
 			Microsoft::WRL::ComPtr<ID3DBlob> ps_blob;
 			D3DCompileFromFile(
-				MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_PS.hlsl"),
+				MakeEngineAssetPath_Wstring(L"Shaders/Particles/RenderParticles_PS.hlsl").c_str(),
 				nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 				"main", "ps_5_0",
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0,
@@ -378,9 +378,52 @@ namespace SE_G {
 		samplerDesc.MinLOD = 0;
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-		textureSampler = new Bind::Sampler(device, samplerDesc, 0u);
+		textureSampler = eastl::make_unique<Bind::Sampler>(device, samplerDesc, 0u);
 
 		ResetParticles();
+	}
+
+	ParticleSystem::~ParticleSystem() {
+		m_particleBuffer.Reset();
+		m_particleSRV.Reset();
+		m_particleUAV.Reset();
+		m_deadListBuffer.Reset();
+		m_deadListUAV.Reset();
+
+		for (int i = 0; i < 2; ++i) {
+			m_aliveIndexBuffer[i].Reset();
+			m_aliveIndexSRV[i].Reset();
+			m_aliveIndexUAV[i].Reset();
+			m_indirectDispatchArgsBuffer[i].Reset();
+			m_indirectDispatchArgsUAV[i].Reset();
+		}
+
+		m_initSimulateDispatchArgsBuffer.Reset();
+		m_indirectDrawArgsBuffer.Reset();
+		m_indirectDrawArgsUAV.Reset();
+		m_deadListCountConstantBuffer.Reset();
+		m_deadListCountConstantBuffer_2.Reset();
+		m_aliveListCountConstantBuffer.Reset();
+		m_resetCShader.Reset();
+		m_initSimulateDispatchArgsCShader.Reset();
+		m_emitParticlesCShader.Reset();
+		m_simulateParticlesCShader.Reset();
+		// m_d3dDevice;
+		// m_d3dContext;
+
+		m_emitterConstantBuffer.Reset();
+		m_simulateParticlesConstantBuffer.Reset();
+
+		m_sceneConstantBuffer.Reset();
+		rasterState.Reset();
+		depthState.Reset();
+		m_viewProjBuffer.Reset();
+		pInputLayout.Reset();
+		m_renderParticleVS.Reset();
+		m_renderParticleGS.Reset();
+		m_renderParticlePS.Reset();
+
+		additionalBindablesForSimulationPass.clear();
 	}
 
 	void ParticleSystem::LoadCS(LPCWSTR computeFilename, ID3D11ComputeShader* m_computeShader)
@@ -644,8 +687,8 @@ namespace SE_G {
 		//const float blendFactor[4] = { 1.f, 1.f, 1.f, 1.f };
 
 
-		m_d3dContext->OMSetDepthStencilState(depthState, 0);
-		m_d3dContext->RSSetState(rasterState);
+		m_d3dContext->OMSetDepthStencilState(depthState.Get(), 0);
+		m_d3dContext->RSSetState(rasterState.Get());
 		m_blendState->Bind(m_d3dContext.Get());
 
 		//m_d3dContext->PSSetSamplers(0, 1, RenderStatesHelper::LinearClamp().GetAddressOf());
@@ -678,14 +721,14 @@ namespace SE_G {
 		SetEmissionRate(m_emissionRate - deltaEmissionRate);
 	}
 
-	void ParticleSystem::SetBlendState(Bind::BlendState* newBlendState)
+	void ParticleSystem::SetBlendState(eastl::unique_ptr<Bind::BlendState> newBlendState)
 	{
-		m_blendState = newBlendState;
+		m_blendState = eastl::move(newBlendState);
 	}
 
-	void ParticleSystem::SetTexture(Bind::Texture* newTexture)
+	void ParticleSystem::SetTexture(eastl::unique_ptr<Bind::Texture> newTexture)
 	{
-		m_texture = newTexture;
+		m_texture = eastl::move(newTexture);
 	}
 
 	void ParticleSystem::SetEmitPosition(DXSM::Vector4 newPosition)

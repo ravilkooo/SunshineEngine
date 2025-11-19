@@ -14,12 +14,12 @@ namespace SE_G {
         dsDesc.DepthEnable = TRUE;
         dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
         dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        depthStencilState = eastl::make_shared<Bind::DepthStencilState>(device, dsDesc);
+        m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
 
         D3D11_RASTERIZER_DESC rasterDesc = {};
         rasterDesc.CullMode = D3D11_CULL_FRONT;
         rasterDesc.FillMode = D3D11_FILL_SOLID;
-        rasterizer = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
+        m_rasterizer = eastl::make_unique<Bind::Rasterizer>(device, rasterDesc);
 
         D3D11_BLEND_DESC blendDesc = {};
         blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -30,12 +30,12 @@ namespace SE_G {
         blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-        blendState = eastl::make_shared<Bind::BlendState>(device, blendDesc);
+        m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 
         if (texturePath.empty() || texturePath == L"Default") {
             m_texture = eastl::make_shared<SE_G::Bind::Texture>(
                 device,
-                MakeEngineAssetPath_Wchar(L"DefaultSkybox.dds"),
+                MakeEngineAssetPath_Wstring(L"DefaultSkybox.dds").c_str(),
                 4u,
                 SE_G::Bind::PipelineStage::PIXEL_SHADER
             );
@@ -50,7 +50,7 @@ namespace SE_G {
             );
         }
 
-        m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
+        m_textureSampler = eastl::make_unique<SE_G::Bind::Sampler>(
             device,
             CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
             1u,
@@ -63,10 +63,10 @@ namespace SE_G {
             DXSM::Vector3::One * camera->GetFarZ() * toHalfDiag);
 
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxVShader.hlsl"));
+            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/SkyBoxVShader.hlsl").c_str());
 
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/SkyBoxPShader.hlsl"));
+            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/SkyBoxPShader.hlsl").c_str());
 
     }
 
@@ -78,12 +78,12 @@ namespace SE_G {
         DrawTechnique(context);
     }
 
-    void SkyBoxTechnique::ChooseDepthStencilState(LightPosition lightPos)
+    void SkyBoxTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         return;
     }
 
-    void SkyBoxTechnique::ChooseRasterizer(LightPosition lightPos)
+    void SkyBoxTechnique::ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         return;
     }
