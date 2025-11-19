@@ -78,7 +78,6 @@ void LuaComponent::ClearState() {
 	foundFunction = false;
 	params.clear();
 	lastResult.clear();
-	sunshineErrorMessage.clear();
 }
 
 void LuaComponent::LoadScript() {
@@ -96,8 +95,7 @@ void LuaComponent::LoadScript() {
 	if (!result.valid()) 
 	{
 		sol::error err = result;
-		sunshineErrorMessage = eastl::string("Error running Lua script: ") + err.what();
-		printSunshineErrorMessage();
+		printSunshineErrorMessage((eastl::string("Error running Lua script: ") + err.what()));
 		return;
 	}
 
@@ -108,7 +106,6 @@ void LuaComponent::LoadScript() {
 	scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
 	printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
 
-	sunshineErrorMessage.clear();
 	foundFunction = false;
 	params.clear();
 	lastResult.clear();
@@ -129,22 +126,19 @@ void LuaComponent::LuaUpdate(float deltaTime)
 	if (!result.valid())
 	{
 		sol::error err = result;
-		sunshineErrorMessage = eastl::string("Error in update hook: ") + err.what();
-		printSunshineErrorMessage();
+		printSunshineErrorMessage((eastl::string("Error in update hook: ") + err.what()));
 	}
 }
 
 bool LuaComponent::FindFunction() {
 	if (!scriptLoaded) { //|| functionName.empty()
-		sunshineErrorMessage = "Lua not initialized or function name empty!";
-		printSunshineErrorMessage();
+		printSunshineErrorMessage("Lua not initialized or function name empty!");
 		return false;
 	}
 
 	//callSolFunction(functionName, 2, 3);
 
 	foundFunction = false;
-	sunshineErrorMessage.clear();
 	params.clear();
 
 	sol::function func = (*lua)[functionName];
@@ -154,8 +148,7 @@ bool LuaComponent::FindFunction() {
 		return true;
 	}
 	else {
-		sunshineErrorMessage = "No such function";
-		printSunshineErrorMessage();
+		printSunshineErrorMessage("No such function");
 		return false;
 	}
 }
@@ -197,8 +190,7 @@ void LuaComponent::InitializeBehavior()
 		if (!result.valid())
 		{
 			sol::error err = result;
-			sunshineErrorMessage = eastl::string("Error in start hook: ") + err.what();
-			printSunshineErrorMessage();
+			printSunshineErrorMessage((eastl::string("Error in start hook: ") + err.what()));
 		}
 	}
 	behaviorInitialized = true;
@@ -209,8 +201,7 @@ bool LuaComponent::CallFunction() {
 	sol::function func = (*lua)[functionName];
 	if (!func.valid())
 	{
-		sunshineErrorMessage = "No such function";
-		printSunshineErrorMessage();
+		printSunshineErrorMessage("No such function");
 		return false;
 	}
 
@@ -235,8 +226,7 @@ bool LuaComponent::CallFunction() {
 	sol::protected_function_result result = func(sol::as_args(args));
 	if (!result.valid()) {
 		sol::error err = result;
-		sunshineErrorMessage = "Lua error: " + eastl::string(err.what());
-		printSunshineErrorMessage();
+		printSunshineErrorMessage(("Lua error: " + eastl::string(err.what())));
 		return false;
 	}
 
