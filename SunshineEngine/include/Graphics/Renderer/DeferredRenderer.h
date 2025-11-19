@@ -1,6 +1,7 @@
 #pragma once
 
 #include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
 
 #include <d3d11.h>
 #include <wrl.h>

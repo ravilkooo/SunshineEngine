@@ -17,6 +17,9 @@
 #include "UI/ContentBrowserPanel.h"
 #include "UI/MainMenuBarPanel.h"
 #include "UI/ToolbarPanel.h"
+#include "UI/BottomBarPanel.h"
+#include "UI/LogPanel.h"
+#include "UI/PropertyPanel.h"
 
 class WorldEditor;
 
@@ -32,13 +35,15 @@ public:
     void SetVieportGBuffer(SE_G::GBuffer* pGBuffer);
 
     void StartFrame() override;
-    void Pass(const Scene& scene) override;
+    void Pass() override;
     void EndFrame() override;
 
     void RenderGameWorld();
     void ShowSceneHierarchy();
     void ShowContentBrowser();
     void ShowProperties();
+    void ShowBottomPanel();
+    void ShowOutputLog();
     void LuaImgui(GameObject*);
 
     UINT m_editorAppWidth = 800;
@@ -60,6 +65,13 @@ public:
     ContentBrowserPanel m_ContentBrowserPanel;
     MainMenuBarPanel m_MainMenuBarPanel;
     ToolbarPanel m_ToolbarPanel;
+    LogPanel m_EditorLogPanel = LogPanel{"Editor Output Log", LogManager::LogTarget::Editor};
+    LogPanel m_GameLogPanel = LogPanel{"Game Output Log", LogManager::LogTarget::Game};
+    BottomBarPanel m_BottomPanel;
+    PropertyPanel m_PropertyPanel;
+
+    bool m_ShowEditorLogPanel = false;
+    bool m_ShowGameLogPanel = false;
 
     void PreResize();
     void OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Texture2D* backBuffer);
@@ -78,6 +90,6 @@ public:
 private:
     //int selectedIdx = -1;
     bool objectSelected = false;
-    Sunshine::UUID selectedUUID;
+    SE::UUID selectedUUID;
 };
 

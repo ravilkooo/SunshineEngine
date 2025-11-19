@@ -7,7 +7,7 @@ namespace SE_G {
         public LightTechnique<AmbientLightData>
     {
     public:
-        AmbientLightTechnique(ID3D11Device* device, eastl::string technique,
+        AmbientLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             eastl::shared_ptr<Camera> camera,
             eastl::shared_ptr<AmbientLightData> lightData);
 

@@ -4,7 +4,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
 #include "sol/sol.hpp"
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include "ScriptComponent.h"
 
 struct ParamEntry {
@@ -38,6 +38,8 @@ public:
     const eastl::vector<ParamEntry>& GetParams() const { return params; }
     eastl::vector<ParamEntry>& GetParams() { return params; }
 
+    eastl::vector<eastl::string> GetAvailableFunctions() const;
+    
     void SetFunctionName(const eastl::string& name);
     eastl::string GetFunctionName() const;
 
@@ -57,6 +59,10 @@ public:
     const std::type_info& getType() const override {
         return typeid(LuaComponent);
     }
+    static const SE::ComponentType s_componentType = SE::ComponentType::LUA;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
 
 private:
     eastl::unique_ptr<sol::state> lua;
@@ -73,4 +79,22 @@ private:
 
     //runtime
     void InitializeBehavior();
+};
+
+class LuaComponent_Info : public Component_Info {
+public:
+    static const SE::ComponentType s_componentType = SE::ComponentType::LUA;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+
+    const std::type_info& getType() const override {
+        return typeid(LuaComponent_Info);
+    }
+
+    bool IsAssigned() override { return false; }
+
+    eastl::string scriptPath;
+    bool scriptLoaded;
+
 };

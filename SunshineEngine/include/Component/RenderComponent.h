@@ -5,17 +5,31 @@
 #include <EASTL/string.h>
 #include <EASTL/map.h>
 #include <EASTL/unique_ptr.h>
+#include <EASTL/unordered_set.h>
 
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Bindable/Bindable.h>
 
-#include "Component.h"
+#include <Component/Component.h>
+#include <Utils/UUID.h>
+
+namespace SE_G {
+    class DeferredRenderer;
+    class GPassTechnique;
+}
+
+//class GameObject_Info;
 
 class RenderComponent :
     public Component
 {
+
+    friend class RenderComponent_Info;
 public:
+
     RenderComponent() = default;
+    RenderComponent(SE_G::DeferredRenderer* renderSystem) : m_renderSystem(renderSystem) {}
     ~RenderComponent() = default;
 
     RenderComponent(const RenderComponent&) = delete;
@@ -24,16 +38,25 @@ public:
     RenderComponent(RenderComponent&&) noexcept = default;
     RenderComponent& operator=(RenderComponent&&) noexcept = default;
 
+    void AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique>);
+
+    /*
     bool HasTechnique(eastl::string technique);
 
     void PassTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
-
-    eastl::map<eastl::string, eastl::unique_ptr<SE_G::RenderTechnique>> techniques;
+    */
 
     const std::type_info& getType() const override {
         return typeid(RenderComponent);
     }
+    
+    static const SE::ComponentType s_componentType = SE::ComponentType::RENDER;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
 
+    SE_G::DeferredRenderer* m_renderSystem;
+    //SE::UUID m_objectUUID;
 };
 
 class RenderComponent_Info : public Component_Info
@@ -104,3 +127,4 @@ private:
         return self->HasTechnique(eastl::string(technique));                       \
     })
 #endif
+*/

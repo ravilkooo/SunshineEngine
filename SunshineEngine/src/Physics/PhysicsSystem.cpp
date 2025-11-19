@@ -44,7 +44,7 @@ PhysicsSystem::PhysicsSystem() :
     m_bodyInterface = &m_physicsSystem->GetBodyInterface();
 }
 
-void PhysicsSystem::AddBody(JPH::BodyID bodyId, Sunshine::UUID objectUUID, JPH::EActivation activation) {
+void PhysicsSystem::AddBody(JPH::BodyID bodyId, SE::UUID objectUUID, JPH::EActivation activation) {
     m_bodyEntries.push_back({ bodyId, objectUUID });
     m_bodyInterface->AddBody(bodyId, activation);
 }

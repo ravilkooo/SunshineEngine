@@ -1,5 +1,10 @@
 #include "Utils/DebugUtils.h"
 
+void printSunshineErrorMessage()
+{
+	printf("%s\n", sunshineErrorMessage.c_str());
+}
+
 void printSunshineErrorMessage(eastl::string errorMessage)
 {
 	printf("%s\n", errorMessage.c_str());

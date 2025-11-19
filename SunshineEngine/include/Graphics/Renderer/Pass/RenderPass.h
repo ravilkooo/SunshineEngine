@@ -5,9 +5,11 @@
 #include <string>
 #include "Scene.h"
 #include <Graphics/Bindable/Bindable.h>
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
+
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
 
 namespace SE_G {
 	class RenderPass
@@ -40,6 +42,8 @@ namespace SE_G {
 
 		Microsoft::WRL::ComPtr<ID3D11Device> device;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
+
+		eastl::vector<eastl::unique_ptr<SE_G::RenderTechnique>> m_techniques;
 
 	private:
 		bool m_enabled = true;

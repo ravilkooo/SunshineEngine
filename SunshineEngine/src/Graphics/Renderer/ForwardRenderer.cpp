@@ -67,9 +67,9 @@ namespace SE_G {
 	void ForwardRenderer::RenderScene(const Scene& scene)
 	{
 		// Passes
-		for (auto pass : passes) {
+		for (auto pass : m_passes) {
 			pass->StartFrame();
-			pass->Pass(scene);
+			pass->Pass();
 			pass->EndFrame();
 		}
 	}
@@ -77,7 +77,7 @@ namespace SE_G {
 
 	void ForwardRenderer::AddPass(eastl::shared_ptr<RenderPass> pass)
 	{
-		passes.push_back(pass);
+		m_passes.push_back(pass);
 	}
 
 	void ForwardRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)

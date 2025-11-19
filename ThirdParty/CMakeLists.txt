@@ -23,9 +23,11 @@ add_subdirectory(FMOD)
 add_subdirectory(sol2)
 
 add_subdirectory(sol2_ImGui_Bindings)
+add_subdirectory(json)
 
 # set_target_properties(EABase EASTL assimp DirectXTK imgui JoltPhysics ViennaGameJobSystem
-set_target_properties(EABase EAStdC EAAssert EAThread EASTL assimp DirectXTK Jolt VGJS imgui lua FMOD sol2 sol2_ImGui_Bindings
+set_target_properties(EABase EAStdC EAAssert EAThread EASTL
+    assimp DirectXTK Jolt VGJS imgui lua FMOD sol2 sol2_ImGui_Bindings nlohmann_json
     PROPERTIES
     FOLDER "ThirdPartyLibs"
 )   

@@ -8,7 +8,7 @@
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
-#include <GameObject.h>
+#include <GameObject/GameObject.h>
 #include <GameTimer.h>
 
 #include <Graphics/Renderer/Pass/GPass.h>
@@ -16,10 +16,11 @@
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
 
-#include <GameObjectFactory.h>
+#include <GameObject/EditorObjectFactory.h>
 #include <Scripting/LuaManager.h>
 
 #include <Physics/PhysicsSystem.h>
+#include <LogManager.h>
 
 
 class WorldEditor
@@ -85,7 +86,7 @@ public:
             return;
         }
 
-        Sunshine::UUID GetUUID(ID3D11DeviceContext* context,
+        SE::UUID GetUUID(ID3D11DeviceContext* context,
             ID3D11ShaderResourceView* UUIDTextureView,
             UINT mouseClickX, UINT mouseClickY) {
             
@@ -115,9 +116,9 @@ public:
 
             context->Unmap(m_outputUUIDBufferStaged.Get(), 0);
 
-            return Sunshine::UUID(uuid);
+            return SE::UUID(uuid);
             
-            //return Sunshine::UUID(0u);
+            //return SE::UUID(0u);
         }
 
     };
@@ -137,7 +138,7 @@ public:
     void Pause();
 
     void Update(float deltaTime);
-    void SyncronizeTransforms();
+    //void SyncronizeTransforms();
     void Render();
     void ClearScene();
     
@@ -170,8 +171,8 @@ public:
     float m_deltaTime = 0.0f;
 
 private:
-    eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
+    //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
     // testing
-    // Sunshine::UUID floorId;
-    // Sunshine::UUID ballId;
+    // SE::UUID floorId;
+    // SE::UUID ballId;
 };

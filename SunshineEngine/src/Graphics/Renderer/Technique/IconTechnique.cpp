@@ -2,10 +2,10 @@
 
 
 namespace SE_G {
-	IconTechnique::IconTechnique(ID3D11Device* device,
+	IconTechnique::IconTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
 		eastl::string technique,
 		IconData iconData, float iconSizeX, float iconSizeY)
-		: RenderTechnique(device, technique)
+		: RenderTechnique(device, assignedTransform, technique)
 	{
 		m_iconData = iconData;
 		m_iconBuffer = eastl::make_shared<Bind::PixelConstantBuffer<IconData>>(device, iconData, 1u);

@@ -1,5 +1,6 @@
 #include "EditorApp.h"
 #include "Utils/DebugUtils.h"
+#include <fstream>   // std::ofstream
 
 EditorApp::EditorApp()
 { }
@@ -34,6 +35,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
 	sol_ImGui::Init(m_lua);
+
 	// Init imgui staff
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -108,6 +110,7 @@ void EditorApp::RunApp()
 	unsigned int frameCount = 0;
 	float FPSstatisticTimer = 0;
 
+
 	while (!isExitRequested) {
 		// Handle the windows messages.
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -120,6 +123,7 @@ void EditorApp::RunApp()
 			}
 			continue;
 		}
+
 
 		m_timer.Tick();
 		m_deltaTime = m_timer.GetDeltaTime();
@@ -155,8 +159,11 @@ void EditorApp::RunApp()
 				accumulator -= physicsUpdateMs;
 			}
 		}
-		m_worldEditor->SyncronizeTransforms();
+
+		//m_worldEditor->SyncronizeTransforms();
 		Render();
+
+
 	}
 	m_worldEditor->ClearScene();
 }

@@ -205,9 +205,9 @@ public:
 class PhysicsBodyEntry {
 public:
     JPH::BodyID m_joltBodyId;
-    Sunshine::UUID m_objectUUID;
+    SE::UUID m_objectUUID;
 
-    PhysicsBodyEntry(JPH::BodyID bodyId, Sunshine::UUID objectUUID) :
+    PhysicsBodyEntry(JPH::BodyID bodyId, SE::UUID objectUUID) :
         m_joltBodyId(bodyId),
         m_objectUUID(objectUUID)
     {}
@@ -221,7 +221,7 @@ public:
     PhysicsSystem();
 
     void AddBody(JPH::BodyID bodyId,
-        Sunshine::UUID objectUUID,
+        SE::UUID objectUUID,
         JPH::EActivation activation = JPH::EActivation::DontActivate);
 
     // Add objects before this step

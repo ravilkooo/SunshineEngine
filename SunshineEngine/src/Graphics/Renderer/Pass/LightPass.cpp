@@ -100,11 +100,11 @@ namespace SE_G {
 		m_camera->BindBuffer(context.Get());
 	}
 
-	void LightPass::Pass(const Scene& scene)
+	void LightPass::Pass()
 	{
 		BindAllPerFrame();
 
-
+		/*
 		for (const auto& gameObjectUUID : scene.gameObjects) {
 			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
 			if (gameObject->HasComponent<RenderComponent>() &&
@@ -119,6 +119,11 @@ namespace SE_G {
 				renderComponent->PassTechnique(techniqueTag, GetDeviceContext());
 
 			}
+		}
+		*/
+		for (auto& tech : m_techniques) {
+			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech->Pass(GetDeviceContext());
 		}
 
 		ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr, nullptr, nullptr };

@@ -223,7 +223,7 @@ namespace SE_G {
 
 		//wchar_t resetCsFilePath[250];
 		//getEnfiAssetPath(resetCsFilePath, 250, L"Shaders/Particles/ResetCShader.hlsl");
-		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/ResetCShader.hlsl").c_str(),
+		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/ResetCShader.hlsl"),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			"main", "cs_5_0",
@@ -238,7 +238,7 @@ namespace SE_G {
 
 		// wchar_t initSimDispCsFilePath[250];
 		// getGraphicsAssetPath(initSimDispCsFilePath, 250, L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl");
-		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl").c_str(),
+		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl"),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			"main", "cs_5_0",
@@ -253,7 +253,7 @@ namespace SE_G {
 
 		// wchar_t emitCsFilePath[250];
 		// getGraphicsAssetPath(emitCsFilePath, 250, L"Shaders/Particles/EmitParticlesCShader.hlsl");
-		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/EmitParticlesCShader.hlsl").c_str(),
+		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/EmitParticlesCShader.hlsl"),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			"main", "cs_5_0",
@@ -268,7 +268,7 @@ namespace SE_G {
 
 		// wchar_t simCsFilePath[250];
 		// getGraphicsAssetPath(simCsFilePath, 250, L"Shaders/Particles/SimulateParticlesCShader.hlsl");
-		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/SimulateParticlesCShader.hlsl").c_str(),
+		D3DCompileFromFile(MakeEngineAssetPath_Wchar(L"Shaders/Particles/SimulateParticlesCShader.hlsl"),
 			nullptr,
 			D3D_COMPILE_STANDARD_FILE_INCLUDE,
 			"main", "cs_5_0",
@@ -287,7 +287,7 @@ namespace SE_G {
 			// m_renderParticle shaders
 			Microsoft::WRL::ComPtr<ID3DBlob> vs_blob;
 			D3DCompileFromFile(
-				MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_VS.hlsl").c_str(),
+				MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_VS.hlsl"),
 				nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 				"main", "vs_5_0",
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0,
@@ -308,7 +308,7 @@ namespace SE_G {
 			ID3DBlob* errorVertexCode = nullptr;
 			HRESULT hr =
 				D3DCompileFromFile(
-					MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_GS.hlsl").c_str(),
+					MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_GS.hlsl"),
 					nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 					"main", "gs_5_0",
 					D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0,
@@ -340,7 +340,7 @@ namespace SE_G {
 			// m_renderParticle shaders
 			Microsoft::WRL::ComPtr<ID3DBlob> ps_blob;
 			D3DCompileFromFile(
-				MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_PS.hlsl").c_str(),
+				MakeEngineAssetPath_Wchar(L"Shaders/Particles/RenderParticles_PS.hlsl"),
 				nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
 				"main", "ps_5_0",
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0,

@@ -8,7 +8,7 @@ WorldEditor::WorldEditor()
 
 WorldEditor::~WorldEditor()
 {
-	m_physicsSystem->ClearScene();
+	//m_physicsSystem->ClearScene();
 }
 
 
@@ -252,31 +252,22 @@ void WorldEditor::Pause() {
 
 void WorldEditor::Update(float deltaTime) {
 
-	m_luaManager.Update(m_scene, deltaTime);
-	//m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_localRotation.y += deltaTime;
-	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.x += rayDirection.x * deltaTime * 10.0f;
-	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.y += rayDirection.y * deltaTime * 10.0f;
-	// m_scene.gameObjects[1]->GetComponent<TransformComponent>()->m_position.z += rayDirection.z * deltaTime * 10.0f;
-	m_physicsSystem->Step(deltaTime);
-	
-	/*
-	auto ballPos = physSystem->SpherePosition();
-
-	m_scene.GetGameObjectByUUID(ballId)->GetComponent<TransformComponent>()->m_position =
-	{ballPos.GetX(), ballPos.GetY(), ballPos.GetZ()};
-	*/
+	//m_luaManager.Update(m_scene, deltaTime);
+	//m_physicsSystem->Step(deltaTime);
 }
 
+/*
 void WorldEditor::SyncronizeTransforms() {
 	m_physicsSystem->SyncronizeTransforms(&m_scene);
 }
+*/
 
 void WorldEditor::Render() {
 	
 }
 
 void WorldEditor::ClearScene() {
-	m_physicsSystem->ClearScene();
+	//m_physicsSystem->ClearScene();
 }
 
 void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
@@ -320,7 +311,7 @@ bool WorldEditor::LoadScene(const std::string& scenePath) {
 	}
 	json j;
 	try {
-		file >> j; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ json пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+		file >> j; // прочитать json из файла
 	}
 	catch (const std::exception& e) {
 		LOG_EDITOR_ERROR(JoinChar_Char("JSON parse error: ", e.what()));
@@ -359,7 +350,7 @@ void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::
 	rayDirection = worldPosFar - worldPos;
 	rayDirection.Normalize();
 
-	// auto trComp = m_scene.gameObjects[1]->GetComponent<TransformComponent>();
+	// auto trComp = m_scene->gameObjects[1]->GetComponent<TransformComponent>();
 	// trComp->m_position = DXSM::Vector3(worldPos);
 }
 */

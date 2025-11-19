@@ -11,6 +11,7 @@ namespace DXSM = DirectX::SimpleMath;
 class SUNSHINE_ENGINE_API TransformComponent :
     public Component
 {
+    friend class TransformComponent_Info;
 public:
     TransformComponent() {};    
     ~TransformComponent();

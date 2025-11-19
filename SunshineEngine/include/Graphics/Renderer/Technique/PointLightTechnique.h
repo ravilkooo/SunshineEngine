@@ -14,7 +14,7 @@ namespace SE_G {
         public LightTechnique<PointLightData>
     {
     public:
-        PointLightTechnique(ID3D11Device* device, eastl::string technique,
+        PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             eastl::shared_ptr<Camera> camera,
             eastl::shared_ptr<PointLightData> lightData);
 
@@ -34,7 +34,5 @@ namespace SE_G {
         eastl::shared_ptr<Bind::Rasterizer> rastCullNone;
         eastl::shared_ptr<Bind::Rasterizer> rastCullBack;
         eastl::shared_ptr<Bind::Rasterizer> rastCullFront;
-
-        eastl::shared_ptr<TransformComponent> m_assignedTransform;
     };
 }

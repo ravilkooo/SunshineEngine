@@ -18,6 +18,7 @@ namespace SE_G {
         ForwardRenderer(HWND hWnd, UINT screenWidth, UINT screenHeight);
         ~ForwardRenderer();
 
+        void RenderScene() override {};
         void RenderScene(const Scene& scene);
 
         void AddPass(eastl::shared_ptr<RenderPass> pass) override;

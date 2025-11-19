@@ -18,7 +18,7 @@ namespace SE_G {
         eastl::shared_ptr<Bind::PixelConstantBuffer<T>> m_lightDataBuffer;
         eastl::shared_ptr<Camera> m_camera;
 
-        LightTechnique(ID3D11Device* device, eastl::string technique,
+        LightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             eastl::shared_ptr<Camera> camera,
             eastl::shared_ptr<T> lightData)
 			: RenderTechnique(device, assignedTransform, technique)

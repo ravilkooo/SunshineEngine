@@ -51,10 +51,10 @@ namespace SE_G {
 		camera->BindBuffer(context.Get());
 	}
 
-	void GPass::Pass(const Scene& scene)
+	void GPass::Pass()
 	{
 		BindAllPerFrame();
-
+		/*
 		for (const auto& gameObjectUUID : scene.gameObjects) {
 			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
 			if (gameObject->HasComponent<RenderComponent>() &&
@@ -68,6 +68,11 @@ namespace SE_G {
 				gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
 				renderComponent->PassTechnique(techniqueTag, GetDeviceContext()); // Bind + Draw
 			}
+		}
+		*/
+		for (auto& tech : m_techniques) {
+			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech->Pass(GetDeviceContext());
 		}
 	}
 

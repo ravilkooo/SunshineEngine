@@ -17,6 +17,7 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/vector.h>
+#include <EASTL/string.h>
 
 #include <Graphics/Bindable/VertexBuffer.h>
 #include <Graphics/Bindable/IndexBuffer.h>
@@ -48,30 +49,35 @@ namespace SE_G {
     public:
         Mesh() {};
         Mesh(ID3D11Device* device,
-            const std::string& path);
+            const eastl::string& path);
         ~Mesh();
 
-        bool LoadModel(eastl::vector<Vertex>& vertices,
+        void ChangeMesh(ID3D11Device* device,
+            const eastl::string& path);
+        void ClearMesh();
+
+        static bool LoadModel(eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            const std::string& path,
+            const eastl::string& path,
             UINT attrFlags = VertexAttributesFlags::POSITION);
 
         static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh(
             ID3D11Device* device,
-            float width = 1.0f, float height = 1.0f, float length = 1.0f
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */
         );
 
         static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh_repeat(
             ID3D11Device* device,
-            float width = 1.0f, float height = 1.0f, float length = 1.0f);
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */);
 
         static eastl::shared_ptr<Mesh> CreateSphereMesh(
             ID3D11Device* device,
-            float radius = 1.0f, uint32_t sliceCount = 10, uint32_t stackCount = 20);
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
+            uint32_t sliceCount = 10, uint32_t stackCount = 20);
 
         static eastl::shared_ptr<Mesh> CreateGeosphereMesh(
             ID3D11Device* device,
-            float radius = 1.0f,
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             UINT numSubdivisions = 6u);
 
         static eastl::shared_ptr<Mesh> CreateScreenAlignedQuad(
@@ -87,27 +93,29 @@ namespace SE_G {
         static void FillUnwrappedBoxMesh(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            float width = 1.0f, float height = 1.0f, float length = 1.0f);
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */);
 
         static void FillUnwrappedBoxMesh_repeat(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            float width = 1.0f, float height = 1.0f, float length = 1.0f);
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */);
 
         static void FillSphereMesh(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            float radius = 1.0f, uint32_t sliceCount = 10, uint32_t stackCount = 10);
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
+            uint32_t sliceCount = 10, uint32_t stackCount = 10);
 
         static void FillSphereMesh_old(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            float radius = 1.0f, uint32_t sliceCount = 10, uint32_t stackCount = 10);
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
+            uint32_t sliceCount = 10, uint32_t stackCount = 10);
 
         static void FillGeosphereMesh(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            float radius = 1.0f,
+            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             UINT numSubdivisions = 6u);
 
         static void FillScreenAlignedQuad(
@@ -118,15 +126,16 @@ namespace SE_G {
         void Draw(ID3D11DeviceContext* context) const;
         void Release();
 
+        eastl::string GetCurrentMeshPath();
+
         //UINT GetIndexCount() const { return m_indexCount; }
 
     private:
-        // Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer;
-        // Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer;
-
         UINT m_indexCount = 0;
         eastl::unique_ptr<Bind::IndexBuffer> m_indexBuffer;
         eastl::unique_ptr<Bind::VertexBuffer> m_vertexBuffer;
         eastl::unique_ptr<Bind::Topology> m_topology;
+
+        eastl::string m_path;
     };
 }

@@ -1,10 +1,12 @@
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
+#include <Utils/StringUtils.h>
 
 namespace SE_G {
-    PointLightTechnique::PointLightTechnique(ID3D11Device* device, eastl::string technique,
+    PointLightTechnique::PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
+        eastl::string technique,
         eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<PointLightData> lightData)
-        : LightTechnique(device, technique, camera, lightData)
+        : LightTechnique(device, assignedTransform, technique, camera, lightData)
     {
         // Depth
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -31,6 +33,12 @@ namespace SE_G {
         rasterDesc.CullMode = D3D11_CULL_FRONT;
         rasterDesc.FillMode = D3D11_FILL_SOLID;
         rastCullFront = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
+
+        m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, DXSM::Vector3::One * lightData->Range, 1);
+        m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
+            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightVShader.hlsl"));
+        m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
+            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/PointLightPShader.hlsl"));
     }
 
     void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
