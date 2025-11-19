@@ -1,3 +1,14 @@
+#include <ResourceManager/Enums/ResourceLifetime.h>
+#include <ResourceManager/Lifetime/ResourceLifetimeInfo.h>
+
+void ResourceLifetimeManager::RegisterResource(ResourceGUID guid, ResourceLifetime lifetime)
+{
+    std::lock_guard<std::mutex> lock(m_LifetimeMutex);
+    ResourceLifetimeInfo info;
+    info.category = lifetime;
+    info.refCount = 0;
+    m_Resources[guid] = info;
+}
 #include <ResourceManager/Lifetime/ResourceLifetimeManager.h>
 
 void ResourceLifetimeManager::OnLevelLoad(uint32_t levelId)

@@ -14,8 +14,8 @@ public:
 
     virtual ~ResourceMemoryManager() = default;
 
-    virtual void* Allocate(size_t size, SunshineResource::ResourceType type);
-    virtual void Deallocate(void* ptr, size_t size);
+    virtual void* Allocate(size_t size, SunshineResource::ResourceType type) = 0;
+    virtual void Deallocate(void* ptr, size_t size) = 0;
 
     size_t GetUsedMemory() const { return m_UsedMemory; }
     size_t GetMaxMemory() const { return m_MaxMemory; }

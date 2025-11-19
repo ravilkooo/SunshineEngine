@@ -1,4 +1,4 @@
-#include "ResourceType.h"
+#include <ResourceManager/Enums/ResourceType.h>
 
 const char* SunshineResource::ResourceTypeToString(ResourceType type)
 {

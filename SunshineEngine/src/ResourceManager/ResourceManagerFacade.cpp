@@ -1,4 +1,4 @@
-#include "ResourceManagerFacade.h"
+#include <ResourceManager/ResourceManagerFacade.h>
 
 ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
 {

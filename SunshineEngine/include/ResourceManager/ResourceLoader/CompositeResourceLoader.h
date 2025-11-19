@@ -12,9 +12,6 @@ public:
     IResource* Load(const eastl::string& path,
         ResourceRegistry* pRegistry,
         ResourceMemoryManager* pMemMgr) override;
-    
-    //IResource* Load(const eastl::string& path,
-    //    ResourceMemoryManager* pMemMgr) override;
 
     eastl::vector<eastl::string> ResolveDependencies(const eastl::string& path);
 
