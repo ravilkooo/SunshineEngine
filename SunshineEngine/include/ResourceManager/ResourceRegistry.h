@@ -11,7 +11,7 @@
 class ResourceRegistry
 {
 public:
-    ResourceRegistry() = default;
+    ResourceRegistry();
     ~ResourceRegistry() = default;
 
     bool Register(const ResourceHandle& handle,

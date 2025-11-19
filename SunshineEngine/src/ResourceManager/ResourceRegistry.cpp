@@ -1,5 +1,10 @@
 #include <ResourceManager/ResourceRegistry.h>
 
+ResourceRegistry::ResourceRegistry() {
+    // Optionally pre-allocate some space
+    m_Registry.reserve(1024); // Adjust based on expected resource count
+}
+
 bool ResourceRegistry::Register(const ResourceHandle& handle,
     IResource* pResource,
     const eastl::string& path)
