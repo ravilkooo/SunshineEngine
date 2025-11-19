@@ -27,8 +27,9 @@ public:
     ImguiEditorPass(ID3D11Device* device, ID3D11DeviceContext* context,
         ID3D11Texture2D* backBuffer,
         UINT screenWidth, UINT screenHeight,
-        eastl::shared_ptr<SE_G::GBuffer> pGBuffer,
         eastl::shared_ptr<WorldEditor> worldEditor);
+
+    void SetVieportGBuffer(SE_G::GBuffer* pGBuffer);
 
     void StartFrame() override;
     void Pass(const Scene& scene) override;
@@ -45,12 +46,12 @@ public:
 
     bool m_isLayoutInitialized = false;
 
-    eastl::shared_ptr<SE_G::GBuffer> m_GBuffer;
+    SE_G::GBuffer* m_viewportGBuffer;
 
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_backBuffer;
 
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
-    D3D11_VIEWPORT m_viewport;
+    D3D11_VIEWPORT m_windowViewport;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pDepthStencil;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDSV;
 

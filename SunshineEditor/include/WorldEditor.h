@@ -5,6 +5,7 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
+#include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <GameObject.h>
@@ -126,23 +127,34 @@ public:
     WorldEditor();
     ~WorldEditor();
 
-    void InitWorldEditor(
-        eastl::shared_ptr<SE_G::DeferredRenderer> renderer,
+    void SetupRendering(
+        eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
-    void Run();
+
+    // Start/Pause worldEditor and it's rendering
+    void Start();
+    void Pause();
 
     void Update(float deltaTime);
     void SyncronizeTransforms();
     void Render();
     void ClearScene();
-
-    GameTimer m_timer;
-    Scene m_scene;
-    eastl::shared_ptr<SE_G::DeferredRenderer> m_renderer;
-    LuaManager m_luaManager;
+    
+    void InitScene();
+    void SaveScene(const std::string& scenePath);
+    bool LoadScene(const std::string& scenePath);
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
+
+    // void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
+
+    SE::UUID ChooseObjectByClick(UINT x, UINT y);
+
+    GameTimer m_timer;
+    eastl::shared_ptr<Scene_Info> m_scene;
+    eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
+    LuaManager m_luaManager;
 
     // Change to (Index + generation handle (robust for inserts/erases))
     // eastl::shared_ptr<GameObject> m_acticeGameObject;
@@ -150,20 +162,12 @@ public:
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
-    eastl::shared_ptr<SE_G::GPass> m_gPass;
-    eastl::shared_ptr<SE_G::LightPass> m_lightPass;
-    eastl::shared_ptr<SE_G::SelectionPass> m_selectionPass;
-    eastl::shared_ptr<SE_G::IconPass> m_iconPass;
+    SE_G::GPass* m_gPass;
+    SE_G::LightPass* m_lightPass;
+    SE_G::SelectionPass* m_selectionPass;
+    SE_G::IconPass* m_iconPass;
 
     float m_deltaTime = 0.0f;
-
-
-    // track ray from mouse click
-    DXSM::Vector4 rayDirection;
-
-    void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
-
-    Sunshine::UUID ChooseObjectByClick(UINT x, UINT y);
 
 private:
     eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

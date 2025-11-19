@@ -15,10 +15,15 @@ namespace SE_G {
 		friend class GameObject;
 	public:
 		RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context);
-		eastl::string GetTechnique();
-		virtual void Pass(const Scene& scene);
+		~RenderPass();
+
+		eastl::string GetTechniqueTag();
+		virtual void Pass();
 		virtual void StartFrame() = 0;
 		virtual void EndFrame() = 0;
+		virtual void OnResize(UINT resizeWidth, UINT resizeHeight) {};
+
+		RenderTechnique* AddTechnique(eastl::unique_ptr<RenderTechnique> tech);
 
 		void AddPerFrameBind(Bind::Bindable* bind);
 		void BindAllPerFrame();

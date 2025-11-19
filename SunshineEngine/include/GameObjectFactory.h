@@ -7,6 +7,9 @@
 #include <Graphics/Utils/Camera.h>
 #include "Graphics/Lighting/LightData.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 class GameObject;
 
 namespace SE_G {
@@ -19,28 +22,53 @@ namespace SE_G {
 class GameObjectFactory
 {
 public:
-	static eastl::unique_ptr<GameObject> CreateDefaultBoxObject(
-		ID3D11Device* device,
-		float width = 1.0f, float height = 1.0f, float length = 1.0f);
+	static eastl::unique_ptr<GameObject> CreateBoxObject(
+		SE_G::DeferredRenderer* renderSystem,
+		float width, float height, float length);
 
-	static eastl::unique_ptr<GameObject> CreateDefaultSphereObject(ID3D11Device* device, float radius = 1.0f);
+	static eastl::unique_ptr<GameObject> CreateBoxObject(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
+	static eastl::unique_ptr<GameObject> CreateSphereObject(
+		SE_G::DeferredRenderer* renderSystem, float radius);
+
+	static eastl::unique_ptr<GameObject> CreateSphereObject(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
+	static eastl::unique_ptr<GameObject> CreateGeosphereObject(
+		SE_G::DeferredRenderer* renderSystem, float radius);
+
+	static eastl::unique_ptr<GameObject> CreateGeosphereObject(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
 
 	static eastl::unique_ptr<GameObject> CreateFinalPassQuad(ID3D11Device* device);
 
 	static eastl::unique_ptr<SE_G::SkyBox> CreateSkyBox(
 		ID3D11Device* device,
 		eastl::shared_ptr<SE_G::Camera> camera,
-		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f },
-		eastl::wstring texturePath = eastl::wstring(L"Default")
-);
+		eastl::wstring texturePath = eastl::wstring(L"Default"),
+		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f });
+
+	static eastl::unique_ptr<SkyBox> CreateSkyBox(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::shared_ptr<SE_G::Camera> camera,
+		const json& j);
 
 	static eastl::unique_ptr<SE_G::AmbientLight> CreateAmbientLightObject(
 		ID3D11Device* device,
 		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::AmbientLightData initData = { DXSM::Vector3::One * 0.1f, 1.0f });
 
-	static eastl::unique_ptr<SE_G::DirectionalLight> CreateDirectionalLightObject(
-		ID3D11Device* device,
+	static eastl::unique_ptr<AmbientLight> CreateAmbientLightObject(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::shared_ptr<SE_G::Camera> camera,
+		const json& j);
+
+	static eastl::unique_ptr<DirectionalLight> CreateDirectionalLightObject(
+		SE_G::DeferredRenderer* m_renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::DirectionalLightData initData = {
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
@@ -49,8 +77,13 @@ public:
 			DXSM::Vector3(1, -1, 1), 0
 		});
 
-	static eastl::unique_ptr<SE_G::PointLight> CreatePointLightObject(
-		ID3D11Device* device,
+	static eastl::unique_ptr<DirectionalLight> CreateDirectionalLightObject(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::shared_ptr<SE_G::Camera> camera,
+		const json& j);
+
+	static eastl::unique_ptr<PointLight> CreatePointLightObject(
+		SE_G::DeferredRenderer* m_renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::PointLightData initData = {
 			DXSM::Vector3::One, 1.0f,
@@ -58,4 +91,9 @@ public:
 			DXSM::Vector3::Zero, 20,
 			DXSM::Vector3::One, 0
 		});
+
+	static eastl::unique_ptr<PointLight> CreatePointLightObject(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::shared_ptr<SE_G::Camera> camera,
+		const json& j);
 };

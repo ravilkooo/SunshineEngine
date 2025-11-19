@@ -45,8 +45,8 @@ namespace SE_G {
 			}
 			else
 			{
-				wprintf(L"Wrong texture file extension: %ls\n", StringHelper::GetFileExtension(filePath));
-				this->Initialize1x1ColorTexture(device, SE_Colors::UnloadedTextureColor);
+				wprintf(L"Wrong texture file extension: %ls\n", StringHelper::GetFileExtension(filePath).c_str());
+				this->Initialize1x1ColorTexture(device, Colors::UnloadedTextureColor);
 				/*
 				HRESULT hr = DirectX::CreateWICTextureFromFile(device, StringHelper::StringToWide(filePath).c_str(), *pTexture, GetTextureResourceViewAddress());
 				if (FAILED(hr))

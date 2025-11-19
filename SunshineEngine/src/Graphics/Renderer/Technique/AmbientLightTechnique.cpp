@@ -18,6 +18,14 @@ namespace SE_G {
         rasterizer = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
     }
 
+    void AmbientLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    {
+        // to-do: update only when changed
+        m_lightDataBuffer->Update(context.Get(), *m_lightData);
+        BindAll(context);
+        DrawTechnique(context);
+    }
+
     void AmbientLightTechnique::ChooseDepthStencilState(LightPosition lightPos)
     {
         return;

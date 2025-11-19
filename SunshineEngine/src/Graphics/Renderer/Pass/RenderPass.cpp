@@ -6,15 +6,25 @@ namespace SE_G {
 	{
 	}
 
-	eastl::string RenderPass::GetTechnique()
+	RenderPass::~RenderPass()
+	{
+		techniqueTag.clear();
+
+		perFrameBindables.clear();
+
+		m_techniques.clear();
+	}
+
+	eastl::string RenderPass::GetTechniqueTag()
 	{
 		return techniqueTag;
 	}
 
-	void RenderPass::Pass(const Scene& scene)
+	void RenderPass::Pass()
 	{
 		BindAllPerFrame();
 
+		/*
 		for (const auto& gameObjectUUID : scene.gameObjects) {
 			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
 			if (gameObject->HasComponent<RenderComponent>() &&
@@ -30,6 +40,17 @@ namespace SE_G {
 
 			}
 		}
+		*/
+
+		for (auto& tech : m_techniques) {
+			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech->Pass(GetDeviceContext());
+		}
+	}
+
+	RenderTechnique* RenderPass::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
+		m_techniques.push_back(eastl::move(tech));
+		return m_techniques.back().get();
 	}
 
 	void RenderPass::AddPerFrameBind(Bind::Bindable* bind)

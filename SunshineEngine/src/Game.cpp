@@ -1,35 +1,79 @@
 #include "Game.h"
+#include <fstream>   // std::ofstream
 
 Game::Game()
 {
 	//Initialize();
 }
 
-void Game::InitGame(
-	eastl::shared_ptr<SE_G::DeferredRenderer> renderer,
+Game::~Game()
+{
+	// Освобождение ресурсов
+}
+
+void Game::SetupRendering(
+	eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
 	UINT screenWidth,
 	UINT screenHeight)
 {
-	this->m_renderer = renderer;
 	this->m_screenHeight = screenHeight;
 	this->m_screenWidth = screenWidth;
 
-	/*
-	{
-		m_gPass = eastl::make_shared<SE_G::GPass>(
-			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->pGBuffer, m_renderer->GetMainCamera());
+	this->m_renderer = eastl::make_unique<SE_G::DeferredRenderer>(
+		"GameDeferred", renderSystem->GetDevice(),
+		renderSystem->GetDeviceContext(),
+		m_screenWidth, m_screenHeight);
 
-		m_renderer->AddPass(m_gPass);
+	{
+		m_gPass = static_cast<SE_G::GPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::GPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
 	}
 	{
-		m_lightPass = eastl::make_shared<SE_G::LightPass>(
-			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->pGBuffer, m_renderer->GetMainCamera());
+		m_lightPass = static_cast<SE_G::LightPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::LightPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+	}
+}
 
-		m_renderer->AddPass(m_lightPass);
+bool Game::LoadScene(const std::string& scenePath)
+{
+	std::ifstream file(scenePath);
+	if (!file) {
+		//LOG_EDITOR_ERROR("File input error");
+		return false;
+	}
+	json j;
+	try {
+		file >> j; // прочитать json из файла
+	}
+	catch (const std::exception& e) {
+		//LOG_EDITOR_ERROR(JoinChar_Char("JSON parse error: ", e.what()));
+		return false;
+	}
+
+	m_scene = Scene::FromJson(m_renderer.get(), m_renderer->GetMainCamera(), j);
+	/*
+	if (!loadedScene) {
+		LOG_EDITOR_ERROR("Scene load error\n");
+		return false;
 	}
 	*/
+	//LOG_EDITOR_INFO("Scene loaded");
+	return true;
+}
+
+
+void Game::Start() {
+	m_renderer->Enable();
+}
+
+void Game::Stop() {
+	m_renderer->Disable();
 }
 
 void Game::Run()
@@ -91,7 +135,7 @@ void Game::Run()
 	*/
 }
 
-void Update(float deltaTime) {
+void Game::Update(float deltaTime) {
 
 	// m_luaManager.Update(m_scene, deltaTime);
 	// m_physicsSystem.Update(deltaTime);
@@ -114,14 +158,5 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_screenWidth = resizeWidth;
 	m_screenHeight = resizeHeight;
 
-	m_lightPass->m_screenWidth = resizeWidth;
-	m_lightPass->m_screenHeight = resizeHeight;
-
-	m_gPass->OnResize(resizeWidth, resizeHeight);
-	m_lightPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
-}
-
-Game::~Game()
-{
-	// Освобождение ресурсов
+	m_renderer->OnResize(resizeWidth, resizeHeight);
 }

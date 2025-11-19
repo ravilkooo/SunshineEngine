@@ -7,42 +7,45 @@
 #include <EASTL/shared_ptr.h>
 
 #include "Scene.h"
-#include "Graphics/Renderer/Pass/RenderPass.h"
+#include <Graphics/Renderer/RenderGroup.h>
 #include <Graphics/Utils/Camera.h>
 
 namespace SE_G {
 	class RenderingSystem
 	{
 	public:
-		ID3D11Device* GetDevice() { return device.Get(); }
-		ID3D11DeviceContext* GetDeviceContext() { return context.Get(); }
+		RenderingSystem();
+		~RenderingSystem();
+		RenderingSystem(HWND hWnd, UINT screenWidth, UINT screenHeight);
 
-		virtual void RenderScene(const Scene& scene) = 0;
-		virtual void PresentFrame() {
-			swapChain->Present(1, /*DXGI_PRESENT_DO_NOT_WAIT*/ 0);
-			return;
-		};
+		ID3D11Device* GetDevice() { return m_device.Get(); }
+		ID3D11DeviceContext* GetDeviceContext() { return m_context.Get(); }
 
-		virtual void SetMainCamera(eastl::shared_ptr<Camera> camera) { this->mainCamera = camera; }
-		virtual eastl::shared_ptr<Camera> GetMainCamera() { return mainCamera; };
+		void Render();
+		void PresentFrame();
 
-		ID3D11Texture2D* GetBackBuffer() { return backBuffer.Get(); }
+		RenderGroup* AddRenderGroup(RenderGroup* renderGroup);
+		void RemoveRenderGroup(eastl::string groupName);
 
-		virtual void AddPass(eastl::shared_ptr<RenderPass> pass) = 0;
+		ID3D11Texture2D* GetBackBuffer() { return m_backBuffer.Get(); }
+		void PreResize();
+		void OnResize(UINT resizeWidth, UINT resizeHeight);
 
-		eastl::vector<eastl::shared_ptr<RenderPass>> passes;
-		eastl::shared_ptr<Camera> mainCamera;
 	protected:
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_device;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context;
+		Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_backBuffer;
 
-		Microsoft::WRL::ComPtr<ID3D11Device> device;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
-		Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
-
+		DXGI_FORMAT m_BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		D3D_FEATURE_LEVEL featureLevels[1] = { D3D_FEATURE_LEVEL_11_1 };
 
-		UINT m_screenWidth = 800;
-		UINT m_screenHeight = 800;
+		UINT m_screenWidth = 800u;
+		UINT m_screenHeight = 800u;
 
+		eastl::vector<eastl::string> m_renderGroupsOrder;
+		eastl::unordered_map<
+			eastl::string, RenderGroup*>
+			m_renderGroups;
 	};
 }

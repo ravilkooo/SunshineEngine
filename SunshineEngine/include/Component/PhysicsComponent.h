@@ -20,7 +20,7 @@ class PhysicsComponent :
 
 public:
     PhysicsComponent() = default;
-    ~PhysicsComponent() = default;
+    ~PhysicsComponent();
 
     PhysicsComponent(const PhysicsComponent&) = delete;
     PhysicsComponent& operator=(const PhysicsComponent&) = delete;
@@ -61,6 +61,7 @@ private:
     JPH::EActivation m_activation = JPH::EActivation::Activate;
     JPH::ShapeRefC m_shape = nullptr;
 
+    // To-do: make weak_ptr or simple ptr?
     eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
 };
 

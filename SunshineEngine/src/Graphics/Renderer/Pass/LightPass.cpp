@@ -148,19 +148,18 @@ namespace SE_G {
 		this->m_camera = camera;
 	}
 
-
-	void LightPass::OnResize(UINT resizeWidth, UINT resizeHeight,
-		eastl::shared_ptr<GBuffer> pGBuffer)
+	void LightPass::OnResize(UINT resizeWidth, UINT resizeHeight)
+		//eastl::shared_ptr<GBuffer> pGBuffer)
 	{
 		m_screenWidth = resizeWidth;
 		m_screenHeight = resizeHeight;
 
-		m_GBuffer = pGBuffer;
+		//m_GBuffer = pGBuffer;
 
-		m_NormalTexture->UpdateTextureView(pGBuffer->pNormalSRV.Get());
-		m_AlbedoTexture->UpdateTextureView(pGBuffer->pAlbedoSRV.Get());
-		m_SpecularTexture->UpdateTextureView(pGBuffer->pSpecularSRV.Get());
-		m_WorldPosTexture->UpdateTextureView(pGBuffer->pWorldPosSRV.Get());
+		m_NormalTexture->UpdateTextureView(m_GBuffer->pNormalSRV.Get());
+		m_AlbedoTexture->UpdateTextureView(m_GBuffer->pAlbedoSRV.Get());
+		m_SpecularTexture->UpdateTextureView(m_GBuffer->pSpecularSRV.Get());
+		m_WorldPosTexture->UpdateTextureView(m_GBuffer->pWorldPosSRV.Get());
 
 		// Viewport
 		m_viewport = {};

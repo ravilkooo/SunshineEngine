@@ -18,6 +18,8 @@ namespace SE_G {
             eastl::shared_ptr<Camera> camera,
             eastl::shared_ptr<PointLightData> lightData);
 
+        //void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+
         void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 
         void ChooseDepthStencilState(LightPosition lightPos) override;

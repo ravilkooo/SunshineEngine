@@ -97,43 +97,17 @@ namespace SE_G {
 		m_pixelShader = eastl::make_shared<Bind::PixelShader>(device,
 			MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionMeshShaderPS.hlsl"));
 
-		m_selectedObjectUUID = Sunshine::UUID(0u);
+		m_selectedObjectUUID = SE::UUID(0u);
 	}
 
 	void SelectionPass::StartFrame()
 	{
 	}
 
-	void SelectionPass::Pass(const Scene& scene)
+	void SelectionPass::Pass()
 	{
-		if (m_selectedObjectUUID == Sunshine::UUID(0u))
+		if (m_selectedObjectUUID == SE::UUID(0u))
 			return;
-
-		// Step 1
-		// Draw only selected object to stencil buffer
-		WriteToStencilStep(scene);
-
-		// Step 2
-		// Draw highlight to LightRTV
-		WriteToBackBufferStep(scene);
-
-	}
-
-	void SelectionPass::EndFrame()
-	{
-	}
-
-	void SelectionPass::WriteToStencilStep(const Scene& scene)
-	{
-		context->OMSetDepthStencilState(m_depthStencilWriteMask.Get(), 1); // draw scaled
-
-		//context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
-		ID3D11RenderTargetView* renderTargets[1] = { 0 };
-		context->OMSetRenderTargets(1, renderTargets, m_GBuffer->pDepthDSV.Get());
-
-		context->RSSetViewports(1, &m_viewport);
-
-		m_camera->BindBuffer(context.Get());
 
 		/*
 		m_screenInfoPCB->Update(GetDeviceContext(), { DXSM::Vector2(
@@ -143,23 +117,35 @@ namespace SE_G {
 
 		BindAllPerFrame();
 
-		auto gameObject = scene.GetGameObjectByUUID(m_selectedObjectUUID);
+		GameObject_Info* gameObject_info = m_scene->GetGameObjectByUUID(m_selectedObjectUUID);
 
-		if (gameObject->HasComponent<RenderComponent>() &&
-			gameObject->HasComponent<TransformComponent>()) {
+		if (gameObject_info->HasComponent<RenderComponent_Info>() &&
+			gameObject_info->HasComponent<TransformComponent_Info>()) {
 
-			auto renderComponent = gameObject->GetComponent<RenderComponent>();
-			auto transformComponent = gameObject->GetComponent<TransformComponent>();
+			auto renderComp_info = gameObject_info->GetComponent<RenderComponent_Info>();
+			auto transformComponent = gameObject_info->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
 			auto actualLocalScaleFactor = DXSM::Vector3(transformComponent->m_localScaleFactor);
+
+			renderComp_info->m_selectionTechnique->BindAll(context.Get());
+
+
+			context->OMSetDepthStencilState(m_depthStencilWriteMask.Get(), 1); // draw scaled
+
+			//context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
+			ID3D11RenderTargetView* renderTargets[1] = { 0 };
+			context->OMSetRenderTargets(1, renderTargets, m_GBuffer->pDepthDSV.Get());
+
+			context->RSSetViewports(1, &m_viewport);
+
+			m_camera->BindBuffer(context.Get());
 
 			transformComponent->BindToGraphicsPipeline(
 				GetDeviceContext()
 			);
 
-			context->PSSetShader(nullptr, nullptr, 0u);
+			if (renderComp_info->HasTechnique("IconPass")) {
 
-			if (renderComponent->HasTechnique("IconPass")) {
 				// Bind IconSelectionShader (VertexShader)
 				// Don't bind object texture and sampler for this
 				m_iconVertexShader->Bind(context.Get());
@@ -169,7 +155,8 @@ namespace SE_G {
 				m_selectionBuffer->Update(context.Get(), { 1.0f });
 				m_selectionBuffer->Bind(context.Get());
 
-				renderComponent->techniques["IconPass"]->Pass(context.Get());
+				context->PSSetShader(nullptr, nullptr, 0u);
+				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
 
 				// Step2 (draw color and mask out)
 				// MaskOut
@@ -183,18 +170,24 @@ namespace SE_G {
 				m_selectionBuffer->Update(context.Get(), { 1.08f });
 				m_selectionBuffer->Bind(context.Get());
 
-				renderComponent->techniques["IconPass"]->Pass(context.Get());
+				renderComp_info->m_selectionTechnique->BindAll(context.Get());
+				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
 
 				transformComponent->m_localScaleFactor = actualLocalScaleFactor;
 			}
-			else if (renderComponent->HasTechnique("GPass")) {
-				renderComponent->techniques["GPass"]->mesh->Bind(context.Get());
+			else if (renderComp_info->HasTechnique("GPass")) {
+				//renderComp_info->techniques["GPass"]->mesh->Bind(context.Get());
 
 				m_meshVertexShader->Bind(context.Get());
-				renderComponent->techniques["GPass"]->mesh->Draw(context.Get());
+				context->PSSetShader(nullptr, nullptr, 0u);
+				//context->RSSetState(nullptr, 0u);
+
+				//renderComp_info->techniques["GPass"]->mesh->Draw(context.Get());
+				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
 
 				// Step2 (draw color and mask out)
 				// MaskOut
+				renderComp_info->m_selectionTechnique->BindAll(context.Get());
 				context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
 				context->RSSetViewports(1, &m_viewport);
 
@@ -206,45 +199,28 @@ namespace SE_G {
 					GetDeviceContext()
 				);
 
-				renderComponent->techniques["GPass"]->mesh->Draw(context.Get());
+				//renderComp_info->techniques["GPass"]->mesh->Draw(context.Get());
+				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
 
 				transformComponent->m_localScaleFactor = actualLocalScaleFactor;
 			}
-
-
-
 		}
 
 		context->OMSetDepthStencilState(nullptr, 0);
 
 	}
 
-	void SelectionPass::WriteToBackBufferStep(const Scene& scene)
+	void SelectionPass::EndFrame()
 	{
-
-		/*
-		auto gameObject = scene.GetGameObjectByUUID(m_selectedObjectUUID);
-
-		if (gameObject->HasComponent<RenderComponent>() &&
-			gameObject->HasComponent<TransformComponent>()) {
-
-			auto renderComponent = gameObject->GetComponent<RenderComponent>();
-
-			gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(
-				GetDeviceContext()
-			);
-			//renderComponent->PassTechnique(techniqueTag, GetDeviceContext());
-		}
-		*/
 	}
 
-	void SelectionPass::OnResize(UINT resizeWidth, UINT resizeHeight,
-		eastl::shared_ptr<GBuffer> pGBuffer)
+	void SelectionPass::OnResize(UINT resizeWidth, UINT resizeHeight)
+		//eastl::shared_ptr<GBuffer> pGBuffer)
 	{
 		m_screenWidth = resizeWidth;
 		m_screenHeight = resizeHeight;
 
-		m_GBuffer = pGBuffer;
+		//m_GBuffer = pGBuffer;
 
 		// Viewport
 		m_viewport = {};

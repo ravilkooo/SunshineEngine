@@ -16,6 +16,8 @@
 #include <EASTL/vector.h>
 #include <EASTL/shared_ptr.h>
 
+class TransformComponent;
+
 namespace SE_G {
     namespace Bind {
         class Bindable;
@@ -24,30 +26,33 @@ namespace SE_G {
     class RenderTechnique
     {
     public:
-        RenderTechnique(ID3D11Device* device, eastl::string technique);
-        virtual ~RenderTechnique() = default;
+        RenderTechnique(ID3D11Device* device, TransformComponent* assignedTransform,  eastl::string technique);
+        virtual ~RenderTechnique();
 
         void AddBind(eastl::shared_ptr<Bind::Bindable> bind);
-        eastl::vector<eastl::shared_ptr<Bind::Bindable>> bindables;
 
         virtual void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
         virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
         virtual void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 
+        virtual eastl::string GetTechniqueTag();
+
         // Resources
-        eastl::shared_ptr<Mesh> mesh;
-        eastl::shared_ptr<Bind::VertexShader> vertexShader;
-        eastl::shared_ptr<Bind::PixelShader> pixelShader;
-        eastl::shared_ptr<Bind::Texture> texture;
+        eastl::shared_ptr<Mesh> m_mesh;
+        eastl::shared_ptr<Bind::VertexShader> m_vertexShader;
+        eastl::shared_ptr<Bind::PixelShader> m_pixelShader;
+        eastl::shared_ptr<Bind::Texture> m_texture;
 
         // Extra (has default values)
-        eastl::shared_ptr<Bind::Sampler> textureSampler;
+        eastl::shared_ptr<Bind::Sampler> m_textureSampler;
         eastl::shared_ptr<Bind::BlendState> blendState;
         eastl::shared_ptr<Bind::Rasterizer> rasterizer;
         eastl::shared_ptr<Bind::DepthStencilState> depthStencilState;
 
-        virtual eastl::string GetTechnique();
+        eastl::vector<eastl::shared_ptr<Bind::Bindable>> bindables;
 
-        eastl::string techniqueTag;
+        eastl::string m_techniqueTag;
+
+        TransformComponent* m_assignedTransform;
     };
 }

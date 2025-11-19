@@ -69,6 +69,11 @@ Editor/bin/
 Engine/lib/
 Editor/lib/
 
+# ---- Projects ----
+
+Projects/*
+!Projects/.gitignore
+
 # ---- Precompiled headers (VS/MSVC) ----
 *.pch
 
