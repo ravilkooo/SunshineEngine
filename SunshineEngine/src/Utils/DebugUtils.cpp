@@ -1,8 +1,8 @@
 #include "Utils/DebugUtils.h"
 
-void printSunshineErrorMessage()
+void printSunshineErrorMessage(eastl::string errorMessage)
 {
-	printf("%s\n", sunshineErrorMessage.c_str());
+	printf("%s\n", errorMessage.c_str());
 }
 
 void printSunshineMessage(eastl::string message)
