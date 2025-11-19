@@ -17,7 +17,7 @@ namespace SE_G {
 		friend class GameObject;
 	public:
 		RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context);
-		~RenderPass();
+		virtual ~RenderPass();
 
 		eastl::string GetTechniqueTag();
 		virtual void Pass();

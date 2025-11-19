@@ -38,7 +38,7 @@ namespace SE_G {
             InitData.SysMemPitch = 0;
             InitData.SysMemSlicePitch = 0;
 
-            device->CreateBuffer(&bd, &InitData, &pVertexBuffer);
+            device->CreateBuffer(&bd, &InitData, pVertexBuffer.GetAddressOf());
 
             isNull = false;
         }
@@ -50,7 +50,12 @@ namespace SE_G {
 
         void VertexBuffer::Release() {
             if (!isNull)
-                pVertexBuffer.ReleaseAndGetAddressOf();
+            {
+                free(stride);
+                free(offset);
+                pVertexBuffer.Reset();
+                isNull = true;
+            }
         }
 
 

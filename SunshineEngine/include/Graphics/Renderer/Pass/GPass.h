@@ -16,6 +16,7 @@ namespace SE_G {
         GPass(ID3D11Device* device, ID3D11DeviceContext* context,
             eastl::shared_ptr<GBuffer> pGBuffer,
             eastl::shared_ptr<Camera> camera);
+        ~GPass();
 
         // Inherited via RenderPass
         void StartFrame() override;
@@ -31,8 +32,6 @@ namespace SE_G {
 
         UINT screenWidth = 800;
         UINT screenHeight = 800;
-
-        Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
 
         ID3D11RenderTargetView* gBufferRTVs[5];
         D3D11_VIEWPORT viewport;

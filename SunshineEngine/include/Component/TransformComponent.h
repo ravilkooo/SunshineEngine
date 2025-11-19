@@ -20,7 +20,6 @@ public:
 
     void SetupBuffer(ID3D11Device* device);
 
-    // To-do: unique_ptr
     eastl::unique_ptr<SE_G::Bind::TransformCBuffer> transformBuffer;
 
     void BindToGraphicsPipeline(ID3D11DeviceContext* context);

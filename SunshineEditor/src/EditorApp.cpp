@@ -247,7 +247,7 @@ void EditorApp::SetIcon(HWND hwnd)
 	HICON hIconLarge = (HICON)LoadImage(
 		NULL,                 // No instance handle (load from file)
 		// Path to .ico file
-		JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"Icons/SunshineLogo_transparent_256.ico"),
+		JoinWchar_Wstring(EDITOR_ASSETS_DIR, L"Icons/SunshineLogo_transparent_256.ico").c_str(),
 		IMAGE_ICON,           // Load an icon
 		256, 256,               // Desired icon size (large)
 		LR_LOADFROMFILE       // Load from file
@@ -256,7 +256,7 @@ void EditorApp::SetIcon(HWND hwnd)
 	HICON hIconSmall = (HICON)LoadImage(
 		NULL,
 		// Path to .ico file
-		JoinWchar_Wchar(EDITOR_ASSETS_DIR, L"Icons/SunshineLogo_transparent_32.ico"),
+		JoinWchar_Wstring(EDITOR_ASSETS_DIR, L"Icons/SunshineLogo_transparent_32.ico").c_str(),
 		IMAGE_ICON,
 		32, 32,
 		LR_LOADFROMFILE
@@ -432,7 +432,7 @@ void EditorApp::LaunchGame() {
 
 	// To-do: there should be path to opened project
 	// to-do: class Project
-	m_worldEditor->SaveScene(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json")));
+	m_worldEditor->SaveScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
 	
 	m_worldEditor->Pause();
 
@@ -440,7 +440,7 @@ void EditorApp::LaunchGame() {
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
-	m_currentGame->LoadScene(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json")));
+	m_currentGame->LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
 

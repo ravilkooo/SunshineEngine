@@ -29,7 +29,10 @@ namespace SE_G {
 
 		void IndexBuffer::Release() {
 			if (!isNull)
-				pIndexBuffer.ReleaseAndGetAddressOf();
+			{
+				pIndexBuffer.Reset();
+				isNull = true;
+			}
 		}
 
 		void IndexBuffer::Bind(ID3D11DeviceContext* context) noexcept

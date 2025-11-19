@@ -8,6 +8,11 @@ namespace SE_G {
 			device->CreateDepthStencilState(&depthStencilDesc, &pDepthStencilState);
 		}
 
+		DepthStencilState::~DepthStencilState()
+		{
+			pDepthStencilState.Reset();
+		}
+
 		void DepthStencilState::Bind(ID3D11DeviceContext* context) noexcept
 		{
 			context->OMSetDepthStencilState(pDepthStencilState.Get(), 1u);

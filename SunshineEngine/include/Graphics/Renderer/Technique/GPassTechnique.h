@@ -12,11 +12,13 @@ namespace SE_G {
         public RenderTechnique
     {
     public:
-        eastl::shared_ptr<Bind::PixelConstantBuffer<UUIDhilo>> m_uuidBuffer;
+        eastl::unique_ptr<Bind::PixelConstantBuffer<UUIDhilo>> m_uuidBuffer;
 
         GPassTechnique(DeferredRenderer* renderSystem, TransformComponent* assignedTransform, eastl::string technique,
             SE::UUID uuid);
-        ~GPassTechnique() = default;
+        ~GPassTechnique();
+
+        void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 
         void SetTexture(const eastl::wstring& filePath,
             SE_G::Bind::SamplerPreset samplerPreset = SE_G::Bind::SamplerPreset::Wrap);

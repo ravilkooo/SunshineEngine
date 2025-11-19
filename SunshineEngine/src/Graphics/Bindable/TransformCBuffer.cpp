@@ -10,8 +10,13 @@ namespace SE_G {
 		{
 			//if (!pVcbuf)
 			{
-				pVcbuf = new VertexConstantBuffer<Transforms>(device, slot);
+				pVcbuf = eastl::make_unique<VertexConstantBuffer<Transforms>>(device, slot);
 			}
+		}
+
+		TransformCBuffer::~TransformCBuffer()
+		{
+			
 		}
 
 		void TransformCBuffer::Bind(ID3D11DeviceContext* context) noexcept

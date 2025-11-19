@@ -15,6 +15,7 @@ namespace SE_G {
         IconPass(ID3D11Device* device, ID3D11DeviceContext* context,
             eastl::shared_ptr<GBuffer> pGBuffer,
             eastl::shared_ptr<Camera> camera);
+        ~IconPass();
 
         // Inherited via RenderPass
         void StartFrame() override;
@@ -37,11 +38,13 @@ namespace SE_G {
         ID3D11RenderTargetView* m_bufferRTVs[2];
         D3D11_VIEWPORT m_viewport;
 
-        eastl::shared_ptr<Bind::VertexShader> m_iconVertexShader;
-        eastl::shared_ptr<Bind::GeometryShader> m_iconGeometryShader;
-        eastl::shared_ptr<Bind::PixelShader> m_iconPixelShader;
-        eastl::shared_ptr<Bind::Texture> m_iconSprites;
-        eastl::shared_ptr<Bind::DepthStencilState> m_depthStencilState;
+        eastl::unique_ptr<Bind::VertexShader> m_iconVertexShader;
+        eastl::unique_ptr<Bind::GeometryShader> m_iconGeometryShader;
+        eastl::unique_ptr<Bind::PixelShader> m_iconPixelShader;
+        eastl::unique_ptr<Bind::Texture> m_iconSprites;
+        eastl::unique_ptr<Bind::DepthStencilState> m_depthStencilState;
+
+        eastl::unique_ptr<Bind::Sampler> m_GBufferSampler;
 
         struct CamGCB {
             DX::XMMATRIX viewMat;
@@ -49,7 +52,7 @@ namespace SE_G {
             DX::XMFLOAT3 camPos;
             float pad;
         };
-        eastl::shared_ptr<Bind::GeometryConstantBuffer<CamGCB>> m_camGCB;
+        eastl::unique_ptr<Bind::GeometryConstantBuffer<CamGCB>> m_camGCB;
 
         struct SpritesheetInfoPCB {
             UINT width = 1024u;
@@ -59,6 +62,6 @@ namespace SE_G {
             UINT uSteps = 8u;
             UINT vSteps = 8u;
         } m_spritesheetData;
-        eastl::shared_ptr<Bind::PixelConstantBuffer<SpritesheetInfoPCB>> m_spritesheetInfoPCB;
+        eastl::unique_ptr<Bind::PixelConstantBuffer<SpritesheetInfoPCB>> m_spritesheetInfoPCB;
     };
 }

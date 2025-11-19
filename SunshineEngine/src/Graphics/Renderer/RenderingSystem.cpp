@@ -8,13 +8,22 @@ namespace SE_G {
 	
 	RenderingSystem::~RenderingSystem()
 	{
-		m_renderGroupsOrder.clear();
+		/*
+		// delete owned RenderGroup pointers before clearing the container
+		for (auto &kv : m_renderGroups) {
+			if (kv.second) {
+				delete kv.second;
+				kv.second = nullptr;
+			}
+		}
+		*/
 		m_renderGroups.clear();
+		m_renderGroupsOrder.clear();
 
-		m_device.ReleaseAndGetAddressOf();
-		m_context.ReleaseAndGetAddressOf();
-		m_swapChain.ReleaseAndGetAddressOf();
-		m_backBuffer.ReleaseAndGetAddressOf();
+		m_device.Reset();
+		m_context.Reset();
+		m_swapChain.Reset();
+		m_backBuffer.Reset();
 	}
 
 	RenderingSystem::RenderingSystem(HWND hWnd,
@@ -53,16 +62,16 @@ namespace SE_G {
 			1,
 			D3D11_SDK_VERSION,
 			&swapChainDesc,
-			&m_swapChain,
-			&m_device,
+			m_swapChain.GetAddressOf(),
+			m_device.GetAddressOf(),
 			nullptr,
-			&m_context);
+			m_context.GetAddressOf());
 		if (FAILED(hr))
 			throw std::runtime_error("Failed to create Device with Swap Chain");
 
 		// Send to Main RenderPass
 		// backBuffer
-		hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&m_backBuffer);
+		hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(m_backBuffer.GetAddressOf()));
 		if (FAILED(hr))
 			throw std::runtime_error("Failed to get back buffer");
 
@@ -73,10 +82,12 @@ namespace SE_G {
 		// Groups
 		for (size_t i = 0; i < m_renderGroupsOrder.size(); i++)
 		{
-			if (!m_renderGroups[m_renderGroupsOrder[i]]->IsEnabled())
-				continue;
+			const eastl::string &name = m_renderGroupsOrder[i];
+			auto it = m_renderGroups.find(name);
+			if (it == m_renderGroups.end() || it->second == nullptr) continue;
+			if (!it->second->IsEnabled()) continue;
 			m_context->ClearState();
-			m_renderGroups[m_renderGroupsOrder[i]]->Pass();
+			it->second->Pass();
 		}
 		// PresentFrame();
 	}
@@ -88,6 +99,7 @@ namespace SE_G {
 
 	RenderGroup* RenderingSystem::AddRenderGroup(RenderGroup* renderGroup)
 	{
+		// to-do: string memory leak
 		eastl::string name = renderGroup->m_groupName;
 		auto [it, inserted] = m_renderGroups.emplace(name, nullptr);
 		if (!inserted)
@@ -126,7 +138,13 @@ namespace SE_G {
 	
 	void RenderingSystem::RemoveRenderGroup(eastl::string groupName)
 	{
-		m_renderGroups.erase(groupName);
+		auto it = m_renderGroups.find(groupName);
+		if (it != m_renderGroups.end()) {
+			if (it->second) {
+				// delete it->second;
+			}
+			m_renderGroups.erase(it);
+		}
 		for (size_t i = 0; i < m_renderGroupsOrder.size(); i++)
 		{
 			if (m_renderGroupsOrder[i] == groupName) {
@@ -150,7 +168,7 @@ namespace SE_G {
 		m_screenHeight = resizeHeight;
 
 
-		m_backBuffer.ReleaseAndGetAddressOf();
+		m_backBuffer.Reset();
 		m_swapChain->ResizeBuffers(
 			2,
 			m_screenWidth, m_screenHeight,
@@ -158,7 +176,7 @@ namespace SE_G {
 			DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
 		);
 
-		HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&m_backBuffer);
+		HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(m_backBuffer.GetAddressOf()));
 		if (FAILED(hr))
 			throw std::runtime_error("Failed to get back buffer");
 	}

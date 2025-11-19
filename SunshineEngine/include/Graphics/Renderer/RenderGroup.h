@@ -10,7 +10,7 @@ namespace SE_G {
 		RenderGroup(
 			eastl::string name,
 			ID3D11Device* device, ID3D11DeviceContext* context);
-		~RenderGroup();
+		virtual ~RenderGroup();
 
 		ID3D11Device* GetDevice();
 		ID3D11DeviceContext* GetDeviceContext();

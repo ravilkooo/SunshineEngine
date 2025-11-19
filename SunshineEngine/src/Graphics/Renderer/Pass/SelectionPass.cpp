@@ -48,7 +48,8 @@ namespace SE_G {
 		samplerDesc.MinLOD = 0;
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-		AddPerFrameBind(new Bind::Sampler(device, samplerDesc, 0u));
+		m_GBufferSampler = eastl::make_unique<Bind::Sampler>(device, samplerDesc, 0u);
+		AddPerFrameBind(m_GBufferSampler.get());
 
 		D3D11_DEPTH_STENCILOP_DESC stencil_op = {};
 		stencil_op.StencilFailOp = D3D11_STENCIL_OP_REPLACE;
@@ -76,8 +77,8 @@ namespace SE_G {
 		desc.BackFace = stencil_op;
 		device->CreateDepthStencilState(&desc, m_depthStencilReadMask.GetAddressOf());
 
-		m_meshVertexShader = eastl::make_shared<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionMeshShaderVS.hlsl"));
+		m_meshVertexShader = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionMeshShaderVS.hlsl").c_str());
 
 		UINT numInputElements = 2;
 		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
@@ -85,19 +86,24 @@ namespace SE_G {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
-		m_iconVertexShader = eastl::make_shared<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl"),
+		m_iconVertexShader = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl").c_str(),
 			numInputElements, IALayoutInputElements);
 
-		m_selectionBuffer = eastl::make_shared<Bind::GeometryConstantBuffer<float>>(device, 1u);
+		m_selectionBuffer = eastl::make_unique<Bind::GeometryConstantBuffer<float>>(device, 1u);
 
-		m_iconGeometryShader = eastl::make_shared<Bind::GeometryShader>(device,
-			MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl"));
+		m_iconGeometryShader = eastl::make_unique<Bind::GeometryShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl").c_str());
 
-		m_pixelShader = eastl::make_shared<Bind::PixelShader>(device,
-			MakeEngineAssetPath_Wchar(L"Shaders/SelectionPass/SelectionMeshShaderPS.hlsl"));
+		m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionMeshShaderPS.hlsl").c_str());
 
 		m_selectedObjectUUID = SE::UUID(0u);
+	}
+
+	SelectionPass::~SelectionPass()
+	{
+
 	}
 
 	void SelectionPass::StartFrame()

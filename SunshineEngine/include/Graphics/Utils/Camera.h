@@ -1,6 +1,7 @@
 #pragma once
 
 #include <EASTL/algorithm.h>
+#include <EASTL/unique_ptr.h>
 
 #include <DirectXMath.h>
 #include <SimpleMath.h>
@@ -20,7 +21,7 @@ namespace SE_G {
             float pad;
         };
 
-        Bind::VertexConstantBuffer<CameraBuffer>* cameraBuffer;
+        eastl::unique_ptr<Bind::VertexConstantBuffer<CameraBuffer>> cameraBuffer;
 
         enum class CAMERA_MODE
         {

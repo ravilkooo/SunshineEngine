@@ -26,7 +26,10 @@ namespace SE_G {
 
 		void Sampler::Release() {
 			if (!isNull)
-				pSampler.ReleaseAndGetAddressOf();
+			{
+				pSampler.Reset();
+				isNull = true;
+			}
 		}
 
 		void Sampler::ChangeSampler(ID3D11Device* device, SamplerPreset preset) {
@@ -56,6 +59,7 @@ namespace SE_G {
 				device->CreateSamplerState(&samplerDesc, &pSampler);
 				break;
 			}
+			isNull = false;
 		}
 
 		void Sampler::Bind(ID3D11DeviceContext* context) noexcept

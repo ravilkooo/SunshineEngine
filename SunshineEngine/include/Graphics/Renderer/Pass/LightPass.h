@@ -1,11 +1,14 @@
 #pragma once
 
 #include <stdexcept>
+#include <EASTL/unique_ptr.h>
 
 #include "RenderPass.h"
 
 #include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Utils/Camera.h>
+#include <Graphics/Bindable/ConstantBuffer.h>
+
 #include <GameObject/Lighting/LightCollection.h>
 
 // temp
@@ -19,6 +22,7 @@ namespace SE_G {
         LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
             eastl::shared_ptr<GBuffer> pGBuffer,
             eastl::shared_ptr<Camera> camera);
+        ~LightPass();
 
         void StartFrame() override;
         void Pass() override;
@@ -39,18 +43,21 @@ namespace SE_G {
 
         D3D11_VIEWPORT m_viewport;
 
+        eastl::unique_ptr<Bind::BlendState> m_defaultBlendState;
+        eastl::unique_ptr<Bind::Sampler> m_GBufferSampler;
+
         struct CamPCB {
             DX::XMMATRIX viewMatInverse;
             DX::XMMATRIX projMatInverse;
             DX::XMFLOAT3 camPos;
             float pad;
         } m_cameraData;
-        Bind::PixelConstantBuffer<CamPCB>* m_camPCB;
+        eastl::unique_ptr<Bind::PixelConstantBuffer<CamPCB>> m_camPCB;
 
         struct ScreenInfoPCB {
             DXSM::Vector2 screenSize;
         } m_screenData;
-        Bind::PixelConstantBuffer<ScreenInfoPCB>* m_screenInfoPCB;
+        eastl::unique_ptr<Bind::PixelConstantBuffer<ScreenInfoPCB>> m_screenInfoPCB;
 
         eastl::shared_ptr<Bind::Texture> m_NormalTexture;
         eastl::shared_ptr<Bind::Texture> m_AlbedoTexture;

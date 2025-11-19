@@ -42,7 +42,8 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
             if (m_editorApp) {
                 // To-do: there should be path to opened project
                 // to-do: class Project
-                m_editorApp->m_worldEditor->SaveScene(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json")));
+                m_editorApp->m_worldEditor->SaveScene(
+                    JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
             }
         }
     }

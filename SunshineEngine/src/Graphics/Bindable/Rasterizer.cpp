@@ -7,6 +7,10 @@ namespace SE_G {
 		{
 			device->CreateRasterizerState(&rasterDesc, &pRasterizer);
 		}
+		Rasterizer::~Rasterizer()
+		{
+			pRasterizer.Reset();
+		}
 		void Rasterizer::Bind(ID3D11DeviceContext* context) noexcept
 		{
 			context->RSSetState(pRasterizer.Get());

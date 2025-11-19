@@ -58,7 +58,7 @@ ImguiEditorPass::ImguiEditorPass(
 	// Change font to Arial to support Russian
 	ImGuiIO& io = ImGui::GetIO();
 	ImFont* fontArial = io.Fonts->AddFontFromFileTTF(
-		MakeEngineAssetPath_Char("Fonts/Arial.ttf"), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
+		MakeEngineAssetPath_Char("Fonts/Arial.ttf").c_str(), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
 		13.0f);
 	io.FontDefault = fontArial;
 	ImGui_ImplDX11_InvalidateDeviceObjects();
@@ -416,10 +416,10 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 void ImguiEditorPass::PreResize()
 {
 	// release RTV/DSV
-	m_renderTargetView.ReleaseAndGetAddressOf();
-	m_pDSV.ReleaseAndGetAddressOf();
-	m_pDepthStencil.ReleaseAndGetAddressOf();
-	m_backBuffer.ReleaseAndGetAddressOf();
+	m_renderTargetView.Reset();
+	m_pDSV.Reset();
+	m_pDepthStencil.Reset();
+	m_backBuffer.Reset();
 
 }
 

@@ -13,6 +13,7 @@ namespace SE_G {
     Mesh::~Mesh()
     {
         Release();
+        m_path.clear();
     }
 
 
@@ -778,6 +779,7 @@ namespace SE_G {
         if (m_indexBuffer)
             m_indexBuffer->Release();
         m_indexCount = 0;
+        m_path.clear();
     }
 
     void Mesh::Release()
