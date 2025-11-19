@@ -170,9 +170,6 @@ public:
 
     float m_deltaTime = 0.0f;
 
-    // track ray from mouse click
-    DXSM::Vector4 rayDirection;
-
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
     // testing

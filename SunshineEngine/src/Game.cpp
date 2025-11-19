@@ -6,6 +6,11 @@ Game::Game()
 	//Initialize();
 }
 
+Game::~Game()
+{
+	// Освобождение ресурсов
+}
+
 void Game::SetupRendering(
 	eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
 	UINT screenWidth,
@@ -130,7 +135,7 @@ void Game::Run()
 	*/
 }
 
-void Update(float deltaTime) {
+void Game::Update(float deltaTime) {
 
 	// m_luaManager.Update(m_scene, deltaTime);
 	// m_physicsSystem.Update(deltaTime);
@@ -153,11 +158,5 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_screenWidth = resizeWidth;
 	m_screenHeight = resizeHeight;
 
-	m_gPass->OnResize(resizeWidth, resizeHeight);
-	m_lightPass->OnResize(resizeWidth, resizeHeight);
-}
-
-Game::~Game()
-{
-	// Освобождение ресурсов
+	m_renderer->OnResize(resizeWidth, resizeHeight);
 }

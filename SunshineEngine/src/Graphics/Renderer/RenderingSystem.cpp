@@ -71,11 +71,12 @@ namespace SE_G {
 	void RenderingSystem::Render()
 	{
 		// Groups
-		for (auto& groupName : m_renderGroupsOrder) {
-			if (!m_renderGroups[groupName]->IsEnabled())
+		for (size_t i = 0; i < m_renderGroupsOrder.size(); i++)
+		{
+			if (!m_renderGroups[m_renderGroupsOrder[i]]->IsEnabled())
 				continue;
 			m_context->ClearState();
-			m_renderGroups[groupName]->Pass();
+			m_renderGroups[m_renderGroupsOrder[i]]->Pass();
 		}
 		// PresentFrame();
 	}
@@ -121,6 +122,20 @@ namespace SE_G {
 		m_renderGroupsOrder.push_back(it->second->m_groupName);
 		return it->second.get();
 		*/
+	}
+	
+	void RenderingSystem::RemoveRenderGroup(eastl::string groupName)
+	{
+		m_renderGroups.erase(groupName);
+		for (size_t i = 0; i < m_renderGroupsOrder.size(); i++)
+		{
+			if (m_renderGroupsOrder[i] == groupName) {
+				m_renderGroupsOrder.erase(m_renderGroupsOrder.begin() + i);
+				return;
+			}
+		}
+		// log << "RenderGroup not found in RenderingSystem";
+		printf("RenderGroup not found in RenderingSystem\n");
 	}
 
 	void RenderingSystem::PreResize()

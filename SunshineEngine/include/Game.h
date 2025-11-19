@@ -32,8 +32,6 @@ class SUNSHINE_ENGINE_API Game
 public:
     Game();
     virtual ~Game();
-
-    bool LoadScene(const std::string& scenePath);
     
     void SetupRendering(
         eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
@@ -48,6 +46,8 @@ public:
     virtual void Update(float deltaTime);
     void Render();
     void ClearScene();
+
+    bool LoadScene(const std::string& scenePath);
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 

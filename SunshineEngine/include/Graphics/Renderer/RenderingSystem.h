@@ -25,6 +25,7 @@ namespace SE_G {
 		void PresentFrame();
 
 		RenderGroup* AddRenderGroup(RenderGroup* renderGroup);
+		void RemoveRenderGroup(eastl::string groupName);
 
 		ID3D11Texture2D* GetBackBuffer() { return m_backBuffer.Get(); }
 		void PreResize();

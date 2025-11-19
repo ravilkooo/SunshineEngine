@@ -76,7 +76,6 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 
 	m_initialized = true;
 
-	m_worldEditor->rayDirection = DXSM::Vector4(0.0f, 0.0f, 1.0f, 0.0f);
 	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
 
 	// Show window
@@ -147,7 +146,7 @@ void EditorApp::RunApp()
 		}
 
 
-		if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
 			while (accumulator >= physicsUpdateMs) {
 				// UpdateGame(physicsUpdateMs);
 				UpdateEditor(physicsUpdateMs);
@@ -156,7 +155,7 @@ void EditorApp::RunApp()
 		}
 		else {
 			while (accumulator >= physicsUpdateMs) {
-				UpdateEditor(physicsUpdateMs);
+				UpdateGame(physicsUpdateMs);
 				accumulator -= physicsUpdateMs;
 			}
 		}
@@ -169,7 +168,29 @@ void EditorApp::RunApp()
 	m_worldEditor->ClearScene();
 }
 
-void EditorApp::UpdateGame(float deltaTime) {
+void EditorApp::UpdateGame(float deltaTime)
+{
+	if (!imguiEditorPass->IsFocusedGameViewport)
+	{
+		for (int i = 0; i < 6; ++i)
+			MovingPressed[i] = false;
+
+		IsRightMousePressed = false;
+	}
+
+	if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
+		m_currentGame->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
+	}
+	if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
+		m_currentGame->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
+	}
+	if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
+		m_currentGame->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
+	}
+
 	m_currentGame->Update(deltaTime);
 }
 
@@ -182,25 +203,20 @@ void EditorApp::UpdateEditor(float deltaTime)
 			MovingPressed[i] = false;
 
 		IsRightMousePressed = false;
+		return;
 	}
-	else
-	{
 
-		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
-		{
-			if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
-				- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
-				m_worldEditor->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
-			}
-			if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
-				- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
-				m_worldEditor->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
-			}
-			if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
-				- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
-				m_worldEditor->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
-			}
-		}
+	if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
+		m_worldEditor->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
+	}
+	if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
+		m_worldEditor->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
+	}
+	if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
+		m_worldEditor->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
 	}
 
 	m_worldEditor->Update(deltaTime);
@@ -255,6 +271,33 @@ void EditorApp::HandleKeyDown(Keys key)
 {
 	if (!imguiEditorPass->IsFocusedGameViewport)
 		return;
+
+	if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+		switch (key)
+		{
+		case Keys::W: MovingPressed[(int)MoveKey::W] = true;
+			break;
+		case Keys::S: MovingPressed[(int)MoveKey::S] = true;
+			break;
+		case Keys::D: MovingPressed[(int)MoveKey::D] = true;
+			break;
+		case Keys::A: MovingPressed[(int)MoveKey::A] = true;
+			break;
+		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = true;
+			break;
+		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true;
+			break;
+
+		case Keys::RightButton: IsRightMousePressed = true;
+			break;
+		case Keys::LeftButton:
+			if (imguiEditorPass->IsHoveredGameViewport)
+			{
+
+			}
+			break;
+		}
+	}
 	
 	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
 		switch (key)
@@ -309,6 +352,27 @@ void EditorApp::HandleKeyUp(Keys key)
 			break;
 		}
 	}
+
+	if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+		switch (key)
+		{
+		case Keys::W: MovingPressed[(int)MoveKey::W] = false;
+			break;
+		case Keys::S: MovingPressed[(int)MoveKey::S] = false;
+			break;
+		case Keys::D: MovingPressed[(int)MoveKey::D] = false;
+			break;
+		case Keys::A: MovingPressed[(int)MoveKey::A] = false;
+			break;
+		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = false;
+			break;
+		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
+			break;
+
+		case Keys::RightButton: IsRightMousePressed = false;
+			break;
+		}
+	}
 }
 
 void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
@@ -338,6 +402,29 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 				CameraSpeed = MaxCameraSpeed;
 		}
 	}
+
+	if (m_runtimeMode == RuntimeMode::GAME_MODE)
+	{
+		if (IsRightMousePressed)
+		{
+			float deltaTime = m_timer.GetDeltaTime();
+
+			m_currentGame->m_renderer->m_mainCamera->RotateYaw(deltaTime * args.Offset.x * CameraRotateSpeed);
+			m_currentGame->m_renderer->m_mainCamera->RotatePitch(-deltaTime * args.Offset.y * CameraRotateSpeed);
+		}
+
+		if (args.WheelDelta != 0.0f)
+		{
+			float deltaTime = m_timer.GetDeltaTime();
+
+			CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
+
+			if (CameraSpeed < MinCameraSpeed)
+				CameraSpeed = MinCameraSpeed;
+			else if (CameraSpeed > MaxCameraSpeed)
+				CameraSpeed = MaxCameraSpeed;
+		}
+	}
 }
 
 void EditorApp::LaunchGame() {
@@ -348,18 +435,34 @@ void EditorApp::LaunchGame() {
 	m_worldEditor->SaveScene(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json")));
 	
 	m_worldEditor->Pause();
-	
+
+	// Init WorldEditor with all it's passes
+	m_currentGame = eastl::make_unique<Game>();
+	m_currentGame->SetupRendering(m_renderingSystem,
+		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
+	m_currentGame->LoadScene(WcharToChar(JoinWchar_Wchar(PROJECTS_DIR, L"DefaultScene/scene.json")));
+
+	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
+
+	imguiEditorPass->SetVieportGBuffer(
+		m_currentGame->m_renderer->m_GBuffer.get());
 
 
 	// There should be saving scene from world editor (serializing) and loading to game (deserializing)
 	// m_worldEditor->SaveScene(...);
 	// m_currentGame->LoadScene(...);
-
 }
 
 
 void EditorApp::StopGame() {
+	m_currentGame->Stop();
+	m_currentGame.reset(NULL);
+	m_renderingSystem->RemoveRenderGroup("GameDeferred");
+
 	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
+	imguiEditorPass->SetVieportGBuffer(
+		m_worldEditor->m_renderer->m_GBuffer.get());
+
 	m_worldEditor->Start();
 	// There should be loading scene to world editor (deserializing)
 	// m_currentGame->UnloadScene(...);

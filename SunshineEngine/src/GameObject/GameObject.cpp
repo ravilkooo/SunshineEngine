@@ -12,8 +12,9 @@ GameObject::GameObject(SE::UUID uuid) : impl(eastl::make_unique<GameObjectImpl>(
 
 GameObject::~GameObject()
 {
+	m_name.clear();
 	impl->components.clear();
-}
+};
 
 GameObject_Info::GameObject_Info() : impl(eastl::make_unique<GameObject_InfoImpl>())
 {
@@ -27,5 +28,6 @@ GameObject_Info::GameObject_Info(SE::UUID uuid) : impl(eastl::make_unique<GameOb
 
 GameObject_Info::~GameObject_Info()
 {
+	m_name.clear();
 	impl->components.clear();
-}
+};

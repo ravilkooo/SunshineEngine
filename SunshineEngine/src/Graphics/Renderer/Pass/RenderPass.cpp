@@ -9,10 +9,7 @@ namespace SE_G {
 	RenderPass::~RenderPass()
 	{
 		techniqueTag.clear();
-		for (size_t i = 0; i < perFrameBindables.size(); i++)
-		{
-			delete perFrameBindables[i];
-		}
+
 		perFrameBindables.clear();
 
 		m_techniques.clear();
