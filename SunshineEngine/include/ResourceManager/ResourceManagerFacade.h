@@ -9,6 +9,8 @@
 #include <ResourceManager/ResourceLoaderFactory.h>
 #include <ResourceManager/MemoryManager/ResourceMemoryManager.h>
 #include <ResourceManager/IResource.h>
+#include "ResourceLoader/CompositeResourceLoader.h"
+#include <Utils/DebugUtils.h>
 
 // Simple, convenient facade over the engine ResourceManager stack.
 // Responsibilities:
@@ -25,45 +27,7 @@ public:
     }
 
     // Load by file path (auto-detects loader by extension). Increments refcount on reuse.
-    ResourceHandle LoadByPath(const eastl::string& path) {
-        const ResourceGUID guid = ComputeGUID(path);
-
-        // If already present, just bump ref and return
-        if (m_registry.Contains(guid)) {
-            m_registry.IncrementRefCount(guid);
-            ResourceEntry* entry = m_registry.GetEntry(guid);
-            return entry ? entry->handle : ResourceHandle{ guid, 0u };
-        }
-
-        // Resolve loader
-        IResourceLoader* loader = ResourceLoaderFactory::GetLoaderForFile(path);
-        if (!loader) {
-            // No loader -> do not register; return handle with guid only
-            return ResourceHandle{ guid, 0u };
-        }
-
-        // Load resource
-        IResource* res = loader->Load(path, &m_memoryManager);
-        if (!res) {
-            return ResourceHandle{ guid, 0u };
-        }
-
-        // Post-load init
-        res->PostLoadInit();
-
-        // Register in registry
-        ResourceHandle handle{ guid, 0u };
-        const bool ok = m_registry.Register(handle, res, path);
-        if (!ok) {
-            // If registration failed, cleanup local ref and return
-            res->PreUnload();
-            m_memoryManager.Deallocate(res, res->GetSizeInMemory());
-            return ResourceHandle{ guid, 0u };
-        }
-
-        m_registry.IncrementRefCount(guid);
-        return handle;
-    }
+    ResourceHandle LoadByPath(const eastl::string& path);
 
     // Raw typed getter (non-owning). Returns nullptr if not found.
     template <typename T>
@@ -74,36 +38,20 @@ public:
     }
 
     // Raw untyped getter (non-owning)
-    IResource* GetRaw(const ResourceHandle& handle) {
-        return m_registry.Get(handle.guid);
-    }
+    IResource* GetRaw(const ResourceHandle& handle);
+
 
     // Increase/decrease reference count explicitly
-    void AddRef(const ResourceHandle& handle) {
-        m_registry.IncrementRefCount(handle.guid);
-    }
+    void AddRef(const ResourceHandle& handle);
 
-    void Release(const ResourceHandle& handle) {
-        // Decrement ref and unload if hits zero
-        const uint32_t before = m_registry.GetRefCount(handle.guid);
-        if (before == 0) return;
-        m_registry.DecrementRefCount(handle.guid);
-        const uint32_t after = m_registry.GetRefCount(handle.guid);
-        if (after == 0) {
-            IResource* res = m_registry.Get(handle.guid);
-            if (res) {
-                res->PreUnload();
-                m_memoryManager.Deallocate(res, res->GetSizeInMemory());
-            }
-            m_registry.Unregister(handle.guid);
-        }
-    }
 
-    bool Contains(const ResourceHandle& handle) const {
-        return m_registry.Contains(handle.guid);
-    }
+    void Release(const ResourceHandle& handle);
 
-    size_t GetTotalMemoryUsage() const { return m_registry.GetTotalMemoryUsage(); }
+
+    bool Contains(const ResourceHandle& handle) const;
+
+
+    size_t GetTotalMemoryUsage() const;
 
 private:
     ResourceManagerFacade() = default;
