@@ -352,9 +352,6 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 			}
 
 		}
-		else if (!sunshineErrorMessage.empty()) {
-			ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", sunshineErrorMessage);
-		}
 	}
 }
 
