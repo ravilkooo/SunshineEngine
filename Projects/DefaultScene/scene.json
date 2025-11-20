@@ -8,7 +8,7 @@
                             "Mesh": "Box_repeat",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
                         }
                     ]
                 },
@@ -65,7 +65,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -124,7 +124,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -183,7 +183,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -242,7 +242,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -301,7 +301,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -360,7 +360,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -629,7 +629,7 @@
                             "Mesh": "Box_repeat",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
                         }
                     ]
                 },
@@ -686,7 +686,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "D:/GitHub projects/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },

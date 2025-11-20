@@ -1,5 +1,6 @@
 #include <ResourceManager/Enums/ResourceLifetime.h>
 #include <ResourceManager/Lifetime/ResourceLifetimeInfo.h>
+#include <ResourceManager/Lifetime/ResourceLifetimeManager.h>
 
 void ResourceLifetimeManager::RegisterResource(ResourceGUID guid, ResourceLifetime lifetime)
 {

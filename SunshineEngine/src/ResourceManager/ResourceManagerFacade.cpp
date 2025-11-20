@@ -13,7 +13,7 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
 
     // Create or get the composite loader
     static CompositeResourceLoader compositeLoader;
-    IResource* res = compositeLoader.Load(path, &m_registry, &m_memoryManager);
+    IResource* res = compositeLoader.Load(path, &m_registry, m_memoryManager);
 
     if (!res) {
         printSunshineErrorMessage(("Failed to load resource: {}", path.c_str()));
@@ -29,7 +29,7 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
         if (!m_registry.Register(handle, res, path)) {
             printSunshineErrorMessage(("Failed to register resource: {}", path.c_str()));
             res->PreUnload();
-            m_memoryManager.Deallocate(res, res->GetSizeInMemory());
+            m_memoryManager->Deallocate(res, res->GetSizeInMemory());
             return ResourceHandle{ guid, 0u };
         }
     }
@@ -63,7 +63,7 @@ void ResourceManagerFacade::Release(const ResourceHandle& handle)
         IResource* res = m_registry.Get(handle.guid);
         if (res) {
             res->PreUnload();
-            m_memoryManager.Deallocate(res, res->GetSizeInMemory());
+            m_memoryManager->Deallocate(res, res->GetSizeInMemory());
         }
         m_registry.Unregister(handle.guid);
     }
