@@ -1,4 +1,5 @@
 #include <GameObject/Shapes/SphereShapeObject.h>
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, SphereShapeData initData)
@@ -63,8 +64,11 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(
 		device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
-
 	rc_info->AddTechnique(eastl::move(gBufferTech));
+
+	auto ñolliderTech = eastl::make_unique<SE_G::ColliderTechnique>(
+		device, tc_info->m_assignedComponent.get(), eastl::string("ColliderPass"), SE::CollisionShape::Sphere);
+	rc_info->AddTechnique(eastl::move(ñolliderTech));
 
 	return obj;
 }

@@ -5,6 +5,9 @@
                 "Render": {
                     "techniques": [
                         {
+                            "Tag": "ColliderPass"
+                        },
+                        {
                             "Mesh": "Box_repeat",
                             "Sampler": 0,
                             "Tag": "GPass",
@@ -61,6 +64,9 @@
             "components": {
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -121,6 +127,9 @@
                 "Render": {
                     "techniques": [
                         {
+                            "Tag": "ColliderPass"
+                        },
+                        {
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
@@ -145,9 +154,9 @@
                         1.0
                     ],
                     "m_position": [
-                        1.4999998807907104,
+                        8.100000381469727,
                         2.598076343536377,
-                        0.0
+                        -7.900000095367432
                     ],
                     "m_rotation": [
                         0.0,
@@ -179,6 +188,9 @@
             "components": {
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -239,6 +251,9 @@
                 "Render": {
                     "techniques": [
                         {
+                            "Tag": "ColliderPass"
+                        },
+                        {
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
@@ -298,6 +313,9 @@
                 "Render": {
                     "techniques": [
                         {
+                            "Tag": "ColliderPass"
+                        },
+                        {
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
@@ -356,6 +374,9 @@
             "components": {
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -626,6 +647,9 @@
                 "Render": {
                     "techniques": [
                         {
+                            "Tag": "ColliderPass"
+                        },
+                        {
                             "Mesh": "Box_repeat",
                             "Sampler": 0,
                             "Tag": "GPass",
@@ -682,6 +706,9 @@
             "components": {
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,

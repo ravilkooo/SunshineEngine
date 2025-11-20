@@ -3,79 +3,82 @@
 #include <EASTL/string.h>
 #include <nlohmann/json.hpp>
 
-// Editor-side enums
-enum class EditorShape {
-    // Primitives
-    Box,
-    Sphere,
-    Capsule,
-    Cylinder,
-    TaperedCapsule,
-    TaperedCylinder,
-    Plane,
-    Triangle,
-    Empty,
+namespace SE {
+    // Editor-side enums
+    enum class CollisionShape {
+        // Primitives
+        Box,
+        Sphere,
+        Capsule,
+        Cylinder,
+        TaperedCapsule,
+        TaperedCylinder,
+        Plane,
+        Triangle,
+        Empty,
 
-    // Convex / Mesh
-    ConvexHull,
-    Mesh,
+        // Convex / Mesh
+        ConvexHull,
+        Mesh,
 
-    // Heightfield
-    HeightField,
+        // Heightfield
+        HeightField,
 
-    // Soft body
-    SoftBody,
+        // Soft body
+        SoftBody,
 
-    // Compound
-    StaticCompound,
-    MutableCompound,
+        // Compound
+        StaticCompound,
+        MutableCompound,
 
-    // Decorators (wrap a child shape)
-    Scaled,
-    RotatedTranslated,
-    OffsetCenterOfMass
-};
+        // Decorators (wrap a child shape)
+        Scaled,
+        RotatedTranslated,
+        OffsetCenterOfMass
+    };
 
-enum class EditorMotionType {
-    Static,
-    Kinematic,
-    Dynamic
-};
+    enum class PhysicsMotionType {
+        Static,
+        Kinematic,
+        Dynamic
+    };
 
-enum class EditorActivation {
-    Activate,
-    DontActivate
-};
+    enum class PhysicsActivation {
+        Activate,
+        DontActivate
+    };
 
-// JSON enum mappings (serialize as readable strings)
-NLOHMANN_JSON_SERIALIZE_ENUM(EditorShape, {
-    {EditorShape::Box,                "Box"},
-    {EditorShape::Sphere,             "Sphere"},
-    {EditorShape::Capsule,            "Capsule"},
-    {EditorShape::Cylinder,           "Cylinder"},
-    {EditorShape::TaperedCapsule,     "TaperedCapsule"},
-    {EditorShape::TaperedCylinder,    "TaperedCylinder"},
-    {EditorShape::Plane,              "Plane"},
-    {EditorShape::Triangle,           "Triangle"},
-    {EditorShape::Empty,              "Empty"},
-    {EditorShape::ConvexHull,         "ConvexHull"},
-    {EditorShape::Mesh,               "Mesh"},
-    {EditorShape::HeightField,        "HeightField"},
-    {EditorShape::SoftBody,           "SoftBody"},
-    {EditorShape::StaticCompound,     "StaticCompound"},
-    {EditorShape::MutableCompound,    "MutableCompound"},
-    {EditorShape::Scaled,             "Scaled"},
-    {EditorShape::RotatedTranslated,  "RotatedTranslated"},
-    {EditorShape::OffsetCenterOfMass, "OffsetCenterOfMass"},
-    })
+    // JSON enum mappings (serialize as readable strings)
+    NLOHMANN_JSON_SERIALIZE_ENUM(CollisionShape, {
+        {CollisionShape::Box,                "Box"},
+        {CollisionShape::Sphere,             "Sphere"},
+        {CollisionShape::Capsule,            "Capsule"},
+        {CollisionShape::Cylinder,           "Cylinder"},
+        {CollisionShape::TaperedCapsule,     "TaperedCapsule"},
+        {CollisionShape::TaperedCylinder,    "TaperedCylinder"},
+        {CollisionShape::Plane,              "Plane"},
+        {CollisionShape::Triangle,           "Triangle"},
+        {CollisionShape::Empty,              "Empty"},
+        {CollisionShape::ConvexHull,         "ConvexHull"},
+        {CollisionShape::Mesh,               "Mesh"},
+        {CollisionShape::HeightField,        "HeightField"},
+        {CollisionShape::SoftBody,           "SoftBody"},
+        {CollisionShape::StaticCompound,     "StaticCompound"},
+        {CollisionShape::MutableCompound,    "MutableCompound"},
+        {CollisionShape::Scaled,             "Scaled"},
+        {CollisionShape::RotatedTranslated,  "RotatedTranslated"},
+        {CollisionShape::OffsetCenterOfMass, "OffsetCenterOfMass"},
+        })
 
-NLOHMANN_JSON_SERIALIZE_ENUM(EditorMotionType, {
-    {EditorMotionType::Static,    "Static"},
-    {EditorMotionType::Kinematic, "Kinematic"},
-    {EditorMotionType::Dynamic,   "Dynamic"},
-    })
+        NLOHMANN_JSON_SERIALIZE_ENUM(PhysicsMotionType, {
+            {PhysicsMotionType::Static,    "Static"},
+            {PhysicsMotionType::Kinematic, "Kinematic"},
+            {PhysicsMotionType::Dynamic,   "Dynamic"},
+            })
 
-NLOHMANN_JSON_SERIALIZE_ENUM(EditorActivation, {
-    {EditorActivation::Activate,     "Activate"},
-    {EditorActivation::DontActivate, "DontActivate"},
-    })
+            NLOHMANN_JSON_SERIALIZE_ENUM(PhysicsActivation, {
+                {PhysicsActivation::Activate,     "Activate"},
+                {PhysicsActivation::DontActivate, "DontActivate"},
+                })
+
+}

@@ -159,14 +159,14 @@ void PhysicsComponent::FromJson(const json& j) {
     else                                         m_objectLayer = Layers::NON_MOVING;
 
     switch (info.m_motion) {
-        case EditorMotionType::Static:    m_motionType = JPH::EMotionType::Static; break;
-        case EditorMotionType::Kinematic: m_motionType = JPH::EMotionType::Kinematic; break;
-        case EditorMotionType::Dynamic:   m_motionType = JPH::EMotionType::Dynamic; break;
+        case SE::PhysicsMotionType::Static:    m_motionType = JPH::EMotionType::Static; break;
+        case SE::PhysicsMotionType::Kinematic: m_motionType = JPH::EMotionType::Kinematic; break;
+        case SE::PhysicsMotionType::Dynamic:   m_motionType = JPH::EMotionType::Dynamic; break;
     }
 
     switch (info.m_activation) {
-        case EditorActivation::Activate:     m_activation = JPH::EActivation::Activate; break;
-        case EditorActivation::DontActivate: m_activation = JPH::EActivation::DontActivate; break;
+        case SE::PhysicsActivation::Activate:     m_activation = JPH::EActivation::Activate; break;
+        case SE::PhysicsActivation::DontActivate: m_activation = JPH::EActivation::DontActivate; break;
     }
 
     // m_shape = MyShapeFactory::CreateJoltShape(info.shape, ...);

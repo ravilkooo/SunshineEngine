@@ -91,9 +91,9 @@ public:
 
     bool IsAssigned() override { return false; }
 
-    EditorShape m_shape = EditorShape::Box;
-    EditorMotionType m_motion = EditorMotionType::Dynamic;
-    EditorActivation m_activation = EditorActivation::Activate;
+    SE::CollisionShape m_shape = SE::CollisionShape::Box;
+    SE::PhysicsMotionType m_motion = SE::PhysicsMotionType::Dynamic;
+    SE::PhysicsActivation m_activation = SE::PhysicsActivation::Activate;
     CollisionLayer m_collisionLayer = {};
 
     // Serialization

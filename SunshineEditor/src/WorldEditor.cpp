@@ -133,6 +133,13 @@ void WorldEditor::SetupRendering(
 			);
 	}
 	{
+		m_colliderPass = static_cast<SE_G::ColliderPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::ColliderPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+	}
+	{
 		m_iconPass = static_cast<SE_G::IconPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::IconPass>(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
