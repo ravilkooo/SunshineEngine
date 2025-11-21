@@ -24,6 +24,9 @@ namespace SE_G {
             UINT screenWidth, UINT screenHeight);
         ~DeferredRenderer();
 
+        ID3D11Device* GetDevice() { return m_device; }
+        ID3D11DeviceContext* GetDeviceContext() { return m_context; }
+
         void InitGBuffer(UINT screenWidth, UINT screenHeight);
 
         void SetMainCamera(eastl::shared_ptr<Camera> camera) { m_mainCamera = camera; }
@@ -38,5 +41,9 @@ namespace SE_G {
 
         UINT m_screenWidth = 800u;
         UINT m_screenHeight = 800u;
+
+    private:
+        ID3D11Device* m_device;
+        ID3D11DeviceContext* m_context;
     };
 }

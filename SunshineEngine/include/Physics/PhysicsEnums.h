@@ -5,13 +5,13 @@
 
 namespace SE {
     // Editor-side enums
-    enum class CollisionShape {
+    enum class ColliderShapeType {
         // Primitives
-        Box,
         Sphere,
+        Box,
         Capsule,
-        Cylinder,
         TaperedCapsule,
+        Cylinder,
         TaperedCylinder,
         Plane,
         Triangle,
@@ -49,25 +49,25 @@ namespace SE {
     };
 
     // JSON enum mappings (serialize as readable strings)
-    NLOHMANN_JSON_SERIALIZE_ENUM(CollisionShape, {
-        {CollisionShape::Box,                "Box"},
-        {CollisionShape::Sphere,             "Sphere"},
-        {CollisionShape::Capsule,            "Capsule"},
-        {CollisionShape::Cylinder,           "Cylinder"},
-        {CollisionShape::TaperedCapsule,     "TaperedCapsule"},
-        {CollisionShape::TaperedCylinder,    "TaperedCylinder"},
-        {CollisionShape::Plane,              "Plane"},
-        {CollisionShape::Triangle,           "Triangle"},
-        {CollisionShape::Empty,              "Empty"},
-        {CollisionShape::ConvexHull,         "ConvexHull"},
-        {CollisionShape::Mesh,               "Mesh"},
-        {CollisionShape::HeightField,        "HeightField"},
-        {CollisionShape::SoftBody,           "SoftBody"},
-        {CollisionShape::StaticCompound,     "StaticCompound"},
-        {CollisionShape::MutableCompound,    "MutableCompound"},
-        {CollisionShape::Scaled,             "Scaled"},
-        {CollisionShape::RotatedTranslated,  "RotatedTranslated"},
-        {CollisionShape::OffsetCenterOfMass, "OffsetCenterOfMass"},
+    NLOHMANN_JSON_SERIALIZE_ENUM(ColliderShapeType, {
+        {ColliderShapeType::Box,                "Box"},
+        {ColliderShapeType::Sphere,             "Sphere"},
+        {ColliderShapeType::Capsule,            "Capsule"},
+        {ColliderShapeType::Cylinder,           "Cylinder"},
+        {ColliderShapeType::TaperedCapsule,     "TaperedCapsule"},
+        {ColliderShapeType::TaperedCylinder,    "TaperedCylinder"},
+        {ColliderShapeType::Plane,              "Plane"},
+        {ColliderShapeType::Triangle,           "Triangle"},
+        {ColliderShapeType::Empty,              "Empty"},
+        {ColliderShapeType::ConvexHull,         "ConvexHull"},
+        {ColliderShapeType::Mesh,               "Mesh"},
+        {ColliderShapeType::HeightField,        "HeightField"},
+        {ColliderShapeType::SoftBody,           "SoftBody"},
+        {ColliderShapeType::StaticCompound,     "StaticCompound"},
+        {ColliderShapeType::MutableCompound,    "MutableCompound"},
+        {ColliderShapeType::Scaled,             "Scaled"},
+        {ColliderShapeType::RotatedTranslated,  "RotatedTranslated"},
+        {ColliderShapeType::OffsetCenterOfMass, "OffsetCenterOfMass"},
         })
 
         NLOHMANN_JSON_SERIALIZE_ENUM(PhysicsMotionType, {

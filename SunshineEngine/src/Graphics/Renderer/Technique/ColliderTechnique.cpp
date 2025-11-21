@@ -3,19 +3,31 @@
 #include <Graphics/Renderer/Pass/ColliderPass.h>
 
 namespace SE_G {
-	eastl::unique_ptr<Bind::VertexShader> ColliderTechnique::s_planesSymmetryShader;
-	eastl::unique_ptr<Bind::VertexShader> ColliderTechnique::s_yAxizSymmetryShader;
+	eastl::unique_ptr<Bind::VertexShader> ColliderTechnique::s_boxShader;
+	eastl::unique_ptr<Bind::VertexShader> ColliderTechnique::s_sphereShader;
+	eastl::unique_ptr<Bind::VertexShader> ColliderTechnique::s_capsuleShader;
+	eastl::unique_ptr<Bind::VertexShader> ColliderTechnique::s_taperedCapsuleShader;
 	eastl::unique_ptr<Bind::VertexShader> ColliderTechnique::s_customShader;
 	bool ColliderTechnique::s_staticDataInitializated = false;
 
 	ColliderTechnique::ColliderTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
-		eastl::string technique, SE::CollisionShape shape)
+		eastl::string technique, eastl::shared_ptr<SE::ColliderData> colliderData)
 		: RenderTechnique(device, assignedTransform, technique)
 	{
 		if (!s_staticDataInitializated) {
 			ColliderTechnique::InitStaticData(device);
 		}
-		m_shape = shape;
+		m_colliderData = colliderData;
+
+		m_transformCB = eastl::make_unique<Bind::VertexConstantBuffer<SE::ColliderTransformCB>>(
+			device,
+			SE::ColliderTransformCB{ DXSM::Matrix::Identity },
+			2u);
+
+		m_settingsCB = eastl::make_unique<Bind::VertexConstantBuffer<SE::ColliderSettings>>(
+			device,
+			m_colliderData->m_settings,
+			3u);
 	}
 
 	void ColliderTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -26,18 +38,31 @@ namespace SE_G {
 
 	void ColliderTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
-		switch (m_shape)
+		UpdateTransformCB(context.Get());
+		UpdateSettingsCB(context.Get());
+
+		m_transformCB->Bind(context.Get());
+		m_settingsCB->Bind(context.Get());
+
+		switch (m_colliderData->m_shapeType)
 		{
-		case SE::CollisionShape::Box:
-		case SE::CollisionShape::Sphere:
-			s_planesSymmetryShader->Bind(context.Get());
+		case SE::ColliderShapeType::Box:
+			s_boxShader->Bind(context.Get());
 			break;
 
-		case SE::CollisionShape::Capsule:
-			s_yAxizSymmetryShader->Bind(context.Get());
+		case SE::ColliderShapeType::Sphere:
+			s_sphereShader->Bind(context.Get());
 			break;
 
-		case SE::CollisionShape::Mesh:
+		case SE::ColliderShapeType::Capsule:
+			s_capsuleShader->Bind(context.Get());
+			break;
+
+		case SE::ColliderShapeType::TaperedCapsule:
+			s_taperedCapsuleShader->Bind(context.Get());
+			break;
+
+		case SE::ColliderShapeType::Mesh:
 			//m_customVertexBuffer->Bind(context.Get());
 			s_customShader->Bind(context.Get());
 			break;
@@ -46,37 +71,46 @@ namespace SE_G {
 			s_customShader->Bind(context.Get());
 			break;
 		}
-
-		//m_vertexBuffer->Bind(context.Get());
 	}
 
 	void ColliderTechnique::DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
-		switch (m_shape)
+		switch (m_colliderData->m_shapeType)
 		{
-		case SE::CollisionShape::Box:
-		case SE::CollisionShape::Sphere:
-		case SE::CollisionShape::Capsule:
+		case SE::ColliderShapeType::Box:
+		case SE::ColliderShapeType::Sphere:
+		case SE::ColliderShapeType::Capsule:
+		case SE::ColliderShapeType::TaperedCapsule:
 
 			context->DrawIndexed(
-				ColliderPass::s_shapeBufferOffsets[m_shape].indexBufferSize,
-				ColliderPass::s_shapeBufferOffsets[m_shape].indexStart,
+				ColliderPass::s_shapeBufferOffsets[m_colliderData->m_shapeType].indexBufferSize,
+				ColliderPass::s_shapeBufferOffsets[m_colliderData->m_shapeType].indexStart,
 				0u
 			);
 			break;
 
-		case SE::CollisionShape::Mesh:
+		case SE::ColliderShapeType::Mesh:
 		default:
 
 			//s_customShader->Bind(context.Get());
 			context->DrawIndexed(
-				ColliderPass::s_shapeBufferOffsets[SE::CollisionShape::Box].indexBufferSize,
-				ColliderPass::s_shapeBufferOffsets[SE::CollisionShape::Box].indexStart,
+				ColliderPass::s_shapeBufferOffsets[SE::ColliderShapeType::Box].indexBufferSize,
+				ColliderPass::s_shapeBufferOffsets[SE::ColliderShapeType::Box].indexStart,
 				0u
 			);
 			break;
 		}
 
+	}
+
+	void ColliderTechnique::UpdateTransformCB(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	{
+		m_transformCB->Update(context.Get(), { m_colliderData->m_transformMat });
+	}
+
+	void ColliderTechnique::UpdateSettingsCB(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	{
+		m_settingsCB->Update(context.Get(), m_colliderData->m_settings);
 	}
 
 	void ColliderTechnique::InitStaticData(ID3D11Device* device)
@@ -87,12 +121,22 @@ namespace SE_G {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		s_planesSymmetryShader = eastl::make_unique<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/PlanesSymmetryVS.hlsl").c_str(),
+		s_boxShader = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/BoxVS.hlsl").c_str(),
 			numInputElements,
 			IALayoutInputElements);
-		s_yAxizSymmetryShader = eastl::make_unique<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/YAxizSymmetryVS.hlsl").c_str(),
+		s_sphereShader = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/SphereVS.hlsl").c_str(),
+			numInputElements,
+			IALayoutInputElements);
+		
+		s_capsuleShader = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/TaperedCapsuleVS.hlsl").c_str(),
+			numInputElements,
+			IALayoutInputElements);
+
+		s_taperedCapsuleShader = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/TaperedCapsuleVS.hlsl").c_str(),
 			numInputElements,
 			IALayoutInputElements);
 		s_customShader = eastl::make_unique<Bind::VertexShader>(device,

@@ -55,7 +55,7 @@ namespace SE_G {
         static eastl::unique_ptr<Bind::Topology> s_topology;
         static eastl::unique_ptr<Bind::IndexBuffer> s_shapesIndexBuffer;
         static eastl::unique_ptr<Bind::VertexBuffer> s_shapesVertexBuffer;
-        static eastl::unordered_map<SE::CollisionShape, SE_G::BufferOffset> s_shapeBufferOffsets;
+        static eastl::unordered_map<SE::ColliderShapeType, SE::ColliderBufferOffset> s_shapeBufferOffsets;
 
         /*
         struct CamGCB {

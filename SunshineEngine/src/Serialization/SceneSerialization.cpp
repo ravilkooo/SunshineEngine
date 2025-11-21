@@ -133,20 +133,33 @@ void RenderComponent_Info::FromJson(const json& j) {
 json PhysicsComponent_Info::ToJson() const {
     json j;
     j = nlohmann::json{
-        {"m_shape",         m_shape},
         {"m_motion",        m_motion},
         {"m_activation",    m_activation},
-        {"m_collisionLayer",  std::string{m_collisionLayer.c_str()}}
+        {"m_collisionLayer",  std::string{m_collisionLayer.c_str()} }
     };
+
+    if (m_colliderData) {
+        j["collider"] = m_colliderData->ToJson();
+    }
     return j;
 }
 
 void PhysicsComponent_Info::FromJson(const json& j) {
-    
-    j.at("m_shape").get_to(m_shape);
-    j.at("m_motion").get_to(m_motion);
-    j.at("m_activation").get_to(m_activation);
-    m_collisionLayer = CollisionLayer{ j.at("m_collisionLayer").get<std::string>().c_str() };
+    // Read motion + activation (enums use NLOHMANN_JSON_SERIALIZE_ENUM)
+    if (j.contains("m_motion")) j.at("m_motion").get_to(m_motion);
+    if (j.contains("m_activation")) j.at("m_activation").get_to(m_activation);
+
+    if (j.contains("m_collisionLayer") && j["m_collisionLayer"].is_string()) {
+        m_collisionLayer = SE::CollisionLayer{ j.at("m_collisionLayer").get<std::string>().c_str() };
+    }
+
+    // Collider data (optional)
+    if (j.contains("collider") && j["collider"].is_object()) {
+        if (!m_colliderData) {
+            m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Box);
+        }
+        m_colliderData->FromJson(j["collider"]);
+    }
 
 }
 
@@ -154,9 +167,9 @@ void PhysicsComponent::FromJson(const json& j) {
 
     PhysicsComponent_Info info; info.FromJson(j);
 
-    if (info.m_collisionLayer == "NON_MOVING")  m_objectLayer = Layers::NON_MOVING;
-    else if (info.m_collisionLayer == "MOVING")      m_objectLayer = Layers::MOVING;
-    else                                         m_objectLayer = Layers::NON_MOVING;
+    if (info.m_collisionLayer == "NON_MOVING")  m_objectLayer = SE::Layers::NON_MOVING;
+    else if (info.m_collisionLayer == "MOVING")      m_objectLayer = SE::Layers::MOVING;
+    else                                         m_objectLayer = SE::Layers::NON_MOVING;
 
     switch (info.m_motion) {
         case SE::PhysicsMotionType::Static:    m_motionType = JPH::EMotionType::Static; break;

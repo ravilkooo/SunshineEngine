@@ -6,7 +6,7 @@ namespace SE_G {
 	eastl::unique_ptr<Bind::Topology> ColliderPass::s_topology;
 	eastl::unique_ptr<Bind::IndexBuffer> ColliderPass::s_shapesIndexBuffer;
 	eastl::unique_ptr<Bind::VertexBuffer> ColliderPass::s_shapesVertexBuffer;
-	eastl::unordered_map<SE::CollisionShape, SE_G::BufferOffset> ColliderPass::s_shapeBufferOffsets;
+	eastl::unordered_map<SE::ColliderShapeType, SE::ColliderBufferOffset> ColliderPass::s_shapeBufferOffsets;
 
 	bool ColliderPass::s_staticDataInitializated = false;
 
@@ -141,28 +141,30 @@ namespace SE_G {
 		UINT vertexOffset = 0u;
 		UINT indexOffset = 0u;
 
-		s_shapeBufferOffsets[SE::CollisionShape::Box] =
-			SE_G::BufferOffset{ 
+		s_shapeBufferOffsets[SE::ColliderShapeType::Box] =
+			SE::ColliderBufferOffset{ 
 				vertexOffset, 8u,
 				indexOffset, 24u };
 		vertexOffset += 8u;
 		indexOffset += 24u;
 
-		s_shapeBufferOffsets[SE::CollisionShape::Sphere] =
-			SE_G::BufferOffset{
+		s_shapeBufferOffsets[SE::ColliderShapeType::Sphere] =
+			SE::ColliderBufferOffset{
 				vertexOffset, 3u * segments,
 				indexOffset, 3u * segments * 2u };
 		vertexOffset += 3u * segments;
 		indexOffset += 3u * segments * 2u;
 
-		s_shapeBufferOffsets[SE::CollisionShape::Capsule] =
-			SE_G::BufferOffset{ 
+		s_shapeBufferOffsets[SE::ColliderShapeType::Capsule] =
+			SE::ColliderBufferOffset{
 				vertexOffset, 2u * segments + 4u * (arcSegments + 1u),
 				indexOffset, 2u * 2u * segments + 4u * 2u * arcSegments + 4u * 2u };
+		s_shapeBufferOffsets[SE::ColliderShapeType::TaperedCapsule] =
+			SE::ColliderBufferOffset(s_shapeBufferOffsets[SE::ColliderShapeType::Capsule]);
 		vertexOffset += 2u * segments + 4u * (arcSegments + 1u);
 		indexOffset += 2u * 2u * segments + 4u * 2u * arcSegments + 4u * 2u;
 
-		eastl::vector<ColliderVertex> vertices;
+		eastl::vector<SE::ColliderVertex> vertices;
 		eastl::vector<UINT> indices;
 
 		//vertices.reserve(vertexOffset);
@@ -174,16 +176,16 @@ namespace SE_G {
 		// Box
 		{
 			// 8 corners of the box
-			ColliderVertex v[8] =
+			SE::ColliderVertex v[8] =
 			{
-				ColliderVertex{{-0.5f, -0.5f, -0.5f}}, // 0
-				ColliderVertex{{+0.5f, -0.5f, -0.5f}}, // 1
-				ColliderVertex{{+0.5f, +0.5f, -0.5f}}, // 2
-				ColliderVertex{{-0.5f, +0.5f, -0.5f}}, // 3
-				ColliderVertex{{-0.5f, -0.5f, +0.5f}}, // 4
-				ColliderVertex{{+0.5f, -0.5f, +0.5f}}, // 5
-				ColliderVertex{{+0.5f, +0.5f, +0.5f}}, // 6
-				ColliderVertex{{-0.5f, +0.5f, +0.5f}}, // 7
+				SE::ColliderVertex{{-0.5f, -0.5f, -0.5f}}, // 0
+				SE::ColliderVertex{{+0.5f, -0.5f, -0.5f}}, // 1
+				SE::ColliderVertex{{+0.5f, +0.5f, -0.5f}}, // 2
+				SE::ColliderVertex{{-0.5f, +0.5f, -0.5f}}, // 3
+				SE::ColliderVertex{{-0.5f, -0.5f, +0.5f}}, // 4
+				SE::ColliderVertex{{+0.5f, -0.5f, +0.5f}}, // 5
+				SE::ColliderVertex{{+0.5f, +0.5f, +0.5f}}, // 6
+				SE::ColliderVertex{{-0.5f, +0.5f, +0.5f}}, // 7
 			};
 
 			for (size_t i = 0; i < 8; i++)
@@ -216,7 +218,7 @@ namespace SE_G {
 						float c = cosf(a);
 						float s = sinf(a);
 
-						ColliderVertex v{};
+						SE::ColliderVertex v{};
 						switch (plane)
 						{
 						case 0: v.position = DXSM::Vector3(c, s, 0.0f);      break; // XY
@@ -241,7 +243,7 @@ namespace SE_G {
 			addCircle(2); // XZ
 		}
 
-		// Capsule
+		// Capsule/TaperedCapsule
 		{
 			auto addCircleXZ = [&](float yCenter) -> UINT
 				{
@@ -278,7 +280,7 @@ namespace SE_G {
 						float c = cosf(a);
 						float s = sinf(a);
 
-						ColliderVertex v{};
+						SE::ColliderVertex v{};
 						if (inXZPlane)          // X‑Y plane (z = 0)
 							v.position = DXSM::Vector3(c, yCenter + s, 0.0f);
 						else                    // Z‑Y plane (x = 0)
@@ -318,7 +320,7 @@ namespace SE_G {
 		}
 
 		s_shapesVertexBuffer = eastl::make_unique<Bind::VertexBuffer>(
-			device, vertices.data(), vertices.size(), sizeof(ColliderVertex));
+			device, vertices.data(), vertices.size(), sizeof(SE::ColliderVertex));
 		s_shapesIndexBuffer = eastl::make_unique<Bind::IndexBuffer>(
 			device, indices.data(), indices.size());
 		s_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);

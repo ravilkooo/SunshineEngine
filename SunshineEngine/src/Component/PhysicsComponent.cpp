@@ -1,6 +1,10 @@
 #include <Component/PhysicsComponent.h>
-#include <Physics/PhysicsSystem.h>
 #include <Component/TransformComponent.h>
+#include <Component/RenderComponent.h>
+
+#include <Physics/PhysicsSystem.h>
+
+#include <Graphics/Renderer/DeferredRenderer.h>
 
 PhysicsComponent::~PhysicsComponent() {
     JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
@@ -58,3 +62,43 @@ void PhysicsComponent::InitTransforms(TransformComponent* tc) {
 
 JPH::Body* PhysicsComponent::GetBody() const { return m_joltBody; }
 JPH::BodyID PhysicsComponent::GetBodyID() const { return m_joltBodyId; }
+
+
+PhysicsComponent_Info::PhysicsComponent_Info(
+    RenderComponent_Info* rc_info,
+    TransformComponent_Info* tc_info)
+{
+    m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Box);
+    SE::PhysicsMotionType m_motion = SE::PhysicsMotionType::Static;
+    SE::PhysicsActivation m_activation = SE::PhysicsActivation::DontActivate;
+
+    // Init collider
+    auto device = rc_info->m_assignedComponent.get()->m_renderSystem->GetDevice();
+    auto colliderTech = eastl::make_unique<SE_G::ColliderTechnique>(
+        device, tc_info->m_assignedComponent.get(), eastl::string("ColliderPass"),
+        m_colliderData);
+
+    rc_info->AddTechnique(eastl::move(colliderTech));
+}
+
+PhysicsComponent_Info::~PhysicsComponent_Info() {
+    ;
+}
+
+
+// Accessors for physics configuration
+SE::ColliderShapeType PhysicsComponent_Info::GetShape() const { return m_colliderData->m_shapeType; }
+void PhysicsComponent_Info::SetShape(SE::ColliderShapeType shape)
+{
+    m_colliderData->SetShapeType(m_colliderData->m_shapeType);
+}
+
+SE::PhysicsMotionType PhysicsComponent_Info::GetMotion() const { return m_motion; }
+void PhysicsComponent_Info::SetMotion(SE::PhysicsMotionType motion) { m_motion = motion; }
+
+SE::PhysicsActivation PhysicsComponent_Info::GetActivation() const { return m_activation; }
+void PhysicsComponent_Info::SetActivation(SE::PhysicsActivation activation) { m_activation = activation; }
+
+const SE::CollisionLayer& PhysicsComponent_Info::GetCollisionLayer() const { return m_collisionLayer; }
+void PhysicsComponent_Info::SetCollisionLayer(const SE::CollisionLayer& layer) { m_collisionLayer = layer; }
+void PhysicsComponent_Info::SetCollisionLayer(SE::CollisionLayer&& layer) { m_collisionLayer = eastl::move(layer); }

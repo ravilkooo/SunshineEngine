@@ -19,13 +19,32 @@ cbuffer CameraCBuf : register(b1)
     row_major float4x4 viewProjMat;
 }
 
+cbuffer ColliderTransformCBuf : register(b2)
+{
+    row_major float4x4 colliderTransformMat;
+}
+
+cbuffer BoxColliderSettings : register(b3)
+{
+    float3 m_size;
+};
+
 PS_IN VSMain(VS_IN input)
 {
     PS_IN output = (PS_IN) 0;
+    output.pos = float4(input.pos, 1.0);
     
-    output.pos = mul(float4(input.pos, 1.0), wMat);
+    // Collider settings
+    output.pos.xyz = output.pos.xyz * m_size;
+    
+    // Collider transforms
+    output.pos = mul(output.pos, colliderTransformMat);
+    
+    // Parent body transforms
+    output.pos = mul(output.pos, wMat);
     output.pos = output.pos.xyzw / output.pos.w;
     output.pos = mul(output.pos, viewProjMat);
 	
     return output;
 }
+

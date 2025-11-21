@@ -24,9 +24,10 @@ cbuffer ColliderTransformCBuf : register(b2)
     row_major float4x4 colliderTransformMat;
 }
 
-cbuffer BoxColliderSettings : register(b3)
+cbuffer TaperedCapsuleColliderSettings : register(b3)
 {
-    float3 m_size;
+    float m_height;
+    float m_radius;
 };
 
 PS_IN VSMain(VS_IN input)
@@ -35,7 +36,18 @@ PS_IN VSMain(VS_IN input)
     output.pos = float4(input.pos, 1.0);
     
     // Collider settings
-    output.pos.xyz = output.pos.xyz * m_size;
+    if (output.pos.y > 0)
+    {
+        output.pos.y = output.pos.y - 0.5f;
+        output.pos.xyz = output.pos.xyz * m_radius;
+        output.pos.y += m_height;
+    }
+    else
+    {
+        output.pos.y = output.pos.y + 0.5f;
+        output.pos.xyz = output.pos.xyz * m_radius;
+        output.pos.y -= m_height;
+    }
     
     // Collider transforms
     output.pos = mul(output.pos, colliderTransformMat);

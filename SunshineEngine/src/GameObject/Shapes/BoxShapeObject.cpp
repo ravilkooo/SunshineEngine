@@ -1,5 +1,6 @@
 #include <GameObject/Shapes/BoxShapeObject.h>
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
+#include <Component/PhysicsComponent.h>
 
 BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, BoxShapeData initData)
@@ -66,14 +67,8 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 
-	auto ñolliderTech = eastl::make_unique<SE_G::ColliderTechnique>(
-		device, tc_info->m_assignedComponent.get(), eastl::string("ColliderPass"), SE::CollisionShape::Capsule);
-	rc_info->AddTechnique(eastl::move(ñolliderTech));
-
-	/*
-	        ColliderTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
-            eastl::string technique, SE::CollisionShape shape = SE::CollisionShape::Box);
-	*/
+	// PhysicsComponent
+	auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
 
 	return obj;
 }

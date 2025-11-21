@@ -11,6 +11,9 @@ namespace SE_G {
 		this->m_screenWidth = screenWidth;
 		this->m_screenHeight = screenHeight;
 
+		this->m_context = context;
+		this->m_device = device;
+
 		InitGBuffer(m_screenWidth, m_screenHeight);
 	}
 

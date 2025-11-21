@@ -5,8 +5,8 @@
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
-void RenderComponent::AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> renderTech) {
-	m_renderSystem->AddTechnique(eastl::move(renderTech));
+SE_G::RenderTechnique* RenderComponent::AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> renderTech) {
+	return m_renderSystem->AddTechnique(eastl::move(renderTech));
 }
 
 RenderComponent_Info::~RenderComponent_Info() {
