@@ -394,6 +394,7 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
 
 eastl::shared_ptr<Scene> Scene::FromJson(
     SE_G::DeferredRenderer* renderSystem,
+    PhysicsSystem* physicsSystem,
     eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
@@ -457,12 +458,15 @@ eastl::shared_ptr<Scene> Scene::FromJson(
             if (go) {
                 // Other components (Physics, Lua)
 
+                /*
                 if (objJ["components"].contains("Physics")) {
                     auto c = go->AddComponent<PhysicsComponent>(
                         go->m_UUID, go->GetComponent<TransformComponent>().get());
                     c->FromJson(j["components"]["Physics"]);
+                    c->CreateBody(physicsSystem);
                 }
-
+                */
+                
                 scene->AddGameObject(eastl::move(go));
             }
         }

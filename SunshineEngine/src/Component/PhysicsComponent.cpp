@@ -36,7 +36,7 @@ void PhysicsComponent::SetActivation(JPH::EActivation activation) { activation =
 void PhysicsComponent::SetShape(JPH::ShapeRefC shapePtr) { m_shape = shapePtr; }
 
 // Create and add body to physics system
-void PhysicsComponent::CreateBody(eastl::shared_ptr<PhysicsSystem> physicsSystem)
+void PhysicsComponent::CreateBody(PhysicsSystem* physicsSystem)
 {
     m_physicsSystem = physicsSystem;
     JPH::BodyInterface& bodyInterface = physicsSystem->Bodies();

@@ -296,7 +296,7 @@ void WorldEditor::InitScene()
 			pc_info->SetActivation(SE::PhysicsActivation::Activate);
 			pc_info->SetShape(SE::ColliderShapeType::Capsule);
 			SE::ColliderSettings collSettings{};
-			collSettings.data.asCapsule = { 1.0f, 1.0f };
+			collSettings.data.asCapsule = { 1.0f, 0.2f };
 
 			pc_info->m_colliderData->SetColliderSettings(collSettings);
 		}

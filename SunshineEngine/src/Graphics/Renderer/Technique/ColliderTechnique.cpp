@@ -131,7 +131,7 @@ namespace SE_G {
 			IALayoutInputElements);
 		
 		s_capsuleShader = eastl::make_unique<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/TaperedCapsuleVS.hlsl").c_str(),
+			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/CapsuleVS.hlsl").c_str(),
 			numInputElements,
 			IALayoutInputElements);
 

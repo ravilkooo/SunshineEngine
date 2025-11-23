@@ -41,13 +41,13 @@ PS_IN VSMain(VS_IN input)
     {
         output.pos.y = output.pos.y - 0.5f;
         output.pos.xyz = output.pos.xyz * m_upperRadius;
-        output.pos.y += m_height;
+        output.pos.y += m_height * 0.5f;
     }
     else
     {
         output.pos.y = output.pos.y + 0.5f;
         output.pos.xyz = output.pos.xyz * m_lowerRadius;
-        output.pos.y -= m_height;
+        output.pos.y -= m_height * 0.5f;
     }
     
     // Collider transforms

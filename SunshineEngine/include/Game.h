@@ -38,6 +38,8 @@ public:
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
 
+    void SetupPhysics();
+
     void Run();
 
     void Start();
@@ -57,6 +59,7 @@ public:
     GameTimer m_timer;
     eastl::shared_ptr<Scene> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
+    eastl::unique_ptr<PhysicsSystem> m_physicsSystem;
 
     // LuaManager m_luaManager;
 

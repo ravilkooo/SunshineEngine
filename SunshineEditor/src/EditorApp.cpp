@@ -440,7 +440,9 @@ void EditorApp::LaunchGame() {
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
+	m_currentGame->SetupPhysics();
 	m_currentGame->LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
+	m_currentGame->m_physicsSystem->FinalizeScene();
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
 

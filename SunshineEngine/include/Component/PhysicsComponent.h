@@ -54,7 +54,7 @@ public:
     void SetShape(JPH::ShapeRefC shapePtr);
 
     // Create and add body to physics system
-    void CreateBody(eastl::shared_ptr<PhysicsSystem> physicsSystem);
+    void CreateBody(PhysicsSystem* physicsSystem);
 
     void InitTransforms(TransformComponent* tc);
 
@@ -79,7 +79,7 @@ private:
     JPH::ShapeRefC m_shape = nullptr;
 
     // To-do: make weak_ptr or simple ptr?
-    eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
+    PhysicsSystem* m_physicsSystem;
 };
 
 class RenderComponent_Info;
