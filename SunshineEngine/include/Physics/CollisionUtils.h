@@ -79,8 +79,8 @@ namespace SE {
     struct TaperedCapsuleColliderSettings
     {
         float m_height = 1.0f;
-        float m_upperRadius = 1.0f;
-        float m_lowerRadius = 1.0f;
+        float m_topRadius = 1.0f;
+        float m_bottomRadius = 1.0f;
     };
 
     struct ColliderSettings
@@ -92,7 +92,7 @@ namespace SE {
             SphereColliderSettings asSphere;
             CapsuleColliderSettings asCapsule;
             TaperedCapsuleColliderSettings asTaperedCapsule;
-        };
+        } data;
     };
 
     class ColliderData
@@ -115,7 +115,7 @@ namespace SE {
 
             m_shapeType = ColliderShapeType::Box;
 
-            m_settings.asBox = { DXSM::Vector3::One };
+            m_settings.data.asBox = { DXSM::Vector3::One };
         }
 
         ColliderData(const ColliderData& cd) : m_settings({}) {
@@ -147,24 +147,24 @@ namespace SE {
             switch (m_shapeType)
             {
             case SE::ColliderShapeType::Box:
-                m_settings.asBox = { { 1.0f, 1.0f, 1.0f } };
+                m_settings.data.asBox = { { 1.0f, 1.0f, 1.0f } };
                 break;
 
             case SE::ColliderShapeType::Sphere:
-                m_settings.asSphere = { 1.0f };
+                m_settings.data.asSphere = { 1.0f };
                 break;
 
             case SE::ColliderShapeType::Capsule:
-                m_settings.asCapsule = { 1.0f, 1.0f };
+                m_settings.data.asCapsule = { 1.0f, 1.0f };
                 break;
 
             case SE::ColliderShapeType::TaperedCapsule:
-                m_settings.asTaperedCapsule = { 1.0f, 1.0f, 1.0f };
+                m_settings.data.asTaperedCapsule = { 1.0f, 1.0f, 1.0f };
                 break;
 
             case SE::ColliderShapeType::Mesh:
             default:
-                m_settings.asBox = { { 1.0f, 1.0f, 1.0f } };
+                m_settings.data.asBox = { { 1.0f, 1.0f, 1.0f } };
                 break;
             }
         }
@@ -220,19 +220,19 @@ namespace SE {
             switch (m_shapeType)
             {
             case ColliderShapeType::Box:
-                m_settings.asBox = { { 1.0f, 1.0f, 1.0f } };
+                m_settings.data.asBox = { { 1.0f, 1.0f, 1.0f } };
                 break;
 
             case ColliderShapeType::Sphere:
-                m_settings.asSphere = { 1.0f };
+                m_settings.data.asSphere = { 1.0f };
                 break;
 
             case ColliderShapeType::Capsule:
-                m_settings.asCapsule = { 1.0f, 1.0f };
+                m_settings.data.asCapsule = { 1.0f, 1.0f };
                 break;
 
             case ColliderShapeType::TaperedCapsule:
-                m_settings.asTaperedCapsule = { 1.0f, 1.0f, 1.0f };
+                m_settings.data.asTaperedCapsule = { 1.0f, 1.0f, 1.0f };
                 break;
 
             case ColliderShapeType::Mesh:
@@ -265,19 +265,19 @@ namespace SE {
             switch (m_shapeType)
             {
             case ColliderShapeType::Box:
-                j["settings"]["box"]["size"] = { m_settings.asBox.m_size.x, m_settings.asBox.m_size.y, m_settings.asBox.m_size.z };
+                j["settings"]["box"]["size"] = { m_settings.data.asBox.m_size.x, m_settings.data.asBox.m_size.y, m_settings.data.asBox.m_size.z };
                 break;
             case ColliderShapeType::Sphere:
-                j["settings"]["sphere"]["radius"] = m_settings.asSphere.m_radius;
+                j["settings"]["sphere"]["radius"] = m_settings.data.asSphere.m_radius;
                 break;
             case ColliderShapeType::Capsule:
-                j["settings"]["capsule"]["height"] = m_settings.asCapsule.m_height;
-                j["settings"]["capsule"]["radius"] = m_settings.asCapsule.m_radius;
+                j["settings"]["capsule"]["height"] = m_settings.data.asCapsule.m_height;
+                j["settings"]["capsule"]["radius"] = m_settings.data.asCapsule.m_radius;
                 break;
             case ColliderShapeType::TaperedCapsule:
-                j["settings"]["taperedCapsule"]["height"] = m_settings.asTaperedCapsule.m_height;
-                j["settings"]["taperedCapsule"]["upperRadius"] = m_settings.asTaperedCapsule.m_upperRadius;
-                j["settings"]["taperedCapsule"]["lowerRadius"] = m_settings.asTaperedCapsule.m_lowerRadius;
+                j["settings"]["taperedCapsule"]["height"] = m_settings.data.asTaperedCapsule.m_height;
+                j["settings"]["taperedCapsule"]["upperRadius"] = m_settings.data.asTaperedCapsule.m_topRadius;
+                j["settings"]["taperedCapsule"]["lowerRadius"] = m_settings.data.asTaperedCapsule.m_bottomRadius;
                 break;
             case ColliderShapeType::Mesh:
             default:
@@ -322,32 +322,32 @@ namespace SE {
                 case ColliderShapeType::Box:
                     if (s.contains("box") && s["box"].contains("size") && s["box"]["size"].is_array()) {
                         auto a = s["box"]["size"];
-                        m_settings.asBox.m_size.x = a[0].get<float>();
-                        m_settings.asBox.m_size.y = a[1].get<float>();
-                        m_settings.asBox.m_size.z = a[2].get<float>();
+                        m_settings.data.asBox.m_size.x = a[0].get<float>();
+                        m_settings.data.asBox.m_size.y = a[1].get<float>();
+                        m_settings.data.asBox.m_size.z = a[2].get<float>();
                     }
                     break;
                 case ColliderShapeType::Sphere:
                     if (s.contains("sphere") && s["sphere"].contains("radius")) {
-                        m_settings.asSphere.m_radius = s["sphere"]["radius"].get<float>();
+                        m_settings.data.asSphere.m_radius = s["sphere"]["radius"].get<float>();
                     }
                     break;
                 case ColliderShapeType::Capsule:
                     if (s.contains("capsule")) {
                         if (s["capsule"].contains("height"))
-                            m_settings.asCapsule.m_height = s["capsule"]["height"].get<float>();
+                            m_settings.data.asCapsule.m_height = s["capsule"]["height"].get<float>();
                         if (s["capsule"].contains("radius"))
-                            m_settings.asCapsule.m_radius = s["capsule"]["radius"].get<float>();
+                            m_settings.data.asCapsule.m_radius = s["capsule"]["radius"].get<float>();
                     }
                     break;
                 case ColliderShapeType::TaperedCapsule:
                     if (s.contains("taperedCapsule")) {
                         if (s["taperedCapsule"].contains("height"))
-                            m_settings.asTaperedCapsule.m_height = s["taperedCapsule"]["height"].get<float>();
+                            m_settings.data.asTaperedCapsule.m_height = s["taperedCapsule"]["height"].get<float>();
                         if (s["taperedCapsule"].contains("upperRadius"))
-                            m_settings.asTaperedCapsule.m_upperRadius = s["taperedCapsule"]["upperRadius"].get<float>();
+                            m_settings.data.asTaperedCapsule.m_topRadius = s["taperedCapsule"]["upperRadius"].get<float>();
                         if (s["taperedCapsule"].contains("lowerRadius"))
-                            m_settings.asTaperedCapsule.m_lowerRadius = s["taperedCapsule"]["lowerRadius"].get<float>();
+                            m_settings.data.asTaperedCapsule.m_bottomRadius = s["taperedCapsule"]["lowerRadius"].get<float>();
                     }
                     break;
                 case ColliderShapeType::Mesh:

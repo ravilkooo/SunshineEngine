@@ -1,5 +1,6 @@
 #include "WorldEditor.h"
 #include <Component/LuaComponent.h>
+#include <Component/PhysicsComponent.h>
 #include <fstream>   // std::ofstream
 
 WorldEditor::WorldEditor()
@@ -168,7 +169,8 @@ void WorldEditor::InitScene()
 	*/
 	// To-do: there should be path to opened project
 	// to-do: class Project
-	if (!LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str()))
+	
+	//if (!LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str()))
 	{
 		this->m_scene = eastl::make_shared<Scene_Info>();
 
@@ -178,33 +180,26 @@ void WorldEditor::InitScene()
 		);
 
 		{
+
 			SE::UUID boxId = m_scene->AddGameObject(
 				EditorObjectFactory::CreateBoxObject(
 					m_renderer.get(), 1.0f, 1.0f, 1.0f
 				)
 			);
 
-			/*
-			auto physicsComp = m_scene->GetGameObjectByUUID(boxId)->AddComponent<PhysicsComponent>();
+			auto obj = m_scene->GetGameObjectByUUID(boxId);
 
-			physicsComp->SetObjecUUID(boxId);
-			physicsComp->SetObjectLayer(Layers::MOVING); // Example ObjectLayer
-			physicsComp->SetPosition(JPH::RVec3(0.0f, 0.0f, 0.0f));
-			auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(0.4f, 0.3f, 0.333f);
-			physicsComp->SetOrientation(JPH::Quat(quat.x, quat.y, quat.z, quat.w));
-			physicsComp->SetMotionType(JPH::EMotionType::Dynamic);
-			physicsComp->SetActivation(JPH::EActivation::Activate);
+			auto tc_info = obj->GetComponent<TransformComponent_Info>();
+			auto rc_info = obj->GetComponent<RenderComponent_Info>();
 
-			// Create a box shape for the physics body
-			JPH::BoxShapeSettings boxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
-			boxSettings.SetEmbedded();
-			JPH::ShapeRefC boxShape = boxSettings.Create().Get();
+			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
 
-			// Set the shape to the component
-			physicsComp->SetShape(boxShape);
-
-			physicsComp->CreateBody(m_physicsSystem);
-			*/
+			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
+			pc_info->SetActivation(SE::PhysicsActivation::Activate);
+			pc_info->SetShape(SE::ColliderShapeType::Box);
+			SE::ColliderSettings collSettings{};
+			collSettings.data.asBox = { { 1.0f, 1.0f, 1.0f } };
+			pc_info->m_colliderData->SetColliderSettings(collSettings);
 		}
 
 		for (size_t i = 0; i < 6; i++)
@@ -213,36 +208,23 @@ void WorldEditor::InitScene()
 				m_renderer.get(), 1.0f)
 			);
 			auto obj = m_scene->GetGameObjectByUUID(m_scene->gameObjects.back());
-			auto tr_info = obj->GetComponent<TransformComponent_Info>();
+			auto tc_info = obj->GetComponent<TransformComponent_Info>();
 
-			tr_info->m_assignedComponent->m_position = DXSM::Vector3(
+			tc_info->m_assignedComponent->m_position = DXSM::Vector3(
 				3.0f * cos(DX::XM_2PI * i / 6.0f),
 				3.0f * sin(DX::XM_2PI * i / 6.0f),
 				0.0f);
 
-			/*
-			auto physicsComp = m_scene->GetGameObjectByUUID(ballId)->AddComponent<PhysicsComponent>();
+			auto rc_info = obj->GetComponent<RenderComponent_Info>();
 
-			physicsComp->SetObjecUUID(ballId);
-			physicsComp->SetObjectLayer(Layers::MOVING); // Example ObjectLayer
-			physicsComp->SetPosition(JPH::RVec3(
-				3.0f * cos(DX::XM_2PI * i / 6.0f),
-				3.0f * sin(DX::XM_2PI * i / 6.0f),
-				0.0f));
-			physicsComp->SetOrientation(JPH::Quat::sIdentity());
-			physicsComp->SetMotionType(JPH::EMotionType::Dynamic);
-			physicsComp->SetActivation(JPH::EActivation::Activate);
+			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
 
-			// Create a box shape for the physics body
-			JPH::SphereShapeSettings settings(1.0f);
-			settings.SetEmbedded();
-			JPH::ShapeRefC sphereShape = settings.Create().Get();
-
-			// Set the shape to the component
-			physicsComp->SetShape(sphereShape);
-
-			physicsComp->CreateBody(m_physicsSystem);
-			*/
+			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
+			pc_info->SetActivation(SE::PhysicsActivation::Activate);
+			pc_info->SetShape(SE::ColliderShapeType::Sphere);
+			SE::ColliderSettings collSettings{};
+			collSettings.data.asSphere = { 1.0f };
+			pc_info->m_colliderData->SetColliderSettings(collSettings);
 		}
 
 		m_scene->AddGameObject(EditorObjectFactory::CreateAmbientLightObject(
@@ -277,30 +259,21 @@ void WorldEditor::InitScene()
 			SE::UUID floorId = m_scene->AddGameObject(EditorObjectFactory::CreateBoxObject(
 				m_renderer.get(), 100.0f, 0.1f, 100.0f)
 			);
-			/*
-			auto physicsComp = m_scene->GetGameObjectByUUID(floorId)->AddComponent<PhysicsComponent>();
 
-			physicsComp->SetObjecUUID(floorId);
-			physicsComp->SetObjectLayer(Layers::NON_MOVING); // Example ObjectLayer
-			physicsComp->SetPosition(JPH::RVec3(0.0f, -5.0f, 0.0f));
-			physicsComp->SetOrientation(JPH::Quat::sIdentity());
-			physicsComp->SetMotionType(JPH::EMotionType::Static);
-			physicsComp->SetActivation(JPH::EActivation::DontActivate);
+			auto floorObj = m_scene->GetGameObjectByUUID(floorId);
+			auto tc_info = floorObj->GetComponent<TransformComponent_Info>();
+			tc_info->m_assignedComponent->m_position.y = -5.0f;
 
-			// Create a box shape for the physics body
-			JPH::BoxShapeSettings boxSettings(JPH::Vec3(50.0f, 0.05f, 50.0f));
-			boxSettings.SetEmbedded();
-			JPH::ShapeRefC boxShape = boxSettings.Create().Get();
+			auto rc_info = floorObj->GetComponent<RenderComponent_Info>();
 
-			// Set the shape to the component
-			physicsComp->SetShape(boxShape);
+			auto pc_info = floorObj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+			pc_info->SetMotion(SE::PhysicsMotionType::Static);
+			pc_info->SetActivation(SE::PhysicsActivation::DontActivate);
+			pc_info->SetShape(SE::ColliderShapeType::Box);
+			SE::ColliderSettings floorCollSettings{};
+			floorCollSettings.data.asBox = { { 100.0f, 0.1f, 100.0f } };
 
-			physicsComp->CreateBody(m_physicsSystem);
-			*/
-
-			auto tr_info = m_scene->GetGameObjectByUUID(floorId)->GetComponent<TransformComponent_Info>();
-
-			tr_info->m_assignedComponent->m_position.y = -5.0f;
+			pc_info->m_colliderData->SetColliderSettings(floorCollSettings);
 		}
 		// ----------------------------------------------------
 
@@ -310,28 +283,22 @@ void WorldEditor::InitScene()
 				m_renderer.get(), 0.5f)
 			);
 
-			/*
-			auto physicsComp = m_scene->GetGameObjectByUUID(ballId)->AddComponent<PhysicsComponent>();
+			auto obj = m_scene->GetGameObjectByUUID(ballId);
 
-			physicsComp->SetObjecUUID(ballId);
-			physicsComp->SetObjectLayer(Layers::MOVING); // Example ObjectLayer
-			physicsComp->SetPosition(JPH::RVec3(0.0f, 2.0f, 0.0f));
-			physicsComp->SetOrientation(JPH::Quat::sIdentity());
-			physicsComp->SetMotionType(JPH::EMotionType::Dynamic);
-			physicsComp->SetActivation(JPH::EActivation::Activate);
+			auto tc_info = obj->GetComponent<TransformComponent_Info>();
+			tc_info->m_assignedComponent->m_position.y = 2.0f;
 
-			// Create a box shape for the physics body
-			JPH::SphereShapeSettings settings(0.5f);
-			settings.SetEmbedded();
-			JPH::ShapeRefC sphereShape = settings.Create().Get();
+			auto rc_info = obj->GetComponent<RenderComponent_Info>();
 
-			// Set the shape to the component
-			physicsComp->SetShape(sphereShape);
+			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
 
-			physicsComp->CreateBody(m_physicsSystem);
-			*/
-			auto tr_info = m_scene->GetGameObjectByUUID(ballId)->GetComponent<TransformComponent_Info>();
-			tr_info->m_assignedComponent->m_position.y = 2.0f;
+			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
+			pc_info->SetActivation(SE::PhysicsActivation::Activate);
+			pc_info->SetShape(SE::ColliderShapeType::Capsule);
+			SE::ColliderSettings collSettings{};
+			collSettings.data.asCapsule = { 1.0f, 1.0f };
+
+			pc_info->m_colliderData->SetColliderSettings(collSettings);
 		}
 		// ----------------------------------------------------
 

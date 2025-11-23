@@ -22,6 +22,13 @@
 
 #include <Serialization/GraphicsSerialization.h>
 
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/Shape/BoxShape.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/CapSuleShape.h>
+#include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -153,7 +160,7 @@ void PhysicsComponent_Info::FromJson(const json& j) {
         m_collisionLayer = SE::CollisionLayer{ j.at("m_collisionLayer").get<std::string>().c_str() };
     }
 
-    // Collider data (optional)
+    // Collider/shape data
     if (j.contains("collider") && j["collider"].is_object()) {
         if (!m_colliderData) {
             m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Box);
@@ -182,7 +189,56 @@ void PhysicsComponent::FromJson(const json& j) {
         case SE::PhysicsActivation::DontActivate: m_activation = JPH::EActivation::DontActivate; break;
     }
 
-    // m_shape = MyShapeFactory::CreateJoltShape(info.shape, ...);
+    // Deserialize shape from collider data
+    if (info.m_colliderData) {
+        const SE::ColliderData& colliderData = *info.m_colliderData;
+        JPH::ShapeSettings::ShapeResult shapeResult;
+
+        switch (colliderData.m_shapeType) {
+            case SE::ColliderShapeType::Box: {
+                JPH::BoxShapeSettings boxSettings(
+                    JPH::Vec3(
+                        colliderData.m_settings.data.asBox.m_size.x * 0.5f,
+                        colliderData.m_settings.data.asBox.m_size.y * 0.5f,
+                        colliderData.m_settings.data.asBox.m_size.z * 0.5f
+                    )
+                );
+                shapeResult = boxSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::Sphere: {
+                JPH::SphereShapeSettings sphereSettings(colliderData.m_settings.data.asSphere.m_radius);
+                shapeResult = sphereSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::Capsule: {
+                JPH::CapsuleShapeSettings capsuleSettings(
+                    colliderData.m_settings.data.asCapsule.m_height * 0.5f,
+                    colliderData.m_settings.data.asCapsule.m_radius
+                );
+                shapeResult = capsuleSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::TaperedCapsule: {
+                JPH::TaperedCapsuleShapeSettings taperedCapsuleSettings(
+                    colliderData.m_settings.data.asTaperedCapsule.m_height * 0.5f,
+                    colliderData.m_settings.data.asTaperedCapsule.m_topRadius,
+                    colliderData.m_settings.data.asTaperedCapsule.m_bottomRadius
+                );
+                shapeResult = taperedCapsuleSettings.Create();
+                break;
+            }
+            default:
+                // Fallback to box if shape type is not recognized
+                JPH::BoxShapeSettings defaultBoxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
+                shapeResult = defaultBoxSettings.Create();
+                break;
+        }
+
+        if (shapeResult.IsValid()) {
+            m_shape = shapeResult.Get();
+        }
+    }
 
 }
 
@@ -348,6 +404,8 @@ eastl::shared_ptr<Scene> Scene::FromJson(
             GameObjectGroup objGroup = objJ["m_group"];
             ObjectType objType = ObjectType(objGroup, objJ["m_type"]);
             eastl::unique_ptr<GameObject> go;
+
+            // Unique stuff for objects groups
             // objJ;
             switch (objGroup)
             {
@@ -396,9 +454,15 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                 break;
             }
 
-
-            //auto go = GameObject::FromJson(objJ);
             if (go) {
+                // Other components (Physics, Lua)
+
+                if (objJ["components"].contains("Physics")) {
+                    auto c = go->AddComponent<PhysicsComponent>(
+                        go->m_UUID, go->GetComponent<TransformComponent>().get());
+                    c->FromJson(j["components"]["Physics"]);
+                }
+
                 scene->AddGameObject(eastl::move(go));
             }
         }

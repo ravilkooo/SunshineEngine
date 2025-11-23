@@ -27,6 +27,7 @@ class PhysicsComponent :
 public:
 
     PhysicsComponent() = default;
+    PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc);
     ~PhysicsComponent();
 
     PhysicsComponent(const PhysicsComponent&) = delete;
@@ -60,8 +61,11 @@ public:
     JPH::Body* GetBody() const;
     JPH::BodyID GetBodyID() const;
 
+    void FromJson(const json& j) override;
 
 private:
+    TransformComponent* transformComp;
+
     SE::UUID m_objectUUID;
     JPH::Body* m_joltBody;
     JPH::BodyID m_joltBodyId;
@@ -76,7 +80,6 @@ private:
 
     // To-do: make weak_ptr or simple ptr?
     eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
-    void FromJson(const json& j) override;
 };
 
 class RenderComponent_Info;

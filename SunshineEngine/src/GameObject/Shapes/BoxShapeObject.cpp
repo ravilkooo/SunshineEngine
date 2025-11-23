@@ -16,6 +16,7 @@ BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 	auto tc_info = AddComponent<TransformComponent_Info>();
 	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 
+	// RenderComponent and techniques
 	auto rc_info = AddComponent<RenderComponent_Info>();
 	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
@@ -68,7 +69,7 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 
 	// PhysicsComponent
-	auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+	//auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
 
 	return obj;
 }

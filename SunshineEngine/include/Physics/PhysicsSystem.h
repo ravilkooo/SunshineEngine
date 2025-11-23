@@ -219,11 +219,11 @@ class PhysicsSystem
 {
 public:
     PhysicsSystem();
-
+    
     void AddBody(JPH::BodyID bodyId,
         SE::UUID objectUUID,
         JPH::EActivation activation = JPH::EActivation::DontActivate);
-
+    
     // Add objects before this step
     void FinalizeScene();
 

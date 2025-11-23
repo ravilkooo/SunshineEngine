@@ -6,6 +6,13 @@
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
+
+PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
+{
+    SetObjecUUID(objectUUID);
+    InitTransforms(tc);
+}
+
 PhysicsComponent::~PhysicsComponent() {
     JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
     bodyInterface.RemoveBody(m_joltBodyId);
@@ -52,11 +59,12 @@ void PhysicsComponent::CreateBody(eastl::shared_ptr<PhysicsSystem> physicsSystem
     */
 }
 
-void PhysicsComponent::InitTransforms(TransformComponent* tc) {
+void PhysicsComponent::InitTransforms(TransformComponent* tc)
+{
+    transformComp = tc;
+
     m_position.Set(tc->m_position.x, tc->m_position.y, tc->m_position.z);
-
     auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(tc->m_rotation.y, tc->m_rotation.x, tc->m_rotation.z);
-
     m_orientation.Set(quat.x, quat.y, quat.z, quat.w);
 }
 
@@ -90,7 +98,7 @@ PhysicsComponent_Info::~PhysicsComponent_Info() {
 SE::ColliderShapeType PhysicsComponent_Info::GetShape() const { return m_colliderData->m_shapeType; }
 void PhysicsComponent_Info::SetShape(SE::ColliderShapeType shape)
 {
-    m_colliderData->SetShapeType(m_colliderData->m_shapeType);
+    m_colliderData->SetShapeType(shape);
 }
 
 SE::PhysicsMotionType PhysicsComponent_Info::GetMotion() const { return m_motion; }

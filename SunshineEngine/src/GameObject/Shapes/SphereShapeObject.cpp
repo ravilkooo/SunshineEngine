@@ -68,7 +68,13 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 
 	// PhysicsComponent
-	auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+	if (j["components"].contains("Physics")) {
+		auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+		pc_info->FromJson(j["components"]["Physics"]);
+	}
+	else {
+		
+	}
 
 	return obj;
 }
