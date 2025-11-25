@@ -104,11 +104,11 @@ public:
 	/// Check if a body has been added to the physics system.
 	bool						IsAdded(const BodyID &inBodyID) const;
 
-	/// Combines CreateBody and CreateAndAddBody
+	/// Combines CreateBody and AddBody
 	/// @return Created body ID or an invalid ID when out of bodies
 	BodyID						CreateAndAddBody(const BodyCreationSettings &inSettings, EActivation inActivationMode);
 
-	/// Combines CreateSoftBody and CreateAndAddBody
+	/// Combines CreateSoftBody and AddBody
 	/// @return Created body ID or an invalid ID when out of bodies
 	BodyID						CreateAndAddSoftBody(const SoftBodyCreationSettings &inSettings, EActivation inActivationMode);
 
