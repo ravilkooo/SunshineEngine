@@ -9,6 +9,7 @@
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+class PhysicsSystem;
 
 class Scene
 {
@@ -35,6 +36,7 @@ public:
 
     static eastl::shared_ptr<Scene> FromJson(
         SE_G::DeferredRenderer* renderSystem,
+        PhysicsSystem* m_physicsSystem,
         eastl::shared_ptr<SE_G::Camera> camera, const json& j);
 private:
 };

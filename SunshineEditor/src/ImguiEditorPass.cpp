@@ -1,26 +1,26 @@
-#include "ImguiEditorPass.h"
-#include "WorldEditor.h"
-#include <Component/LuaComponent.h>
 #include <EASTL/string.h>
-#include <Utils/DebugUtils.h>
 
 #include "assimp/SceneCombiner.h"
 
+#include "ImguiEditorPass.h"
+#include <EditorApp.h>
+
+#include <Component/LuaComponent.h>
+#include <Utils/DebugUtils.h>
+
+
 ImguiEditorPass::ImguiEditorPass(
-	ID3D11Device* device,
-	ID3D11DeviceContext* context,
-	ID3D11Texture2D* backBuffer,
-	UINT editorAppWidth, UINT editorAppHeight,
-	eastl::shared_ptr<WorldEditor> worldEditor)
-	: RenderPass("LightPass", device, context)
+	EditorApp* editorApp)
+	: RenderPass("LightPass", editorApp->m_renderingSystem->GetDevice(),
+		editorApp->m_renderingSystem->GetDeviceContext())
 {
-	m_editorAppWidth = editorAppWidth;
-	m_editorAppHeight = editorAppHeight;
-	m_worldEditor = worldEditor;
-	m_backBuffer = backBuffer;
+	m_editorAppWidth = editorApp->m_winWidth;
+	m_editorAppHeight = editorApp->m_winHeight;
+	m_editorApp = editorApp;
+	m_backBuffer = editorApp->m_renderingSystem->GetBackBuffer();
 
 	// rtv
-	HRESULT hr = device->CreateRenderTargetView(m_backBuffer.Get(), nullptr, m_renderTargetView.GetAddressOf());
+	HRESULT hr = device->CreateRenderTargetView(m_backBuffer, nullptr, m_renderTargetView.GetAddressOf());
 	if (FAILED(hr))
 		throw std::runtime_error("Failed to create Render Target View");
 
@@ -195,8 +195,11 @@ void ImguiEditorPass::Pass()
 				DXSM::Vector2(m_lastGameViewportSize.x, m_lastGameViewportSize.y)
 			);
 			*/
-			selectedUUID = m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
-			m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+
+			if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
+				selectedUUID = m_editorApp->m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
+				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+			}
 		}
 	}
 
@@ -208,7 +211,12 @@ void ImguiEditorPass::Pass()
 	m_gameViewportJustResized = (contentSize.x != m_lastGameViewportSize.x) || (contentSize.y != m_lastGameViewportSize.y);
 	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0)
 	{
-		m_worldEditor->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
+		if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
+			m_editorApp->m_worldEditor->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
+		}
+		else {
+			m_editorApp->m_currentGame->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
+		}
 	}
 	m_lastGameViewportSize = contentSize;
 
@@ -256,7 +264,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 	ImGui::Text("Scene Hierarchy");
 	if (ImGui::TreeNode("Root"))
 	{
-		auto& objects = m_worldEditor->m_scene->gameObjects;
+		auto& objects = m_editorApp->m_worldEditor->m_scene->gameObjects;
 		for (size_t i = 0; i < objects.size(); ++i)
 		{
 			// selectedIdx
@@ -269,14 +277,14 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
 			//m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->Name = objLabel;
 
-			eastl::string objName = m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->m_name;
+			eastl::string objName = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->m_name;
 			if (objName == "")
 				objName = std::to_string(objects[i].m_UUID).c_str();
 			// if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
 			if (ImGui::Selectable(objName.c_str(), isSelected))
 			{
 				selectedUUID = objects[i];
-				m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 			}
 			ImGui::PopID();
 		}
@@ -291,11 +299,11 @@ void ImguiEditorPass::ShowContentBrowser()
 
 void ImguiEditorPass::ShowProperties()
 {
-	m_PropertyPanel.SetWorldEditor(m_worldEditor);
+	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
 	m_PropertyPanel.SetSelectedUUID(selectedUUID);
 	m_PropertyPanel.OnImGuiRender();
 
-	GameObject_Info* obj = m_worldEditor->m_scene->GetGameObjectByUUID(
+	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
 		selectedUUID
 	);
 
@@ -419,7 +427,6 @@ void ImguiEditorPass::PreResize()
 	m_renderTargetView.Reset();
 	m_pDSV.Reset();
 	m_pDepthStencil.Reset();
-	m_backBuffer.Reset();
 
 }
 
@@ -429,7 +436,7 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	m_editorAppHeight = resizeHeight;
 	m_backBuffer = backBuffer;
 
-	HRESULT hr = device->CreateRenderTargetView(m_backBuffer.Get(), nullptr, m_renderTargetView.GetAddressOf());
+	HRESULT hr = device->CreateRenderTargetView(m_backBuffer, nullptr, m_renderTargetView.GetAddressOf());
 	if (FAILED(hr))
 		throw std::runtime_error("Failed to create Render Target View");
 

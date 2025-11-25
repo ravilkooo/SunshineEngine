@@ -5,6 +5,9 @@
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
 
+template<class C, class T>
+concept FitsInC = (sizeof(T) <= sizeof(C));
+
 namespace SE_G {
 	namespace Bind
 	{
@@ -16,7 +19,8 @@ namespace SE_G {
 			Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
 			UINT slot;
 		public:
-			virtual void Update(ID3D11DeviceContext* context, const C& consts) {
+			virtual void Update(ID3D11DeviceContext* context, const C& consts)
+			{
 				if (!pConstantBuffer) return;
 
 				const UINT aligned = Align16(static_cast<UINT>(sizeof(C)));
@@ -30,6 +34,28 @@ namespace SE_G {
 				std::memcpy(tmp.data(), &consts, sizeof(C));
 
 				std::memcpy(mappedResource.pData, tmp.data(), aligned);
+				context->Unmap(pConstantBuffer.Get(), 0);
+			}
+
+			template <FitsInC<C> T>
+			void UpdateWithOtherType(ID3D11DeviceContext* context, const T& consts)
+			{
+				if (!pConstantBuffer) return;
+
+				const UINT alignedOrigin = Align16(static_cast<UINT>(sizeof(C)));
+				const UINT alignedIncoming = Align16(static_cast<UINT>(sizeof(T)));
+				const UINT alignedMin = min(alignedIncoming, alignedOrigin);
+				const UINT copySize = min(alignedMin, sizeof(T));
+
+				D3D11_MAPPED_SUBRESOURCE mappedResource{};
+				HRESULT hr = context->Map(pConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
+				if (FAILED(hr)) return;
+
+				eastl::vector<char> tmp(alignedOrigin);
+				std::memset(tmp.data(), 0, alignedOrigin);
+				std::memcpy(tmp.data(), &consts, copySize);
+
+				std::memcpy(mappedResource.pData, tmp.data(), alignedOrigin);
 				context->Unmap(pConstantBuffer.Get(), 0);
 			}
 

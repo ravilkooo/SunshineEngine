@@ -60,16 +60,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 
 	imguiEditorPass = static_cast<ImguiEditorPass*>(
 		m_imguiRenderGroup->AddPass(
-			eastl::make_unique<ImguiEditorPass>(
-				m_renderingSystem->GetDevice(),
-				m_renderingSystem->GetDeviceContext(),
-				m_renderingSystem->GetBackBuffer(),
-				m_winWidth,
-				m_winHeight,
-				m_worldEditor
-			)
-		)
-	);
+			eastl::make_unique<ImguiEditorPass>(this)));
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_worldEditor->m_renderer->m_GBuffer.get());
@@ -160,7 +151,6 @@ void EditorApp::RunApp()
 			}
 		}
 
-		//m_worldEditor->SyncronizeTransforms();
 		Render();
 
 
@@ -440,13 +430,14 @@ void EditorApp::LaunchGame() {
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
+	m_currentGame->SetupPhysics();
 	m_currentGame->LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
+	m_currentGame->m_physicsSystem->FinalizeScene();
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
-
 
 	// There should be saving scene from world editor (serializing) and loading to game (deserializing)
 	// m_worldEditor->SaveScene(...);
@@ -456,6 +447,7 @@ void EditorApp::LaunchGame() {
 
 void EditorApp::StopGame() {
 	m_currentGame->Stop();
+	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
 	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
 

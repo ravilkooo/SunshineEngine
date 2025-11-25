@@ -6,7 +6,7 @@
 
 JPH_NAMESPACE_BEGIN
 
-/// Enum used by AddBody to determine if the body needs to be initially active
+/// Enum used by CreateAndAddBody to determine if the body needs to be initially active
 enum class EActivation
 {
 	Activate,				///< Activate the body, making it part of the simulation

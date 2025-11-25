@@ -2,7 +2,7 @@
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
-    bool PointLightTechnique::m_staticDataInitializated = false;
+    bool PointLightTechnique::s_staticDataInitializated = false;
 
     eastl::shared_ptr<Bind::DepthStencilState> PointLightTechnique::depthCompLess;
     eastl::shared_ptr<Bind::DepthStencilState> PointLightTechnique::depthCompGreater;
@@ -17,7 +17,7 @@ namespace SE_G {
         eastl::shared_ptr<PointLightData> lightData)
         : LightTechnique(device, assignedTransform, technique, camera, lightData)
     {
-        if (!PointLightTechnique::m_staticDataInitializated)
+        if (!PointLightTechnique::s_staticDataInitializated)
         {
             PointLightTechnique::InitStaticData(device);
         }
@@ -165,6 +165,6 @@ namespace SE_G {
         rasterDesc.FillMode = D3D11_FILL_SOLID;
         rastCullFront = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
 
-        m_staticDataInitializated = true;
+        s_staticDataInitializated = true;
     }
 }

@@ -15,6 +15,7 @@
 #include <Graphics/Renderer/Pass/LightPass.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
+#include <Graphics/Renderer/Pass/ColliderPass.h>
 
 #include <GameObject/EditorObjectFactory.h>
 #include <Scripting/LuaManager.h>
@@ -93,6 +94,7 @@ public:
     SE_G::LightPass* m_lightPass;
     SE_G::SelectionPass* m_selectionPass;
     SE_G::IconPass* m_iconPass;
+    SE_G::ColliderPass* m_colliderPass;
 
     float m_deltaTime = 0.0f;
 

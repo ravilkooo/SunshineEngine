@@ -44,10 +44,10 @@ public:
     eastl::vector<eastl::string> m_collisionLayerGroups;
     eastl::vector<eastl::string> m_collisionLayers;
 
-    CollisionLayerVsLayerTable m_collisionLayerVsLayerTable;
-    CollisionLayerVsGroupTable m_collisionLayerVsGroupTable;
+    SE::CollisionLayerVsLayerTable m_collisionLayerVsLayerTable;
+    SE::CollisionLayerVsGroupTable m_collisionLayerVsGroupTable;
 
-    eastl::unordered_map<CollisionLayer, CollisionGroup> m_layerToGroupMapping;
+    eastl::unordered_map<SE::CollisionLayer, SE::CollisionGroup> m_layerToGroupMapping;
 };
 
 
@@ -131,9 +131,9 @@ public:
     {
         switch (inObject1)
         {
-        case Layers::NON_MOVING:
-            return inObject2 == Layers::MOVING; // Non moving only collides with moving
-        case Layers::MOVING:
+        case SE::Layers::NON_MOVING:
+            return inObject2 == SE::Layers::MOVING; // Non moving only collides with moving
+        case SE::Layers::MOVING:
             return true; // Moving collides with everything
         default:
             JPH_ASSERT(false);
@@ -150,18 +150,18 @@ public:
     BPLayerInterfaceImpl()
     {
         // Create a mapping table from object to broad phase layer
-        mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
-        mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
+        mObjectToBroadPhase[SE::Layers::NON_MOVING] = SE::BroadPhaseLayers::NON_MOVING;
+        mObjectToBroadPhase[SE::Layers::MOVING] = SE::BroadPhaseLayers::MOVING;
     }
 
     virtual UINT GetNumBroadPhaseLayers() const override
     {
-        return BroadPhaseLayers::NUM_LAYERS;
+        return SE::BroadPhaseLayers::NUM_LAYERS;
     }
 
     virtual JPH::BroadPhaseLayer GetBroadPhaseLayer(JPH::ObjectLayer inLayer) const override
     {
-        JPH_ASSERT(inLayer < Layers::NUM_LAYERS);
+        JPH_ASSERT(inLayer < SE::Layers::NUM_LAYERS);
         return mObjectToBroadPhase[inLayer];
     }
 
@@ -170,15 +170,15 @@ public:
     {
         switch ((JPH::BroadPhaseLayer::Type)inLayer)
         {
-        case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
-        case (JPH::BroadPhaseLayer::Type)BroadPhaseLayers::MOVING:		return "MOVING";
+        case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
+        case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::MOVING:		return "MOVING";
         default:													JPH_ASSERT(false); return "INVALID";
         }
     }
 #endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
 
 private:
-    JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
+    JPH::BroadPhaseLayer mObjectToBroadPhase[SE::Layers::NUM_LAYERS];
 };
 
 /// Class that determines if an object layer can collide with a broadphase layer
@@ -191,9 +191,9 @@ public:
     {
         switch (inLayer1)
         {
-        case Layers::NON_MOVING:
-            return inLayer2 == BroadPhaseLayers::MOVING;
-        case Layers::MOVING:
+        case SE::Layers::NON_MOVING:
+            return inLayer2 == SE::BroadPhaseLayers::MOVING;
+        case SE::Layers::MOVING:
             return true;
         default:
             JPH_ASSERT(false);
@@ -219,10 +219,9 @@ class PhysicsSystem
 {
 public:
     PhysicsSystem();
-
-    void AddBody(JPH::BodyID bodyId,
-        SE::UUID objectUUID,
-        JPH::EActivation activation = JPH::EActivation::DontActivate);
+    ~PhysicsSystem();
+    
+    void CreateAndAddBody(PhysicsComponent* physComp);
 
     // Add objects before this step
     void FinalizeScene();
@@ -231,14 +230,15 @@ public:
 
     void Step(float dt);
 
-    void ClearAllBodies();
-
-    void ClearScene();
-
     JPH::PhysicsSystem& GetWorld();
     JPH::BodyInterface& Bodies();
 
+    bool IsValid() { return m_isValid; }
+
 private:
+
+    void ClearAllBodies();
+
     eastl::unique_ptr<BPLayerInterfaceImpl> m_bpInterface; // { 2, 2 };
     eastl::unique_ptr<ObjectVsBroadPhaseLayerFilterImpl> m_objectVsBpFilter; // ; // { 2 };
     eastl::unique_ptr<ObjectLayerPairFilterImpl> m_objectPairFilter; // { 2 };
@@ -251,6 +251,8 @@ private:
     MyContactListener m_contactListener;
 
     eastl::vector<PhysicsBodyEntry> m_bodyEntries;
+
+    bool m_isValid = false;
     // TO-DO
     // Something like list of all phys objects (or some entries like in nau engine)
     // It will be used for (Syn Step) syncronization with TransformComponent and other stuff

@@ -1,4 +1,6 @@
 #include <GameObject/Shapes/SphereShapeObject.h>
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
+#include <Component/PhysicsComponent.h>
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, SphereShapeData initData)
@@ -63,8 +65,16 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(
 		device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
-
 	rc_info->AddTechnique(eastl::move(gBufferTech));
+
+	// PhysicsComponent
+	if (j["components"].contains("Physics")) {
+		auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+		pc_info->FromJson(j["components"]["Physics"]);
+	}
+	else {
+		
+	}
 
 	return obj;
 }

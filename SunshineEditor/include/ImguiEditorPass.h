@@ -21,16 +21,13 @@
 #include "UI/LogPanel.h"
 #include "UI/PropertyPanel.h"
 
-class WorldEditor;
+class EditorApp;
 
 class ImguiEditorPass :
     public SE_G::RenderPass
 {
 public:
-    ImguiEditorPass(ID3D11Device* device, ID3D11DeviceContext* context,
-        ID3D11Texture2D* backBuffer,
-        UINT screenWidth, UINT screenHeight,
-        eastl::shared_ptr<WorldEditor> worldEditor);
+    ImguiEditorPass(EditorApp* editorApp);
 
     void SetVieportGBuffer(SE_G::GBuffer* pGBuffer);
 
@@ -51,16 +48,14 @@ public:
 
     bool m_isLayoutInitialized = false;
 
+    EditorApp* m_editorApp;
     SE_G::GBuffer* m_viewportGBuffer;
-
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> m_backBuffer;
+    ID3D11Texture2D* m_backBuffer;
 
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
     D3D11_VIEWPORT m_windowViewport;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pDepthStencil;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDSV;
-
-    eastl::shared_ptr<WorldEditor> m_worldEditor;
     
     ContentBrowserPanel m_ContentBrowserPanel;
     MainMenuBarPanel m_MainMenuBarPanel;

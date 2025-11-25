@@ -24,24 +24,6 @@ namespace SE_G {
 	{
 		BindAllPerFrame();
 
-		/*
-		for (const auto& gameObjectUUID : scene.gameObjects) {
-			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
-			if (gameObject->HasComponent<RenderComponent>() &&
-				gameObject->HasComponent<TransformComponent>()) {
-
-				auto renderComponent = gameObject->GetComponent<RenderComponent>();
-
-				if (!renderComponent->HasTechnique(techniqueTag))
-					continue;
-
-				gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
-				renderComponent->PassTechnique(techniqueTag, GetDeviceContext());
-
-			}
-		}
-		*/
-
 		for (auto& tech : m_techniques) {
 			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech->Pass(GetDeviceContext());

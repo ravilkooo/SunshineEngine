@@ -40,6 +40,11 @@ void Game::SetupRendering(
 	}
 }
 
+void Game::SetupPhysics()
+{
+	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
+}
+
 bool Game::LoadScene(const wchar_t* scenePath)
 {
 	std::ifstream file(scenePath);
@@ -56,7 +61,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		return false;
 	}
 
-	m_scene = Scene::FromJson(m_renderer.get(), m_renderer->GetMainCamera(), j);
+	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	/*
 	if (!loadedScene) {
 		LOG_EDITOR_ERROR("Scene load error\n");
@@ -138,7 +143,9 @@ void Game::Run()
 void Game::Update(float deltaTime) {
 
 	// m_luaManager.Update(m_scene, deltaTime);
-	// m_physicsSystem.Update(deltaTime);
+	 m_physicsSystem->Step(deltaTime);
+
+	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
 }
 
 void Game::Render()

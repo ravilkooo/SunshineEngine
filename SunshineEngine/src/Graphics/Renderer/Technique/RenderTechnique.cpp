@@ -74,4 +74,16 @@ namespace SE_G {
 	{
 		return m_techniqueTag;
 	}
+
+	bool RenderTechnique::IsEnabled() {
+		return m_enabled;
+	}
+
+	void RenderTechnique::Disable() {
+		m_enabled = false;
+	}
+
+	void RenderTechnique::Enable() {
+		m_enabled = true;
+	}
 }

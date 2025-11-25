@@ -16,6 +16,12 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+template<class T>
+concept DerivedFromComponent = std::is_base_of_v<Component, T>;
+
+template<class T>
+concept DerivedFromComponent_Info = std::is_base_of_v<Component_Info, T>;
+
 namespace SE_G {
     class DeferredRenderer;
     class Camera;
@@ -49,8 +55,7 @@ public:
     eastl::string m_name;
     SE::UUID m_UUID;
 
-    template<typename T, typename... Args,
-        typename = std::enable_if_t<std::is_base_of<Component, T>::value>>
+    template<DerivedFromComponent T, typename... Args>
     eastl::shared_ptr<T> AddComponent(Args&&... args)
     {
         auto component = eastl::make_shared<T>(eastl::forward<Args>(args)...);
@@ -58,8 +63,7 @@ public:
         return component;
     }
     
-    template<typename T,
-        typename = std::enable_if_t<std::is_base_of<Component, T>::value>>
+    template<DerivedFromComponent T>
     bool HasComponent() const {
         for (auto& comp : impl->components) {
             if (typeid(T) == comp->getType()) return true;
@@ -67,8 +71,7 @@ public:
         return false;
     }
 
-    template<typename T,
-        typename = std::enable_if_t<std::is_base_of<Component, T>::value>>
+    template<DerivedFromComponent T>
     eastl::shared_ptr<T> GetComponent() {
         for (auto& comp : impl->components) {
             if (typeid(T) == comp->getType()) {
@@ -163,8 +166,7 @@ public:
     eastl::string m_name;
     SE::UUID m_UUID;
 
-    template<typename T, typename... Args,
-        typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>
+    template<DerivedFromComponent_Info T, typename... Args>
     eastl::shared_ptr<T> AddComponent(Args&&... args) {
         //SE::ComponentType type = T::StaticComponentType();
         // Check if already has this type
@@ -178,15 +180,13 @@ public:
         return component;
     }
 
-    template<typename T,
-        typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>
+    template<DerivedFromComponent_Info T>
     bool HasComponent() const {
         SE::ComponentType type = T::s_componentType;
         return impl->components.find(type) != impl->components.end();
     }
 
-    template<typename T,
-        typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>
+    template<DerivedFromComponent_Info T>
     eastl::shared_ptr<T> GetComponent() {
         SE::ComponentType type = T::s_componentType;
         auto it = impl->components.find(type);
@@ -196,8 +196,7 @@ public:
         return nullptr;
     }
 
-    template<typename T,
-        typename = std::enable_if_t<std::is_base_of<Component_Info, T>::value>>
+    template<DerivedFromComponent_Info T>
     void RemoveComponent() {
         SE::ComponentType type = T::s_componentType;
         impl->components.erase(type);

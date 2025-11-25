@@ -31,7 +31,7 @@ namespace SE_G {
     private:
         static void InitStaticData(ID3D11Device* device);
 
-        static bool m_staticDataInitializated;
+        static bool s_staticDataInitializated;
         static eastl::shared_ptr<Bind::DepthStencilState> depthCompLess;
         static eastl::shared_ptr<Bind::DepthStencilState> depthCompGreater;
 

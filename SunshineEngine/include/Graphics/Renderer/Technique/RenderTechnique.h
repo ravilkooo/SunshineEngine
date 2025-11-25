@@ -37,6 +37,10 @@ namespace SE_G {
 
         virtual eastl::string GetTechniqueTag();
 
+        bool IsEnabled();
+        void Disable();
+        void Enable();
+
         // Resources
         eastl::shared_ptr<Mesh> m_mesh;
         eastl::shared_ptr<Bind::VertexShader> m_vertexShader;
@@ -54,5 +58,8 @@ namespace SE_G {
         eastl::string m_techniqueTag;
 
         TransformComponent* m_assignedTransform;
+
+    private:
+        bool m_enabled = true;
     };
 }

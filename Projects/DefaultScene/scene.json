@@ -5,6 +5,101 @@
                 "Render": {
                     "techniques": [
                         {
+                            "Tag": "LightPass"
+                        },
+                        {
+                            "Tag": "IconPass"
+                        }
+                    ]
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 2637786834941709975,
+            "m_group": "Lighting",
+            "m_lightData": {
+                "Power": 0.0,
+                "Tint": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            },
+            "m_name": "SkyBox",
+            "m_type": "SkyBox"
+        },
+        {
+            "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
+                "Render": {
+                    "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
+                        {
                             "Mesh": "Box_repeat",
                             "Sampler": 0,
                             "Tag": "GPass",
@@ -45,7 +140,7 @@
                     ]
                 }
             },
-            "m_UUID": 1424466117171281493,
+            "m_UUID": 16447159791327144703,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_shapeData": {
@@ -59,8 +154,41 @@
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -102,13 +230,13 @@
                     ]
                 }
             },
-            "m_UUID": 11588112938971255355,
+            "m_UUID": 7363524756394080689,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
                 "Size": {
-                    "x": 0.5,
-                    "y": 2.4000000953674316,
+                    "x": 1.0,
+                    "y": 1.0,
                     "z": 1.0
                 },
                 "SliceCount": 10,
@@ -118,8 +246,41 @@
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -161,14 +322,14 @@
                     ]
                 }
             },
-            "m_UUID": 13809923256199016527,
+            "m_UUID": 233342740661002224,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
                 "Size": {
-                    "x": 0.30000001192092896,
-                    "y": 2.0,
-                    "z": 0.30000001192092896
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
                 },
                 "SliceCount": 10,
                 "StackCount": 10
@@ -177,8 +338,41 @@
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -220,7 +414,7 @@
                     ]
                 }
             },
-            "m_UUID": 3964217110369663957,
+            "m_UUID": 6317672114452528993,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -229,15 +423,48 @@
                     "y": 1.0,
                     "z": 1.0
                 },
-                "SliceCount": 5,
-                "StackCount": 3
+                "SliceCount": 10,
+                "StackCount": 10
             },
             "m_type": "Sphere"
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -279,7 +506,7 @@
                     ]
                 }
             },
-            "m_UUID": 18114811131372586489,
+            "m_UUID": 13299136484908695829,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -295,8 +522,41 @@
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -338,7 +598,7 @@
                     ]
                 }
             },
-            "m_UUID": 5144899744862162175,
+            "m_UUID": 8919476992905167112,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -354,8 +614,41 @@
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -397,7 +690,7 @@
                     ]
                 }
             },
-            "m_UUID": 16928252306129811499,
+            "m_UUID": 3492604863435408409,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -440,7 +733,7 @@
                         1.0
                     ],
                     "m_position": [
-                        -5.0,
+                        0.0,
                         0.0,
                         0.0
                     ],
@@ -456,13 +749,13 @@
                     ]
                 }
             },
-            "m_UUID": 5218894299015404965,
+            "m_UUID": 9200503562846642332,
             "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
-                    "x": 0.45588237047195435,
-                    "y": 0.0,
-                    "z": 0.0
+                    "x": 0.5,
+                    "y": 0.5,
+                    "z": 0.5
                 },
                 "AmbientPad": 1.0
             },
@@ -500,7 +793,7 @@
                     "m_position": [
                         0.0,
                         0.0,
-                        -3.0
+                        0.0
                     ],
                     "m_rotation": [
                         0.0,
@@ -514,13 +807,13 @@
                     ]
                 }
             },
-            "m_UUID": 5183811516246017063,
+            "m_UUID": 6461568226811642412,
             "m_group": "Lighting",
             "m_lightData": {
                 "Diffuse": {
-                    "x": 0.9656862616539001,
-                    "y": 0.619843602180481,
-                    "z": 0.5301806330680847
+                    "x": 0.4901960790157318,
+                    "y": 0.43529412150382996,
+                    "z": 0.2607843279838562
                 },
                 "DiffusePad": 1.0,
                 "Direction": {
@@ -531,12 +824,12 @@
                 "Position": {
                     "x": 0.0,
                     "y": 0.0,
-                    "z": -3.0
+                    "z": 0.0
                 },
                 "Specular": {
-                    "x": 0.8382352590560913,
-                    "y": 0.20375783741474152,
-                    "z": 0.11916087567806244
+                    "x": 0.4901960790157318,
+                    "y": 0.43529412150382996,
+                    "z": 0.2607843279838562
                 },
                 "SpecularPad": 1.0,
                 "pad1": 0.0,
@@ -574,9 +867,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -0.30000001192092896,
-                        3.5,
-                        -0.4000000059604645
+                        -0.20000000298023224,
+                        -1.2000000476837158,
+                        0.0
                     ],
                     "m_rotation": [
                         0.0,
@@ -590,7 +883,7 @@
                     ]
                 }
             },
-            "m_UUID": 11137188815868449180,
+            "m_UUID": 8463629027835700873,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
@@ -599,20 +892,20 @@
                     "z": 0.10000000149011612
                 },
                 "Diffuse": {
-                    "x": 0.05803057178854942,
-                    "y": 0.16548368334770203,
-                    "z": 0.5147058963775635
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": -0.30000001192092896,
-                    "y": 3.5,
-                    "z": -0.4000000059604645
+                    "x": -0.20000000298023224,
+                    "y": -1.2000000476837158,
+                    "z": 0.0
                 },
-                "Range": 45.5,
+                "Range": 51.59644317626953,
                 "Specular": {
-                    "x": 0.0,
-                    "y": 0.029412031173706055,
+                    "x": 1.0,
+                    "y": 1.0,
                     "z": 1.0
                 },
                 "SpecularPad": 1.0,
@@ -623,8 +916,45 @@
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    100.0,
+                                    0.10000000149011612,
+                                    100.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "DontActivate",
+                    "m_collisionLayer": "NON_MOVING",
+                    "m_motion": "Static"
+                },
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Box_repeat",
                             "Sampler": 0,
@@ -651,7 +981,7 @@
                     ],
                     "m_position": [
                         0.0,
-                        -6.099999904632568,
+                        -5.0,
                         0.0
                     ],
                     "m_rotation": [
@@ -666,7 +996,7 @@
                     ]
                 }
             },
-            "m_UUID": 966564696566596814,
+            "m_UUID": 9885254204936311936,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_shapeData": {
@@ -680,8 +1010,42 @@
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "capsule": {
+                                "height": 1.0,
+                                "radius": 0.20000000298023224
+                            }
+                        },
+                        "shapeType": "Capsule",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": {
                     "techniques": [
+                        {
+                            "Tag": "ColliderPass"
+                        },
                         {
                             "Mesh": "Sphere",
                             "Sampler": 0,
@@ -723,7 +1087,7 @@
                     ]
                 }
             },
-            "m_UUID": 7803781639373709234,
+            "m_UUID": 14872900828441765046,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -736,64 +1100,6 @@
                 "StackCount": 10
             },
             "m_type": "Sphere"
-        },
-        {
-            "components": {
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "LightPass"
-                        },
-                        {
-                            "Tag": "IconPass"
-                        }
-                    ]
-                },
-                "Transform": {
-                    "m_localPosition": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localRotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_position": [
-                        -1.399999976158142,
-                        0.0,
-                        2.5999999046325684
-                    ],
-                    "m_rotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            "m_UUID": 9521223442288758316,
-            "m_group": "Lighting",
-            "m_lightData": {
-                "Power": 0.5,
-                "Tint": {
-                    "x": 0.7107843160629272,
-                    "y": 0.12379290908575058,
-                    "z": 0.08710594475269318
-                }
-            },
-            "m_name": "SkyBox",
-            "m_type": "SkyBox"
         }
     ]
 }
