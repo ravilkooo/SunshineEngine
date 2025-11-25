@@ -3,7 +3,9 @@
 #include <fstream>   // std::ofstream
 
 EditorApp::EditorApp()
-{ }
+{
+
+}
 
 void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 {
@@ -28,7 +30,6 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Init WorldEditor with all it's passes
 	m_worldEditor = eastl::make_shared<WorldEditor>();
 	m_worldEditor->SetupRendering(m_renderingSystem, worldEditorWidth, worldEditorHeight);
-	m_worldEditor->InitScene();
 
 	m_renderingSystem->AddRenderGroup(m_worldEditor->m_renderer.get());
 
@@ -89,6 +90,16 @@ EditorApp::~EditorApp() {
 
 void EditorApp::RunApp()
 {
+	ChooseProject();
+
+	while (!OpenProject())
+	{
+		ChooseProject();
+	}
+	ContentBrowserPanel::s_AssetsDirectory =
+		std::filesystem::path(m_openedProject->GetFullPath().c_str());
+	
+
 	float physicsUpdateFPS = 120.0f;
 	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
 	float accumulator = 0.0f;
@@ -136,7 +147,6 @@ void EditorApp::RunApp()
 			frameCount = 0;
 		}
 
-
 		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
 			while (accumulator >= physicsUpdateMs) {
 				// UpdateGame(physicsUpdateMs);
@@ -152,10 +162,10 @@ void EditorApp::RunApp()
 		}
 
 		Render();
-
-
 	}
 	m_worldEditor->ClearScene();
+
+	SE::SaveProjects(m_projectsList);
 }
 
 void EditorApp::UpdateGame(float deltaTime)
@@ -183,7 +193,6 @@ void EditorApp::UpdateGame(float deltaTime)
 
 	m_currentGame->Update(deltaTime);
 }
-
 
 void EditorApp::UpdateEditor(float deltaTime) 
 {
@@ -417,7 +426,7 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 	}
 }
 
-void EditorApp::LaunchGame() {
+void EditorApp::RunGame() {
 	m_runtimeMode = RuntimeMode::GAME_MODE;
 
 	// To-do: there should be path to opened project
@@ -444,7 +453,6 @@ void EditorApp::LaunchGame() {
 	// m_currentGame->LoadScene(...);
 }
 
-
 void EditorApp::StopGame() {
 	m_currentGame->Stop();
 	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
@@ -459,4 +467,45 @@ void EditorApp::StopGame() {
 	// There should be loading scene to world editor (deserializing)
 	// m_currentGame->UnloadScene(...);
 	// m_worldEditor->LoadScene(...);
+}
+
+void EditorApp::ChooseProject()
+{
+	while (!SE::LoadProjects(m_projectsList))
+	{
+		SE::SaveProjects(m_projectsList);
+	}
+
+	SE::PrintProjectsToConsole(m_projectsList);
+
+	size_t chosenProject = m_projectsList.size();
+
+	std::cout << "Choose project: ";
+
+	while (chosenProject >= m_projectsList.size())
+	{
+		std::cin >> chosenProject;
+	}
+
+	m_openedProject = &m_projectsList[chosenProject];
+}
+
+
+bool EditorApp::OpenProject()
+{
+	/*
+	m_worldEditor->CreateDefaultScene();
+	return true;
+	*/
+	
+	return m_worldEditor->LoadScene(JoinWchar_Wstring(
+		m_openedProject->GetFullPath().c_str(),
+		L"scene.json").c_str());
+}
+
+void EditorApp::SaveProject()
+{
+	m_openedProject->UpdateSaveTime();
+	SE::SaveProjects(m_projectsList);
+	m_worldEditor->SaveScene(m_openedProject->GetFullPath().c_str());
 }

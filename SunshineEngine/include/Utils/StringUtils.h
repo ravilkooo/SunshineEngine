@@ -1,8 +1,56 @@
-#pragma once
+﻿#pragma once
 
-#include <EASTL/string.h>
 #include <string>
 #include <windows.h>
+
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
+
+inline eastl::string WStringToUtf8(const eastl::wstring& ws)
+{
+    if (ws.empty())
+        return {};
+
+    int needed = WideCharToMultiByte(
+        CP_UTF8, 0,
+        ws.c_str(), static_cast<int>(ws.size()),
+        nullptr, 0, nullptr, nullptr
+    );
+    if (needed <= 0)
+        return {};
+
+    eastl::string out;
+    out.resize(needed);
+    WideCharToMultiByte(
+        CP_UTF8, 0,
+        ws.c_str(), static_cast<int>(ws.size()),
+        &out[0], needed, nullptr, nullptr
+    );
+    return out;
+}
+
+inline eastl::wstring Utf8ToWString(const eastl::string& s)
+{
+    if (s.empty())
+        return {};
+
+    int needed = MultiByteToWideChar(
+        CP_UTF8, 0,
+        s.c_str(), static_cast<int>(s.size()),
+        nullptr, 0
+    );
+    if (needed <= 0)
+        return {};
+
+    eastl::wstring out;
+    out.resize(needed);
+    MultiByteToWideChar(
+        CP_UTF8, 0,
+        s.c_str(), static_cast<int>(s.size()),
+        &out[0], needed
+    );
+    return out;
+}
 
 inline eastl::string WcharToChar(const wchar_t* wstr) {
     if (!wstr) return eastl::string();
@@ -47,7 +95,7 @@ inline eastl::wstring JoinWchar_Wstring(const wchar_t* a, const wchar_t* b) {
     return s;
 }
 
-inline eastl::string JoinChar_Char(const char* a, const char* b) {
+inline eastl::string JoinChar_String(const char* a, const char* b) {
     if (!a) a = "";
     if (!b) b = "";
     eastl::string s;
@@ -61,11 +109,10 @@ inline eastl::wstring MakeEngineAssetPath_Wstring(const wchar_t* sub) {
     return JoinWchar_Wstring(ENGINE_ASSETS_DIR, sub);
 }
 
-
-inline eastl::string MakeEngineAssetPath_Char(const char* sub) {
+inline eastl::string MakeEngineAssetPath_String(const char* sub) {
     // Convert ENGINE_ASSETS_DIR to UTF-8 string and join
     eastl::string dirUtf8 = WcharToChar(ENGINE_ASSETS_DIR);
-    return JoinChar_Char(dirUtf8.c_str(), sub);
+    return JoinChar_String(dirUtf8.c_str(), sub);
 }
 
 inline eastl::string wstringToString(const eastl::wstring& wideStr) {
@@ -74,6 +121,11 @@ inline eastl::string wstringToString(const eastl::wstring& wideStr) {
     for (auto wc : wideStr)
         result.push_back(static_cast<char>(wc));
     return result;
+}
+
+inline eastl::wstring ToEastlWstring(const eastl::string& s)
+{
+    return eastl::wstring(s.c_str());
 }
 
 inline eastl::string to_string_eastl(int value) {

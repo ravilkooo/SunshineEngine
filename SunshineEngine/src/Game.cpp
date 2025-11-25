@@ -57,7 +57,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		file >> j; // прочитать json из файла
 	}
 	catch (const std::exception& e) {
-		//LOG_EDITOR_ERROR(JoinChar_Char("JSON parse error: ", e.what()));
+		//LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()));
 		return false;
 	}
 

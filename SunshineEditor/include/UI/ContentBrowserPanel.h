@@ -13,10 +13,10 @@ public:
 
     void OnImGuiRender();
 
-private:
-    
     std::filesystem::path m_CurrentDirectory;
     static std::filesystem::path s_AssetsDirectory;
+
+private:
 
     // Selection
     std::optional<std::filesystem::path> m_SelectedPath; 

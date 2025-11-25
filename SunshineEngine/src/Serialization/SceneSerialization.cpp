@@ -551,8 +551,17 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
             }
 
 
-            //auto go = GameObject_Info::FromJson(objJ);
             if (go) {
+                // Other components (Physics, Lua)
+
+                if (objJ["components"].contains("Physics")) {
+                    auto c = go->AddComponent<PhysicsComponent_Info>(
+                        go->GetComponent<RenderComponent_Info>().get(),
+                        go->GetComponent<TransformComponent_Info>().get());
+                    c->FromJson(objJ["components"]["Physics"]);
+                    //physicsSystem->CreateAndBody(c);
+                }
+
                 scene->AddGameObject(eastl::move(go));
             }
         }

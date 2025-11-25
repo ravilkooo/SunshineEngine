@@ -58,7 +58,7 @@ ImguiEditorPass::ImguiEditorPass(
 	// Change font to Arial to support Russian
 	ImGuiIO& io = ImGui::GetIO();
 	ImFont* fontArial = io.Fonts->AddFontFromFileTTF(
-		MakeEngineAssetPath_Char("Fonts/Arial.ttf").c_str(), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
+		MakeEngineAssetPath_String("Fonts/Arial.ttf").c_str(), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
 		13.0f);
 	io.FontDefault = fontArial;
 	ImGui_ImplDX11_InvalidateDeviceObjects();
