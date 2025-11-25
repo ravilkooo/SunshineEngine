@@ -68,17 +68,17 @@ namespace SE {
         {ColliderShapeType::Scaled,             "Scaled"},
         {ColliderShapeType::RotatedTranslated,  "RotatedTranslated"},
         {ColliderShapeType::OffsetCenterOfMass, "OffsetCenterOfMass"},
-        })
+        });
 
-        NLOHMANN_JSON_SERIALIZE_ENUM(PhysicsMotionType, {
-            {PhysicsMotionType::Static,    "Static"},
-            {PhysicsMotionType::Kinematic, "Kinematic"},
-            {PhysicsMotionType::Dynamic,   "Dynamic"},
-            })
+    NLOHMANN_JSON_SERIALIZE_ENUM(PhysicsMotionType, {
+        {PhysicsMotionType::Static,    "Static"},
+        {PhysicsMotionType::Kinematic, "Kinematic"},
+        {PhysicsMotionType::Dynamic,   "Dynamic"},
+        });
 
-            NLOHMANN_JSON_SERIALIZE_ENUM(PhysicsActivation, {
-                {PhysicsActivation::Activate,     "Activate"},
-                {PhysicsActivation::DontActivate, "DontActivate"},
-                })
+    NLOHMANN_JSON_SERIALIZE_ENUM(PhysicsActivation, {
+        {PhysicsActivation::Activate,     "Activate"},
+        {PhysicsActivation::DontActivate, "DontActivate"},
+        });
 
 }

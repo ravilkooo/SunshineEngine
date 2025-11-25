@@ -160,7 +160,6 @@ void EditorApp::RunApp()
 			}
 		}
 
-		//m_worldEditor->SyncronizeTransforms();
 		Render();
 
 
@@ -448,7 +447,6 @@ void EditorApp::LaunchGame() {
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
-
 
 	// There should be saving scene from world editor (serializing) and loading to game (deserializing)
 	// m_worldEditor->SaveScene(...);

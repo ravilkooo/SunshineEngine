@@ -13,10 +13,9 @@ PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
     InitTransforms(tc);
 }
 
-PhysicsComponent::~PhysicsComponent() {
-    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
-    bodyInterface.RemoveBody(m_joltBodyId);
-    bodyInterface.DestroyBody(m_joltBodyId);
+PhysicsComponent::~PhysicsComponent()
+{
+
 }
 
 void PhysicsComponent::SetObjecUUID(SE::UUID objectUUID) {
@@ -34,30 +33,6 @@ void PhysicsComponent::SetMotionType(JPH::EMotionType type) { m_motionType = typ
 void PhysicsComponent::SetActivation(JPH::EActivation activation) { activation = activation; }
 
 void PhysicsComponent::SetShape(JPH::ShapeRefC shapePtr) { m_shape = shapePtr; }
-
-// Create and add body to physics system
-void PhysicsComponent::CreateBody(PhysicsSystem* physicsSystem)
-{
-    m_physicsSystem = physicsSystem;
-    JPH::BodyInterface& bodyInterface = physicsSystem->Bodies();
-
-    if (!m_shape) {
-        // handle error: shape not set
-        return;
-    }
-    JPH::BodyCreationSettings settings(m_shape, m_position, m_orientation, m_motionType, m_objectLayer);
-    settings.mObjectLayer = m_objectLayer;
-    settings.mAllowSleeping = (m_activation != JPH::EActivation::DontActivate);
-
-    m_joltBody = bodyInterface.CreateBody(settings);
-    m_joltBodyId = m_joltBody->GetID();
-    physicsSystem->AddBody(m_joltBodyId, m_objectUUID, m_activation);
-
-    /*
-    joltBodyId = bodyInterface.CreateAndAddBody(settings, activation);
-    joltBody = bodyInterface.GetBody(joltBodyId);
-    */
-}
 
 void PhysicsComponent::InitTransforms(TransformComponent* tc)
 {

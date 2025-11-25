@@ -72,8 +72,8 @@ void WorldEditor::PixelUUIDHandler::Init(ID3D11Device* device) {
 
 SE::UUID WorldEditor::PixelUUIDHandler::GetUUID(ID3D11DeviceContext* context,
 	ID3D11ShaderResourceView* UUIDTextureView,
-	UINT mouseClickX, UINT mouseClickY) {
-
+	UINT mouseClickX, UINT mouseClickY)
+{
 	context->CSSetShaderResources(0u, 1u, &UUIDTextureView);
 
 	UINT clickPos[2] = { mouseClickX, mouseClickY };
@@ -194,6 +194,7 @@ void WorldEditor::InitScene()
 
 			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
 
+			pc_info->SetCollisionLayer("MOVING");
 			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
 			pc_info->SetActivation(SE::PhysicsActivation::Activate);
 			pc_info->SetShape(SE::ColliderShapeType::Box);
@@ -219,6 +220,7 @@ void WorldEditor::InitScene()
 
 			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
 
+			pc_info->SetCollisionLayer("MOVING");
 			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
 			pc_info->SetActivation(SE::PhysicsActivation::Activate);
 			pc_info->SetShape(SE::ColliderShapeType::Sphere);
@@ -267,6 +269,8 @@ void WorldEditor::InitScene()
 			auto rc_info = floorObj->GetComponent<RenderComponent_Info>();
 
 			auto pc_info = floorObj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+
+			pc_info->SetCollisionLayer("NON_MOVING");
 			pc_info->SetMotion(SE::PhysicsMotionType::Static);
 			pc_info->SetActivation(SE::PhysicsActivation::DontActivate);
 			pc_info->SetShape(SE::ColliderShapeType::Box);
@@ -292,6 +296,7 @@ void WorldEditor::InitScene()
 
 			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
 
+			pc_info->SetCollisionLayer("MOVING");
 			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
 			pc_info->SetActivation(SE::PhysicsActivation::Activate);
 			pc_info->SetShape(SE::ColliderShapeType::Capsule);

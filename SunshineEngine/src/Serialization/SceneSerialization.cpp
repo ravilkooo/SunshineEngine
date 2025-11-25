@@ -29,6 +29,8 @@
 #include <Jolt/Physics/Collision/Shape/CapSuleShape.h>
 #include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
 
+#include <Physics/PhysicsSystem.h>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -457,15 +459,14 @@ eastl::shared_ptr<Scene> Scene::FromJson(
 
             if (go) {
                 // Other components (Physics, Lua)
-
-                /*
+                
                 if (objJ["components"].contains("Physics")) {
                     auto c = go->AddComponent<PhysicsComponent>(
                         go->m_UUID, go->GetComponent<TransformComponent>().get());
-                    c->FromJson(j["components"]["Physics"]);
-                    c->CreateBody(physicsSystem);
+                    c->FromJson(objJ["components"]["Physics"]);
+                    physicsSystem->CreateAndAddBody(c.get());
+                    //physicsSystem->CreateAndBody(c);
                 }
-                */
                 
                 scene->AddGameObject(eastl::move(go));
             }

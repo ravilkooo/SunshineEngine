@@ -219,11 +219,10 @@ class PhysicsSystem
 {
 public:
     PhysicsSystem();
+    ~PhysicsSystem();
     
-    void AddBody(JPH::BodyID bodyId,
-        SE::UUID objectUUID,
-        JPH::EActivation activation = JPH::EActivation::DontActivate);
-    
+    void CreateAndAddBody(PhysicsComponent* physComp);
+
     // Add objects before this step
     void FinalizeScene();
 
@@ -231,14 +230,15 @@ public:
 
     void Step(float dt);
 
-    void ClearAllBodies();
-
-    void ClearScene();
-
     JPH::PhysicsSystem& GetWorld();
     JPH::BodyInterface& Bodies();
 
+    bool IsValid() { return m_isValid; }
+
 private:
+
+    void ClearAllBodies();
+
     eastl::unique_ptr<BPLayerInterfaceImpl> m_bpInterface; // { 2, 2 };
     eastl::unique_ptr<ObjectVsBroadPhaseLayerFilterImpl> m_objectVsBpFilter; // ; // { 2 };
     eastl::unique_ptr<ObjectLayerPairFilterImpl> m_objectPairFilter; // { 2 };
@@ -251,6 +251,8 @@ private:
     MyContactListener m_contactListener;
 
     eastl::vector<PhysicsBodyEntry> m_bodyEntries;
+
+    bool m_isValid = false;
     // TO-DO
     // Something like list of all phys objects (or some entries like in nau engine)
     // It will be used for (Syn Step) syncronization with TransformComponent and other stuff

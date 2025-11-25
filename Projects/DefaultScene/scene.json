@@ -45,7 +45,7 @@
                     ]
                 }
             },
-            "m_UUID": 3803180229175453363,
+            "m_UUID": 13659431641106636459,
             "m_group": "Lighting",
             "m_lightData": {
                 "Power": 0.0,
@@ -91,7 +91,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
                 "Render": {
@@ -103,7 +103,7 @@
                             "Mesh": "Box_repeat",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
                         }
                     ]
                 },
@@ -140,7 +140,7 @@
                     ]
                 }
             },
-            "m_UUID": 8862932594989587446,
+            "m_UUID": 330057997423963960,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_shapeData": {
@@ -181,7 +181,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
                 "Render": {
@@ -193,7 +193,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -230,7 +230,7 @@
                     ]
                 }
             },
-            "m_UUID": 7244342552698679975,
+            "m_UUID": 11189992369050006831,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -273,7 +273,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
                 "Render": {
@@ -285,7 +285,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -322,7 +322,7 @@
                     ]
                 }
             },
-            "m_UUID": 10833390335887230829,
+            "m_UUID": 1767073404487408819,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -365,7 +365,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
                 "Render": {
@@ -377,7 +377,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -414,7 +414,7 @@
                     ]
                 }
             },
-            "m_UUID": 5971655861602136130,
+            "m_UUID": 17492542799978026492,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -457,7 +457,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
                 "Render": {
@@ -469,7 +469,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -506,7 +506,7 @@
                     ]
                 }
             },
-            "m_UUID": 17666922930851584083,
+            "m_UUID": 4018682506084261058,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -549,7 +549,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
                 "Render": {
@@ -561,7 +561,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -598,7 +598,7 @@
                     ]
                 }
             },
-            "m_UUID": 4571365014555320948,
+            "m_UUID": 12124506567010590125,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -641,7 +641,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
                 "Render": {
@@ -653,7 +653,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -690,7 +690,7 @@
                     ]
                 }
             },
-            "m_UUID": 2389609188455587709,
+            "m_UUID": 12565261551547952386,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {
@@ -749,7 +749,7 @@
                     ]
                 }
             },
-            "m_UUID": 8170585569459078782,
+            "m_UUID": 15175571806268822492,
             "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
@@ -807,7 +807,7 @@
                     ]
                 }
             },
-            "m_UUID": 2506451673357693536,
+            "m_UUID": 14078473626625740580,
             "m_group": "Lighting",
             "m_lightData": {
                 "Diffuse": {
@@ -883,7 +883,7 @@
                     ]
                 }
             },
-            "m_UUID": 2776016175159405039,
+            "m_UUID": 423859525668950513,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
@@ -947,7 +947,7 @@
                         }
                     },
                     "m_activation": "DontActivate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "NON_MOVING",
                     "m_motion": "Static"
                 },
                 "Render": {
@@ -959,7 +959,7 @@
                             "Mesh": "Box_repeat",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
                         }
                     ]
                 },
@@ -996,7 +996,7 @@
                     ]
                 }
             },
-            "m_UUID": 7903107837809801122,
+            "m_UUID": 16904273719149985265,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_shapeData": {
@@ -1038,7 +1038,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_collisionLayer": "",
+                    "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
                 "Render": {
@@ -1050,7 +1050,7 @@
                             "Mesh": "Sphere",
                             "Sampler": 0,
                             "Tag": "GPass",
-                            "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                         }
                     ]
                 },
@@ -1087,7 +1087,7 @@
                     ]
                 }
             },
-            "m_UUID": 8357085396380624286,
+            "m_UUID": 11765206786272196784,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_shapeData": {

@@ -24,6 +24,7 @@ class PhysicsComponent :
     public Component
 {
     friend class PhysicsComponent_Info;
+    friend class PhysicsSystem;
 public:
 
     PhysicsComponent() = default;
@@ -53,9 +54,6 @@ public:
     void SetActivation(JPH::EActivation activation);
     void SetShape(JPH::ShapeRefC shapePtr);
 
-    // Create and add body to physics system
-    void CreateBody(PhysicsSystem* physicsSystem);
-
     void InitTransforms(TransformComponent* tc);
 
     JPH::Body* GetBody() const;
@@ -79,7 +77,7 @@ private:
     JPH::ShapeRefC m_shape = nullptr;
 
     // To-do: make weak_ptr or simple ptr?
-    PhysicsSystem* m_physicsSystem;
+    // PhysicsSystem* m_physicsSystem;
 };
 
 class RenderComponent_Info;
