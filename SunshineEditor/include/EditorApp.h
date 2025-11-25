@@ -75,6 +75,12 @@ public:
 
     sol::state m_lua;
 
+
+    enum class RuntimeMode {
+        GAME_MODE, WORLD_EDITOR_MODE
+    };
+    RuntimeMode m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
+
 private:
     // Camera movings
     void HandleKeyDown(Keys key);
@@ -100,11 +106,5 @@ private:
     ImguiEditorPass* imguiEditorPass;
     bool m_initialized = false;
 
-
-    enum class RuntimeMode {
-        GAME_MODE, WORLD_EDITOR_MODE
-    };
-
-    RuntimeMode m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
 };
 

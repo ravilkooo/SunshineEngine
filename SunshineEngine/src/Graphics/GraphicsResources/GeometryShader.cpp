@@ -7,7 +7,7 @@ namespace SE_G {
 		GeometryShader::GeometryShader(ID3D11Device* device, LPCWSTR filePath)
 		{
 			Microsoft::WRL::ComPtr<ID3DBlob> pShaderBytecodeBlob;
-			ID3DBlob* errorGeometryCode;
+			Microsoft::WRL::ComPtr<ID3DBlob> errorGeometryCode;
 			HRESULT hr = D3DCompileFromFile(
 				filePath,
 				nullptr,
@@ -17,7 +17,7 @@ namespace SE_G {
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
 				0,
 				pShaderBytecodeBlob.GetAddressOf(),
-				&errorGeometryCode);
+				errorGeometryCode.GetAddressOf());
 
 			if (FAILED(hr)) {
 				// If the shader failed to compile it should have written something to the error message.
@@ -25,14 +25,15 @@ namespace SE_G {
 					char* compileErrors = (char*)(errorGeometryCode->GetBufferPointer());
 
 					std::cout << compileErrors << " - // -- " << std::endl;
-					errorGeometryCode->Release();
 				}
 				// If there was  nothing in the error message then it simply could not find the shader file itself.
 				else
 				{
 					//std::cout << filePath << L" - Missing Shader File\n";
 				}
-
+				pShaderBytecodeBlob.Reset();
+				errorGeometryCode.Reset();
+				Release();
 				return;
 			}
 
@@ -42,6 +43,7 @@ namespace SE_G {
 				nullptr,
 				&pGeometryShader);
 			pShaderBytecodeBlob.Reset();
+			errorGeometryCode.Reset();
 		}
 
 		GeometryShader::~GeometryShader()

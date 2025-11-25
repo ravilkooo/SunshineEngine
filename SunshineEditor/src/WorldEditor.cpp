@@ -170,7 +170,7 @@ void WorldEditor::InitScene()
 	// To-do: there should be path to opened project
 	// to-do: class Project
 	
-	//if (!LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str()))
+	// if (!LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str()))
 	{
 		this->m_scene = eastl::make_shared<Scene_Info>();
 

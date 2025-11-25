@@ -22,6 +22,7 @@ void PhysicsComponent::SetObjecUUID(SE::UUID objectUUID) {
     m_objectUUID = objectUUID;
 }
 
+// Can have only two values: MOVING or NON_MOVING
 void PhysicsComponent::SetObjectLayer(JPH::ObjectLayer layer) { m_objectLayer = layer; }
 
 void PhysicsComponent::SetPosition(const JPH::RVec3& pos) { m_position = pos; }

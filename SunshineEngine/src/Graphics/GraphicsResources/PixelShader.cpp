@@ -25,7 +25,7 @@ namespace SE_G {
 			Release();
 
 			Microsoft::WRL::ComPtr<ID3DBlob> pShaderBytecodeBlob;
-			ID3DBlob* errorPixelCode;
+			Microsoft::WRL::ComPtr<ID3DBlob> errorPixelCode;
 			HRESULT hr = D3DCompileFromFile(
 				filePath,
 				nullptr,
@@ -35,14 +35,13 @@ namespace SE_G {
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
 				0,
 				pShaderBytecodeBlob.GetAddressOf(),
-				&errorPixelCode);
+				errorPixelCode.GetAddressOf());
 
 			if (FAILED(hr)) {
 				// If the shader failed to compile it should have written something to the error message.
 				if (errorPixelCode) {
 					char* compileErrors = (char*)(errorPixelCode->GetBufferPointer());
 					std::cout << compileErrors << " - // -- " << std::endl;
-					errorPixelCode->Release();
 				}
 				// If there was  nothing in the error message then it simply could not find the shader file itself.
 				else
@@ -50,6 +49,8 @@ namespace SE_G {
 					//std::cout << filePath << L" - Missing Shader File\n";
 				}
 				pShaderBytecodeBlob.Reset();
+				errorPixelCode.Reset();
+				Release();
 				return;
 			}
 
@@ -60,6 +61,7 @@ namespace SE_G {
 				&pPixelShader);
 			// Reset the ComPtr instead of manually releasing the underlying pointer
 			pShaderBytecodeBlob.Reset();
+			errorPixelCode.Reset();
 		}
 
 		void PixelShader::Bind(ID3D11DeviceContext* context) noexcept

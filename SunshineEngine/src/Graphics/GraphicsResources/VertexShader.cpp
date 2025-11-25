@@ -6,7 +6,7 @@ namespace SE_G {
 	{
 		VertexShader::VertexShader(ID3D11Device* device, LPCWSTR filePath)
 		{
-			ID3DBlob* errorVertexCode = nullptr;
+			Microsoft::WRL::ComPtr<ID3DBlob> errorVertexCode;
 			HRESULT hr = D3DCompileFromFile(
 				filePath,
 				nullptr,
@@ -16,14 +16,13 @@ namespace SE_G {
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
 				0,
 				pShaderBytecodeBlob.GetAddressOf(),
-				&errorVertexCode);
+				errorVertexCode.GetAddressOf());
 
 			if (FAILED(hr)) {
 				// If the shader failed to compile it should have written something to the error message.
 				if (errorVertexCode) {
 					char* compileErrors = (char*)(errorVertexCode->GetBufferPointer());
 					std::cout << compileErrors << std::endl;
-					errorVertexCode->Release();
 				}
 				// If there was nothing in the error message then it simply could not find the shader file itself.
 				else
@@ -31,6 +30,8 @@ namespace SE_G {
 					std::wcout << filePath << L" - Missing Shader File\n";
 				}
 				// Compilation failed; avoid using null bytecode blob
+				errorVertexCode.Reset();
+				Release();
 				return;
 			}
 
@@ -38,7 +39,7 @@ namespace SE_G {
 				pShaderBytecodeBlob->GetBufferPointer(),
 				pShaderBytecodeBlob->GetBufferSize(),
 				nullptr,
-				&pVertexShader
+				pVertexShader.GetAddressOf()
 			);
 
 			UINT numInputElements = 4;
@@ -87,16 +88,17 @@ namespace SE_G {
 				numInputElements,
 				pShaderBytecodeBlob->GetBufferPointer(),
 				pShaderBytecodeBlob->GetBufferSize(),
-				&pInputLayout);
+				pInputLayout.GetAddressOf());
 
 			free(IALayoutInputElements);
+			errorVertexCode.Reset();
 		}
 
 		VertexShader::VertexShader(ID3D11Device* device, LPCWSTR filePath,
 			UINT numInputElements,
 			D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements) {
 
-			ID3DBlob* errorVertexCode = nullptr;
+			Microsoft::WRL::ComPtr<ID3DBlob> errorVertexCode;
 			HRESULT hr = D3DCompileFromFile(
 				filePath,
 				nullptr,
@@ -106,7 +108,7 @@ namespace SE_G {
 				D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
 				0,
 				pShaderBytecodeBlob.GetAddressOf(),
-				&errorVertexCode);
+				errorVertexCode.GetAddressOf());
 
 			if (FAILED(hr)) {
 				// If the shader failed to compile it should have written something to the error message.
@@ -120,6 +122,8 @@ namespace SE_G {
 				{
 					std::wcout << filePath << L" - Missing Shader File\n";
 				}
+				errorVertexCode.Reset();
+				Release();
 				return;
 			}
 
@@ -127,7 +131,7 @@ namespace SE_G {
 				pShaderBytecodeBlob->GetBufferPointer(),
 				pShaderBytecodeBlob->GetBufferSize(),
 				nullptr,
-				&pVertexShader
+				pVertexShader.GetAddressOf()
 			);
 
 			device->CreateInputLayout(
@@ -135,7 +139,9 @@ namespace SE_G {
 				numInputElements,
 				pShaderBytecodeBlob->GetBufferPointer(),
 				pShaderBytecodeBlob->GetBufferSize(),
-				&pInputLayout);
+				pInputLayout.GetAddressOf());
+
+			errorVertexCode.Reset();
 		}
 
 		VertexShader::~VertexShader()

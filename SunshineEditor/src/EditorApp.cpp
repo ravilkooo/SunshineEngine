@@ -60,16 +60,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 
 	imguiEditorPass = static_cast<ImguiEditorPass*>(
 		m_imguiRenderGroup->AddPass(
-			eastl::make_unique<ImguiEditorPass>(
-				m_renderingSystem->GetDevice(),
-				m_renderingSystem->GetDeviceContext(),
-				m_renderingSystem->GetBackBuffer(),
-				m_winWidth,
-				m_winHeight,
-				m_worldEditor
-			)
-		)
-	);
+			eastl::make_unique<ImguiEditorPass>(this)));
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_worldEditor->m_renderer->m_GBuffer.get());
@@ -456,6 +447,7 @@ void EditorApp::LaunchGame() {
 
 void EditorApp::StopGame() {
 	m_currentGame->Stop();
+	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
 	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
 
