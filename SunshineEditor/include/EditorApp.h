@@ -54,8 +54,20 @@ public:
     void InitEditorApp(UINT winWidth = 1600u, UINT winHeight = 800u);
     ~EditorApp();
 
-    void SaveProject();
+    // Open project from projectlist
     bool OpenProject();
+
+    // Save openedProject
+    void SaveProject();
+
+    // Create new project (create folder, scene.json, and add it to projectlist)
+    void CreateProject();
+
+    // Add existing project to projectlist
+    void AddProject(/* args */);
+
+    // Remove project from projectlist
+    void RemoveProject(/* args */);
 
     void RunApp();
 
