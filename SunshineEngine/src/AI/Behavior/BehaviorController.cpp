@@ -7,7 +7,7 @@
 // ---------------------------------- Action
 // ------------------------------------------------------------------------------------------------------
 
-EActionCondition Action::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
+EActionCondition Action::Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
 	if (IsAborted == true)
 	{
@@ -143,7 +143,7 @@ bool Pattern::RemoveActionByIndex(size_t Index)
 	return true;
 }
 
-EActionCondition Pattern::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
+EActionCondition Pattern::Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
 	if (OnPatternUpdate)
 	{
@@ -243,7 +243,7 @@ EventTransition::EventTransition(const eastl::string& InToState, CheckFunc InChe
 			};
 }
 
-void EventTransition::Trigger(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+void EventTransition::Trigger(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
 {
 	if (Check)
 	{
@@ -365,7 +365,7 @@ bool State::RemoveEventTransition(const eastl::string& ToState)
 	return false;
 }
 
-bool State::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
+bool State::Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
 	if (OnStateUpdate)
 	{
@@ -439,7 +439,7 @@ bool State::Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoa
 	}
 }
 
-eastl::shared_ptr<ConditionTransition> State::CheckConditionTransitions(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+eastl::shared_ptr<ConditionTransition> State::CheckConditionTransitions(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
 {
 	for (auto& CT : ConditionTransitions)
 	{
@@ -606,7 +606,7 @@ bool BehaviorController::ChangeToStateInConditionTransition(const eastl::string&
 		}
 	}
 
-	std::cerr << "[Warning]";
+	std::cerr << "[Warning] BehaviorController::ChangeToStateInConditionTransition: No condition transition found in state " << FromState.c_str() << " from ToState " << OldToState.c_str() << "\n";
 	return false; 
 }
 
@@ -628,7 +628,7 @@ bool BehaviorController::ChangeToStateInEventTransition(const eastl::string& Fro
 		}
 	}
 
-	std::cerr << "[Warning]";
+	std::cerr << "[Warning] BehaviorController::ChangeToStateInEventTransition: No condition transition found in state " << FromState.c_str() << " from ToState " << OldToState.c_str() << "\n";
 	return false;
 }
 
@@ -759,7 +759,7 @@ void BehaviorController::Abort(const eastl::string& ToState)
 		CurrentState->CurrentPattern->AbortCurrentAction();
 }
 
-void BehaviorController::ChangeState(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const eastl::string& NewState)
+void BehaviorController::ChangeState(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const eastl::string& NewState)
 {
 	if (NewState.empty())
 	{

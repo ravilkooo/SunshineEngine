@@ -7,7 +7,9 @@ namespace SE {
 		TRANSFORM,
 		RENDER,
 		LUA,
-		PHYSICS
+		PHYSICS,
+		PERCEPTION,
+		BEHAVIOR
 	};
 }
 
@@ -17,4 +19,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(SE::ComponentType, {
 	{SE::ComponentType::RENDER, "RENDER"},
 	{SE::ComponentType::LUA,   "LUA"},
 	{SE::ComponentType::PHYSICS,   "PHYSICS"},
+	{SE::ComponentType::PERCEPTION,   "PERCEPTION"},
+	{SE::ComponentType::BEHAVIOR,   "BEHAVIOR"},
 })

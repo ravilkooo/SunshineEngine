@@ -10,6 +10,7 @@
 
 #include "MemoryBoard.h"
 #include <Utils/UUID.h>
+#include <Component/Component.h>
 
 
 enum class EActionCondition
@@ -36,13 +37,13 @@ enum class EStateResult
 };
 
 
-using OnDefaultFunc = eastl::function<void(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
-using OnUpdateFunc = eastl::function<void(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)>;
-using OnActionUpdateFunc = eastl::function<EActionResult(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)>;
-using OnCompleteFunc = eastl::function<void(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, EActionResult Result)>;
-using EvaluateUtilityFunc = eastl::function<float(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
+using OnDefaultFunc = eastl::function<void(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
+using OnUpdateFunc = eastl::function<void(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)>;
+using OnActionUpdateFunc = eastl::function<EActionResult(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)>;
+using OnCompleteFunc = eastl::function<void(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, EActionResult Result)>;
+using EvaluateUtilityFunc = eastl::function<float(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
 
-using CheckFunc = eastl::function<bool(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
+using CheckFunc = eastl::function<bool(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
 using AbortFunc = eastl::function<void(const eastl::string& ToState)>;
 
 
@@ -62,7 +63,7 @@ public:
     eastl::string Name;
 
 private:
-    EActionCondition Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
+    EActionCondition Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
 
     void Abort() { IsAborted = true; }
 
@@ -99,7 +100,7 @@ public:
     OnCompleteFunc OnPatternComplete = nullptr;
 
 private:
-    EActionCondition Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
+    EActionCondition Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
 
     void AbortCurrentAction();
 
@@ -131,7 +132,7 @@ class EventTransition
 public:
     explicit EventTransition(const eastl::string& InToState, CheckFunc InCheck, BehaviorController* FSM);
 
-    void Trigger(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard);
+    void Trigger(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard);
 
     void ChangeToState(const eastl::string& InToState, BehaviorController* FSM);
 
@@ -151,13 +152,11 @@ class State
 public:
     State() = default;
 
-    // Patterns
     bool AddPattern(const eastl::string& Name, eastl::shared_ptr<Pattern> Pattern);
     eastl::shared_ptr<Pattern> GetPattern(const eastl::string& Name);
     bool RemovePattern(const eastl::string& Name);
 
     eastl::hash_map<eastl::string, eastl::shared_ptr<Pattern>> GetAllPatternsCopy() { return Patterns; };
-    //
 
 
     OnDefaultFunc OnStateEnter = nullptr;
@@ -166,17 +165,15 @@ public:
     OnDefaultFunc OnStateExit = nullptr;
 
 private:
-    // Conditions
     void AddConditionTransition(const eastl::string& InToState, CheckFunc InCheck);
     void AddEventTransition(const eastl::string& InToState, CheckFunc InCheck, BehaviorController* FSM);
 
     bool RemoveConditionTransition(const eastl::string& ToState);
     bool RemoveEventTransition(const eastl::string& ToState);
-    //
 
-    bool Update(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
+    bool Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
 
-    eastl::shared_ptr<ConditionTransition> CheckConditionTransitions(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard);
+    eastl::shared_ptr<ConditionTransition> CheckConditionTransitions(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard);
 
 
     eastl::vector<eastl::shared_ptr<ConditionTransition>> ConditionTransitions;
@@ -189,19 +186,19 @@ private:
 };
 
 
-class BehaviorController
+class BehaviorController : public Component
 {
+    //friend class ***;
     friend class EventTransition;
 
 public:
-    BehaviorController(const Sunshine::UUID& InGOID) : GOID(InGOID) {};
+    BehaviorController(const SE::UUID& InGOID) : GOID(InGOID) {};
 
-    // MemoryBoard
+    // --- MemoryBoard ---
     void SetMemoryBoard(const eastl::shared_ptr<MemoryBoard>& InMemoryBoard);
     eastl::shared_ptr<MemoryBoard> GetMemoryBoard() { return MBoard; };
-    //
 
-    // States
+    // --- States ---
     bool AddState(const eastl::string& Name, const eastl::shared_ptr<State>& NewState);
     eastl::shared_ptr<State> GetState(const eastl::string& Name);
     bool RemoveState(const eastl::string& Name);
@@ -210,9 +207,8 @@ public:
     const eastl::string& GetCurrentStateName() const { return CurrentStateName; }
 
     eastl::hash_map<eastl::string, eastl::shared_ptr<State>> GetAllStatesCopy() const { return States; }
-    //
 
-    // Conditions
+    // --- Conditions ---
     bool AddConditionTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck);
     bool AddEventTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck);
 
@@ -224,7 +220,6 @@ public:
 
     bool RemoveConditionTransition(const eastl::string& FromState, const eastl::string& ToState);
     bool RemoveEventTransition(const eastl::string& FromState, const eastl::string& ToState);
-    //
 
 
     bool IsEnabled = true;
@@ -234,10 +229,10 @@ private:
 
     void Abort(const eastl::string& ToState);
 
-    void ChangeState(const Sunshine::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const eastl::string& NewState);
+    void ChangeState(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const eastl::string& NewState);
 
 
-    Sunshine::UUID GOID;
+    SE::UUID GOID;
     eastl::shared_ptr<MemoryBoard> MBoard = nullptr;
 
     eastl::hash_map<eastl::string, eastl::shared_ptr<State>> States;
@@ -246,4 +241,20 @@ private:
 
     eastl::string AfterAbortStateName;
     bool IsClosedForAbort = false;
+};
+
+
+class BehaviorController_Info : public Component_Info
+{
+public:
+    BehaviorController_Info() {};
+
+    static const SE::ComponentType s_componentType = SE::ComponentType::BEHAVIOR;
+
+    const SE::ComponentType ComponentType() const override { return s_componentType; }
+    const std::type_info& getType() const override { return typeid(BehaviorController_Info); }
+    bool IsAssigned() override { return true; }
+
+
+    BehaviorController* Controller;
 };

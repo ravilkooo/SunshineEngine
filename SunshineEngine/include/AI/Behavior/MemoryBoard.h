@@ -1,17 +1,21 @@
 #pragma once
 
+// EASTL
 #include <EASTL/hash_map.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 #include <EASTL/functional.h>
 
+// Engine
 #include <Utils/UUID.h>
 #include <SimpleMath.h>
 
-#ifdef _DEBUG
+// C++
 #include <iostream>
-#endif
+
+// Lua
+#include <sol/sol.hpp>
 
 
 namespace DXSM = DirectX::SimpleMath;
@@ -24,13 +28,20 @@ class MemoryBoard
 {
 public:
     // Base interface for type erasure.
-    struct HolderStructInterface { virtual ~HolderStructInterface() = default; };
+    struct HolderStructInterface 
+    { 
+        virtual ~HolderStructInterface() = default; 
+
+        virtual const std::type_info& GetType() const = 0;
+    };
 
     // Base interface for type erasure.
     template<typename T>
     struct HolderStruct : HolderStructInterface
     {
         HolderStruct(const T& InValue) : Value(InValue) {}
+
+        const std::type_info& GetType() const override { return typeid(T); }
 
         T Value;
     };
@@ -41,7 +52,8 @@ public:
     bool SetBool(const eastl::string& Key, bool Value) { return SetTypedValue<bool>(Key, Value); }
     bool SetString(const eastl::string& Key, const eastl::string& Value) { return SetTypedValue<eastl::string>(Key, Value); }
     bool SetVector3(const eastl::string& Key, const DXSM::Vector3& Value) { return SetTypedValue<DXSM::Vector3>(Key, Value); }
-    bool SetUUID(const eastl::string& Key, const Sunshine::UUID& Value) { return SetTypedValue<Sunshine::UUID>(Key, Value); }
+    bool SetUUID(const eastl::string& Key, const SE::UUID& Value) { return SetTypedValue<SE::UUID>(Key, Value); }
+    //
 
     // --- GETTERS ---
     bool GetInt(const eastl::string& Key, int& OutValue) const { return GetTypedValue<int>(Key, OutValue); }
@@ -49,67 +61,61 @@ public:
     bool GetBool(const eastl::string& Key, bool& OutValue) const { return GetTypedValue<bool>(Key, OutValue); }
     bool GetString(const eastl::string& Key, eastl::string& OutValue) const { return GetTypedValue<eastl::string>(Key, OutValue); }
     bool GetVector3(const eastl::string& Key, DXSM::Vector3& OutValue) const { return GetTypedValue<DXSM::Vector3>(Key, OutValue); }
-    bool GetUUID(const eastl::string& Key, Sunshine::UUID& OutValue) const { return GetTypedValue<Sunshine::UUID>(Key, OutValue); }
+    bool GetUUID(const eastl::string& Key, SE::UUID& OutValue) const { return GetTypedValue<SE::UUID>(Key, OutValue); }
+    //
 
     // --- GENERAL OPERATIONS ---
     bool HasKey(const eastl::string& Key) const { return Data.find(Key) != Data.end(); }
     void RemoveKey(const eastl::string& Key) { Data.erase(Key); }
     void Clear() { Data.clear(); }
-
+    //
 
     // --- CALLBACK MANAGEMENT ---
-    using MemoryChangedCallback = eastl::function<void(const MemoryBoard::HolderStructInterface* NewValue)>;
-    struct CallbackWrapper { uint64_t CallbackId; MemoryChangedCallback Callback; };
+    struct CallbackWrapper { uint64_t CallbackId; sol::function Callback; };
 
     // Subscribe to a key's changes. Returns a unique callback ID.
     // If the key doesn't exist yet, returns UINT64_MAX.
-    uint64_t AddCallback(const eastl::string& Key, MemoryChangedCallback Callback);
+    uint64_t AddCallback(const eastl::string& Key, const sol::function& Callback);
 
     void RemoveCallback(const eastl::string& Key, uint64_t CallbackId);
     void ClearCallbacks(const eastl::string& Key) { Callbacks.erase(Key); }
+    //
 
 private:
     // --- INTERNAL GENERIC IMPLEMENTATION ---
     template<typename T>
     bool SetTypedValue(const eastl::string& Key, const T& Value)
     {
-        bool HasChanged = true;
-        bool IsNew = true;
-
         auto it = Data.find(Key);
 
-        if (it != Data.end())
-        {
-            IsNew = false;
-            auto Holder = eastl::dynamic_shared_pointer_cast<HolderStruct<T>>(it->second);
-
-            if (!Holder)
-            {
-#ifdef _DEBUG
-                std::cerr << "[Warning] Type mismatch in MemoryBoard::Set key: " << Key.c_str() << "\n";
-#endif
-                return false;
-            }
-
-            if (Holder->Value == Value)
-                HasChanged = false;
-        }
-
-        if (HasChanged || IsNew)
+        if (it == Data.end())
         {
             Data[Key] = eastl::make_shared<HolderStruct<T>>(Value);
+            return true;
+        }
 
-            if (HasChanged && !IsNew)
+        auto Holder = eastl::dynamic_shared_pointer_cast<HolderStruct<T>>(it->second);
+
+        if (!Holder)
+        {
+            std::cerr << "[Warning] MemoryBoard::Set: Type mismatch in key: " << Key.c_str() << "\n";
+            return false;
+        }
+
+        if (Holder->Value == Value)
+        {
+            return true;
+        }
+
+        Holder->Value = Value;
+
+        auto cbIt = Callbacks.find(Key);
+
+        if (cbIt != Callbacks.end())
+        {
+            for (auto& CW : cbIt->second)
             {
-                auto cbIt = Callbacks.find(Key);
-
-                if (cbIt != Callbacks.end())
-                {
-                    for (auto& CW : cbIt->second)
-                    {
-                        CW.Callback(Data[Key].get());
-                    }
-                }
+                CW.Callback(Holder.get());
             }
         }
 
@@ -122,22 +128,23 @@ private:
         auto it = Data.find(Key);
 
         if (it == Data.end())
+        {
+            std::cerr << "[Warning] MemoryBoard::Get: key does not exist: " << Key.c_str() << "\n";
             return false;
+        }
 
         auto Holder = eastl::dynamic_shared_pointer_cast<HolderStruct<T>>(it->second);
 
         if (!Holder)
         {
-#ifdef _DEBUG
-            std::cerr << "[Warning] Type mismatch in MemoryBoard::Get key: " << Key.c_str() << "\n";
-#endif
+            std::cerr << "[Warning] MemoryBoard::Get: Type mismatch for key: " << Key.c_str() << "\n";
             return false;
         }
 
         OutValue = Holder->Value;
-
         return true;
     }
+    //
 
 
     eastl::hash_map<eastl::string, eastl::shared_ptr<HolderStructInterface>> Data;

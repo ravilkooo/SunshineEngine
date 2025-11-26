@@ -1,37 +1,22 @@
 #pragma once
 
-#include <EASTL/vector.h>
+// EASTL
+#include <EASTL/hash_map.h>
 #include <EASTL/functional.h>
 
+// Engine
 #include <Utils/UUID.h>
 #include <SimpleMath.h>
 #include <Component/Component.h>
 
+// Lua
+#include <sol/sol.hpp>
+
+
+class PerceptionSystem;
+
 
 namespace DXSM = DirectX::SimpleMath;
-
-
-struct SightStruct
-{
-    // Maximum distance at which the object can see others
-    float SightRadius = 1000.0f; 
-    // Distance at which sight of a target is lost
-    float LoseRadius = 1000.0f;    
-    // Angle of vision in degrees
-    float FieldOfView = 90.0f;  
-    // Whether vision penetrates obstacles
-    bool CanSeeThroughObjects = false;       
-};
-
-struct HearingStruct
-{
-    // Maximum distance to hear sounds
-    float HearingRadius = 1000.0f;  
-    // Minimum loudness to trigger hearing
-    float Threshold = 0.0f;     
-    // Multiplier for loudness perception
-    float Sensitivity = 1.0f;                
-};
 
 
 // Perception component attached to a GameObject
@@ -41,84 +26,177 @@ class PerceptionComponent : public Component
     friend class PerceptionSystem;
 
 public:
-    explicit PerceptionComponent(Sunshine::UUID Id): OwnerId(Id) {}
+    explicit PerceptionComponent(SE::UUID GOID): OwnerID(GOID) {}
 
-    Sunshine::UUID GetOwnerId() const { return OwnerId; }
+    ~PerceptionComponent();
 
-
-    // --- Sight settings ---
-    void SetSightStruct(SightStruct NewSightStruct);
-    const SightStruct& GetSightSettings() const { return SightSettings; };
-
-    void ChangeSightRadius(float NewRange);
-    void ChangeLoseRadius(float NewLoseRadius);
-    void ChangeFieldOfView(float NewFieldOfView);
-    void ChangeCanSeeThroughObjects(bool NewCanSeeThroughObjects) { 
-        SightSettings.CanSeeThroughObjects = NewCanSeeThroughObjects; };
+    SE::UUID GetOwnerID() const { return OwnerID; }
 
 
-    // --- Hearing settings ---
-    void SetHearingStruct(HearingStruct NewHearingStruct);
-    const HearingStruct& GetHearingSettings() const { return HearingSettings; };
+    // --- SIGHT ---
+    bool SetSight(float NewSightRadius, float NewLoseRadius, float NewFieldOfView, bool NewCanSeeThroughObjects);
 
-    void ChangeHearingRange(float NewHearingRange);
-    void ChangeThreshold(float NewThreshold);
-    void ChangeSensitivity(float NewSensitivity);
+    bool SetSightRadius(float NewSightRadius);
+    bool SetLoseRadius(float NewLoseRadius);
+    bool SetFieldOfView(float NewFieldOfView);
+    void SetCanSeeThroughObjects(bool NewCanSeeThroughObjects) { CanSeeThroughObjects = NewCanSeeThroughObjects; };
 
+    float GetSightRadius() { return SightRadius; };
+    float GetLoseRadius() { return LoseRadius; };
+    float GetFieldOfView() { return FieldOfView; };
+    bool GetCanSeeThroughObjects() { return CanSeeThroughObjects; };
+    //
 
-    // --- Sight listeners ---
-    using SightCallback = eastl::function<void(Sunshine::UUID TargetId)>;
-    struct CallbackWrapperSight { uint64_t Id; SightCallback Callback; };
+    // --- HEARING ---
+    bool SetHearing(float NewHearingRadius, float NewThreshold, float NewSensitivity);
 
-    uint64_t AddSightCallback(SightCallback Callback);
-    void RemoveSightCallback(uint64_t Id);
+    bool SetHearingRadius(float NewHearingRadius);
+    bool SetThreshold(float NewThreshold);
+    bool SetSensitivity(float NewSensitivity);
+
+    float GetHearingRadius() { return HearingRadius; };
+    float GetThreshold() { return Threshold; };
+    float GetSensitivity() { return Sensitivity; };
+    //
+
+    // --- SIGHT LISTENERS ---
+    uint64_t AddSightCallback(const sol::function& Callback);
+    void RemoveSightCallback(uint64_t Id) { SightCallbacks.erase(Id); };
     void ClearSightCallbacks() { SightCallbacks.clear(); };
+    //
 
-    // --- Hearing listeners ---
-    using HearingCallback = eastl::function<void(DXSM::Vector3 Location, float Loudness)>;
-    struct CallbackWrapperHearing { uint64_t Id; HearingCallback Callback; };
-
-    uint64_t AddHearingCallback(HearingCallback Callback);
-    void RemoveHearingCallback(uint64_t Id);
+    // --- HEARING LISTENERS ---
+    uint64_t AddHearingCallback(const sol::function& Callback);
+    void RemoveHearingCallback(uint64_t Id) { HearingCallbacks.erase(Id); };
     void ClearHearingCallbacks() { HearingCallbacks.clear(); };
+    //
 
-    // --- Damage listeners ---
-    using DamageCallback = eastl::function<void(Sunshine::UUID, float DamageAmount)>;
-    struct CallbackWrapperDamage { uint64_t Id; DamageCallback Callback; };
-
-    uint64_t AddDamageCallback(DamageCallback Callback);
-    void RemoveDamageCallback(uint64_t Id);
+    // --- DAMAGE LISTENERS ---
+    uint64_t AddDamageCallback(const sol::function& Callback);
+    void RemoveDamageCallback(uint64_t Id) { DamageCallbacks.erase(Id); };
     void ClearDamageCallbacks() { DamageCallbacks.clear(); };
-
+    //
   
-    // --- Event triggers ---
+    // --- EVENTS ---
     // Trigger a noise event to be broadcast globally
     bool MakeNoise(float Loudness);
 
-    //
-    //void ChangeInSight();
-
-    // Notify listeners that a sound was heard
-    void Heard(DXSM::Vector3& Location, float Loudness);
-
     // Notify listeners that damage was received
     void DealDamage(PerceptionComponent* Instigator, float DamageAmount);
+    //
 
 
     bool CanSee = false;
     bool CanHear = false;
 
 private:
-    Sunshine::UUID OwnerId;
+    //
+    void ChangeInSight(SE::UUID GOID, bool NewCondition);
 
-    SightStruct SightSettings;
-    HearingStruct HearingSettings;
+    // Notify listeners that a sound was heard
+    void Heard(SE::UUID GOID, float Loudness);
+
+
+    SE::UUID OwnerID;
+
+    // --- SIGHT ---
+    // Maximum distance at which the object can see others
+    float SightRadius = 1000.0f;
+
+    // Distance at which sight of a target is lost
+    float LoseRadius = 1000.0f;
+
+    // Angle of vision in degrees
+    float FieldOfView = 90.0f;
+
+    // Whether vision penetrates obstacles
+    bool CanSeeThroughObjects = false;
+    //
+
+    // --- Hearing ---
+    // Maximum distance to hear sounds
+    float HearingRadius = 1000.0f;
+
+    // Minimum loudness to trigger hearing
+    float Threshold = 0.0f;
+
+    // Multiplier for loudness perception
+    float Sensitivity = 1.0f;
+    //
 
     uint32_t TeamId = UINT32_MAX;
 
-    eastl::vector<CallbackWrapperSight> SightCallbacks;
-    eastl::vector<CallbackWrapperHearing> HearingCallbacks;
-    eastl::vector<CallbackWrapperDamage> DamageCallbacks;
+    eastl::hash_map<uint64_t, sol::function> SightCallbacks;
+    eastl::hash_map<uint64_t, sol::function> HearingCallbacks;
+    eastl::hash_map<uint64_t, sol::function> DamageCallbacks;
 
     uint64_t NextCallbackId = 1u;
+
+    eastl::vector<SE::UUID> GOCanSee;
 };
+
+
+class PerceptionComponent_Info : public Component_Info
+{
+public:
+    PerceptionComponent_Info() { };
+
+    static const SE::ComponentType s_componentType = SE::ComponentType::PERCEPTION;
+
+    const SE::ComponentType ComponentType() const override { return s_componentType; }
+    const std::type_info& getType() const override { return typeid(PerceptionComponent_Info); }
+    bool IsAssigned() override { return true; }
+
+
+    PerceptionComponent* Component;
+};
+
+
+// ------------------------------------------------------------------------------------------------------
+// ---------------------------------- LUA
+// ------------------------------------------------------------------------------------------------------
+
+#ifndef PERCEPTIONCOMPONENT_LUA_METHODS_APPLY
+#define PERCEPTIONCOMPONENT_LUA_METHODS_APPLY(FM) \
+    /* OWNER */ \
+    FM("getOwnerId", [](PerceptionComponent* self) { return self->GetOwnerID(); }) \
+    \
+    /* SIGHT */ \
+  , FM("setSight", [](PerceptionComponent* self, float r, float lose, float fov, bool through) { return self->SetSight(r, lose, fov, through); }) \
+  , FM("setSightRadius", [](PerceptionComponent* self, float r) { return self->SetSightRadius(r); }) \
+  , FM("setLoseRadius", [](PerceptionComponent* self, float r) { return self->SetLoseRadius(r); }) \
+  , FM("setFieldOfView", [](PerceptionComponent* self, float f) { return self->SetFieldOfView(f); }) \
+  , FM("setCanSeeThroughObjects", [](PerceptionComponent* self, bool b) { self->SetCanSeeThroughObjects(b); }) \
+  , FM("getSightRadius", [](PerceptionComponent* self) { return self->GetSightRadius(); }) \
+  , FM("getLoseRadius", [](PerceptionComponent* self) { return self->GetLoseRadius(); }) \
+  , FM("getFieldOfView", [](PerceptionComponent* self) { return self->GetFieldOfView(); }) \
+  , FM("getCanSeeThroughObjects", [](PerceptionComponent* self) { return self->GetCanSeeThroughObjects(); }) \
+    \
+    /* HEARING */ \
+  , FM("setHearing", [](PerceptionComponent* self, float r, float th, float sens) { return self->SetHearing(r, th, sens); }) \
+  , FM("setHearingRadius", [](PerceptionComponent* self, float r) { return self->SetHearingRadius(r); }) \
+  , FM("setThreshold", [](PerceptionComponent* self, float t) { return self->SetThreshold(t); }) \
+  , FM("setSensitivity", [](PerceptionComponent* self, float s) { return self->SetSensitivity(s); }) \
+  , FM("getHearingRadius", [](PerceptionComponent* self) { return self->GetHearingRadius(); }) \
+  , FM("getThreshold", [](PerceptionComponent* self) { return self->GetThreshold(); }) \
+  , FM("getSensitivity", [](PerceptionComponent* self) { return self->GetSensitivity(); }) \
+    \
+    /* SIGHT CALLBACKS */ \
+  , FM("addSightCallback", [](PerceptionComponent* self, const sol::function& fn) { return self->AddSightCallback(fn); }) \
+  , FM("removeSightCallback", [](PerceptionComponent* self, uint64_t id) { self->RemoveSightCallback(id); }) \
+  , FM("clearSightCallbacks", [](PerceptionComponent* self) { self->ClearSightCallbacks(); }) \
+    \
+    /* HEARING CALLBACKS */ \
+  , FM("addHearingCallback", [](PerceptionComponent* self, const sol::function& fn) { return self->AddHearingCallback(fn); }) \
+  , FM("removeHearingCallback", [](PerceptionComponent* self, uint64_t id) { self->RemoveHearingCallback(id); }) \
+  , FM("clearHearingCallbacks", [](PerceptionComponent* self) { self->ClearHearingCallbacks(); }) \
+    \
+    /* DAMAGE CALLBACKS */ \
+  , FM("addDamageCallback", [](PerceptionComponent* self, const sol::function& fn) { return self->AddDamageCallback(fn); }) \
+  , FM("removeDamageCallback", [](PerceptionComponent* self, uint64_t id) { self->RemoveDamageCallback(id); }) \
+  , FM("clearDamageCallbacks", [](PerceptionComponent* self) { self->ClearDamageCallbacks(); }) \
+    \
+    /* EVENTS */ \
+  , FM("makeNoise", [](PerceptionComponent* self, float loudness) { return self->MakeNoise(loudness); }) \
+  , FM("dealDamage", [](PerceptionComponent* self, PerceptionComponent* instigator, float damage) { self->DealDamage(instigator, damage); })
+#endif
