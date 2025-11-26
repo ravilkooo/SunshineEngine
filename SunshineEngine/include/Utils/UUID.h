@@ -35,7 +35,7 @@ namespace SE
     };
 }
 
-// возможно не пригодится
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 namespace std {
     template<>
@@ -55,9 +55,23 @@ namespace eastl {
     {
         size_t operator()(const SE::UUID& uuid) const noexcept
         {
-            // Для 64-бит UUID — просто возвращаем value
+            // пїЅпїЅпїЅ 64-пїЅпїЅпїЅ UUID пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ value
             return static_cast<size_t>(uuid.m_UUID);
         }
     };
 }
 */
+
+// EASTL requires its own hash specialization for custom types. Provide one
+// for SE::UUID so containers like eastl::hash_set / eastl::unordered_set
+// can compute hash codes correctly.
+namespace eastl {
+    template <>
+    struct hash<SE::UUID>
+    {
+        size_t operator()(const SE::UUID& uuid) const noexcept
+        {
+            return static_cast<size_t>((uint64_t)uuid);
+        }
+    };
+}

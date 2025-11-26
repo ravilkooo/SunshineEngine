@@ -43,6 +43,8 @@ void Game::SetupRendering(
 void Game::SetupPhysics()
 {
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
+	// For Volodya
+	//m_tracingSystem = eastl::make_unique<TracingSystem>();
 }
 
 bool Game::LoadScene(const wchar_t* scenePath)
@@ -69,6 +71,41 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	}
 	*/
 	//LOG_EDITOR_INFO("Scene loaded");
+
+	// For Volodya
+	/*
+	auto m_uuid0 = m_scene->gameObjects[0];
+	auto m_gobj0 = m_scene->GetGameObjectByUUID(m_uuid0);
+	auto m_uuid1 = m_scene->gameObjects[1];
+	auto m_gobj1 = m_scene->GetGameObjectByUUID(m_uuid1);
+
+	TracedBody* tb0 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
+
+	tb0->m_objectLayer = 0u;
+	tb0->m_motionType = JPH::EMotionType::Dynamic;
+	tb0->m_activation = JPH::EActivation::Activate;
+	JPH::ShapeSettings::ShapeResult shapeResult;
+	JPH::BoxShapeSettings boxSettings(
+		JPH::Vec3(
+			0.5f,
+			0.5f,
+			0.5f
+		)
+	);
+	shapeResult = boxSettings.Create();
+	tb0->m_shape = shapeResult.Get();
+	m_tracingSystem->CreateAndAddBody(tb0);
+
+	TracedBody* tb1 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
+	tb1->m_objectLayer = 0u;
+	tb1->m_motionType = JPH::EMotionType::Dynamic;
+	tb1->m_activation = JPH::EActivation::Activate;
+	tb1->m_shape = shapeResult.Get();
+	m_tracingSystem->CreateAndAddBody(tb1);
+
+	m_tracingSystem->FinalizeScene();
+	*/
+
 	return true;
 }
 
@@ -146,6 +183,9 @@ void Game::Update(float deltaTime) {
 	 m_physicsSystem->Step(deltaTime);
 
 	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
+	 
+	 // For Volodya
+	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
 }
 
 void Game::Render()

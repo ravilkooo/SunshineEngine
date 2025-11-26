@@ -17,7 +17,7 @@ PhysicsSystem::PhysicsSystem() :
 #ifdef JPH_DISABLE_TEMP_ALLOCATOR
     tempAllocator = new TempAllocatorMalloc();
 #else
-    m_tempAllocator = eastl::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024); // <-- ERROR
+    m_tempAllocator = eastl::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024);
 #endif
 
     m_jobSystem = eastl::make_unique<JPH::JobSystemThreadPool>(
@@ -74,8 +74,9 @@ void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
 
     physComp->m_joltBody = bodyInterface.CreateBody(settings);
     physComp->m_joltBodyId = physComp->m_joltBody->GetID();
+    physComp->m_joltBody->SetUserData(physComp->m_objectUUID.m_UUID);
 
-    m_bodyEntries.push_back({ physComp->m_joltBodyId, physComp->m_objectUUID });
+    m_bodyEntries.push_back({ physComp->m_joltBodyId });
     m_bodyInterface->AddBody(physComp->m_joltBodyId, physComp->m_activation);
 }
 
@@ -127,9 +128,11 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
 
         JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
         JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);        
+        
+        SE::UUID objectUUID = SE::UUID((std::uint64_t) m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
 
         auto tr = scene->GetGameObjectByUUID(
-            bodyEntry.m_objectUUID)->GetComponent<TransformComponent>();
+            objectUUID)->GetComponent<TransformComponent>();
 
         tr->m_position =
             DXSM::Vector3(position.mF32

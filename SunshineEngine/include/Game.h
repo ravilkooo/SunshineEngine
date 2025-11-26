@@ -21,6 +21,8 @@
 
 #include <Physics/PhysicsSystem.h>
 
+#include <TracingSystem/TracingSystem.h>
+
 #include <Utils/ILogManager.h>
 
 // To-do: move lua manager from Editor to Engine
@@ -60,6 +62,9 @@ public:
     eastl::shared_ptr<Scene> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
     eastl::unique_ptr<PhysicsSystem> m_physicsSystem;
+    
+    // For Volodya
+    //eastl::unique_ptr<TracingSystem> m_tracingSystem;
 
     // LuaManager m_luaManager;
 
