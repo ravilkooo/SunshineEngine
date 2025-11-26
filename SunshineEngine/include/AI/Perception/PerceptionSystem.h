@@ -18,23 +18,6 @@ class PerceptionSystem
     friend class PerceptionComponent;
 
 public:
-    static PerceptionSystem& Get()
-    {
-        static PerceptionSystem instance;
-        return instance;
-    }
-
-    // Represents a team participating in the perception system
-    // Each team contains perceivers (GameObject with perception components)
-    // and lists of other team IDs that THEY CAN SEE and WHO CAN HEAR THEM
-    struct TeamSctruct
-    {
-        eastl::vector<PerceptionComponent*> Perceivers;
-
-        eastl::vector<uint32_t> SightTargetTeamIDs;
-        eastl::vector<uint32_t> HearingSourceTeamIDs;
-    };
-
     // --- TEAMS ---
     // Registers a new team in the perception system.
     // Id Unique team identifier.
@@ -60,6 +43,23 @@ public:
     //
 
 private:
+    static PerceptionSystem& Get()
+    {
+        static PerceptionSystem instance;
+        return instance;
+    }
+
+    // Represents a team participating in the perception system
+    // Each team contains perceivers (GameObject with perception components)
+    // and lists of other team IDs that THEY CAN SEE and WHO CAN HEAR THEM
+    struct TeamSctruct
+    {
+        eastl::vector<PerceptionComponent*> Perceivers;
+
+        eastl::vector<uint32_t> SightTargetTeamIDs;
+        eastl::vector<uint32_t> HearingSourceTeamIDs;
+    };
+
     void SetScene(eastl::shared_ptr<Scene> InScene) { SceneSP = InScene; };
 
     // --- RUNTIME ---
