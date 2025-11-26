@@ -1,6 +1,7 @@
 #include "EditorApp.h"
 #include "Utils/DebugUtils.h"
 #include <fstream>   // std::ofstream
+#include <filesystem>
 
 EditorApp::EditorApp()
 {
@@ -476,18 +477,188 @@ void EditorApp::ChooseProject()
 		SE::SaveProjects(m_projectsList);
 	}
 
-	SE::PrintProjectsToConsole(m_projectsList);
-
-	size_t chosenProject = m_projectsList.size();
-
-	std::cout << "Choose project: ";
-
-	while (chosenProject >= m_projectsList.size())
+	// Console loop supports numeric selection and management commands:
+	//  - n : create new project
+	//  - a : add existing project to projectlist
+	//  - r : remove project from projectlist
+	//  - <index> : select project by index
+	while (true)
 	{
-		std::cin >> chosenProject;
+		SE::PrintProjectsToConsole(m_projectsList);
+
+		std::cout << "Choose project (index), or 'n' (new), 'a' (add), 'r' (remove): ";
+
+		std::string input;
+		std::cin >> input;
+
+		if (input == "n") {
+			CreateProject();
+			SE::LoadProjects(m_projectsList);
+			continue;
+		}
+		else if (input == "a") {
+			AddProject();
+			SE::LoadProjects(m_projectsList);
+			continue;
+		}
+		else if (input == "r") {
+			RemoveProject();
+			SE::LoadProjects(m_projectsList);
+			continue;
+		}
+
+		bool allDigits = !input.empty() && std::all_of(input.begin(), input.end(), ::isdigit);
+		if (!allDigits) {
+			std::cout << "Unknown command. Try again.\n";
+			continue;
+		}
+
+		size_t chosenProject = static_cast<size_t>(std::stoul(input));
+		if (chosenProject < m_projectsList.size())
+		{
+			m_openedProject = &m_projectsList[chosenProject];
+			break;
+		}
+		else
+		{
+			std::cout << "Index out of range. Try again.\n";
+			continue;
+		}
+	}
+}
+
+void EditorApp::CreateProject()
+{
+	std::cout << "Enter new project folder name (relative to Projects/, e.g. MyProject): ";
+	std::string name;
+	std::cin >> name;
+	if (name.empty()) {
+		std::cout << "Empty name. Aborting.\n";
+		return;
 	}
 
-	m_openedProject = &m_projectsList[chosenProject];
+	// Convert to eastl::wstring
+	eastl::string name_e(name.c_str());
+	eastl::wstring subPath = Utf8ToWString(name_e);
+	if (subPath.back() != L'/' && subPath.back() != L'\\')
+		subPath.push_back(L'/');
+
+	// Check duplicate
+	for (const SE::Project& p : m_projectsList)
+	{
+		if (p.GetSubPath() == subPath)
+		{
+			std::cout << "Project already in projectlist.\n";
+			return;
+		}
+	}
+
+	// Create directory
+	eastl::wstring fullPath = JoinWchar_Wstring(PROJECTS_DIR, subPath.c_str());
+	try {
+		std::filesystem::path dir(fullPath.c_str());
+		std::filesystem::create_directories(dir);
+	}
+	catch (const std::exception& e) {
+		std::cout << "Failed to create project directory: " << e.what() << "\n";
+		return;
+	}
+
+	// Create default scene and save
+	eastl::wstring sceneFile = JoinWchar_Wstring(fullPath.c_str(), L"scene.json");
+	eastl::wstring templateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/DefaultScene.json");
+	std::filesystem::copy(templateFile.c_str(), sceneFile.c_str());
+	//std::rename("from.txt", "to.txt")
+
+	// Add to project list and save
+	SE::Project p(subPath);
+	p.SetCreationDate(std::chrono::system_clock::now());
+	p.SetLastSavedTime(std::chrono::system_clock::now());
+	m_projectsList.push_back(eastl::move(p));
+	if (SE::SaveProjects(m_projectsList))
+		std::cout << "Project created and added to projlist.\n";
+	else
+		std::cout << "Failed to save project list.\n";
+}
+
+void EditorApp::AddProject()
+{
+	std::cout << "Enter existing project folder name (relative to Projects/, e.g. MyProject): ";
+	std::string name;
+	std::cin >> name;
+	if (name.empty()) {
+		std::cout << "Empty name. Aborting.\n";
+		return;
+	}
+
+	eastl::string name_e(name.c_str());
+	eastl::wstring subPath = Utf8ToWString(name_e);
+	if (subPath.back() != L'/' && subPath.back() != L'\\')
+		subPath.push_back(L'/');
+
+	// Check that folder contains scene.json
+	eastl::wstring fullPath = JoinWchar_Wstring(PROJECTS_DIR, subPath.c_str());
+	eastl::wstring sceneFile = JoinWchar_Wstring(fullPath.c_str(), L"scene.json");
+	if (!std::filesystem::exists(std::filesystem::path(sceneFile.c_str()))) {
+		std::cout << "scene.json not found under provided folder. Aborting.\n";
+		return;
+	}
+
+	// Check duplicate
+	for (const SE::Project& p : m_projectsList)
+	{
+		if (p.GetSubPath() == subPath)
+		{
+			std::cout << "Project already in projectlist.\n";
+			return;
+		}
+	}
+
+	// Set timestamps to now (we could read file times if desired)
+	SE::Project p(subPath);
+	p.SetCreationDate(std::chrono::system_clock::now());
+	p.SetLastSavedTime(std::chrono::system_clock::now());
+	m_projectsList.push_back(eastl::move(p));
+	if (SE::SaveProjects(m_projectsList))
+		std::cout << "Project added to projlist.\n";
+	else
+		std::cout << "Failed to save project list.\n";
+}
+
+void EditorApp::RemoveProject()
+{
+	if (m_projectsList.empty()) {
+		std::cout << "Project list is empty.\n";
+		return;
+	}
+
+	SE::PrintProjectsToConsole(m_projectsList);
+
+	std::cout << "Enter index of project to remove: ";
+	std::string input;
+	std::cin >> input;
+	if (input.empty() || !std::all_of(input.begin(), input.end(), ::isdigit)) {
+		std::cout << "Invalid index. Aborting.\n";
+		return;
+	}
+
+	size_t idx = static_cast<size_t>(std::stoul(input));
+	if (idx >= m_projectsList.size()) {
+		std::cout << "Index out of range. Aborting.\n";
+		return;
+	}
+
+	eastl::wstring removedSub = m_projectsList[idx].GetSubPath();
+
+	m_projectsList.erase(m_projectsList.begin() + idx);
+
+	if (m_openedProject && m_openedProject->GetSubPath() == removedSub)
+		m_openedProject = nullptr;
+
+	if (SE::SaveProjects(m_projectsList))
+		std::cout << "Project removed from projlist.\n";
+	else
+		std::cout << "Failed to save project list.\n";
 }
 
 
@@ -507,5 +678,7 @@ void EditorApp::SaveProject()
 {
 	m_openedProject->UpdateSaveTime();
 	SE::SaveProjects(m_projectsList);
-	m_worldEditor->SaveScene(m_openedProject->GetFullPath().c_str());
+	m_worldEditor->SaveScene(JoinWchar_Wstring(
+		m_openedProject->GetFullPath().c_str(),
+		L"scene.json").c_str());
 }

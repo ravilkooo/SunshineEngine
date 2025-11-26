@@ -63,11 +63,11 @@ public:
     // Create new project (create folder, scene.json, and add it to projectlist)
     void CreateProject();
 
-    // Add existing project to projectlist
-    void AddProject(/* args */);
+    // Add existing project to projectlist (console-driven)
+    void AddProject();
 
-    // Remove project from projectlist
-    void RemoveProject(/* args */);
+    // Remove project from projectlist (console-driven)
+    void RemoveProject();
 
     void RunApp();
 
