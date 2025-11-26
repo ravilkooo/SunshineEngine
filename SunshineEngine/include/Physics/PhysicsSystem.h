@@ -205,11 +205,11 @@ public:
 class PhysicsBodyEntry {
 public:
     JPH::BodyID m_joltBodyId;
-    SE::UUID m_objectUUID;
+    //SE::UUID m_objectUUID;
 
-    PhysicsBodyEntry(JPH::BodyID bodyId, SE::UUID objectUUID) :
-        m_joltBodyId(bodyId),
-        m_objectUUID(objectUUID)
+    PhysicsBodyEntry(JPH::BodyID bodyId) :
+        m_joltBodyId(bodyId)
+        //m_objectUUID(objectUUID)
     {}
 };
 
