@@ -18,14 +18,16 @@
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/RenderGroup.h>
 #include <Graphics/Renderer/Pass/RenderPass.h>
-#include <ImguiEditorPass.h>
 
 #include <Windows/WindowsApp.h>
-#include <GameTimer.h>
-#include <Project.h>
+
 //#include <ResourceManager.h>
-#include <WorldEditor.h>
+#include <GameTimer.h>
 #include <Game.h>
+
+#include <Project.h>
+#include <WorldEditor.h>
+#include <ImguiEditorPass.h>
 
 
 enum class MoveKey
@@ -52,21 +54,39 @@ public:
     void InitEditorApp(UINT winWidth = 1600u, UINT winHeight = 800u);
     ~EditorApp();
 
+    // Open project from projectlist
+    bool OpenProject();
+
+    // Save openedProject
+    void SaveProject();
+
+    // Create new project (create folder, scene.json, and add it to projectlist)
+    void CreateProject();
+
+    // Add existing project to projectlist (console-driven)
+    void AddProject();
+
+    // Remove project from projectlist (console-driven)
+    void RemoveProject();
+
     void RunApp();
-    //void RunGame();
+
+    void RunGame();
+    void StopGame();
 
     void UpdateEditor(float deltaTime);
     void UpdateGame(float deltaTime);
+
     void Render();
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
-    void LaunchGame();
-    void StopGame();
+
+    SE::ProjectList m_projectsList = { SE::Project() };
 
     eastl::shared_ptr<SE_G::RenderingSystem> m_renderingSystem;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;
-    eastl::unique_ptr<Project> m_openedProject;
+    SE::Project* m_openedProject = nullptr;
     eastl::unique_ptr<Game> m_currentGame;
 
     GameTimer m_timer;
@@ -74,7 +94,6 @@ public:
     float m_deltaTime = 0.0f;
 
     sol::state m_lua;
-
 
     enum class RuntimeMode {
         GAME_MODE, WORLD_EDITOR_MODE
@@ -98,7 +117,6 @@ private:
     bool IsRightMousePressed = false;
 
     float const CameraRotateSpeed = 0.5f;
-    //
 
     bool is_layout_initialized = false;
 
@@ -106,5 +124,7 @@ private:
     ImguiEditorPass* imguiEditorPass;
     bool m_initialized = false;
 
+private:
+    // Only for testing
+    void ChooseProject();
 };
-

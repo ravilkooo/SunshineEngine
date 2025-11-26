@@ -69,7 +69,7 @@ public:
     void Render();
     void ClearScene();
     
-    void InitScene();
+    void CreateDefaultScene();
     void SaveScene(const wchar_t* scenePath);
     bool LoadScene(const wchar_t* scenePath);
 

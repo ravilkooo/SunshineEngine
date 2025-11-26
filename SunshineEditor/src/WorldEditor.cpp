@@ -160,17 +160,8 @@ void WorldEditor::SetupRendering(
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
 }
 
-void WorldEditor::InitScene()
+void WorldEditor::CreateDefaultScene()
 {
-	//m_physicsSystem = eastl::make_shared<PhysicsSystem>();
-
-	/*
-	TestObjects
-	*/
-	// To-do: there should be path to opened project
-	// to-do: class Project
-	
-	// if (!LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str()))
 	{
 		this->m_scene = eastl::make_shared<Scene_Info>();
 
@@ -385,7 +376,7 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 		file >> j; // ��������� json �� �����
 	}
 	catch (const std::exception& e) {
-		LOG_EDITOR_ERROR(JoinChar_Char("JSON parse error: ", e.what()).c_str());
+		LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()).c_str());
 		return false;
 	}
 	m_scene = Scene_Info::FromJson(m_renderer.get(), m_renderer->GetMainCamera(), j);
@@ -396,6 +387,8 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	}
 	*/
 	LOG_EDITOR_INFO("Scene loaded");
+
+	m_selectionPass->m_scene = m_scene.get();
 	return true;
 }
 

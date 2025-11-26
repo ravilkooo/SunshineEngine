@@ -34,16 +34,13 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
             isPlaying = true; 
             LOG_GAME_INFO("Game started");
             if (m_editorApp)
-                m_editorApp->LaunchGame();
+                m_editorApp->RunGame();
         }
         ImGui::SameLine();
         if (ImGui::Button("Save"))
         {
             if (m_editorApp) {
-                // To-do: there should be path to opened project
-                // to-do: class Project
-                m_editorApp->m_worldEditor->SaveScene(
-                    JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
+                m_editorApp->SaveProject();
             }
         }
     }
