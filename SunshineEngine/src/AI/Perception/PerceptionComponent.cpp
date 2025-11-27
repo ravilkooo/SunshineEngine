@@ -140,6 +140,8 @@ bool PerceptionComponent::SetHearingRadius(float NewHearingRadius)
 	}
 
 	HearingRadius = NewHearingRadius;
+
+	return true;
 }
 
 bool PerceptionComponent::SetThreshold(float NewThreshold)
@@ -151,6 +153,8 @@ bool PerceptionComponent::SetThreshold(float NewThreshold)
 	}
 
 	Threshold = NewThreshold;
+
+	return true;
 }
 
 bool PerceptionComponent::SetSensitivity(float NewSensitivity)
@@ -162,6 +166,8 @@ bool PerceptionComponent::SetSensitivity(float NewSensitivity)
 	}
 
 	Sensitivity = NewSensitivity;
+
+	return true;
 }
 
 // ------------------------------------------------------------------------------------------------------

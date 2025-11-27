@@ -3,6 +3,7 @@
 // EASTL
 #include <EASTL/hash_map.h>
 #include <EASTL/functional.h>
+#include <EASTL/vector.h>
 
 // Engine
 #include <Utils/UUID.h>
