@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <fstream>   // std::ofstream
+#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 Game::Game()
 {
@@ -29,6 +30,20 @@ void Game::SetupRendering(
 			m_renderer->AddPass(eastl::make_unique<SE_G::GPass>(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+	}
+	{
+		
+		lightData = eastl::make_shared<SE_G::DirectionalLightData>();
+		lightData->Diffuse = { 1.0f, 1.0f, 1.0f };
+		lightData->Specular = { 1.0f, 1.0f, 1.0f };
+		lightData->Position = { 0.0f, 0.0f, -10.0f };
+		lightData->Direction = { 0.0f, -1.0f, 0.0f };
+
+		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_gPass, lightData))
 			);
 	}
 	{
