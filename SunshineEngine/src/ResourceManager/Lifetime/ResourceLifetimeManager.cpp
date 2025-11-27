@@ -10,7 +10,6 @@ void ResourceLifetimeManager::RegisterResource(ResourceGUID guid, ResourceLifeti
     info.refCount = 0;
     m_Resources[guid] = info;
 }
-#include <ResourceManager/Lifetime/ResourceLifetimeManager.h>
 
 void ResourceLifetimeManager::OnLevelLoad(uint32_t levelId)
 {
