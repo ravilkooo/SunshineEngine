@@ -14,6 +14,7 @@ namespace DXSM = DirectX::SimpleMath;
 namespace SE_G {
     class Camera
     {
+        friend class ShadowMapPass;
     public:
         struct CameraBuffer {
             DXSM::Matrix viewProjMatrix;
