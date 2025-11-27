@@ -1,6 +1,7 @@
 #include "Graphics/Renderer/Technique/GPassTechnique.h"
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Utils/StringUtils.h>
+#include <ResourceManager/ResourceManagerFacade.h>
 
 namespace SE_G {
 	GPassTechnique::GPassTechnique(DeferredRenderer* renderSystem, TransformComponent* assignedTransform, eastl::string technique,
@@ -44,12 +45,37 @@ namespace SE_G {
 			0u
 		);
 
+		//eastl::string vertexShaderPath = "Shaders/GPass/GPassShaderVS.hlsl";
+		//ResourceHandle vertexHandle = ResourceManagerFacade::Instance().LoadByPath(vertexShaderPath);
+		//SE_G::Bind::VertexShader* shader = ResourceManagerFacade::Instance().Get<SE_G::Bind::VertexShader>(vertexHandle);
+		//if (!shader)
+		//{
+		//	printSunshineErrorMessage("VertexShader not loaded (possibly wrong path or loader).");
+		//	// Задай m_vertexShader = nullptr и не вызывай Bind!
+		//}
+		//else
+		//{
+		//	m_vertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(shader, {});
+		//}
+
+
+
 		m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
 			renderSystem->GetDevice(), MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassShaderVS.hlsl").c_str());
 
 		m_colored = true;
 		m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
 			renderSystem->GetDevice(), MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
+
+		
+		//eastl::string texturePath = "Assets/Textures/UnloadedTextureColor.dds";
+		//// Загружаем и получаем handle
+		//ResourceHandle texHandle = ResourceManagerFacade::Instance().LoadByPath(texturePath);
+		//// Получаем указатель на Texture
+		//SE_G::Bind::Texture* tex = ResourceManagerFacade::Instance().Get<SE_G::Bind::Texture>(texHandle);
+		//// Сохраняем для дальнейшего использования в рендере (в shared_ptr, если требуется)
+		//m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(tex, [](SE_G::Bind::Texture*) {});
+
 		m_texture = eastl::make_shared<SE_G::Bind::Texture>(renderSystem->GetDevice(),
 			SE_G::Colors::UnloadedTextureColor,
 			0u,
