@@ -9,6 +9,7 @@
 #include <Graphics/Utils/Color.h>
 #include <Graphics/Bindable/Bindable.h>
 #include <Graphics/Bindable/Sampler.h>
+#include <ResourceManager/IResource.h>
 
 #include <EASTL/string.h>
 
@@ -18,7 +19,7 @@ namespace SE_G {
 	{
 		class Texture :
 			public Bindable
-			// , public Resource
+			, public IResource
 		{
 		public:
 			Texture(ID3D11Device* device, const eastl::wstring& filePath, UINT slot = 0u,
@@ -62,7 +63,14 @@ namespace SE_G {
 			eastl::wstring GetCurrentTexturePath();
 			SE_G::Color GetCurrentColor();
 
+			// Inherited via IResource
+			SunshineResource::ResourceType GetType() const override;
+			ResourceGUID GetGUID() const override;
+			size_t GetSizeInMemory() const override;
 		private:
+			ResourceGUID m_GUID = 0;
+			size_t m_MemorySize = 0;
+
 			bool isNull = true;
 
 			UINT m_slot;
@@ -75,6 +83,7 @@ namespace SE_G {
 			bool m_colored = true;
 			SE_G::Color m_color = SE_G::Colors::UnloadedTextureColor;
 			Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER;
+
 		};
 
 	}

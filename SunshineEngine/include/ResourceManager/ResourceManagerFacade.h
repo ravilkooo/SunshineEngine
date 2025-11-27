@@ -62,5 +62,5 @@ private:
 
 private:
     ResourceRegistry m_registry;
-    ResourceMemoryManager* m_memoryManager; // default heap-backed
+    HeapMemoryManager* m_memoryManager; // default heap-backed
 };

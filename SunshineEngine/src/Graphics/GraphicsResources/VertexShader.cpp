@@ -165,5 +165,17 @@ namespace SE_G {
 		{
 			return pShaderBytecodeBlob.Get();
 		}
+		SunshineResource::ResourceType VertexShader::GetType() const
+		{
+			return SunshineResource::ResourceType::SHADER;
+		}
+		ResourceGUID VertexShader::GetGUID() const
+		{
+			return m_GUID;
+		}
+		size_t VertexShader::GetSizeInMemory() const
+		{
+			return m_MemorySize;
+		}
 	}
 }

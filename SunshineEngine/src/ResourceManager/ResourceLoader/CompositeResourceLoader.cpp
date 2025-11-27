@@ -5,6 +5,11 @@
 #include <ResourceManager/ResourceRegistry.h>
 #include <EASTL/unordered_set.h>
 #include <Utils/DebugUtils.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/material.h>
+#include <assimp/postprocess.h>
+
 
 IResource* CompositeResourceLoader::Load(const eastl::string& path,
     ResourceRegistry* pRegistry,
@@ -112,72 +117,37 @@ eastl::vector<eastl::string> CompositeResourceLoader::ResolveDependencies(const 
 {
     eastl::vector<eastl::string> dependencies;
 
-    // ������ �� ������ �������� json/xml/txt ������:
-    // ����� �������, ��� ����������� ������������� � ��������� ������ �����.
-    // ��������: {
-    //   "meshes": ["mesh1.mesh", "mesh2.mesh"],
-    //   "materials": ["mat1.mat", "mat2.mat"],
-    //   "textures": ["tex1.dds", "tex2.dds"]
-    // }
-
-    // --- Pseudocode, �������� ������ ������� �� ������� ������� ---
-    // std::ifstream file(path.c_str());
-    // std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    //
-    // JsonDocument doc = ParseJson(content); // ��� ���� xml/txt ������
-    //
-    // for (auto& meshPath : doc["meshes"])
-    //     dependencies.push_back(meshPath.GetString());
-    // for (auto& matPath : doc["materials"])
-    //     dependencies.push_back(matPath.GetString());
-    // for (auto& texPath : doc["textures"])
-    //     dependencies.push_back(texPath.GetString());
-
-    // --- ������ ��� �������� ���������� ������� ---
-    /*
-    std::ifstream file(path.c_str());
-    eastl::string line;
-    while (std::getline(file, line))
-    {
-        if (line.starts_with("dependency:"))
-        {
-            // dependency:Assets/Characters/hero.mesh
-            eastl::string depPath = line.substr(strlen("dependency:"));
-            dependencies.push_back(depPath);
-        }
-    }
-    */
-
-    // --- ������ ��� ������� Assimp (������) ---
-    // ���� ������������ Assimp, ����� ��������� ����� � �������� �� ���� ���������, ���������� � �����:
-    /*
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path.c_str(), aiProcess_Triangulate);
-    if (scene)
+    const aiScene* scene = importer.ReadFile(path.c_str(),
+        aiProcess_Triangulate | aiProcess_CalcTangentSpace);
+
+    if (!scene) {
+        printSunshineErrorMessage(("Failed to load model with Assimp: {}", path.c_str()));
+        return dependencies;
+    }
+
+    // Collect all textures from materials
+    for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
     {
-        for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
+        aiMaterial* material = scene->mMaterials[i];
+
+        // Check all texture types
+        for (int texType = aiTextureType_DIFFUSE; texType <= aiTextureType_UNKNOWN; ++texType)
         {
-            // �������� ���� � ����, ���� �� �������
-            // dependencies.push_back(meshPath);
-        }
-        for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
-        {
-            aiMaterial* material = scene->mMaterials[i];
-            // for ������ texture type: get path
-            aiString texPath;
-            if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS)
-                dependencies.push_back(texPath.C_Str());
+            unsigned int texCount = material->GetTextureCount((aiTextureType)texType);
+            for (unsigned int t = 0; t < texCount; ++t)
+            {
+                aiString texPath;
+                if (material->GetTexture((aiTextureType)texType, t, &texPath) == AI_SUCCESS) {
+                    dependencies.push_back(texPath.C_Str());
+                }
+            }
         }
     }
-    */
-
-    // --- ��� stub: ������ ������ ������������� ����������� ---
-    // dependencies.push_back("Assets/mesh1.mesh");
-    // dependencies.push_back("Assets/texture1.dds");
-    // dependencies.push_back("Assets/material1.mat");
 
     return dependencies;
 }
+
 
 bool CompositeResourceLoader::CanLoad(const eastl::string& path) const
 {

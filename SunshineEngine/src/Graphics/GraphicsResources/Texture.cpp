@@ -1,5 +1,7 @@
 #include "Graphics/GraphicsResources/Texture.h"
 #include <iostream>
+#include <ResourceManager/Enums/ResourceType.h>
+#include <ResourceManager/ResourceHandle.h>
 
 
 namespace SE_G {
@@ -180,6 +182,18 @@ namespace SE_G {
 
 		SE_G::Color Texture::GetCurrentColor() {
 			return m_color;
+		}
+		SunshineResource::ResourceType Texture::GetType() const
+		{
+			return SunshineResource::ResourceType::TEXTURE;
+		}
+		ResourceGUID Texture::GetGUID() const
+		{
+			return m_GUID;
+		}
+		size_t Texture::GetSizeInMemory() const
+		{
+			return m_MemorySize;
 		}
 	}
 }
