@@ -64,6 +64,12 @@ cbuffer CascadeCBuf : register(b3) // per frame
     float4 distances;
 };
 
+cbuffer MapSizeBuffer : register(b4) // per frame
+{
+    ScreenInfo shadowMapSize;
+};
+
+
 Texture2DArray shadowMap : register(t4);
 SamplerState shadowSampler : register(s1);
 SamplerComparisonState samShadow : register(s2)
@@ -105,38 +111,46 @@ float CalcShadowFactor(SamplerComparisonState samShadow,
                        float4 shadowPosH,
                        int layer)
 {
-  // Complete projection by doing division by w.
-    shadowPosH.xyz /= shadowPosH.w;
-  
-  // Depth in NDC space.
-    float depth = shadowPosH.z;
-
-    // if (samShadow.Sample())
-  
-    //return shadowMap.SampleCmpLevelZero(samShadow, shadowPosH.xy, depth).r;
-  
-    // Texel size.
-    const float dx = 1.0f / screenInfo.sceenSize.x;
-    const float dy = 1.0f / screenInfo.sceenSize.y;
-
-    float percentLit = 0.0f;
-    const float2 offsets[9] =
+    if (shadowPosH.x < 0 || shadowPosH.y < 0 || shadowPosH.z < 0
+        || shadowPosH.x > 1 || shadowPosH.y > 1 || shadowPosH.z > 1)
     {
-        float2(-dx, -dy), float2(0.0f, -dy), float2(dx, -dy),
-        float2(-dx, 0.0f), float2(0.0f, 0.0f), float2(dx, 0.0f),
-        float2(-dx, +dy), float2(0.0f, +dy), float2(dx, +dy)
-    };
+        return 1.0f;
+    }
+  
+    // Depth in NDC space.
+    float depth = shadowPosH.z;
+    
+    // Base texel size in UV space
+    float2 texelSize = 1.0f / shadowMapSize.sceenSize;
+
+    // Optional: scale kernel radius (e.g. softer shadows for larger cascades)
+    float kernelScale = 1.0f; // tweak per cascade if needed
+    texelSize *= kernelScale;
+    
+    const int KERNEL_HALF = 2; // 5x5 kernel
+    float sum = 0.0f;
+    int count = 0;
 
     [unroll]
-    for (int i = 0; i < 9; ++i)
+    for (int dy = -KERNEL_HALF; dy <= KERNEL_HALF; ++dy)
     {
-        percentLit += shadowMap.SampleCmpLevelZero(
-            samShadow,
-            float3(shadowPosH.xy + offsets[i], layer),
-            depth).r;
+        [unroll]
+        for (int dx = -KERNEL_HALF; dx <= KERNEL_HALF; ++dx)
+        {
+            float2 uv = shadowPosH.xy + float2(dx, dy) * texelSize;
+
+            // Optional clamp to avoid sampling BORDER color
+            uv = saturate(uv);
+
+            sum += shadowMap.SampleCmpLevelZero(
+                       samShadow,
+                       float3(uv, layer),
+                       depth).r;
+            ++count;
+        }
     }
 
-    return percentLit /= 9.0f;
+    return sum / count;
 }
 
 struct PS_IN
@@ -144,6 +158,8 @@ struct PS_IN
     float4 pos : SV_POSITION;
     float2 tex : TEXCOORD;
 };
+
+static float cascadeDistances[4] = (float[4]) distances;
 
 float4 PSMain(PS_IN input) : SV_Target
 {
@@ -159,18 +175,8 @@ float4 PSMain(PS_IN input) : SV_Target
     float3 dl_spec;
     
     float4 normal = float4(NormalMap.Sample(Sam, float2(x, y)).rgb, 1.0f);
-    /*
-    float pixelDepthValue = DepthMap.Sample(Sam, float2(x, y)).r;
-    float4 pixelViewPos = mul(float4(2 * x - 1, 2 * y - 1, pixelDepthValue, 1.0f),
-    camData.pMatInverse);
-    pixelViewPos = pixelViewPos / pixelViewPos.w;
-    float4 pixelWorldPos = mul(pixelViewPos, camData.vMatInverse);
-    */
     float3 pixelWorldPos = WorldPosMap.Sample(Sam, float2(x, y)).rgb;
-    
-    
     float3 toEye = normalize(camData.camPos - pixelWorldPos.xyz);
-    //toEye = float3(1, 0, 0);
     
     calcDirectionalLight(pixelWorldPos.xyz, normal.xyz, toEye, mat, directionalLight,
         dl_diffuse, dl_spec);
@@ -179,14 +185,11 @@ float4 PSMain(PS_IN input) : SV_Target
     
     int layer = 1;
     
-    static float cascadeDistances[4] = (float[4]) distances;
-    
     float4 viewPos = mul(float4(pixelWorldPos, 1), camData.viewMat);
     viewPos /= viewPos.w;
     
     for (int i = 0; i < 4; ++i)
     {
-        //if (lightViewPos.z < cascadeDistances[i])
         if (viewPos.z < cascadeDistances[i])
         {
             layer = i;
@@ -197,18 +200,9 @@ float4 PSMain(PS_IN input) : SV_Target
     float4 shPos = mul(float4(pixelWorldPos, 1.0), shTransforms[layer].shadowTransform);
     shPos = shPos / shPos.w;
     
-    float4 shadowPictureColor = float4(0, 0, 0, 0);
-    float shadowFactor = 0;
+    float shadowFactor = CalcShadowFactor(samShadow, shadowMap, shPos, layer);
     
-    float3 dirLightCol;
-    if ((shPos.x >= 0) && (shPos.y >= 0) && (shPos.z >= 0) && (shPos.x <= 1) && (shPos.y <= 1) && (shPos.z <= 1))
-    {
-        shadowFactor = CalcShadowFactor(samShadow, shadowMap, shPos, layer);
-        
-        dirLightCol = saturate(shadowFactor * (dl_diffuse + dl_spec));
-    }
-    else
-        dirLightCol = saturate(dl_spec + dl_diffuse);
+    float3 dirLightCol = saturate(shadowFactor * (dl_diffuse + dl_spec));
 
     // ---------------------------------------------
     

@@ -18,7 +18,7 @@ namespace SE_G {
 	}
 
 	DeferredRenderer::~DeferredRenderer() {
-
+		m_passesOrder.clear();
 	}
 
 	void DeferredRenderer::InitGBuffer(UINT screenWidth, UINT screenHeight)

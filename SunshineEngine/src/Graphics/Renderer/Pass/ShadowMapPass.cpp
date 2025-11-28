@@ -83,11 +83,11 @@ namespace SE_G {
 		D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
 		rastDesc.CullMode = D3D11_CULL_NONE;
 		rastDesc.FillMode = D3D11_FILL_SOLID;
-		rastDesc.DepthBias = 1000000;
+		rastDesc.DepthBias = DEPTH_BIAS_D24_UNORM(0.001f);
 		rastDesc.DepthBiasClamp = 0.0f;
-		rastDesc.SlopeScaledDepthBias = 2.0f;
+		rastDesc.SlopeScaledDepthBias = 3.0f;
 
-		AddPerFrameBind(new Bind::Rasterizer(device, rastDesc));
+		m_shadowMapRasterizer = eastl::make_unique<Bind::Rasterizer>(device, rastDesc);
 		
 
 		// Directional Stuff bindables (textures, samplers)
@@ -141,6 +141,11 @@ namespace SE_G {
 
 		m_cascadesConstantBuffer = eastl::make_unique<Bind::PixelConstantBuffer<ShadowMapPass::CascadesData>>(
 			device, m_cascadesData, 3u);
+
+		m_mapSizePCB = eastl::make_unique<Bind::PixelConstantBuffer<MapSizePCB>>(
+			device, MapSizePCB{ DXSM::Vector2{ m_shadowMap.m_mapWidth * 1.0f, m_shadowMap.m_mapHeight * 1.0f } }, 4u);
+
+		//InitFrustumStuff(device, context);
 	}
 
 	ShadowMapPass::~ShadowMapPass()
@@ -177,6 +182,7 @@ namespace SE_G {
 			GenerateBoundingFrustum(currCascade);
 			MapCurrentCascadeData();
 			m_shadowTransformsConstantBuffer->Bind(GetDeviceContext());
+			m_shadowMapRasterizer->Bind(GetDeviceContext());
 
 			for (auto& tech : m_gPass->m_techniques) {
 				tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
@@ -218,7 +224,8 @@ namespace SE_G {
 		// nearestZ - у всех одинаковый (например 0.01)
 		// SetViewWidth - вычисляется по значениям точек (находим right вектор как вект произв Up X Direction)
 		// SetViewHeight - вычисляется по значениям точек
-		// SetPosition - выбираем на уровне вершины фрустума, которая располагается "выше" (в противоположную сторону -) всех остальных вдоль оси направления света, затем отмеряем назад значение nearZ
+		// SetPosition - выбираем на уровне вершины фрустума, которая располагается "выше" (в противоположную сторону -)
+		// всех остальных вдоль оси направления света, затем отмеряем назад значение nearZ
 		// и выбираем ровно посередине исходя из значений исполььзованных при расчёте SetViewWidth и SetViewHeight
 		// farestZ - макс расстояние от SetPosition до вершин фрустума вдоль направление света
 
@@ -227,82 +234,50 @@ namespace SE_G {
 
 		// Получаем крайние точки подфрустумов игрока
 		m_playerCamera->SetNearZ(cascadeBounds[cascadeNum] - (cascadeNum > 0 ? frustumBias : 0));
-		m_playerCamera->SetFarZ(cascadeBounds[cascadeNum + 1] + frustumBias);
+		m_playerCamera->SetFarZ(cascadeBounds[cascadeNum + 1]);
 
-		DXSM::Matrix playerViewMat = m_playerCamera->GetViewMatrix();
-		DXSM::Matrix playerProjMat = m_playerCamera->GetProjectionMatrix();
+		auto _fpsWorld = FillFrustumPoints(m_playerCamera);
 
 		m_playerCamera->SetNearZ(playerNearZ);
 		m_playerCamera->SetFarZ(playerFarZ);
 
-		DXSM::Matrix viewInverse = playerViewMat.Invert();
-		DXSM::Matrix projInverse = playerProjMat.Invert();
+		ShadowMapPass::FrustumPoints _fpsLightView;
+		const DXSM::Matrix lightViewMat = m_lightViewCamera->GetViewMatrix();
+		const DXSM::Matrix lightViewMatInv = lightViewMat.Invert();
 
-		DXSM::Vector3 farLeftPoint, farRightPoint, highestPoint, lowestPoint, nearZPoint, farZPoint;
-		float farLeft, farRight, highest, lowest, nearestZ, farestZ;
+		for (size_t i = 0; i < 8; i++)
 		{
-			DXSM::Vector4 _v = { 0, 0, 0, 1 };
-			_v = DXSM::Vector4::Transform(_v, projInverse);
-			_v = DXSM::Vector4::Transform(_v, viewInverse);
-			_v = _v / _v.w;
-			DXSM::Vector3 _w = DXSM::Vector3(_v);
-			farLeftPoint = _w; farRightPoint = _w; highestPoint = _w; lowestPoint = _w; nearZPoint = _w; farZPoint = _w;
+			_fpsLightView.corners[i] = DXSM::Vector4::Transform(_fpsWorld.corners[i], lightViewMat);
+			_fpsLightView.corners[i] = _fpsLightView.corners[i] / _fpsLightView.corners[i].w;
 		}
-
-		DXSM::Vector3 zDir = DXSM::Vector3(m_lightData->Direction);
-		zDir.Normalize();
-		DXSM::Vector3 camUpDir = m_lightViewCamera->GetUp();
-		camUpDir.Normalize();
-		DXSM::Vector3 xDir = camUpDir.Cross(zDir);
-		xDir.Normalize();
-
-		float epsilon = 0.0001;
-		if (xDir.LengthSquared() < epsilon)
+		float x_min = _fpsLightView.corners[0].x; float x_max = _fpsLightView.corners[0].x;
+		float y_min = _fpsLightView.corners[0].y; float y_max = _fpsLightView.corners[0].y;
+		float z_min = _fpsLightView.corners[0].z; float z_max = _fpsLightView.corners[0].z;
+		for (size_t i = 1; i < 8; i++)
 		{
-			m_lightViewCamera->SetUp({ 0.0f, 0.0f, 1.0f });
-			camUpDir = m_lightViewCamera->GetUp();
-			camUpDir.Normalize();
-			xDir = camUpDir.Cross(zDir);
-			xDir.Normalize();
+			x_min = eastl::min(_fpsLightView.corners[i].x, x_min);
+			x_max = eastl::max(_fpsLightView.corners[i].x, x_max);
+			y_min = eastl::min(_fpsLightView.corners[i].y, y_min);
+			y_max = eastl::max(_fpsLightView.corners[i].y, y_max);
+			z_min = eastl::min(_fpsLightView.corners[i].z, z_min);
+			z_max = eastl::max(_fpsLightView.corners[i].z, z_max);
 		}
+		float newWidth = x_max - x_min;
+		float newHeight = y_max - y_min;
+		float newDeltaZ = z_max - z_min;
+		float _nearZ = 0.01;
+		
+		DXSM::Vector3 newCamPos_oldViewSpace((x_min + x_max) * 0.5f, (y_min + y_max) * 0.5f, z_min - _nearZ);
+		DXSM::Vector3 newCamPos_worldSpace = DXSM::Vector3::Transform(newCamPos_oldViewSpace, lightViewMatInv);
 
-		DXSM::Vector3 yDir = zDir.Cross(xDir);
-		yDir.Normalize();
+		m_lightViewCamera->SetPosition(newCamPos_worldSpace);
+		m_lightViewCamera->SetTarget(newCamPos_worldSpace + m_lightData->Direction);
+		m_lightViewCamera->SetNearZ(_nearZ);
+		m_lightViewCamera->SetFarZ(newDeltaZ + _nearZ);
+		m_lightViewCamera->SetViewWidth(newWidth);
+		m_lightViewCamera->SetViewHeight(newHeight);
 
-		for (float i = -1; i < 2; i += 2)
-		{
-			for (float j = -1; j < 2; j += 2)
-			{
-				for (float k = 0; k < 2; k++)
-				{
-					DXSM::Vector4 _v = { i, j, k, 1 };
-					_v = DXSM::Vector4::Transform(_v, projInverse);
-					_v = DXSM::Vector4::Transform(_v, viewInverse);
-					_v = _v / _v.w;
-					if (farRightPoint.Dot(xDir) < DXSM::Vector3(_v).Dot(xDir)) { farRightPoint = DXSM::Vector3(_v); }
-					else
-						if (farLeftPoint.Dot(xDir) > DXSM::Vector3(_v).Dot(xDir)) { farLeftPoint = DXSM::Vector3(_v); }
-
-					if (highestPoint.Dot(yDir) < DXSM::Vector3(_v).Dot(yDir)) { highestPoint = DXSM::Vector3(_v); }
-					else
-						if (lowestPoint.Dot(yDir) > DXSM::Vector3(_v).Dot(yDir)) { lowestPoint = DXSM::Vector3(_v); }
-
-					if (farZPoint.Dot(zDir) < DXSM::Vector3(_v).Dot(zDir)) { farZPoint = DXSM::Vector3(_v); }
-					else
-						if (nearZPoint.Dot(zDir) > DXSM::Vector3(_v).Dot(zDir)) { nearZPoint = DXSM::Vector3(_v); }
-
-
-					//std::cout << _v.x << ",\t" << _v.y << ",\t" << _v.z << "\n";
-				}
-			}
-		}
-		farRight = farRightPoint.Dot(xDir);
-		farLeft = farLeftPoint.Dot(xDir);
-		highest = highestPoint.Dot(yDir);
-		lowest = lowestPoint.Dot(yDir);
-		nearestZ = nearZPoint.Dot(zDir);
-		farestZ = farZPoint.Dot(zDir);
-
+		/*
 		printf("\n");
 		printf("      x----- (%6.2f, %6.2f, %6.2f) [%6.2f] -----x\n", highestPoint.x, highestPoint.y, highestPoint.z, highest);
 		printf("      |                                             |\n");
@@ -310,21 +285,7 @@ namespace SE_G {
 		printf("      |                                             |\n");
 		printf("      x----- (%6.2f, %6.2f, %6.2f) [%6.2f] -----x\n", lowestPoint.x, lowestPoint.y, lowestPoint.z, lowest);
 		printf("\n");
-
-		float _nearZ = 0.01;
-
-		DXSM::Vector3 newCamPos =
-			(farRight + farLeft) * 0.5 * xDir
-			+ (highest + lowest) * 0.5 * yDir
-			+ (nearestZ - _nearZ) * zDir; // -0.01 так как камера немного отдалена от nearZ
-
-
-		m_lightViewCamera->SetPosition(newCamPos);
-		m_lightViewCamera->SetTarget(newCamPos + m_lightData->Direction);
-		m_lightViewCamera->SetNearZ(_nearZ);
-		m_lightViewCamera->SetFarZ(farestZ - nearestZ + _nearZ);
-		m_lightViewCamera->SetViewWidth(farRight - farLeft);
-		m_lightViewCamera->SetViewHeight(highest - lowest);
+		*/
 
 		{
 			DirectX::XMMATRIX T = {
@@ -345,7 +306,8 @@ namespace SE_G {
 				* m_cascadesData.cascades[cascadeNum].lightProjection
 				* T;
 		}
-
+		// fps[cascadeNum] = FillFrustumPoints(m_lightViewCamera.get());
+		// fps[cascadeNum].idx = currCascade;
 		return m_cascadesData.cascades[cascadeNum];
 	}
 
@@ -360,5 +322,85 @@ namespace SE_G {
 		m_shadowSampler_1->Bind(GetDeviceContext());
 		m_shadowSampler_2->Bind(GetDeviceContext());
 		m_cascadesConstantBuffer->Bind(GetDeviceContext());
+		m_mapSizePCB->Bind(GetDeviceContext());
 	}
+
+	ShadowMapPass::FrustumPoints ShadowMapPass::FillFrustumPoints(Camera* camera)
+	{
+		FrustumPoints frustPoints;
+		const DXSM::Matrix viewProj = camera->GetViewMatrix() * camera->GetProjectionMatrix();
+		const DXSM::Matrix inv = viewProj.Invert();
+		UINT currCorner = 0;
+		for (unsigned int x = 0; x < 2; ++x) {
+			for (unsigned int y = 0; y < 2; ++y) {
+				for (unsigned int z = 0; z < 2; ++z) {
+					DXSM::Vector4 pt = DXSM::Vector4::Transform(
+						DXSM::Vector4(
+							2.0f * x - 1.0f, // -1, 1
+							2.0f * y - 1.0f, // -1, 1
+							z,               //  0, 1
+							1.0f), inv);
+					pt = pt / pt.w;
+					frustPoints.corners[currCorner++] = pt;
+				}
+			}
+		}
+		return frustPoints;
+	}
+
+	/*
+	void ShadowMapPass::InitFrustumStuff(ID3D11Device* device, ID3D11DeviceContext* context)
+	{
+		D3D11_RASTERIZER_DESC rasterDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
+		rasterDesc.CullMode = D3D11_CULL_NONE;
+		rasterDesc.FillMode = D3D11_FILL_SOLID;
+
+		m_rasterizer = eastl::make_unique<Bind::Rasterizer>(device, rasterDesc);
+		m_frustumCube = Mesh::CreateUnwrappedBoxMesh(device);
+		m_frusumVS = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/ShadowMapPass/FrustumVS.hlsl").c_str());
+		m_frusumPS = eastl::make_unique<Bind::PixelShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/ShadowMapPass/FrustumPS.hlsl").c_str());
+
+		m_fpBuffer = eastl::make_unique<Bind::VertexConstantBuffer<FrustumPoints>>(device, fps[0], 0u);
+
+		D3D11_BLEND_DESC blendDesc = CD3D11_BLEND_DESC(CD3D11_DEFAULT{});
+		blendDesc.RenderTarget[0].BlendEnable = TRUE;
+		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		m_blendFrust = eastl::make_unique<Bind::BlendState>(device, blendDesc);
+
+		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT{});
+		dsDesc.DepthEnable = TRUE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		m_depthStencilFrust = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
+	}
+
+	void ShadowMapPass::DrawFrustums()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			// Get data for current cascade
+			m_fpBuffer->Update(GetDeviceContext(), fps[i]);
+			m_fpBuffer->Bind(GetDeviceContext());
+			m_shadowTransformsConstantBuffer->Bind(GetDeviceContext());
+			m_frusumVS->Bind(GetDeviceContext());
+			m_frusumPS->Bind(GetDeviceContext());
+			m_rasterizer->Bind(GetDeviceContext());
+			m_blendFrust->Bind(GetDeviceContext());
+			m_depthStencilFrust->Bind(GetDeviceContext());
+
+			m_frustumCube->Bind(GetDeviceContext());
+			m_frustumCube->Draw(GetDeviceContext());
+
+		}
+	}
+	*/
 }

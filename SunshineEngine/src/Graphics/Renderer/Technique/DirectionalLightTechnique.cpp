@@ -51,12 +51,13 @@ namespace SE_G {
         {
             m_shadowMapPass->BindForLightingPass();
             s_shadowShader->Bind(context.Get());
+            DrawTechnique(context);
         }
         else
         {
             s_noShadowShader->Bind(context.Get());
+            DrawTechnique(context);
         }
-        DrawTechnique(context);
     }
 
     void DirectionalLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
@@ -79,10 +80,17 @@ namespace SE_G {
         return true;
     }
 
-    void DirectionalLightTechnique::EnableShadow(ShadowMapPass* shadowMapPass)
+    void DirectionalLightTechnique::AssignShadowMapPass(ShadowMapPass* shadowMapPass)
     {
         m_shadowMapPass = shadowMapPass;
-        m_castsShadow = true;
+    }
+
+    void DirectionalLightTechnique::EnableShadow()
+    {
+        if (m_shadowMapPass)
+            m_castsShadow = true;
+        else
+            printf("No asssigned shadowMapPass"); // LOG_GAME(...)
     }
 
     void DirectionalLightTechnique::DisableShadow()

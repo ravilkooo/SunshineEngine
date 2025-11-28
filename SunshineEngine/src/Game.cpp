@@ -197,11 +197,19 @@ void Game::Render()
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	//m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio(m_screenWidth * 1.0f / m_screenHeight);
 	if (resizeHeight == m_screenHeight)
-		m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio_horizontal(resizeWidth * 1.0f / resizeHeight);
-	else if (resizeWidth == m_screenWidth)
-		m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio_vertical(resizeWidth * 1.0f / resizeHeight);
-	else
+	{
 		m_renderer->GetMainCamera()->ResetCameraView(resizeWidth * 1.0f / resizeHeight);
+		//m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio_horizontal(resizeWidth * 1.0f / resizeHeight);
+	}
+	else if (resizeWidth == m_screenWidth)
+	{
+		m_renderer->GetMainCamera()->ResetCameraView(resizeWidth * 1.0f / resizeHeight);
+		//m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio_vertical(resizeWidth * 1.0f / resizeHeight);
+	}
+	else
+	{
+		m_renderer->GetMainCamera()->ResetCameraView(resizeWidth * 1.0f / resizeHeight);
+	}
 
 	m_screenWidth = resizeWidth;
 	m_screenHeight = resizeHeight;

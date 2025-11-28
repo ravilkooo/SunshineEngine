@@ -22,7 +22,8 @@ namespace SE_G {
         LightPosition GetLightPositionInFrustum() override;
         bool IsFrustumInsideOfLight() override;
 
-        void EnableShadow(ShadowMapPass* shadowMapPass);
+        void AssignShadowMapPass(ShadowMapPass* shadowMapPass);
+        void EnableShadow();
         void DisableShadow();
 
         bool m_castsShadow = false;

@@ -2,6 +2,8 @@
 
 #include "Bindable.h"
 
+#define DEPTH_BIAS_D24_UNORM(x) int((x) * float(1 << 24))
+
 namespace SE_G {
 	namespace Bind
 	{

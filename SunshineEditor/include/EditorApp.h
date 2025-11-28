@@ -74,6 +74,9 @@ public:
     void RunGame();
     void StopGame();
 
+    void PauseGame();
+    void ContinueGame();
+
     void UpdateEditor(float deltaTime);
     void UpdateGame(float deltaTime);
 
@@ -99,7 +102,7 @@ public:
         GAME_MODE, WORLD_EDITOR_MODE
     };
     RuntimeMode m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
-
+    bool m_gamePaused = false;
 private:
     // Camera movings
     void HandleKeyDown(Keys key);

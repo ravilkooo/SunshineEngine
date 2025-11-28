@@ -112,7 +112,6 @@ namespace SE_G {
 
 	void LightPass::Pass()
 	{
-		BindAllPerFrame();
 
 		/*
 		for (const auto& gameObjectUUID : scene.gameObjects) {
@@ -132,6 +131,9 @@ namespace SE_G {
 		}
 		*/
 		for (auto& tech : m_techniques) {
+
+			BindAllPerFrame();
+			m_camera->BindBuffer(context.Get());
 			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech->Pass(GetDeviceContext());
 		}
