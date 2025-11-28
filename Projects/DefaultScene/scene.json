@@ -763,6 +763,7 @@
             "m_type": "AmbientLight"
         },
         {
+            "CastsShadow": true,
             "components": {
                 "Render": {
                     "techniques": [

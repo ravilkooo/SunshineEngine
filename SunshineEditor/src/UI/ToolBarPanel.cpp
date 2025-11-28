@@ -46,9 +46,21 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
     }
     else
     {
-        if (ImGui::Button("Pause"))
+        if (!m_editorApp->m_gamePaused)
         {
-            LOG_GAME_INFO("Game paused");
+            if (ImGui::Button("Pause"))
+            {
+                LOG_GAME_INFO("Game paused");
+                m_editorApp->PauseGame();
+            }
+        }
+        else
+        {
+            if (ImGui::Button("Continue"))
+            {
+                LOG_GAME_INFO("Game continued");
+                m_editorApp->ContinueGame();
+            }
         }
         ImGui::SameLine();
         if (ImGui::Button("Stop"))

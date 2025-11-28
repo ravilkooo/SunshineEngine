@@ -12,6 +12,7 @@ namespace SE_G {
     class GPass :
         public RenderPass
     {
+        friend class ShadowMapPass;
     public:
         GPass(ID3D11Device* device, ID3D11DeviceContext* context,
             eastl::shared_ptr<GBuffer> pGBuffer,

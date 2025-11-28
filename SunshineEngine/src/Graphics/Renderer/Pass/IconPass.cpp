@@ -13,6 +13,7 @@ namespace SE_G {
 		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
+		m_passType = PassType::Icon;
 
 		// Set RTVs
 		m_bufferRTVs[0] = pGBuffer->pLightRTV.Get();

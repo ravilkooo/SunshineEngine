@@ -18,8 +18,11 @@ namespace SE_G {
         orbitalPitch(0.0f), orbitalYaw(0.0f),
         spinAxis(0.0f, 1.0f, 0.0f), orbitalAngleSpeed(0.0f)
     {
-        SetUpCameraViewByAspectRatio(aspectRatio);
+        //SetUpCameraViewByAspectRatio(aspectRatio);
         //fov = 2.0f * atan(aspectRatio * 0.5625f); 
+
+        SetUpCameraViewByFOV(DX::XM_PI * 0.333f);
+
         InitBuffer(device);
     }
 
@@ -116,15 +119,6 @@ namespace SE_G {
         SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
     }
 
-    void Camera::SetUpCameraViewByFOV(float newFOV)
-    {
-        SetFOV(newFOV);
-        SetAspectRatio(16.0f * tan(fov * 0.5f) / 9.0f);
-        SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
-        SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
-
-    }
-
     void Camera::SetUpCameraViewByAspectRatio_horizontal(float newAspectRatio)
     {
         //SetFOV(fov); // stay the same
@@ -142,14 +136,47 @@ namespace SE_G {
         SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
     }
 
+    void Camera::SetUpCameraViewByFOV(float newFOV)
+    {
+        SetFOV(newFOV);
+        SetAspectRatio(16.0f * tan(fov * 0.5f) / 9.0f);
+        SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+        SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+    }
+
+    /*
+    void Camera::SetUpCameraViewByFOV_horizontal(float newFOV)
+    {
+        SetFOV(newFOV);
+        SetAspectRatio(16.0f * tan(fov * 0.5f) / 9.0f);
+        SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+        SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+    }
+
+    void Camera::SetUpCameraViewByFOV_vertical(float newFOV)
+    {
+        SetFOV(newFOV);
+        SetAspectRatio(16.0f * tan(fov * 0.5f) / 9.0f);
+        SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+        SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+    }
+    */
+
     void Camera::ResetCameraView(float newAspectRatio)
     {
+        SetFOV(DX::XM_PI * 0.333f);
+        SetAspectRatio(newAspectRatio);
+        SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
+        SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+
+        /*
         SetFOV(2.0f * atan(tan(DX::XM_PIDIV2 * 0.5f) * 16.0f / 9.0f / newAspectRatio));
         SetAspectRatio(newAspectRatio);
         //SetAspectRatio(newAspectRatio);
         //SetFOV(DX::XM_PIDIV2); // 2 * atan(1)
         SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
         SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+        */
     }
 
     void Camera::SetViewWidth(float viewWidth)
@@ -372,7 +399,6 @@ namespace SE_G {
         position = target - cam2targetDist * (direction + sinf(followPitch) * up);
     }
 
-
     void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget)
     {
         SwitchToOrbitalMode(orbitalTarget, DXSM::Vector3(0.0f, 1.0f, 0.0f), 1.0f);
@@ -382,6 +408,7 @@ namespace SE_G {
     {
         SwitchToOrbitalMode(orbitalTarget, spinAxis, 1.0f);
     }
+    
     void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis, float referenceLen)
     {
         this->referenceLen = referenceLen;

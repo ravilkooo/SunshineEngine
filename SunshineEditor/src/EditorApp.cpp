@@ -142,7 +142,7 @@ void EditorApp::RunApp()
 			FPSstatisticTimer -= 1.0f;
 
 			WCHAR text[256];
-			swprintf_s(text, TEXT("FPS: %f"), fps);
+			swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), m_openedProject->GetSubPath().c_str(), fps);
 			SetWindowText(m_displayWindow.m_hWnd, text);
 
 			frameCount = 0;
@@ -192,7 +192,8 @@ void EditorApp::UpdateGame(float deltaTime)
 		m_currentGame->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
 	}
 
-	m_currentGame->Update(deltaTime);
+	if (!m_gamePaused)
+		m_currentGame->Update(deltaTime);
 }
 
 void EditorApp::UpdateEditor(float deltaTime) 
@@ -452,6 +453,14 @@ void EditorApp::RunGame() {
 	// There should be saving scene from world editor (serializing) and loading to game (deserializing)
 	// m_worldEditor->SaveScene(...);
 	// m_currentGame->LoadScene(...);
+}
+
+void EditorApp::PauseGame() {
+	m_gamePaused = true;
+}
+
+void EditorApp::ContinueGame() {
+	m_gamePaused = false;
 }
 
 void EditorApp::StopGame() {

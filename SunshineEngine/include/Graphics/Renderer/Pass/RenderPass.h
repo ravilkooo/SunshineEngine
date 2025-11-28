@@ -15,7 +15,18 @@ namespace SE_G {
 	class RenderPass
 	{
 		friend class GameObject;
+
 	public:
+		enum class PassType : UINT {
+			GPass = 0u,
+			Shadow = 1u,
+			Light = 2u,
+			Collider = 3u,
+			Icon = 4u,
+			Selection = 5u,
+			Count
+		};
+
 		RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context);
 		virtual ~RenderPass();
 
@@ -35,6 +46,8 @@ namespace SE_G {
 		bool IsEnabled();
 		void Disable();
 		void Enable();
+
+		PassType m_passType;
 
 	protected:
 		eastl::string techniqueTag;

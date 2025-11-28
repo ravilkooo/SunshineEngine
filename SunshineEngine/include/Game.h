@@ -11,6 +11,7 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 #include <GameObject/GameObjectFactory.h>
 #include <GameObject/GameObject.h>
@@ -68,6 +69,8 @@ public:
 
     // LuaManager m_luaManager;
 
+    eastl::shared_ptr<SE_G::DirectionalLightData> lightData;
+    SE_G::ShadowMapPass* m_shadowMapPass;
     SE_G::GPass* m_gPass;
     SE_G::LightPass* m_lightPass;
 
