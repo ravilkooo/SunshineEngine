@@ -13,6 +13,8 @@ namespace SE_G {
 		m_gPass(gPass),
 		m_lightData(lightData)
 	{
+		m_passType = PassType::Shadow;
+
 		m_playerCamera = gPass->camera.get();
 
 		m_lightViewCamera = eastl::make_unique<SE_G::Camera>(device,
@@ -86,9 +88,59 @@ namespace SE_G {
 		rastDesc.SlopeScaledDepthBias = 2.0f;
 
 		AddPerFrameBind(new Bind::Rasterizer(device, rastDesc));
+		
+
+		// Directional Stuff bindables (textures, samplers)
+
+		// --- Shadow stuff ---
+
+		// View texture as Shader resource while using it for shadowing in pixel shader
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+		srvDesc.Texture2DArray.MostDetailedMip = 0;
+		srvDesc.Texture2DArray.MipLevels = 1;
+		srvDesc.Texture2DArray.FirstArraySlice = 0;
+		srvDesc.Texture2DArray.ArraySize = 4;
+
+		m_shadowMapTexture = eastl::make_unique<Bind::Texture>(device, m_shadowMap.GetTexture(), srvDesc, 4u);
+
+		// Sampler of texture. It samples values from texture
+		D3D11_SAMPLER_DESC shadowSamplerDesc;
+		shadowSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		shadowSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		shadowSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		shadowSamplerDesc.MipLODBias = 0.0f;
+		shadowSamplerDesc.MaxAnisotropy = 1;
+		shadowSamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		shadowSamplerDesc.BorderColor[0] = 1.0;
+		shadowSamplerDesc.BorderColor[1] = 1.0;
+		shadowSamplerDesc.BorderColor[2] = 1.0;
+		shadowSamplerDesc.BorderColor[3] = 1.0;
+		shadowSamplerDesc.MinLOD = 0;
+		shadowSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+		m_shadowSampler_1 = eastl::make_unique<Bind::Sampler>(device, shadowSamplerDesc, 1u);
+
+		shadowSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+		shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+		shadowSamplerDesc.MipLODBias = 0.0f;
+		shadowSamplerDesc.MaxAnisotropy = 1;
+		shadowSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+		shadowSamplerDesc.BorderColor[0] = 1.0;
+		shadowSamplerDesc.BorderColor[1] = 1.0;
+		shadowSamplerDesc.BorderColor[2] = 1.0;
+		shadowSamplerDesc.BorderColor[3] = 1.0;
+		shadowSamplerDesc.MinLOD = 0;
+		shadowSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+		m_shadowSampler_2 = eastl::make_unique<Bind::Sampler>(device, shadowSamplerDesc, 2u);
 
 		m_cascadesConstantBuffer = eastl::make_unique<Bind::PixelConstantBuffer<ShadowMapPass::CascadesData>>(
-			device, m_cascadesData, 1u);
+			device, m_cascadesData, 3u);
 	}
 
 	ShadowMapPass::~ShadowMapPass()
@@ -300,5 +352,13 @@ namespace SE_G {
 	void ShadowMapPass::MapCurrentCascadeData()
 	{
 		m_shadowTransformsConstantBuffer->Update(GetDeviceContext(), m_cascadesData.cascades[currCascade]);
+	}
+
+	void ShadowMapPass::BindForLightingPass()
+	{
+		m_shadowMapTexture->Bind(GetDeviceContext());
+		m_shadowSampler_1->Bind(GetDeviceContext());
+		m_shadowSampler_2->Bind(GetDeviceContext());
+		m_cascadesConstantBuffer->Bind(GetDeviceContext());
 	}
 }

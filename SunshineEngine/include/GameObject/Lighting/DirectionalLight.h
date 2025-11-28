@@ -30,7 +30,7 @@ public:
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3::Zero, 0,
             DXSM::Vector3(1, -1, 1), 0
-        });
+        }, bool castsShadow = false);
 
     DirectionalLight(
         SE_G::DeferredRenderer* renderSystem,

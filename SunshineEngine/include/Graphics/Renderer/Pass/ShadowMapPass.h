@@ -43,6 +43,8 @@ namespace SE_G {
         ShadowTransformData GenerateBoundingFrustum(UINT cascadeNum);
         void MapCurrentCascadeData();
 
+        void BindForLightingPass();
+
         GPass* m_gPass;
         ShadowMap m_shadowMap;
         
@@ -59,11 +61,17 @@ namespace SE_G {
         eastl::unique_ptr<SE_G::Bind::VertexShader> vertexShader;
 
         eastl::unique_ptr<SE_G::Bind::VertexConstantBuffer<ShadowTransformData>> m_shadowTransformsConstantBuffer;
-        eastl::unique_ptr<SE_G::Bind::PixelConstantBuffer<CascadesData>> m_cascadesConstantBuffer;
 
         eastl::shared_ptr<SE_G::DirectionalLightData> m_lightData;
         eastl::shared_ptr<SE_G::Bind::PixelConstantBuffer<SE_G::DirectionalLightData>> m_lightDataBuffer;
         eastl::unique_ptr<SE_G::Camera> m_lightViewCamera;
         SE_G::Camera* m_playerCamera;
+
+        // For lighting
+        eastl::unique_ptr<Bind::Texture> m_shadowMapTexture;
+        eastl::unique_ptr<Bind::Sampler> m_shadowSampler_1;
+        eastl::unique_ptr<Bind::Sampler> m_shadowSampler_2;
+
+        eastl::unique_ptr<SE_G::Bind::PixelConstantBuffer<CascadesData>> m_cascadesConstantBuffer;
     };
 }

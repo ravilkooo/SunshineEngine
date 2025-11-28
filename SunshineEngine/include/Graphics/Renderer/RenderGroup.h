@@ -16,8 +16,8 @@ namespace SE_G {
 		ID3D11DeviceContext* GetDeviceContext();
 
 		// == void RenderScene();
-		void Pass();
-		RenderPass* AddPass(eastl::unique_ptr<RenderPass> pass);
+		virtual void Pass();
+		virtual RenderPass* AddPass(eastl::unique_ptr<RenderPass> pass);
 		RenderTechnique* AddTechnique(eastl::unique_ptr<RenderTechnique> tech);
 
 		bool IsEnabled();

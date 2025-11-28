@@ -12,6 +12,7 @@ namespace SE_G {
 		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
+		m_passType = PassType::Light;
 
 		// Viewport
 		m_viewport = {};
@@ -95,12 +96,12 @@ namespace SE_G {
 		context->RSSetViewports(1, &m_viewport);
 
 		DX::XMFLOAT3 camPos = m_camera->GetPosition();
-		DX::XMMATRIX vMatInverse = DX::XMMatrixTranspose(DX::XMMatrixInverse(nullptr,
-			m_camera->GetViewMatrix()));
+		DX::XMMATRIX viewMat = m_camera->GetViewMatrix();
+			//DX::XMMatrixTranspose(DX::XMMatrixInverse(nullptr, m_camera->GetViewMatrix()));
 		DX::XMMATRIX pMatInverse = DX::XMMatrixTranspose(DX::XMMatrixInverse(nullptr,
 			m_camera->GetProjectionMatrix()));
 		// camera->GetProjectionMatrix()
-		m_camPCB->Update(GetDeviceContext(), { vMatInverse, pMatInverse, camPos, 0 });
+		m_camPCB->Update(GetDeviceContext(), { viewMat, pMatInverse, camPos, 0 });
 		m_screenInfoPCB->Update(GetDeviceContext(), { DXSM::Vector2(
 				static_cast<float>(m_screenWidth),
 				static_cast<float>(m_screenHeight)) });

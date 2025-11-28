@@ -3,6 +3,8 @@
 #include <Graphics/Renderer/Technique/DirectionalLightTechnique.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Pass/RenderPass.h>
+#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
@@ -11,7 +13,7 @@
 
 DirectionalLight::DirectionalLight(
     SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera, SE_G::DirectionalLightData initData)
+    eastl::shared_ptr<SE_G::Camera> camera, SE_G::DirectionalLightData initData, bool castsShadow)
 {
     initData.Direction.Normalize();
 
@@ -30,7 +32,22 @@ DirectionalLight::DirectionalLight(
 	auto lightTech =
 		eastl::make_unique<SE_G::DirectionalLightTechnique>(
 			device, tc.get(), "LightPass", camera, m_lightData);
+
+	if (castsShadow)
+	{
+		//renderSystem->
+		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
+
+		auto m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
+			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
+				renderSystem->GetDevice(), renderSystem->GetDeviceContext(),
+				gPass, m_lightData)));
+
+		lightTech->EnableShadow(m_shadowMapPass);
+	}
+
 	rc->AddTechnique(eastl::move(lightTech));
+
 }
 
 DirectionalLight::DirectionalLight(

@@ -3,6 +3,8 @@
 #include "Graphics/Lighting/LightData.h"
 
 namespace SE_G {
+    class ShadowMapPass;
+
     class DirectionalLightTechnique :
         public LightTechnique<DirectionalLightData>
     {
@@ -19,5 +21,18 @@ namespace SE_G {
 
         LightPosition GetLightPositionInFrustum() override;
         bool IsFrustumInsideOfLight() override;
+
+        void EnableShadow(ShadowMapPass* shadowMapPass);
+        void DisableShadow();
+
+        bool m_castsShadow = false;
+        ShadowMapPass* m_shadowMapPass;
+    private:
+        static void InitStaticData(ID3D11Device* device);
+
+        static bool s_staticDataInitializated;
+
+        static eastl::unique_ptr<Bind::PixelShader> s_noShadowShader;
+        static eastl::unique_ptr<Bind::PixelShader> s_shadowShader;
     };
 }

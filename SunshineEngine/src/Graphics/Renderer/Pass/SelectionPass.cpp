@@ -13,6 +13,7 @@ namespace SE_G {
 		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
+		m_passType = PassType::Selection;
 
 		// Viewport
 		m_viewport = {};

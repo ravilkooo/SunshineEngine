@@ -11,7 +11,7 @@ namespace SE_G {
 		this->screenHeight = pGBuffer->m_screenHeight;
 		this->pGBuffer = pGBuffer;
 		this->camera = camera;
-
+		m_passType = PassType::GPass;
 
 		// Set RTVs
 		gBufferRTVs[0] = pGBuffer->pNormalRTV.Get();
