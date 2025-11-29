@@ -39,7 +39,7 @@
 #include <Utils/UUID.h>
 
 
-class PhysicsSysten_Info {
+class PhysicsSystem_Info {
 public:
     eastl::vector<eastl::string> m_collisionLayerGroups;
     eastl::vector<eastl::string> m_collisionLayers;

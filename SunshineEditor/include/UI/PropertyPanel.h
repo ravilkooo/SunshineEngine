@@ -48,6 +48,9 @@ private:
 
     void DrawBoxShapeDetails(BoxShapeObject_Info* obj);
     void DrawSphereShapeDetails(SphereShapeObject_Info* obj);
+    void DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj);
+
+    void DrawPhysicsComponent(GameObject_Info* obj);
 
     void DrawLuaComponent(GameObject_Info* obj);
     void DrawLuaFunctions(LuaComponent* luaComp);
