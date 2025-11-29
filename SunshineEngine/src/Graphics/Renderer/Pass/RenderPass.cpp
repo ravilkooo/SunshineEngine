@@ -6,6 +6,15 @@ namespace SE_G {
 	{
 	}
 
+	RenderPass::~RenderPass()
+	{
+		techniqueTag.clear();
+
+		perFrameBindables.clear();
+
+		m_techniques.clear();
+	}
+
 	eastl::string RenderPass::GetTechniqueTag()
 	{
 		return techniqueTag;
@@ -15,32 +24,15 @@ namespace SE_G {
 	{
 		BindAllPerFrame();
 
-		/*
-		for (const auto& gameObjectUUID : scene.gameObjects) {
-			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
-			if (gameObject->HasComponent<RenderComponent>() &&
-				gameObject->HasComponent<TransformComponent>()) {
-
-				auto renderComponent = gameObject->GetComponent<RenderComponent>();
-
-				if (!renderComponent->HasTechnique(techniqueTag))
-					continue;
-
-				gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
-				renderComponent->PassTechnique(techniqueTag, GetDeviceContext());
-
-			}
-		}
-		*/
-
 		for (auto& tech : m_techniques) {
 			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech->Pass(GetDeviceContext());
 		}
 	}
 
-	void RenderPass::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
+	RenderTechnique* RenderPass::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
 		m_techniques.push_back(eastl::move(tech));
+		return m_techniques.back().get();
 	}
 
 	void RenderPass::AddPerFrameBind(Bind::Bindable* bind)

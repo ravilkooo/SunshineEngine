@@ -13,7 +13,6 @@
 #include <GameObject/Shapes/ShapeCollection.h>
 
 #include <nlohmann/json.hpp>
-
 using json = nlohmann::json;
 
 namespace SE_G {
@@ -23,18 +22,25 @@ namespace SE_G {
 class EditorObjectFactory
 {
 public:
-	static eastl::unique_ptr<BoxShapeObject_Info> CreateDefaultBoxObject(
+	static eastl::unique_ptr<BoxShapeObject_Info> CreateBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
 		float width, float height, float length);
 
-	static eastl::unique_ptr<BoxShapeObject_Info> CreateDefaultBoxObject(
+	static eastl::unique_ptr<BoxShapeObject_Info> CreateBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
-	static eastl::unique_ptr<SphereShapeObject_Info> CreateDefaultSphereObject(
+	static eastl::unique_ptr<SphereShapeObject_Info> CreateSphereObject(
 		SE_G::DeferredRenderer* renderSystem, float radius);
 
-	static eastl::unique_ptr<SphereShapeObject_Info> CreateDefaultSphereObject(
+	static eastl::unique_ptr<SphereShapeObject_Info> CreateSphereObject(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
+	static eastl::unique_ptr<GeosphereShapeObject_Info> CreateGeosphereObject(
+		SE_G::DeferredRenderer* renderSystem, float radius);
+
+	static eastl::unique_ptr<GeosphereShapeObject_Info> CreateGeosphereObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 

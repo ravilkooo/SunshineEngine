@@ -31,7 +31,7 @@ namespace SE_G {
 		dsDesc.DepthEnable = TRUE;
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-		m_depthStencilState = eastl::make_shared<Bind::DepthStencilState>(device, dsDesc);
+		m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
 
 		UINT numInputElements = 2;
 		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
@@ -40,11 +40,11 @@ namespace SE_G {
 			{ "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		m_iconVertexShader = eastl::make_shared<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wchar(L"Shaders/IconPass/IconShaderVS.hlsl"),
+		m_iconVertexShader = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/IconPass/IconShaderVS.hlsl").c_str(),
 			numInputElements, IALayoutInputElements);
 
-		m_camGCB = eastl::make_shared<Bind::GeometryConstantBuffer<CamGCB>>
+		m_camGCB = eastl::make_unique<Bind::GeometryConstantBuffer<CamGCB>>
 			(
 				device,
 				0u
@@ -52,10 +52,10 @@ namespace SE_G {
 
 		AddPerFrameBind(m_camGCB.get());
 
-		m_iconGeometryShader = eastl::make_shared<Bind::GeometryShader>(device,
-			MakeEngineAssetPath_Wchar(L"Shaders/IconPass/IconShaderGS.hlsl"));
+		m_iconGeometryShader = eastl::make_unique<Bind::GeometryShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/IconPass/IconShaderGS.hlsl").c_str());
 
-		m_iconSprites = eastl::make_shared<Bind::Texture>(
+		m_iconSprites = eastl::make_unique<Bind::Texture>(
 			device,
 			MakeEngineAssetPath_Wstring(L"EditorIcons.dds"),
 			0u,
@@ -77,16 +77,22 @@ namespace SE_G {
 		samplerDesc.BorderColor[3] = 0;
 		samplerDesc.MinLOD = 0;
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-		AddPerFrameBind(new Bind::Sampler(device, samplerDesc, 0u));
 
-		m_spritesheetInfoPCB = eastl::make_shared<Bind::PixelConstantBuffer<SpritesheetInfoPCB>>(
+		m_GBufferSampler = eastl::make_unique<Bind::Sampler>(device, samplerDesc, 0u);
+		AddPerFrameBind(m_GBufferSampler.get());
+
+		m_spritesheetInfoPCB = eastl::make_unique<Bind::PixelConstantBuffer<SpritesheetInfoPCB>>(
 			device,
 			m_spritesheetData,
 			0u);
 		AddPerFrameBind(m_spritesheetInfoPCB.get());
 
-		m_iconPixelShader = eastl::make_shared<Bind::PixelShader>(device,
-			MakeEngineAssetPath_Wchar(L"Shaders/IconPass/IconShaderPS.hlsl"));
+		m_iconPixelShader = eastl::make_unique<Bind::PixelShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/IconPass/IconShaderPS.hlsl").c_str());
+	}
+
+	IconPass::~IconPass() {
+		//delete[] m_bufferRTVs;
 	}
 
 	void IconPass::StartFrame()
@@ -141,17 +147,17 @@ namespace SE_G {
 		context->OMSetRenderTargets(2, nullRTVs, *nullDSVs);
 	}
 
-	void IconPass::OnResize(UINT resizeWidth, UINT resizeHeight,
-		eastl::shared_ptr<GBuffer> pGBuffer)
+	void IconPass::OnResize(UINT resizeWidth, UINT resizeHeight)
+		//eastl::shared_ptr<GBuffer> pGBuffer)
 	{
 		m_screenWidth = resizeWidth;
 		m_screenHeight = resizeHeight;
 
-		m_GBuffer = pGBuffer;
+		//m_GBuffer = pGBuffer;
 
 		// Set RTVs
-		m_bufferRTVs[0] = pGBuffer->pLightRTV.Get();
-		m_bufferRTVs[1] = pGBuffer->pUUIDRTV.Get();
+		m_bufferRTVs[0] = m_GBuffer->pLightRTV.Get();
+		m_bufferRTVs[1] = m_GBuffer->pUUIDRTV.Get();
 
 		// Viewport
 		m_viewport = {};

@@ -1,28 +1,26 @@
-#include "ImguiEditorPass.h"
-#include "WorldEditor.h"
-#include <Component/LuaComponent.h>
 #include <EASTL/string.h>
-#include <Utils/DebugUtils.h>
 
 #include "assimp/SceneCombiner.h"
 
+#include "ImguiEditorPass.h"
+#include <EditorApp.h>
+
+#include <Component/LuaComponent.h>
+#include <Utils/DebugUtils.h>
+
+
 ImguiEditorPass::ImguiEditorPass(
-	ID3D11Device* device,
-	ID3D11DeviceContext* context,
-	ID3D11Texture2D* backBuffer,
-	UINT editorAppWidth, UINT editorAppHeight,
-	eastl::shared_ptr<SE_G::GBuffer> pGBuffer,
-	eastl::shared_ptr<WorldEditor> worldEditor)
-	: RenderPass("LightPass", device, context)
+	EditorApp* editorApp)
+	: RenderPass("LightPass", editorApp->m_renderingSystem->GetDevice(),
+		editorApp->m_renderingSystem->GetDeviceContext())
 {
-	m_GBuffer = pGBuffer;
-	m_editorAppWidth = editorAppWidth;
-	m_editorAppHeight = editorAppHeight;
-	m_worldEditor = worldEditor;
-	m_backBuffer = backBuffer;
+	m_editorAppWidth = editorApp->m_winWidth;
+	m_editorAppHeight = editorApp->m_winHeight;
+	m_editorApp = editorApp;
+	m_backBuffer = editorApp->m_renderingSystem->GetBackBuffer();
 
 	// rtv
-	HRESULT hr = device->CreateRenderTargetView(m_backBuffer.Get(), nullptr, m_renderTargetView.GetAddressOf());
+	HRESULT hr = device->CreateRenderTargetView(m_backBuffer, nullptr, m_renderTargetView.GetAddressOf());
 	if (FAILED(hr))
 		throw std::runtime_error("Failed to create Render Target View");
 
@@ -47,25 +45,30 @@ ImguiEditorPass::ImguiEditorPass(
 	descDSV.Texture2D.MipSlice = 0u;
 	device->CreateDepthStencilView(m_pDepthStencil.Get(), &descDSV, m_pDSV.GetAddressOf());
 
-	m_viewport = {};
-	m_viewport.Width = static_cast<float>(m_editorAppWidth);
-	m_viewport.Height = static_cast<float>(m_editorAppHeight);
-	m_viewport.TopLeftX = 0;
-	m_viewport.TopLeftY = 0;
-	m_viewport.MinDepth = 0;
-	m_viewport.MaxDepth = 1.0f;
+	m_windowViewport = {};
+	m_windowViewport.Width = static_cast<float>(m_editorAppWidth);
+	m_windowViewport.Height = static_cast<float>(m_editorAppHeight);
+	m_windowViewport.TopLeftX = 0;
+	m_windowViewport.TopLeftY = 0;
+	m_windowViewport.MinDepth = 0;
+	m_windowViewport.MaxDepth = 1.0f;
 
 	selectedUUID = SE::UUID(0u);
 
 	// Change font to Arial to support Russian
 	ImGuiIO& io = ImGui::GetIO();
 	ImFont* fontArial = io.Fonts->AddFontFromFileTTF(
-		MakeEngineAssetPath_Char("Fonts/Arial.ttf"), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
+		MakeEngineAssetPath_String("Fonts/Arial.ttf").c_str(), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
 		13.0f);
 	io.FontDefault = fontArial;
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
+}
 
+void ImguiEditorPass::SetVieportGBuffer(
+	SE_G::GBuffer* pGBuffer) {
+	m_viewportGBuffer = pGBuffer;
+	// Call m_viewportGBuffer->OnResize() ?
 }
 
 void ImguiEditorPass::StartFrame()
@@ -74,7 +77,7 @@ void ImguiEditorPass::StartFrame()
 	float color[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	context->ClearRenderTargetView(m_renderTargetView.Get(), color);
 	context->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
-	context->RSSetViewports(1, &m_viewport);
+	context->RSSetViewports(1, &m_windowViewport);
 }
 
 void ImguiEditorPass::Pass()
@@ -192,8 +195,11 @@ void ImguiEditorPass::Pass()
 				DXSM::Vector2(m_lastGameViewportSize.x, m_lastGameViewportSize.y)
 			);
 			*/
-			selectedUUID = m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
-			m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+
+			if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
+				selectedUUID = m_editorApp->m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
+				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+			}
 		}
 	}
 
@@ -203,11 +209,14 @@ void ImguiEditorPass::Pass()
 		vMax.y - vMin.y
 	);
 	m_gameViewportJustResized = (contentSize.x != m_lastGameViewportSize.x) || (contentSize.y != m_lastGameViewportSize.y);
-	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0) {
-
-		m_GBuffer->OnResize(GetDevice(), (UINT)contentSize.x, (UINT)contentSize.y);
-		m_worldEditor->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
-		//ResizeGBuffer((UINT)contentSize.x, (UINT)contentSize.y); // Your resize call
+	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0)
+	{
+		if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
+			m_editorApp->m_worldEditor->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
+		}
+		else {
+			m_editorApp->m_currentGame->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
+		}
 	}
 	m_lastGameViewportSize = contentSize;
 
@@ -245,7 +254,7 @@ void ImguiEditorPass::EndFrame()
 void ImguiEditorPass::RenderGameWorld()
 {
 	ImVec2 avail = ImGui::GetContentRegionAvail();
-	ImGui::Image((ImTextureID)m_GBuffer->pLightSRV.Get(), avail);
+	ImGui::Image((ImTextureID)m_viewportGBuffer->pLightSRV.Get(), avail);
 	// ����� ����� ���������� ���� ������� ����������, ���� ��������
 	//ImGui::Text("Game World Render Here");
 }
@@ -255,7 +264,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 	ImGui::Text("Scene Hierarchy");
 	if (ImGui::TreeNode("Root"))
 	{
-		auto& objects = m_worldEditor->m_scene->gameObjects;
+		auto& objects = m_editorApp->m_worldEditor->m_scene->gameObjects;
 		for (size_t i = 0; i < objects.size(); ++i)
 		{
 			// selectedIdx
@@ -268,14 +277,14 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
 			//m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->Name = objLabel;
 
-			eastl::string objName = m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->m_name;
+			eastl::string objName = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->m_name;
 			if (objName == "")
 				objName = std::to_string(objects[i].m_UUID).c_str();
 			// if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
 			if (ImGui::Selectable(objName.c_str(), isSelected))
 			{
 				selectedUUID = objects[i];
-				m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 			}
 			ImGui::PopID();
 		}
@@ -290,11 +299,11 @@ void ImguiEditorPass::ShowContentBrowser()
 
 void ImguiEditorPass::ShowProperties()
 {
-	m_PropertyPanel.SetWorldEditor(m_worldEditor);
+	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
 	m_PropertyPanel.SetSelectedUUID(selectedUUID);
 	m_PropertyPanel.OnImGuiRender();
 
-	GameObject_Info* obj = m_worldEditor->m_scene->GetGameObjectByUUID(
+	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
 		selectedUUID
 	);
 
@@ -415,10 +424,9 @@ void ImguiEditorPass::LuaImgui(GameObject* obj)
 void ImguiEditorPass::PreResize()
 {
 	// release RTV/DSV
-	m_renderTargetView.ReleaseAndGetAddressOf();
-	m_pDSV.ReleaseAndGetAddressOf();
-	m_pDepthStencil.ReleaseAndGetAddressOf();
-	m_backBuffer.ReleaseAndGetAddressOf();
+	m_renderTargetView.Reset();
+	m_pDSV.Reset();
+	m_pDepthStencil.Reset();
 
 }
 
@@ -428,7 +436,7 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	m_editorAppHeight = resizeHeight;
 	m_backBuffer = backBuffer;
 
-	HRESULT hr = device->CreateRenderTargetView(m_backBuffer.Get(), nullptr, m_renderTargetView.GetAddressOf());
+	HRESULT hr = device->CreateRenderTargetView(m_backBuffer, nullptr, m_renderTargetView.GetAddressOf());
 	if (FAILED(hr))
 		throw std::runtime_error("Failed to create Render Target View");
 
@@ -452,11 +460,11 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	descDSV.Texture2D.MipSlice = 0u;
 	device->CreateDepthStencilView(m_pDepthStencil.Get(), &descDSV, m_pDSV.GetAddressOf());
 
-	m_viewport = {};
-	m_viewport.Width = static_cast<float>(m_editorAppWidth);
-	m_viewport.Height = static_cast<float>(m_editorAppHeight);
-	m_viewport.TopLeftX = 0;
-	m_viewport.TopLeftY = 0;
-	m_viewport.MinDepth = 0;
-	m_viewport.MaxDepth = 1.0f;
+	m_windowViewport = {};
+	m_windowViewport.Width = static_cast<float>(m_editorAppWidth);
+	m_windowViewport.Height = static_cast<float>(m_editorAppHeight);
+	m_windowViewport.TopLeftX = 0;
+	m_windowViewport.TopLeftY = 0;
+	m_windowViewport.MinDepth = 0;
+	m_windowViewport.MaxDepth = 1.0f;
 }

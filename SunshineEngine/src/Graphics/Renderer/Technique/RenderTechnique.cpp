@@ -10,9 +10,15 @@ namespace SE_G {
 	{
 	}
 
+	RenderTechnique::~RenderTechnique()
+	{
+		m_techniqueTag.clear();
+		m_bindables.clear();
+	}
+
 	void RenderTechnique::AddBind(eastl::shared_ptr<Bind::Bindable> bind)
 	{
-		bindables.push_back(bind);
+		m_bindables.push_back(bind);
 	}
 
 	void RenderTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -23,9 +29,9 @@ namespace SE_G {
 
 	void RenderTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
-		for (size_t i = 0; i < bindables.size(); i++)
+		for (size_t i = 0; i < m_bindables.size(); i++)
 		{
-			bindables[i]->Bind(context.Get());
+			m_bindables[i]->Bind(context.Get());
 		}
 
 		if (m_vertexShader)
@@ -43,13 +49,15 @@ namespace SE_G {
 		}
 
 		// Bind rasterizer
-		rasterizer->Bind(context.Get());
+		if (m_rasterizer)
+			m_rasterizer->Bind(context.Get());
 
 		// Bind depthState
-		depthStencilState->Bind(context.Get());
+		if (m_depthStencilState)
+			m_depthStencilState->Bind(context.Get());
 
-		if (blendState)
-			blendState->Bind(context.Get());
+		if (m_blendState)
+			m_blendState->Bind(context.Get());
 
 		if (m_mesh)
 			m_mesh->Bind(context.Get());
@@ -65,5 +73,17 @@ namespace SE_G {
 	eastl::string RenderTechnique::GetTechniqueTag()
 	{
 		return m_techniqueTag;
+	}
+
+	bool RenderTechnique::IsEnabled() {
+		return m_enabled;
+	}
+
+	void RenderTechnique::Disable() {
+		m_enabled = false;
+	}
+
+	void RenderTechnique::Enable() {
+		m_enabled = true;
 	}
 }

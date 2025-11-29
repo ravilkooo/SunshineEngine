@@ -6,9 +6,12 @@ TransformComponent::TransformComponent(ID3D11Device* device) {
     SetupBuffer(device);
 }
 
+TransformComponent::~TransformComponent() {
+}
+
 void TransformComponent::SetupBuffer(ID3D11Device* device)
 {
-    transformBuffer = new SE_G::Bind::TransformCBuffer(device, this, 0u);
+    transformBuffer = eastl::make_unique<SE_G::Bind::TransformCBuffer>(device, this, 0u);
 }
 
 void TransformComponent::BindToGraphicsPipeline(ID3D11DeviceContext* context) {
@@ -54,6 +57,11 @@ DXSM::Matrix TransformComponent::GetScaleMatrix() const
 DXSM::Matrix TransformComponent::GetWorldMatrix() const
 {
     return GetLocalTransformMatrix() * GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
+}
+
+TransformComponent_Info::~TransformComponent_Info()
+{
+
 }
 
 #define TC_ADD_FIELD(name) #name, &TransformComponent::name

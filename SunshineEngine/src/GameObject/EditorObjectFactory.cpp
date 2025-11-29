@@ -13,37 +13,53 @@
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
-eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateDefaultBoxObject(
+eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateBoxObject(
 	SE_G::DeferredRenderer* renderSystem,
 	float width, float height, float length)
 {
 	auto obj = eastl::make_unique<BoxShapeObject_Info>(renderSystem,
 		BoxShapeData{ DXSM::Vector3(width, height, length) });
-	return eastl::move(obj);
+	return obj;
 }
 
-eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateDefaultBoxObject(
+eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateBoxObject(
 	SE_G::DeferredRenderer* renderSystem,
 	const json& j)
 {
 	auto obj = BoxShapeObject_Info::FromJson(renderSystem, j);
-	return eastl::move(obj);
+	return obj;
 }
 
-eastl::unique_ptr<SphereShapeObject_Info> EditorObjectFactory::CreateDefaultSphereObject(
+eastl::unique_ptr<SphereShapeObject_Info> EditorObjectFactory::CreateSphereObject(
 	SE_G::DeferredRenderer* renderSystem, float radius)
 {
 	auto obj = eastl::make_unique<SphereShapeObject_Info>(renderSystem,
 		SphereShapeData{ DXSM::Vector3::One * radius, 10u, 10u });
-	return eastl::move(obj);
+	return obj;
 }
 
-eastl::unique_ptr<SphereShapeObject_Info> EditorObjectFactory::CreateDefaultSphereObject(
+eastl::unique_ptr<SphereShapeObject_Info> EditorObjectFactory::CreateSphereObject(
 	SE_G::DeferredRenderer* renderSystem,
 	const json& j)
 {
 	auto obj = SphereShapeObject_Info::FromJson(renderSystem, j);
-	return eastl::move(obj);
+	return obj;
+}
+
+eastl::unique_ptr<GeosphereShapeObject_Info> EditorObjectFactory::CreateGeosphereObject(
+	SE_G::DeferredRenderer* renderSystem, float radius)
+{
+	auto obj = eastl::make_unique<GeosphereShapeObject_Info>(renderSystem,
+		GeosphereShapeData{ DXSM::Vector3::One * radius, 2u });
+	return obj;
+}
+
+eastl::unique_ptr<GeosphereShapeObject_Info> EditorObjectFactory::CreateGeosphereObject(
+	SE_G::DeferredRenderer* renderSystem,
+	const json& j)
+{
+	auto obj = GeosphereShapeObject_Info::FromJson(renderSystem, j);
+	return obj;
 }
 
 eastl::unique_ptr<SkyBox_Info> EditorObjectFactory::CreateSkyBox(
@@ -53,7 +69,7 @@ eastl::unique_ptr<SkyBox_Info> EditorObjectFactory::CreateSkyBox(
 	SE_G::SkyBoxData initData)
 {
 	auto obj = eastl::make_unique<SkyBox_Info>(renderSystem, camera, texturePath, initData);
-	return eastl::move(obj);
+	return obj;
 }
 
 eastl::unique_ptr<AmbientLight_Info> EditorObjectFactory::CreateAmbientLightObject(
@@ -62,7 +78,7 @@ eastl::unique_ptr<AmbientLight_Info> EditorObjectFactory::CreateAmbientLightObje
 	SE_G::AmbientLightData initData)
 {
 	auto obj = eastl::make_unique<AmbientLight_Info>(renderSystem, camera, initData);
-	return eastl::move(obj);
+	return obj;
 }
 
 eastl::unique_ptr<DirectionalLight_Info> EditorObjectFactory::CreateDirectionalLightObject(
@@ -71,7 +87,7 @@ eastl::unique_ptr<DirectionalLight_Info> EditorObjectFactory::CreateDirectionalL
 	SE_G::DirectionalLightData initData)
 {
 	auto obj = eastl::make_unique<DirectionalLight_Info>(renderSystem, camera, initData);
-	return eastl::move(obj);
+	return obj;
 }
 
 eastl::unique_ptr<PointLight_Info> EditorObjectFactory::CreatePointLightObject(
@@ -80,7 +96,7 @@ eastl::unique_ptr<PointLight_Info> EditorObjectFactory::CreatePointLightObject(
 	SE_G::PointLightData initData)
 {
 	auto obj = eastl::make_unique<PointLight_Info>(renderSystem, camera, initData);
-	return eastl::move(obj);
+	return obj;
 }
 
 

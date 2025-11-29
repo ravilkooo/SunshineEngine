@@ -6,16 +6,19 @@
 
 #include <Physics/CollisionUtils.h>
 
-class CollisionLayerVsGroupTable
+namespace SE
 {
-public:
-    eastl::unordered_map<
-        CollisionLayer,
-        eastl::unordered_set<CollisionGroup>>
-        m_collisionLayerVsGroupTable;
+    class CollisionLayerVsGroupTable
+    {
+    public:
+        eastl::unordered_map<
+            CollisionLayer,
+            eastl::unordered_set<CollisionGroup>>
+            m_collisionLayerVsGroupTable;
 
-    void DisableCollision(CollisionLayer inLayer1, CollisionGroup inGroup2);
-    void EnableCollision(CollisionLayer inLayer1, CollisionGroup inGroup2);
-    bool ShouldCollide(CollisionLayer inLayer1, CollisionGroup inGroup2);
+        void DisableCollision(CollisionLayer inLayer1, CollisionGroup inGroup2);
+        void EnableCollision(CollisionLayer inLayer1, CollisionGroup inGroup2);
+        bool ShouldCollide(CollisionLayer inLayer1, CollisionGroup inGroup2);
 
-};
+    };
+}

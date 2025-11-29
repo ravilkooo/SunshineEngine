@@ -27,14 +27,19 @@ namespace SE_G {
     {
     public:
         RenderTechnique(ID3D11Device* device, TransformComponent* assignedTransform,  eastl::string technique);
-        virtual ~RenderTechnique() = default;
+        virtual ~RenderTechnique();
 
         void AddBind(eastl::shared_ptr<Bind::Bindable> bind);
-        eastl::vector<eastl::shared_ptr<Bind::Bindable>> bindables;
 
         virtual void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
         virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
         virtual void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
+
+        virtual eastl::string GetTechniqueTag();
+
+        bool IsEnabled();
+        void Disable();
+        void Enable();
 
         // Resources
         eastl::shared_ptr<Mesh> m_mesh;
@@ -43,15 +48,18 @@ namespace SE_G {
         eastl::shared_ptr<Bind::Texture> m_texture;
 
         // Extra (has default values)
-        eastl::shared_ptr<Bind::Sampler> m_textureSampler;
-        eastl::shared_ptr<Bind::BlendState> blendState;
-        eastl::shared_ptr<Bind::Rasterizer> rasterizer;
-        eastl::shared_ptr<Bind::DepthStencilState> depthStencilState;
+        eastl::unique_ptr<Bind::Sampler> m_textureSampler;
+        eastl::unique_ptr<Bind::BlendState> m_blendState;
+        eastl::unique_ptr<Bind::Rasterizer> m_rasterizer;
+        eastl::unique_ptr<Bind::DepthStencilState> m_depthStencilState;
 
-        virtual eastl::string GetTechniqueTag();
+        eastl::vector<eastl::shared_ptr<Bind::Bindable>> m_bindables;
 
         eastl::string m_techniqueTag;
 
         TransformComponent* m_assignedTransform;
+
+    private:
+        bool m_enabled = true;
     };
 }

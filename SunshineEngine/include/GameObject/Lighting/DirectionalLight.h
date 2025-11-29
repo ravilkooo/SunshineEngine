@@ -31,6 +31,11 @@ public:
             DXSM::Vector3::Zero, 0,
             DXSM::Vector3(1, -1, 1), 0
         });
+
+    DirectionalLight(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        const json& j);
 };
 
 class DirectionalLight_Info :

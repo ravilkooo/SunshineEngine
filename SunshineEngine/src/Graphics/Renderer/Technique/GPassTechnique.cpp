@@ -12,13 +12,13 @@ namespace SE_G {
 		D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
 		rastDesc.CullMode = D3D11_CULL_BACK;
 		rastDesc.FillMode = D3D11_FILL_SOLID;
-		rasterizer = eastl::make_shared<Bind::Rasterizer>(renderSystem->GetDevice(), rastDesc);
+		m_rasterizer = eastl::make_unique<Bind::Rasterizer>(renderSystem->GetDevice(), rastDesc);
 
 		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT{});
 		dsDesc.DepthEnable = TRUE;
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-		depthStencilState = eastl::make_shared<Bind::DepthStencilState>(renderSystem->GetDevice(), dsDesc);
+		m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(renderSystem->GetDevice(), dsDesc);
 
 		D3D11_BLEND_DESC blendDesc = {};
 		blendDesc.IndependentBlendEnable = TRUE;
@@ -33,31 +33,42 @@ namespace SE_G {
 			blendDesc.RenderTarget[i].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 			blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		}
-		blendDesc.RenderTarget[4].BlendEnable = TRUE;
+		blendDesc.RenderTarget[4].BlendEnable = FALSE;
+		blendDesc.RenderTarget[4].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-		blendState = eastl::make_shared<Bind::BlendState>(renderSystem->GetDevice(), blendDesc);
+		m_blendState = eastl::make_unique<Bind::BlendState>(renderSystem->GetDevice(), blendDesc);
 
-		m_uuidBuffer = eastl::make_shared<Bind::PixelConstantBuffer<UUIDhilo>>(
+		m_uuidBuffer = eastl::make_unique<Bind::PixelConstantBuffer<UUIDhilo>>(
 			renderSystem->GetDevice(),
 			uuid.GetHilo(),
 			0u
 		);
 
-		AddBind(m_uuidBuffer);
-
 		m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-			renderSystem->GetDevice(), MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassShaderVS.hlsl"));
+			renderSystem->GetDevice(), MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassShaderVS.hlsl").c_str());
 
 		m_colored = true;
 		m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-			renderSystem->GetDevice(), MakeEngineAssetPath_Wchar(L"Shaders/GPass/GPassTextureShaderPS.hlsl"));
+			renderSystem->GetDevice(), MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
 		m_texture = eastl::make_shared<SE_G::Bind::Texture>(renderSystem->GetDevice(),
 			SE_G::Colors::UnloadedTextureColor,
 			0u,
 			SE_G::Bind::PipelineStage::PIXEL_SHADER);
-		m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
+
+		m_textureSampler = eastl::make_unique<SE_G::Bind::Sampler>(
 			renderSystem->GetDevice(),
 			SE_G::Bind::SamplerPreset::Wrap);
+	}
+
+	GPassTechnique::~GPassTechnique()
+	{
+		
+	}
+
+	void GPassTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	{
+		RenderTechnique::BindAll(context);
+		m_uuidBuffer->Bind(context.Get());
 	}
 
 	void GPassTechnique::SetColor(SE_G::Color color) {

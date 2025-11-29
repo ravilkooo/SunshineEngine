@@ -15,14 +15,27 @@
 #include <GameObject/Shapes/ShapeCollection.h>
 #include <GameObject/Lighting/LightCollection.h>
 #include <GameObject/EditorObjectFactory.h>
+#include <GameObject/GameObjectFactory.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Utils/Camera.h>
 
 #include <Serialization/GraphicsSerialization.h>
 
+#include <Jolt/Jolt.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/Shape/BoxShape.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/CapSuleShape.h>
+#include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
+
+#include <Physics/PhysicsSystem.h>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
+// To-do: Modify all FromJson functions toi return pair [ bool, object ]
+// first param for checking is deserialization was succesful
 
 // ----------------- TransformComponent -----------------
 json TransformComponent_Info::ToJson() const {
@@ -50,7 +63,7 @@ json TransformComponent_Info::ToJson() const {
 }
 
 void TransformComponent_Info::FromJson(const json& j, ID3D11Device* device) {
-    m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+    m_assignedComponent = eastl::make_unique<TransformComponent>(device);
     m_assignedComponent->FromJson(j);
 }
 
@@ -129,20 +142,33 @@ void RenderComponent_Info::FromJson(const json& j) {
 json PhysicsComponent_Info::ToJson() const {
     json j;
     j = nlohmann::json{
-        {"m_shape",         m_shape},
         {"m_motion",        m_motion},
         {"m_activation",    m_activation},
-        {"m_collisionLayer",  std::string{m_collisionLayer.c_str()}}
+        {"m_collisionLayer",  std::string{m_collisionLayer.c_str()} }
     };
+
+    if (m_colliderData) {
+        j["collider"] = m_colliderData->ToJson();
+    }
     return j;
 }
 
 void PhysicsComponent_Info::FromJson(const json& j) {
-    
-    j.at("m_shape").get_to(m_shape);
-    j.at("m_motion").get_to(m_motion);
-    j.at("m_activation").get_to(m_activation);
-    m_collisionLayer = CollisionLayer{ j.at("m_collisionLayer").get<std::string>().c_str() };
+    // Read motion + activation (enums use NLOHMANN_JSON_SERIALIZE_ENUM)
+    if (j.contains("m_motion")) j.at("m_motion").get_to(m_motion);
+    if (j.contains("m_activation")) j.at("m_activation").get_to(m_activation);
+
+    if (j.contains("m_collisionLayer") && j["m_collisionLayer"].is_string()) {
+        m_collisionLayer = SE::CollisionLayer{ j.at("m_collisionLayer").get<std::string>().c_str() };
+    }
+
+    // Collider/shape data
+    if (j.contains("collider") && j["collider"].is_object()) {
+        if (!m_colliderData) {
+            m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Box);
+        }
+        m_colliderData->FromJson(j["collider"]);
+    }
 
 }
 
@@ -150,22 +176,71 @@ void PhysicsComponent::FromJson(const json& j) {
 
     PhysicsComponent_Info info; info.FromJson(j);
 
-    if (info.m_collisionLayer == "NON_MOVING")  m_objectLayer = Layers::NON_MOVING;
-    else if (info.m_collisionLayer == "MOVING")      m_objectLayer = Layers::MOVING;
-    else                                         m_objectLayer = Layers::NON_MOVING;
+    if (info.m_collisionLayer == "NON_MOVING")  m_objectLayer = SE::Layers::NON_MOVING;
+    else if (info.m_collisionLayer == "MOVING")      m_objectLayer = SE::Layers::MOVING;
+    else                                         m_objectLayer = SE::Layers::NON_MOVING;
 
     switch (info.m_motion) {
-        case EditorMotionType::Static:    m_motionType = JPH::EMotionType::Static; break;
-        case EditorMotionType::Kinematic: m_motionType = JPH::EMotionType::Kinematic; break;
-        case EditorMotionType::Dynamic:   m_motionType = JPH::EMotionType::Dynamic; break;
+        case SE::PhysicsMotionType::Static:    m_motionType = JPH::EMotionType::Static; break;
+        case SE::PhysicsMotionType::Kinematic: m_motionType = JPH::EMotionType::Kinematic; break;
+        case SE::PhysicsMotionType::Dynamic:   m_motionType = JPH::EMotionType::Dynamic; break;
     }
 
     switch (info.m_activation) {
-        case EditorActivation::Activate:     m_activation = JPH::EActivation::Activate; break;
-        case EditorActivation::DontActivate: m_activation = JPH::EActivation::DontActivate; break;
+        case SE::PhysicsActivation::Activate:     m_activation = JPH::EActivation::Activate; break;
+        case SE::PhysicsActivation::DontActivate: m_activation = JPH::EActivation::DontActivate; break;
     }
 
-    // m_shape = MyShapeFactory::CreateJoltShape(info.shape, ...);
+    // Deserialize shape from collider data
+    if (info.m_colliderData) {
+        const SE::ColliderData& colliderData = *info.m_colliderData;
+        JPH::ShapeSettings::ShapeResult shapeResult;
+
+        switch (colliderData.m_shapeType) {
+            case SE::ColliderShapeType::Box: {
+                JPH::BoxShapeSettings boxSettings(
+                    JPH::Vec3(
+                        colliderData.m_settings.data.asBox.m_size.x * 0.5f,
+                        colliderData.m_settings.data.asBox.m_size.y * 0.5f,
+                        colliderData.m_settings.data.asBox.m_size.z * 0.5f
+                    )
+                );
+                shapeResult = boxSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::Sphere: {
+                JPH::SphereShapeSettings sphereSettings(colliderData.m_settings.data.asSphere.m_radius);
+                shapeResult = sphereSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::Capsule: {
+                JPH::CapsuleShapeSettings capsuleSettings(
+                    colliderData.m_settings.data.asCapsule.m_height * 0.5f,
+                    colliderData.m_settings.data.asCapsule.m_radius
+                );
+                shapeResult = capsuleSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::TaperedCapsule: {
+                JPH::TaperedCapsuleShapeSettings taperedCapsuleSettings(
+                    colliderData.m_settings.data.asTaperedCapsule.m_height * 0.5f,
+                    colliderData.m_settings.data.asTaperedCapsule.m_topRadius,
+                    colliderData.m_settings.data.asTaperedCapsule.m_bottomRadius
+                );
+                shapeResult = taperedCapsuleSettings.Create();
+                break;
+            }
+            default:
+                // Fallback to box if shape type is not recognized
+                JPH::BoxShapeSettings defaultBoxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
+                shapeResult = defaultBoxSettings.Create();
+                break;
+        }
+
+        if (shapeResult.IsValid()) {
+            m_shape = shapeResult.Get();
+        }
+    }
 
 }
 
@@ -317,6 +392,89 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
 }
 */
 
+// ----------------- Scene -----------------
+
+eastl::shared_ptr<Scene> Scene::FromJson(
+    SE_G::DeferredRenderer* renderSystem,
+    PhysicsSystem* physicsSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    const json& j)
+{
+    auto scene = eastl::make_shared<Scene>();
+
+    if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
+        for (const auto& objJ : j["gameObjects"]) {
+            GameObjectGroup objGroup = objJ["m_group"];
+            ObjectType objType = ObjectType(objGroup, objJ["m_type"]);
+            eastl::unique_ptr<GameObject> go;
+
+            // Unique stuff for objects groups
+            // objJ;
+            switch (objGroup)
+            {
+            case GameObjectGroup::Lighting:
+                switch (objType.m_asLight)
+                {
+                case LightObjectType::SkyBox:
+                    go = eastl::make_unique<SkyBox>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::AmbientLight:
+                    go = eastl::make_unique<AmbientLight>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::PointLight:
+                    go = eastl::make_unique<PointLight>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::DirectionalLight:
+                    go = eastl::make_unique<DirectionalLight>(
+                        renderSystem, camera, objJ);
+                    break;
+                }
+                break;
+
+            case GameObjectGroup::Shapes:
+
+                switch (objType.m_asShape)
+                {
+                case ShapeObjectType::Box:
+                    go = GameObjectFactory::CreateBoxObject(renderSystem, objJ);
+                    break;
+                case ShapeObjectType::Sphere:
+                    go = GameObjectFactory::CreateSphereObject(renderSystem, objJ);
+                    break;
+                case ShapeObjectType::Geosphere:
+                    go = GameObjectFactory::CreateGeosphereObject(renderSystem, objJ);
+                    break;
+                }
+                break;
+            case GameObjectGroup::CustomMesh:
+                break;
+            case GameObjectGroup::Other:
+                break;
+            default:
+                break;
+            }
+
+            if (go) {
+                // Other components (Physics, Lua)
+                
+                if (objJ["components"].contains("Physics")) {
+                    auto c = go->AddComponent<PhysicsComponent>(
+                        go->m_UUID, go->GetComponent<TransformComponent>().get());
+                    c->FromJson(objJ["components"]["Physics"]);
+                    physicsSystem->CreateAndAddBody(c.get());
+                    //physicsSystem->CreateAndBody(c);
+                }
+                
+                scene->AddGameObject(eastl::move(go));
+            }
+        }
+    }
+    return scene;
+}
+
 // ----------------- Scene_Info -----------------
 json Scene_Info::ToJson() const {
     json j;
@@ -393,8 +551,17 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
             }
 
 
-            //auto go = GameObject_Info::FromJson(objJ);
             if (go) {
+                // Other components (Physics, Lua)
+
+                if (objJ["components"].contains("Physics")) {
+                    auto c = go->AddComponent<PhysicsComponent_Info>(
+                        go->GetComponent<RenderComponent_Info>().get(),
+                        go->GetComponent<TransformComponent_Info>().get());
+                    c->FromJson(objJ["components"]["Physics"]);
+                    //physicsSystem->CreateAndBody(c);
+                }
+
                 scene->AddGameObject(eastl::move(go));
             }
         }

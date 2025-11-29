@@ -8,35 +8,16 @@ namespace SE_G {
 		OnResize(device, screenWidth, screenHeight);
 	}
 
+	GBuffer::~GBuffer() {
+		Release();
+	}
+
 	void GBuffer::OnResize(ID3D11Device* device, UINT resizeWidth, UINT resizeHeight)
 	{
 		m_screenWidth = resizeWidth;
 		m_screenHeight = resizeHeight;
 
-		pDepthBuffer.ReleaseAndGetAddressOf();
-		pDepthDSV.ReleaseAndGetAddressOf();
-		pDepthSRV.ReleaseAndGetAddressOf();
-
-		pWorldPosBuffer.ReleaseAndGetAddressOf();
-		pWorldPosRTV.ReleaseAndGetAddressOf();
-		pWorldPosSRV.ReleaseAndGetAddressOf();
-
-		pNormalBuffer.ReleaseAndGetAddressOf();
-		pNormalRTV.ReleaseAndGetAddressOf();
-		pNormalSRV.ReleaseAndGetAddressOf();
-
-		pAlbedoBuffer.ReleaseAndGetAddressOf();
-		pAlbedoRTV.ReleaseAndGetAddressOf();
-		pAlbedoSRV.ReleaseAndGetAddressOf();
-
-		pSpecularBuffer.ReleaseAndGetAddressOf();
-		pSpecularRTV.ReleaseAndGetAddressOf();
-		pSpecularSRV.ReleaseAndGetAddressOf();
-
-		pLightBuffer.ReleaseAndGetAddressOf();
-		pLightRTV.ReleaseAndGetAddressOf();
-		pLightSRV.ReleaseAndGetAddressOf();
-
+		Release();
 
 		// Depth Texture
 		D3D11_TEXTURE2D_DESC depthDesc = {};
@@ -218,5 +199,35 @@ namespace SE_G {
 		hr = device->CreateRenderTargetView(pLightBuffer.Get(), nullptr, pLightRTV.GetAddressOf());
 		if (FAILED(hr))
 			throw std::runtime_error("Failed to create Render Target View");
+	}
+
+	void GBuffer::Release() {
+		pDepthBuffer.Reset();
+		pDepthDSV.Reset();
+		pDepthSRV.Reset();
+
+		pWorldPosBuffer.Reset();
+		pWorldPosRTV.Reset();
+		pWorldPosSRV.Reset();
+
+		pNormalBuffer.Reset();
+		pNormalRTV.Reset();
+		pNormalSRV.Reset();
+
+		pAlbedoBuffer.Reset();
+		pAlbedoRTV.Reset();
+		pAlbedoSRV.Reset();
+
+		pSpecularBuffer.Reset();
+		pSpecularRTV.Reset();
+		pSpecularSRV.Reset();
+
+		pUUIDBuffer.Reset();
+		pUUIDRTV.Reset();
+		pUUIDSRV.Reset();
+
+		pLightBuffer.Reset();
+		pLightRTV.Reset();
+		pLightSRV.Reset();
 	}
 }

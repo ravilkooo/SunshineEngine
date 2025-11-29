@@ -1,4 +1,6 @@
 #include <GameObject/Shapes/SphereShapeObject.h>
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
+#include <Component/PhysicsComponent.h>
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, SphereShapeData initData)
@@ -12,10 +14,10 @@ SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 
 	// TransformComponent
 	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 
 	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
 	//auto tc_info = GetComponent<TransformComponent_Info>();
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
@@ -51,22 +53,32 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 		tc_info->FromJson(j["components"]["Transform"], device);
 	}
 	else {
-		tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(device);
+		tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 	}
 
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
 	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(
 		device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
-
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 
-	return eastl::move(obj);
+	// PhysicsComponent
+	/*
+	if (j["components"].contains("Physics")) {
+		auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+		pc_info->FromJson(j["components"]["Physics"]);
+	}
+	else {
+		
+	}
+	*/
+
+	return obj;
 }
 
 DXSM::Vector3 SphereShapeObject_Info::GetSize() {

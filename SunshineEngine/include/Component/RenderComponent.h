@@ -38,7 +38,7 @@ public:
     RenderComponent(RenderComponent&&) noexcept = default;
     RenderComponent& operator=(RenderComponent&&) noexcept = default;
 
-    void AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique>);
+    SE_G::RenderTechnique* AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique>);
 
     /*
     bool HasTechnique(eastl::string technique);
@@ -62,6 +62,8 @@ public:
 class RenderComponent_Info : public Component_Info
 {
 public:
+    ~RenderComponent_Info();
+
     static const SE::ComponentType s_componentType = SE::ComponentType::RENDER;
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
@@ -73,7 +75,7 @@ public:
 
     bool IsAssigned() override { return true; }
 
-    void AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> tech)
+    SE_G::RenderTechnique* AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> tech)
     {
         if (tech->GetTechniqueTag() == "IconPass") {
             m_selectionTechnique = tech.get();
@@ -85,8 +87,7 @@ public:
         }
 
         techniques.insert(tech->GetTechniqueTag());
-        m_assignedComponent->AddTechnique(eastl::move(tech));
-
+        return m_assignedComponent->AddTechnique(eastl::move(tech));
     }
     
     bool HasTechnique(eastl::string technique) {
@@ -104,7 +105,7 @@ public:
     SE_G::Bind::SamplerPreset GetCurrentTextureSampler() const;
     
     eastl::unordered_set<eastl::string> techniques;
-    eastl::shared_ptr<RenderComponent> m_assignedComponent;
+    eastl::unique_ptr<RenderComponent> m_assignedComponent;
 
     SE_G::RenderTechnique* m_selectionTechnique;
     

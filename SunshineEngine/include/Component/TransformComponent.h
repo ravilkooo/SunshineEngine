@@ -4,6 +4,7 @@
 #include <SimpleMath.h>
 #include <d3d11.h>
 #include <Graphics/Bindable/TransformCBuffer.h>
+#include <EASTL/unique_ptr.h>
 
 namespace DXSM = DirectX::SimpleMath;
 
@@ -13,13 +14,13 @@ class SUNSHINE_ENGINE_API TransformComponent :
     friend class TransformComponent_Info;
 public:
     TransformComponent() {};    
+    ~TransformComponent();
 
     TransformComponent(ID3D11Device* device);
 
     void SetupBuffer(ID3D11Device* device);
 
-    // To-do ptr
-    SE_G::Bind::TransformCBuffer* transformBuffer;
+    eastl::unique_ptr<SE_G::Bind::TransformCBuffer> transformBuffer;
 
     void BindToGraphicsPipeline(ID3D11DeviceContext* context);
 
@@ -85,6 +86,7 @@ class TransformComponent_Info : public Component_Info
 {
 public:
     TransformComponent_Info() {};
+    ~TransformComponent_Info();
 
     static const SE::ComponentType s_componentType = SE::ComponentType::TRANSFORM;
     const SE::ComponentType ComponentType() const override {
@@ -97,7 +99,7 @@ public:
 
     bool IsAssigned() override { return true; }
 
-    eastl::shared_ptr<TransformComponent> m_assignedComponent;
+    eastl::unique_ptr<TransformComponent> m_assignedComponent;
 
     // Serialization
     json ToJson() const override;

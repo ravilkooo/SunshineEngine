@@ -19,6 +19,7 @@ namespace SE_G {
             };
             GeometryShader(ID3D11Device* device, LPCWSTR filePath);
             ~GeometryShader();
+            void Release();
             void Bind(ID3D11DeviceContext* context) noexcept override;
         private:
             Microsoft::WRL::ComPtr<ID3D11GeometryShader> pGeometryShader;

@@ -22,17 +22,21 @@ namespace SE_G {
 
         void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 
-        void ChooseDepthStencilState(LightPosition lightPos) override;
-        void ChooseRasterizer(LightPosition lightPos) override;
+        void ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos) override;
+        void ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos) override;
 
         LightPosition GetLightPositionInFrustum() override;
         bool IsFrustumInsideOfLight() override;
 
-        eastl::shared_ptr<Bind::DepthStencilState> depthCompLess;
-        eastl::shared_ptr<Bind::DepthStencilState> depthCompGreater;
+    private:
+        static void InitStaticData(ID3D11Device* device);
 
-        eastl::shared_ptr<Bind::Rasterizer> rastCullNone;
-        eastl::shared_ptr<Bind::Rasterizer> rastCullBack;
-        eastl::shared_ptr<Bind::Rasterizer> rastCullFront;
+        static bool s_staticDataInitializated;
+        static eastl::shared_ptr<Bind::DepthStencilState> depthCompLess;
+        static eastl::shared_ptr<Bind::DepthStencilState> depthCompGreater;
+
+        static eastl::shared_ptr<Bind::Rasterizer> rastCullNone;
+        static eastl::shared_ptr<Bind::Rasterizer> rastCullBack;
+        static eastl::shared_ptr<Bind::Rasterizer> rastCullFront;
     };
 }

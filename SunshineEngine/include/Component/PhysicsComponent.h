@@ -1,6 +1,6 @@
 #pragma once
-#include <Component/Component.h>
 #include <EASTL/unique_ptr.h>
+
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
 #include <Jolt/Physics/Body/BodyID.h>
@@ -9,9 +9,12 @@
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 #include <Jolt/Physics/EActivation.h>
 
+#include <Component/Component.h>
 #include <Physics/CollisionUtils.h>
 #include <Physics/PhysicsEnums.h>
 #include <Utils/UUID.h>
+
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
 class TransformComponent;
 
@@ -21,10 +24,12 @@ class PhysicsComponent :
     public Component
 {
     friend class PhysicsComponent_Info;
+    friend class PhysicsSystem;
 public:
 
     PhysicsComponent() = default;
-    ~PhysicsComponent() = default;
+    PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc);
+    ~PhysicsComponent();
 
     PhysicsComponent(const PhysicsComponent&) = delete;
     PhysicsComponent& operator=(const PhysicsComponent&) = delete;
@@ -49,16 +54,16 @@ public:
     void SetActivation(JPH::EActivation activation);
     void SetShape(JPH::ShapeRefC shapePtr);
 
-    // Create and add body to physics system
-    void CreateBody(eastl::shared_ptr<PhysicsSystem> physicsSystem);
-
     void InitTransforms(TransformComponent* tc);
 
     JPH::Body* GetBody() const;
     JPH::BodyID GetBodyID() const;
 
+    void FromJson(const json& j) override;
 
 private:
+    TransformComponent* transformComp;
+
     SE::UUID m_objectUUID;
     JPH::Body* m_joltBody;
     JPH::BodyID m_joltBodyId;
@@ -68,18 +73,26 @@ private:
     JPH::Quat m_orientation = JPH::Quat::sIdentity();
     JPH::EMotionType m_motionType = JPH::EMotionType::Static;
     JPH::EActivation m_activation = JPH::EActivation::Activate;
-    JPH::ObjectLayer m_objectLayer = Layers::NON_MOVING; // default layer
+    JPH::ObjectLayer m_objectLayer = SE::Layers::NON_MOVING; // default layer
     JPH::ShapeRefC m_shape = nullptr;
 
-    eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
-    void FromJson(const json& j) override;
+    // To-do: make weak_ptr or simple ptr?
+    // PhysicsSystem* m_physicsSystem;
 };
+
+class RenderComponent_Info;
+class TransformComponent_Info;
 
 class PhysicsComponent_Info :
     public Component_Info
 {
 public:
     static const SE::ComponentType s_componentType = SE::ComponentType::PHYSICS;
+    PhysicsComponent_Info() {};
+    PhysicsComponent_Info(RenderComponent_Info* rc_info, 
+        TransformComponent_Info* tc_info);
+    ~PhysicsComponent_Info();
+
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
     }
@@ -90,12 +103,42 @@ public:
 
     bool IsAssigned() override { return false; }
 
-    EditorShape m_shape = EditorShape::Box;
-    EditorMotionType m_motion = EditorMotionType::Dynamic;
-    EditorActivation m_activation = EditorActivation::Activate;
-    CollisionLayer m_collisionLayer = {};
-
     // Serialization
     json ToJson() const override;
     void FromJson(const json& j) override;
+
+    // Accessors for physics configuration
+    SE::ColliderShapeType GetShape() const;
+    void SetShape(SE::ColliderShapeType shape);
+
+    SE::PhysicsMotionType GetMotion() const;
+    void SetMotion(SE::PhysicsMotionType motion);
+
+    SE::PhysicsActivation GetActivation() const;
+    void SetActivation(SE::PhysicsActivation activation);
+
+    const SE::CollisionLayer& GetCollisionLayer() const;
+    void SetCollisionLayer(const SE::CollisionLayer& layer);
+    void SetCollisionLayer(SE::CollisionLayer&& layer);
+
+
+    /*
+    SE::ColliderTransforms GetTransformData();
+    void SetTransformData(SE::ColliderTransforms transform);
+
+    SE::ColliderShapeType GetShapeType();
+    void SetShapeType(SE::ColliderShapeType shapeType);
+
+    SE::ColliderSettings GetColliderSettings();
+    void SetColliderSettings(SE::ColliderSettings settings);
+    */
+
+    // All colliders settings
+    eastl::shared_ptr<SE::ColliderData> m_colliderData;
+
+    SE::PhysicsMotionType m_motion = SE::PhysicsMotionType::Static;
+    SE::PhysicsActivation m_activation = SE::PhysicsActivation::DontActivate;
+
+    SE::CollisionLayer m_collisionLayer = {};
+
 };

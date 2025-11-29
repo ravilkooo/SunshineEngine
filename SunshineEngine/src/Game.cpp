@@ -1,35 +1,121 @@
 #include "Game.h"
+#include <fstream>   // std::ofstream
 
 Game::Game()
 {
 	//Initialize();
 }
 
-void Game::InitGame(
-	eastl::shared_ptr<SE_G::DeferredRenderer> renderer,
+Game::~Game()
+{
+	// Освобождение ресурсов
+}
+
+void Game::SetupRendering(
+	eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
 	UINT screenWidth,
 	UINT screenHeight)
 {
-	this->m_renderer = renderer;
 	this->m_screenHeight = screenHeight;
 	this->m_screenWidth = screenWidth;
 
-	/*
-	{
-		m_gPass = eastl::make_shared<SE_G::GPass>(
-			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->pGBuffer, m_renderer->GetMainCamera());
+	this->m_renderer = eastl::make_unique<SE_G::DeferredRenderer>(
+		"GameDeferred", renderSystem->GetDevice(),
+		renderSystem->GetDeviceContext(),
+		m_screenWidth, m_screenHeight);
 
-		m_renderer->AddPass(m_gPass);
+	{
+		m_gPass = static_cast<SE_G::GPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::GPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
 	}
 	{
-		m_lightPass = eastl::make_shared<SE_G::LightPass>(
-			m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-			m_renderer->pGBuffer, m_renderer->GetMainCamera());
+		m_lightPass = static_cast<SE_G::LightPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::LightPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+	}
+}
 
-		m_renderer->AddPass(m_lightPass);
+void Game::SetupPhysics()
+{
+	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
+	// For Volodya
+	//m_tracingSystem = eastl::make_unique<TracingSystem>();
+}
+
+bool Game::LoadScene(const wchar_t* scenePath)
+{
+	std::ifstream file(scenePath);
+	if (!file) {
+		//LOG_EDITOR_ERROR("File input error");
+		return false;
+	}
+	json j;
+	try {
+		file >> j; // прочитать json из файла
+	}
+	catch (const std::exception& e) {
+		//LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()));
+		return false;
+	}
+
+	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
+	/*
+	if (!loadedScene) {
+		LOG_EDITOR_ERROR("Scene load error\n");
+		return false;
 	}
 	*/
+	//LOG_EDITOR_INFO("Scene loaded");
+
+	// For Volodya
+	/*
+	auto m_uuid0 = m_scene->gameObjects[0];
+	auto m_gobj0 = m_scene->GetGameObjectByUUID(m_uuid0);
+	auto m_uuid1 = m_scene->gameObjects[1];
+	auto m_gobj1 = m_scene->GetGameObjectByUUID(m_uuid1);
+
+	TracedBody* tb0 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
+
+	tb0->m_objectLayer = 0u;
+	tb0->m_motionType = JPH::EMotionType::Dynamic;
+	tb0->m_activation = JPH::EActivation::Activate;
+	JPH::ShapeSettings::ShapeResult shapeResult;
+	JPH::BoxShapeSettings boxSettings(
+		JPH::Vec3(
+			0.5f,
+			0.5f,
+			0.5f
+		)
+	);
+	shapeResult = boxSettings.Create();
+	tb0->m_shape = shapeResult.Get();
+	m_tracingSystem->CreateAndAddBody(tb0);
+
+	TracedBody* tb1 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
+	tb1->m_objectLayer = 0u;
+	tb1->m_motionType = JPH::EMotionType::Dynamic;
+	tb1->m_activation = JPH::EActivation::Activate;
+	tb1->m_shape = shapeResult.Get();
+	m_tracingSystem->CreateAndAddBody(tb1);
+
+	m_tracingSystem->FinalizeScene();
+	*/
+
+	return true;
+}
+
+
+void Game::Start() {
+	m_renderer->Enable();
+}
+
+void Game::Stop() {
+	m_renderer->Disable();
 }
 
 void Game::Run()
@@ -91,10 +177,15 @@ void Game::Run()
 	*/
 }
 
-void Update(float deltaTime) {
+void Game::Update(float deltaTime) {
 
 	// m_luaManager.Update(m_scene, deltaTime);
-	// m_physicsSystem.Update(deltaTime);
+	 m_physicsSystem->Step(deltaTime);
+
+	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
+	 
+	 // For Volodya
+	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
 }
 
 void Game::Render()
@@ -114,14 +205,5 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_screenWidth = resizeWidth;
 	m_screenHeight = resizeHeight;
 
-	m_lightPass->m_screenWidth = resizeWidth;
-	m_lightPass->m_screenHeight = resizeHeight;
-
-	m_gPass->OnResize(resizeWidth, resizeHeight);
-	m_lightPass->OnResize(resizeWidth, resizeHeight, m_renderer->pGBuffer);
-}
-
-Game::~Game()
-{
-	// Освобождение ресурсов
+	m_renderer->OnResize(resizeWidth, resizeHeight);
 }

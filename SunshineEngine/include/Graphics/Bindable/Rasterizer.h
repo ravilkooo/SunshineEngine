@@ -12,6 +12,7 @@ namespace SE_G {
 			// Set D3D11_CULL_BACK, D3D11_FILL_SOLID
 			Rasterizer(ID3D11Device* device,
 				D3D11_RASTERIZER_DESC rasterDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{}));
+			~Rasterizer();
 			void Bind(ID3D11DeviceContext* context) noexcept override;
 
 		private:

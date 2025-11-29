@@ -31,6 +31,11 @@ namespace SE_G {
 
 	}
 
+	GPass::~GPass()
+	{
+		//delete[] gBufferRTVs;
+	}
+
 	void GPass::StartFrame()
 	{
 		context->OMSetRenderTargets(5, gBufferRTVs, pGBuffer->pDepthDSV.Get());

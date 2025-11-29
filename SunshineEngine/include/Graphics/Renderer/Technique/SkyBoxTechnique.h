@@ -16,8 +16,8 @@ namespace SE_G {
         //void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
         void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 
-        void ChooseDepthStencilState(LightPosition lightPos) override;
-        void ChooseRasterizer(LightPosition lightPos) override;
+        void ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos) override;
+        void ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos) override;
 
         LightPosition GetLightPositionInFrustum() override;
         bool IsFrustumInsideOfLight() override;

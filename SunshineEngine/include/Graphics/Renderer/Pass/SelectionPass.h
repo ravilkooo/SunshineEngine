@@ -13,6 +13,7 @@ namespace SE_G {
         SelectionPass(ID3D11Device* device, ID3D11DeviceContext* context,
             eastl::shared_ptr<GBuffer> pGBuffer,
             eastl::shared_ptr<Camera> camera);
+        ~SelectionPass();
 
         // Inherited via RenderPass
         void StartFrame() override;
@@ -22,8 +23,8 @@ namespace SE_G {
         eastl::shared_ptr<Camera> GetCamera();
         void SetCamera(eastl::shared_ptr<Camera> camera);
 
-        void OnResize(UINT resizeWidth, UINT resizeHeight,
-            eastl::shared_ptr<GBuffer> pGBuffer);
+        void OnResize(UINT resizeWidth, UINT resizeHeight) override;
+            //eastl::shared_ptr<GBuffer> pGBuffer);
 
         eastl::shared_ptr<Camera> m_camera;
 
@@ -34,20 +35,21 @@ namespace SE_G {
 
         D3D11_VIEWPORT m_viewport;
 
+        eastl::unique_ptr<Bind::Sampler> m_GBufferSampler;
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilWriteMask;
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilReadMask;
         SE::UUID m_selectedObjectUUID;
 
-        eastl::shared_ptr<Bind::VertexShader> m_meshVertexShader;
+        eastl::unique_ptr<Bind::VertexShader> m_meshVertexShader;
 
-        eastl::shared_ptr<Bind::VertexShader> m_iconVertexShader;
-        eastl::shared_ptr<Bind::GeometryShader> m_iconGeometryShader;
-        eastl::shared_ptr<Bind::GeometryConstantBuffer<float>> m_selectionBuffer;
+        eastl::unique_ptr<Bind::VertexShader> m_iconVertexShader;
+        eastl::unique_ptr<Bind::GeometryShader> m_iconGeometryShader;
+        eastl::unique_ptr<Bind::GeometryConstantBuffer<float>> m_selectionBuffer;
         IconPass* m_iconPass;
 
-        eastl::shared_ptr<Bind::PixelShader> m_pixelShader;
+        eastl::unique_ptr<Bind::PixelShader> m_pixelShader;
 
-        eastl::shared_ptr<Scene_Info> m_scene;
+        Scene_Info* m_scene;
 
 
         /*

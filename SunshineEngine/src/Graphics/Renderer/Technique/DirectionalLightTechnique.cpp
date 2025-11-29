@@ -12,19 +12,19 @@ namespace SE_G {
         dsDesc.DepthEnable = TRUE;
         dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
         dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        depthStencilState = eastl::make_shared<Bind::DepthStencilState>(device, dsDesc);
+        m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
 
         D3D11_RASTERIZER_DESC rasterDesc = {};
         rasterDesc.CullMode = D3D11_CULL_NONE;
         rasterDesc.FillMode = D3D11_FILL_SOLID;
-        rasterizer = eastl::make_shared<Bind::Rasterizer>(device, rasterDesc);
+        m_rasterizer = eastl::make_unique<Bind::Rasterizer>(device, rasterDesc);
 
         // Add mesh for Ambient
         m_mesh = SE_G::Mesh::CreateScreenAlignedQuad(device);
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/DirectionalLightVShader.hlsl"));
+            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightVShader.hlsl").c_str());
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-            device, MakeEngineAssetPath_Wchar(L"Shaders/LightPass/DirectionalLightPShader.hlsl"));
+            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightPShader.hlsl").c_str());
     }
 
     void DirectionalLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -36,12 +36,12 @@ namespace SE_G {
         DrawTechnique(context);
     }
 
-    void DirectionalLightTechnique::ChooseDepthStencilState(LightPosition lightPos)
+    void DirectionalLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         return;
     }
 
-    void DirectionalLightTechnique::ChooseRasterizer(LightPosition lightPos)
+    void DirectionalLightTechnique::ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         return;
     }

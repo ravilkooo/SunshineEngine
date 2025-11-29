@@ -17,7 +17,7 @@ PhysicsSystem::PhysicsSystem() :
 #ifdef JPH_DISABLE_TEMP_ALLOCATOR
     tempAllocator = new TempAllocatorMalloc();
 #else
-    m_tempAllocator = eastl::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024); // <-- ERROR
+    m_tempAllocator = eastl::make_unique<JPH::TempAllocatorImpl>(10 * 1024 * 1024);
 #endif
 
     m_jobSystem = eastl::make_unique<JPH::JobSystemThreadPool>(
@@ -44,9 +44,40 @@ PhysicsSystem::PhysicsSystem() :
     m_bodyInterface = &m_physicsSystem->GetBodyInterface();
 }
 
-void PhysicsSystem::AddBody(JPH::BodyID bodyId, SE::UUID objectUUID, JPH::EActivation activation) {
-    m_bodyEntries.push_back({ bodyId, objectUUID });
-    m_bodyInterface->AddBody(bodyId, activation);
+PhysicsSystem::~PhysicsSystem()
+{
+    ClearAllBodies();
+
+    // Unregisters all types with the factory and cleans up the default material
+    JPH::UnregisterTypes();
+
+    // Destroy the factory
+    delete JPH::Factory::sInstance;
+    JPH::Factory::sInstance = nullptr;
+
+    m_isValid = false;
+
+    m_bodyInterface = nullptr;
+}
+
+void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
+
+    JPH::BodyInterface& bodyInterface = Bodies();
+
+    if (!physComp->m_shape) {
+        // handle error: shape not set
+        return;
+    }
+    JPH::BodyCreationSettings settings(physComp->m_shape, physComp->m_position, physComp->m_orientation, physComp->m_motionType, physComp->m_objectLayer);
+    settings.mObjectLayer = physComp->m_objectLayer;
+    settings.mAllowSleeping = (physComp->m_activation != JPH::EActivation::DontActivate);
+
+    physComp->m_joltBody = bodyInterface.CreateBody(settings);
+    physComp->m_joltBodyId = physComp->m_joltBody->GetID();
+    physComp->m_joltBody->SetUserData(physComp->m_objectUUID.m_UUID);
+
+    m_bodyEntries.push_back({ physComp->m_joltBodyId });
+    m_bodyInterface->AddBody(physComp->m_joltBodyId, physComp->m_activation);
 }
 
 // Add objects before this step
@@ -72,7 +103,7 @@ void PhysicsSystem::FinalizeScene() {
     floor = bodyInterface->CreateBody(floor_settings); // Note that if we run out of bodies this can return nullptr
 
     // Add it to the world
-    bodyInterface->AddBody(floor->GetID(), JPH::EActivation::DontActivate);
+    bodyInterface->CreateAndAddBody(floor->GetID(), JPH::EActivation::DontActivate);
 
     // Now create a dynamic body to bounce on the floor
     // Note that this uses the shorthand version of creating and adding a body to the world
@@ -87,6 +118,7 @@ void PhysicsSystem::FinalizeScene() {
     */
 
     m_physicsSystem->OptimizeBroadPhase();
+    m_isValid = true;
 }
 
 void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
@@ -96,9 +128,11 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
 
         JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
         JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);        
+        
+        SE::UUID objectUUID = SE::UUID((std::uint64_t) m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
 
         auto tr = scene->GetGameObjectByUUID(
-            bodyEntry.m_objectUUID)->GetComponent<TransformComponent>();
+            objectUUID)->GetComponent<TransformComponent>();
 
         tr->m_position =
             DXSM::Vector3(position.mF32
@@ -151,17 +185,6 @@ void PhysicsSystem::ClearAllBodies()
     bodyInterface->RemoveBody(floor->GetID());
     bodyInterface->DestroyBody(floor->GetID());
     */
-}
-
-void PhysicsSystem::ClearScene() {
-    ClearAllBodies();
-
-    // Unregisters all types with the factory and cleans up the default material
-    JPH::UnregisterTypes();
-
-    // Destroy the factory
-    delete JPH::Factory::sInstance;
-    JPH::Factory::sInstance = nullptr;
 }
 
 JPH::PhysicsSystem& PhysicsSystem::GetWorld() { return *m_physicsSystem; }
