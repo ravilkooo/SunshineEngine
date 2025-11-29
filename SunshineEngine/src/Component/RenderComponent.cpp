@@ -16,9 +16,11 @@ RenderComponent_Info::~RenderComponent_Info() {
 bool RenderComponent_Info::HasGPassMesh() {
 	return m_hasGPassMesh;
 }
+
 void RenderComponent_Info::SetMesh(const eastl::string& filePath) {
 	m_gPassTech->SetMesh(filePath);
 }
+
 void RenderComponent_Info::SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh) {
 	m_gPassTech->SetMesh(newMesh);
 }

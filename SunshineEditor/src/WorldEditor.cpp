@@ -397,6 +397,32 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	LOG_EDITOR_INFO("Scene loaded");
 
 	m_selectionPass->m_scene = m_scene.get();
+
+	/*
+	{
+		SE::UUID customMeshId = m_scene->AddGameObject(
+			EditorObjectFactory::CreateCustomMesh(
+				m_renderer.get(), MakeEngineAssetPath_String("Meshes/plane.obj")
+			)
+		);
+
+		auto obj = m_scene->GetGameObjectByUUID(customMeshId);
+
+		auto tc_info = obj->GetComponent<TransformComponent_Info>();
+		auto rc_info = obj->GetComponent<RenderComponent_Info>();
+
+		auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+
+		pc_info->SetCollisionLayer("MOVING");
+		pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
+		pc_info->SetActivation(SE::PhysicsActivation::Activate);
+		pc_info->SetShape(SE::ColliderShapeType::Box);
+		SE::ColliderSettings collSettings{};
+		collSettings.data.asBox = { { 1.0f, 1.0f, 1.0f } };
+		pc_info->m_colliderData->SetColliderSettings(collSettings);
+	}
+	*/
+
 	return true;
 }
 

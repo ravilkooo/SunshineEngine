@@ -105,16 +105,30 @@ namespace SE_G {
 		SetColor(SE_G::Colors::UnloadedTextureColor);
 	}
 
-	void GPassTechnique::SetMesh(const eastl::string& filePath) {
-		m_mesh->ChangeMesh(m_renderSystem->GetDevice(), filePath);
-	}
-
 	void GPassTechnique::SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh) {
 		m_mesh->ClearMesh();
 		m_mesh = newMesh;
 	}
 
+	void GPassTechnique::SetMeshComponent(MeshComponent* meshComponent)
+	{
+		m_meshComponent = meshComponent;
+		if (meshComponent)
+			m_mesh = meshComponent->GetMesh();
+	}
+
+	void GPassTechnique::SetMesh(const eastl::string& filePath)
+	{
+		eastl::shared_ptr<SE_G::Mesh> newMesh = eastl::make_shared<SE_G::Mesh>(
+			m_renderSystem->GetDevice(), filePath);
+		m_mesh->ClearMesh();
+		m_mesh = newMesh;
+		//m_mesh->ChangeMesh(m_renderSystem->GetDevice(), filePath);
+	}
+
+	/*
 	void GPassTechnique::ClearMesh() {
 		
 	}
+	*/
 }

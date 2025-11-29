@@ -1,6 +1,7 @@
 #include <GameObject/Shapes/SphereShapeObject.h>
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Component/PhysicsComponent.h>
+#include <Component/MeshComponent.h>
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, SphereShapeData initData)
@@ -19,11 +20,15 @@ SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	auto rc_info = AddComponent<RenderComponent_Info>();
 	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
-	//auto tc_info = GetComponent<TransformComponent_Info>();
+	auto mesh_info = AddComponent<MeshComponent_Info>();
+	mesh_info->m_assignedComponent = eastl::make_unique<MeshComponent>();
+
+	auto newMesh = SE_G::Mesh::CreateSphereMesh(device, initData.Size, initData.SliceCount, initData.StackCount);
+	mesh_info->m_assignedComponent->SetMesh(newMesh);
+
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(
-		device, initData.Size, initData.SliceCount, initData.StackCount);
+	gBufferTech->SetMeshComponent(mesh_info->m_assignedComponent.get());
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
 
 	rc_info->AddTechnique(eastl::move(gBufferTech));
@@ -60,10 +65,15 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	auto rc_info = obj->AddComponent<RenderComponent_Info>();
 	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
+	auto mesh_info = obj->AddComponent<MeshComponent_Info>();
+	mesh_info->m_assignedComponent = eastl::make_unique<MeshComponent>();
+
+	auto newMesh = SE_G::Mesh::CreateSphereMesh(device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
+	mesh_info->m_assignedComponent->SetMesh(newMesh);
+
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(
-		device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
+	gBufferTech->SetMeshComponent(mesh_info->m_assignedComponent.get());
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 

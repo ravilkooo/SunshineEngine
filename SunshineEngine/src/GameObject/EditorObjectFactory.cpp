@@ -13,6 +13,37 @@
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
+
+eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
+	SE_G::DeferredRenderer* renderSystem,
+	eastl::string filePath)
+{
+
+	auto obj = eastl::make_unique<GameObject_Info>();
+
+	auto device = renderSystem->GetDevice();
+	obj->m_group = GameObjectGroup::CustomMesh;
+	obj->m_name = "CustomObject";
+
+	// TransformComponent
+	auto tc_info = obj->AddComponent<TransformComponent_Info>();
+	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+
+	// RenderComponent and techniques
+	auto rc_info = obj->AddComponent<RenderComponent_Info>();
+	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+
+	//auto tc_info = GetComponent<TransformComponent_Info>();
+	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
+		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
+	gBufferTech->m_mesh = eastl::make_shared<SE_G::Mesh>(device, filePath);
+	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
+
+	rc_info->AddTechnique(eastl::move(gBufferTech));
+
+	return obj;
+}
+
 eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateBoxObject(
 	SE_G::DeferredRenderer* renderSystem,
 	float width, float height, float length)

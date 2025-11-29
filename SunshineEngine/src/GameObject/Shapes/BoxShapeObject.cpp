@@ -1,6 +1,7 @@
 #include <GameObject/Shapes/BoxShapeObject.h>
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Component/PhysicsComponent.h>
+#include <Component/MeshComponent.h>
 
 BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, BoxShapeData initData)
@@ -20,11 +21,17 @@ BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 	auto rc_info = AddComponent<RenderComponent_Info>();
 	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
+	// MeshComponent (holds shared mesh resource)
+	auto mesh_info = AddComponent<MeshComponent_Info>();
+	mesh_info->m_assignedComponent = eastl::make_unique<MeshComponent>();
+
 	//auto tc_info = GetComponent<TransformComponent_Info>();
+	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, initData.Size);
+	mesh_info->m_assignedComponent->SetMesh(newMesh);
+
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-		device, initData.Size);
+	gBufferTech->SetMeshComponent(mesh_info->m_assignedComponent.get());
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
 
 	rc_info->AddTechnique(eastl::move(gBufferTech));
@@ -61,10 +68,16 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	auto rc_info = obj->AddComponent<RenderComponent_Info>();
 	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
 
+	// MeshComponent (holds shared mesh resource)
+	auto mesh_info = obj->AddComponent<MeshComponent_Info>();
+	mesh_info->m_assignedComponent = eastl::make_unique<MeshComponent>();
+
+	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, obj->m_shapeData->Size);
+	mesh_info->m_assignedComponent->SetMesh(newMesh);
+
 	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
 		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-		device, obj->m_shapeData->Size);
+	gBufferTech->SetMeshComponent(mesh_info->m_assignedComponent.get());
 	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
 	rc_info->AddTechnique(eastl::move(gBufferTech));
 
