@@ -2,21 +2,6 @@
 
 void LogManager::AddLog(LogTarget target, LogType type, const char* fmt, ...)
 {
-    // const LogTypeInfo& info = s_LogTypeInfos[(int)type];
-    //
-    // std::string finalMsg = info.name;
-    //
-    // va_list args;
-    // va_start(args, fmt);
-    //
-    // char buffer[1024];
-    // vsnprintf(buffer, sizeof(buffer), fmt, args);
-    // finalMsg += buffer;
-    //
-    // va_end(args);
-    //
-    // logs.push_back({ type, finalMsg, info.color, target });
-
     va_list args;
     va_start(args, fmt);
     AddFormattedLog(target, type, fmt, args);
@@ -42,16 +27,6 @@ void LogManager::Clear(LogTarget target)
 
 void LogManager::AddFormattedLog(LogTarget target, LogType type, const char* fmt, va_list args)
 {
-    // const LogTypeInfo& info = s_LogTypeInfos[(int)type];
-    //
-    // char buffer[1024];
-    // vsnprintf(buffer, sizeof(buffer), fmt, args);
-    //
-    // std::string finalMsg = info.name;
-    // finalMsg += buffer;
-    //
-    // logs.push_back({ type, finalMsg, info.color, target });
-
     const LogTypeInfo& info = s_LogTypeInfos[(int)type];
 
     char buffer[1024];
@@ -94,4 +69,3 @@ IMPLEMENT_LOG_METHODS(Editor, LogTarget::Editor)
 IMPLEMENT_LOG_METHODS(Game, LogTarget::Game)
 
 #undef IMPLEMENT_LOG_METHODS
-
