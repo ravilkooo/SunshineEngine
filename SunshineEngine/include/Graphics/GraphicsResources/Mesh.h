@@ -52,8 +52,6 @@ namespace SE_G {
             const eastl::string& path);
         ~Mesh();
 
-        void ChangeMesh(ID3D11Device* device,
-            const eastl::string& path);
         void ClearMesh();
 
         static bool LoadModel(eastl::vector<Vertex>& vertices,
@@ -137,5 +135,9 @@ namespace SE_G {
         eastl::unique_ptr<Bind::Topology> m_topology;
 
         eastl::string m_path;
+
+    // private cause every mesh should correspond to its key in ResourceManager
+        void ChangeMesh(ID3D11Device* device,
+            const eastl::string& path);
     };
 }

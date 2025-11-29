@@ -105,19 +105,17 @@ void TransformComponent::FromJson(const json& j) {
 json RenderComponent_Info::ToJson() const {
     json j;
     
-    j["techniques"] = json::array();
+    //j["techniques"] = json::array();
     for (const auto& t : techniques) {
         json j_t;
-        j_t["Tag"] = t.c_str();
         if (t == "GPass")
         {
             j_t["Mesh"] = GetCurrentMeshPath().c_str();
             j_t["Texture"] = GetCurrentTexturePath().c_str();
             j_t["Sampler"] = GetCurrentTextureSampler();
-        }
-        j["techniques"].push_back(j_t);
-        
 
+            j["techniques"]["GPass"] = j_t;
+        }
     }
 
     return j;
@@ -130,12 +128,25 @@ json RenderComponent_Info::ToJson() const {
 //}
 
 void RenderComponent_Info::FromJson(const json& j) {
-    techniques.clear();
+    //techniques.clear();
+    if (j.contains("techniques"))
+    {
+        if (j["techniques"].contains("GPass"))
+        {
+            eastl::string meshFullPath = j["techniques"]["GPass"]["Mesh"].get<std::string>().c_str();
+            eastl::wstring textureFullPath = j["techniques"]["GPass"]["Texture"].get<std::wstring>().c_str();
+            SE_G::Bind::SamplerPreset samplePreset = j["techniques"]["GPass"]["Sampler"];
+
+        }
+    }
+    
+    /*
     if (j.contains("techniques") && j["techniques"].is_array()) {
         for (const auto& v : j["techniques"]) {
             techniques.insert( StdToEASTLString(v.get<std::string>()));
         }
     }
+    */
 }
 
 // ----------------- PhysicsComponent -----------------
@@ -525,7 +536,6 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 break;
 
             case GameObjectGroup::Shapes:
-
                 switch (objType.m_asShape)
                 {
                 case ShapeObjectType::Box:
@@ -542,7 +552,9 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                     break;
                 }
                 break;
+
             case GameObjectGroup::CustomMesh:
+                //go = eastl::make_unique<GameObject_Info>()
                 break;
             case GameObjectGroup::Other:
                 break;
@@ -552,7 +564,6 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
 
 
             if (go) {
-                // Other components (Physics, Lua)
 
                 if (objJ["components"].contains("Physics")) {
                     auto c = go->AddComponent<PhysicsComponent_Info>(
