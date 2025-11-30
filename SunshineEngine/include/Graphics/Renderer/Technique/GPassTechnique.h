@@ -2,57 +2,67 @@
 #include "RenderTechnique.h"
 #include <Graphics/Bindable/ConstantBuffer.h>
 #include <Utils/UUID.h>
-#include <Component/MeshComponent.h>
+// forward declare MeshData to avoid including MeshComponent.h here
+class MeshData;
 
+#include <d3d11.h>
 
 
 namespace SE_G {
-    class DeferredRenderer;
-
     class GPassTechnique :
         public RenderTechnique
     {
     public:
         eastl::unique_ptr<Bind::PixelConstantBuffer<UUIDhilo>> m_uuidBuffer;
 
-        GPassTechnique(DeferredRenderer* renderSystem, TransformComponent* assignedTransform, eastl::string technique,
+        GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             SE::UUID uuid);
         ~GPassTechnique();
 
-        void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+        // move
+        GPassTechnique(GPassTechnique&& other) noexcept;
+        GPassTechnique& operator=(GPassTechnique&& other) noexcept;
 
+        void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+        void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+
+        /*
         // To-do: it should:
         // 1) forget about old texture OBJECT
         // 2) Assign NEW texture OBJECT
         void SetTexture(const eastl::wstring& filePath,
             SE_G::Bind::SamplerPreset samplerPreset = SE_G::Bind::SamplerPreset::Wrap);
+        */
 
+        /*
         // To-do: it should:
         // 1) forget about old mesh OBJECT
         // 2) Assign NEW mesh OBJECT
         void SetMesh(const eastl::string& filePath);
+        void SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh);
+        */
 
+        /*
         // To-do: it should:
         // 1) forget about old texture OBJECT
         // 2) Assign NEW texture OBJECT
         void SetColor(SE_G::Color color);
+        */
 
-        void SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh);
-
-        // Associate this technique with a MeshComponent so the mesh can be shared
+        // Associate this technique with a MeshData so the mesh can be shared
         // with other systems and modified externally.
-        void SetMeshComponent(MeshComponent* meshComponent);
+        void InitByMeshData(eastl::shared_ptr<MeshData> meshData);
+        eastl::shared_ptr<MeshData> m_meshData;
 
-        DeferredRenderer* m_renderSystem;
+        ID3D11Device* m_device;
 
         // otherwise textured
-        bool m_colored = true;
+        //bool m_colored = true;
     private:
-        MeshComponent* m_meshComponent = nullptr;
         // To-do: it should:
         // 1) forget about old texture OBJECT
         // 2) Assign NEW texture OBJECT
-        void ClearTexture();
+        //void ClearTexture();
         /*
         void ClearMesh();
         */

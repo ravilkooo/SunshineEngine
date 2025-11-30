@@ -5,8 +5,27 @@
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
-SE_G::RenderTechnique* RenderComponent::AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> renderTech) {
-	return m_renderSystem->AddTechnique(eastl::move(renderTech));
+SE_G::RenderTechnique* RenderComponent::AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> renderTech)
+{
+	return m_renderSystem->AddTechnique(m_objectUUID, eastl::move(renderTech));
+}
+
+SE_G::RenderTechnique* RenderComponent::GetTechnique(eastl::string technique)
+{
+	return m_renderSystem->GetTechnique(m_objectUUID, technique);
+}
+
+void RenderComponent::RemoveTechnique(eastl::string technique)
+{
+	m_renderSystem->RemoveTechnique(m_objectUUID, technique);
+}
+
+ID3D11Device* RenderComponent::GetDevice() { return m_renderSystem->GetDevice(); }
+ID3D11DeviceContext* RenderComponent::GetDeviceContext() { return m_renderSystem->GetDeviceContext(); }
+
+RenderComponent_Info::RenderComponent_Info(SE::UUID uuid, SE_G::DeferredRenderer* renderSystem)
+{
+	m_assignedComponent = eastl::make_unique<RenderComponent>(uuid, renderSystem);
 }
 
 RenderComponent_Info::~RenderComponent_Info() {
@@ -17,6 +36,7 @@ bool RenderComponent_Info::HasGPassMesh() {
 	return m_hasGPassMesh;
 }
 
+/*
 void RenderComponent_Info::SetMesh(const eastl::string& filePath) {
 	m_gPassTech->SetMesh(filePath);
 }
@@ -41,6 +61,7 @@ eastl::wstring RenderComponent_Info::GetCurrentTexturePath() const {
 SE_G::Bind::SamplerPreset RenderComponent_Info::GetCurrentTextureSampler() const {
 	return m_gPassTech->m_textureSampler->m_preset;
 }
+*/
 
 /*
 bool RenderComponent::HasTechnique(eastl::string technique)

@@ -59,6 +59,11 @@ DXSM::Matrix TransformComponent::GetWorldMatrix() const
     return GetLocalTransformMatrix() * GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
 }
 
+TransformComponent_Info::TransformComponent_Info(ID3D11Device* device)
+{
+    m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+}
+
 TransformComponent_Info::~TransformComponent_Info()
 {
 

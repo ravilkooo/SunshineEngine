@@ -28,20 +28,17 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
     auto device = renderSystem->GetDevice();
 
     auto obj = eastl::make_unique<GameObject>();
-    auto tr = obj->AddComponent<TransformComponent>();
-    auto rc = obj->AddComponent<RenderComponent>(renderSystem);
+    auto tc = obj->AddComponent<TransformComponent>(device);
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-    auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-        device, DXSM::Vector3(width, height, length));
+    auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, DXSM::Vector3(width, height, length));
+    auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-    auto meshComp = obj->AddComponent<MeshComponent>(meshPtr);
-
-    auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-        renderSystem, tr.get(), "GPass", obj->m_UUID);
-    gBufferTech->SetMeshComponent(meshComp.get());
-    gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
-
-    rc->AddTechnique(eastl::move(gBufferTech));
+    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+        rc->GetDevice(),
+        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    mc->SetTexture(texture);
 
     return obj;
 }
@@ -58,26 +55,23 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
     auto device = renderSystem->GetDevice();
 
     // TransformComponent
-    auto tc = obj->AddComponent<TransformComponent>(renderSystem->GetDevice());
+    auto tc = obj->AddComponent<TransformComponent>(device);
     if (j["components"].contains("Transform")) {
         tc->FromJson(j["components"]["Transform"]);
     }
+
+    // RenderComponent and technique
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
     auto shapeData = eastl::make_shared<BoxShapeData>(j["m_shapeData"].get<BoxShapeData>());
+    auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, shapeData->Size);
+    auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-    // RenderComponent and technique
-    auto rc = obj->AddComponent<RenderComponent>(renderSystem);
-
-    auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-        device, shapeData->Size);
-
-    auto meshComp = obj->AddComponent<MeshComponent>(meshPtr);
-
-    auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-        renderSystem, tc.get(), "GPass", obj->m_UUID);
-    gBufferTech->SetMeshComponent(meshComp.get());
-    gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
-    rc->AddTechnique(eastl::move(gBufferTech));
+    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+        rc->GetDevice(),
+        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    mc->SetTexture(texture);
 
     return obj;
 }
@@ -88,18 +82,17 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
     auto device = renderSystem->GetDevice();
 
     auto obj = eastl::make_unique<GameObject>();
-    auto tr = obj->AddComponent<TransformComponent>(device);
-    auto rc = obj->AddComponent<RenderComponent>(renderSystem);
+    auto tc = obj->AddComponent<TransformComponent>(device);
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-    auto meshPtr = SE_G::Mesh::CreateSphereMesh(
-        device, DXSM::Vector3::One * radius);
-    auto meshComp = obj->AddComponent<MeshComponent>(meshPtr);
-    auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-        renderSystem, tr.get(), "GPass", obj->m_UUID);
-    gBufferTech->SetMeshComponent(meshComp.get());
-    gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
+    auto meshPtr = SE_G::Mesh::CreateSphereMesh(device, DXSM::Vector3::One * radius);
+    auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-    rc->AddTechnique(eastl::move(gBufferTech));
+    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+        rc->GetDevice(),
+        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    mc->SetTexture(texture);
 
     return obj;
 }
@@ -116,24 +109,23 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
     auto device = renderSystem->GetDevice();
 
     // TransformComponent
-    auto tc = obj->AddComponent<TransformComponent>(renderSystem->GetDevice());
+    auto tc = obj->AddComponent<TransformComponent>(device);
     if (j["components"].contains("Transform")) {
         tc->FromJson(j["components"]["Transform"]);
     }
+
+    // RenderComponent and technique
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
     auto shapeData = eastl::make_shared<SphereShapeData>(j["m_shapeData"].get<SphereShapeData>());
+    auto meshPtr = SE_G::Mesh::CreateSphereMesh(device, shapeData->Size, shapeData->SliceCount, shapeData->StackCount);
+    auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-    // RenderComponent and technique
-    auto rc = obj->AddComponent<RenderComponent>(renderSystem);
-
-    auto meshPtr = SE_G::Mesh::CreateSphereMesh(
-        device, shapeData->Size, shapeData->SliceCount, shapeData->StackCount);
-    auto meshComp = obj->AddComponent<MeshComponent>(meshPtr);
-    auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-        renderSystem, tc.get(), "GPass", obj->m_UUID);
-    gBufferTech->SetMeshComponent(meshComp.get());
-    gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
-    rc->AddTechnique(eastl::move(gBufferTech));
+    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+        rc->GetDevice(),
+        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    mc->SetTexture(texture);
 
     return obj;
 }
@@ -144,18 +136,17 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
     auto device = renderSystem->GetDevice();
 
     auto obj = eastl::make_unique<GameObject>();
-    auto tr = obj->AddComponent<TransformComponent>(device);
-    auto rc = obj->AddComponent<RenderComponent>(renderSystem);
+    auto tc = obj->AddComponent<TransformComponent>(device);
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-    auto meshPtr = SE_G::Mesh::CreateGeosphereMesh(
-        device, DXSM::Vector3::One * radius, 2u);
-    auto meshComp = obj->AddComponent<MeshComponent>(meshPtr);
-    auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-        renderSystem, tr.get(), "GPass", obj->m_UUID);
-    gBufferTech->SetMeshComponent(meshComp.get());
-    gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
+    auto meshPtr = SE_G::Mesh::CreateGeosphereMesh(device, DXSM::Vector3::One * radius, 2u);
+    auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-    rc->AddTechnique(eastl::move(gBufferTech));
+    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+        rc->GetDevice(),
+        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    mc->SetTexture(texture);
 
     return obj;
 }
@@ -172,26 +163,23 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
     auto device = renderSystem->GetDevice();
 
     // TransformComponent
-    auto tc = obj->AddComponent<TransformComponent>(renderSystem->GetDevice());
+    auto tc = obj->AddComponent<TransformComponent>(device);
     if (j["components"].contains("Transform")) {
         tc->FromJson(j["components"]["Transform"]);
     }
 
-    auto shapeData = eastl::make_shared<GeosphereShapeData>(
-        j["m_shapeData"].get<GeosphereShapeData>());
-
     // RenderComponent and technique
-    auto rc = obj->AddComponent<RenderComponent>(renderSystem);
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-    auto meshPtr = SE_G::Mesh::CreateGeosphereMesh(
-        device, shapeData->Size, shapeData->NumSubdivisions);
-    auto meshComp = obj->AddComponent<MeshComponent>(meshPtr);
-    
-    auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-        renderSystem, tc.get(), "GPass", obj->m_UUID);
-    gBufferTech->SetMeshComponent(meshComp.get());
-    gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
-    rc->AddTechnique(eastl::move(gBufferTech));
+    auto shapeData = eastl::make_shared<GeosphereShapeData>(j["m_shapeData"].get<GeosphereShapeData>());
+    auto meshPtr = SE_G::Mesh::CreateGeosphereMesh(device, shapeData->Size, shapeData->NumSubdivisions);
+    auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
+
+    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+        rc->GetDevice(),
+        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    mc->SetTexture(texture);
 
     return obj;
 }

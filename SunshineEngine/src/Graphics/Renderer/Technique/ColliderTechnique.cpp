@@ -1,6 +1,7 @@
 #include "Graphics/Renderer/Technique/ColliderTechnique.h"
 #include <Utils/StringUtils.h>
 #include <Graphics/Renderer/Pass/ColliderPass.h>
+#include <Graphics/GraphicsResources/VertexShader.h>
 
 namespace SE_G {
 	eastl::unique_ptr<Bind::VertexShader> ColliderTechnique::s_boxShader;

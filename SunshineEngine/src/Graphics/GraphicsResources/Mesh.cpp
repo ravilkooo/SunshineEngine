@@ -1,4 +1,4 @@
-#include "Graphics/GraphicsResources/Mesh.h"
+#include <Graphics/GraphicsResources/Mesh.h>
 #include <Utils/StringUtils.h>
 
 #include <SimpleMath.h>

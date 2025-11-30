@@ -2,11 +2,15 @@
 #include "WorldEditor.h"
 #include "GameObject/GameObject.h"
 #include "Component/TransformComponent.h"
+#include "Component/RenderComponent.h"
+#include "Component/PhysicsComponent.h"
+#include "Component/MeshComponent.h"
 #include "Component/LuaComponent.h"
 #include "DirectXMath.h"
 #include "GameObject/Lighting/LightObject.h"
 #include "Graphics/Lighting/LightData.h"
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
+#include <UI/FontStyles.h>
 
 PropertyPanel::PropertyPanel() {}
 
@@ -69,8 +73,11 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
                               ImGuiTreeNodeFlags_Framed |
                               ImGuiTreeNodeFlags_SpanAvailWidth;
     
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
     if (ImGui::TreeNodeEx("Transform", flags))
     {
+        EditorUI::FontStyles::Pop();
+
         DrawVector3Control("Position", transform->m_position, 0.0f);
         
         DXSM::Vector3 rotationDeg = transform->m_rotation * (180.0f / DirectX::XM_PI);
@@ -106,8 +113,12 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         ImGuiTreeNodeFlags_Framed |
         ImGuiTreeNodeFlags_SpanAvailWidth;
 
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
     if (ImGui::TreeNodeEx("Details", flags))
     {
+        EditorUI::FontStyles::Pop();
+
         if (obj->m_group == GameObjectGroup::Lighting)
         {
             switch (obj->m_type.m_asLight)
@@ -172,9 +183,9 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
             default:
                 break;
             }
-
-            DrawPhysicsComponent(obj);
         }
+
+        DrawPhysicsComponent(obj);
         ImGui::TreePop();
     }
 }
@@ -183,7 +194,11 @@ void PropertyPanel::DrawAmbientLightDetails(SE_G::AmbientLightData* lightData)
 {
     if (lightData)
     {
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Ambient Light");
+        EditorUI::FontStyles::Pop();
+
         ImGui::ColorEdit3("Light Color", &lightData->Ambient.x, ImGuiColorEditFlags_Float);
     }
 }
@@ -192,7 +207,9 @@ void PropertyPanel::DrawDirectionalLightDetails(SE_G::DirectionalLightData* ligh
 {
     if (lightData)
     {
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Directional Light");
+        EditorUI::FontStyles::Pop();
         
         ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
         ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
@@ -205,7 +222,9 @@ void PropertyPanel::DrawPointLightDetails(SE_G::PointLightData* lightData)
 {
     if (lightData)
     {
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Point Light");
+        EditorUI::FontStyles::Pop();
         
         ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
         ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
@@ -217,7 +236,9 @@ void PropertyPanel::DrawSkyBoxDetails(SE_G::SkyBoxData* lightData)
 {
     if (lightData)
     {
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Skybox");
+        EditorUI::FontStyles::Pop();
         
         ImGui::ColorEdit3("Sky Tint", &lightData->Tint.x, ImGuiColorEditFlags_Float);
         ImGui::DragFloat("Intensity", &lightData->Power, 0.1f, 0.0f, 10.0f, "%.1f");
@@ -226,7 +247,9 @@ void PropertyPanel::DrawSkyBoxDetails(SE_G::SkyBoxData* lightData)
 
 void PropertyPanel::DrawBoxShapeDetails(BoxShapeObject_Info* obj)
 {
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
     ImGui::Text("Box Shape");
+    EditorUI::FontStyles::Pop();
     
     DXSM::Vector3 currentSize = obj->GetSize();
     
@@ -238,7 +261,9 @@ void PropertyPanel::DrawBoxShapeDetails(BoxShapeObject_Info* obj)
 
 void PropertyPanel::DrawSphereShapeDetails(SphereShapeObject_Info* obj)
 {
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
     ImGui::Text("Sphere Shape");
+    EditorUI::FontStyles::Pop();
     
     DXSM::Vector3 currentSize = obj->GetSize();
     uint32_t currentSliceCount = obj->GetSliceCount();
@@ -264,7 +289,10 @@ void PropertyPanel::DrawSphereShapeDetails(SphereShapeObject_Info* obj)
 
 void PropertyPanel::DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj)
 {
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);    
     ImGui::Text("Geosphere Shape");
+    EditorUI::FontStyles::Pop();
+
     DXSM::Vector3 currentSize = obj->GetSize();
     uint32_t currentNumSubdiv = obj->GetNumSubdivisions();
     
@@ -284,12 +312,37 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
 {
     if (!obj->HasComponent<PhysicsComponent_Info>()) 
         return;
-
-    if (auto physicsInfo = obj->GetComponent<PhysicsComponent_Info>()) {
-        
+    if (auto physicsInfo = obj->GetComponent<PhysicsComponent_Info>())
+    {   
         ImGui::Separator();
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        const char* labelRemove = "Remove component";
         ImGui::Text("Physics Settings");
+        EditorUI::FontStyles::Pop();
         
+        // Button width
+        ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
+        ImVec2 padding = ImGui::GetStyle().FramePadding;
+        float labelWidth = textSize.x + padding.x * 2.0f;
+
+        // free space on this line
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        avail.x = avail.x - textSize.x;
+
+        if (avail.x > labelWidth) {
+            // put on the same line
+            float oldX = ImGui::GetCursorPosX();
+            ImGui::SameLine();
+            ImGui::SetCursorPosX(oldX + avail.x);
+        }
+        // else dont call SameLine, Button will be under line
+
+        if (ImGui::SmallButton(labelRemove)) {
+            obj->RemoveComponent<PhysicsComponent_Info>();
+            return;
+        }
+
         auto currentMotion = physicsInfo->GetMotion();
         if (ImGui::Combo("Motion Type", (int*)&currentMotion, "Static\0Kinematic\0Dynamic\0"))
         {
@@ -313,7 +366,10 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
         
         if (auto colliderData = physicsInfo->m_colliderData) {
             ImGui::Separator();
+
+            EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
             ImGui::Text("Collider Settings");
+            EditorUI::FontStyles::Pop();
 
             auto currentShape = colliderData->GetShapeType();
             const char* shapeItems = 
@@ -655,6 +711,22 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
     {
         ImGui::Text("Add Component");
         ImGui::Separator();
+
+        if (!obj->HasComponent<PhysicsComponent_Info>())
+        {
+            if (ImGui::MenuItem("Physics Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::PHYSICS);
+            }
+        }
+        if (!obj->HasComponent<MeshComponent_Info>())
+        {
+            if (ImGui::MenuItem("Mesh Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::MESH);
+            }
+        }
+
         /*
         if (!obj->HasComponent<LuaComponent_Info>())
         {

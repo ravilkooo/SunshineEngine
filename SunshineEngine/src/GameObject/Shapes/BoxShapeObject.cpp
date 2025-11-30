@@ -1,5 +1,8 @@
 #include <GameObject/Shapes/BoxShapeObject.h>
+
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
+#include <Graphics/GraphicsResources/Texture.h>
+
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>
 
@@ -14,27 +17,20 @@ BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 	m_shapeData = eastl::make_shared<BoxShapeData>(initData);
 
 	// TransformComponent
-	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+	auto tc_info = AddComponent<TransformComponent_Info>(device);
 
 	// RenderComponent and techniques
-	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
 	// MeshComponent (holds shared mesh resource)
-	auto mesh_info = AddComponent<MeshComponent_Info>();
-	mesh_info->m_assignedComponent = eastl::make_unique<MeshComponent>();
-
-	//auto tc_info = GetComponent<TransformComponent_Info>();
 	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, initData.Size);
-	mesh_info->m_assignedComponent->SetMesh(newMesh);
+	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, newMesh);
 
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-		renderSystem, tc_info->m_assignedComponent.get(), "GPass", m_UUID);
-	gBufferTech->SetMeshComponent(mesh_info->m_assignedComponent.get());
-	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
-
-	rc_info->AddTechnique(eastl::move(gBufferTech));
+	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+		rc_info->GetDevice(),
+		MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+		SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	mesh_info->SetTexture(texture);
 }
 
 BoxShapeObject_Info::BoxShapeObject_Info(SE_G::DeferredRenderer* renderSystem, BoxShapeData initData) :
@@ -56,30 +52,23 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	auto device = renderSystem->GetDevice();
 
 	// TransformComponent
-	auto tc_info = obj->AddComponent<TransformComponent_Info>();
+	auto tc_info = obj->AddComponent<TransformComponent_Info>(device);
 	if (j["components"].contains("Transform")) {
 		tc_info->FromJson(j["components"]["Transform"], device);
 	}
-	else {
-		tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
-	}
 
 	// RenderComponent and technique
-	auto rc_info = obj->AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
 	// MeshComponent (holds shared mesh resource)
-	auto mesh_info = obj->AddComponent<MeshComponent_Info>();
-	mesh_info->m_assignedComponent = eastl::make_unique<MeshComponent>();
-
 	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, obj->m_shapeData->Size);
-	mesh_info->m_assignedComponent->SetMesh(newMesh);
+	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->SetMeshComponent(mesh_info->m_assignedComponent.get());
-	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
-	rc_info->AddTechnique(eastl::move(gBufferTech));
+	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+		rc_info->GetDevice(),
+		MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+		SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	mesh_info->SetTexture(texture);
 
 	// PhysicsComponent
 	//auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
@@ -98,8 +87,8 @@ void BoxShapeObject_Info::SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Ve
 		eastl::shared_ptr<SE_G::Mesh> newMesh =
 			SE_G::Mesh::CreateUnwrappedBoxMesh(renderSystem->GetDevice(),
 				newSize);
-		// Call SetMesh from RenderComponent
-		auto rc = GetComponent<RenderComponent_Info>();
-		rc->SetMesh(newMesh);
+
+		auto mc = GetComponent<MeshComponent_Info>();
+		mc->m_assignedComponent->SetMesh(newMesh);
 	}
 }

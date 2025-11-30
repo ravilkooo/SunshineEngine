@@ -9,8 +9,18 @@
 #include <EASTL/string.h>
 #include <EASTL/map.h>
 
+#include <Graphics/GraphicsResources/Mesh.h>
+
 #include <Component/Component.h>
 #include <Component/ComponentType.h>
+#include <Component/RenderComponent.h>
+#include <Component/TransformComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/MeshComponent.h>
+
+//#include <Graphics/Renderer/DeferredRenderer.h>
+
+#include <Utils/StringUtils.h>
 #include <Utils/UUID.h>
 
 #include <nlohmann/json.hpp>
@@ -166,6 +176,84 @@ public:
     eastl::string m_name;
     SE::UUID m_UUID;
 
+    // Add Component with default values
+    void AddDefaultComponent(SE::ComponentType compType)
+    {
+        if (impl->components.contains(compType))
+        {
+            return;
+        }
+        else
+        {
+            switch (compType)
+            {
+            case SE::ComponentType::TRANSFORM:
+            case SE::ComponentType::RENDER:
+                break;
+
+            case SE::ComponentType::LUA:
+
+                // To-do:
+                // Add  #include <Component/LuaComponent.h>
+                // Add LuaComponent with default values
+
+                break;
+
+            case SE::ComponentType::PHYSICS:
+
+                // Add PhysicsComponent with default values
+            {
+                auto tc_info = GetComponent<TransformComponent_Info>();
+                auto rc_info = GetComponent<RenderComponent_Info>();
+
+                auto pc_info = AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+
+            }
+                break;
+
+            case SE::ComponentType::PERCEPTION:
+
+                // To-do:
+                // Add  #include <Component/PerceptionComponent.h>
+                // Add PerceptionComponent with default values
+
+                break;
+
+            case SE::ComponentType::BEHAVIOR:
+
+                // To-do:
+                // Add  #include <Component/BehaviourController.h>
+                // Add BehaviourController with default values
+
+                break;
+                
+            case SE::ComponentType::MESH:
+
+                // To-do:
+                // Add  #include <Component/MeshComponent.h>
+                // Add MeshComponent with default values
+
+            {
+                auto tc_info = GetComponent<TransformComponent_Info>();
+                auto rc_info = GetComponent<RenderComponent_Info>();
+                
+                auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
+                    rc_info->GetDevice(),
+                    DXSM::Vector3(1.0f, 1.0f, 1.0f)
+                );
+                auto meshComp = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, meshPtr);
+
+            }
+
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+
+    // Only for inner class methods
     template<DerivedFromComponent_Info T, typename... Args>
     eastl::shared_ptr<T> AddComponent(Args&&... args) {
         //SE::ComponentType type = T::StaticComponentType();

@@ -63,11 +63,15 @@ json TransformComponent_Info::ToJson() const {
 }
 
 void TransformComponent_Info::FromJson(const json& j, ID3D11Device* device) {
-    m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+    if (!m_assignedComponent)
+        m_assignedComponent = eastl::make_unique<TransformComponent>(device);
     m_assignedComponent->FromJson(j);
 }
 
-void TransformComponent::FromJson(const json& j) {
+void TransformComponent::FromJson(const json& j)
+{
+
+
     if (j.contains("m_position") && j["m_position"].is_array() && j["m_position"].size() >= 3) {
         m_position.x = j["m_position"][0].get<float>();
         m_position.y = j["m_position"][1].get<float>();
@@ -105,9 +109,11 @@ void TransformComponent::FromJson(const json& j) {
 json RenderComponent_Info::ToJson() const {
     json j;
     
+    /*
     //j["techniques"] = json::array();
     for (const auto& t : techniques) {
         json j_t;
+
         if (t == "GPass")
         {
             j_t["Mesh"] = GetCurrentMeshPath().c_str();
@@ -117,6 +123,7 @@ json RenderComponent_Info::ToJson() const {
             j["techniques"]["GPass"] = j_t;
         }
     }
+    */
 
     return j;
 }
@@ -129,6 +136,7 @@ json RenderComponent_Info::ToJson() const {
 
 void RenderComponent_Info::FromJson(const json& j) {
     //techniques.clear();
+    /*
     if (j.contains("techniques"))
     {
         if (j["techniques"].contains("GPass"))
@@ -139,6 +147,7 @@ void RenderComponent_Info::FromJson(const json& j) {
 
         }
     }
+    */
     
     /*
     if (j.contains("techniques") && j["techniques"].is_array()) {
@@ -148,6 +157,52 @@ void RenderComponent_Info::FromJson(const json& j) {
     }
     */
 }
+
+// ----------------- MeshComponent -----------------
+
+json MeshComponent_Info::ToJson() const
+{
+    json j;
+
+    // prefer assigned component's mesh if present
+    if (m_assignedComponent && m_assignedComponent->GetMesh()) {
+        auto path = m_assignedComponent->GetMesh()->GetCurrentMeshPath();
+        if (!path.empty())
+            j["Mesh"] = path.c_str();
+    }
+
+    return j;
+}
+
+void MeshComponent_Info::FromJson(const json& j, ID3D11Device* device)
+{
+    if (j.contains("Mesh") && j["Mesh"].is_string()) {
+        // remember the path so we can reconstruct later
+        auto meshPath = StdToEASTLString(j["Mesh"].get<std::string>());
+
+        // ensure an assigned component exists
+        if (!m_assignedComponent)
+            m_assignedComponent = eastl::make_unique<MeshComponent>();
+
+        // If we have a valid D3D device at deserialization time, create the Mesh
+        if (device) {
+            auto loaded = eastl::make_shared<SE_G::Mesh>(device, meshPath);
+            m_assignedComponent->SetMesh(loaded);
+        }
+    }
+}
+
+void MeshComponent::FromJson(const json& j, ID3D11Device* device)
+{
+    if (j.contains("Mesh") && j["Mesh"].is_string()) {
+        eastl::string path = StdToEASTLString(j["Mesh"].get<std::string>());
+        if (device && !path.empty()) {
+            auto mesh = eastl::make_shared<SE_G::Mesh>(device, path);
+            SetMesh(mesh);
+        }
+    }
+}
+
 
 // ----------------- PhysicsComponent -----------------
 json PhysicsComponent_Info::ToJson() const {
@@ -381,8 +436,8 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
             tc_info->FromJson(j["components"]["Transform"], renderSystem->GetDevice());
         }
         if (j["components"].contains("Render")) {
-            auto rc_info = out->AddComponent<RenderComponent_Info>();
-            rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(renderSystem);
+            auto rc_info = out->AddComponent<RenderComponent_Info>(out->m_UUID, renderSystem);
+            rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(out->m_UUID, renderSystem);
             // Restore Render techniques
 
             

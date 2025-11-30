@@ -1,4 +1,8 @@
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
+#include <Graphics/Bindable/Rasterizer.h>
+#include <Graphics/Bindable/Sampler.h>
+#include <Graphics/GraphicsResources/VertexShader.h>
+#include <Graphics/GraphicsResources/Texture.h>
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
@@ -185,14 +189,14 @@ namespace SE_G {
 			m_shadowMapRasterizer->Bind(GetDeviceContext());
 
 			for (auto& tech : m_gPass->m_techniques) {
-				tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-				// tech->BindAll(GetDeviceContext());
+				tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+				// tech.second->BindAll(GetDeviceContext());
 
-				if (tech->m_mesh)
-					tech->m_mesh->Bind(context.Get());
+				if (tech.second->m_mesh)
+					tech.second->m_mesh->Bind(context.Get());
 
 
-				tech->DrawTechnique(GetDeviceContext());
+				tech.second->DrawTechnique(GetDeviceContext());
 			}
 
 		}

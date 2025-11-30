@@ -1,6 +1,8 @@
 ﻿#include <Graphics/Renderer/Pass/ColliderPass.h>
-#include <Utils/StringUtils.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/GraphicsResources/PixelShader.h>
+#include <Graphics/Bindable/Sampler.h>
+#include <Utils/StringUtils.h>
 
 namespace SE_G {
 	eastl::unique_ptr<Bind::Topology> ColliderPass::s_topology;
@@ -95,8 +97,8 @@ namespace SE_G {
 		s_shapesVertexBuffer->Bind(context.Get());
 		s_shapesIndexBuffer->Bind(context.Get());
 		for (auto& tech : m_techniques) {
-			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-			tech->Pass(GetDeviceContext());
+			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech.second->Pass(GetDeviceContext());
 		}
 
 		// Custom shapes

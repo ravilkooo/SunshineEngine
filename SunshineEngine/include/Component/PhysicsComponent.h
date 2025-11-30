@@ -132,6 +132,9 @@ public:
     SE::ColliderSettings GetColliderSettings();
     void SetColliderSettings(SE::ColliderSettings settings);
     */
+    
+    bool m_isValid = false;
+    RenderComponent_Info* m_rc_info;
 
     // All colliders settings
     eastl::shared_ptr<SE::ColliderData> m_colliderData;

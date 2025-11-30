@@ -2,7 +2,6 @@
 
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include <Graphics/GraphicsResources/VertexShader.h>
 
 #include <EASTL/algorithm.h>
 #include <EASTL/shared_ptr.h>

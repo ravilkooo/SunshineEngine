@@ -85,15 +85,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Box_repeat",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -145,7 +137,7 @@
                     "collider": {
                         "settings": {
                             "sphere": {
-                                "radius": 1.0
+                                "radius": 1.600000023841858
                             }
                         },
                         "shapeType": "Sphere",
@@ -171,15 +163,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -259,15 +243,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -347,15 +323,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -435,15 +403,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -523,15 +483,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -611,15 +563,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -717,7 +661,7 @@
             "m_type": "AmbientLight"
         },
         {
-            "CastsShadow": false,
+            "CastsShadow": true,
             "components": {
                 "Render": null,
                 "Transform": {
@@ -786,6 +730,37 @@
         },
         {
             "components": {
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "capsule": {
+                                "height": 1.2999999523162842,
+                                "radius": 0.3100000023841858
+                            }
+                        },
+                        "shapeType": "Capsule",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -809,7 +784,7 @@
                         0.0
                     ],
                     "m_rotation": [
-                        0.0,
+                        0.9128071665763855,
                         0.0,
                         0.0
                     ],
@@ -887,15 +862,7 @@
                     "m_collisionLayer": "NON_MOVING",
                     "m_motion": "Static"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Box_repeat",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -974,15 +941,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": {
-                        "GPass": {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    }
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,

@@ -1,4 +1,5 @@
 #include "Graphics/Renderer/Technique/AmbientLightTechnique.h"
+#include <Graphics/GraphicsResources/Mesh.h>
 #include <Utils/StringUtils.h>
 
 namespace SE_G {

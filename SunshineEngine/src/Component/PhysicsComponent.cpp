@@ -51,22 +51,34 @@ JPH::BodyID PhysicsComponent::GetBodyID() const { return m_joltBodyId; }
 PhysicsComponent_Info::PhysicsComponent_Info(
     RenderComponent_Info* rc_info,
     TransformComponent_Info* tc_info)
+    : m_rc_info(rc_info)
 {
     m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Box);
     SE::PhysicsMotionType m_motion = SE::PhysicsMotionType::Static;
     SE::PhysicsActivation m_activation = SE::PhysicsActivation::DontActivate;
 
     // Init collider
-    auto device = rc_info->m_assignedComponent.get()->m_renderSystem->GetDevice();
+    auto device = rc_info->m_assignedComponent.get()->GetDevice();
     auto colliderTech = eastl::make_unique<SE_G::ColliderTechnique>(
         device, tc_info->m_assignedComponent.get(), eastl::string("ColliderPass"),
         m_colliderData);
 
     rc_info->AddTechnique(eastl::move(colliderTech));
+
+    SetCollisionLayer("MOVING");
+    SetMotion(SE::PhysicsMotionType::Dynamic);
+    SetActivation(SE::PhysicsActivation::Activate);
+    SetShape(SE::ColliderShapeType::Box);
+    SE::ColliderSettings collSettings{};
+    collSettings.data.asBox = { { 1.0f, 1.0f, 1.0f } };
+    m_colliderData->SetColliderSettings(collSettings);
+
+    m_isValid = true;
 }
 
 PhysicsComponent_Info::~PhysicsComponent_Info() {
-    ;
+    if (m_isValid)
+        m_rc_info->RemoveTechnique("ColliderPass");
 }
 
 

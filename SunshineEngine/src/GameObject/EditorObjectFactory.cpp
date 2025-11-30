@@ -26,20 +26,19 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	obj->m_name = "CustomObject";
 
 	// TransformComponent
-	auto tc_info = obj->AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+	auto tc_info = obj->AddComponent<TransformComponent_Info>(device);
 
 	// RenderComponent and techniques
-	auto rc_info = obj->AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	//auto tc_info = GetComponent<TransformComponent_Info>();
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = eastl::make_shared<SE_G::Mesh>(device, filePath);
-	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
+	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc_info->GetDevice(), filePath);
+	auto mc_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, meshPtr);
 
-	rc_info->AddTechnique(eastl::move(gBufferTech));
+	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+		rc_info->GetDevice(),
+		MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+		SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	mc_info->SetTexture(texture);
 
 	return obj;
 }
