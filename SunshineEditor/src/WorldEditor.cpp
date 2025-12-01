@@ -296,6 +296,14 @@ void WorldEditor::CreateDefaultScene()
 
 			pc_info->m_colliderData->SetColliderSettings(collSettings);
 		}
+
+		{
+			SE::UUID customMeshId = m_scene->AddGameObject(
+				EditorObjectFactory::CreateCustomMesh(
+					m_renderer.get(), MakeEngineAssetPath_String("Meshes/plane.obj")
+				)
+			);
+		}
 		// ----------------------------------------------------
 
 		//m_physicsSystem->FinalizeScene();
@@ -398,13 +406,6 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 
 	m_selectionPass->m_scene = m_scene.get();
 
-	{
-		SE::UUID customMeshId = m_scene->AddGameObject(
-			EditorObjectFactory::CreateCustomMesh(
-				m_renderer.get(), MakeEngineAssetPath_String("Meshes/plane.obj")
-			)
-		);
-	}
 
 	return true;
 }
