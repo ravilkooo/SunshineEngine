@@ -32,6 +32,10 @@ public:
     MeshData(MeshData&& other) noexcept;
     MeshData& operator=(MeshData&& other) noexcept;
 
+    // Serialization
+    json ToJson() const;
+    void FromJson(const json& j, ID3D11Device* device);
+
     eastl::shared_ptr<SE_G::Mesh> m_mesh;
     eastl::shared_ptr<SE_G::Bind::Texture> m_texture;
     eastl::shared_ptr<SE_G::Bind::Sampler> m_textureSampler;
@@ -39,6 +43,7 @@ public:
 
 class MeshComponent : public Component
 {
+    friend class MeshComponent_Info;
 public:
     MeshComponent() = default;
     MeshComponent(RenderComponent* rc, TransformComponent* tc, SE::UUID uuid, const eastl::string& meshPath);
@@ -64,7 +69,9 @@ public:
     void SetTextureSamplerPreset(eastl::shared_ptr<SE_G::Bind::Sampler> sampler) { m_meshData->m_textureSampler = sampler; }
     eastl::shared_ptr<SE_G::Bind::Sampler> GetTextureSamplerPreset() { return m_meshData->m_textureSampler; }
 
-    void FromJson(const json& j, ID3D11Device* device);
+    void FromJson(const json& j, ID3D11Device* device,
+        RenderComponent* rc, TransformComponent* tc,
+        SE::UUID uuid);
 
 private:
     eastl::shared_ptr<MeshData> m_meshData;
@@ -102,7 +109,9 @@ public:
 
     // Serialization
     json ToJson() const override;
-    void FromJson(const json& j, ID3D11Device* device);
+    void FromJson(const json& j, ID3D11Device* device,
+        RenderComponent_Info* rc_info, TransformComponent_Info* tc_info,
+        SE::UUID uuid);
 
     RenderComponent_Info* m_rc_info;
 };

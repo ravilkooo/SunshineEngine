@@ -160,47 +160,104 @@ void RenderComponent_Info::FromJson(const json& j) {
 
 // ----------------- MeshComponent -----------------
 
+json MeshData::ToJson() const
+{
+    json j;
+    if (m_mesh) {
+        try { j["Mesh"] = std::string(m_mesh->GetCurrentMeshPath().c_str()); }
+        catch (...) {}
+    }
+    if (m_texture) {
+        try { j["Texture"] = WStringToUtf8(m_texture->GetCurrentTexturePath()).c_str(); }
+        catch (...) {}
+    }
+    if (m_textureSampler) {
+        try { j["Sampler"] = static_cast<int>(m_textureSampler->GetPreset()); }
+        catch (...) {}
+    }
+    return j;
+}
+
+void MeshData::FromJson(const json& j, ID3D11Device* device)
+{
+    // Mesh
+    if (j.contains("Mesh") && j["Mesh"].is_string()) {
+        std::string meshPath = j["Mesh"].get<std::string>();
+        m_mesh = eastl::make_shared<SE_G::Mesh>(device, eastl::string(meshPath.c_str()));
+    }
+    else
+    {
+        m_mesh = eastl::make_shared<SE_G::Mesh>(device, "Box_repeat");
+    }
+
+    // Texture
+    if (j.contains("Texture") && j["Texture"].is_string()) {
+        eastl::wstring texPath = Utf8ToWString(j["Texture"].get<std::string>().c_str());
+        m_texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    }
+    else {
+        m_texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device,
+            MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+            SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    }
+
+    // Sampler
+    if (j.contains("Sampler")) {
+        int preset = j["Sampler"].get<int>();
+        m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(device, static_cast<SE_G::Bind::SamplerPreset>(preset));
+    }
+    else {
+        m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(device, SE_G::Bind::SamplerPreset::Wrap);
+    }
+}
+
+void MeshComponent::FromJson(const json& j, ID3D11Device* device,
+    RenderComponent* rc, TransformComponent* tc,
+    SE::UUID uuid)
+{
+    if (j.contains("Mesh") && j["Mesh"].is_string()) {
+        m_meshData = eastl::make_shared<MeshData>();
+        m_meshData->FromJson(j, device);
+
+        auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
+            rc->GetDevice(), tc, "GPass", uuid);
+        m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
+
+        m_gBufferTech->InitByMeshData(m_meshData);
+    }
+}
+
 json MeshComponent_Info::ToJson() const
 {
     json j;
 
     // prefer assigned component's mesh if present
-    if (m_assignedComponent && m_assignedComponent->GetMesh()) {
-        auto path = m_assignedComponent->GetMesh()->GetCurrentMeshPath();
-        if (!path.empty())
-            j["Mesh"] = path.c_str();
+    if (m_assignedComponent && m_assignedComponent->m_meshData) {
+        return m_assignedComponent->m_meshData->ToJson();
     }
 
     return j;
 }
 
-void MeshComponent_Info::FromJson(const json& j, ID3D11Device* device)
+void MeshComponent_Info::FromJson(const json& j, ID3D11Device* device,
+    RenderComponent_Info* rc_info, TransformComponent_Info* tc_info,
+    SE::UUID uuid)
 {
-    if (j.contains("Mesh") && j["Mesh"].is_string()) {
-        // remember the path so we can reconstruct later
-        auto meshPath = StdToEASTLString(j["Mesh"].get<std::string>());
+    m_assignedComponent = eastl::make_unique<MeshComponent>();
+    // If there's an assigned runtime component, populate it
+    if (m_assignedComponent) {
+        m_assignedComponent->FromJson(j, device, rc_info->m_assignedComponent.get(),
+            tc_info->m_assignedComponent.get(), uuid);
 
-        // ensure an assigned component exists
-        if (!m_assignedComponent)
-            m_assignedComponent = eastl::make_unique<MeshComponent>();
 
-        // If we have a valid D3D device at deserialization time, create the Mesh
-        if (device) {
-            auto loaded = eastl::make_shared<SE_G::Mesh>(device, meshPath);
-            m_assignedComponent->SetMesh(loaded);
-        }
+        rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+
+        m_rc_info = rc_info;
+
     }
-}
 
-void MeshComponent::FromJson(const json& j, ID3D11Device* device)
-{
-    if (j.contains("Mesh") && j["Mesh"].is_string()) {
-        eastl::string path = StdToEASTLString(j["Mesh"].get<std::string>());
-        if (device && !path.empty()) {
-            auto mesh = eastl::make_shared<SE_G::Mesh>(device, path);
-            SetMesh(mesh);
-        }
-    }
 }
 
 
@@ -349,6 +406,7 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::RENDER:    key = "Render"; break;
             case SE::ComponentType::PHYSICS:   key = "Physics"; break;
             case SE::ComponentType::LUA:       key = "Lua"; break;
+            case SE::ComponentType::MESH:       key = "Mesh"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -474,14 +532,15 @@ eastl::shared_ptr<Scene> Scene::FromJson(
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
             GameObjectGroup objGroup = objJ["m_group"];
-            ObjectType objType = ObjectType(objGroup, objJ["m_type"]);
             eastl::unique_ptr<GameObject> go;
-
+            ObjectType objType;
             // Unique stuff for objects groups
             // objJ;
             switch (objGroup)
             {
+
             case GameObjectGroup::Lighting:
+                objType = ObjectType(objGroup, objJ["m_type"]);
                 switch (objType.m_asLight)
                 {
                 case LightObjectType::SkyBox:
@@ -504,7 +563,7 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                 break;
 
             case GameObjectGroup::Shapes:
-
+                objType = ObjectType(objGroup, objJ["m_type"]);
                 switch (objType.m_asShape)
                 {
                 case ShapeObjectType::Box:
@@ -519,6 +578,10 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                 }
                 break;
             case GameObjectGroup::CustomMesh:
+            {
+                go = GameObjectFactory::CreateCustomMesh(
+                    renderSystem, objJ);
+            }
                 break;
             case GameObjectGroup::Other:
                 break;
@@ -566,12 +629,14 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
             GameObjectGroup objGroup = objJ["m_group"];
-            ObjectType objType = ObjectType(objGroup, objJ["m_type"]);
+            ObjectType objType;
             eastl::unique_ptr<GameObject_Info> go;
             // objJ;
             switch (objGroup)
             {
             case GameObjectGroup::Lighting:
+                objType = ObjectType(objGroup, objJ["m_type"]);
+
                 switch (objType.m_asLight)
                 {
                 case LightObjectType::SkyBox:
@@ -594,6 +659,8 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 break;
 
             case GameObjectGroup::Shapes:
+                objType = ObjectType(objGroup, objJ["m_type"]);
+
                 switch (objType.m_asShape)
                 {
                 case ShapeObjectType::Box:
@@ -612,7 +679,9 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 break;
 
             case GameObjectGroup::CustomMesh:
-                //go = eastl::make_unique<GameObject_Info>()
+            {
+                go = EditorObjectFactory::CreateCustomMesh(renderSystem, objJ);
+            }
                 break;
             case GameObjectGroup::Other:
                 break;
@@ -630,6 +699,7 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                     c->FromJson(objJ["components"]["Physics"]);
                     //physicsSystem->CreateAndBody(c);
                 }
+
 
                 scene->AddGameObject(eastl::move(go));
             }

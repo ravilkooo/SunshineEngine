@@ -43,6 +43,34 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	return obj;
 }
 
+eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
+	SE_G::DeferredRenderer* renderSystem,
+	const json& j)
+{
+
+	auto obj = eastl::make_unique<GameObject_Info>();
+
+	auto device = renderSystem->GetDevice();
+	obj->m_group = GameObjectGroup::CustomMesh;
+	obj->m_name = "CustomObject";
+
+	// TransformComponent
+	auto tc_info = obj->AddComponent<TransformComponent_Info>(device);
+	if (j["components"].contains("Transform")) {
+		tc_info->FromJson(j["components"]["Transform"], device);
+	}
+
+	// RenderComponent and techniques
+	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
+
+	auto mc_info = obj->AddComponent<MeshComponent_Info>();
+	mc_info->FromJson(j["components"]["Mesh"],
+		device, rc_info.get(),
+		tc_info.get(), obj->m_UUID);
+
+	return obj;
+}
+
 eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateBoxObject(
 	SE_G::DeferredRenderer* renderSystem,
 	float width, float height, float length)

@@ -327,7 +327,7 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
         EditorUI::FontStyles::Pop();
         
         // Button width
-        const char* labelRemove = "Remove component";
+        const char* labelRemove = "Remove Physics component";
         ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
         ImVec2 padding = ImGui::GetStyle().FramePadding;
         float labelWidth = textSize.x + padding.x * 2.0f;
@@ -984,7 +984,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     if (!(obj->m_group == GameObjectGroup::Shapes))
     {
         // Button width calculation similar to other components
-        const char* labelRemove = "Remove component";
+        const char* labelRemove = "Remove Mesh component";
         ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
         ImVec2 padding = ImGui::GetStyle().FramePadding;
         float labelWidth = textSize.x + padding.x * 2.0f;

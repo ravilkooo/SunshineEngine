@@ -52,6 +52,10 @@ namespace SE_G {
             FillUnwrappedBoxMesh_repeat(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
+        else
+        {
+            m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        }
 
         m_indexCount = static_cast<UINT>(indices.size());
         m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));

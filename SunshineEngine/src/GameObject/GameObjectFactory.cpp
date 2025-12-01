@@ -9,6 +9,8 @@
 #include <GameObject/Lighting/SkyBox.h>
 #include <GameObject/Shapes/ShapeData.h>
 
+#include <Graphics/GraphicsResources/Mesh.h>
+
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Technique/LightTechnique.h>
@@ -20,6 +22,82 @@
 
 #include <Serialization/ShapeSerialization.h>
 
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
+    SE_G::DeferredRenderer* renderSystem,
+    const json& j)
+{
+    auto obj = eastl::make_unique<GameObject>();
+    obj->m_name = "CustomObject";
+
+    auto device = renderSystem->GetDevice();
+
+    // TransformComponent
+    auto tc = obj->AddComponent<TransformComponent>(device);
+    if (j["components"].contains("Transform")) {
+        tc->FromJson(j["components"]["Transform"]);
+    }
+
+    // RenderComponent and technique
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+
+    auto mc = obj->AddComponent<MeshComponent>();
+    mc->FromJson(j["components"]["Mesh"], device, rc.get(), tc.get(), obj->m_UUID);
+
+    return obj;
+}
+
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Mesh> mesh)
+{
+    auto obj = eastl::make_unique<GameObject>();
+    obj->m_name = "CustomObject";
+
+    auto device = renderSystem->GetDevice();
+
+    // TransformComponent
+    auto tc = obj->AddComponent<TransformComponent>(device);
+
+    // RenderComponent and technique
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+
+    auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, mesh);
+
+    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+        rc->GetDevice(),
+        SE_G::Colors::UnloadedTextureColor, 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    mc->SetTexture(texture);
+
+    return obj;
+}
+
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::string filePath)
+{
+    auto obj = eastl::make_unique<GameObject>();
+    obj->m_name = "CustomObject";
+
+    auto device = renderSystem->GetDevice();
+
+    // TransformComponent
+    auto tc = obj->AddComponent<TransformComponent>(device);
+
+    // RenderComponent and technique
+    auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+
+    auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc->GetDevice(), filePath);
+    auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
+
+    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+        rc->GetDevice(),
+        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    mc->SetTexture(texture);
+
+    return obj;
+}
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
     SE_G::DeferredRenderer* renderSystem,

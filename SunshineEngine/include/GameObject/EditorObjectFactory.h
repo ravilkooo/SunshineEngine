@@ -26,6 +26,10 @@ public:
 		SE_G::DeferredRenderer* renderSystem,
 		eastl::string filePath);
 
+	static eastl::unique_ptr<GameObject_Info> CreateCustomMesh(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
 	static eastl::unique_ptr<BoxShapeObject_Info> CreateBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
 		float width, float height, float length);
