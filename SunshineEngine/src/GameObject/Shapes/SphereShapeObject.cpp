@@ -1,6 +1,7 @@
 #include <GameObject/Shapes/SphereShapeObject.h>
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Component/PhysicsComponent.h>
+#include <Component/MeshComponent.h>
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, SphereShapeData initData)
@@ -13,20 +14,18 @@ SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	m_shapeData = eastl::make_shared<SphereShapeData>(initData);
 
 	// TransformComponent
-	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+	auto tc_info = AddComponent<TransformComponent_Info>(device);
 
-	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
-	//auto tc_info = GetComponent<TransformComponent_Info>();
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-		renderSystem, tc_info->m_assignedComponent.get(), "GPass", m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(
-		device, initData.Size, initData.SliceCount, initData.StackCount);
-	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
+	auto mesh = SE_G::Mesh::CreateSphereMesh(device, initData.Size, initData.SliceCount, initData.StackCount);
+	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, mesh);
 
-	rc_info->AddTechnique(eastl::move(gBufferTech));
+	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+		rc_info->GetDevice(),
+		MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+		SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	mesh_info->SetTexture(texture);
 }
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE_G::DeferredRenderer* renderSystem, SphereShapeData initData) :
@@ -48,24 +47,22 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	auto device = renderSystem->GetDevice();
 
 	// TransformComponent
-	auto tc_info = obj->AddComponent<TransformComponent_Info>();
+	auto tc_info = obj->AddComponent<TransformComponent_Info>(device);
 	if (j["components"].contains("Transform")) {
 		tc_info->FromJson(j["components"]["Transform"], device);
 	}
-	else {
-		tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
-	}
 
 	// RenderComponent and technique
-	auto rc_info = obj->AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateSphereMesh(
-		device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
-	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"));
-	rc_info->AddTechnique(eastl::move(gBufferTech));
+	auto newMesh = SE_G::Mesh::CreateSphereMesh(device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
+	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
+
+	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+		rc_info->GetDevice(),
+		MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+		SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	mesh_info->SetTexture(texture);
 
 	// PhysicsComponent
 	/*
@@ -100,8 +97,8 @@ void SphereShapeObject_Info::SetSize(SE_G::DeferredRenderer* renderSystem, DXSM:
 		eastl::shared_ptr<SE_G::Mesh> newMesh =
 			SE_G::Mesh::CreateSphereMesh(renderSystem->GetDevice(),
 				newSize, m_shapeData->SliceCount, m_shapeData->StackCount);
-		auto rc = GetComponent<RenderComponent_Info>();
-		rc->SetMesh(newMesh);
+		auto mc = GetComponent<MeshComponent_Info>();
+		mc->m_assignedComponent->SetMesh(newMesh);
 	}
 }
 
@@ -111,8 +108,8 @@ void SphereShapeObject_Info::SetSliceCount(SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Mesh> newMesh =
 			SE_G::Mesh::CreateSphereMesh(renderSystem->GetDevice(),
 				m_shapeData->Size, m_shapeData->SliceCount, m_shapeData->StackCount);
-		auto rc = GetComponent<RenderComponent_Info>();
-		rc->SetMesh(newMesh);
+		auto mc = GetComponent<MeshComponent_Info>();
+		mc->m_assignedComponent->SetMesh(newMesh);
 	}
 }
 
@@ -122,7 +119,7 @@ void SphereShapeObject_Info::SetStackCount(SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Mesh> newMesh =
 			SE_G::Mesh::CreateSphereMesh(renderSystem->GetDevice(),
 				m_shapeData->Size, m_shapeData->SliceCount, m_shapeData->StackCount);
-		auto rc = GetComponent<RenderComponent_Info>();
-		rc->SetMesh(newMesh);
+		auto mc = GetComponent<MeshComponent_Info>();
+		mc->m_assignedComponent->SetMesh(newMesh);
 	}
 }

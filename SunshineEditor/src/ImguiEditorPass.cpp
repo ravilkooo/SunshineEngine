@@ -7,6 +7,7 @@
 
 #include <Component/LuaComponent.h>
 #include <Utils/DebugUtils.h>
+#include <UI/FontStyles.h>
 
 
 ImguiEditorPass::ImguiEditorPass(
@@ -55,14 +56,12 @@ ImguiEditorPass::ImguiEditorPass(
 
 	selectedUUID = SE::UUID(0u);
 
-	// Change font to Arial to support Russian
 	ImGuiIO& io = ImGui::GetIO();
-	ImFont* fontArial = io.Fonts->AddFontFromFileTTF(
-		MakeEngineAssetPath_String("Fonts/Arial.ttf").c_str(), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
-		13.0f);
-	io.FontDefault = fontArial;
+	// Init fonts
+	EditorUI::FontStyles::Init(io);
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
+
 }
 
 void ImguiEditorPass::SetVieportGBuffer(

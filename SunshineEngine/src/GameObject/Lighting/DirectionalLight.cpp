@@ -27,7 +27,7 @@ DirectionalLight::DirectionalLight(
 	tc->m_position = initData.Position;
 
 	// RenderComponent and Passess
-	auto rc = eastl::make_shared<RenderComponent>(renderSystem);
+	auto rc = eastl::make_shared<RenderComponent>(m_UUID, renderSystem);
 
 	// LightPass - LightTechnique
 	auto lightTech =
@@ -71,7 +71,7 @@ DirectionalLight::DirectionalLight(
 	tc->m_position = m_lightData->Position;
 
 	// RenderComponent and Passes
-	auto rc = AddComponent<RenderComponent>(renderSystem);
+	auto rc = AddComponent<RenderComponent>(m_UUID, renderSystem);
 
 	// LightPass - LightTechnique
 	auto lightTech =
@@ -128,17 +128,30 @@ DirectionalLight_Info::DirectionalLight_Info(
 	auto device = renderSystem->GetDevice();
 
 	// TransformComponent
-	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+	auto tc_info = AddComponent<TransformComponent_Info>(device);
 	tc_info->m_assignedComponent->m_position = initData.Position;
 
 	// RenderComponent and Passes
-	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
 	// LightPass - LightTechnique
 	auto lightTech =
 		eastl::make_unique<SE_G::DirectionalLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+
+	if (castsShadow)
+	{
+		//renderSystem->
+		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
+
+		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
+			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
+				renderSystem->GetDevice(), renderSystem->GetDeviceContext(),
+				gPass, m_lightData)));
+
+		lightTech->AssignShadowMapPass(m_shadowMapPass);
+		lightTech->EnableShadow();
+	}
+
 	m_lightTech = static_cast<SE_G::DirectionalLightTechnique*>(rc_info->AddTechnique(eastl::move(lightTech)));
 
 	// IconPass
@@ -162,18 +175,14 @@ DirectionalLight_Info::DirectionalLight_Info(
 	auto device = renderSystem->GetDevice();
 
 	// TransformComponent
-	auto tc_info = AddComponent<TransformComponent_Info>();
+	auto tc_info = AddComponent<TransformComponent_Info>(device);
 	if (j["components"].contains("Transform")) {
 		tc_info->FromJson(j["components"]["Transform"], device);
-	}
-	else {
-		tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 	}
 	tc_info->m_assignedComponent->m_position = m_lightData->Position;
 
 	// RenderComponent and Passes
-	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
 	// LightPass - LightTechnique
 	auto lightTech =

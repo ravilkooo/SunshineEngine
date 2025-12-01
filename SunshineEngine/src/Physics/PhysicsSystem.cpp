@@ -127,17 +127,17 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
         //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(bodyEntry.m_joltBodyId);
 
         JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
-        JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);        
-        
+        JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);
+
         SE::UUID objectUUID = SE::UUID((std::uint64_t) m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
 
-        auto tr = scene->GetGameObjectByUUID(
+        auto tc = scene->GetGameObjectByUUID(
             objectUUID)->GetComponent<TransformComponent>();
 
-        tr->m_position =
+        tc->m_position =
             DXSM::Vector3(position.mF32
             );
-        tr->m_rotation =
+        tc->m_rotation =
             DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
             );
     }

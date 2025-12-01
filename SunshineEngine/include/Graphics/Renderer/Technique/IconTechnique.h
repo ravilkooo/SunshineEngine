@@ -1,7 +1,14 @@
 #pragma once
 #include "RenderTechnique.h"
 #include <Graphics/Bindable/ConstantBuffer.h>
+#include <Graphics/GraphicsResources/VertexShader.h>
+#include "Graphics/Bindable/VertexBuffer.h"
 #include <Utils/UUID.h>
+
+#include <SimpleMath.h>
+
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 namespace SE_G {
     struct IconData {

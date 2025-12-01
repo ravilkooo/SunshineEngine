@@ -1,6 +1,14 @@
 #pragma once
 #include "RenderTechnique.h"
+
 #include <Graphics/Bindable/ConstantBuffer.h>
+#include <Graphics/GraphicsResources/VertexShader.h>
+#include <Graphics/GraphicsResources/PixelShader.h>
+#include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/Bindable/BlendState.h>
+#include <Graphics/Bindable/Rasterizer.h>
+#include <Graphics/Bindable/DepthStencilState.h>
+
 #include <Graphics/Utils/Camera.h>
 #include <Graphics/Lighting/LightData.h>
 

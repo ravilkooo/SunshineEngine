@@ -86,6 +86,7 @@ class TransformComponent_Info : public Component_Info
 {
 public:
     TransformComponent_Info() {};
+    TransformComponent_Info(ID3D11Device* device);
     ~TransformComponent_Info();
 
     static const SE::ComponentType s_componentType = SE::ComponentType::TRANSFORM;

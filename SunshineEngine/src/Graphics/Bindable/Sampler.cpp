@@ -17,7 +17,7 @@ namespace SE_G {
 			SamplerPreset preset, UINT slot,
 			PipelineStage pipelineStage)
 			: slot(slot), m_pipelineStage(pipelineStage), m_preset(preset) {
-			ChangeSampler(device, preset);
+			ChangePreset(device, preset);
 		}
 
 		Sampler::~Sampler() {
@@ -32,9 +32,11 @@ namespace SE_G {
 			}
 		}
 
-		void Sampler::ChangeSampler(ID3D11Device* device, SamplerPreset preset) {
+		void Sampler::ChangePreset(ID3D11Device* device, SamplerPreset preset) {
 			Release();
 			D3D11_SAMPLER_DESC samplerDesc;
+			m_preset = preset;
+
 			switch (preset)
 			{
 			case SamplerPreset::Wrap:
@@ -62,6 +64,8 @@ namespace SE_G {
 			isNull = false;
 		}
 
+		SamplerPreset Sampler::GetPreset() { return m_preset; }
+
 		void Sampler::Bind(ID3D11DeviceContext* context) noexcept
 		{
 			if (m_pipelineStage == PipelineStage::PIXEL_SHADER)
@@ -69,7 +73,6 @@ namespace SE_G {
 			else if (m_pipelineStage == PipelineStage::COMPUTE_SHADER)
 				context->CSSetSamplers(slot, 1u, pSampler.GetAddressOf());
 		}
-
 
 		// Preset for D3D11_TEXTURE_ADDRESS_WRAP
 		D3D11_SAMPLER_DESC Sampler::WrapDesc()

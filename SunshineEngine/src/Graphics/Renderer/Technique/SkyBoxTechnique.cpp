@@ -1,4 +1,5 @@
 #include "Graphics/Renderer/Technique/SkyBoxTechnique.h"
+#include <Graphics/GraphicsResources/Mesh.h>
 #include <Utils/StringUtils.h>
 #include <Component/TransformComponent.h>
 
@@ -50,7 +51,7 @@ namespace SE_G {
             );
         }
 
-        m_textureSampler = eastl::make_unique<SE_G::Bind::Sampler>(
+        m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
             device,
             CD3D11_SAMPLER_DESC(CD3D11_DEFAULT{}),
             1u,

@@ -7,7 +7,6 @@
 
 #include <GameObject/GameObject.h>
 #include <GameObject/Lighting/LightObject.h>
-#include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/Lighting/LightData.h>
 #include <Graphics/Renderer/Technique/DirectionalLightTechnique.h>
 
@@ -66,6 +65,7 @@ public:
             DXSM::Vector3::Zero, 0,
             DXSM::Vector3(1, -1, 1), 0
         }, bool castsShadow = true);
+
     DirectionalLight_Info(
         SE_G::DeferredRenderer* renderSystem,
         eastl::shared_ptr<SE_G::Camera> camera,

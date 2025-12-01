@@ -4,7 +4,6 @@
 #include <SimpleMath.h>
 #include <directxmath.h>
 
-#include <Graphics/GraphicsResources/VertexShader.h>
 #include "Graphics/Utils/ShapeGenerator.h"
 #include "Graphics/Utils/Camera.h"
 #include "Graphics/Bindable/BindableCollection.h"

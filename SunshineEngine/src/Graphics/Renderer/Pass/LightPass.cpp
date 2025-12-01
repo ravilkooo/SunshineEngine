@@ -134,8 +134,8 @@ namespace SE_G {
 
 			BindAllPerFrame();
 			m_camera->BindBuffer(context.Get());
-			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-			tech->Pass(GetDeviceContext());
+			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech.second->Pass(GetDeviceContext());
 		}
 
 		ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr, nullptr, nullptr };

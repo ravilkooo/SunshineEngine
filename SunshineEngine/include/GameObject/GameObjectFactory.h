@@ -14,6 +14,7 @@ class GameObject;
 
 namespace SE_G {
 	class DeferredRenderer;
+	class Mesh;
 }
 
 class AmbientLight;
@@ -24,6 +25,18 @@ class SkyBox;
 class GameObjectFactory
 {
 public:
+	static eastl::unique_ptr<GameObject> CreateCustomMesh(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
+	static eastl::unique_ptr<GameObject> CreateCustomMesh(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::shared_ptr<SE_G::Mesh> mesh);
+
+	static eastl::unique_ptr<GameObject> CreateCustomMesh(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::string filePath);
+
 	static eastl::unique_ptr<GameObject> CreateBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
 		float width, float height, float length);

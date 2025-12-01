@@ -13,6 +13,64 @@
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
+
+eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
+	SE_G::DeferredRenderer* renderSystem,
+	eastl::string filePath)
+{
+
+	auto obj = eastl::make_unique<GameObject_Info>();
+
+	auto device = renderSystem->GetDevice();
+	obj->m_group = GameObjectGroup::CustomMesh;
+	obj->m_name = "CustomObject";
+
+	// TransformComponent
+	auto tc_info = obj->AddComponent<TransformComponent_Info>(device);
+
+	// RenderComponent and techniques
+	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
+
+	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc_info->GetDevice(), filePath);
+	auto mc_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, meshPtr);
+
+	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+		rc_info->GetDevice(),
+		MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+		SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	mc_info->SetTexture(texture);
+
+	return obj;
+}
+
+eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
+	SE_G::DeferredRenderer* renderSystem,
+	const json& j)
+{
+
+	auto obj = eastl::make_unique<GameObject_Info>();
+
+	auto device = renderSystem->GetDevice();
+	obj->m_group = GameObjectGroup::CustomMesh;
+	obj->m_name = "CustomObject";
+
+	// TransformComponent
+	auto tc_info = obj->AddComponent<TransformComponent_Info>(device);
+	if (j["components"].contains("Transform")) {
+		tc_info->FromJson(j["components"]["Transform"], device);
+	}
+
+	// RenderComponent and techniques
+	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
+
+	auto mc_info = obj->AddComponent<MeshComponent_Info>();
+	mc_info->FromJson(j["components"]["Mesh"],
+		device, rc_info.get(),
+		tc_info.get(), obj->m_UUID);
+
+	return obj;
+}
+
 eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateBoxObject(
 	SE_G::DeferredRenderer* renderSystem,
 	float width, float height, float length)

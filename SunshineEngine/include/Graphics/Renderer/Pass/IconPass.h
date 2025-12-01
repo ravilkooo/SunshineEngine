@@ -4,8 +4,17 @@
 #include <Graphics/Utils/Camera.h>
 #include <Utils/UUID.h>
 #include <GameObject/Lighting/LightCollection.h>
-#include <Graphics/GraphicsResources/Texture.h>
-#include <Graphics/Bindable/DepthStencilState.h>
+// forward declare bindable resources used by IconPass to reduce includes
+namespace SE_G { namespace Bind {
+    class VertexShader;
+    class GeometryShader;
+    class PixelShader;
+    class Texture;
+    class DepthStencilState;
+    class Sampler;
+    template<typename> class GeometryConstantBuffer;
+    template<typename> class PixelConstantBuffer;
+} }
 
 namespace SE_G {
     class IconPass :

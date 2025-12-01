@@ -30,7 +30,7 @@ PointLight::PointLight(
     tc->m_position = initData.Position;
 
     // RenderComponent and Passes
-    auto rc = eastl::make_shared<RenderComponent>(renderSystem);
+    auto rc = eastl::make_shared<RenderComponent>(m_UUID, renderSystem);
 
     // LightPass - LightTechnique
     auto lightTech =
@@ -58,7 +58,7 @@ PointLight::PointLight(
     tc->m_position = m_lightData->Position;
 
     // RenderComponent and Passes
-    auto rc = AddComponent<RenderComponent>(renderSystem);
+    auto rc = AddComponent<RenderComponent>(m_UUID, renderSystem);
 
     // LightPass - LightTechnique
     auto lightTech =
@@ -88,13 +88,11 @@ PointLight_Info::PointLight_Info(
     auto device = renderSystem->GetDevice();
 
     // TransformComponent
-    auto tc_info = AddComponent<TransformComponent_Info>();
-    tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+    auto tc_info = AddComponent<TransformComponent_Info>(device);
     tc_info->m_assignedComponent->m_position = initData.Position;
 
     // RenderComponent and Passes
-    auto rc_info = AddComponent<RenderComponent_Info>();
-    rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+    auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
     // LightPass - LightTechnique
     auto lightTech =
@@ -123,18 +121,14 @@ PointLight_Info::PointLight_Info(
     auto device = renderSystem->GetDevice();
 
     // TransformComponent
-    auto tc_info = AddComponent<TransformComponent_Info>();
+    auto tc_info = AddComponent<TransformComponent_Info>(device);
     if (j["components"].contains("Transform")) {
         tc_info->FromJson(j["components"]["Transform"], device);
-    }
-    else {
-        tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
     }
     tc_info->m_assignedComponent->m_position = m_lightData->Position;
 
     // RenderComponent and Passes
-    auto rc_info = AddComponent<RenderComponent_Info>();
-    rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+    auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
     // LightPass - LightTechnique
     auto lightTech =

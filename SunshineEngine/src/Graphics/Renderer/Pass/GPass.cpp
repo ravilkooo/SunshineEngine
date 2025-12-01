@@ -76,8 +76,8 @@ namespace SE_G {
 		}
 		*/
 		for (auto& tech : m_techniques) {
-			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-			tech->Pass(GetDeviceContext());
+			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech.second->Pass(GetDeviceContext());
 		}
 	}
 

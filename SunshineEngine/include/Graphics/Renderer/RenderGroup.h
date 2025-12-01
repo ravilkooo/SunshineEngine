@@ -18,7 +18,9 @@ namespace SE_G {
 		// == void RenderScene();
 		virtual void Pass();
 		virtual RenderPass* AddPass(eastl::unique_ptr<RenderPass> pass);
-		RenderTechnique* AddTechnique(eastl::unique_ptr<RenderTechnique> tech);
+		RenderTechnique* AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech);
+		RenderTechnique* GetTechnique(SE::UUID uuid, eastl::string techniqueTag);
+		void RemoveTechnique(SE::UUID uuid, eastl::string techniqueTag);
 
 		bool IsEnabled();
 		void Disable();
