@@ -110,6 +110,15 @@ public:
     void RemoveTechnique(eastl::string technique) {
         if (techniques.find(technique) != techniques.end())
         {
+            if (technique == "GPass")
+            {
+                m_selectionTechnique = nullptr;
+                if (HasTechnique("IconPass"))
+                {
+                    m_selectionTechnique = m_assignedComponent->GetTechnique("IconPass");
+                }
+            }
+
             techniques.erase(technique);
             m_assignedComponent->RemoveTechnique(technique);
         }

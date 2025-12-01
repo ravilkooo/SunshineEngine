@@ -5,6 +5,9 @@
 #include "Component/RenderComponent.h"
 #include "Component/PhysicsComponent.h"
 #include "Component/MeshComponent.h"
+#include <Graphics/GraphicsResources/Mesh.h>
+#include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/Bindable/Sampler.h>
 #include "Component/LuaComponent.h"
 #include "DirectXMath.h"
 #include "GameObject/Lighting/LightObject.h"
@@ -105,6 +108,7 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
         
         ImGui::TreePop();
     }
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawDetails(GameObject_Info* obj)
@@ -185,9 +189,11 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
             }
         }
 
+        DrawMeshComponent(obj);
         DrawPhysicsComponent(obj);
         ImGui::TreePop();
     }
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawAmbientLightDetails(SE_G::AmbientLightData* lightData)
@@ -317,11 +323,11 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
         ImGui::Separator();
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        const char* labelRemove = "Remove component";
         ImGui::Text("Physics Settings");
         EditorUI::FontStyles::Pop();
         
         // Button width
+        const char* labelRemove = "Remove component";
         ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
         ImVec2 padding = ImGui::GetStyle().FramePadding;
         float labelWidth = textSize.x + padding.x * 2.0f;
@@ -382,13 +388,12 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
                 colliderData->SetShapeType(currentShape);
             }
             
+            /*
             auto transformData = colliderData->GetTransformData();
             bool transformChanged = false;
-            
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
                               ImGuiTreeNodeFlags_SpanAvailWidth;
-    
             if (ImGui::TreeNodeEx("Collider Transform", flags))
             {
                 if (DrawVector3Control("Offset", transformData.m_offset, 0.0f))
@@ -400,17 +405,14 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
                     transformData.m_rotation = rotationDeg * (DirectX::XM_PI / 180.0f);
                     transformChanged = true;
                 }
-                
-                if (DrawVector3Control("Scale", transformData.m_scale, 1.0f))
-                    transformChanged = true;
         
                 ImGui::TreePop();
             }
-            
             if (transformChanged)
             {
                 colliderData->SetTransformData(transformData);
             }
+            */
 
             auto settings = colliderData->GetColliderSettings();
             bool settingsChanged = false;
@@ -964,4 +966,91 @@ bool PropertyPanel::DrawVector3Control(const char* label, DirectX::SimpleMath::V
     ImGui::PopID();
     
     return changed;
+}
+
+void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<MeshComponent_Info>())
+        return;
+
+    auto meshInfo = obj->GetComponent<MeshComponent_Info>();
+
+    ImGui::Separator();
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    ImGui::Text("Mesh");
+    EditorUI::FontStyles::Pop();
+
+    if (!(obj->m_group == GameObjectGroup::Shapes))
+    {
+        // Button width calculation similar to other components
+        const char* labelRemove = "Remove component";
+        ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
+        ImVec2 padding = ImGui::GetStyle().FramePadding;
+        float labelWidth = textSize.x + padding.x * 2.0f;
+
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        avail.x = avail.x - textSize.x;
+
+        if (avail.x > labelWidth) {
+            // put on the same line
+            float oldX = ImGui::GetCursorPosX();
+            ImGui::SameLine();
+            ImGui::SetCursorPosX(oldX + avail.x);
+        }
+
+        if (ImGui::SmallButton(labelRemove)) {
+            obj->RemoveComponent<MeshComponent_Info>();
+            return; // component removed, nothing to draw
+        }
+    }
+
+    // Draw mesh info
+    if (!meshInfo->IsAssigned()) {
+        ImGui::TextDisabled("No mesh assigned");
+        return;
+    }
+
+    auto assigned = meshInfo->m_assignedComponent.get();
+    if (!assigned) {
+        ImGui::TextDisabled("(mesh component not initialized)");
+        return;
+    }
+
+    // Mesh path
+    auto meshPtr = assigned->GetMesh();
+    if (meshPtr) {
+        eastl::string path = meshPtr->GetCurrentMeshPath();
+        ImGui::Text("Mesh: %s", path.c_str());
+    } else {
+        ImGui::TextDisabled("Mesh: (procedural or empty)");
+    }
+
+    // Texture
+    auto tex = assigned->GetTexture();
+    if (tex) {
+        eastl::wstring tpath = tex->GetCurrentTexturePath();
+        // convert wstring to narrow string for ImGui display
+        std::wstring ws = tpath.c_str();
+        std::string s(ws.begin(), ws.end());
+        ImGui::Text("Texture: %s", s.c_str());
+    } else {
+        ImGui::TextDisabled("Texture: (none)");
+    }
+
+    // Sampler
+    auto sampler = assigned->GetTextureSamplerPreset();
+    if (sampler) {
+        auto preset = sampler->GetPreset();
+        const char* presetName = "Unknown";
+        switch (preset) {
+        case SE_G::Bind::SamplerPreset::Wrap: presetName = "Wrap"; break;
+        case SE_G::Bind::SamplerPreset::Mirror: presetName = "Mirror"; break;
+        case SE_G::Bind::SamplerPreset::Clamp: presetName = "Clamp"; break;
+        case SE_G::Bind::SamplerPreset::Border: presetName = "Border"; break;
+        }
+        ImGui::Text("Sampler: %s", presetName);
+    } else {
+        ImGui::TextDisabled("Sampler: (none)");
+    }
 }

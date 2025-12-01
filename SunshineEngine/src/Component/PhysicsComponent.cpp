@@ -38,7 +38,7 @@ void PhysicsComponent::SetShape(JPH::ShapeRefC shapePtr) { m_shape = shapePtr; }
 void PhysicsComponent::InitTransforms(TransformComponent* tc)
 {
     transformComp = tc;
-
+    
     m_position.Set(tc->m_position.x, tc->m_position.y, tc->m_position.z);
     auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(tc->m_rotation.y, tc->m_rotation.x, tc->m_rotation.z);
     m_orientation.Set(quat.x, quat.y, quat.z, quat.w);

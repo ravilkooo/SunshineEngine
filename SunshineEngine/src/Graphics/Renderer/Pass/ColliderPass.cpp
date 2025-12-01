@@ -96,15 +96,27 @@ namespace SE_G {
 		// Default shapes
 		s_shapesVertexBuffer->Bind(context.Get());
 		s_shapesIndexBuffer->Bind(context.Get());
-		for (auto& tech : m_techniques) {
+		for (auto& tech : m_techniques)
+		{
+			DXSM::Vector3 old_scaleFactor = tech.second->m_assignedTransform->m_scaleFactor;
+			tech.second->m_assignedTransform->m_scaleFactor = DXSM::Vector3::One;
+
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
+
+			tech.second->m_assignedTransform->m_scaleFactor = old_scaleFactor;
 		}
 
 		// Custom shapes
-		for (auto& tech : m_customTechniques) {
+		for (auto& tech : m_customTechniques)
+		{
+			DXSM::Vector3 old_scaleFactor = tech->m_assignedTransform->m_scaleFactor;
+			tech->m_assignedTransform->m_scaleFactor = DXSM::Vector3::One;
+
 			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech->Pass(GetDeviceContext());
+
+			tech->m_assignedTransform->m_scaleFactor = old_scaleFactor;
 		}
 	}
 

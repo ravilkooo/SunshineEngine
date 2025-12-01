@@ -51,6 +51,7 @@ private:
     void DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj);
 
     void DrawPhysicsComponent(GameObject_Info* obj);
+    void DrawMeshComponent(GameObject_Info* obj);
 
     void DrawLuaComponent(GameObject_Info* obj);
     void DrawLuaFunctions(LuaComponent* luaComp);

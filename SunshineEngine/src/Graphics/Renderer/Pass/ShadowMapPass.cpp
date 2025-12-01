@@ -192,9 +192,11 @@ namespace SE_G {
 				tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 				// tech.second->BindAll(GetDeviceContext());
 
-				if (tech.second->m_mesh)
-					tech.second->m_mesh->Bind(context.Get());
-
+				if (tech.second->GetTechniqueTag() == "GPass")
+				{
+					auto gTech = static_cast<GPassTechnique*>(tech.second.get());
+					gTech->m_meshData->m_mesh->Bind(context.Get());
+				}
 
 				tech.second->DrawTechnique(GetDeviceContext());
 			}

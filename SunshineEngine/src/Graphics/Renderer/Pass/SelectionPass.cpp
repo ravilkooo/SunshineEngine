@@ -132,6 +132,12 @@ namespace SE_G {
 			auto renderComp_info = gameObject_info->GetComponent<RenderComponent_Info>();
 			auto transformComponent = gameObject_info->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
+			if (!renderComp_info->HasTechnique("GPass") && !renderComp_info->HasTechnique("IconPass")
+				|| !(renderComp_info->m_selectionTechnique))
+			{
+				return;
+			}
+
 			auto actualLocalScaleFactor = DXSM::Vector3(transformComponent->m_localScaleFactor);
 
 			renderComp_info->m_selectionTechnique->BindAll(context.Get());
@@ -151,7 +157,36 @@ namespace SE_G {
 				GetDeviceContext()
 			);
 
-			if (renderComp_info->HasTechnique("IconPass")) {
+			if (renderComp_info->HasTechnique("GPass")) {
+				//renderComp_info->techniques["GPass"]->mesh->Bind(context.Get());
+
+				m_meshVertexShader->Bind(context.Get());
+				context->PSSetShader(nullptr, nullptr, 0u);
+				//context->RSSetState(nullptr, 0u);
+
+				//renderComp_info->techniques["GPass"]->mesh->Draw(context.Get());
+				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
+
+				// Step2 (draw color and mask out)
+				// MaskOut
+				renderComp_info->m_selectionTechnique->BindAll(context.Get());
+				context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
+				context->RSSetViewports(1, &m_viewport);
+
+				context->OMSetDepthStencilState(m_depthStencilReadMask.Get(), 1);
+				m_pixelShader->Bind(context.Get());
+
+				transformComponent->m_localScaleFactor *= 1.08f;
+				transformComponent->BindToGraphicsPipeline(
+					GetDeviceContext()
+				);
+
+				//renderComp_info->techniques["GPass"]->mesh->Draw(context.Get());
+				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
+
+				transformComponent->m_localScaleFactor = actualLocalScaleFactor;
+			}
+			else if (renderComp_info->HasTechnique("IconPass")) {
 
 				// Bind IconSelectionShader (VertexShader)
 				// Don't bind object texture and sampler for this
@@ -178,35 +213,6 @@ namespace SE_G {
 				m_selectionBuffer->Bind(context.Get());
 
 				renderComp_info->m_selectionTechnique->BindAll(context.Get());
-				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
-
-				transformComponent->m_localScaleFactor = actualLocalScaleFactor;
-			}
-			else if (renderComp_info->HasTechnique("GPass")) {
-				//renderComp_info->techniques["GPass"]->mesh->Bind(context.Get());
-
-				m_meshVertexShader->Bind(context.Get());
-				context->PSSetShader(nullptr, nullptr, 0u);
-				//context->RSSetState(nullptr, 0u);
-
-				//renderComp_info->techniques["GPass"]->mesh->Draw(context.Get());
-				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
-
-				// Step2 (draw color and mask out)
-				// MaskOut
-				renderComp_info->m_selectionTechnique->BindAll(context.Get());
-				context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
-				context->RSSetViewports(1, &m_viewport);
-
-				context->OMSetDepthStencilState(m_depthStencilReadMask.Get(), 1);
-				m_pixelShader->Bind(context.Get());
-
-				transformComponent->m_localScaleFactor *= 1.08f;
-				transformComponent->BindToGraphicsPipeline(
-					GetDeviceContext()
-				);
-
-				//renderComp_info->techniques["GPass"]->mesh->Draw(context.Get());
 				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
 
 				transformComponent->m_localScaleFactor = actualLocalScaleFactor;

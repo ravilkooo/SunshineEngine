@@ -303,6 +303,9 @@ void PhysicsComponent::FromJson(const json& j) {
                 break;
         }
 
+        m_transformsData.m_offset = info.m_colliderData->GetTransformData().m_offset;
+        m_transformsData.m_rotation = info.m_colliderData->GetTransformData().m_rotation;
+
         if (shapeResult.IsValid()) {
             m_shape = shapeResult.Get();
         }
