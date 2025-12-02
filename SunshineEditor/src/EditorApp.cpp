@@ -97,6 +97,7 @@ void EditorApp::RunApp()
 	{
 		ChooseProject();
 	}
+	imguiEditorPass->InitHierarchy();
 	ContentBrowserPanel::s_AssetsDirectory =
 		std::filesystem::path(m_openedProject->GetFullPath().c_str());
 	
@@ -674,9 +675,10 @@ void EditorApp::RemoveProject()
 bool EditorApp::OpenProject()
 {
 	/*
-	m_worldEditor->CreateDefaultScene();
+	m_worldEditor->CreateParentTestScene();
 	return true;
 	*/
+	
 	
 	return m_worldEditor->LoadScene(JoinWchar_Wstring(
 		m_openedProject->GetFullPath().c_str(),

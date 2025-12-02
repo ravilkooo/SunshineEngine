@@ -70,6 +70,7 @@ public:
     void ClearScene();
     
     void CreateDefaultScene();
+    void CreateParentTestScene();
     void SaveScene(const wchar_t* scenePath);
     bool LoadScene(const wchar_t* scenePath);
 

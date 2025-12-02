@@ -2,6 +2,7 @@
 
 #include <xhash>
 #include <EASTL/hash_map.h>
+#include <sstream>
 
 struct UUIDhilo
 {
@@ -32,6 +33,13 @@ namespace SE
         }
 
         uint64_t m_UUID;
+
+        std::string ToString()
+        {
+            std::ostringstream ss;
+            ss << m_UUID;
+            return ss.str();
+        }
     };
 }
 

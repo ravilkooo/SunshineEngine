@@ -36,7 +36,7 @@
                     ]
                 }
             },
-            "m_UUID": 10342700453611063179,
+            "m_UUID": 10349756182875634575,
             "m_group": "Lighting",
             "m_lightData": {
                 "Power": 0.0,
@@ -120,7 +120,7 @@
                     ]
                 }
             },
-            "m_UUID": 16055517535643138601,
+            "m_UUID": 15551142850770219886,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_parent": null,
@@ -199,9 +199,13 @@
                     ]
                 }
             },
-            "m_UUID": 15796118175998089090,
+            "m_UUID": 1179623425869587445,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": false,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -279,9 +283,13 @@
                     ]
                 }
             },
-            "m_UUID": 10083651771455789577,
+            "m_UUID": 13836700115024532676,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": false,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -359,9 +367,13 @@
                     ]
                 }
             },
-            "m_UUID": 16118607533608304084,
+            "m_UUID": 5252445742742597294,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": false,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -439,9 +451,13 @@
                     ]
                 }
             },
-            "m_UUID": 10927559828151054357,
+            "m_UUID": 16981128559790429414,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": false,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -519,9 +535,13 @@
                     ]
                 }
             },
-            "m_UUID": 1636167872992725476,
+            "m_UUID": 2639839029316881779,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": false,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -599,9 +619,13 @@
                     ]
                 }
             },
-            "m_UUID": 5365493739560341006,
+            "m_UUID": 646582510600955799,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": false,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -649,7 +673,7 @@
                     ]
                 }
             },
-            "m_UUID": 15563290516189474870,
+            "m_UUID": 15350749837127902739,
             "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
@@ -700,7 +724,7 @@
                     ]
                 }
             },
-            "m_UUID": 2232075412692994267,
+            "m_UUID": 6433801847370492395,
             "m_group": "Lighting",
             "m_lightData": {
                 "Diffuse": {
@@ -768,7 +792,7 @@
                     ]
                 }
             },
-            "m_UUID": 2434990236523965749,
+            "m_UUID": 4259055904536338598,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
@@ -870,7 +894,7 @@
                     ]
                 }
             },
-            "m_UUID": 7762742091813298621,
+            "m_UUID": 2729350038267267073,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_parent": null,
@@ -950,9 +974,13 @@
                     ]
                 }
             },
-            "m_UUID": 6262391893528170957,
+            "m_UUID": 2232906597439411555,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": false,
+                "uuid": 2729350038267267073
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 0.5,
@@ -970,35 +998,6 @@
                     "Mesh": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Meshes/plane.obj",
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
-                },
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "box": {
-                                "size": [
-                                    1.0,
-                                    0.4000000059604645,
-                                    1.0
-                                ]
-                            }
-                        },
-                        "shapeType": "Box",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
                 },
                 "Render": null,
                 "Transform": {
@@ -1018,8 +1017,8 @@
                         1.0
                     ],
                     "m_position": [
-                        -1.2999999523162842,
-                        0.20000000298023224,
+                        0.0,
+                        0.0,
                         0.0
                     ],
                     "m_rotation": [
@@ -1034,9 +1033,13 @@
                     ]
                 }
             },
-            "m_UUID": 2707831331918171364,
+            "m_UUID": 9113710987823197044,
             "m_group": "CustomMesh",
-            "m_name": "CustomObject"
+            "m_name": "CustomObject",
+            "m_parent": {
+                "attached": false,
+                "uuid": 2232906597439411555
+            }
         }
     ]
 }

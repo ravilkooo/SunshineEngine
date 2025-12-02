@@ -375,11 +375,16 @@ void PhysicsComponent::FromJson(const json& j) {
 
 
 // ----------------- GameObject_Info -----------------
+
+
 json GameObject_Info::ToJson() const {
     json j;
     j["m_name"] = m_name.c_str();
     j["m_UUID"] = (uint64_t)m_UUID;
     j["m_group"] = m_group;
+    j["m_parent"] = m_parent.ToJson();
+    
+
     switch (m_group)
     {
     case GameObjectGroup::Lighting:
@@ -600,10 +605,17 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     //physicsSystem->CreateAndBody(c);
                 }
                 
+                // Parentnes
+                if (objJ.contains("m_parent"))
+                {
+                    go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
+                }
+
                 scene->AddGameObject(eastl::move(go));
             }
         }
     }
+    scene->RestoreParents();
     return scene;
 }
 
@@ -700,10 +712,16 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                     //physicsSystem->CreateAndBody(c);
                 }
 
+                // Parentnes
+                if (objJ.contains("m_parent"))
+                {
+                    go->SetParent(ParentNode<GameObject_Info>::FromJson(objJ["m_parent"]));
+                }
 
                 scene->AddGameObject(eastl::move(go));
             }
         }
     }
+    scene->RestoreParents();
     return scene;
 }

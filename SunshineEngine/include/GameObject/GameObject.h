@@ -18,6 +18,8 @@
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>
 
+#include <GameObject/ParentNode.h>
+
 //#include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <Utils/StringUtils.h>
@@ -95,6 +97,35 @@ public:
 
     virtual void Update(float deltaTime) {};
 
+    ParentNode<GameObject> m_parent;
+    void SetParent(ParentNode<GameObject> parent)
+    {
+        GameObject* currNode = parent.ptr;
+        while (currNode)
+        {
+            if (currNode == this)
+            {
+                printf("Cyclce parentness dependence prevented!\n");
+                return;
+            }
+            currNode = currNode->m_parent.ptr;
+        }
+        m_parent = parent;
+
+        if (m_parent.attached)
+        {
+            if (HasComponent<TransformComponent>() && m_parent.ptr->HasComponent<TransformComponent>())
+            {
+                GetComponent<TransformComponent>()->SetParentTransform(
+                    m_parent.ptr->GetComponent<TransformComponent>().get()
+                );
+            }
+            if (HasComponent<PhysicsComponent>())
+            {
+                GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
+            }
+        }
+    }
 protected:
     eastl::unique_ptr<GameObjectImpl> impl;
 };
@@ -175,6 +206,37 @@ public:
     ObjectType m_type;
     eastl::string m_name;
     SE::UUID m_UUID;
+
+    ParentNode<GameObject_Info> m_parent;
+    void SetParent(ParentNode<GameObject_Info> parent)
+    {
+        GameObject_Info* currNode = parent.ptr;
+        while (currNode)
+        {
+            if (currNode == this)
+            {
+                printf("Cyclce parentness dependence prevented!\n");
+                return;
+            }
+            currNode = currNode->m_parent.ptr;
+        }
+        m_parent = parent;
+
+        if (m_parent.attached)
+        {
+            if (HasComponent<TransformComponent_Info>() && m_parent.ptr->HasComponent<TransformComponent_Info>())
+            {
+                GetComponent<TransformComponent_Info>()->m_assignedComponent->SetParentTransform(
+                    m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get()
+                );
+            }
+
+            if (HasComponent<PhysicsComponent_Info>())
+            {
+                GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
+            }
+        }
+    }
 
     // Add Component with default values
     void AddDefaultComponent(SE::ComponentType compType)

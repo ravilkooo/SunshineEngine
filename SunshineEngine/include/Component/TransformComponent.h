@@ -80,6 +80,12 @@ public:
     // Serialization
     void FromJson(const json& j) override;
     //void FromJson(const json& j, ID3D11Device* device);
+
+    void SetParentTransform(TransformComponent* parentTransform);
+    TransformComponent* GetParentTransform();
+
+private:
+    TransformComponent* m_parentTransform = nullptr;
 };
 
 class TransformComponent_Info : public Component_Info

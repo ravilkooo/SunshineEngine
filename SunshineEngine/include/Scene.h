@@ -38,6 +38,8 @@ public:
         SE_G::DeferredRenderer* renderSystem,
         PhysicsSystem* m_physicsSystem,
         eastl::shared_ptr<SE_G::Camera> camera, const json& j);
+
+    void RestoreParents();
 private:
 };
 
@@ -64,6 +66,8 @@ public:
     static eastl::shared_ptr<Scene_Info> FromJson(
         SE_G::DeferredRenderer* renderSystem,
         eastl::shared_ptr<SE_G::Camera> camera, const json& j);
+
+    void RestoreParents();
 
     // Чтобы быстро и последовательно итероваться
     eastl::vector<SE::UUID> gameObjects;

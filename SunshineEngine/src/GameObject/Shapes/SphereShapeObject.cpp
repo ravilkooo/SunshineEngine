@@ -2,6 +2,7 @@
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>
+#include <Graphics/GraphicsResources/Texture.h>
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, SphereShapeData initData)

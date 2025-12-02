@@ -68,6 +68,15 @@ eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
     return out;
 }
 
+void Scene::RestoreParents()
+{
+    for (auto& pair : uuidToObjectMap)
+    {
+        pair.second->m_parent.ptr = (pair.second->m_parent.uuid.m_UUID != uint64_t(0u) ?
+            uuidToObjectMap[pair.second->m_parent.uuid].get() : nullptr);
+    }
+}
+
 Scene_Info::Scene_Info()
 {
 }
@@ -134,4 +143,13 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::RemoveGameObjectByUUID(SE::UUID u
         }
     }
     return out;
+}
+
+void Scene_Info::RestoreParents()
+{
+    for (auto& pair : uuidToObjectMap)
+    {
+        pair.second->m_parent.ptr = (pair.second->m_parent.uuid.m_UUID != uint64_t(0u) ?
+            uuidToObjectMap[pair.second->m_parent.uuid].get() : nullptr);
+    }
 }
