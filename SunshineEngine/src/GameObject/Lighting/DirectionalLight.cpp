@@ -49,6 +49,7 @@ DirectionalLight::DirectionalLight(
 	}
 
 	m_lightTech = static_cast<SE_G::DirectionalLightTechnique*>(rc->AddTechnique(eastl::move(lightTech)));
+	m_lightTech->m_castsShadow = castsShadow;
 
 }
 
@@ -77,8 +78,10 @@ DirectionalLight::DirectionalLight(
 	auto lightTech =
 		eastl::make_unique<SE_G::DirectionalLightTechnique>(device, tc.get(), "LightPass", camera, m_lightData);
 
-	if (j.contains("CastsShadow") && j["CastsShadow"])
+	bool castsShadow = j.contains("CastsShadow") && j["CastsShadow"];
+	if (castsShadow)
 	{
+		
 		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
@@ -88,8 +91,8 @@ DirectionalLight::DirectionalLight(
 		lightTech->AssignShadowMapPass(m_shadowMapPass);
 		lightTech->EnableShadow();
 	}
-
 	m_lightTech = static_cast<SE_G::DirectionalLightTechnique*>(rc->AddTechnique(eastl::move(lightTech)));
+	m_lightTech->m_castsShadow = castsShadow;
 }
 
 void DirectionalLight::EnableShadow(

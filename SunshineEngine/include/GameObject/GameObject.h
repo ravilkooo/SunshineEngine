@@ -18,10 +18,13 @@
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>
 
+#include <GameObject/ParentNode.h>
+
 //#include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <Utils/StringUtils.h>
 #include <Utils/UUID.h>
+#include <Utils/MathUtils.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -39,7 +42,6 @@ namespace SE_G {
 
 class GameObjectImpl {
 public:
-    // to-do: make vector of unique? or not to do?
     eastl::vector<eastl::shared_ptr<Component>> components;
 };
 
@@ -68,13 +70,27 @@ public:
     template<DerivedFromComponent T, typename... Args>
     eastl::shared_ptr<T> AddComponent(Args&&... args)
     {
+        if (HasComponent<T>())
+        {
+            return GetComponent<T>();
+        }
+        if ((typeid(T) == typeid(PhysicsComponent)) && (m_parent.attached == true))
+        {
+            auto currObj = this;
+            while (currObj)
+            {
+                this->DetachFromParent();
+                currObj = this->m_parent.ptr;
+            }
+        }
         auto component = eastl::make_shared<T>(eastl::forward<Args>(args)...);
         impl->components.emplace_back(component);
         return component;
     }
     
     template<DerivedFromComponent T>
-    bool HasComponent() const {
+    bool HasComponent() const
+    {
         for (auto& comp : impl->components) {
             if (typeid(T) == comp->getType()) return true;
         }
@@ -82,7 +98,8 @@ public:
     }
 
     template<DerivedFromComponent T>
-    eastl::shared_ptr<T> GetComponent() {
+    eastl::shared_ptr<T> GetComponent()
+    {
         for (auto& comp : impl->components) {
             if (typeid(T) == comp->getType()) {
                 return eastl::static_pointer_cast<T>(comp);
@@ -93,7 +110,137 @@ public:
         return nullptr;
     }
 
+    template<DerivedFromComponent T>
+    void RemoveComponent() {
+        //for (auto& comp : impl->components)
+        for (auto it = impl->components.begin(); it != impl->components.end(); it++)
+        {
+            if (typeid(T) == (*it)->getType()) {
+                impl->components.erase(it);
+                return;
+            }
+        }
+        // log << "Component not found";
+        printf("Component not found");
+        //return nullptr;
+    }
+
+
     virtual void Update(float deltaTime) {};
+
+    ParentNode<GameObject> m_parent;
+    void SetParent(ParentNode<GameObject> parent)
+    {
+        GameObject* currNode = parent.ptr;
+        while (currNode)
+        {
+            if (currNode == this)
+            {
+                printf("Cyclce parentness dependence prevented!\n");
+                if (parent.ptr->m_UUID == m_parent.ptr->m_UUID)
+                {
+                    m_parent.uuid = SE::UUID(0u);
+                    m_parent.ptr = nullptr;
+                    m_parent.attached = false;
+                }
+                return;
+            }
+            currNode = currNode->m_parent.ptr;
+        }
+        m_parent = parent;
+
+        if (m_parent.ptr && m_parent.attached)
+        {
+            if (HasComponent<TransformComponent>() && m_parent.ptr->HasComponent<TransformComponent>())
+            {
+                GetComponent<TransformComponent>()->SetParentTransform(
+                    m_parent.ptr->GetComponent<TransformComponent>().get()
+                );
+            }
+            if (HasComponent<PhysicsComponent>())
+            {
+                RemoveComponent<PhysicsComponent>();
+                // To-do: remove phys from every child
+                
+                // OR
+                
+                // To-do: make extended attached mode
+                //GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
+            }
+        }
+    }
+
+    void AttachToParent()
+    {
+        if (!HasComponent<TransformComponent>() || !m_parent.ptr->HasComponent<TransformComponent>())
+            return;
+
+        auto tc = GetComponent<TransformComponent>();
+        auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
+
+        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix().Invert(); // *XMMatrixInverse(nullptr, Matrix::CreateScale(1 / ball->radius) * ball->worldMat);
+
+        DXSM::Vector3 scale;
+        DXSM::Vector3 rotate;
+        DXSM::Vector3 translation;
+        DecomposeTransform(newTransform, scale, rotate, translation);
+        tc->m_scaleFactor = scale;
+        tc->m_position = translation;
+        tc->m_rotation = rotate;
+
+
+        GetComponent<TransformComponent>()->SetParentTransform(
+            m_parent.ptr->GetComponent<TransformComponent>().get()
+        );
+
+        if (HasComponent<PhysicsComponent>())
+        {
+            RemoveComponent<PhysicsComponent>();
+
+            // To-do: remove phys from every child
+
+            // OR
+            // To-do: make extended attached mode
+            //GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
+        }
+
+        m_parent.attached = true;
+
+        // To-do rewrite code to safe local transform
+        // tc->m_localScaleFactor = DXSM::Vector3::One;
+        // tc->m_localRotation = DXSM::Vector3::Zero;
+        // tc->m_localPosition = DXSM::Vector3::Zero;
+    }
+
+    void DetachFromParent()
+    {
+        auto tc = GetComponent<TransformComponent>();
+        auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
+
+        DXSM::Matrix newTransform = tc->GetWorldMatrix();
+
+        DXSM::Vector3 scale;
+        DXSM::Vector3 rotate;
+        DXSM::Vector3 translation;
+        DecomposeTransform(newTransform, scale, rotate, translation);
+        tc->m_scaleFactor = scale;
+        tc->m_position = translation;
+        tc->m_rotation = rotate;
+
+        GetComponent<TransformComponent>()->SetParentTransform(
+            nullptr
+        );
+
+        if (HasComponent<PhysicsComponent>())
+        {
+            //RemoveComponent<PhysicsComponent>();
+
+            // To-do: make extended attached mode
+            //GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Dynamic);
+        }
+
+        m_parent.attached = false;
+    }
 
 protected:
     eastl::unique_ptr<GameObjectImpl> impl;
@@ -176,6 +323,49 @@ public:
     eastl::string m_name;
     SE::UUID m_UUID;
 
+    ParentNode<GameObject_Info> m_parent;
+    void SetParent(ParentNode<GameObject_Info> parent)
+    {
+        GameObject_Info* currNode = parent.ptr;
+        while (currNode)
+        {
+            if (currNode == this)
+            {
+                printf("Cyclce parentness dependence prevented!\n");
+                if (parent.ptr->m_UUID == m_parent.ptr->m_UUID)
+                {
+                    m_parent.uuid = SE::UUID(0u);
+                    m_parent.ptr = nullptr;
+                    m_parent.attached = false;
+                }
+                return;
+            }
+            currNode = currNode->m_parent.ptr;
+        }
+        m_parent = parent;
+
+        if (m_parent.ptr && m_parent.attached)
+        {
+            if (HasComponent<TransformComponent_Info>() && m_parent.ptr->HasComponent<TransformComponent_Info>())
+            {
+                GetComponent<TransformComponent_Info>()->SetParentTransform(
+                    m_parent.ptr->GetComponent<TransformComponent_Info>().get()
+                );
+            }
+
+            if (HasComponent<PhysicsComponent_Info>())
+            {
+                RemoveComponent< PhysicsComponent_Info>();
+
+                // To-do: remove phys from every child
+
+                // OR
+                // To-do: make extended attached mode
+                //GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
+            }
+        }
+    }
+
     // Add Component with default values
     void AddDefaultComponent(SE::ComponentType compType)
     {
@@ -253,9 +443,83 @@ public:
         }
     }
 
+
+    void AttachToParent()
+    {
+        if (!HasComponent<TransformComponent_Info>() || !m_parent.ptr->HasComponent<TransformComponent_Info>())
+            return;
+
+        auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+        auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+
+        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix().Invert(); // *XMMatrixInverse(nullptr, Matrix::CreateScale(1 / ball->radius) * ball->worldMat);
+
+        DXSM::Vector3 scale;
+        DXSM::Vector3 rotate;
+        DXSM::Vector3 translation;
+        DecomposeTransform(newTransform, scale, rotate, translation);
+        tc->m_scaleFactor = scale;
+        tc->m_position = translation;
+        tc->m_rotation = rotate;
+
+        GetComponent<TransformComponent_Info>()->SetParentTransform(
+            m_parent.ptr->GetComponent<TransformComponent_Info>().get()
+        );
+
+        if (HasComponent<PhysicsComponent_Info>())
+        {
+            RemoveComponent<PhysicsComponent_Info>();
+            // To-do
+            // Remove PhysComp from every GrandChild
+            // OR
+            // To-do: make extended attached mode
+            //GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
+        }
+
+        m_parent.attached = true;
+    }
+
+    void DetachFromParent()
+    {
+        auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+        auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+
+        DXSM::Matrix newTransform = tc->GetWorldMatrix();
+
+        DXSM::Vector3 scale;
+        DXSM::Vector3 rotate;
+        DXSM::Vector3 translation;
+        DecomposeTransform(newTransform, scale, rotate, translation);
+        tc->m_scaleFactor = scale;
+        tc->m_position = translation;
+        tc->m_rotation = rotate;
+
+        GetComponent<TransformComponent_Info>()->SetParentTransform(
+            nullptr
+        );
+
+        if (HasComponent<PhysicsComponent_Info>())
+        {
+            //GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Dynamic);
+        }
+
+        m_parent.attached = false;
+    }
+
     // Only for inner class methods
     template<DerivedFromComponent_Info T, typename... Args>
-    eastl::shared_ptr<T> AddComponent(Args&&... args) {
+    eastl::shared_ptr<T> AddComponent(Args&&... args)
+    {
+        SE::ComponentType type = T::s_componentType;
+        if (type == SE::ComponentType::PHYSICS && m_parent.attached == true)
+        {
+            auto currObj = this;
+            while (currObj)
+            {
+                this->DetachFromParent();
+                currObj = this->m_parent.ptr;
+            }
+        }
         //SE::ComponentType type = T::StaticComponentType();
         // Check if already has this type
         if (HasComponent<T>()) {

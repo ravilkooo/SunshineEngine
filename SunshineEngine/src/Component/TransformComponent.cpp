@@ -54,9 +54,39 @@ DXSM::Matrix TransformComponent::GetScaleMatrix() const
     return DXSM::Matrix::CreateScale(m_scaleFactor);
 }
 
+DXSM::Matrix TransformComponent::GetWorldMatrix_noLocal() const
+{
+    return GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
+}
+
 DXSM::Matrix TransformComponent::GetWorldMatrix() const
 {
-    return GetLocalTransformMatrix() * GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
+    DXSM::Matrix wt = GetLocalTransformMatrix() * GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
+    if (m_parentTransform)
+    {
+        wt = wt * m_parentTransform->GetWorldMatrix();
+    }
+    return wt;
+}
+
+void TransformComponent::SetParentTransform(TransformComponent* parentTransform)
+{
+    TransformComponent* currNode = parentTransform;
+    while (currNode)
+    {
+        if (currNode == this)
+        {
+            printf("Cyclce transform dependence prevented!\n");
+            return;
+        }
+        currNode = parentTransform->GetParentTransform();
+    }
+    m_parentTransform = parentTransform;
+}
+
+TransformComponent* TransformComponent::GetParentTransform()
+{
+    return m_parentTransform;
 }
 
 TransformComponent_Info::TransformComponent_Info(ID3D11Device* device)
@@ -67,6 +97,14 @@ TransformComponent_Info::TransformComponent_Info(ID3D11Device* device)
 TransformComponent_Info::~TransformComponent_Info()
 {
 
+}
+
+void TransformComponent_Info::SetParentTransform(TransformComponent_Info* parentTransform_Info)
+{
+    if (parentTransform_Info)
+        m_assignedComponent->SetParentTransform(parentTransform_Info->m_assignedComponent.get());
+    else
+        m_assignedComponent->SetParentTransform(nullptr);
 }
 
 #define TC_ADD_FIELD(name) #name, &TransformComponent::name

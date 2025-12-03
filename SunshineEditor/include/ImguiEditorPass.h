@@ -22,6 +22,10 @@
 #include "UI/PropertyPanel.h"
 
 class EditorApp;
+class WorldEditor;
+struct Selection;
+struct SceneNode;
+class SceneGraph;
 
 class ImguiEditorPass :
     public SE_G::RenderPass
@@ -36,7 +40,6 @@ public:
     void EndFrame() override;
 
     void RenderGameWorld();
-    void ShowSceneHierarchy();
     void ShowContentBrowser();
     void ShowProperties();
     void ShowBottomPanel();
@@ -82,9 +85,13 @@ public:
         UINT x;
         UINT y;
     } m_mouseClickCoords = { 0u, 0u };
+
+    void ShowSceneHierarchy();
+    void DrawNode(SceneNode* node, Selection& sel);
+    void DrawSceneGraph(SceneGraph* g, Selection& sel);
 private:
     //int selectedIdx = -1;
-    bool objectSelected = false;
-    SE::UUID selectedUUID;
+    // bool objectSelected = false;
+    // SE::UUID selectedUUID;
 };
 

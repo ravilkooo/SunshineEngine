@@ -1,4 +1,5 @@
 #include <Scene.h>
+#include <SceneHierarchy.h>
 
 Scene::Scene()
 {
@@ -68,6 +69,20 @@ eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
     return out;
 }
 
+void Scene::RestoreParents()
+{
+    for (auto& pair : uuidToObjectMap)
+    {
+        if (pair.second->m_parent.uuid != SE::UUID(0u))
+        {
+            ParentNode pn = pair.second->m_parent;
+            pn.ptr = uuidToObjectMap[pair.second->m_parent.uuid].get();
+
+            pair.second->SetParent(pn);
+        }
+    }
+}
+
 Scene_Info::Scene_Info()
 {
 }
@@ -134,4 +149,24 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::RemoveGameObjectByUUID(SE::UUID u
         }
     }
     return out;
+}
+
+void Scene_Info::RestoreParents()
+{
+    for (auto& pair : uuidToObjectMap)
+    {
+        if (pair.second->m_parent.uuid != SE::UUID(0u))
+        {
+            ParentNode pn = pair.second->m_parent;
+            pn.ptr = uuidToObjectMap[pair.second->m_parent.uuid].get();
+
+            pair.second->SetParent(pn);
+        }
+    }
+}
+
+void Scene_Info::InitHierarchy()
+{
+    m_sceneGraph = eastl::make_unique<SceneGraph>(uuidToObjectMap);
+    m_sceneGraph->Build();
 }
