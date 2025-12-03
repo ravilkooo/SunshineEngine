@@ -97,7 +97,7 @@ void EditorApp::RunApp()
 	{
 		ChooseProject();
 	}
-	imguiEditorPass->InitHierarchy();
+	m_worldEditor->m_scene->InitHierarchy();
 	ContentBrowserPanel::s_AssetsDirectory =
 		std::filesystem::path(m_openedProject->GetFullPath().c_str());
 	

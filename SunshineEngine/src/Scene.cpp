@@ -1,4 +1,5 @@
 #include <Scene.h>
+#include <SceneHierarchy.h>
 
 Scene::Scene()
 {
@@ -162,4 +163,10 @@ void Scene_Info::RestoreParents()
             pair.second->SetParent(pn);
         }
     }
+}
+
+void Scene_Info::InitHierarchy()
+{
+    m_sceneGraph = eastl::make_unique<SceneGraph>(uuidToObjectMap);
+    m_sceneGraph->Build();
 }

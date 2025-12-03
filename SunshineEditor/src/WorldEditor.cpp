@@ -598,3 +598,5 @@ void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::
 	// trComp->m_position = DXSM::Vector3(worldPos);
 }
 */
+
+

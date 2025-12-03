@@ -10,6 +10,7 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 class PhysicsSystem;
+class SceneGraph;
 
 class Scene
 {
@@ -40,6 +41,7 @@ public:
         eastl::shared_ptr<SE_G::Camera> camera, const json& j);
 
     void RestoreParents();
+
 private:
 };
 
@@ -73,4 +75,8 @@ public:
     eastl::vector<SE::UUID> gameObjects;
     // Владеет объектами. Нужен чтобы быстро находить по UUID
     std::unordered_map<SE::UUID, eastl::unique_ptr<GameObject_Info>> uuidToObjectMap;
+
+    // Hierarchy
+    eastl::unique_ptr<SceneGraph> m_sceneGraph;
+    void InitHierarchy();
 };

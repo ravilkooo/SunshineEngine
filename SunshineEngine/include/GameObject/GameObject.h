@@ -42,7 +42,6 @@ namespace SE_G {
 
 class GameObjectImpl {
 public:
-    // to-do: make vector of unique? or not to do?
     eastl::vector<eastl::shared_ptr<Component>> components;
 };
 
@@ -71,13 +70,27 @@ public:
     template<DerivedFromComponent T, typename... Args>
     eastl::shared_ptr<T> AddComponent(Args&&... args)
     {
+        if (HasComponent<T>())
+        {
+            return GetComponent<T>();
+        }
+        if ((typeid(T) == typeid(PhysicsComponent)) && (m_parent.attached == true))
+        {
+            auto currObj = this;
+            while (currObj)
+            {
+                this->DetachFromParent();
+                currObj = this->m_parent.ptr;
+            }
+        }
         auto component = eastl::make_shared<T>(eastl::forward<Args>(args)...);
         impl->components.emplace_back(component);
         return component;
     }
     
     template<DerivedFromComponent T>
-    bool HasComponent() const {
+    bool HasComponent() const
+    {
         for (auto& comp : impl->components) {
             if (typeid(T) == comp->getType()) return true;
         }
@@ -85,7 +98,8 @@ public:
     }
 
     template<DerivedFromComponent T>
-    eastl::shared_ptr<T> GetComponent() {
+    eastl::shared_ptr<T> GetComponent()
+    {
         for (auto& comp : impl->components) {
             if (typeid(T) == comp->getType()) {
                 return eastl::static_pointer_cast<T>(comp);
@@ -146,7 +160,10 @@ public:
             if (HasComponent<PhysicsComponent>())
             {
                 RemoveComponent<PhysicsComponent>();
-
+                // To-do: remove phys from every child
+                
+                // OR
+                
                 // To-do: make extended attached mode
                 //GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
             }
@@ -180,6 +197,9 @@ public:
         {
             RemoveComponent<PhysicsComponent>();
 
+            // To-do: remove phys from every child
+
+            // OR
             // To-do: make extended attached mode
             //GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
         }
@@ -337,6 +357,9 @@ public:
             {
                 RemoveComponent< PhysicsComponent_Info>();
 
+                // To-do: remove phys from every child
+
+                // OR
                 // To-do: make extended attached mode
                 //GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
             }
@@ -445,8 +468,10 @@ public:
 
         if (HasComponent<PhysicsComponent_Info>())
         {
-            RemoveComponent< PhysicsComponent_Info>();
-
+            RemoveComponent<PhysicsComponent_Info>();
+            // To-do
+            // Remove PhysComp from every GrandChild
+            // OR
             // To-do: make extended attached mode
             //GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
         }
@@ -483,7 +508,18 @@ public:
 
     // Only for inner class methods
     template<DerivedFromComponent_Info T, typename... Args>
-    eastl::shared_ptr<T> AddComponent(Args&&... args) {
+    eastl::shared_ptr<T> AddComponent(Args&&... args)
+    {
+        SE::ComponentType type = T::s_componentType;
+        if (type == SE::ComponentType::PHYSICS && m_parent.attached == true)
+        {
+            auto currObj = this;
+            while (currObj)
+            {
+                this->DetachFromParent();
+                currObj = this->m_parent.ptr;
+            }
+        }
         //SE::ComponentType type = T::StaticComponentType();
         // Check if already has this type
         if (HasComponent<T>()) {

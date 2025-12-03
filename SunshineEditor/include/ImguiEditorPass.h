@@ -20,9 +20,12 @@
 #include "UI/BottomBarPanel.h"
 #include "UI/LogPanel.h"
 #include "UI/PropertyPanel.h"
-#include <UI/SceneHierarchy.h>
 
 class EditorApp;
+class WorldEditor;
+struct Selection;
+struct SceneNode;
+class SceneGraph;
 
 class ImguiEditorPass :
     public SE_G::RenderPass
@@ -83,18 +86,6 @@ public:
         UINT y;
     } m_mouseClickCoords = { 0u, 0u };
 
-    struct Selection {
-        eastl::unordered_set<SE::UUID> picked;
-        SE::UUID last_clicked = SE::UUID(0u);
-
-        bool Contains(const SE::UUID n) const { return picked.find(n) != picked.end(); }
-        void SetSingle(const SE::UUID n) { picked.clear(); picked.insert(n); last_clicked = n; }
-        void Toggle(const SE::UUID n) { if (!picked.erase(n)) picked.insert(n); last_clicked = n; }
-    };
-
-    Selection m_hierarchySelection;
-    eastl::unique_ptr<SceneGraph> m_sceneGraph;
-    void InitHierarchy();
     void ShowSceneHierarchy();
     void DrawNode(SceneNode* node, Selection& sel);
     void DrawSceneGraph(SceneGraph* g, Selection& sel);

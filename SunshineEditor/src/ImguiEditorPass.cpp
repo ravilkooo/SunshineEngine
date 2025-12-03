@@ -5,6 +5,8 @@
 
 #include "ImguiEditorPass.h"
 #include <EditorApp.h>
+#include <WorldEditor.h>
+#include <SceneHierarchy.h>
 
 #include <Component/LuaComponent.h>
 #include <Utils/DebugUtils.h>
@@ -72,12 +74,6 @@ ImguiEditorPass::ImguiEditorPass(
 	EditorUI::FontStyles::Init(io);
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
-}
-
-void ImguiEditorPass::InitHierarchy()
-{
-	m_sceneGraph = eastl::make_unique<SceneGraph>(m_editorApp->m_worldEditor->m_scene->uuidToObjectMap);
-	m_sceneGraph->Build();
 }
 
 void ImguiEditorPass::SetVieportGBuffer(
@@ -215,7 +211,7 @@ void ImguiEditorPass::Pass()
 					auto selectedUUID = m_editorApp->m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
 				if (selectedUUID != SE::UUID(0u))
 				{
-					m_hierarchySelection.SetSingle(selectedUUID);
+					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
 					m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 				}
 			}
@@ -280,7 +276,7 @@ void ImguiEditorPass::RenderGameWorld()
 
 void ImguiEditorPass::ShowSceneHierarchy()
 {
-	DrawSceneGraph(m_sceneGraph.get(), m_hierarchySelection);
+	DrawSceneGraph(m_editorApp->m_worldEditor->m_scene->m_sceneGraph.get(), m_editorApp->m_worldEditor->m_hierarchySelection);
 	/*
 	InitHierarchy();
 
@@ -330,11 +326,11 @@ void ImguiEditorPass::ShowContentBrowser()
 void ImguiEditorPass::ShowProperties()
 {
 	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
-	m_PropertyPanel.SetSelectedUUID(m_hierarchySelection.last_clicked);
+	m_PropertyPanel.SetSelectedUUID(m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked);
 	m_PropertyPanel.OnImGuiRender();
 
 	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
-		m_hierarchySelection.last_clicked
+		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
 	);
 
 	/*
@@ -512,7 +508,8 @@ void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
 
 	ImGui::PushID(node); // stable id (or use UUID string)
 	//bool open = ImGui::TreeNodeEx((void*)node, flags, "%s", node->objUUID.ToString().c_str());
-	bool open = ImGui::TreeNodeEx((void*)node, flags, "%s", m_sceneGraph->m_uuidToObjectMap[node->objUUID]->m_name);
+	bool open = ImGui::TreeNodeEx((void*)node, flags, "%s",
+		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_uuidToObjectMap[node->objUUID]->m_name);
 
 	// Selection handling: click label to select; arrow toggles open.
 	if (ImGui::IsItemClicked()) {
