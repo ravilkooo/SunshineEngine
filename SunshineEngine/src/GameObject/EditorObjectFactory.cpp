@@ -157,4 +157,11 @@ eastl::unique_ptr<PointLight_Info> EditorObjectFactory::CreatePointLightObject(
 	return obj;
 }
 
-
+eastl::unique_ptr<SpotLight_Info> EditorObjectFactory::CreateSpotLightObject(
+	SE_G::DeferredRenderer* renderSystem,
+	eastl::shared_ptr<SE_G::Camera> camera,
+	SE_G::SpotLightData initData)
+{
+	auto obj = eastl::make_unique<SpotLight_Info>(renderSystem, camera, initData);
+	return obj;
+}

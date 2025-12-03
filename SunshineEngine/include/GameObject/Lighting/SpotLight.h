@@ -2,59 +2,72 @@
 
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include <directxmath.h>
 
-#include "Graphics/Utils/ShapeGenerator.h"
+#include <EASTL/algorithm.h>
+#include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
+
+#include <Graphics/Utils/ShapeGenerator.h>
+//#include <DirectXCollision.h>
+
 #include "Graphics/Utils/Camera.h"
-#include "Graphics/Bindable/BindableCollection.h"
-#include "Graphics/Renderer/Technique/RenderTechnique.h"
-#include <Graphics/Lighting/LightData.h>
 
 #include <GameObject/GameObject.h>
 #include <GameObject/Lighting/LightObject.h>
+#include <Graphics/Lighting/LightData.h>
 
 #include <Serialization/LightDataSerialization.h>
+#include <Serialization/DXSMSerialization.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 namespace DXSM = DirectX::SimpleMath;
 
-
 class SpotLight :
     public LightObject<SE_G::SpotLightData>
 {
 public:
-    /*
-    SpotLight(ID3D11Device* device, DXSM::Vector3 position,
-        float range, DXSM::Vector3 direction, float spot, DXSM::Vector3 att,
-        DXSM::Vector4 ambient, DXSM::Vector4 diffuse, DXSM::Vector4 specular);
 
-    struct SpotLightPCB {
-        XMFLOAT4 Diffuse;
-        XMFLOAT4 Specular;
-        XMFLOAT3 Position;
-        float Range;
+    SpotLight(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        SE_G::SpotLightData initData = {
+            DXSM::Vector3::One, 1.0f,
+            DXSM::Vector3::One, 1.0f,
+            DXSM::Vector3::Zero, 20,
+            DXSM::Vector2(0, -DX::XM_PIDIV4), 10, 0,
+            DXSM::Vector3::One, 0
+        });
 
-        XMFLOAT3 Direction;
-        float Spot;
+    SpotLight(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        const json& j);
+    // Unnecessary?
+    //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+};
 
-        XMFLOAT3 Att;
-        float pad;
-    } spotLightData;
+class SpotLight_Info :
+    public LightObject_Info<SE_G::SpotLightData>
+{
+public:
 
-    float width;
-    float depth;
+    SpotLight_Info(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        SE_G::SpotLightData initData = {
+            DXSM::Vector3::One, 1.0f,
+            DXSM::Vector3::One, 1.0f,
+            DXSM::Vector3::Zero, 20,
+            DXSM::Vector2(0, -DX::XM_PIDIV4), 10, 0,
+            DXSM::Vector3::One, 0
+        });
 
-    Vector4 ambient;
+    SpotLight_Info(
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera,
+        const json& j);
 
-    Bind::PixelConstantBuffer<SpotLightPCB>* spotLightPBuffer;
-
-    D3D11_DEPTH_STENCIL_DESC ChooseDepthStencilState(LightObject::LightPosition lightPos) override;
-    D3D11_RASTERIZER_DESC GetRasterizerDesc(LightObject::LightPosition lightPos) override;
-
-    LightPosition GetLightPositionInFrustum(Camera* camera) override;
-    bool IsFrustumInsideOfLight(Camera* camera) override;
-
-    void UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-    */
+    // Unnecessary?
+    //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 };

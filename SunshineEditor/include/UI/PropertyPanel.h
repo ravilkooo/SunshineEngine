@@ -45,6 +45,7 @@ private:
     void DrawAmbientLightDetails(SE_G::AmbientLightData* lightData);
     void DrawDirectionalLightDetails(SE_G::DirectionalLightData* lightData);
     void DrawPointLightDetails(SE_G::PointLightData* lightData);
+    void DrawSpotLightDetails(SE_G::SpotLightData* lightData);
     
     void DrawSkyBoxDetails(SE_G::SkyBoxData* lightData);
 

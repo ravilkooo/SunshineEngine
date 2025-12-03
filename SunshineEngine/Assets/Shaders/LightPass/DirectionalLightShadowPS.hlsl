@@ -13,8 +13,9 @@ struct DirectionalLight
     float3 Position;
     float pad1;
     
-    float3 Direction;
+    float2 Direction;
     float pad2;
+    float pad3;
 };
 
 struct CameraData
@@ -92,7 +93,11 @@ void calcDirectionalLight(float3 wPos, float3 normal, float3 toEye, Material mat
     dl_spec = float3(0.0f, 0.0f, 0.0f);
     
     {
-        float3 lightVec = -dirLight.Direction;
+        float3 lightVec = -float3(
+            cos(dirLight.Direction.y) * cos(dirLight.Direction.x),
+            sin(dirLight.Direction.y),
+            cos(dirLight.Direction.y) * sin(dirLight.Direction.x)
+        );
         float diffuseFactor = dot(lightVec, normal);
         
         [flatten]

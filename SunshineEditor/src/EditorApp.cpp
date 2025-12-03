@@ -97,6 +97,15 @@ void EditorApp::RunApp()
 	{
 		ChooseProject();
 	}
+
+	// To-do: remove this
+	m_worldEditor->m_scene->AddGameObject(
+		EditorObjectFactory::CreateSpotLightObject(m_worldEditor->m_renderer.get(),
+			m_worldEditor->m_renderer->GetMainCamera())
+	);
+
+	//
+
 	m_worldEditor->m_scene->InitHierarchy();
 	ContentBrowserPanel::s_AssetsDirectory =
 		std::filesystem::path(m_openedProject->GetFullPath().c_str());

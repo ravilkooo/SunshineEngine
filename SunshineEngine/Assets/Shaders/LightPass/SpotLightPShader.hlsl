@@ -6,16 +6,19 @@ SamplerState Sam : register(s0);
 
 struct SpotLight
 {
-    float4 Diffuse;
-    float4 Specular;
+    float3 Diffuse;
+    float DiffusePad;
+    float3 Specular;
+    float SpecularPad;
     float3 Position;
     float Range;
     
-    float3 Direction;
+    float2 Direction;
     float Spot;
+    float pad;
     
     float3 Att;
-    float pad;
+    float pad2;
 };
 
 struct CameraData
@@ -33,7 +36,7 @@ struct ScreenInfo
 
 struct Material
 {
-    float4 Diffuse;
+    float3 Diffuse;
     float2 Specular;
 };
 
@@ -54,11 +57,11 @@ cbuffer LightBuffer : register(b2) // per object
 
 void calcSpotLight(float3 wPos, float3 normal, float3 toEye,
     Material mat, SpotLight spotLight,
-    out float4 sl_diffuse,
-    out float4 sl_spec)
+    out float3 sl_diffuse,
+    out float3 sl_spec)
 {
-    sl_diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    sl_spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    sl_diffuse = float3(0.0f, 0.0f, 0.0f);
+    sl_spec = float3(0.0f, 0.0f, 0.0f);
     
     float3 lightVec = spotLight.Position - wPos;
     float d = length(lightVec);
@@ -77,7 +80,13 @@ void calcSpotLight(float3 wPos, float3 normal, float3 toEye,
         sl_spec = sl_diffuse * mat.Specular.x;
     }
     
-    float spot = pow(max(dot(-lightVec, spotLight.Direction), 0.0f), spotLight.Spot);
+    float3 direction = float3(
+        cos(spotLight.Direction.y) * cos(spotLight.Direction.x),
+        sin(spotLight.Direction.y),
+        cos(spotLight.Direction.y) * sin(spotLight.Direction.x)
+    );
+    
+    float spot = pow(max(dot(-lightVec, direction), 0.0f), spotLight.Spot);
     
 
     float att = spot / dot(spotLight.Att, float3(1.0f, d, d * d));
@@ -97,12 +106,12 @@ float4 PSMain(PS_IN input) : SV_Target
     float y = input.pos.y / screenInfo.sceenSize.y;
     Material mat =
     {
-        float4(AlbedoMap.Sample(Sam, float2(x, y)).rgb, 1.0f),
+        float3(AlbedoMap.Sample(Sam, float2(x, y)).rgb),
         float2(SpecularMap.Sample(Sam, float2(x, y)).rg)
     };
     
-    float4 sl_diffuse;
-    float4 sl_spec;
+    float3 sl_diffuse;
+    float3 sl_spec;
     
     float4 normal = float4(NormalMap.Sample(Sam, float2(x, y)).rgb, 1.0f);
     /*
@@ -121,6 +130,6 @@ float4 PSMain(PS_IN input) : SV_Target
     calcSpotLight(pixelWorldPos.xyz, normal.xyz, toEye, mat, spotLight,
         sl_diffuse, sl_spec);
     
-    return saturate(sl_diffuse + sl_spec);
+    return saturate(float4(sl_diffuse + sl_spec, 1.0f));
     //return float4(1.0f, 1.0f, 0.0f, 0.5f);
 }

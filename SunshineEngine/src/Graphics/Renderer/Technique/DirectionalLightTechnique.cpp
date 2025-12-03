@@ -23,17 +23,6 @@ namespace SE_G {
             DirectionalLightTechnique::InitStaticData(device);
         }
 
-        D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
-
-        D3D11_RASTERIZER_DESC rasterDesc = {};
-        rasterDesc.CullMode = D3D11_CULL_NONE;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-        m_rasterizer = eastl::make_unique<Bind::Rasterizer>(device, rasterDesc);
-
         // Add mesh for Ambient
         m_mesh = SE_G::Mesh::CreateScreenAlignedQuad(device);
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
@@ -62,12 +51,12 @@ namespace SE_G {
 
     void DirectionalLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
     {
-        return;
+        LightStaticData::depthCompLess->Bind(context);
     }
 
     void DirectionalLightTechnique::ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos)
     {
-        return;
+        LightStaticData::rastCullNone->Bind(context);
     }
 
     LightPosition DirectionalLightTechnique::GetLightPositionInFrustum()

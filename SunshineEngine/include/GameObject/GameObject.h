@@ -259,7 +259,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(GameObjectGroup, {
 
 
 enum class LightObjectType {
-    PointLight, DirectionalLight, SkyBox, AmbientLight, 
+    PointLight, DirectionalLight, SkyBox, AmbientLight, SpotLight,
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(LightObjectType, {
@@ -267,6 +267,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(LightObjectType, {
     {LightObjectType::DirectionalLight, "DirectionalLight"},
     {LightObjectType::SkyBox, "SkyBox"},
     {LightObjectType::AmbientLight, "AmbientLight"},
+    {LightObjectType::AmbientLight, "SpotLight"},
     })
 
 enum class ShapeObjectType {

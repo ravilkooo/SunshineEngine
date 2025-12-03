@@ -10,13 +10,13 @@ namespace DXSM = DirectX::SimpleMath;
 namespace DX = DirectX;
 
 namespace SE_G {
-    class PointLightTechnique :
-        public LightTechnique<PointLightData>
+    class SpotLightTechnique :
+        public LightTechnique<SpotLightData>
     {
     public:
-        PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
+        SpotLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             eastl::shared_ptr<Camera> camera,
-            eastl::shared_ptr<PointLightData> lightData);
+            eastl::shared_ptr<SpotLightData> lightData);
 
         //void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 
@@ -27,6 +27,5 @@ namespace SE_G {
 
         LightPosition GetLightPositionInFrustum() override;
         bool IsFrustumInsideOfLight() override;
-
     };
 }

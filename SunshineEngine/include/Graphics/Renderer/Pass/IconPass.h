@@ -4,6 +4,7 @@
 #include <Graphics/Utils/Camera.h>
 #include <Utils/UUID.h>
 #include <GameObject/Lighting/LightCollection.h>
+
 // forward declare bindable resources used by IconPass to reduce includes
 namespace SE_G { namespace Bind {
     class VertexShader;

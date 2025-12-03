@@ -560,6 +560,10 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     go = eastl::make_unique<PointLight>(
                         renderSystem, camera, objJ);
                     break;
+                case LightObjectType::SpotLight:
+                    go = eastl::make_unique<SpotLight>(
+                        renderSystem, camera, objJ);
+                    break;
                 case LightObjectType::DirectionalLight:
                     go = eastl::make_unique<DirectionalLight>(
                         renderSystem, camera, objJ);
@@ -665,6 +669,10 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                     break;
                 case LightObjectType::DirectionalLight:
                     go = eastl::make_unique<DirectionalLight_Info>(
+                        renderSystem, camera, objJ);
+                    break;
+                case LightObjectType::SpotLight:
+                    go = eastl::make_unique<SpotLight_Info>(
                         renderSystem, camera, objJ);
                     break;
                 }

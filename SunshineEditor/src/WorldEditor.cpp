@@ -235,7 +235,7 @@ void WorldEditor::CreateParentTestScene()
 				DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f) * 0.5f, 1.0f,
 				DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f) * 0.5f, 1.0f,
 				DXSM::Vector3::Zero, 0,
-				DXSM::Vector3(1, -2, 0.5), 0
+				DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
 			})
 		);
 		m_scene->AddGameObject(EditorObjectFactory::CreatePointLightObject(
@@ -394,7 +394,7 @@ void WorldEditor::CreateDefaultScene()
 				DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f) * 0.5f, 1.0f,
 				DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f) * 0.5f, 1.0f,
 				DXSM::Vector3::Zero, 0,
-				DXSM::Vector3(1, -2, 0.5), 0
+				DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
 			})
 		);
 		m_scene->AddGameObject(EditorObjectFactory::CreatePointLightObject(

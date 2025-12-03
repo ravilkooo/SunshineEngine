@@ -3,9 +3,21 @@
 #include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Utils/Camera.h>
 #include <Utils/UUID.h>
-#include <Graphics/Renderer/Pass/IconPass.h>
 
 namespace SE_G {
+    namespace Bind {
+        class VertexShader;
+        class GeometryShader;
+        class PixelShader;
+        class Texture;
+        class DepthStencilState;
+        class Sampler;
+        template<typename> class GeometryConstantBuffer;
+        template<typename> class PixelConstantBuffer;
+    }
+
+    class IconPass;
+
     class SelectionPass :
         public RenderPass
     {

@@ -11,17 +11,6 @@ namespace SE_G {
         eastl::wstring texturePath)
         : LightTechnique(device, assignedTransform, technique, camera, lightData) {
 
-        D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
-
-        D3D11_RASTERIZER_DESC rasterDesc = {};
-        rasterDesc.CullMode = D3D11_CULL_FRONT;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-        m_rasterizer = eastl::make_unique<Bind::Rasterizer>(device, rasterDesc);
-
         D3D11_BLEND_DESC blendDesc = {};
         blendDesc.RenderTarget[0].BlendEnable = TRUE;
         blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
@@ -81,12 +70,12 @@ namespace SE_G {
 
     void SkyBoxTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
     {
-        return;
+        LightStaticData::depthCompLess->Bind(context);
     }
 
     void SkyBoxTechnique::ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos)
     {
-        return;
+        LightStaticData::rastCullNone->Bind(context);
     }
 
     LightPosition SkyBoxTechnique::GetLightPositionInFrustum()

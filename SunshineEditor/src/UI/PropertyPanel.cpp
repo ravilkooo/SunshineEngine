@@ -155,28 +155,35 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
             switch (obj->m_type.m_asLight)
             {
             case LightObjectType::AmbientLight:
-                if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::AmbientLightData>*>(obj))
+                if (auto lightObj = static_cast<LightObject_Info<SE_G::AmbientLightData>*>(obj))
                 {
                     DrawAmbientLightDetails(lightObj->m_lightData.get());
                 }
                 break;
 
             case LightObjectType::DirectionalLight:
-                if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::DirectionalLightData>*>(obj))
+                if (auto lightObj = static_cast<LightObject_Info<SE_G::DirectionalLightData>*>(obj))
                 {
                     DrawDirectionalLightDetails(lightObj->m_lightData.get());
                 }
                 break;
 
             case LightObjectType::PointLight:
-                if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::PointLightData>*>(obj))
+                if (auto lightObj = static_cast<LightObject_Info<SE_G::PointLightData>*>(obj))
                 {
                     DrawPointLightDetails(lightObj->m_lightData.get());
                 }
                 break;
 
+            case LightObjectType::SpotLight:
+                if (auto lightObj = static_cast<LightObject_Info<SE_G::SpotLightData>*>(obj))
+                {
+                    DrawSpotLightDetails(lightObj->m_lightData.get());
+                }
+                break;
+
             case LightObjectType::SkyBox:
-                if (auto lightObj = dynamic_cast<LightObject_Info<SE_G::SkyBoxData>*>(obj))
+                if (auto lightObj = static_cast<LightObject_Info<SE_G::SkyBoxData>*>(obj))
                 {
                     DrawSkyBoxDetails(lightObj->m_lightData.get());
                 }
@@ -191,21 +198,21 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
             switch (obj->m_type.m_asShape)
             {
             case ShapeObjectType::Box:
-                if (auto shapeObj = dynamic_cast<BoxShapeObject_Info*>(obj))
+                if (auto shapeObj = static_cast<BoxShapeObject_Info*>(obj))
                 {
                     DrawBoxShapeDetails(shapeObj);
                 }
                 break;
 
             case ShapeObjectType::Sphere:
-                if (auto shapeObj = dynamic_cast<SphereShapeObject_Info*>(obj))
+                if (auto shapeObj = static_cast<SphereShapeObject_Info*>(obj))
                 {
                     DrawSphereShapeDetails(shapeObj);
                 }
                 break;
 
             case ShapeObjectType::Geosphere:
-                if (auto shapeObj = dynamic_cast<GeosphereShapeObject_Info*>(obj))
+                if (auto shapeObj = static_cast<GeosphereShapeObject_Info*>(obj))
                 {
                     DrawGeosphereShapeDetails(shapeObj);
                 }
@@ -246,8 +253,18 @@ void PropertyPanel::DrawDirectionalLightDetails(SE_G::DirectionalLightData* ligh
         
         ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
         ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
-        // direction should be normalized after edditing! Use angles instead of coordinates? Hmmm...
-        // ImGui::ColorEdit3("Light Color", &lightData->Direction.x, ImGuiColorEditFlags_Float);
+        
+        float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
+        float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
+        if (ImGui::DragFloat("Azimut", &azimut, 0.5f, 0.0f, 360.0f, "%.1f m"))
+        {
+            lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
+        }
+        if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
+        {
+            lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
+        }
+
     }
 }
 
@@ -262,6 +279,33 @@ void PropertyPanel::DrawPointLightDetails(SE_G::PointLightData* lightData)
         ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
         ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
         ImGui::DragFloat("Range", &lightData->Range, 0.5f, 0.0f, 100.0f, "%.1f m");
+    }
+}
+
+void PropertyPanel::DrawSpotLightDetails(SE_G::SpotLightData* lightData)
+{
+    if (lightData)
+    {
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Spot Light");
+        EditorUI::FontStyles::Pop();
+
+        ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
+        ImGui::DragFloat("Range", &lightData->Range, 0.5f, 0.0f, 100.0f, "%.1f m");
+        ImGui::DragFloat("Spot", &lightData->Spot, 0.1f, 0.0f, 100.0f, "%.1f m");
+        /*
+        float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
+        float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
+        if (ImGui::DragFloat("Azimut", &azimut, 0.5f, 0.0f, 360.0f, "%.1f m"))
+        {
+            lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
+        }
+        if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
+        {
+            lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
+        }
+        */
     }
 }
 
