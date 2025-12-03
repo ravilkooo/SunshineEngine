@@ -13,7 +13,12 @@ public:
 	SE::UUID uuid = SE::UUID(0u);
 	T* ptr = nullptr;
 
-	// Apply parent transform and PhysComponent should be Kinematic (Jolt)
+	// Apply parent transform and PhysComponent should be Kinematic (Jolt)?
+	// to-do: change to enum class
+	// AttachMode:
+	// None, Free, FixedConstraint (Fixed, when both have Physics), FixedGhost (Fixed, when both haven't Physics)
+	// ParentKinematicControl (Child has Physics, child controlled by parent)
+	// ParentGhostControl (Child hasn't Physics, child controlled by parent)
 	bool attached = false;
 
 	// Serialization

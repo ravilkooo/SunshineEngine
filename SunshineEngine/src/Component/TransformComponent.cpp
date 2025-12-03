@@ -54,12 +54,17 @@ DXSM::Matrix TransformComponent::GetScaleMatrix() const
     return DXSM::Matrix::CreateScale(m_scaleFactor);
 }
 
+DXSM::Matrix TransformComponent::GetWorldMatrix_noLocal() const
+{
+    return GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
+}
+
 DXSM::Matrix TransformComponent::GetWorldMatrix() const
 {
     DXSM::Matrix wt = GetLocalTransformMatrix() * GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
     if (m_parentTransform)
     {
-        wt = m_parentTransform->GetWorldMatrix() * wt;
+        wt = wt * m_parentTransform->GetWorldMatrix();
     }
     return wt;
 }
@@ -92,6 +97,14 @@ TransformComponent_Info::TransformComponent_Info(ID3D11Device* device)
 TransformComponent_Info::~TransformComponent_Info()
 {
 
+}
+
+void TransformComponent_Info::SetParentTransform(TransformComponent_Info* parentTransform_Info)
+{
+    if (parentTransform_Info)
+        m_assignedComponent->SetParentTransform(parentTransform_Info->m_assignedComponent.get());
+    else
+        m_assignedComponent->SetParentTransform(nullptr);
 }
 
 #define TC_ADD_FIELD(name) #name, &TransformComponent::name

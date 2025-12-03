@@ -39,6 +39,9 @@ void PropertyPanel::OnImGuiRender()
     DrawGameObjectHeader(obj);
     ImGui::Separator();
     
+    DrawParentnes(obj);
+    ImGui::Separator();
+
     DrawTransformComponent(obj);
     DrawDetails(obj);
     DrawLuaComponent(obj);
@@ -63,6 +66,30 @@ void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
     }
     
     ImGui::TextDisabled("UUID: %llu", obj->m_UUID.m_UUID);
+}
+
+void PropertyPanel::DrawParentnes(GameObject_Info* obj)
+{
+    if (obj->m_parent.uuid == SE::UUID(0u) || !(obj->m_parent.ptr))
+    {
+        ImGui::Text("No parent object");
+        return;
+    }
+
+    ImGui::Text("Parent: ");
+    ImGui::SameLine();
+    ImGui::Text(obj->m_parent.ptr->m_name.c_str());
+
+    ImGui::SetNextItemWidth(-FLT_MIN);
+
+    bool attached = obj->m_parent.attached;
+    ImGui::Checkbox("Attached to parent: ", &attached); ImGui::SameLine();
+    if (attached != obj->m_parent.attached)
+    {
+        if (attached) obj->AttachToParent();
+        else obj->DetachFromParent();
+    }
+
 }
 
 void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)

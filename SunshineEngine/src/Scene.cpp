@@ -72,8 +72,13 @@ void Scene::RestoreParents()
 {
     for (auto& pair : uuidToObjectMap)
     {
-        pair.second->m_parent.ptr = (pair.second->m_parent.uuid.m_UUID != uint64_t(0u) ?
-            uuidToObjectMap[pair.second->m_parent.uuid].get() : nullptr);
+        if (pair.second->m_parent.uuid != SE::UUID(0u))
+        {
+            ParentNode pn = pair.second->m_parent;
+            pn.ptr = uuidToObjectMap[pair.second->m_parent.uuid].get();
+
+            pair.second->SetParent(pn);
+        }
     }
 }
 
@@ -149,7 +154,12 @@ void Scene_Info::RestoreParents()
 {
     for (auto& pair : uuidToObjectMap)
     {
-        pair.second->m_parent.ptr = (pair.second->m_parent.uuid.m_UUID != uint64_t(0u) ?
-            uuidToObjectMap[pair.second->m_parent.uuid].get() : nullptr);
+        if (pair.second->m_parent.uuid != SE::UUID(0u))
+        {
+            ParentNode pn = pair.second->m_parent;
+            pn.ptr = uuidToObjectMap[pair.second->m_parent.uuid].get();
+
+            pair.second->SetParent(pn);
+        }
     }
 }

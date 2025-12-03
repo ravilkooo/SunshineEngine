@@ -53,6 +53,7 @@ public:
     DXSM::Matrix GetLocalScaleMatrix() const;
 
     DXSM::Matrix GetLocalTransformMatrix() const;
+    DXSM::Matrix GetWorldMatrix_noLocal() const;
 
     // World Transform
     DXSM::Matrix GetWorldMatrix() const; // include LocalTransfrom
@@ -112,6 +113,8 @@ public:
     json ToJson() const override;
     //void FromJson(const json& j) override;
     void FromJson(const json& j, ID3D11Device* device);
+
+    void SetParentTransform(TransformComponent_Info* parentTransform_Info);
 };
 
 // Macro listing fields of TransformComponent to expose in Lua bindings

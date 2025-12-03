@@ -36,6 +36,8 @@ private:
     
     void DrawGameObjectHeader(GameObject_Info* obj);
 
+    void DrawParentnes(GameObject_Info* obj);
+
     void DrawTransformComponent(GameObject_Info* obj);
     void DrawDetails(GameObject_Info* obj);
     void DrawComponentAddPopup(GameObject_Info* obj);
