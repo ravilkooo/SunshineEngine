@@ -4,8 +4,9 @@
 #include <Component/TransformComponent.h>
 #include <Component/MeshComponent.h>
 #include <GameObject/Lighting/AmbientLight.h>
-#include <GameObject/Lighting/PointLight.h>
 #include <GameObject/Lighting/DirectionalLight.h>
+#include <GameObject/Lighting/PointLight.h>
+#include <GameObject/Lighting/SpotLight.h>
 #include <GameObject/Lighting/SkyBox.h>
 #include <GameObject/Shapes/ShapeData.h>
 
@@ -17,6 +18,7 @@
 #include <Graphics/Renderer/Technique/AmbientLightTechnique.h>
 #include <Graphics/Renderer/Technique/DirectionalLightTechnique.h>
 #include <Graphics/Renderer/Technique/PointLightTechnique.h>
+#include <Graphics/Renderer/Technique/SpotLightTechnique.h>
 #include <Graphics/Renderer/Technique/SkyBoxTechnique.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
@@ -332,5 +334,23 @@ eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
     const json& j)
 {
     auto obj = eastl::make_unique<PointLight>(renderSystem, camera, j);
+    return obj;
+}
+
+eastl::unique_ptr<SpotLight> GameObjectFactory::CreateSpotLightObject(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    SE_G::SpotLightData initData)
+{
+    auto obj = eastl::make_unique<SpotLight>(renderSystem, camera, initData);
+    return obj;
+}
+
+eastl::unique_ptr<SpotLight> GameObjectFactory::CreateSpotLightObject(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    const json& j)
+{
+    auto obj = eastl::make_unique<SpotLight>(renderSystem, camera, j);
     return obj;
 }

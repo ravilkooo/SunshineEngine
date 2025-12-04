@@ -1,33 +1,47 @@
-#include "Graphics/Renderer/Technique/PointLightTechnique.h"
+#include "Graphics/Renderer/Technique/SpotLightTechnique.h"
 #include <Graphics/GraphicsResources/Mesh.h>
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
-    PointLightTechnique::PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
+
+    SpotLightTechnique::SpotLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
         eastl::string technique,
         eastl::shared_ptr<Camera> camera,
-        eastl::shared_ptr<PointLightData> lightData)
+        eastl::shared_ptr<SpotLightData> lightData)
         : LightTechnique(device, assignedTransform, technique, camera, lightData)
     {
         m_depthStencilState.reset(NULL);
         m_rasterizer.reset(NULL);
-        m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, DXSM::Vector3::One * lightData->Range, 1);
+
+        float coneAngle = acosf(powf(128.0f, -1.0f / lightData->Spot));
+        float width = lightData->Range * sinf(coneAngle);
+        float depth = lightData->Range;
+
+        m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device, DXSM::Vector3(width, depth, width));
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/PointLightVShader.hlsl").c_str());
+            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/SpotLightVShader.hlsl").c_str());
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/PointLightPShader.hlsl").c_str());
+            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/SpotLightPShader.hlsl").c_str());
     }
 
-    void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    void SpotLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
     {
         // to-do: update only when changed
         m_lightData->Position = m_assignedTransform->m_position;
+
+        DXSM::Matrix rot = m_assignedTransform->GetRotationMatrix();
+        DXSM::Vector3 dir = DXSM::Vector3::Transform(DXSM::Vector3::Down, rot);
+        float h = asinf(dir.y);
+        float eps = 0.001f;
+        float az = (h > (1.0f - eps)) ? atan2f(dir.z, dir.x) : 0.0f;
+        m_lightData->Direction = { az, h };
+
         m_lightDataBuffer->Update(context.Get(), *m_lightData);
         BindAll(context);
         DrawTechnique(context);
     }
 
-    void PointLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
+    void SpotLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         if (lightPos == LightPosition::INSIDE) {
             LightStaticData::depthCompGreater->Bind(context);
@@ -43,7 +57,7 @@ namespace SE_G {
         }
     }
 
-    void PointLightTechnique::ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos)
+    void SpotLightTechnique::ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         if (lightPos == LightPosition::INSIDE) {
             LightStaticData::rastCullFront->Bind(context);
@@ -59,7 +73,7 @@ namespace SE_G {
         }
     }
 
-    LightPosition PointLightTechnique::GetLightPositionInFrustum()
+    LightPosition SpotLightTechnique::GetLightPositionInFrustum()
     {
         if (IsFrustumInsideOfLight())
             return LightPosition::FILL;
@@ -110,7 +124,7 @@ namespace SE_G {
         return isOutside ? LightPosition::INSIDE : LightPosition::OUTSIDE;
     }
 
-    bool PointLightTechnique::IsFrustumInsideOfLight()
+    bool SpotLightTechnique::IsFrustumInsideOfLight()
     {
         Camera::FrustumCorners frustum = m_camera->GetFrustumCorners();
         for (int i = 0; i < 4; ++i) {

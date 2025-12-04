@@ -24,7 +24,12 @@ namespace SE_G {
 		m_lightViewCamera = eastl::make_unique<SE_G::Camera>(device,
 			m_shadowMap.m_mapWidth / m_shadowMap.m_mapHeight);
 		m_lightViewCamera->SetPosition(lightData->Position);
-		m_lightViewCamera->SetTarget(lightData->Position + lightData->Direction);
+		DXSM::Vector3 direction = DXSM::Vector3(
+			cos(lightData->Direction.y) * cos(lightData->Direction.x),
+			sin(lightData->Direction.y),
+			cos(lightData->Direction.y) * sin(lightData->Direction.x)
+		);
+		m_lightViewCamera->SetTarget(lightData->Position + direction);
 		DXSM::Vector3 cameraUp = { 0, 1, 0 };
 		cameraUp.Normalize();
 		m_lightViewCamera->SetUp(cameraUp);
@@ -168,6 +173,24 @@ namespace SE_G {
 		context->PSSetShaderResources(0u, 0u, nullptr);
 		BindAllPerFrame();
 
+
+		DXSM::Vector3 direction = DXSM::Vector3(
+			cos(m_lightData->Direction.y) * cos(m_lightData->Direction.x),
+			sin(m_lightData->Direction.y),
+			cos(m_lightData->Direction.y) * sin(m_lightData->Direction.x)
+		);
+		float eps = 0.01f;
+		if (abs(direction.z) < 1.0f - eps)
+		{
+			DXSM::Vector3 _help = direction.Cross(DXSM::Vector3::Up);
+			m_lightViewCamera->SetUp(_help.Cross(direction));
+		}
+		else
+		{
+			DXSM::Vector3 _help = direction.Cross(DXSM::Vector3::Backward);
+			m_lightViewCamera->SetUp(_help.Cross(direction));
+		}
+
 		for (currCascade = 0; currCascade < 4; currCascade++)
 		{
 			context->OMSetRenderTargets(0, NULL, NULL);
@@ -182,7 +205,6 @@ namespace SE_G {
 			context->ClearDepthStencilView(m_shadowMap.m_depthDSV[currCascade].Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 			// Get data for current cascade
-			
 			GenerateBoundingFrustum(currCascade);
 			MapCurrentCascadeData();
 			m_shadowTransformsConstantBuffer->Bind(GetDeviceContext());
@@ -277,7 +299,14 @@ namespace SE_G {
 		DXSM::Vector3 newCamPos_worldSpace = DXSM::Vector3::Transform(newCamPos_oldViewSpace, lightViewMatInv);
 
 		m_lightViewCamera->SetPosition(newCamPos_worldSpace);
-		m_lightViewCamera->SetTarget(newCamPos_worldSpace + m_lightData->Direction);
+
+		DXSM::Vector3 direction = DXSM::Vector3(
+			cos(m_lightData->Direction.y) * cos(m_lightData->Direction.x),
+			sin(m_lightData->Direction.y),
+			cos(m_lightData->Direction.y) * sin(m_lightData->Direction.x)
+		);
+
+		m_lightViewCamera->SetTarget(newCamPos_worldSpace + direction);
 		m_lightViewCamera->SetNearZ(_nearZ);
 		m_lightViewCamera->SetFarZ(newDeltaZ + _nearZ);
 		m_lightViewCamera->SetViewWidth(newWidth);

@@ -558,7 +558,7 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
+                        -4.5,
                         0.0,
                         0.0
                     ],
@@ -584,12 +584,11 @@
                 },
                 "DiffusePad": 1.0,
                 "Direction": {
-                    "x": 0.4364357590675354,
-                    "y": -0.8728715181350708,
-                    "z": 0.2182178795337677
+                    "x": 0.8464847207069397,
+                    "y": -0.7504915595054626
                 },
                 "Position": {
-                    "x": 0.0,
+                    "x": -4.5,
                     "y": 0.0,
                     "z": 0.0
                 },
@@ -883,13 +882,86 @@
                     ]
                 }
             },
-            "m_UUID": 14086594813797626014,
+            "m_UUID": 4409358042948180694,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
                 "attached": true,
                 "uuid": 2232906597439411555
             }
+        },
+        {
+            "components": {
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 13780240543166426970,
+            "m_group": "Lighting",
+            "m_lightData": {
+                "Att": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "Diffuse": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "DiffusePad": 1.0,
+                "Direction": {
+                    "x": 0.0,
+                    "y": -0.7853981852531433
+                },
+                "Position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "Range": 20.0,
+                "Specular": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SpecularPad": 1.0,
+                "Spot": 10.0,
+                "pad": 0.0
+            },
+            "m_name": "SpotLight",
+            "m_parent": null,
+            "m_type": "PointLight"
         }
     ]
 }

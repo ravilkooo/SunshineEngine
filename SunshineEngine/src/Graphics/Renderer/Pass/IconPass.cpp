@@ -1,6 +1,7 @@
 #include <Graphics/Renderer/Pass/IconPass.h>
-#include <Utils/StringUtils.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/GraphicsResources/GeometryShader.h>
+#include <Utils/StringUtils.h>
 
 namespace SE_G {
 	IconPass::IconPass(ID3D11Device* device, ID3D11DeviceContext* context,

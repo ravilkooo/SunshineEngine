@@ -34,7 +34,7 @@ public:
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3::Zero, 0,
-            DXSM::Vector3(1, -1, 1), 0
+            DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
         }, bool castsShadow = true);
 
     DirectionalLight(
@@ -63,7 +63,7 @@ public:
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3::Zero, 0,
-            DXSM::Vector3(1, -1, 1), 0
+            DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
         }, bool castsShadow = true);
 
     DirectionalLight_Info(

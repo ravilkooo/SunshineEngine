@@ -1,6 +1,9 @@
-#include "Graphics/Renderer/Pass/SelectionPass.h"
-#include <Utils/StringUtils.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
+#include <Graphics/Renderer/Pass/IconPass.h>
+#include <Graphics/GraphicsResources/GeometryShader.h>
+
+#include <Utils/StringUtils.h>
 
 namespace SE_G {
 	SelectionPass::SelectionPass(ID3D11Device* device, ID3D11DeviceContext* context,

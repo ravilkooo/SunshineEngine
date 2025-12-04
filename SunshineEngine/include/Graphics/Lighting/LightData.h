@@ -18,8 +18,9 @@ namespace SE_G {
         DXSM::Vector3 Position;
         float pad1;
 
-        DXSM::Vector3 Direction;
+        DXSM::Vector2 Direction;
         float pad2;
+        float pad3;
     };
 
     struct PointLightData {
@@ -42,11 +43,12 @@ namespace SE_G {
         DXSM::Vector3 Position;
         float Range;
 
-        DXSM::Vector3 Direction;
+        DXSM::Vector2 Direction;
         float Spot;
+        float pad;
 
         DXSM::Vector3 Att;
-        float pad;
+        float pad2;
     };
 
     struct SkyBoxData {
