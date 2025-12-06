@@ -20,6 +20,7 @@
 #include "UI/BottomBarPanel.h"
 #include "UI/LogPanel.h"
 #include "UI/PropertyPanel.h"
+#include "UI/ProjectSelector.h"
 
 class EditorApp;
 
@@ -43,6 +44,12 @@ public:
     void ShowOutputLog();
     void LuaImgui(GameObject*);
 
+    void ShowProjectSelector();
+    bool IsProjectSelectorVisible() const { return m_ProjectSelector.IsVisible(); }
+    bool IsProjectSelected() const { return m_ProjectSelected; }
+    eastl::shared_ptr<SE::Project> GetSelectedProject() { return m_ProjectSelector.GetSelectedProject(); }
+    void ResetProjectSelection() { m_ProjectSelected = false; m_ProjectSelector.Close(); }
+
     UINT m_editorAppWidth = 800;
     UINT m_editorAppHeight = 800;
 
@@ -64,6 +71,7 @@ public:
     LogPanel m_GameLogPanel = LogPanel{"Game Output Log", LogManager::LogTarget::Game};
     BottomBarPanel m_BottomPanel;
     PropertyPanel m_PropertyPanel;
+    SE::ProjectSelector m_ProjectSelector;
 
     bool m_ShowEditorLogPanel = false;
     bool m_ShowGameLogPanel = false;
@@ -86,5 +94,6 @@ private:
     //int selectedIdx = -1;
     bool objectSelected = false;
     SE::UUID selectedUUID;
+    bool m_ProjectSelected = false;
 };
 

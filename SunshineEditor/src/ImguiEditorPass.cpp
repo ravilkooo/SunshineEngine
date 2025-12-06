@@ -86,6 +86,18 @@ void ImguiEditorPass::Pass()
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	if (!m_ProjectSelected)
+	{
+		if (m_ProjectSelector.Show())
+		{
+			m_ProjectSelected = true;
+		}
+		
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		return;
+	}
+	
 	// Main Menu Bar
 	m_MainMenuBarPanel.OnImGuiRender();
 

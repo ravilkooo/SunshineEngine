@@ -61,13 +61,13 @@ public:
     void SaveProject();
 
     // Create new project (create folder, scene.json, and add it to projectlist)
-    void CreateProject();
+    // void CreateProject();
 
     // Add existing project to projectlist (console-driven)
-    void AddProject();
+    // void AddProject();
 
     // Remove project from projectlist (console-driven)
-    void RemoveProject();
+    // void RemoveProject();
 
     void RunApp();
 
@@ -86,7 +86,7 @@ public:
     eastl::shared_ptr<SE_G::RenderingSystem> m_renderingSystem;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;
-    SE::Project* m_openedProject = nullptr;
+    eastl::shared_ptr<SE::Project> m_openedProject;
     eastl::unique_ptr<Game> m_currentGame;
 
     GameTimer m_timer;
@@ -124,7 +124,9 @@ private:
     ImguiEditorPass* imguiEditorPass;
     bool m_initialized = false;
 
+    bool m_projectSelected = false;
+
 private:
     // Only for testing
-    void ChooseProject();
+    // void ChooseProject();
 };
