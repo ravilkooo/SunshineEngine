@@ -54,6 +54,12 @@ public:
 
     bool LoadScene(const wchar_t* scenePath);
 
+    bool LoadGAIScene();
+    bool LoadDefaultScene();
+    bool LoadParentScene();
+    bool LoadLuaScene();
+    bool LoadResourcesScene();
+
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 
     UINT m_screenWidth = 800u;
@@ -75,5 +81,8 @@ public:
     SE_G::LightPass* m_lightPass;
 
     float m_deltaTime = 0.0f;
+
+    // GAI
+    void CreateGAIScene();
 };
 

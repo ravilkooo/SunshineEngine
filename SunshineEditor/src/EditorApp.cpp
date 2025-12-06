@@ -99,16 +99,46 @@ void EditorApp::RunApp()
 	}
 
 	// To-do: remove this
+	/*
 	m_worldEditor->m_scene->AddGameObject(
 		EditorObjectFactory::CreateSpotLightObject(m_worldEditor->m_renderer.get(),
 			m_worldEditor->m_renderer->GetMainCamera())
 	);
+	*/
 
 	//
 
 	m_worldEditor->m_scene->InitHierarchy();
-	ContentBrowserPanel::s_AssetsDirectory =
-		std::filesystem::path(m_openedProject->GetFullPath().c_str());
+
+
+	if (m_loadedSceneType == LoadedSceneType::Custom)
+	{
+		ContentBrowserPanel::s_AssetsDirectory = std::filesystem::path(m_openedProject->GetFullPath().c_str());
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Default)
+	{
+		ContentBrowserPanel::s_AssetsDirectory = std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
+	}
+	else if (m_loadedSceneType == LoadedSceneType::GAI)
+	{
+		ContentBrowserPanel::s_AssetsDirectory = std::filesystem::path(SE::Project(L"GAI/").GetFullPath().c_str());
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Parent)
+	{
+		ContentBrowserPanel::s_AssetsDirectory = std::filesystem::path(SE::Project(L"Hierarchy/").GetFullPath().c_str());
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Lua)
+	{
+		ContentBrowserPanel::s_AssetsDirectory = std::filesystem::path(SE::Project(L"Lua/").GetFullPath().c_str());
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Resources)
+	{
+		ContentBrowserPanel::s_AssetsDirectory = std::filesystem::path(SE::Project(L"Resources/").GetFullPath().c_str());
+	}
+	else
+	{
+		ContentBrowserPanel::s_AssetsDirectory = std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
+	}
 	
 
 	float physicsUpdateFPS = 120.0f;
@@ -152,7 +182,36 @@ void EditorApp::RunApp()
 			FPSstatisticTimer -= 1.0f;
 
 			WCHAR text[256];
-			swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), m_openedProject->GetSubPath().c_str(), fps);
+			
+			if (m_loadedSceneType == LoadedSceneType::Custom)
+			{
+				swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), m_openedProject->GetSubPath().c_str(), fps);
+			}
+			else if (m_loadedSceneType == LoadedSceneType::Default)
+			{
+				swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), L"TestingMode: DefaultScene", fps);
+			}
+			else if (m_loadedSceneType == LoadedSceneType::GAI)
+			{
+				swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), L"TestingMode: GAI", fps);
+			}
+			else if (m_loadedSceneType == LoadedSceneType::Parent)
+			{
+				swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), L"TestingMode: Hierarchy", fps);
+			}
+			else if (m_loadedSceneType == LoadedSceneType::Lua)
+			{
+				swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), L"TestingMode: Lua", fps);
+			}
+			else if (m_loadedSceneType == LoadedSceneType::Resources)
+			{
+				swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), L"TestingMode: Resources", fps);
+			}
+			else
+			{
+				swprintf_s(text, TEXT("SunshineEngine: [???]   FPS: %f"), fps);
+			}
+
 			SetWindowText(m_displayWindow.m_hWnd, text);
 
 			frameCount = 0;
@@ -440,10 +499,11 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 
 void EditorApp::RunGame() {
 	m_runtimeMode = RuntimeMode::GAME_MODE;
-
-	// To-do: there should be path to opened project
-	// to-do: class Project
-	m_worldEditor->SaveScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
+	
+	if (m_loadedSceneType == LoadedSceneType::Custom)
+	{
+		m_worldEditor->SaveScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());	
+	}
 	
 	m_worldEditor->Pause();
 
@@ -451,18 +511,36 @@ void EditorApp::RunGame() {
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
-	m_currentGame->SetupPhysics();
-	m_currentGame->LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
-	m_currentGame->m_physicsSystem->FinalizeScene();
+
+	if (m_loadedSceneType == LoadedSceneType::Custom)
+	{
+		m_currentGame->LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Default)
+	{
+		m_currentGame->LoadDefaultScene();
+	}
+	else if (m_loadedSceneType == LoadedSceneType::GAI)
+	{
+		m_currentGame->LoadGAIScene();
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Parent)
+	{
+		m_currentGame->LoadParentScene();
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Lua)
+	{
+		m_currentGame->LoadLuaScene();
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Resources)
+	{
+		m_currentGame->LoadResourcesScene();
+	}
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
-
-	// There should be saving scene from world editor (serializing) and loading to game (deserializing)
-	// m_worldEditor->SaveScene(...);
-	// m_currentGame->LoadScene(...);
 }
 
 void EditorApp::PauseGame() {
@@ -505,7 +583,10 @@ void EditorApp::ChooseProject()
 	{
 		SE::PrintProjectsToConsole(m_projectsList);
 
-		std::cout << "Choose project (index), or 'n' (new), 'a' (add), 'r' (remove): ";
+		std::cout << "Choose project (index), or 'n' (new), 'a' (add), 'r' (remove);\n" <<
+			"Or choose one of testing project:\n" <<
+			"\t'gai' (GAI testing), 'def' (default),\n" <<
+			"\t'par' (parent), 'lua' (lua scripting), 'res' (resources): ";
 
 		std::string input;
 		std::cin >> input;
@@ -525,6 +606,26 @@ void EditorApp::ChooseProject()
 			SE::LoadProjects(m_projectsList);
 			continue;
 		}
+		else if (input == "gai") {
+			m_loadedSceneType = LoadedSceneType::GAI;
+			return;
+		}
+		else if (input == "def") {
+			m_loadedSceneType = LoadedSceneType::Default;
+			return;
+		}
+		else if (input == "par") {
+			m_loadedSceneType = LoadedSceneType::Parent;
+			return;
+		}
+		else if (input == "lua") {
+			m_loadedSceneType = LoadedSceneType::Lua;
+			return;
+		}
+		else if (input == "res") {
+			m_loadedSceneType = LoadedSceneType::Resources;
+			return;
+		}
 
 		bool allDigits = !input.empty() && std::all_of(input.begin(), input.end(), ::isdigit);
 		if (!allDigits) {
@@ -536,6 +637,7 @@ void EditorApp::ChooseProject()
 		if (chosenProject < m_projectsList.size())
 		{
 			m_openedProject = &m_projectsList[chosenProject];
+			m_loadedSceneType = LoadedSceneType::Custom;
 			break;
 		}
 		else
@@ -683,22 +785,53 @@ void EditorApp::RemoveProject()
 
 bool EditorApp::OpenProject()
 {
+
+	if (m_loadedSceneType == LoadedSceneType::Custom)
+	{
+		return m_worldEditor->LoadScene(JoinWchar_Wstring(
+			m_openedProject->GetFullPath().c_str(),
+			L"scene.json").c_str());
+	}
+	else if (m_loadedSceneType == LoadedSceneType::GAI)
+	{
+		m_worldEditor->CreateGAIScene();
+		return true;
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Default)
+	{
+		m_worldEditor->CreateDefaultScene();
+		return true;
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Parent)
+	{
+		m_worldEditor->CreateParentScene();
+		return true;
+
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Lua)
+	{
+		m_worldEditor->CreateLuaScene();
+		return true;
+	}
+	else if (m_loadedSceneType == LoadedSceneType::Resources)
+	{
+		m_worldEditor->CreateResourcesScene();
+		return true;
+	}
 	/*
-	m_worldEditor->CreateParentTestScene();
-	return true;
 	*/
+	return false;
 	
-	
-	return m_worldEditor->LoadScene(JoinWchar_Wstring(
-		m_openedProject->GetFullPath().c_str(),
-		L"scene.json").c_str());
 }
 
 void EditorApp::SaveProject()
 {
-	m_openedProject->UpdateSaveTime();
-	SE::SaveProjects(m_projectsList);
-	m_worldEditor->SaveScene(JoinWchar_Wstring(
-		m_openedProject->GetFullPath().c_str(),
-		L"scene.json").c_str());
+	if (m_loadedSceneType == LoadedSceneType::Custom)
+	{
+		m_openedProject->UpdateSaveTime();
+		SE::SaveProjects(m_projectsList);
+		m_worldEditor->SaveScene(JoinWchar_Wstring(
+			m_openedProject->GetFullPath().c_str(),
+			L"scene.json").c_str());
+	}
 }

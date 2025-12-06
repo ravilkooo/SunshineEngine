@@ -64,6 +64,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		return false;
 	}
 
+	SetupPhysics();
 	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	/*
 	if (!loadedScene) {
@@ -107,6 +108,67 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_tracingSystem->FinalizeScene();
 	*/
 
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadGAIScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadDefaultScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadParentScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadLuaScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadResourcesScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
