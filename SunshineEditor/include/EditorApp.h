@@ -29,6 +29,10 @@
 #include <WorldEditor.h>
 #include <ImguiEditorPass.h>
 
+enum class LoadedSceneType
+{
+    Custom, GAI, Default, Parent, Lua, Resources
+};
 
 enum class MoveKey
 {
@@ -83,6 +87,8 @@ public:
     void Render();
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
+
+    LoadedSceneType m_loadedSceneType = LoadedSceneType::Custom;
 
     SE::ProjectList m_projectsList = { SE::Project() };
 

@@ -882,7 +882,7 @@
                     ]
                 }
             },
-            "m_UUID": 4409358042948180694,
+            "m_UUID": 9904250048562420471,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -940,10 +940,6 @@
                     "z": 1.0
                 },
                 "DiffusePad": 1.0,
-                "Direction": {
-                    "x": 0.0,
-                    "y": -0.7853981852531433
-                },
                 "Position": {
                     "x": 0.0,
                     "y": 0.0,
@@ -956,10 +952,9 @@
                     "z": 1.0
                 },
                 "SpecularPad": 1.0,
-                "Spot": 10.0,
                 "pad": 0.0
             },
-            "m_name": "SpotLight",
+            "m_name": "PointLight",
             "m_parent": null,
             "m_type": "PointLight"
         }

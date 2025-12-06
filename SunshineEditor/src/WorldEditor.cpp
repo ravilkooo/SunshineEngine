@@ -160,7 +160,7 @@ void WorldEditor::SetupRendering(
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
 }
 
-void WorldEditor::CreateParentTestScene()
+void WorldEditor::CreateParentScene()
 {
 	{
 		this->m_scene = eastl::make_shared<Scene_Info>();
@@ -470,6 +470,45 @@ void WorldEditor::CreateDefaultScene()
 
 		//m_physicsSystem->FinalizeScene();
 	}
+
+	m_selectionPass->m_scene = m_scene.get();
+}
+
+void WorldEditor::CreateGAIScene()
+{
+	this->m_scene = eastl::make_shared<Scene_Info>();
+
+	// Add some GameObject_Info
+	// ...
+	// ...
+	// ...
+	// ...
+
+	m_selectionPass->m_scene = m_scene.get();
+}
+
+void WorldEditor::CreateLuaScene()
+{
+	this->m_scene = eastl::make_shared<Scene_Info>();
+
+	// Add some GameObject_Info
+	// ...
+	// ...
+	// ...
+	// ...
+
+	m_selectionPass->m_scene = m_scene.get();
+}
+
+void WorldEditor::CreateResourcesScene()
+{
+	this->m_scene = eastl::make_shared<Scene_Info>();
+
+	// Add some GameObject_Info
+	// ...
+	// ...
+	// ...
+	// ...
 
 	m_selectionPass->m_scene = m_scene.get();
 }
