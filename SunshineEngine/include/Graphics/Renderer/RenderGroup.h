@@ -16,9 +16,11 @@ namespace SE_G {
 		ID3D11DeviceContext* GetDeviceContext();
 
 		// == void RenderScene();
-		void Pass();
-		RenderPass* AddPass(eastl::unique_ptr<RenderPass> pass);
-		RenderTechnique* AddTechnique(eastl::unique_ptr<RenderTechnique> tech);
+		virtual void Pass();
+		virtual RenderPass* AddPass(eastl::unique_ptr<RenderPass> pass);
+		RenderTechnique* AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech);
+		RenderTechnique* GetTechnique(SE::UUID uuid, eastl::string techniqueTag);
+		void RemoveTechnique(SE::UUID uuid, eastl::string techniqueTag);
 
 		bool IsEnabled();
 		void Disable();

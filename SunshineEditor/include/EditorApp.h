@@ -29,6 +29,10 @@
 #include <WorldEditor.h>
 #include <ImguiEditorPass.h>
 
+enum class LoadedSceneType
+{
+    Custom, GAI, Default, Parent, Lua, Resources
+};
 
 enum class MoveKey
 {
@@ -74,12 +78,17 @@ public:
     void RunGame();
     void StopGame();
 
+    void PauseGame();
+    void ContinueGame();
+
     void UpdateEditor(float deltaTime);
     void UpdateGame(float deltaTime);
 
     void Render();
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
+
+    LoadedSceneType m_loadedSceneType = LoadedSceneType::Custom;
 
     SE::ProjectList m_projectsList = { SE::Project() };
 
@@ -99,7 +108,7 @@ public:
         GAME_MODE, WORLD_EDITOR_MODE
     };
     RuntimeMode m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
-
+    bool m_gamePaused = false;
 private:
     // Camera movings
     void HandleKeyDown(Keys key);

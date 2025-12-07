@@ -41,16 +41,40 @@ namespace SE_G {
 		return m_passes.back().get();
 	}
 
-	RenderTechnique* RenderGroup::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
+	RenderTechnique* RenderGroup::AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech)
+	{
 		for (auto& pass : m_passes)
 		{
 			if (pass->GetTechniqueTag() == tech->GetTechniqueTag())
 			{
-				return pass->AddTechnique(eastl::move(tech));
+				return pass->AddTechnique(uuid, eastl::move(tech));
 			}
 		}
 		// log << ("RenderGroup %s has not pass with %s tag", m_groupName, tech->GetTechniqueTag())
 		return nullptr;
+	}
+	
+	RenderTechnique* RenderGroup::GetTechnique(SE::UUID uuid, eastl::string techniqueTag)
+	{
+		for (auto& pass : m_passes)
+		{
+			if (pass->GetTechniqueTag() == techniqueTag)
+			{
+				return pass->GetTechnique(uuid);
+			}
+		}
+		return nullptr;
+	}
+
+	void RenderGroup::RemoveTechnique(SE::UUID uuid, eastl::string techniqueTag)
+	{
+		for (auto& pass : m_passes)
+		{
+			if (pass->GetTechniqueTag() == techniqueTag)
+			{
+				return pass->RemoveTechnique(uuid);
+			}
+		}
 	}
 
 	bool RenderGroup::IsEnabled() {

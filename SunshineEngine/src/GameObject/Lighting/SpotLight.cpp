@@ -1,290 +1,144 @@
 #include "GameObject/Lighting/SpotLight.h"
 
+#include <Graphics/Renderer/Technique/SpotLightTechnique.h>
+#include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
 
-/*
+#include <Component/RenderComponent.h>
+#include <Component/TransformComponent.h>
 
-SpotLight::SpotLight(ID3D11Device* device, DXSM::Vector3 position,
-    float range, DXSM::Vector3 direction, float spot, DXSM::Vector3 att,
-    DXSM::Vector4 ambient, DXSM::Vector4 diffuse, DXSM::Vector4 specular)
+SpotLight::SpotLight(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    SE_G::SpotLightData initData)
 {
-    this->ambient;
-
-    if (att.z < 0.0001) {
-        float c = eastl::max(eastl::max(diffuse.x, diffuse.y), diffuse.z) / att.y;
-        range = eastl::max(range, (256.0f * c)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+    if (initData.Att.z < 0.0001) {
+        float c = eastl::max(eastl::max(initData.Diffuse.x, initData.Diffuse.y), initData.Diffuse.z) / initData.Att.y;
+        initData.Range = eastl::max(initData.Range, (256.0f * c)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
     }
     else {
-        float c = eastl::max(eastl::max(diffuse.x, diffuse.y), diffuse.z) / att.z;
-        range = eastl::max(range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+        float c = eastl::max(eastl::max(initData.Diffuse.x, initData.Diffuse.y), initData.Diffuse.z) / initData.Att.z;
+        initData.Range = eastl::max(initData.Range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
     }
 
-    spotLightData = {
-        diffuse, specular, position, range,
-        direction, spot,
-        att, 0.0f
-    };
+    m_lightData = eastl::make_shared<SE_G::SpotLightData>(initData);
 
-    //float coneAngle = acosf(powf(256.0f, -1.0f / spot));
-    //width = 2 * range * sinf(coneAngle);
-    float coneAngle = acosf(powf(128.0f, -1.0f / spot));
-    width = range * sinf(coneAngle);
-    depth = range;
+    auto device = renderSystem->GetDevice();
 
-    CreateSimpleCubeMesh(width, width, depth, diffuse, &vertices, &verticesNum, &indices, &indicesNum);
+    // TransformComponent
+    auto tc = eastl::make_shared<TransformComponent>(device);
+    tc->m_position = initData.Position;
 
-    // gPass
-    {
-        RenderTechnique* gPass = new RenderTechnique("gPass");
-        gPass->AddBind(new Bind::Topology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-        gPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
-        gPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
-        // AddStaticBind(texture);
+    // RenderComponent and Passes
+    auto rc = eastl::make_shared<RenderComponent>(m_UUID, renderSystem);
 
-        wchar_t vsFilePath[250];
-        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/GPass/SpotLightGBufferShaderVS.hlsl");
-        Bind::VertexShader* vertexShaderB = new Bind::VertexShader(device, vsFilePath);
-        gPass->AddBind(vertexShaderB);
+    // LightPass - LightTechnique
+    auto lightTech =
+        eastl::make_unique<SE_G::SpotLightTechnique>(device, tc.get(), "LightPass", camera, m_lightData);
+    rc->AddTechnique(eastl::move(lightTech));
 
-
-        numInputElements = 4;
-        IALayoutInputElements = (D3D11_INPUT_ELEMENT_DESC*)malloc(numInputElements * sizeof(D3D11_INPUT_ELEMENT_DESC));
-
-        IALayoutInputElements[0] =
-            D3D11_INPUT_ELEMENT_DESC{
-                "POSITION",
-                0,
-                DXGI_FORMAT_R32G32B32_FLOAT,
-                0,
-                0,
-                D3D11_INPUT_PER_VERTEX_DATA,
-                0 };
-        IALayoutInputElements[1] =
-            D3D11_INPUT_ELEMENT_DESC{
-                "COLOR",
-                0,
-                DXGI_FORMAT_R32G32B32A32_FLOAT,
-                0,
-                D3D11_APPEND_ALIGNED_ELEMENT,
-                D3D11_INPUT_PER_VERTEX_DATA,
-                0 };
-        IALayoutInputElements[2] =
-            D3D11_INPUT_ELEMENT_DESC{
-                "TEXCOORD",
-                0,
-                DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT,
-                0,
-                D3D11_APPEND_ALIGNED_ELEMENT,
-                D3D11_INPUT_PER_VERTEX_DATA,
-                0 };
-        IALayoutInputElements[3] =
-            D3D11_INPUT_ELEMENT_DESC{
-                "NORMAL",
-                0,
-                DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT,
-                0,
-                D3D11_APPEND_ALIGNED_ELEMENT,
-                D3D11_INPUT_PER_VERTEX_DATA,
-                0 };
-
-        gPass->AddBind(new Bind::InputLayout(device, IALayoutInputElements, numInputElements, vertexShaderB->GetBytecode()));
-
-
-        wchar_t psFilePath[250];
-        getGraphicsAssetPath(psFilePath, 250, L"Shaders/GPass/SpotLightGBufferShaderPS.hlsl");
-        gPass->AddBind(new Bind::PixelShader(device, psFilePath));
-
-
-        D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
-        rastDesc.CullMode = D3D11_CULL_NONE;
-        rastDesc.FillMode = D3D11_FILL_WIREFRAME;
-        gPass->AddBind(new Bind::Rasterizer(device, rastDesc));
-        gPass->AddBind(new Bind::TransformCBuffer(device, this, 0u));
-
-        // techniсs.insert({ "gPass", gPass });
-    }
-    // LightPass
-    {
-        RenderTechnique* lightPass = new RenderTechnique("LightPass");
-        lightPass->AddBind(new Bind::Topology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-        lightPass->AddBind(new Bind::IndexBuffer(device, indices, indicesNum));
-        // AddStaticBind(texture);
-
-        wchar_t vsFilePath[250];
-        getGraphicsAssetPath(vsFilePath, 250, L"Shaders/LightPass/SpotLightVShader.hlsl");
-        Bind::VertexShader* vertexShaderB = new Bind::VertexShader(device, vsFilePath);
-        lightPass->AddBind(vertexShaderB);
-
-
-        numInputElements = 1;
-        IALayoutInputElements = (D3D11_INPUT_ELEMENT_DESC*)malloc(numInputElements * sizeof(D3D11_INPUT_ELEMENT_DESC));
-
-        IALayoutInputElements[0] =
-            D3D11_INPUT_ELEMENT_DESC{
-                "POSITION",
-                0,
-                DXGI_FORMAT_R32G32B32_FLOAT,
-                0,
-                0,
-                D3D11_INPUT_PER_VERTEX_DATA,
-                0 };
-
-        lightPass->AddBind(new Bind::InputLayout(device, IALayoutInputElements, numInputElements, vertexShaderB->GetBytecode()));
-
-
-        wchar_t psFilePath[250];
-        getGraphicsAssetPath(psFilePath, 250, L"Shaders/LightPass/SpotLightPShader.hlsl");
-        lightPass->AddBind(new Bind::PixelShader(device, psFilePath));
-
-
-        // D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
-        // rastDesc.CullMode = D3D11_CULL_BACK;
-        // rastDesc.FillMode = D3D11_FILL_SOLID;
-        // lightPass->AddBind(new Bind::Rasterizer(device, rastDesc));
-
-        lightPass->AddBind(new Bind::VertexBuffer(device, vertices, verticesNum, sizeof(CommonVertex)));
-        lightPass->AddBind(new Bind::TransformCBuffer(device, this, 0u));
-
-        spotLightPBuffer = new Bind::PixelConstantBuffer<SpotLightPCB>(device, spotLightData, 1u);
-        lightPass->AddBind(spotLightPBuffer);
-
-        techniques.insert({ "LightPass", lightPass });
-    }
 }
 
-D3D11_DEPTH_STENCIL_DESC SpotLight::ChooseDepthStencilState(LightObject::LightPosition lightPos)
+SpotLight::SpotLight(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    const json& j)
 {
-    D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-    // hot fix
-    {
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_GREATER;
-        return dsDesc;
+    m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+    m_lightData = eastl::make_shared<SE_G::SpotLightData>(j["m_lightData"]);
+    m_name = "SpotLight";
+
+    auto device = renderSystem->GetDevice();
+
+    // TransformComponent
+    auto tc = AddComponent<TransformComponent>(device);
+    if (j["components"].contains("Transform")) {
+        tc->FromJson(j["components"]["Transform"]);
     }
-    if (lightPos == LightPosition::INSIDE) {
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_GREATER;
-    }
-    else if (lightPos == LightPosition::FILL || lightPos == LightPosition::BEHIND_NEAR_PLANE) {
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-    }
-    else if (lightPos == LightPosition::INTERSECT_FAR_PLANE) {
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-    }
-    else { // I dont know why, just
-        dsDesc.DepthEnable = TRUE;
-        dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        dsDesc.DepthFunc = D3D11_COMPARISON_GREATER;
-    }
-    return dsDesc;
+    tc->m_position = m_lightData->Position;
+
+    // RenderComponent and Passes
+    auto rc = AddComponent<RenderComponent>(m_UUID, renderSystem);
+
+    // LightPass - LightTechnique
+    auto lightTech =
+        eastl::make_unique<SE_G::SpotLightTechnique>(device, tc.get(), "LightPass", camera, m_lightData);
+    rc->AddTechnique(eastl::move(lightTech));
 }
 
-D3D11_RASTERIZER_DESC SpotLight::GetRasterizerDesc(LightObject::LightPosition lightPos)
+SpotLight_Info::SpotLight_Info(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    SE_G::SpotLightData initData)
 {
-    D3D11_RASTERIZER_DESC rasterDesc = {};
-
-    // hot fix
-    {
-        rasterDesc.CullMode = D3D11_CULL_NONE;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-        return rasterDesc;
+    if (initData.Att.z < 0.0001) {
+        float c = eastl::max(eastl::max(initData.Diffuse.x, initData.Diffuse.y), initData.Diffuse.z) / initData.Att.y;
+        initData.Range = eastl::max(initData.Range, (256.0f * c)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
+    }
+    else {
+        float c = eastl::max(eastl::max(initData.Diffuse.x, initData.Diffuse.y), initData.Diffuse.z) / initData.Att.z;
+        initData.Range = eastl::max(initData.Range, (16.0f * sqrtf(c) + 1.0f)); // range = max(range, (8.0f * sqrtf(c) + 1.0f));
     }
 
-    if (lightPos == LightPosition::INSIDE) {
-        rasterDesc.CullMode = D3D11_CULL_FRONT;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-    }
-    else if (lightPos == LightPosition::FILL || lightPos == LightPosition::BEHIND_NEAR_PLANE) {
-        rasterDesc.CullMode = D3D11_CULL_NONE;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-    }
-    else if (lightPos == LightPosition::INTERSECT_FAR_PLANE) {
-        rasterDesc.CullMode = D3D11_CULL_BACK;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-    }
-    else { // I dont know why, just
-        rasterDesc.CullMode = D3D11_CULL_FRONT;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;
-    }
-    return rasterDesc;
+    m_lightData = eastl::make_shared<SE_G::SpotLightData>(initData);
+    m_name = "SpotLight";
+    m_group = GameObjectGroup::Lighting;
+    m_type.m_asLight = LightObjectType::SpotLight;
+
+    auto device = renderSystem->GetDevice();
+
+    // TransformComponent
+    auto tc_info = AddComponent<TransformComponent_Info>(device);
+    tc_info->m_assignedComponent->m_position = initData.Position;
+
+    // RenderComponent and Passes
+    auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
+
+    // LightPass - LightTechnique
+    auto lightTech =
+        eastl::make_unique<SE_G::SpotLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+    rc_info->AddTechnique(eastl::move(lightTech));
+
+    // IconPass
+    auto iconTech =
+        eastl::make_unique<SE_G::IconTechnique>(device, tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
+            SE_G::IconData{ 4u, 0u, 1u, 1u, m_UUID.GetHilo() });
+
+    rc_info->AddTechnique(eastl::move(iconTech));
 }
 
-LightObject::LightPosition SpotLight::GetLightPositionInFrustum(Camera* camera)
+SpotLight_Info::SpotLight_Info(
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera,
+    const json& j)
 {
-    if (IsFrustumInsideOfLight(camera))
-        return LightPosition::FILL;
+    m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+    m_lightData = eastl::make_shared<SE_G::SpotLightData>(j["m_lightData"]);
+    m_name = "SpotLight";
+    m_group = GameObjectGroup::Lighting;
+    m_type.m_asLight = LightObjectType::SpotLight;
 
+    auto device = renderSystem->GetDevice();
 
-    Camera::FrustumPlanes planes = camera->GetFrustumPlanes();
-    XMVECTOR lightPosition = XMLoadFloat3(&(spotLightData.Position));
-
-    bool isOutside = false;
-    bool intersectsFarPlane = false;
-    bool behindNearPlane = false;
-
-    // Проверка каждой плоскости фрустума
-    XMVECTOR planesArray[] = { planes.Near, planes.Far, planes.Left, planes.Right, planes.Top, planes.Bottom };
-
-    for (int i = 0; i < 6; i++) {
-        // Расстояние от центра сферы до плоскости
-        float distance = XMVectorGetX(XMPlaneDotCoord(planesArray[i], lightPosition));
-
-        // Если расстояние меньше -radius, сфера полностью вне плоскости
-        if (distance <= -spotLightData.Range) {
-            return LightPosition::OUTSIDE;
-        }
-
-        // Если за ближней плоскостью
-        if (i == 0 && distance < 0) {
-            behindNearPlane = true;
-        }
-
-        // Если пересекает дальнюю плоскость
-        if (i == 1 && abs(distance) < spotLightData.Range) {
-            intersectsFarPlane = true;
-        }
-
-        // Если пересекает хотя бы одну плоскость, но не полностью вне
-        if (abs(distance) < spotLightData.Range) {
-            isOutside = true;
-        }
+    // TransformComponent
+    auto tc_info = AddComponent<TransformComponent_Info>(device);
+    if (j["components"].contains("Transform")) {
+        tc_info->FromJson(j["components"]["Transform"], device);
     }
+    tc_info->m_assignedComponent->m_position = m_lightData->Position;
 
-    if (intersectsFarPlane) {
-        return LightPosition::INTERSECT_FAR_PLANE;
-    }
+    // RenderComponent and Passes
+    auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
-    if (behindNearPlane) {
-        return LightPosition::BEHIND_NEAR_PLANE;
-    }
+    // LightPass - LightTechnique
+    auto lightTech =
+        eastl::make_unique<SE_G::SpotLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+    rc_info->AddTechnique(eastl::move(lightTech));
 
-    return isOutside ? LightPosition::INSIDE : LightPosition::OUTSIDE;
+    // IconPass
+    auto iconTech =
+        eastl::make_unique<SE_G::IconTechnique>(device, tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
+            SE_G::IconData{ 3u, 0u, 1u, 1u, m_UUID.GetHilo() });
 
+    rc_info->AddTechnique(eastl::move(iconTech));
 }
-
-bool SpotLight::IsFrustumInsideOfLight(Camera* camera)
-{
-    Camera::FrustumCorners frustum = camera->GetFrustumCorners();
-    for (int i = 0; i < 4; ++i) {
-        XMVECTOR vecToCorner = XMVectorSubtract(frustum.Near[i], DXSM::Vector3(spotLightData.Position));
-        float distance = XMVectorGetX(XMVector3Length(vecToCorner));
-        if (distance > spotLightData.Range) return false;
-    }
-    for (int i = 0; i < 4; ++i) {
-        XMVECTOR vecToCorner = XMVectorSubtract(frustum.Far[i], DXSM::Vector3(spotLightData.Position));
-        float distance = XMVectorGetX(XMVector3Length(vecToCorner));
-        if (distance > spotLightData.Range) return false;
-    }
-    return true;
-}
-
-void SpotLight::UpdateBuffers(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
-{
-    spotLightPBuffer->Update(context.Get(), spotLightData);
-}
-*/

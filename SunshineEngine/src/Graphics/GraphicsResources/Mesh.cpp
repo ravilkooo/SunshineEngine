@@ -1,4 +1,4 @@
-#include "Graphics/GraphicsResources/Mesh.h"
+#include <Graphics/GraphicsResources/Mesh.h>
 #include <Utils/StringUtils.h>
 
 #include <SimpleMath.h>
@@ -50,6 +50,10 @@ namespace SE_G {
         else if (!LoadModel(vertices, indices, path, attrFlags)) {
             m_path = "Box_repeat";
             FillUnwrappedBoxMesh_repeat(vertices, indices);
+            m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        }
+        else
+        {
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
 

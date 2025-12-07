@@ -1,5 +1,5 @@
 #include "Graphics/Renderer/Technique/IconTechnique.h"
-
+#include <Graphics/Bindable/DepthStencilState.h>
 
 namespace SE_G {
 	IconTechnique::IconTechnique(ID3D11Device* device, TransformComponent* assignedTransform,

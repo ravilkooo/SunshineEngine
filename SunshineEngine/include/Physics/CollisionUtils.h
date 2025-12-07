@@ -48,7 +48,7 @@ namespace SE {
     struct ColliderTransforms {
         DXSM::Vector3 m_offset = { 0, 0, 0 };
         DXSM::Vector3 m_rotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
-        DXSM::Vector3 m_scale = { 1, 1, 1 };
+        //DXSM::Vector3 m_scale = { 1, 1, 1 };
     };
 
     struct ColliderTransformCB {
@@ -107,8 +107,7 @@ namespace SE {
         {
             m_transformsData = {
                 { 0, 0, 0 },
-                { 0, 0, 0 },
-                { 1, 1, 1 }
+                { 0, 0, 0 }
             };
 
             m_transformMat = { DXSM::Matrix::Identity };
@@ -137,8 +136,7 @@ namespace SE {
         {
             m_transformsData = {
                 { 0, 0, 0 },
-                { 0, 0, 0 },
-                { 1, 1, 1 }
+                { 0, 0, 0 }
             };
 
             m_transformMat = { DXSM::Matrix::Identity };
@@ -203,8 +201,7 @@ namespace SE {
             {
                 DXSM::Matrix::CreateTranslation(m_transformsData.m_offset) *
                 DXSM::Matrix::CreateFromYawPitchRoll(m_transformsData.m_rotation.y,
-                    m_transformsData.m_rotation.x, m_transformsData.m_rotation.z) *
-                DXSM::Matrix::CreateScale(m_transformsData.m_scale)
+                    m_transformsData.m_rotation.x, m_transformsData.m_rotation.z)
             };
         }
 
@@ -258,7 +255,6 @@ namespace SE {
 
             j["transforms"]["offset"] = { m_transformsData.m_offset.x, m_transformsData.m_offset.y, m_transformsData.m_offset.z };
             j["transforms"]["rotation"] = { m_transformsData.m_rotation.x, m_transformsData.m_rotation.y, m_transformsData.m_rotation.z };
-            j["transforms"]["scale"] = { m_transformsData.m_scale.x, m_transformsData.m_scale.y, m_transformsData.m_scale.z };
 
             j["shapeType"] = m_shapeType;
 
@@ -302,11 +298,6 @@ namespace SE {
                     m_transformsData.m_rotation.x = t["rotation"][0].get<float>();
                     m_transformsData.m_rotation.y = t["rotation"][1].get<float>();
                     m_transformsData.m_rotation.z = t["rotation"][2].get<float>();
-                }
-                if (t.contains("scale") && t["scale"].is_array() && t["scale"].size() >= 3) {
-                    m_transformsData.m_scale.x = t["scale"][0].get<float>();
-                    m_transformsData.m_scale.y = t["scale"][1].get<float>();
-                    m_transformsData.m_scale.z = t["scale"][2].get<float>();
                 }
             }
 

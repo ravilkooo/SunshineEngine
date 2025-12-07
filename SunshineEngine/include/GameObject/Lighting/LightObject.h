@@ -20,7 +20,7 @@ public:
     // Unnecessary?
     //virtual void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) = 0;
 
-    json ToJson() const override {
+    virtual json ToJson() const override {
         json j = GameObject_Info::ToJson();
         j["m_lightData"] = *(m_lightData.get());
         return j;

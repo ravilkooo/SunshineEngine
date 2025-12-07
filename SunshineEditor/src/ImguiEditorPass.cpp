@@ -1,13 +1,27 @@
 #include <EASTL/string.h>
+#include <EASTL/priority_queue.h>
 
 #include "assimp/SceneCombiner.h"
 
 #include "ImguiEditorPass.h"
 #include <EditorApp.h>
+#include <WorldEditor.h>
+#include <SceneHierarchy.h>
 
 #include <Component/LuaComponent.h>
 #include <Utils/DebugUtils.h>
+#include <Utils/StringUtils.h>
+#include <UI/FontStyles.h>
 
+#include <sstream>
+
+template <typename T>
+std::string toString(const T& t)
+{
+	std::ostringstream ss;
+	ss << t;
+	return ss.str();
+}
 
 ImguiEditorPass::ImguiEditorPass(
 	EditorApp* editorApp)
@@ -53,14 +67,11 @@ ImguiEditorPass::ImguiEditorPass(
 	m_windowViewport.MinDepth = 0;
 	m_windowViewport.MaxDepth = 1.0f;
 
-	selectedUUID = SE::UUID(0u);
+	// selectedUUID = SE::UUID(0u);
 
-	// Change font to Arial to support Russian
 	ImGuiIO& io = ImGui::GetIO();
-	ImFont* fontArial = io.Fonts->AddFontFromFileTTF(
-		MakeEngineAssetPath_String("Fonts/Arial.ttf").c_str(), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
-		13.0f);
-	io.FontDefault = fontArial;
+	// Init fonts
+	EditorUI::FontStyles::Init(io);
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
 }
@@ -210,8 +221,12 @@ void ImguiEditorPass::Pass()
 			*/
 
 			if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
-				selectedUUID = m_editorApp->m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
-				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+					auto selectedUUID = m_editorApp->m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
+				if (selectedUUID != SE::UUID(0u))
+				{
+					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
+					m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+				}
 			}
 		}
 	}
@@ -274,8 +289,12 @@ void ImguiEditorPass::RenderGameWorld()
 
 void ImguiEditorPass::ShowSceneHierarchy()
 {
+	DrawSceneGraph(m_editorApp->m_worldEditor->m_scene->m_sceneGraph.get(), m_editorApp->m_worldEditor->m_hierarchySelection);
+	/*
+	InitHierarchy();
+
 	ImGui::Text("Scene Hierarchy");
-	if (ImGui::TreeNode("Root"))
+	if (ImGui::TreeNode(WStringToUtf8(m_editorApp->m_openedProject->GetSubPath()).c_str()))
 	{
 		auto& objects = m_editorApp->m_worldEditor->m_scene->gameObjects;
 		for (size_t i = 0; i < objects.size(); ++i)
@@ -301,8 +320,15 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			}
 			ImGui::PopID();
 		}
+
+		for (auto& node : nodesHierarchy)
+		{
+			ShowNode(node);
+		}
+
 		ImGui::TreePop();
 	}
+	*/
 }
 
 void ImguiEditorPass::ShowContentBrowser()
@@ -313,11 +339,11 @@ void ImguiEditorPass::ShowContentBrowser()
 void ImguiEditorPass::ShowProperties()
 {
 	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
-	m_PropertyPanel.SetSelectedUUID(selectedUUID);
+	m_PropertyPanel.SetSelectedUUID(m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked);
 	m_PropertyPanel.OnImGuiRender();
 
 	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
-		selectedUUID
+		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
 	);
 
 	/*
@@ -480,4 +506,44 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	m_windowViewport.TopLeftY = 0;
 	m_windowViewport.MinDepth = 0;
 	m_windowViewport.MaxDepth = 1.0f;
+}
+
+void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
+		| ImGuiTreeNodeFlags_SpanFullWidth
+		| ImGuiTreeNodeFlags_DefaultOpen
+		| ImGuiTreeNodeFlags_DrawLinesToNodes;
+	const bool is_leaf = node->children.empty();
+	if (is_leaf)
+		flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+	if (sel.Contains(node->objUUID))
+		flags |= ImGuiTreeNodeFlags_Selected;
+
+	ImGui::PushID(node); // stable id (or use UUID string)
+	//bool open = ImGui::TreeNodeEx((void*)node, flags, "%s", node->objUUID.ToString().c_str());
+	bool open = ImGui::TreeNodeEx((void*)node, flags, "%s",
+		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_uuidToObjectMap[node->objUUID]->m_name);
+
+	// Selection handling: click label to select; arrow toggles open.
+	if (ImGui::IsItemClicked()) {
+		// To-do: uncomment when mutliple selection will be implemented
+		/*
+		if (ImGui::GetIO().KeyCtrl) sel.Toggle(node->objUUID);
+		else 
+		*/
+		sel.SetSingle(node->objUUID);
+		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = node->objUUID;
+	}
+
+	if (!is_leaf && open) {
+		for (auto* child : node->children)
+			DrawNode(child, sel);
+		ImGui::TreePop();
+	}
+	ImGui::PopID();
+}
+
+void ImguiEditorPass::DrawSceneGraph(SceneGraph* g, Selection& sel) {
+	for (auto* root : g->m_roots)
+		DrawNode(root, sel);
 }

@@ -1,6 +1,14 @@
 #pragma once
 #include "RenderTechnique.h"
+
 #include <Graphics/Bindable/ConstantBuffer.h>
+#include <Graphics/GraphicsResources/VertexShader.h>
+#include <Graphics/GraphicsResources/PixelShader.h>
+#include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/Bindable/BlendState.h>
+#include <Graphics/Bindable/Rasterizer.h>
+#include <Graphics/Bindable/DepthStencilState.h>
+
 #include <Graphics/Utils/Camera.h>
 #include <Graphics/Lighting/LightData.h>
 
@@ -9,11 +17,32 @@ namespace SE_G {
         INSIDE, INTERSECT_FAR_PLANE, OUTSIDE, FILL, BEHIND_NEAR_PLANE
     };
 
+	// ------- static data -------
+	class LightStaticData
+	{
+	public:
+		static bool s_staticDataInitializated;
+		static eastl::shared_ptr<Bind::DepthStencilState> depthCompLess;
+		static eastl::shared_ptr<Bind::DepthStencilState> depthCompGreater;
+
+		static eastl::shared_ptr<Bind::Rasterizer> rastCullNone;
+		static eastl::shared_ptr<Bind::Rasterizer> rastCullBack;
+		static eastl::shared_ptr<Bind::Rasterizer> rastCullFront;
+
+		static void InitStaticData(ID3D11Device* device);
+	};
+
+	
+	// ------- ---------- -------
+
+
+
     template <class T>
     class LightTechnique :
         public RenderTechnique
     {
     public:
+
         eastl::shared_ptr<T> m_lightData;
         eastl::shared_ptr<Bind::PixelConstantBuffer<T>> m_lightDataBuffer;
         eastl::shared_ptr<Camera> m_camera;
@@ -23,6 +52,12 @@ namespace SE_G {
             eastl::shared_ptr<T> lightData)
 			: RenderTechnique(device, assignedTransform, technique)
 		{
+
+			if (!LightStaticData::s_staticDataInitializated)
+			{
+				LightStaticData::InitStaticData(device);
+			}
+
 			D3D11_BLEND_DESC blendDesc = {};
 			blendDesc.RenderTarget[0].BlendEnable = TRUE;
 			blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
@@ -45,6 +80,7 @@ namespace SE_G {
 
 			m_camera = camera;
 		}
+
 		virtual ~LightTechnique() = default;
 
         virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override

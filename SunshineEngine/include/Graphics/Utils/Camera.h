@@ -14,6 +14,7 @@ namespace DXSM = DirectX::SimpleMath;
 namespace SE_G {
     class Camera
     {
+        friend class ShadowMapPass;
     public:
         struct CameraBuffer {
             DXSM::Matrix viewProjMatrix;
@@ -52,9 +53,14 @@ namespace SE_G {
         float GetFarZ();
 
         void SetUpCameraViewByAspectRatio(float newAspectRatio);
-        void SetUpCameraViewByFOV(float newFOV);
         void SetUpCameraViewByAspectRatio_horizontal(float newAspectRatio);
         void SetUpCameraViewByAspectRatio_vertical(float newAspectRatio);
+        void SetUpCameraViewByFOV(float newFOV);
+        /*
+        void SetUpCameraViewByFOV_horizontal(float newFOV);
+        void SetUpCameraViewByFOV_vertical(float newFOV);
+        */
+
         void ResetCameraView(float newAspectRatio);
 
         float GetViewWidth();

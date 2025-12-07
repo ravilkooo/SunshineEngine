@@ -1,5 +1,7 @@
 #pragma once
 
+#include <EASTL/unordered_map.h>
+
 #include <d3d11.h>
 #include <wrl.h>
 #include <string>
@@ -11,11 +13,24 @@
 
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 
+#include <Utils/UUID.h>
+
 namespace SE_G {
 	class RenderPass
 	{
 		friend class GameObject;
+
 	public:
+		enum class PassType : UINT {
+			GPass = 0u,
+			Shadow = 1u,
+			Light = 2u,
+			Collider = 3u,
+			Icon = 4u,
+			Selection = 5u,
+			Count
+		};
+
 		RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context);
 		virtual ~RenderPass();
 
@@ -25,7 +40,9 @@ namespace SE_G {
 		virtual void EndFrame() = 0;
 		virtual void OnResize(UINT resizeWidth, UINT resizeHeight) {};
 
-		RenderTechnique* AddTechnique(eastl::unique_ptr<RenderTechnique> tech);
+		RenderTechnique* AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech);
+		RenderTechnique* GetTechnique(SE::UUID uuid);
+		void RemoveTechnique(SE::UUID uuid);
 
 		void AddPerFrameBind(Bind::Bindable* bind);
 		void BindAllPerFrame();
@@ -36,6 +53,8 @@ namespace SE_G {
 		void Disable();
 		void Enable();
 
+		PassType m_passType;
+
 	protected:
 		eastl::string techniqueTag;
 		eastl::vector<Bind::Bindable*> perFrameBindables;
@@ -43,7 +62,9 @@ namespace SE_G {
 		Microsoft::WRL::ComPtr<ID3D11Device> device;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 
-		eastl::vector<eastl::unique_ptr<SE_G::RenderTechnique>> m_techniques;
+		// Владеет объектами. Нужен чтобы быстро находить по UUID
+		eastl::unordered_map<SE::UUID, eastl::unique_ptr<SE_G::RenderTechnique>> m_techniques;
+
 
 	private:
 		bool m_enabled = true;

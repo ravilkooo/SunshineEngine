@@ -1,4 +1,8 @@
-#include "Graphics/Renderer/Pass/FinalPass.h"
+#include <Graphics/Renderer/Pass/FinalPass.h>
+
+#include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/Bindable/Sampler.h>
+
 
 namespace SE_G {
 	FinalPass::FinalPass(ID3D11Device* device, ID3D11DeviceContext* context,

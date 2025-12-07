@@ -1,4 +1,5 @@
 #include <GameObject/Shapes/GeosphereShapeObject.h>
+#include <Graphics/GraphicsResources/Texture.h>
 
 GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, GeosphereShapeData initData)
@@ -11,20 +12,19 @@ GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
 	m_shapeData = eastl::make_shared<GeosphereShapeData>(initData);
 
 	// TransformComponent
-	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+	auto tc_info = AddComponent<TransformComponent_Info>(device);
 
-	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
-	//auto tc_info = GetComponent<TransformComponent_Info>();
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-		renderSystem, tc_info->m_assignedComponent.get(), "GPass", m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateGeosphereMesh(
+	auto mesh = SE_G::Mesh::CreateGeosphereMesh(
 		device, initData.Size, static_cast<UINT>(initData.NumSubdivisions));
-	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
+	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, mesh);
 
-	rc_info->AddTechnique(eastl::move(gBufferTech));
+	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+		rc_info->GetDevice(),
+		MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+		SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	mesh_info->SetTexture(texture);
 }
 
 GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE_G::DeferredRenderer* renderSystem, GeosphereShapeData initData) :
@@ -46,25 +46,24 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 	auto device = renderSystem->GetDevice();
 
 	// TransformComponent
-	auto tc_info = obj->AddComponent<TransformComponent_Info>();
+	auto tc_info = obj->AddComponent<TransformComponent_Info>(device);
 	if (j["components"].contains("Transform")) {
 		tc_info->FromJson(j["components"]["Transform"], device);
 	}
-	else {
-		tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
-	}
 
 	// RenderComponent and technique
-	auto rc_info = obj->AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-		renderSystem, tc_info->m_assignedComponent.get(), "GPass", obj->m_UUID);
-	gBufferTech->m_mesh = SE_G::Mesh::CreateGeosphereMesh(
-		device, obj->m_shapeData->Size, static_cast<UINT>(obj->m_shapeData->NumSubdivisions));
-	gBufferTech->SetTexture(MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"));
+	auto newMesh = SE_G::Mesh::CreateGeosphereMesh(
+		device, obj->m_shapeData->Size,
+		static_cast<UINT>(obj->m_shapeData->NumSubdivisions));
+	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
-	rc_info->AddTechnique(eastl::move(gBufferTech));
+	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+		rc_info->GetDevice(),
+		MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+		SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	mesh_info->SetTexture(texture);
 
 	return obj;
 }
@@ -83,8 +82,9 @@ void GeosphereShapeObject_Info::SetSize(SE_G::DeferredRenderer* renderSystem, DX
 		eastl::shared_ptr<SE_G::Mesh> newMesh =
 			SE_G::Mesh::CreateGeosphereMesh(renderSystem->GetDevice(),
 				newSize, static_cast<UINT>(m_shapeData->NumSubdivisions));
-		auto rc = GetComponent<RenderComponent_Info>();
-		rc->SetMesh(newMesh);
+
+		auto mc = GetComponent<MeshComponent_Info>();
+		mc->m_assignedComponent->SetMesh(newMesh);
 	}
 }
 
@@ -93,6 +93,7 @@ void GeosphereShapeObject_Info::SetNumSubdivisions(SE_G::DeferredRenderer* rende
 	eastl::shared_ptr<SE_G::Mesh> newMesh =
 		SE_G::Mesh::CreateGeosphereMesh(renderSystem->GetDevice(),
 			m_shapeData->Size, static_cast<UINT>(m_shapeData->NumSubdivisions));
-	auto rc = GetComponent<RenderComponent_Info>();
-	rc->SetMesh(newMesh);
+
+	auto mc = GetComponent<MeshComponent_Info>();
+	mc->m_assignedComponent->SetMesh(newMesh);
 }

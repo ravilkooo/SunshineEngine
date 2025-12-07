@@ -1,6 +1,7 @@
 #include <Graphics/Renderer/Pass/IconPass.h>
-#include <Utils/StringUtils.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/GraphicsResources/GeometryShader.h>
+#include <Utils/StringUtils.h>
 
 namespace SE_G {
 	IconPass::IconPass(ID3D11Device* device, ID3D11DeviceContext* context,
@@ -13,6 +14,7 @@ namespace SE_G {
 		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
+		m_passType = PassType::Icon;
 
 		// Set RTVs
 		m_bufferRTVs[0] = pGBuffer->pLightRTV.Get();
@@ -135,8 +137,8 @@ namespace SE_G {
 		}
 		*/
 		for (auto& tech : m_techniques) {
-			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-			tech->Pass(GetDeviceContext());
+			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech.second->Pass(GetDeviceContext());
 		}
 	}
 

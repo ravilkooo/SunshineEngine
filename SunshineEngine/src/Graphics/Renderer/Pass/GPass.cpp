@@ -11,7 +11,7 @@ namespace SE_G {
 		this->screenHeight = pGBuffer->m_screenHeight;
 		this->pGBuffer = pGBuffer;
 		this->camera = camera;
-
+		m_passType = PassType::GPass;
 
 		// Set RTVs
 		gBufferRTVs[0] = pGBuffer->pNormalRTV.Get();
@@ -76,8 +76,8 @@ namespace SE_G {
 		}
 		*/
 		for (auto& tech : m_techniques) {
-			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-			tech->Pass(GetDeviceContext());
+			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech.second->Pass(GetDeviceContext());
 		}
 	}
 

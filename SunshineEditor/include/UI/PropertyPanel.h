@@ -36,6 +36,8 @@ private:
     
     void DrawGameObjectHeader(GameObject_Info* obj);
 
+    void DrawParentnes(GameObject_Info* obj);
+
     void DrawTransformComponent(GameObject_Info* obj);
     void DrawDetails(GameObject_Info* obj);
     void DrawComponentAddPopup(GameObject_Info* obj);
@@ -43,6 +45,7 @@ private:
     void DrawAmbientLightDetails(SE_G::AmbientLightData* lightData);
     void DrawDirectionalLightDetails(SE_G::DirectionalLightData* lightData);
     void DrawPointLightDetails(SE_G::PointLightData* lightData);
+    void DrawSpotLightDetails(SE_G::SpotLightData* lightData);
     
     void DrawSkyBoxDetails(SE_G::SkyBoxData* lightData);
 
@@ -51,6 +54,7 @@ private:
     void DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj);
 
     void DrawPhysicsComponent(GameObject_Info* obj);
+    void DrawMeshComponent(GameObject_Info* obj);
 
     void DrawLuaComponent(GameObject_Info* obj);
     void DrawLuaFunctions(LuaComponent* luaComp);
