@@ -13,7 +13,8 @@ namespace SE
             return false;
 
         DrawWindow();
-        return !m_isVisible && m_selectedProject != nullptr;
+        
+        return !m_isVisible && m_selectedIndex >= 0;
     }
 
     void ProjectSelector::Close()
@@ -26,9 +27,9 @@ namespace SE
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImVec2 center = viewport->GetCenter();
         ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-        ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Appearing);
+        ImGui::SetNextWindowSize(m_windowSize);
 
-        ImGui::Begin("Project Selector", &m_isVisible, 
+        ImGui::Begin("Project Selector", NULL, 
                     ImGuiWindowFlags_NoCollapse | 
                     ImGuiWindowFlags_NoResize |
                     ImGuiWindowFlags_NoMove);
@@ -36,7 +37,7 @@ namespace SE
         ImGui::Text("Select Project");
         ImGui::Separator();
 
-        if (ImGui::BeginChild("ProjectList", ImVec2(0, 200), true, ImGuiWindowFlags_HorizontalScrollbar))
+        if (ImGui::BeginChild("ProjectList", ImVec2(0, -120), true, ImGuiWindowFlags_HorizontalScrollbar))
         {
             if (!m_projects || m_projects->empty())
             {
@@ -44,7 +45,7 @@ namespace SE
             }
             else
             {
-                for (int i = 0; i < m_projects->size(); ++i)
+                for (int i = 0; i < static_cast<int>(m_projects->size()); ++i)
                 {
                     const auto& project = (*m_projects)[i];
                     bool isSelected = (i == m_selectedIndex);
@@ -65,11 +66,10 @@ namespace SE
                         ImGui::TableNextRow();
 
                         ImGui::TableSetColumnIndex(0);
-                        ImGui::AlignTextToFramePadding();
 
                         if (ImGui::Selectable(WStringToUtf8(displayName).c_str(), isSelected,
                             ImGuiSelectableFlags_AllowDoubleClick,
-                            ImVec2(0, 30)))
+                            ImVec2(0, 20)))
                         {
                             m_selectedIndex = i;
                             m_selectedProject = eastl::make_shared<SE::Project>(project);
@@ -81,7 +81,6 @@ namespace SE
                         }
 
                         ImGui::TableSetColumnIndex(1);
-                        ImGui::AlignTextToFramePadding();
 
                         ImGui::BeginGroup();
                         
@@ -90,8 +89,9 @@ namespace SE
                         float buttonStartX = columnWidth - buttonsWidth;
         
                         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + buttonStartX);
+
                         
-                        if (ImGui::Button("Edit", ImVec2(60, 0)))
+                        if (ImGui::Button("Edit", ImVec2(60, 20)))
                         {
                             m_editingIndex = i;
                             eastl::string displayNameUtf8 = WStringToUtf8(displayName);
@@ -106,7 +106,7 @@ namespace SE
         
                         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 0.6f));
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 0.8f));
-                        if (ImGui::Button("Delete", ImVec2(70, 0)))
+                        if (ImGui::Button("Delete", ImVec2(70, 20)))
                         {
                             m_deletingIndex = i;
                             ImGui::OpenPopup("Delete Project");
@@ -163,14 +163,25 @@ namespace SE
         ImGui::Text("Create New Project");
         
         ImGui::InputText("Project Name", m_newProjectName, sizeof(m_newProjectName));
+        static bool duplicate_error = false;
+        if (ImGui::IsItemActive() || ImGui::IsItemEdited())
+        {
+            duplicate_error = false;
+        }
         ImGui::SameLine();
         
         if (ImGui::Button("Create") && strlen(m_newProjectName) > 0)
         {
-            CreateNewProject();
-            m_newProjectName[0] = '\0';
+            duplicate_error = !CreateNewProject();
+            if (!duplicate_error)
+            {
+                m_newProjectName[0] = '\0';
+            }
         }
-
+        if (duplicate_error)
+        {
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Project already exists!");
+        }
         ImGui::End();
     }
 
@@ -181,7 +192,7 @@ namespace SE
         m_selectedProject.reset();
     }
 
-    void ProjectSelector::CreateNewProject()
+    bool ProjectSelector::CreateNewProject()
     {
         eastl::wstring projectName = Utf8ToWString(m_newProjectName);
         eastl::wstring projectPath = projectName + L"/";
@@ -190,17 +201,24 @@ namespace SE
         for (const auto& p : *m_projects)
         {
             if (p.GetSubPath() == projectPath)
-                return;
+            {
+                return false;
+            }
+        }
+
+        eastl::wstring fullPath = JoinWchar_Wstring(PROJECTS_DIR, projectPath.c_str());
+        if (std::filesystem::exists(fullPath.c_str()))
+        {
+            return false;
         }
 
         // Create directory
-        eastl::wstring fullPath = JoinWchar_Wstring(PROJECTS_DIR, projectPath.c_str());
         try {
             std::filesystem::path dir(fullPath.c_str());
             std::filesystem::create_directories(dir);
         }
         catch (const std::exception& e) {
-            return;
+            return false;
         }
 
         // Create default scene and save
@@ -217,14 +235,27 @@ namespace SE
     
         m_selectedIndex = static_cast<int>(m_projects->size() - 1);
         m_selectedProject = eastl::make_shared<Project>(m_projects->back());
+
+        return true;
     }
 
     void ProjectSelector::DrawEditPopup()
     {
         if (ImGui::BeginPopupModal("Edit Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
+            static bool duplicate_error = false;
             ImGui::Text("Rename project:");
             ImGui::InputText("##NewName", m_editBuffer, sizeof(m_editBuffer));
+
+            if (ImGui::IsItemActive() || ImGui::IsItemEdited())
+            {
+                duplicate_error = false;
+            }
+
+            if (duplicate_error)
+            {
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), "Project name already exists!");
+            }
         
             ImGui::Spacing();
             ImGui::Separator();
@@ -234,11 +265,14 @@ namespace SE
             {
                 if (strlen(m_editBuffer) > 0)
                 {
-                    RenameProject(m_editingIndex, m_editBuffer);
-                    m_editingIndex = -1;
-                    m_editBuffer[0] = '\0';
+                    duplicate_error = !RenameProject(m_editingIndex, m_editBuffer);
+                    if (!duplicate_error)
+                    {
+                        m_editingIndex = -1;
+                        m_editBuffer[0] = '\0';
+                        ImGui::CloseCurrentPopup();
+                    }
                 }
-                ImGui::CloseCurrentPopup();
             }
         
             ImGui::SameLine();
@@ -247,6 +281,7 @@ namespace SE
             {
                 m_editingIndex = -1;
                 m_editBuffer[0] = '\0';
+                duplicate_error = false;
                 ImGui::CloseCurrentPopup();
             }
         
@@ -258,7 +293,8 @@ namespace SE
     {
         if (ImGui::BeginPopupModal("Delete Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            if (m_deletingIndex >= 0 && m_deletingIndex < m_projects->size())
+            static bool deleteFiles = false;
+            if (m_deletingIndex >= 0 &&  static_cast<size_t>(m_deletingIndex) < m_projects->size())
             {
                 eastl::wstring projectName = (*m_projects)[m_deletingIndex].GetSubPath();
                 if (projectName.back() == L'/')
@@ -271,6 +307,8 @@ namespace SE
                 ImGui::Text("This will remove the project from the list.");
                 ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), 
                     "Warning: Project files will NOT be deleted from disk!");
+        
+                ImGui::Checkbox("Also delete project files from disk", &deleteFiles);
             }
         
             ImGui::Spacing();
@@ -279,7 +317,7 @@ namespace SE
         
             if (ImGui::Button("Delete", ImVec2(120, 0)))
             {
-                DeleteProject(m_deletingIndex);
+                DeleteProject(m_deletingIndex, deleteFiles);
                 m_deletingIndex = -1;
                 ImGui::CloseCurrentPopup();
             }
@@ -296,33 +334,85 @@ namespace SE
         }
     }
 
-    void ProjectSelector::RenameProject(int index, const eastl::string& newName)
+    bool ProjectSelector::RenameProject(int index, const eastl::string& newName)
     {
-        if (index < 0 || index >= m_projects->size())
-            return;
+        if (index < 0 || static_cast<size_t>(index) >= m_projects->size())
+            return false;
         
         eastl::wstring newPath = Utf8ToWString(newName) + L"/";
     
-        for (int i = 0; i < m_projects->size(); ++i)
+        for (size_t i = 0; i < m_projects->size(); ++i)
         {
-            if (i != index && (*m_projects)[i].GetSubPath() == newPath)
+            // if (i != static_cast<size_t>(index) && (*m_projects)[i].GetSubPath() == newPath)
+            // {
+            //     return false;
+            // }
+            if (static_cast<int>(i) == index) 
+                continue;
+            
+            eastl::wstring existingPath = (*m_projects)[i].GetSubPath();
+            
+            eastl::wstring existingName = existingPath;
+            if (!existingName.empty() && existingName.back() == L'/')
+                existingName.pop_back();
+            
+            size_t slashPos = existingName.find_last_of(L'/');
+            if (slashPos != eastl::wstring::npos)
+                existingName = existingName.substr(slashPos + 1);
+            
+            if (existingName == Utf8ToWString(newName))
             {
-                return;
+                return false;   
             }
         }
         
+        // (*m_projects)[index].SetSubPath(newPath);
+        // SE::SaveProjects(*m_projects);
+        //
+        // if (index == m_selectedIndex && m_selectedProject)
+        // {
+        //     *m_selectedProject = (*m_projects)[index];
+        // }
+        
+        eastl::wstring oldPath = (*m_projects)[index].GetSubPath();
+        eastl::wstring oldFullPath = JoinWchar_Wstring(PROJECTS_DIR, oldPath.c_str());
+        eastl::wstring newFullPath = JoinWchar_Wstring(PROJECTS_DIR, newPath.c_str());
+        
+        if (std::filesystem::exists(newFullPath.c_str()))
+        {
+            return false;
+        }
+    
+        try {
+            if (std::filesystem::exists(oldFullPath.c_str()))
+            {
+                std::filesystem::rename(oldFullPath.c_str(), newFullPath.c_str());
+            }
+        }
+        catch (...) {
+            return false;
+        }
+        
         (*m_projects)[index].SetSubPath(newPath);
-        SE::SaveProjects(*m_projects);
+        
+        if (!SE::SaveProjects(*m_projects))
+        {
+            return false;
+        }
         
         if (index == m_selectedIndex && m_selectedProject)
         {
             *m_selectedProject = (*m_projects)[index];
         }
+
+        return true;
     }
 
-    void ProjectSelector::DeleteProject(int index)
+    void ProjectSelector::DeleteProject(int index, bool deleteFilesFromDisk)
     {
-        if (index < 0 || index >= m_projects->size())
+        eastl::wstring fullPath = (*m_projects)[index].GetFullPath();
+        
+        if (index < 0 || static_cast<size_t>(index) >= m_projects->size())
             return;
         
         m_projects->erase(m_projects->begin() + index);
@@ -347,6 +437,14 @@ namespace SE
             m_deletingIndex = -1;
         else if (m_deletingIndex > index)
             m_deletingIndex--;
+
+        if (deleteFilesFromDisk)
+        {
+            try {
+                std::filesystem::remove_all(fullPath.c_str());
+            }
+            catch (...) {}
+        }
     }
 }
 

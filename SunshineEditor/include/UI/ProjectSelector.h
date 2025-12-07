@@ -20,15 +20,19 @@ namespace SE
         void SetProjectList(SE::ProjectList* projects) { m_projects = projects; }
 
         bool IsVisible() const { return m_isVisible; }
+        void ResetSelection()  { m_selectedIndex = -1; m_selectedProject.reset(); }
+        void SetWindowSize(ImVec2 windowSize) { m_windowSize = windowSize; }
 
     private:
         void DrawWindow();
         void RefreshProjectList();
-        void CreateNewProject();
+        bool CreateNewProject();
         void DrawEditPopup();
         void DrawDeletePopup();
-        void RenameProject(int index, const eastl::string& newName);
-        void DeleteProject(int index);
+        bool RenameProject(int index, const eastl::string& newName);
+        void DeleteProject(int index, bool deleteFilesFromDisk);
+
+        ImVec2 m_windowSize;
         
         bool m_isVisible = true;
         eastl::shared_ptr<SE::Project> m_selectedProject;

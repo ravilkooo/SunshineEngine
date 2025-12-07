@@ -85,9 +85,10 @@ void ImguiEditorPass::Pass()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-
+	
 	if (!m_ProjectSelected)
 	{
+		m_ProjectSelector.SetWindowSize(ImVec2(m_editorAppWidth, m_editorAppHeight));
 		if (m_ProjectSelector.Show())
 		{
 			m_ProjectSelected = true;
