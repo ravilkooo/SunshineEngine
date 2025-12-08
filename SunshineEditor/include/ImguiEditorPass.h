@@ -74,6 +74,7 @@ public:
     LogPanel m_GameLogPanel = LogPanel{"Game Output Log", LogManager::LogTarget::Game};
     BottomBarPanel m_BottomPanel;
     PropertyPanel m_PropertyPanel;
+    SE::ProjectSelector m_ProjectSelector;
 
     bool m_ShowEditorLogPanel = false;
     bool m_ShowGameLogPanel = false;

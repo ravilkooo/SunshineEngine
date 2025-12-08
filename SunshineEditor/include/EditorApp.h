@@ -65,13 +65,13 @@ public:
     void SaveProject();
 
     // Create new project (create folder, scene.json, and add it to projectlist)
-    // void CreateProject();
+    void CreateProject();
 
     // Add existing project to projectlist (console-driven)
-    // void AddProject();
+    void AddProject();
 
     // Remove project from projectlist (console-driven)
-    // void RemoveProject();
+    void RemoveProject();
 
     void RunApp();
 
@@ -137,5 +137,5 @@ private:
 
 private:
     // Only for testing
-    // void ChooseProject();
+    void ChooseProject();
 };
