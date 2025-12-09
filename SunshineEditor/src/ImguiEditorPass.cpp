@@ -96,9 +96,31 @@ void ImguiEditorPass::Pass()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-
+	
+	if (!m_ProjectSelected)
+	{
+		m_ProjectSelector.SetWindowSize(ImVec2(m_editorAppWidth, m_editorAppHeight));
+		if (m_ProjectSelector.Show())
+		{
+			m_ProjectSelected = true;
+		}
+		
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		return;
+	}
+	
 	// Main Menu Bar
+	m_MainMenuBarPanel.SetEditorApp(m_editorApp);
+	m_MainMenuBarPanel.SetImguiEditorPass(this);
 	m_MainMenuBarPanel.OnImGuiRender();
+	if (!m_ProjectSelected)
+	{
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = SE::UUID(0u);
+		return;
+	}
 
 	// Toolbar
 	m_ToolbarPanel.OnImGuiRender(m_MainMenuBarPanel.GetHeight());
@@ -212,8 +234,8 @@ void ImguiEditorPass::Pass()
 				if (selectedUUID != SE::UUID(0u))
 				{
 					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
-					m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 				}
+				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 			}
 		}
 	}

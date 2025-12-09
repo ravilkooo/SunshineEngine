@@ -36,13 +36,13 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
             if (m_editorApp)
                 m_editorApp->RunGame();
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Save"))
-        {
-            if (m_editorApp) {
-                m_editorApp->SaveProject();
-            }
-        }
+        // ImGui::SameLine();
+        // if (ImGui::Button("Save"))
+        // {
+        //     if (m_editorApp) {
+        //         m_editorApp->SaveProject();
+        //     }
+        // }
     }
     else
     {

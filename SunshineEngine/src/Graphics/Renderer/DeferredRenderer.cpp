@@ -18,7 +18,7 @@ namespace SE_G {
 	}
 
 	DeferredRenderer::~DeferredRenderer() {
-		m_passesOrder.clear();
+		//m_passes.clear();
 	}
 
 	void DeferredRenderer::InitGBuffer(UINT screenWidth, UINT screenHeight)
@@ -36,7 +36,7 @@ namespace SE_G {
 
 		// Passes
 		for (auto& pass : m_passes) {
-			pass->OnResize(m_screenWidth, m_screenHeight);
+			pass.second->OnResize(m_screenWidth, m_screenHeight);
 
 		}
 	}
@@ -46,11 +46,10 @@ namespace SE_G {
 		// Passes
 		for (UINT i = 0u; i < static_cast<UINT>(RenderPass::PassType::Count); i++)
 		{
-			if (m_passesOrder.contains(static_cast<RenderPass::PassType>(i)))
+			if (m_passes.contains(static_cast<RenderPass::PassType>(i)))
 			{
-				auto idx = m_passesOrder[static_cast<RenderPass::PassType>(i)];
+				auto pass = m_passes[static_cast<RenderPass::PassType>(i)].get();
 
-				auto& pass = m_passes[idx];
 				if (!pass->IsEnabled())
 					continue;
 
@@ -74,26 +73,6 @@ namespace SE_G {
 			pass->EndFrame();
 		}
 		*/
-	}
-
-	RenderPass* DeferredRenderer::AddPass(eastl::unique_ptr<RenderPass> pass) {
-		auto passType = pass->m_passType;
-		m_passesOrder[passType] = m_passes.size();
-
-		m_passes.push_back(eastl::move(pass));
-		return m_passes.back().get();
-	}
-
-	RenderPass* DeferredRenderer::GetPass(RenderPass::PassType passType)
-	{
-		if (!m_passesOrder.contains(passType))
-		{
-			return nullptr;
-		}
-		else
-		{
-			return m_passes[m_passesOrder[passType]].get();
-		}
 	}
 
 }

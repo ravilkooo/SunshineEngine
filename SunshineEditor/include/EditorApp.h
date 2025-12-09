@@ -29,11 +29,6 @@
 #include <WorldEditor.h>
 #include <ImguiEditorPass.h>
 
-enum class LoadedSceneType
-{
-    Custom, GAI, Default, Parent, Lua, Resources
-};
-
 enum class MoveKey
 {
     W,
@@ -60,18 +55,19 @@ public:
 
     // Open project from projectlist
     bool OpenProject();
+    void CloseProject();
 
     // Save openedProject
     void SaveProject();
 
     // Create new project (create folder, scene.json, and add it to projectlist)
-    void CreateProject();
+    // void CreateProject();
 
     // Add existing project to projectlist (console-driven)
-    void AddProject();
+    // void AddProject();
 
     // Remove project from projectlist (console-driven)
-    void RemoveProject();
+    // void RemoveProject();
 
     void RunApp();
 
@@ -88,14 +84,12 @@ public:
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
 
-    LoadedSceneType m_loadedSceneType = LoadedSceneType::Custom;
-
-    SE::ProjectList m_projectsList = { SE::Project() };
+    SE::SceneType m_loadedSceneType = SE::SceneType::Custom;
 
     eastl::shared_ptr<SE_G::RenderingSystem> m_renderingSystem;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;
-    SE::Project* m_openedProject = nullptr;
+    SE::Project* m_openedProject;
     eastl::unique_ptr<Game> m_currentGame;
 
     GameTimer m_timer;
@@ -109,6 +103,7 @@ public:
     };
     RuntimeMode m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
     bool m_gamePaused = false;
+
 private:
     // Camera movings
     void HandleKeyDown(Keys key);
@@ -133,7 +128,12 @@ private:
     ImguiEditorPass* imguiEditorPass;
     bool m_initialized = false;
 
+    bool m_projectSelected = false;
+
 private:
     // Only for testing
-    void ChooseProject();
+    // void ChooseProject();
+    
+    bool LoadTestScene(SE::SceneType sceneType);
+    void SetupAssetsDirectory();
 };

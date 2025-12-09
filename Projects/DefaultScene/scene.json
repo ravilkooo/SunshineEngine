@@ -55,7 +55,7 @@
                 "Mesh": {
                     "Mesh": "Box_repeat",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultTexture.dds"
                 },
                 "Physics": {
                     "collider": {
@@ -138,7 +138,7 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
                 "Render": null,
                 "Transform": {
@@ -197,7 +197,7 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
                 "Render": null,
                 "Transform": {
@@ -256,7 +256,7 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
                 "Render": null,
                 "Transform": {
@@ -315,7 +315,7 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
                 "Render": null,
                 "Transform": {
@@ -374,7 +374,7 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
                 "Render": null,
                 "Transform": {
@@ -433,7 +433,7 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
                 "Render": null,
                 "Transform": {
@@ -678,7 +678,7 @@
                 "Mesh": {
                     "Mesh": "Box_repeat",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultTexture.dds"
                 },
                 "Physics": {
                     "collider": {
@@ -761,7 +761,7 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
                 "Physics": {
                     "collider": {
@@ -844,7 +844,7 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Meshes/plane.obj",
+                    "Mesh": "Box_repeat",
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
                 },
@@ -882,7 +882,7 @@
                     ]
                 }
             },
-            "m_UUID": 9904250048562420471,
+            "m_UUID": 16286738325577183270,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {

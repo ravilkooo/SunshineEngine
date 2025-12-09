@@ -25,6 +25,19 @@ public:
         : m_uuidToObjectMap(uuidToObjectMap)
     {
     }
+    
+    ~SceneGraph()
+    {
+        Clear();
+    }
+    
+    void Clear()
+    {
+        m_nodes.clear();
+        m_roots.clear();
+        m_byObjUUID.clear();
+        // m_uuidToObjectMap.clear();
+    }
 
     void Build() {
         m_nodes.clear(); m_roots.clear(); m_byObjUUID.clear();
