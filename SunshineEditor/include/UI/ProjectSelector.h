@@ -7,6 +7,16 @@
 
 namespace SE
 {
+    enum class SceneType
+    {
+        Custom = 0, 
+        GAI = 1,
+        Default = 2,   
+        Parent = 3,      
+        Lua = 4,         
+        Resources = 5   
+    };
+    
     class ProjectSelector
     {
     public:
@@ -31,11 +41,15 @@ namespace SE
         }
         void SetWindowSize(ImVec2 windowSize) { m_windowSize = windowSize; }
 
+        // For testing
+        static const char* SceneTypeToString(SceneType type);
+        static const char* SceneTypeToDisplayName(SceneType type);
+        static const wchar_t* SceneTypeToWString(SceneType type);
+
     private:
         void DrawWindow();
         void RefreshProjectList();
         bool CreateNewProject();
-        void AddExistingProject();
         void DrawEditPopup();
         void DrawDeletePopup();
         void DrawTestScenesPopup();
@@ -50,7 +64,7 @@ namespace SE
         int m_selectedIndex = -1;
         char m_newProjectName[256] = "";
         
-        SceneType m_selectedSceneType = SceneType::Default;
+        SceneType m_selectedSceneType = SceneType::Custom;
 
         int m_editingIndex = -1;
         char m_editBuffer[256] = "";

@@ -29,8 +29,6 @@
 #include <WorldEditor.h>
 #include <ImguiEditorPass.h>
 
-using SceneType = ImguiEditorPass::SceneType;
-
 enum class MoveKey
 {
     W,
@@ -57,6 +55,7 @@ public:
 
     // Open project from projectlist
     bool OpenProject();
+    void CloseProject();
 
     // Save openedProject
     void SaveProject();
@@ -85,7 +84,7 @@ public:
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
 
-    SceneType m_loadedSceneType = SceneType::Custom;
+    SE::SceneType m_loadedSceneType = SE::SceneType::Custom;
 
     SE::ProjectList m_projectsList = { SE::Project() };
 
@@ -106,6 +105,7 @@ public:
     };
     RuntimeMode m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
     bool m_gamePaused = false;
+
 private:
     // Camera movings
     void HandleKeyDown(Keys key);
@@ -135,6 +135,7 @@ private:
 private:
     // Only for testing
     // void ChooseProject();
-    bool LoadTestScene(SceneType sceneType);
+    
+    bool LoadTestScene(SE::SceneType sceneType);
     void SetupAssetsDirectory();
 };

@@ -14,7 +14,7 @@ namespace SE
         
         DrawWindow();
         
-        return !m_isVisible && m_selectedIndex >= 0;
+        return !m_isVisible;
     }
 
     void ProjectSelector::Close()
@@ -191,8 +191,6 @@ namespace SE
 
         DrawTestScenesPopup();
         
-        ImGui::Text("Scene Type: %s", Project::SceneTypeToDisplayName(m_selectedSceneType));
-        
         ImGui::End();
     }
     
@@ -326,49 +324,55 @@ namespace SE
             float buttonWidth = 150.0f;
 
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Default), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Default), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Default;
+                m_isVisible = false;
                 ImGui::CloseCurrentPopup();
             }
 
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::GAI), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::GAI), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::GAI;
+                m_isVisible = false;
                 ImGui::CloseCurrentPopup();
             }
             
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Parent), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Parent), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Parent;
+                m_isVisible = false;
                 ImGui::CloseCurrentPopup();
             }
             
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Lua), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Lua), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Lua;
+                m_isVisible = false;
                 ImGui::CloseCurrentPopup();
             }
             
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Resources), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Resources), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Resources;
+                m_isVisible = false;
                 ImGui::CloseCurrentPopup();
             }
 
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Custom), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Custom), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Custom;
+                m_isVisible = false;
                 ImGui::CloseCurrentPopup();
             }
             
@@ -406,15 +410,14 @@ namespace SE
 
         eastl::shared_ptr<Project> newProject;
         
-        eastl::string error = Project::CreateNew(m_newProjectName, m_selectedSceneType, newProject);
+        eastl::string error = Project::CreateNew(m_newProjectName, newProject);
         
         if (!error.empty())
         {
             m_lastError = error; 
             return false;
         }
-
-        newProject->SetSceneType(m_selectedSceneType);
+        
         RefreshProjectList();
         
         for (int i = 0; i < static_cast<int>(m_projects->size()); ++i)
@@ -501,6 +504,47 @@ namespace SE
             m_deletingIndex--;
 
         m_lastError.clear();
+    }
+
+    const char* ProjectSelector::SceneTypeToString(SceneType type)
+    {
+        switch (type)
+        {
+        case SceneType::Custom: return "Custom";
+        case SceneType::GAI: return "GAI";
+        case SceneType::Default: return "Default";
+        case SceneType::Parent: return "Parent";
+        case SceneType::Lua: return "Lua";
+        case SceneType::Resources: return "Resources";
+        default: return "Unknown";
+        }
+    }
+
+    const char* ProjectSelector::SceneTypeToDisplayName(SceneType type)
+    {
+        switch (type)
+        {
+        case SceneType::GAI: return "GAI Scene";
+        case SceneType::Default: return "Default Scene";
+        case SceneType::Parent: return "Parent Scene";
+        case SceneType::Lua: return "Lua Scripting Scene";
+        case SceneType::Resources: return "Resources Scene";
+        default: return "Unknown Scene";
+        }
+    }
+
+    const wchar_t* ProjectSelector::SceneTypeToWString(SceneType type)
+    {
+        switch (type)
+        {
+        case SceneType::Custom: return L"Custom";
+        case SceneType::GAI: return L"GAI";
+        case SceneType::Default: return L"Default";
+        case SceneType::Parent: return L"Parent";
+        case SceneType::Lua: return L"Lua";
+        case SceneType::Resources: return L"Resources";
+        default: return L"Unknown";
+        }
     }
 }
 

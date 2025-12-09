@@ -282,10 +282,12 @@ void MainMenuBarPanel::CloseCurrentProject()
         
         m_editorApp->m_openedProject.reset();
         
+        
         if (m_imguiEditorPass)
         {
-            m_imguiEditorPass->ResetProjectSelection();
+            m_imguiEditorPass->m_ProjectSelected = NULL;
         }
+        m_editorApp->CloseProject();
     }
 }
 

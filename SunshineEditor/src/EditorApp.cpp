@@ -144,8 +144,14 @@ void EditorApp::RunApp()
 
 			if (m_projectSelected)
 			{
-				const char* sceneName = SE::Project::SceneTypeToDisplayName(m_loadedSceneType);
-				swprintf_s(text, TEXT("SunshineEngine: %hs - FPS: %.1f"), sceneName, fps);
+				if (m_loadedSceneType == SE::SceneType::Custom)
+					swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), m_openedProject->GetSubPath().c_str(), fps);
+				else
+				{
+					const char* sceneName = SE::ProjectSelector::SceneTypeToDisplayName(m_loadedSceneType);
+					swprintf_s(text, TEXT("SunshineEngine: %hs - FPS: %.1f"), sceneName, fps);
+				}
+					
 			}
 			else
 			{
@@ -157,23 +163,21 @@ void EditorApp::RunApp()
 			frameCount = 0;
 		}
 
-		if (m_projectSelected)
-		{
-			if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
-				while (accumulator >= physicsUpdateMs) {
-					// UpdateGame(physicsUpdateMs);
-					UpdateEditor(physicsUpdateMs);
-					accumulator -= physicsUpdateMs;
-				}
-			}
-			else {
-				while (accumulator >= physicsUpdateMs) {
-					UpdateGame(physicsUpdateMs);
-					accumulator -= physicsUpdateMs;
-				}
+
+		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
+			while (accumulator >= physicsUpdateMs) {
+				// UpdateGame(physicsUpdateMs);
+				UpdateEditor(physicsUpdateMs);
+				accumulator -= physicsUpdateMs;
 			}
 		}
-
+		else {
+			while (accumulator >= physicsUpdateMs) {
+				UpdateGame(physicsUpdateMs);
+				accumulator -= physicsUpdateMs;
+			}
+		}
+		
 		Render();
 
 		if (!m_projectSelected && imguiEditorPass->IsProjectSelected()) {
@@ -187,7 +191,13 @@ void EditorApp::RunApp()
 		}
 
 		if (!m_projectSelected && !imguiEditorPass->IsProjectSelectorVisible()) {
-			isExitRequested = true;
+			if (imguiEditorPass->IsProjectSelectorVisible())
+			{
+				imguiEditorPass->ResetProjectSelection();
+				m_openedProject.reset();
+			}
+			else
+				isExitRequested = true;
 		}
 	}
 	m_worldEditor->ClearScene();
@@ -457,7 +467,7 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 void EditorApp::RunGame() {
 	m_runtimeMode = RuntimeMode::GAME_MODE;
 
-	if (m_openedProject)
+	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
 		m_openedProject->Save();
 	}
@@ -469,14 +479,30 @@ void EditorApp::RunGame() {
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
 	
-	if (m_openedProject)
+	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
 		eastl::wstring scenePath = m_openedProject->GetScenePath();
 		m_currentGame->LoadScene(scenePath.c_str());
 	}
-	else
+	else if (m_loadedSceneType == SE::SceneType::Default)
 	{
 		m_currentGame->LoadDefaultScene();
+	}
+	else if (m_loadedSceneType == SE::SceneType::GAI)
+	{
+		m_currentGame->LoadGAIScene();
+	}
+	else if (m_loadedSceneType == SE::SceneType::Parent)
+	{
+		m_currentGame->LoadParentScene();
+	}
+	else if (m_loadedSceneType == SE::SceneType::Lua)
+	{
+		m_currentGame->LoadLuaScene();
+	}
+	else if (m_loadedSceneType == SE::SceneType::Resources)
+	{
+		m_currentGame->LoadResourcesScene();
 	}
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
@@ -524,60 +550,78 @@ void EditorApp::SaveProject()
 bool EditorApp::OpenProject()
 {
 	m_openedProject = imguiEditorPass->GetSelectedProject();
-	eastl::string error = m_openedProject->Open();
-	if (!error.empty())
-		return false;
-
-	m_loadedSceneType = m_openedProject->GetSceneType();
+	m_loadedSceneType = imguiEditorPass->m_ProjectSelector.GetSelectedSceneType();
+	if (m_loadedSceneType == SE::SceneType::Custom)
+	{
+		eastl::string error = m_openedProject->Open();
+		if (!error.empty())
+			return false;
+	}
+	else
+	{
+		switch (m_loadedSceneType)
+		{
+		case SE::SceneType::GAI:
+			m_worldEditor->CreateGAIScene();
+			break;
+		case SE::SceneType::Default:
+			m_worldEditor->CreateDefaultScene();
+			break;
+		case SE::SceneType::Parent:
+			m_worldEditor->CreateParentScene();
+			break;
+		case SE::SceneType::Resources:
+			m_worldEditor->CreateResourcesScene();
+			break;
+		}
+	}
+	
 	SetupAssetsDirectory();
 	
 	return true;
 }
 
+void EditorApp::CloseProject()
+{
+	m_projectSelected = NULL;
+	// m_openedProject = NULL;
+	// m_loadedSceneType = SE::SceneType::Custom;
+}
+
 void EditorApp::SetupAssetsDirectory()
 {
-	if (m_openedProject)
+	switch (m_loadedSceneType)
 	{
-		ContentBrowserPanel::s_AssetsDirectory = 
-			std::filesystem::path(m_openedProject->GetFullPath().c_str());
+	    case SE::SceneType::Custom:
+	        if (m_openedProject)
+	        {
+	            ContentBrowserPanel::s_AssetsDirectory = 
+	                std::filesystem::path(m_openedProject->GetFullPath().c_str());
+	        }
+	        break;
+	    case SE::SceneType::GAI:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"GAI/").GetFullPath().c_str());
+	        break;
+	    case SE::SceneType::Default:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
+	        break;
+	    case SE::SceneType::Parent:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"Hierarchy/").GetFullPath().c_str());
+	        break;
+	    case SE::SceneType::Lua:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"Lua/").GetFullPath().c_str());
+	        break;
+	    case SE::SceneType::Resources:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"Resources/").GetFullPath().c_str());
+	        break;
+	    default:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
+	        break;
 	}
-	else
-	{
-		ContentBrowserPanel::s_AssetsDirectory = 
-			std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
-	}
-    // switch (m_loadedSceneType)
-    // {
-    //     case SceneType::Custom:
-    //         if (m_openedProject)
-    //         {
-    //             ContentBrowserPanel::s_AssetsDirectory = 
-    //                 std::filesystem::path(m_openedProject->GetFullPath().c_str());
-    //         }
-    //         break;
-    //     case SceneType::GAI:
-    //         ContentBrowserPanel::s_AssetsDirectory = 
-    //             std::filesystem::path(SE::Project(L"GAI/").GetFullPath().c_str());
-    //         break;
-    //     case SceneType::Default:
-    //         ContentBrowserPanel::s_AssetsDirectory = 
-    //             std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
-    //         break;
-    //     case SceneType::Parent:
-    //         ContentBrowserPanel::s_AssetsDirectory = 
-    //             std::filesystem::path(SE::Project(L"Hierarchy/").GetFullPath().c_str());
-    //         break;
-    //     case SceneType::Lua:
-    //         ContentBrowserPanel::s_AssetsDirectory = 
-    //             std::filesystem::path(SE::Project(L"Lua/").GetFullPath().c_str());
-    //         break;
-    //     case SceneType::Resources:
-    //         ContentBrowserPanel::s_AssetsDirectory = 
-    //             std::filesystem::path(SE::Project(L"Resources/").GetFullPath().c_str());
-    //         break;
-    //     default:
-    //         ContentBrowserPanel::s_AssetsDirectory = 
-    //             std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
-    //         break;
-    // }
 }

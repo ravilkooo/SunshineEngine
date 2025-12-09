@@ -82,6 +82,7 @@ public:
     void CreateGAIScene();
     void CreateLuaScene();
     void CreateResourcesScene();
+    void CreateCustomScene();
 
     void SaveScene(const wchar_t* scenePath);
     bool LoadScene(const wchar_t* scenePath);

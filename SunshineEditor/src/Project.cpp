@@ -23,7 +23,7 @@ namespace SE
 	{
 	}
 
-	eastl::string Project::CreateNew(const eastl::string& name,	SceneType sceneType,
+	eastl::string Project::CreateNew(const eastl::string& name,
                            eastl::shared_ptr<Project>& outProject)
     {
         if (name.empty())
@@ -49,7 +49,7 @@ namespace SE
 	    if (!error.empty())
 	        return "Failed to create project directory: " + error;
 		
-		error = createInitialScene(newProject, sceneType);
+		error = createInitialScene(newProject);
 		if (!error.empty())
 		{
 			newProject.deleteDirectory();
@@ -245,45 +245,18 @@ namespace SE
         }
     }
 
-	eastl::string Project::createInitialScene(const Project& project, SceneType sceneType)
+	eastl::string Project::createInitialScene(const Project& project)
 	{
 	    try
 	    {
-	        bool created = false;
-	        switch (sceneType)
-	        {
-	            case SceneType::GAI:
-	                s_worldEditor->CreateGAIScene();
-	                created = true;
-	                break;
-	            case SceneType::Default:
-	                s_worldEditor->CreateDefaultScene();
-	                created = true;
-	                break;
-	            case SceneType::Parent:
-	                s_worldEditor->CreateParentScene();
-	                created = true;
-	                break;
-	            case SceneType::Lua:
-	                s_worldEditor->CreateLuaScene();
-	                created = true;
-	                break;
-	            case SceneType::Resources:
-	                s_worldEditor->CreateResourcesScene();
-	                created = true;
-	                break;
-	            case SceneType::Custom:
-	            default:
-	                s_worldEditor->CreateDefaultScene();
-	                created = true;
-	                break;
-	        }
-	        
-	        if (!created)
-	            return "Failed to create scene";
-    		
-	        eastl::wstring scenePath = project.GetScenePath();
-	        s_worldEditor->SaveScene(scenePath.c_str());
+	    	eastl::wstring subPath = project.GetSubPath();
+	    	if (subPath.back() != L'/' && subPath.back() != L'\\')
+	    		subPath.push_back(L'/');
+	    	
+	    	eastl::wstring sceneFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"scene.json");
+	    	eastl::wstring templateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/DefaultScene.json");
+	    	std::filesystem::copy(templateFile.c_str(), sceneFile.c_str());
+	    	//std::rename("from.txt", "to.txt")
     		
 	        return "";
 	    }
@@ -345,11 +318,6 @@ namespace SE
 		return JoinWchar_Wstring(GetFullPath().c_str(), L"scene.json");
 	}
 
-	SceneType Project::GetSceneType() const
-	{
-		return m_sceneType;
-	}
-
 	std::chrono::system_clock::time_point Project::GetLastSavedTime() const
 	{
 		return m_lastSavedTime;
@@ -363,11 +331,6 @@ namespace SE
 	void Project::SetSubPath(const eastl::wstring& subPath)
 	{
 		m_subPath = subPath;
-	}
-
-	void Project::SetSceneType(SceneType sceneType)
-	{
-		m_sceneType = sceneType;
 	}
 
 	void Project::SetLastSavedTime(const std::chrono::system_clock::time_point& lastSaved)
@@ -384,46 +347,4 @@ namespace SE
 	{
 		m_lastSavedTime = std::chrono::system_clock::now();
 	}
-
-    const char* Project::SceneTypeToString(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::Custom: return "Custom";
-        case SceneType::GAI: return "GAI";
-        case SceneType::Default: return "Default";
-        case SceneType::Parent: return "Parent";
-        case SceneType::Lua: return "Lua";
-        case SceneType::Resources: return "Resources";
-        default: return "Unknown";
-        }
-    }
-
-    const char* Project::SceneTypeToDisplayName(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::Custom: return "Custom Project";
-        case SceneType::GAI: return "GAI Scene";
-        case SceneType::Default: return "Default Scene";
-        case SceneType::Parent: return "Parent Scene";
-        case SceneType::Lua: return "Lua Scripting Scene";
-        case SceneType::Resources: return "Resources Scene";
-        default: return "Unknown Scene";
-        }
-    }
-
-    const wchar_t* Project::SceneTypeToWString(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::Custom: return L"Custom";
-        case SceneType::GAI: return L"GAI";
-        case SceneType::Default: return L"Default";
-        case SceneType::Parent: return L"Parent";
-        case SceneType::Lua: return L"Lua";
-        case SceneType::Resources: return L"Resources";
-        default: return L"Unknown";
-        }
-    }
 }

@@ -16,15 +16,7 @@ class WorldEditor;
 
 namespace SE
 {
-    enum class SceneType
-    {
-        Custom = 0, 
-        GAI = 1,
-        Default = 2,   
-        Parent = 3,      
-        Lua = 4,         
-        Resources = 5   
-    };
+    
     
 	class Project
 	{
@@ -34,7 +26,7 @@ namespace SE
 
 		using ProjectList = eastl::vector<Project>;
 
-	    static eastl::string CreateNew(const eastl::string& name, SceneType sceneType,
+	    static eastl::string CreateNew(const eastl::string& name,
                              eastl::shared_ptr<Project>& outProject);
 		eastl::string Open() const;
 	    eastl::string Save() const;
@@ -47,10 +39,8 @@ namespace SE
 		eastl::wstring GetSubPath() const;
 		eastl::wstring GetFullPath() const;
 		eastl::wstring GetScenePath() const;
-		SceneType GetSceneType() const;
 
 		void SetSubPath(const eastl::wstring& subPath);
-		void SetSceneType(SceneType sceneType);
 		static void SetWorldEditor(WorldEditor* editor) { s_worldEditor = editor; }
 
 		std::chrono::system_clock::time_point GetLastSavedTime() const;
@@ -61,21 +51,18 @@ namespace SE
 
 		void UpdateSaveTime();
 		
-	    static const char* SceneTypeToString(SceneType type);
-	    static const char* SceneTypeToDisplayName(SceneType type);
-	    static const wchar_t* SceneTypeToWString(SceneType type);
+	    
 
 	private:
 		// FullPath = PROJECTS_DIR + m_subPath
 		eastl::wstring m_subPath;
 		std::chrono::system_clock::time_point m_lastSavedTime;
 		std::chrono::system_clock::time_point m_creationDate;
-		SceneType m_sceneType = SceneType::Default;
 		static WorldEditor* s_worldEditor;
 
 		eastl::string createDirectory() const;
-		static eastl::string createInitialScene(const Project& project, SceneType sceneType);
-		eastl::string copyTemplateFile(SceneType sceneType) const;
+		static eastl::string createInitialScene(const Project& project);
+		// eastl::string copyTemplateFile(SceneType sceneType) const;
 		eastl::string renameDirectory(const eastl::wstring& newPath) const;
 		eastl::string deleteDirectory() const;
 		
