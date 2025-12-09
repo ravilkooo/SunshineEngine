@@ -114,6 +114,10 @@ void ImguiEditorPass::Pass()
 	m_MainMenuBarPanel.SetEditorApp(m_editorApp);
 	m_MainMenuBarPanel.SetImguiEditorPass(this);
 	m_MainMenuBarPanel.OnImGuiRender();
+	if (!m_ProjectSelected)
+	{
+		return;
+	}
 
 	// Toolbar
 	m_ToolbarPanel.OnImGuiRender(m_MainMenuBarPanel.GetHeight());

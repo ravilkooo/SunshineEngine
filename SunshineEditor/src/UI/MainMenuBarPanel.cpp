@@ -285,7 +285,7 @@ void MainMenuBarPanel::CloseCurrentProject()
         
         if (m_imguiEditorPass)
         {
-            m_imguiEditorPass->m_ProjectSelected = NULL;
+            m_imguiEditorPass->m_ProjectSelected = false;
         }
         m_editorApp->CloseProject();
     }

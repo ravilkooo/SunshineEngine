@@ -539,6 +539,7 @@ void WorldEditor::Render() {
 
 void WorldEditor::ClearScene() {
 	//m_physicsSystem->ClearScene();
+	m_scene->ClearScene();
 }
 
 void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
