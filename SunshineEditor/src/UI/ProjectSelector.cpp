@@ -11,7 +11,7 @@ namespace SE
     {
         if (!m_isVisible)
             return false;
-
+        
         DrawWindow();
         
         return !m_isVisible && m_selectedIndex >= 0;
@@ -20,6 +20,7 @@ namespace SE
     void ProjectSelector::Close()
     {
         m_isVisible = false;
+        m_lastError.clear();
     }
 
     void ProjectSelector::DrawWindow()
@@ -36,6 +37,12 @@ namespace SE
 
         ImGui::Text("Select Project");
         ImGui::Separator();
+
+        if (!m_lastError.empty())
+        {
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: %s", m_lastError.c_str());
+            ImGui::Separator();
+        }
 
         if (ImGui::BeginChild("ProjectList", ImVec2(0, -120), true, ImGuiWindowFlags_HorizontalScrollbar))
         {
@@ -163,25 +170,16 @@ namespace SE
         ImGui::Text("Create New Project");
         
         ImGui::InputText("Project Name", m_newProjectName, sizeof(m_newProjectName));
-        static bool duplicate_error = false;
-        if (ImGui::IsItemActive() || ImGui::IsItemEdited())
-        {
-            duplicate_error = false;
-        }
         ImGui::SameLine();
         
         if (ImGui::Button("Create") && strlen(m_newProjectName) > 0)
         {
-            duplicate_error = !CreateNewProject();
-            if (!duplicate_error)
+            bool success = CreateNewProject();
+            if (success)
             {
                 m_newProjectName[0] = '\0';
-                m_selectedSceneType = SceneType::Custom; 
+                m_lastError.clear();
             }
-        }
-        if (duplicate_error)
-        {
-            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Project already exists!");
         }
 
         ImGui::SameLine();
@@ -192,69 +190,12 @@ namespace SE
         }
 
         DrawTestScenesPopup();
-
-        if (m_selectedSceneType != SceneType::Custom)
-        {
-            ImGui::Text("Scene Type: %s", SceneTypeToDisplayName(m_selectedSceneType));
-        }
+        
+        ImGui::Text("Scene Type: %s", Project::SceneTypeToDisplayName(m_selectedSceneType));
         
         ImGui::End();
     }
-
-    void ProjectSelector::RefreshProjectList()
-    {
-        LoadProjects(*m_projects);
-        m_selectedIndex = -1;
-        m_selectedProject.reset();
-    }
-
-    bool ProjectSelector::CreateNewProject()
-    {
-        eastl::wstring projectName = Utf8ToWString(m_newProjectName);
-        eastl::wstring projectPath = projectName + L"/";
-
-        // Check duplicate
-        for (const auto& p : *m_projects)
-        {
-            if (p.GetSubPath() == projectPath)
-            {
-                return false;
-            }
-        }
-
-        eastl::wstring fullPath = JoinWchar_Wstring(PROJECTS_DIR, projectPath.c_str());
-        if (std::filesystem::exists(fullPath.c_str()))
-        {
-            return false;
-        }
-
-        // Create directory
-        try {
-            std::filesystem::path dir(fullPath.c_str());
-            std::filesystem::create_directories(dir);
-        }
-        catch (const std::exception& e) {
-            return false;
-        }
-
-        // Create default scene and save
-        eastl::wstring sceneFile = JoinWchar_Wstring(fullPath.c_str(), L"scene.json");
-        eastl::wstring templateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/DefaultScene.json");
-        std::filesystem::copy(templateFile.c_str(), sceneFile.c_str());
-
-        // Add to project list and save
-        SE::Project newProject(projectPath);
-        newProject.SetCreationDate(std::chrono::system_clock::now());
-        newProject.SetLastSavedTime(std::chrono::system_clock::now());
-        m_projects->push_back(newProject);
-        SE::SaveProjects(*m_projects);
     
-        m_selectedIndex = static_cast<int>(m_projects->size() - 1);
-        m_selectedProject = eastl::make_shared<Project>(m_projects->back());
-
-        return true;
-    }
-
     void ProjectSelector::DrawEditPopup()
     {
         if (ImGui::BeginPopupModal("Edit Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -266,9 +207,14 @@ namespace SE
             if (ImGui::IsItemActive() || ImGui::IsItemEdited())
             {
                 duplicate_error = false;
+                m_lastError.clear();
             }
 
-            if (duplicate_error)
+            if (!m_lastError.empty())
+            {
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", m_lastError.c_str());
+            }
+            else if (duplicate_error)
             {
                 ImGui::TextColored(ImVec4(1, 0, 0, 1), "Project name already exists!");
             }
@@ -281,14 +227,20 @@ namespace SE
             {
                 if (strlen(m_editBuffer) > 0)
                 {
-                    duplicate_error = !RenameProject(m_editingIndex, m_editBuffer);
-                    if (!duplicate_error)
+                    bool success = RenameProject(m_editingIndex, m_editBuffer);
+                    
+                    if (success)
                     {
                         m_editingIndex = -1;
                         m_editBuffer[0] = '\0';
+                        duplicate_error = false;
                         ImGui::CloseCurrentPopup();
                     }
+                    else
+                        duplicate_error = !success && m_lastError.empty();
                 }
+                else
+                    m_lastError = "New project name cannot be empty";
             }
         
             ImGui::SameLine();
@@ -298,6 +250,7 @@ namespace SE
                 m_editingIndex = -1;
                 m_editBuffer[0] = '\0';
                 duplicate_error = false;
+                m_lastError.clear();
                 ImGui::CloseCurrentPopup();
             }
         
@@ -326,6 +279,12 @@ namespace SE
         
                 ImGui::Checkbox("Also delete project files from disk", &deleteFiles);
             }
+
+            if (!m_lastError.empty())
+            {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: %s", m_lastError.c_str());
+            }
         
             ImGui::Spacing();
             ImGui::Separator();
@@ -334,8 +293,11 @@ namespace SE
             if (ImGui::Button("Delete", ImVec2(120, 0)))
             {
                 DeleteProject(m_deletingIndex, deleteFiles);
-                m_deletingIndex = -1;
-                ImGui::CloseCurrentPopup();
+                if (m_lastError.empty())
+                {
+                    m_deletingIndex = -1;
+                    ImGui::CloseCurrentPopup();
+                }
             }
         
             ImGui::SameLine();
@@ -343,6 +305,7 @@ namespace SE
             if (ImGui::Button("Cancel", ImVec2(120, 0)))
             {
                 m_deletingIndex = -1;
+                m_lastError.clear();
                 ImGui::CloseCurrentPopup();
             }
         
@@ -363,7 +326,7 @@ namespace SE
             float buttonWidth = 150.0f;
 
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Default), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Default), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Default;
                 ImGui::CloseCurrentPopup();
@@ -371,7 +334,7 @@ namespace SE
 
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::GAI), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::GAI), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::GAI;
                 ImGui::CloseCurrentPopup();
@@ -379,16 +342,15 @@ namespace SE
             
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Parent), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Parent), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Parent;
-                m_isVisible = false;
                 ImGui::CloseCurrentPopup();
             }
             
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Lua), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Lua), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Lua;
                 ImGui::CloseCurrentPopup();
@@ -396,7 +358,7 @@ namespace SE
             
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Resources), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Resources), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Resources;
                 ImGui::CloseCurrentPopup();
@@ -404,7 +366,7 @@ namespace SE
 
             ImGui::Spacing();
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Custom), ImVec2(buttonWidth, 40)))
+            if (ImGui::Button(Project::SceneTypeToDisplayName(SceneType::Custom), ImVec2(buttonWidth, 40)))
             {
                 m_selectedSceneType = SceneType::Custom;
                 ImGui::CloseCurrentPopup();
@@ -424,89 +386,99 @@ namespace SE
         }
     }
 
+    void ProjectSelector::RefreshProjectList()
+    {
+        eastl::string error = SE::LoadProjects(*m_projects);
+        if (!error.empty())
+            m_lastError = "Failed to load project list: " + error;
+        
+        m_selectedIndex = -1;
+        m_selectedProject.reset();
+    }
+
+    bool ProjectSelector::CreateNewProject()
+    {
+        if (strlen(m_newProjectName) == 0)
+        {
+            m_lastError = "Project name cannot be empty";
+            return false;
+        }
+
+        eastl::shared_ptr<Project> newProject;
+        
+        eastl::string error = Project::CreateNew(m_newProjectName, m_selectedSceneType, newProject);
+        
+        if (!error.empty())
+        {
+            m_lastError = error; 
+            return false;
+        }
+
+        newProject->SetSceneType(m_selectedSceneType);
+        RefreshProjectList();
+        
+        for (int i = 0; i < static_cast<int>(m_projects->size()); ++i)
+        {
+            if ((*m_projects)[i].GetSubPath() == newProject->GetSubPath())
+            {
+                m_selectedIndex = i;
+                m_selectedProject = newProject;
+                break;
+            }
+        }
+
+        m_lastError.clear();
+        return true;
+    }
+    
     bool ProjectSelector::RenameProject(int index, const eastl::string& newName)
     {
         if (index < 0 || static_cast<size_t>(index) >= m_projects->size())
-            return false;
-        
-        eastl::wstring newPath = Utf8ToWString(newName) + L"/";
-    
-        for (size_t i = 0; i < m_projects->size(); ++i)
         {
-            // if (i != static_cast<size_t>(index) && (*m_projects)[i].GetSubPath() == newPath)
-            // {
-            //     return false;
-            // }
-            if (static_cast<int>(i) == index) 
-                continue;
-            
-            eastl::wstring existingPath = (*m_projects)[i].GetSubPath();
-            
-            eastl::wstring existingName = existingPath;
-            if (!existingName.empty() && existingName.back() == L'/')
-                existingName.pop_back();
-            
-            size_t slashPos = existingName.find_last_of(L'/');
-            if (slashPos != eastl::wstring::npos)
-                existingName = existingName.substr(slashPos + 1);
-            
-            if (existingName == Utf8ToWString(newName))
-            {
-                return false;   
-            }
+            m_lastError = "Invalid project index";
+            return false;
         }
+
+        eastl::shared_ptr<Project> project = eastl::make_shared<Project>((*m_projects)[index]);
         
-        // (*m_projects)[index].SetSubPath(newPath);
-        // SE::SaveProjects(*m_projects);
-        //
-        // if (index == m_selectedIndex && m_selectedProject)
-        // {
-        //     *m_selectedProject = (*m_projects)[index];
-        // }
+        eastl::string error = project->Rename(newName);
         
-        eastl::wstring oldPath = (*m_projects)[index].GetSubPath();
-        eastl::wstring oldFullPath = JoinWchar_Wstring(PROJECTS_DIR, oldPath.c_str());
-        eastl::wstring newFullPath = JoinWchar_Wstring(PROJECTS_DIR, newPath.c_str());
-        
-        if (std::filesystem::exists(newFullPath.c_str()))
+        if (!error.empty())
         {
+            m_lastError = error;
             return false;
         }
-    
-        try {
-            if (std::filesystem::exists(oldFullPath.c_str()))
-            {
-                std::filesystem::rename(oldFullPath.c_str(), newFullPath.c_str());
-            }
-        }
-        catch (...) {
-            return false;
-        }
-        
-        (*m_projects)[index].SetSubPath(newPath);
-        
-        if (!SE::SaveProjects(*m_projects))
-        {
-            return false;
-        }
+
+        RefreshProjectList();
         
         if (index == m_selectedIndex && m_selectedProject)
         {
-            *m_selectedProject = (*m_projects)[index];
+            m_selectedProject = project;
         }
 
+        m_lastError.clear();
         return true;
     }
 
     void ProjectSelector::DeleteProject(int index, bool deleteFilesFromDisk)
     {
-        eastl::wstring fullPath = (*m_projects)[index].GetFullPath();
-        
         if (index < 0 || static_cast<size_t>(index) >= m_projects->size())
+        {
+            m_lastError = "Invalid project index";
             return;
+        }
         
-        m_projects->erase(m_projects->begin() + index);
-        SE::SaveProjects(*m_projects);
+        Project projectToDelete = (*m_projects)[index];
+        
+        eastl::string error = projectToDelete.Delete(deleteFilesFromDisk);
+        
+        if (!error.empty())
+        {
+            m_lastError = error;
+            return;
+        }
+        
+        RefreshProjectList();
         
         if (m_selectedIndex == index)
         {
@@ -528,55 +500,7 @@ namespace SE
         else if (m_deletingIndex > index)
             m_deletingIndex--;
 
-        if (deleteFilesFromDisk)
-        {
-            try {
-                std::filesystem::remove_all(fullPath.c_str());
-            }
-            catch (...) {}
-        }
-    }
-
-    const char* ProjectSelector::SceneTypeToString(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::Custom: return "Custom";
-        case SceneType::GAI: return "GAI";
-        case SceneType::Default: return "Default";
-        case SceneType::Parent: return "Parent";
-        case SceneType::Lua: return "Lua";
-        case SceneType::Resources: return "Resources";
-        default: return "Unknown";
-        }
-    }
-
-    const char* ProjectSelector::SceneTypeToDisplayName(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::Custom: return "Custom Project";
-        case SceneType::GAI: return "GAI Scene";
-        case SceneType::Default: return "Default Scene";
-        case SceneType::Parent: return "Parent Scene";
-        case SceneType::Lua: return "Lua Scripting Scene";
-        case SceneType::Resources: return "Resources Scene";
-        default: return "Unknown Scene";
-        }
-    }
-
-    const wchar_t* ProjectSelector::SceneTypeToWString(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::Custom: return L"Custom";
-        case SceneType::GAI: return L"GAI";
-        case SceneType::Default: return L"Default";
-        case SceneType::Parent: return L"Parent";
-        case SceneType::Lua: return L"Lua";
-        case SceneType::Resources: return L"Resources";
-        default: return L"Unknown";
-        }
+        m_lastError.clear();
     }
 }
 

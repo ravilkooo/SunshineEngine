@@ -46,9 +46,9 @@ public:
     void ShowBottomPanel();
     void ShowOutputLog();
     void LuaImgui(GameObject*);
-
-    void ShowProjectSelector();
+    
     bool IsProjectSelectorVisible() const { return m_ProjectSelector.IsVisible(); }
+    void SetProjectSelectorVisible() { m_ProjectSelected = false; m_ProjectSelector.ResetSelection(); m_ProjectSelector.SetVisible(true); }
     bool IsProjectSelected() const { return m_ProjectSelected; }
     eastl::shared_ptr<SE::Project> GetSelectedProject() { return m_ProjectSelector.GetSelectedProject(); }
     void ResetProjectSelection() { m_ProjectSelected = false; m_ProjectSelector.Close(); }
@@ -75,6 +75,7 @@ public:
     BottomBarPanel m_BottomPanel;
     PropertyPanel m_PropertyPanel;
     SE::ProjectSelector m_ProjectSelector;
+    bool m_ProjectSelected = false;
 
     using SceneType = SE::SceneType;
 
@@ -103,6 +104,5 @@ private:
     //int selectedIdx = -1;
     // bool objectSelected = false;
     // SE::UUID selectedUUID;
-    bool m_ProjectSelected = false;
 };
 

@@ -111,6 +111,8 @@ void ImguiEditorPass::Pass()
 	}
 	
 	// Main Menu Bar
+	m_MainMenuBarPanel.SetEditorApp(m_editorApp);
+	m_MainMenuBarPanel.SetImguiEditorPass(this);
 	m_MainMenuBarPanel.OnImGuiRender();
 
 	// Toolbar
