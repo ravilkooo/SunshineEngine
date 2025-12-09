@@ -176,12 +176,28 @@ namespace SE
             if (!duplicate_error)
             {
                 m_newProjectName[0] = '\0';
+                m_selectedSceneType = SceneType::Custom; 
             }
         }
         if (duplicate_error)
         {
             ImGui::TextColored(ImVec4(1, 0, 0, 1), "Project already exists!");
         }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Select type"))
+        {
+            ImGui::OpenPopup("Test Scenes");
+        }
+
+        DrawTestScenesPopup();
+
+        if (m_selectedSceneType != SceneType::Custom)
+        {
+            ImGui::Text("Scene Type: %s", SceneTypeToDisplayName(m_selectedSceneType));
+        }
+        
         ImGui::End();
     }
 
@@ -334,6 +350,80 @@ namespace SE
         }
     }
 
+    void ProjectSelector::DrawTestScenesPopup()
+    {
+        if (ImGui::BeginPopupModal("Test Scenes", NULL, 
+                                   ImGuiWindowFlags_AlwaysAutoResize | 
+                                   ImGuiWindowFlags_NoTitleBar))
+        {
+            ImGui::Text("Select Test Scene");
+            ImGui::Separator();
+            
+            float windowWidth = ImGui::GetWindowSize().x;
+            float buttonWidth = 150.0f;
+
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Default), ImVec2(buttonWidth, 40)))
+            {
+                m_selectedSceneType = SceneType::Default;
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::Spacing();
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::GAI), ImVec2(buttonWidth, 40)))
+            {
+                m_selectedSceneType = SceneType::GAI;
+                ImGui::CloseCurrentPopup();
+            }
+            
+            ImGui::Spacing();
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Parent), ImVec2(buttonWidth, 40)))
+            {
+                m_selectedSceneType = SceneType::Parent;
+                m_isVisible = false;
+                ImGui::CloseCurrentPopup();
+            }
+            
+            ImGui::Spacing();
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Lua), ImVec2(buttonWidth, 40)))
+            {
+                m_selectedSceneType = SceneType::Lua;
+                ImGui::CloseCurrentPopup();
+            }
+            
+            ImGui::Spacing();
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Resources), ImVec2(buttonWidth, 40)))
+            {
+                m_selectedSceneType = SceneType::Resources;
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::Spacing();
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Custom), ImVec2(buttonWidth, 40)))
+            {
+                m_selectedSceneType = SceneType::Custom;
+                ImGui::CloseCurrentPopup();
+            }
+            
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+            
+            ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
+            if (ImGui::Button("Cancel", ImVec2(100, 30)))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            
+            ImGui::EndPopup();
+        }
+    }
+
     bool ProjectSelector::RenameProject(int index, const eastl::string& newName)
     {
         if (index < 0 || static_cast<size_t>(index) >= m_projects->size())
@@ -444,6 +534,48 @@ namespace SE
                 std::filesystem::remove_all(fullPath.c_str());
             }
             catch (...) {}
+        }
+    }
+
+    const char* ProjectSelector::SceneTypeToString(SceneType type)
+    {
+        switch (type)
+        {
+        case SceneType::Custom: return "Custom";
+        case SceneType::GAI: return "GAI";
+        case SceneType::Default: return "Default";
+        case SceneType::Parent: return "Parent";
+        case SceneType::Lua: return "Lua";
+        case SceneType::Resources: return "Resources";
+        default: return "Unknown";
+        }
+    }
+
+    const char* ProjectSelector::SceneTypeToDisplayName(SceneType type)
+    {
+        switch (type)
+        {
+        case SceneType::Custom: return "Custom Project";
+        case SceneType::GAI: return "GAI Scene";
+        case SceneType::Default: return "Default Scene";
+        case SceneType::Parent: return "Parent Scene";
+        case SceneType::Lua: return "Lua Scripting Scene";
+        case SceneType::Resources: return "Resources Scene";
+        default: return "Unknown Scene";
+        }
+    }
+
+    const wchar_t* ProjectSelector::SceneTypeToWString(SceneType type)
+    {
+        switch (type)
+        {
+        case SceneType::Custom: return L"Custom";
+        case SceneType::GAI: return L"GAI";
+        case SceneType::Default: return L"Default";
+        case SceneType::Parent: return L"Parent";
+        case SceneType::Lua: return L"Lua";
+        case SceneType::Resources: return L"Resources";
+        default: return L"Unknown";
         }
     }
 }

@@ -29,10 +29,7 @@
 #include <WorldEditor.h>
 #include <ImguiEditorPass.h>
 
-enum class LoadedSceneType
-{
-    Custom, GAI, Default, Parent, Lua, Resources
-};
+using SceneType = ImguiEditorPass::SceneType;
 
 enum class MoveKey
 {
@@ -65,13 +62,13 @@ public:
     void SaveProject();
 
     // Create new project (create folder, scene.json, and add it to projectlist)
-    void CreateProject();
+    // void CreateProject();
 
     // Add existing project to projectlist (console-driven)
-    void AddProject();
+    // void AddProject();
 
     // Remove project from projectlist (console-driven)
-    void RemoveProject();
+    // void RemoveProject();
 
     void RunApp();
 
@@ -88,7 +85,7 @@ public:
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
 
-    LoadedSceneType m_loadedSceneType = LoadedSceneType::Custom;
+    SceneType m_loadedSceneType = SceneType::Custom;
 
     SE::ProjectList m_projectsList = { SE::Project() };
 
@@ -137,5 +134,7 @@ private:
 
 private:
     // Only for testing
-    void ChooseProject();
+    // void ChooseProject();
+    bool LoadTestScene(SceneType sceneType);
+    void SetupAssetsDirectory();
 };

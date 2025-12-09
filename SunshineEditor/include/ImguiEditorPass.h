@@ -76,6 +76,8 @@ public:
     PropertyPanel m_PropertyPanel;
     SE::ProjectSelector m_ProjectSelector;
 
+    using SceneType = SE::SceneType;
+
     bool m_ShowEditorLogPanel = false;
     bool m_ShowGameLogPanel = false;
 
