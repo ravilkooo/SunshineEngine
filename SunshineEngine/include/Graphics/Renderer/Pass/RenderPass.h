@@ -34,6 +34,8 @@ namespace SE_G {
 		RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context);
 		virtual ~RenderPass();
 
+		virtual void ClearTechniques();
+
 		eastl::string GetTechniqueTag();
 		virtual void Pass();
 		virtual void StartFrame() = 0;

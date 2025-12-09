@@ -15,6 +15,11 @@ namespace SE_G {
 		m_techniques.clear();
 	}
 
+	void RenderPass::ClearTechniques()
+	{
+		m_techniques.clear();
+	}
+
 	eastl::string RenderPass::GetTechniqueTag()
 	{
 		return techniqueTag;

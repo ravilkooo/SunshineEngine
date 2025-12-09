@@ -33,12 +33,9 @@ namespace SE_G {
         void SetMainCamera(eastl::shared_ptr<Camera> camera) { m_mainCamera = camera; }
         eastl::shared_ptr<Camera> GetMainCamera() { return m_mainCamera; };
 
-        void PreResize();
         void OnResize(UINT resizeWidth, UINT resizeHeight);
         
         void Pass() override;
-        RenderPass* AddPass(eastl::unique_ptr<RenderPass> pass) override;
-        RenderPass* GetPass(RenderPass::PassType passType);
 
         eastl::shared_ptr<Camera> m_mainCamera;
 
@@ -46,8 +43,6 @@ namespace SE_G {
 
         UINT m_screenWidth = 800u;
         UINT m_screenHeight = 800u;
-
-        eastl::unordered_map<RenderPass::PassType, UINT> m_passesOrder;
 
     private:
         ID3D11Device* m_device;

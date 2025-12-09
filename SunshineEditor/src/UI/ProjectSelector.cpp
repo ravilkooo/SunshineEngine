@@ -46,15 +46,15 @@ namespace SE
 
         if (ImGui::BeginChild("ProjectList", ImVec2(0, -120), true, ImGuiWindowFlags_HorizontalScrollbar))
         {
-            if (!m_projects || m_projects->empty())
+            if (m_projectsList.empty())
             {
                 ImGui::Text("No projects found. Create a new one!");
             }
             else
             {
-                for (int i = 0; i < static_cast<int>(m_projects->size()); ++i)
+                for (int i = 0; i < static_cast<int>(m_projectsList.size()); ++i)
                 {
-                    const auto& project = (*m_projects)[i];
+                    auto& project = m_projectsList[i];
                     bool isSelected = (i == m_selectedIndex);
                     
                     eastl::wstring displayName = project.GetSubPath();
@@ -79,7 +79,7 @@ namespace SE
                             ImVec2(0, 20)))
                         {
                             m_selectedIndex = i;
-                            m_selectedProject = eastl::make_shared<SE::Project>(project);
+                            m_selectedProject = &project;
             
                             if (ImGui::IsMouseDoubleClicked(0))
                             {
@@ -163,7 +163,7 @@ namespace SE
         {
             m_isVisible = false;
             m_selectedIndex = -1;
-            m_selectedProject.reset();
+            m_selectedProject = nullptr;
         }
 
         ImGui::Separator();
@@ -184,10 +184,14 @@ namespace SE
 
         ImGui::SameLine();
 
-        if (ImGui::Button("Select type"))
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 0.8f));
+        if (ImGui::Button("[DEV] TESTING SCENES"))
         {
             ImGui::OpenPopup("Test Scenes");
         }
+        ImGui::PopStyleColor(2);
+
 
         DrawTestScenesPopup();
         
@@ -261,9 +265,9 @@ namespace SE
         if (ImGui::BeginPopupModal("Delete Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
             static bool deleteFiles = false;
-            if (m_deletingIndex >= 0 &&  static_cast<size_t>(m_deletingIndex) < m_projects->size())
+            if (m_deletingIndex >= 0 &&  static_cast<size_t>(m_deletingIndex) < m_projectsList.size())
             {
-                eastl::wstring projectName = (*m_projects)[m_deletingIndex].GetSubPath();
+                eastl::wstring projectName = m_projectsList[m_deletingIndex].GetSubPath();
                 if (projectName.back() == L'/')
                     projectName.pop_back();
                 
@@ -366,15 +370,6 @@ namespace SE
                 m_isVisible = false;
                 ImGui::CloseCurrentPopup();
             }
-
-            ImGui::Spacing();
-            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Custom), ImVec2(buttonWidth, 40)))
-            {
-                m_selectedSceneType = SceneType::Custom;
-                m_isVisible = false;
-                ImGui::CloseCurrentPopup();
-            }
             
             ImGui::Spacing();
             ImGui::Separator();
@@ -392,12 +387,12 @@ namespace SE
 
     void ProjectSelector::RefreshProjectList()
     {
-        eastl::string error = SE::LoadProjects(*m_projects);
+        eastl::string error = SE::LoadProjects(m_projectsList);
         if (!error.empty())
             m_lastError = "Failed to load project list: " + error;
         
         m_selectedIndex = -1;
-        m_selectedProject.reset();
+        m_selectedProject = nullptr;
     }
 
     bool ProjectSelector::CreateNewProject()
@@ -408,7 +403,7 @@ namespace SE
             return false;
         }
 
-        eastl::shared_ptr<Project> newProject;
+        Project newProject;
         
         eastl::string error = Project::CreateNew(m_newProjectName, newProject);
         
@@ -420,12 +415,12 @@ namespace SE
         
         RefreshProjectList();
         
-        for (int i = 0; i < static_cast<int>(m_projects->size()); ++i)
+        for (int i = 0; i < static_cast<int>(m_projectsList.size()); ++i)
         {
-            if ((*m_projects)[i].GetSubPath() == newProject->GetSubPath())
+            if (m_projectsList[i].GetSubPath() == newProject.GetSubPath())
             {
                 m_selectedIndex = i;
-                m_selectedProject = newProject;
+                m_selectedProject = &newProject;
                 break;
             }
         }
@@ -436,13 +431,13 @@ namespace SE
     
     bool ProjectSelector::RenameProject(int index, const eastl::string& newName)
     {
-        if (index < 0 || static_cast<size_t>(index) >= m_projects->size())
+        if (index < 0 || static_cast<size_t>(index) >= m_projectsList.size())
         {
             m_lastError = "Invalid project index";
             return false;
         }
 
-        eastl::shared_ptr<Project> project = eastl::make_shared<Project>((*m_projects)[index]);
+        Project* project = &m_projectsList[index];
         
         eastl::string error = project->Rename(newName);
         
@@ -465,13 +460,13 @@ namespace SE
 
     void ProjectSelector::DeleteProject(int index, bool deleteFilesFromDisk)
     {
-        if (index < 0 || static_cast<size_t>(index) >= m_projects->size())
+        if (index < 0 || static_cast<size_t>(index) >= m_projectsList.size())
         {
             m_lastError = "Invalid project index";
             return;
         }
         
-        Project projectToDelete = (*m_projects)[index];
+        Project projectToDelete = m_projectsList[index];
         
         eastl::string error = projectToDelete.Delete(deleteFilesFromDisk);
         
@@ -486,7 +481,7 @@ namespace SE
         if (m_selectedIndex == index)
         {
             m_selectedIndex = -1;
-            m_selectedProject.reset();
+            m_selectedProject = nullptr;
         }
         else if (m_selectedIndex > index)
         {
@@ -511,12 +506,12 @@ namespace SE
         switch (type)
         {
         case SceneType::Custom: return "Custom";
-        case SceneType::GAI: return "GAI";
-        case SceneType::Default: return "Default";
-        case SceneType::Parent: return "Parent";
-        case SceneType::Lua: return "Lua";
-        case SceneType::Resources: return "Resources";
-        default: return "Unknown";
+        case SceneType::GAI: return "GAI Testing";
+        case SceneType::Default: return "Default Testing";
+        case SceneType::Parent: return "Parent Testing";
+        case SceneType::Lua: return "Lua Testing";
+        case SceneType::Resources: return "Resources Testing";
+        default: return "Default Testing";
         }
     }
 
@@ -524,12 +519,12 @@ namespace SE
     {
         switch (type)
         {
-        case SceneType::GAI: return "GAI Scene";
-        case SceneType::Default: return "Default Scene";
-        case SceneType::Parent: return "Parent Scene";
-        case SceneType::Lua: return "Lua Scripting Scene";
-        case SceneType::Resources: return "Resources Scene";
-        default: return "Unknown Scene";
+        case SceneType::GAI: return "GAI Testing Scene";
+        case SceneType::Default: return "Default Testing Scene";
+        case SceneType::Parent: return "Parent Testing Scene";
+        case SceneType::Lua: return "Lua Scripting Testing Scene";
+        case SceneType::Resources: return "Resources Testing Scene";
+        default: return "Default Testing Scene";
         }
     }
 
@@ -538,12 +533,12 @@ namespace SE
         switch (type)
         {
         case SceneType::Custom: return L"Custom";
-        case SceneType::GAI: return L"GAI";
-        case SceneType::Default: return L"Default";
-        case SceneType::Parent: return L"Parent";
-        case SceneType::Lua: return L"Lua";
-        case SceneType::Resources: return L"Resources";
-        default: return L"Unknown";
+        case SceneType::GAI: return L"GAI Testing";
+        case SceneType::Default: return L"Default Testing";
+        case SceneType::Parent: return L"Parent Testing";
+        case SceneType::Lua: return L"Lua Testing";
+        case SceneType::Resources: return L"Resources Testing";
+        default: return L"Default Testing";
         }
     }
 }

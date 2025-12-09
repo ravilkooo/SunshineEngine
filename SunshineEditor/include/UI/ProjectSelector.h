@@ -20,22 +20,26 @@ namespace SE
     class ProjectSelector
     {
     public:
-        ProjectSelector() {};
+        ProjectSelector() {
+            if (!SE::LoadProjects(m_projectsList).empty())
+            {
+                SE::SaveProjects(m_projectsList);
+            }
+        };
         ~ProjectSelector() = default;
 
         bool Show();
         void Close();
 
         SceneType GetSelectedSceneType() const { return m_selectedSceneType; }
-        eastl::shared_ptr<SE::Project> GetSelectedProject() { return m_selectedProject; }
-        void SetProjectList(SE::ProjectList* projects) { m_projects = projects; }
+        SE::Project* GetSelectedProject() { return m_selectedProject; }
 
         bool IsVisible() const { return m_isVisible; }
         void SetVisible(bool isVisible) { m_isVisible = isVisible; }
         void ResetSelection()
         {
             m_selectedIndex = -1;
-            m_selectedProject.reset();
+            m_selectedProject = nullptr;
             m_selectedSceneType = SceneType::Custom;
             m_lastError.clear();
         }
@@ -46,9 +50,11 @@ namespace SE
         static const char* SceneTypeToDisplayName(SceneType type);
         static const wchar_t* SceneTypeToWString(SceneType type);
 
+        SE::ProjectList m_projectsList = { SE::Project() };
+
+        void RefreshProjectList();
     private:
         void DrawWindow();
-        void RefreshProjectList();
         bool CreateNewProject();
         void DrawEditPopup();
         void DrawDeletePopup();
@@ -59,8 +65,8 @@ namespace SE
         ImVec2 m_windowSize;
         
         bool m_isVisible = true;
-        eastl::shared_ptr<SE::Project> m_selectedProject;
-        SE::ProjectList* m_projects = nullptr;
+        SE::Project* m_selectedProject;
+        //SE::ProjectList* m_projects = nullptr;
         int m_selectedIndex = -1;
         char m_newProjectName[256] = "";
         

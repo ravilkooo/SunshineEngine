@@ -92,13 +92,6 @@ EditorApp::~EditorApp() {
 void EditorApp::RunApp()
 {
 	SE::Project::SetWorldEditor(m_worldEditor.get());
-	
-	while (!SE::LoadProjects(m_projectsList).empty())
-	{
-		SE::SaveProjects(m_projectsList);
-	}
-	
-	imguiEditorPass->m_ProjectSelector.SetProjectList(&m_projectsList);
 
 	float physicsUpdateFPS = 120.0f;
 	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
@@ -186,7 +179,7 @@ void EditorApp::RunApp()
 				m_worldEditor->m_scene->InitHierarchy();
 			} else {
 				imguiEditorPass->ResetProjectSelection();
-				m_openedProject.reset();
+				m_openedProject = nullptr;
 			}
 		}
 
@@ -194,7 +187,7 @@ void EditorApp::RunApp()
 			if (imguiEditorPass->IsProjectSelectorVisible())
 			{
 				imguiEditorPass->ResetProjectSelection();
-				m_openedProject.reset();
+				m_openedProject = nullptr;
 			}
 			else
 				isExitRequested = true;
@@ -202,7 +195,7 @@ void EditorApp::RunApp()
 	}
 	m_worldEditor->ClearScene();
 
-	SE::SaveProjects(m_projectsList);
+	SE::SaveProjects(imguiEditorPass->m_ProjectSelector.m_projectsList);
 }
 
 void EditorApp::UpdateGame(float deltaTime)
@@ -537,13 +530,14 @@ void EditorApp::StopGame() {
 
 void EditorApp::SaveProject()
 {
-	if (m_openedProject)
+	if (m_openedProject && m_loadedSceneType == SE::SceneType::Custom)
 	{
 		eastl::string error = m_openedProject->Save();
 		if (!error.empty())
 			return;
-    
-		SE::SaveProjects(m_projectsList);
+
+		SE::SaveProjects(imguiEditorPass->m_ProjectSelector.m_projectsList);
+		imguiEditorPass->m_ProjectSelector.RefreshProjectList();
 	}
 }
 

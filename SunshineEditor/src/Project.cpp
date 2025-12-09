@@ -24,7 +24,7 @@ namespace SE
 	}
 
 	eastl::string Project::CreateNew(const eastl::string& name,
-                           eastl::shared_ptr<Project>& outProject)
+                           Project& outProject)
     {
         if (name.empty())
             return "Project name cannot be empty";
@@ -61,10 +61,11 @@ namespace SE
 	    if (!error.empty())
 	    {
 	        newProject.deleteDirectory();
+			projects.pop_back();
 	        return "Failed to save project list: " + error;
 	    }
 		
-        outProject = eastl::make_shared<Project>(newProject);
+        outProject = projects.back();
 		
         return "";
     }
@@ -89,7 +90,7 @@ namespace SE
 		return "";
 	}
 
-	eastl::string Project::Save() const
+	eastl::string Project::Save()
 	{
 		if (!s_worldEditor)
 			return "WorldEditor is null";
@@ -98,8 +99,25 @@ namespace SE
 		
 		s_worldEditor->SaveScene(scenePath.c_str());
 		
-		const_cast<Project*>(this)->UpdateSaveTime();
-    
+		UpdateSaveTime();
+
+		ProjectList projects;
+		eastl::string error = LoadProjects(projects);
+		if (!error.empty())
+			return "Failed to load project list: " + error;
+		for (auto& project : projects)
+		{
+			if (project.GetSubPath() == GetSubPath())
+			{
+				project.UpdateSaveTime();
+				break;
+			}
+		}
+		error = SaveProjects(projects);
+		if (!error.empty())
+		{
+			return "Failed to save updated project list: " + error;
+		}
 		return "";
     }
 
@@ -277,9 +295,9 @@ namespace SE
         return Exists(m_subPath);
     }
 
-    bool Project::isDuplicateName(const eastl::wstring& name,
-                                 const eastl::vector<Project>& projects,
-                                 int excludeIndex)
+    bool isDuplicateName(const eastl::wstring& name,
+		const ProjectList& projects,
+		int excludeIndex)
     {
         for (size_t i = 0; i < projects.size(); ++i)
         {

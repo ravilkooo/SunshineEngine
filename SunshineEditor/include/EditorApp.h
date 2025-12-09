@@ -86,12 +86,10 @@ public:
 
     SE::SceneType m_loadedSceneType = SE::SceneType::Custom;
 
-    SE::ProjectList m_projectsList = { SE::Project() };
-
     eastl::shared_ptr<SE_G::RenderingSystem> m_renderingSystem;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;
-    eastl::shared_ptr<SE::Project> m_openedProject;
+    SE::Project* m_openedProject;
     eastl::unique_ptr<Game> m_currentGame;
 
     GameTimer m_timer;

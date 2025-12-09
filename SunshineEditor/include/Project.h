@@ -16,20 +16,18 @@ class WorldEditor;
 
 namespace SE
 {
-    
-    
+
 	class Project
 	{
 	public:
         Project();
         Project(const eastl::wstring& subPath);
 
-		using ProjectList = eastl::vector<Project>;
 
 	    static eastl::string CreateNew(const eastl::string& name,
-                             eastl::shared_ptr<Project>& outProject);
+                             Project& outProject);
 		eastl::string Open() const;
-	    eastl::string Save() const;
+	    eastl::string Save();
 	    eastl::string Rename(const eastl::string& newName);
 	    eastl::string Delete(bool deleteFilesFromDisk = false);
 	    
@@ -40,12 +38,12 @@ namespace SE
 		eastl::wstring GetFullPath() const;
 		eastl::wstring GetScenePath() const;
 
-		void SetSubPath(const eastl::wstring& subPath);
 		static void SetWorldEditor(WorldEditor* editor) { s_worldEditor = editor; }
 
 		std::chrono::system_clock::time_point GetLastSavedTime() const;
 		std::chrono::system_clock::time_point GetCreationDate() const;
 
+        void SetSubPath(const eastl::wstring& subPath);
 		void SetLastSavedTime(const std::chrono::system_clock::time_point& lastSaved);
 		void SetCreationDate(const std::chrono::system_clock::time_point& creationDate);
 
@@ -65,13 +63,13 @@ namespace SE
 		// eastl::string copyTemplateFile(SceneType sceneType) const;
 		eastl::string renameDirectory(const eastl::wstring& newPath) const;
 		eastl::string deleteDirectory() const;
-		
-		static bool isDuplicateName(const eastl::wstring& name, 
-								   const ProjectList& projects, 
-								   int excludeIndex = -1);
 	};
 
     using ProjectList = eastl::vector<Project>;
+        
+    bool isDuplicateName(const eastl::wstring& name,
+        const ProjectList& projects,
+        int excludeIndex = -1);
 
     inline eastl::string SaveProjects(const ProjectList& projects)
     {

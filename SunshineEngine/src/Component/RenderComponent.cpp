@@ -29,6 +29,11 @@ RenderComponent_Info::RenderComponent_Info(SE::UUID uuid, SE_G::DeferredRenderer
 }
 
 RenderComponent_Info::~RenderComponent_Info() {
+	eastl::unordered_set techs_copy = techniques;
+	for (auto tech : techs_copy)
+	{
+		RemoveTechnique(tech);
+	}
 	techniques.clear();
 }
 

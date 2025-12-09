@@ -537,9 +537,17 @@ void WorldEditor::Render() {
 	
 }
 
+void WorldEditor::CloseProject()
+{
+	ClearScene();
+}
+
 void WorldEditor::ClearScene() {
 	//m_physicsSystem->ClearScene();
-	m_scene->ClearScene();
+	if (m_scene)
+		m_scene->ClearScene();
+	m_renderer->ClearAllTechniques();
+	m_renderer->RemovePass(SE_G::RenderPass::PassType::Shadow);
 }
 
 void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {

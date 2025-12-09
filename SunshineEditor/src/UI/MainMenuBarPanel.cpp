@@ -280,7 +280,7 @@ void MainMenuBarPanel::CloseCurrentProject()
             m_editorApp->m_worldEditor->ClearScene();
         }
         
-        m_editorApp->m_openedProject.reset();
+        m_editorApp->m_openedProject = nullptr;
         
         
         if (m_imguiEditorPass)

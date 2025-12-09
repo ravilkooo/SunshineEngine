@@ -50,7 +50,7 @@ public:
     bool IsProjectSelectorVisible() const { return m_ProjectSelector.IsVisible(); }
     void SetProjectSelectorVisible() { m_ProjectSelected = false; m_ProjectSelector.ResetSelection(); m_ProjectSelector.SetVisible(true); }
     bool IsProjectSelected() const { return m_ProjectSelected; }
-    eastl::shared_ptr<SE::Project> GetSelectedProject() { return m_ProjectSelector.GetSelectedProject(); }
+    SE::Project* GetSelectedProject() { return m_ProjectSelector.GetSelectedProject(); }
     void ResetProjectSelection() { m_ProjectSelected = false; m_ProjectSelector.Close(); }
 
     UINT m_editorAppWidth = 800;
