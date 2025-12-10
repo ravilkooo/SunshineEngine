@@ -5,6 +5,7 @@
 
 class TransformComponent;
 class RenderComponent;
+class PerceptionComponent;
 
 namespace ScriptingBindings {
     // Registers all engine types and GameObject accessors to the given Lua state.
@@ -19,5 +20,6 @@ namespace ScriptingBindings {
 #ifndef GAMEOBJECT_LUA_GETTERS_APPLY
 #define GAMEOBJECT_LUA_GETTERS_APPLY(F) \
     F(TransformComponent, "getTransform") , \
-    F(RenderComponent, "getRender")
+    F(RenderComponent, "getRender") , \
+    F(PerceptionComponent, "getPerception")
 #endif
