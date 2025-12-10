@@ -372,7 +372,39 @@ void PhysicsComponent::FromJson(const json& j) {
 
 // ----------------- LuaComponent -----------------
 
+json LuaComponent_Info::ToJson() const {
+    json j;
+    j = nlohmann::json{
+        {"scriptPath", std::string{scriptPath.c_str()}},
+        {"selectedLuaFile", selectedLuaFile},
+        {"scriptLoaded", scriptLoaded}
+    };
+    return j;
+}
 
+void LuaComponent_Info::FromJson(const json& j) {
+    if (j.contains("scriptPath") && j["scriptPath"].is_string()) {
+        std::string stdPath = j.at("scriptPath").get<std::string>();
+        scriptPath = eastl::string(stdPath.c_str());
+    }
+    if (j.contains("selectedLuaFile") && j["selectedLuaFile"].is_number()) {
+        selectedLuaFile = j.at("selectedLuaFile").get<int>();
+    }
+    if (j.contains("scriptLoaded") && j["scriptLoaded"].is_boolean()) {
+        scriptLoaded = j.at("scriptLoaded").get<bool>();
+    }
+}
+
+void LuaComponent::FromJson(const json& j) {
+
+    LuaComponent_Info info;
+    info.FromJson(j);
+
+    if (!info.scriptPath.empty()) {
+        scriptPath = info.scriptPath;
+        LoadScript();
+    }
+}
 
 // ----------------- GameObject_Info -----------------
 
@@ -608,6 +640,12 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     physicsSystem->CreateAndAddBody(c.get());
                     //physicsSystem->CreateAndBody(c);
                 }
+
+                if (objJ["components"].contains("Lua")) {
+                    auto luaComp = go->AddComponent<LuaComponent>();
+                    luaComp->FromJson(objJ["components"]["Lua"]);
+                    luaComp->Init(go.get(), luaComp->scriptPath);
+                }
                 
                 // Parentnes
                 if (objJ.contains("m_parent"))
@@ -718,6 +756,11 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                         go->GetComponent<TransformComponent_Info>().get());
                     c->FromJson(objJ["components"]["Physics"]);
                     //physicsSystem->CreateAndBody(c);
+                }
+
+                if (objJ["components"].contains("Lua")) {
+                    auto c = go->AddComponent<LuaComponent_Info>();
+                    c->FromJson(objJ["components"]["Lua"]);
                 }
 
                 // Parentnes

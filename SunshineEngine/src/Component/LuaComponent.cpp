@@ -12,7 +12,7 @@
 #include "Utils/FileSystemWrapper.h"
 #include "Scripting/ComponentBindings.h"
 
-void LuaComponent::ScanLuaFiles(const eastl::string& dirPath) {
+void LuaComponent_Info::ScanLuaFiles(const eastl::string& dirPath) {
 	luaFiles.clear();
 	std::error_code ec;
 	//for (eastlfs::directory_iterator it(dirPath); it != eastlfs::directory_iterator(""); ++it) {
@@ -31,6 +31,18 @@ void LuaComponent::ScanLuaFiles(const eastl::string& dirPath) {
 	}
 }
 
+
+void LuaComponent_Info::InitLuaFile()
+{
+	eastl::wstring wpath = MakeEngineAssetPath_Wstring(L"Scripts");
+	eastl::string assetsPath = wstringToString(wpath);
+	ScanLuaFiles(assetsPath);
+	if (!luaFiles.empty()) {
+		scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
+	}
+	printSunshineMessage(scriptPath.c_str());
+}
+
 LuaComponent::LuaComponent()
 	: lua(nullptr), scriptLoaded(false), foundFunction(false) {
 }
@@ -39,26 +51,18 @@ LuaComponent::~LuaComponent() {
 	Cleanup();
 }
 
-void LuaComponent::Init(GameObject* obj) {
+void LuaComponent::Init(GameObject* obj, const eastl::string& inScriptPath) {
 
 	this->obj = obj;
-	InitLuaFile();
+	scriptPath = inScriptPath;
+
+	//InitLuaFile();
+	LoadScript();
 }
 
 void LuaComponent::registerComponents()
 {
     ScriptingBindings::RegisterAll(*lua);
-}
-
-void LuaComponent::InitLuaFile()
-{
-	eastl::wstring wpath = MakeEngineAssetPath_Wstring(L"Scripts");
-	assetsPath = wstringToString(wpath);
-	ScanLuaFiles(assetsPath);
-	if (!luaFiles.empty()) {
-		scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
-	}
-	printSunshineMessage(scriptPath.c_str());
 }
 
 void LuaComponent::Cleanup() {
@@ -84,7 +88,7 @@ void LuaComponent::LoadScript() {
 
 	Cleanup();
 
-	InitLuaFile();
+	//InitLuaFile();
 
 	lua = eastl::make_unique<sol::state>();
 	lua->open_libraries(sol::lib::base);
@@ -103,8 +107,8 @@ void LuaComponent::LoadScript() {
 
 	InitializeBehavior();
 
-	scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
-	printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
+	//scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
+	//printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
 
 	foundFunction = false;
 	params.clear();

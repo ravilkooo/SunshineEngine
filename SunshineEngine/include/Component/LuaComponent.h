@@ -15,6 +15,7 @@ struct ParamEntry {
 
 class LuaComponent : public Component
 {
+    friend class LuaComponent_Info;
 public:
     LuaComponent();
     ~LuaComponent();
@@ -25,7 +26,7 @@ public:
     LuaComponent(LuaComponent&&) noexcept = default;
     LuaComponent& operator=(LuaComponent&&) noexcept = default;
 
-    void Init(GameObject*);
+    void Init(GameObject* owner, const eastl::string& inScriptPath);
     void Cleanup();
 
     void LoadScript();
@@ -44,12 +45,11 @@ public:
     eastl::string GetFunctionName() const;
 
     //runtime
+    void FromJson(const json& j) override;
     void LuaUpdate(float deltaTime);
 
     eastl::string scriptPath;
     eastl::string assetsPath;
-    int selectedLuaFile = 0;
-    eastl::vector<eastl::string> luaFiles;
     bool scriptLoaded;
     char functionName[128] = "";
     bool foundFunction;
@@ -71,9 +71,7 @@ private:
     ScriptComponent scriptComponent;
     bool behaviorInitialized;
 
-    void InitLuaFile();
     void registerComponents();
-    void ScanLuaFiles(const eastl::string& dirPath);
     void ClearState();
     void LoadParamsFromLua();
 
@@ -92,9 +90,18 @@ public:
         return typeid(LuaComponent_Info);
     }
 
-    bool IsAssigned() override { return false; }
+    bool IsAssigned() override { return !scriptPath.empty(); }
 
+    // Serialization
+    json ToJson() const override;
+    void FromJson(const json& j) override;
+
+    void InitLuaFile();
+    void ScanLuaFiles(const eastl::string& dirPath);
+
+    eastl::vector<eastl::string> luaFiles;
     eastl::string scriptPath;
     bool scriptLoaded;
+    int selectedLuaFile = 0;
 
 };
