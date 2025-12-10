@@ -11,6 +11,7 @@
 #include <shlobj.h>
 
 #include <Utils/StringUtils.h>
+#include "FileDialogManager.h"
 
 std::filesystem::path ContentBrowserPanel::s_AssetsDirectory =
     std::filesystem::path(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/").c_str());
@@ -100,23 +101,26 @@ bool ContentBrowserPanel::CopyPathToClipboardSystem(const std::string& text)
 
 std::filesystem::path ContentBrowserPanel::OpenFileDialog()
 {
-    OPENFILENAMEW ofn;       
-    wchar_t szFile[260] = { 0 };
-    ZeroMemory(&ofn, sizeof(ofn));
-    ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = NULL;
-    ofn.lpstrFile = szFile;
-    ofn.nMaxFile = _countof(szFile);
-    ofn.lpstrFilter = FileCategories::GetAllFilter();
-    ofn.nFilterIndex = 1;
-    ofn.lpstrFileTitle = NULL;
-    ofn.nMaxFileTitle = 0;
-    ofn.lpstrInitialDir = NULL;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+    // OPENFILENAMEW ofn;       
+    // wchar_t szFile[260] = { 0 };
+    // ZeroMemory(&ofn, sizeof(ofn));
+    // ofn.lStructSize = sizeof(ofn);
+    // ofn.hwndOwner = NULL;
+    // ofn.lpstrFile = szFile;
+    // ofn.nMaxFile = _countof(szFile);
+    // ofn.lpstrFilter = FileCategories::GetAllFilter();
+    // ofn.nFilterIndex = 1;
+    // ofn.lpstrFileTitle = NULL;
+    // ofn.nMaxFileTitle = 0;
+    // ofn.lpstrInitialDir = NULL;
+    // ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+    //
+    // if (GetOpenFileNameW(&ofn))
+    //     return std::filesystem::u8path(WStringToUTF8(szFile));
+    // return {};
 
-    if (GetOpenFileNameW(&ofn))
-        return std::filesystem::u8path(WStringToUTF8(szFile));
-    return {};
+    auto filters = FileDialogManager::GetAllFilters();
+    return FileDialogManager::Get().OpenFile(L"Open File", filters);
 }
 
 std::filesystem::path ContentBrowserPanel::SaveFileDialog(const wchar_t* filter, int filterIndex)
@@ -240,11 +244,21 @@ void ContentBrowserPanel::Action_Duplicate(const std::filesystem::path& p)
 
 void ContentBrowserPanel::Action_Import()
 {
-    auto selectedFile = OpenFileDialog();
+    // auto selectedFile = OpenFileDialog();
+    // if (!selectedFile.empty())
+    // {
+    //     std::filesystem::path dst = m_CurrentDirectory / selectedFile.filename();
+    //     
+    //     dst = MakeUniquePath(dst);
+    //     FileCopy(selectedFile, dst);
+    // }
+
+    auto filters = FileDialogManager::GetAllFilters();
+    auto selectedFile = FileDialogManager::Get().OpenFile(L"Import File", filters);
+    
     if (!selectedFile.empty())
     {
         std::filesystem::path dst = m_CurrentDirectory / selectedFile.filename();
-        
         dst = MakeUniquePath(dst);
         FileCopy(selectedFile, dst);
     }

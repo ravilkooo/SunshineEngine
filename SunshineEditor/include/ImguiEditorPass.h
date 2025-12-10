@@ -52,6 +52,7 @@ public:
     bool IsProjectSelected() const { return m_ProjectSelected; }
     SE::Project* GetSelectedProject() { return m_ProjectSelector.GetSelectedProject(); }
     void ResetProjectSelection() { m_ProjectSelected = false; m_ProjectSelector.Close(); }
+    void SetScene(const eastl::shared_ptr<Scene_Info>& scene) { m_ToolbarPanel.SetScene(scene); }
 
     UINT m_editorAppWidth = 800;
     UINT m_editorAppHeight = 800;

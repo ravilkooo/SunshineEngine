@@ -74,6 +74,8 @@ ImguiEditorPass::ImguiEditorPass(
 	EditorUI::FontStyles::Init(io);
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
+
+	m_ToolbarPanel.Init(m_editorApp);
 }
 
 void ImguiEditorPass::SetVieportGBuffer(

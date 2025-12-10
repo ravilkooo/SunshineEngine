@@ -74,8 +74,6 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Show window
 	// ShowWindow(m_displayWindow.m_hWnd, SW_SHOWDEFAULT);
 	// UpdateWindow(m_displayWindow.m_hWnd);
-	
-	imguiEditorPass->m_ToolbarPanel.SetEditorApp(this);
 
 	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &EditorApp::HandleKeyDown);
 	InputDevice::getInstance().OnKeyReleased.AddRaw(this, &EditorApp::HandleKeyUp);
@@ -177,6 +175,7 @@ void EditorApp::RunApp()
 			if (OpenProject()) {
 				m_projectSelected = true;
 				m_worldEditor->m_scene->InitHierarchy();
+				imguiEditorPass->SetScene(m_worldEditor->m_scene);
 			} else {
 				imguiEditorPass->ResetProjectSelection();
 				m_openedProject = nullptr;
