@@ -49,7 +49,7 @@ LuaComponent::LuaComponent()
 }
 
 LuaComponent::~LuaComponent() {
-	Cleanup();
+	//Cleanup();
 }
 
 void LuaComponent::Init(GameObject* obj, const eastl::string& inScriptPath) {
