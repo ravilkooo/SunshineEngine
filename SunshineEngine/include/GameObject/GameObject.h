@@ -390,7 +390,6 @@ public:
                 // Add LuaComponent with default values
 
                 auto lc_info = AddComponent<LuaComponent_Info>();
-                lc_info->selectedLuaFile = 2;
                 lc_info->InitLuaFile();
             }
                 break;

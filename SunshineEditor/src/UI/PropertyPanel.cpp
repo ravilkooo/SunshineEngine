@@ -602,6 +602,24 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
                               ImGuiTreeNodeFlags_SpanAvailWidth;
+
+
+    if (auto luaInfo = obj->GetComponent<LuaComponent_Info>())
+    {
+        ImGui::Separator();
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Lua Settings");
+        EditorUI::FontStyles::Pop();
+
+        uint32_t luaScriptIndex = luaInfo->selectedLuaFile;
+        if (DrawUIntControl("Lua Script Index", luaScriptIndex, 10, 1.0f))
+        {
+            luaInfo->selectedLuaFile = luaScriptIndex;
+            luaInfo->InitLuaFile();
+            ImGui::Text(luaInfo->scriptPath.c_str());
+        }        
+    }
     /*
     if (ImGui::TreeNodeEx("Lua Script", flags))
     {

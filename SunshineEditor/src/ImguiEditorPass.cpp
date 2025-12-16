@@ -367,12 +367,11 @@ void ImguiEditorPass::ShowProperties()
 	//	return;	
 	//}
 
-	//if (ImGui::Button("Add Lua Script")) {
-	//	obj->AddComponent<LuaComponent_Info>();
-	//	auto lc_info = obj->GetComponent<LuaComponent_Info>();
-	//	lc_info->selectedLuaFile = 2;
-	//	lc_info->InitLuaFile();
-	//}
+	if (ImGui::Button("Add Lua Script")) {
+		obj->AddComponent<LuaComponent_Info>();
+		auto lc_info = obj->GetComponent<LuaComponent_Info>();
+		lc_info->InitLuaFile();
+	}
 	
 	//ImGui::Begin("Properties);
 	// if (selectedUUID == SE::UUID(0u))
