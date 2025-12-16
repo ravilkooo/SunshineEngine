@@ -44,7 +44,6 @@ void PropertyPanel::OnImGuiRender()
 
     DrawTransformComponent(obj);
     DrawDetails(obj);
-    DrawLuaComponent(obj);
     
     DrawComponentAddPopup(obj);
 
@@ -225,6 +224,7 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
 
         DrawMeshComponent(obj);
         DrawPhysicsComponent(obj);
+        DrawLuaComponent(obj);
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();
@@ -612,6 +612,29 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
         ImGui::Text("Lua Settings");
         EditorUI::FontStyles::Pop();
 
+        // Button width
+        const char* labelRemove = "Remove";
+        ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
+        ImVec2 padding = ImGui::GetStyle().FramePadding;
+        float labelWidth = textSize.x + padding.x * 2.0f;
+
+        // free space on this line
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        avail.x = avail.x - textSize.x;
+
+        if (avail.x > labelWidth) {
+            // put on the same line
+            float oldX = ImGui::GetCursorPosX();
+            ImGui::SameLine();
+            ImGui::SetCursorPosX(oldX + avail.x);
+        }
+        // else dont call SameLine, Button will be under line
+
+        if (ImGui::SmallButton(labelRemove)) {
+            obj->RemoveComponent<LuaComponent_Info>();
+            return;
+        }
+
         uint32_t luaScriptIndex = luaInfo->selectedLuaFile;
         if (DrawUIntControl("Lua Script Index", luaScriptIndex, 10, 1.0f))
         {
@@ -619,6 +642,7 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
             luaInfo->InitLuaFile();
             ImGui::Text(luaInfo->scriptPath.c_str());
         }        
+
     }
     /*
     if (ImGui::TreeNodeEx("Lua Script", flags))

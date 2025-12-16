@@ -354,47 +354,6 @@ void ImguiEditorPass::ShowProperties()
 	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
 		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
 	);
-
-	
-	//if (!obj->HasComponent<LuaComponent_Info>())
-	//{
-	//	if (ImGui::Button("Add Lua Script")) {
-	//		obj->AddComponent<LuaComponent_Info>();
-	//		auto lc_info = obj->GetComponent<LuaComponent_Info>();
-	//		lc_info->selectedLuaFile = 5;
-	//		lc_info->InitLuaFile();
-	//	}
-	//	return;	
-	//}
-
-	if (ImGui::Button("Add Lua Script")) {
-		obj->AddComponent<LuaComponent_Info>();
-		auto lc_info = obj->GetComponent<LuaComponent_Info>();
-		lc_info->InitLuaFile();
-	}
-	
-	//ImGui::Begin("Properties);
-	// if (selectedUUID == SE::UUID(0u))
-	// 	return;
-	//
-	// GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
-	// 	selectedUUID
-	// );
-	//
-	// if (!obj->HasComponent<LuaComponent>())
-	// {
-	// 	if (ImGui::Button("Add Lua Script")) {
-	// 		obj->AddComponent<LuaComponent>();
-	// 		auto lua2 = obj->GetComponent<LuaComponent>();
-	// 		lua2->Init(obj);
-	// 	}
-	// 	return;
-	// }
-	// else 
-	// {
-	// 	LuaImgui(obj);
-	// }
-	//ImGui::End();
 }
 
 void ImguiEditorPass::ShowBottomPanel()
