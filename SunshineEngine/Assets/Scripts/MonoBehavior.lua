@@ -8,11 +8,11 @@ end
 
 function behavior:update(dt)
 
-    local rc = self.owner:getRender()
-    if rc and rc:hasTechnique("GPass") and self.checkTechnique == false then
-        print("Use GPass!")
-        self.checkTechnique = true
-    end
+    --local rc = self.owner:getRender()
+    --if rc and rc:hasTechnique("GPass") and self.checkTechnique == false then
+    --    print("Use GPass!")
+    --    self.checkTechnique = true
+    --end
 
     local tr = self.owner:getTransform()
     tr.m_position.x = tr.m_position.x - self.speedMyY * dt
