@@ -4,8 +4,9 @@
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
 #include "sol/sol.hpp"
-#include <GameObject/GameObject.h>
 #include "ScriptComponent.h"
+
+class GameObject;
 
 struct ParamEntry {
     eastl::string name;
@@ -45,7 +46,7 @@ public:
     eastl::string GetFunctionName() const;
 
     //runtime
-    void FromJson(const json& j) override;
+    void FromJson(const json& j, GameObject* obj);
     void LuaUpdate(float deltaTime);
 
     eastl::string scriptPath;
@@ -82,6 +83,11 @@ private:
 class LuaComponent_Info : public Component_Info {
 public:
     static const SE::ComponentType s_componentType = SE::ComponentType::LUA;
+
+    LuaComponent_Info() {};
+    LuaComponent_Info(int indexSelectedLuaFile) {};
+    ~LuaComponent_Info() {};
+
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
     }
@@ -90,7 +96,7 @@ public:
         return typeid(LuaComponent_Info);
     }
 
-    bool IsAssigned() override { return !scriptPath.empty(); }
+    bool IsAssigned() override { return false; }
 
     // Serialization
     json ToJson() const override;

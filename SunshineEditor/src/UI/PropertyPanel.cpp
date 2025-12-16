@@ -811,21 +811,19 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             }
         }
 
-        /*
+        
         if (!obj->HasComponent<LuaComponent_Info>())
         {
             if (ImGui::MenuItem("Lua Script", nullptr, false, true))
             {
-                obj->AddComponent<LuaComponent_Info>();
-                auto luaComp = obj->GetComponent<LuaComponent_Info>();
-                luaComp->Init(obj);
+                obj->AddDefaultComponent(SE::ComponentType::LUA);
             }
         }
         else
         {
             ImGui::TextDisabled("All available components added");
         }
-        */
+        
         ImGui::EndPopup();
     }
 }

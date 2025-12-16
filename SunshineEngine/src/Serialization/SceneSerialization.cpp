@@ -395,14 +395,13 @@ void LuaComponent_Info::FromJson(const json& j) {
     }
 }
 
-void LuaComponent::FromJson(const json& j) {
+void LuaComponent::FromJson(const json& j, GameObject* obj) {
 
     LuaComponent_Info info;
     info.FromJson(j);
 
     if (!info.scriptPath.empty()) {
-        scriptPath = info.scriptPath;
-        LoadScript();
+        Init(obj, info.scriptPath);
     }
 }
 
@@ -643,8 +642,7 @@ eastl::shared_ptr<Scene> Scene::FromJson(
 
                 if (objJ["components"].contains("Lua")) {
                     auto luaComp = go->AddComponent<LuaComponent>();
-                    luaComp->FromJson(objJ["components"]["Lua"]);
-                    luaComp->Init(go.get(), luaComp->scriptPath);
+                    luaComp->FromJson(objJ["components"]["Lua"], go.get());
                 }
                 
                 // Parentnes

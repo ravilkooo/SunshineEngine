@@ -11,6 +11,7 @@
 #include "Utils/DebugUtils.h"
 #include "Utils/FileSystemWrapper.h"
 #include "Scripting/ComponentBindings.h"
+#include <GameObject/GameObject.h>
 
 void LuaComponent_Info::ScanLuaFiles(const eastl::string& dirPath) {
 	luaFiles.clear();
@@ -175,10 +176,32 @@ void LuaComponent::LoadParamsFromLua() {
 
 void LuaComponent::InitializeBehavior()
 {
-	if (!scriptLoaded)	{ return; }
+	if (!scriptLoaded) {
+		printSunshineErrorMessage("InitializeBehavior: scriptLoaded is false!");
+		return;
+	}
+
+	if (!obj) {
+		printSunshineErrorMessage("InitializeBehavior: obj is nullptr!");
+		return;
+	}
+
+	if (!lua) {
+		printSunshineErrorMessage("InitializeBehavior: lua is nullptr!");
+		return;
+	}
 
 	sol::object behaviorObj = (*lua)["behavior"];
-	if (!behaviorObj.valid() || behaviorObj.get_type() != sol::type::table) { return;	}
+	if (!behaviorObj.valid()) {
+		printSunshineErrorMessage("InitializeBehavior: behaviorObj is not valid!");
+		return;
+	}
+
+	if (behaviorObj.get_type() != sol::type::table) {
+		//printSunshineErrorMessage(eastl::string("InitializeBehavior: behavior is not a table, it's ") +
+		//	std::to_string((int)behaviorObj.get_type()));
+		return;
+	}
 
 	scriptComponent.self = behaviorObj.as<sol::table>();
 	scriptComponent.self["id"] = reinterpret_cast<uintptr_t>(obj);

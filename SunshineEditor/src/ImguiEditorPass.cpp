@@ -355,17 +355,25 @@ void ImguiEditorPass::ShowProperties()
 		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
 	);
 
-	/*
-	if (!obj->HasComponent<LuaComponent_Info>())
-	{
-		if (ImGui::Button("Add Lua Script")) {
-			obj->AddComponent<LuaComponent_Info>();
-			auto lua2 = obj->GetComponent<LuaComponent_Info>();
-			lua2->Init(obj);
-		}
-		return;
-	}
-	*/
+	
+	//if (!obj->HasComponent<LuaComponent_Info>())
+	//{
+	//	if (ImGui::Button("Add Lua Script")) {
+	//		obj->AddComponent<LuaComponent_Info>();
+	//		auto lc_info = obj->GetComponent<LuaComponent_Info>();
+	//		lc_info->selectedLuaFile = 5;
+	//		lc_info->InitLuaFile();
+	//	}
+	//	return;	
+	//}
+
+	//if (ImGui::Button("Add Lua Script")) {
+	//	obj->AddComponent<LuaComponent_Info>();
+	//	auto lc_info = obj->GetComponent<LuaComponent_Info>();
+	//	lc_info->selectedLuaFile = 2;
+	//	lc_info->InitLuaFile();
+	//}
+	
 	//ImGui::Begin("Properties);
 	// if (selectedUUID == SE::UUID(0u))
 	// 	return;
@@ -412,62 +420,62 @@ void ImguiEditorPass::ShowOutputLog()
 	}
 }
 	
-void ImguiEditorPass::LuaImgui(GameObject* obj)
-{
-	eastl::shared_ptr<LuaComponent> testComponent = obj->GetComponent<LuaComponent>();
-
-	if (ImGui::BeginCombo("##LuaFile", testComponent->luaFiles.empty() ? "" : testComponent->luaFiles[testComponent->selectedLuaFile].c_str())) {
-		for (int i = 0; i < testComponent->luaFiles.size(); ++i) {
-			bool is_selected = (i == testComponent->selectedLuaFile);
-			if (ImGui::Selectable(testComponent->luaFiles[i].c_str(), is_selected))
-				testComponent->selectedLuaFile = i;
-			if (is_selected)
-				ImGui::SetItemDefaultFocus();
-		}
-		ImGui::EndCombo();
-	}
-	if (ImGui::Button("Load Script")) {
-		testComponent->LoadScript();
-	}
-
-	if (testComponent->scriptLoaded)
-	{
-		ImGui::Text("Function Name:"); ImGui::SameLine();
-		ImGui::InputText("##FunctionName", testComponent->functionName, IM_ARRAYSIZE(testComponent->functionName));
-		if (ImGui::Button("Find")) {
-			testComponent->FindFunction();
-		}
-
-		if (testComponent->foundFunction) {
-			ImGui::Text("Parameters:");
-
-			for (int i = 0; i < testComponent->params.size(); ++i) {
-				auto& param = testComponent->params[i];
-				ImGui::Text("%s (%s) =", param.name, param.type);
-				ImGui::SameLine();
-
-				if (!EASTLStringEqualsChar(param.type,"userdata")) {
-					ImGui::InputText(("##p" + to_string_eastl(i)).c_str(), param.value, sizeof(param.value));
-				}
-				else {
-					eastl::string objName = obj->m_name;
-					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), objName.c_str());
-				}
-			}
-
-			if (ImGui::Button("Call")) {
-				testComponent->CallFunction();
-			}
-			if (!testComponent->lastResult.empty()) {
-				ImGui::Text("%s", testComponent->lastResult);
-			}
-
-		}
-		else if (!sunshineErrorMessage.empty()) {
-			ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", sunshineErrorMessage);
-		}
-	}
-}
+//void ImguiEditorPass::LuaImgui(GameObject* obj)
+//{
+//	eastl::shared_ptr<LuaComponent_Info> testComponent = obj->GetComponent<LuaComponent_Info>();
+//
+//	if (ImGui::BeginCombo("##LuaFile", testComponent->luaFiles.empty() ? "" : testComponent->luaFiles[testComponent->selectedLuaFile].c_str())) {
+//		for (int i = 0; i < testComponent->luaFiles.size(); ++i) {
+//			bool is_selected = (i == testComponent->selectedLuaFile);
+//			if (ImGui::Selectable(testComponent->luaFiles[i].c_str(), is_selected))
+//				testComponent->selectedLuaFile = i;
+//			if (is_selected)
+//				ImGui::SetItemDefaultFocus();
+//		}
+//		ImGui::EndCombo();
+//	}
+//	if (ImGui::Button("Load Script")) {
+//		testComponent->LoadScript();
+//	}
+//
+//	if (testComponent->scriptLoaded)
+//	{
+//		ImGui::Text("Function Name:"); ImGui::SameLine();
+//		ImGui::InputText("##FunctionName", testComponent->functionName, IM_ARRAYSIZE(testComponent->functionName));
+//		if (ImGui::Button("Find")) {
+//			testComponent->FindFunction();
+//		}
+//
+//		if (testComponent->foundFunction) {
+//			ImGui::Text("Parameters:");
+//
+//			for (int i = 0; i < testComponent->params.size(); ++i) {
+//				auto& param = testComponent->params[i];
+//				ImGui::Text("%s (%s) =", param.name, param.type);
+//				ImGui::SameLine();
+//
+//				if (!EASTLStringEqualsChar(param.type,"userdata")) {
+//					ImGui::InputText(("##p" + to_string_eastl(i)).c_str(), param.value, sizeof(param.value));
+//				}
+//				else {
+//					eastl::string objName = obj->m_name;
+//					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), objName.c_str());
+//				}
+//			}
+//
+//			if (ImGui::Button("Call")) {
+//				testComponent->CallFunction();
+//			}
+//			if (!testComponent->lastResult.empty()) {
+//				ImGui::Text("%s", testComponent->lastResult);
+//			}
+//
+//		}
+//		else if (!sunshineErrorMessage.empty()) {
+//			ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", sunshineErrorMessage);
+//		}
+//	}
+//}
 
 void ImguiEditorPass::PreResize()
 {
