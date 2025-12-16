@@ -17,6 +17,7 @@
 #include <Component/TransformComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>
+#include <Component/LuaComponent.h>
 
 #include <GameObject/ParentNode.h>
 
@@ -383,11 +384,14 @@ public:
                 break;
 
             case SE::ComponentType::LUA:
-
+            {
                 // To-do:
                 // Add  #include <Component/LuaComponent.h>
                 // Add LuaComponent with default values
 
+                auto lc_info = AddComponent<LuaComponent_Info>();
+                lc_info->InitLuaFile();
+            }
                 break;
 
             case SE::ComponentType::PHYSICS:

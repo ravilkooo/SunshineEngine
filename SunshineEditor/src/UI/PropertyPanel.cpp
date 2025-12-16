@@ -602,6 +602,24 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
                               ImGuiTreeNodeFlags_SpanAvailWidth;
+
+
+    if (auto luaInfo = obj->GetComponent<LuaComponent_Info>())
+    {
+        ImGui::Separator();
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Lua Settings");
+        EditorUI::FontStyles::Pop();
+
+        uint32_t luaScriptIndex = luaInfo->selectedLuaFile;
+        if (DrawUIntControl("Lua Script Index", luaScriptIndex, 10, 1.0f))
+        {
+            luaInfo->selectedLuaFile = luaScriptIndex;
+            luaInfo->InitLuaFile();
+            ImGui::Text(luaInfo->scriptPath.c_str());
+        }        
+    }
     /*
     if (ImGui::TreeNodeEx("Lua Script", flags))
     {
@@ -811,21 +829,19 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             }
         }
 
-        /*
+        
         if (!obj->HasComponent<LuaComponent_Info>())
         {
             if (ImGui::MenuItem("Lua Script", nullptr, false, true))
             {
-                obj->AddComponent<LuaComponent_Info>();
-                auto luaComp = obj->GetComponent<LuaComponent_Info>();
-                luaComp->Init(obj);
+                obj->AddDefaultComponent(SE::ComponentType::LUA);
             }
         }
         else
         {
             ImGui::TextDisabled("All available components added");
         }
-        */
+        
         ImGui::EndPopup();
     }
 }

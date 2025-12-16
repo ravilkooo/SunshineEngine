@@ -25,6 +25,7 @@
 #include <TracingSystem/TracingSystem.h>
 
 #include <Utils/ILogManager.h>
+#include <Scripting/LuaManager.h>
 
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
@@ -73,7 +74,7 @@ public:
     // For Volodya
     //eastl::unique_ptr<TracingSystem> m_tracingSystem;
 
-    // LuaManager m_luaManager;
+    LuaManager m_luaManager;
 
     eastl::shared_ptr<SE_G::DirectionalLightData> lightData;
     SE_G::ShadowMapPass* m_shadowMapPass;

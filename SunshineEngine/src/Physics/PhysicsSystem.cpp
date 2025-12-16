@@ -124,22 +124,25 @@ void PhysicsSystem::FinalizeScene() {
 void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
     for (auto bodyEntry : m_bodyEntries) {
 
-        //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(bodyEntry.m_joltBodyId);
+        if (m_bodyInterface->GetMotionType(bodyEntry.m_joltBodyId) == JPH::EMotionType::Dynamic)
+        {
+            //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(bodyEntry.m_joltBodyId);
 
-        JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
-        JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);
+            JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
+            JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);
 
-        SE::UUID objectUUID = SE::UUID((std::uint64_t) m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
+            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
 
-        auto tc = scene->GetGameObjectByUUID(
-            objectUUID)->GetComponent<TransformComponent>();
+            auto tc = scene->GetGameObjectByUUID(
+                objectUUID)->GetComponent<TransformComponent>();
 
-        tc->m_position =
-            DXSM::Vector3(position.mF32
-            );
-        tc->m_rotation =
-            DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
-            );
+            tc->m_position =
+                DXSM::Vector3(position.mF32
+                );
+            tc->m_rotation =
+                DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
+                );
+        }        
     }
 }
 

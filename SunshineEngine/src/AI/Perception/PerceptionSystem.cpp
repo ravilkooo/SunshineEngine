@@ -2,6 +2,8 @@
 
 // Engine
 #include <Component/TransformComponent.h>
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
 
 // C++
 #include <iostream>
@@ -495,3 +497,15 @@ bool PerceptionSystem::ReportNoise(PerceptionComponent* SourcePC, float Loudness
 
     return true;
 }
+
+#define PS_ADD_FIELD(name) #name, &PerceptionSystem::name
+#define PS_FIELD_PAIRS 
+#undef  PS_ADD_FIELD
+
+#define PS_ADD_METHOD(k, fn) k, fn
+#define PS_METHOD_PAIRS PERCEPTIONSYSTEM_LUA_METHODS_APPLY(PS_ADD_METHOD)
+
+LUA_REGISTER_TYPE(PerceptionSystem, "PerceptionSystem", PS_FIELD_PAIRS, PS_METHOD_PAIRS)
+
+#undef PS_ADD_METHOD
+#undef PS_FIELD_PAIRS

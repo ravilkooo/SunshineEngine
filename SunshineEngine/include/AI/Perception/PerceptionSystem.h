@@ -42,12 +42,12 @@ public:
     bool ClearTeam(uint32_t TeamId);
     //
 
-private:
     static PerceptionSystem& Get()
     {
         static PerceptionSystem instance;
         return instance;
     }
+private:
 
     // Represents a team participating in the perception system
     // Each team contains perceivers (GameObject with perception components)
@@ -76,3 +76,18 @@ private:
 
     eastl::hash_map<uint32_t, TeamSctruct> Teams;
 };
+
+#ifndef PERCEPTIONSYSTEM_LUA_METHODS_APPLY
+#define PERCEPTIONSYSTEM_LUA_METHODS_APPLY(FM) \
+    FM("registerTeam", &PerceptionSystem::RegisterTeam) , \
+    FM("unregisterTeam", &PerceptionSystem::UnregisterTeam) , \
+    FM("addSightTargetTeamIDsInTeam", &PerceptionSystem::AddSightTargetTeamIDsInTeam) , \
+    FM("addHearingSourceTeamIDsInTeam", &PerceptionSystem::AddHearingSourceTeamIDsInTeam) , \
+    FM("removeSightTargetTeamIDsInTeam", &PerceptionSystem::RemoveSightTargetTeamIDsInTeam) , \
+    FM("removeHearingSourceTeamIDsInTeam", &PerceptionSystem::RemoveHearingSourceTeamIDsInTeam) , \
+    FM("clearSightTargetTeamIDsInTeam", &PerceptionSystem::ClearSightTargetTeamIDsInTeam) , \
+    FM("clearHearingSourceTeamIDsInTeam", &PerceptionSystem::ClearHearingSourceTeamIDsInTeam) , \
+    FM("addToTeam", &PerceptionSystem::AddToTeam) , \
+    FM("removeFromTeam", &PerceptionSystem::RemoveFromTeam) , \
+    FM("clearTeam", &PerceptionSystem::ClearTeam)
+#endif

@@ -242,7 +242,7 @@ void Game::Run()
 
 void Game::Update(float deltaTime) {
 
-	// m_luaManager.Update(m_scene, deltaTime);
+	 m_luaManager.Update(m_scene.get(), deltaTime);
 	 m_physicsSystem->Step(deltaTime);
 
 	 m_physicsSystem->SyncronizeTransforms(m_scene.get());

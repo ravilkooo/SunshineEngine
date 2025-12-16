@@ -4,8 +4,9 @@
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
 #include "sol/sol.hpp"
-#include <GameObject/GameObject.h>
 #include "ScriptComponent.h"
+
+class GameObject;
 
 struct ParamEntry {
     eastl::string name;
@@ -15,6 +16,7 @@ struct ParamEntry {
 
 class LuaComponent : public Component
 {
+    friend class LuaComponent_Info;
 public:
     LuaComponent();
     ~LuaComponent();
@@ -25,7 +27,7 @@ public:
     LuaComponent(LuaComponent&&) noexcept = default;
     LuaComponent& operator=(LuaComponent&&) noexcept = default;
 
-    void Init(GameObject*);
+    void Init(GameObject* owner, const eastl::string& inScriptPath);
     void Cleanup();
 
     void LoadScript();
@@ -44,12 +46,11 @@ public:
     eastl::string GetFunctionName() const;
 
     //runtime
+    void FromJson(const json& j, GameObject* obj);
     void LuaUpdate(float deltaTime);
 
     eastl::string scriptPath;
     eastl::string assetsPath;
-    int selectedLuaFile = 0;
-    eastl::vector<eastl::string> luaFiles;
     bool scriptLoaded;
     char functionName[128] = "";
     bool foundFunction;
@@ -71,9 +72,7 @@ private:
     ScriptComponent scriptComponent;
     bool behaviorInitialized;
 
-    void InitLuaFile();
     void registerComponents();
-    void ScanLuaFiles(const eastl::string& dirPath);
     void ClearState();
     void LoadParamsFromLua();
 
@@ -84,6 +83,11 @@ private:
 class LuaComponent_Info : public Component_Info {
 public:
     static const SE::ComponentType s_componentType = SE::ComponentType::LUA;
+
+    LuaComponent_Info() {};
+    LuaComponent_Info(int indexSelectedLuaFile) {};
+    ~LuaComponent_Info() {};
+
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
     }
@@ -94,7 +98,16 @@ public:
 
     bool IsAssigned() override { return false; }
 
+    // Serialization
+    json ToJson() const override;
+    void FromJson(const json& j) override;
+
+    void InitLuaFile();
+    void ScanLuaFiles(const eastl::string& dirPath);
+
+    eastl::vector<eastl::string> luaFiles;
     eastl::string scriptPath;
     bool scriptLoaded;
+    int selectedLuaFile = 0;
 
 };
