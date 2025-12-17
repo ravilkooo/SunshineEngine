@@ -2,6 +2,7 @@
 
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
+#include <EASTL/unordered_map.h>
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -32,8 +33,9 @@ namespace SE_G {
         void SetMainCamera(eastl::shared_ptr<Camera> camera) { m_mainCamera = camera; }
         eastl::shared_ptr<Camera> GetMainCamera() { return m_mainCamera; };
 
-        void PreResize();
         void OnResize(UINT resizeWidth, UINT resizeHeight);
+        
+        void Pass() override;
 
         eastl::shared_ptr<Camera> m_mainCamera;
 

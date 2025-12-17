@@ -18,7 +18,7 @@ namespace SE_G {
 	}
 
 	DeferredRenderer::~DeferredRenderer() {
-
+		//m_passes.clear();
 	}
 
 	void DeferredRenderer::InitGBuffer(UINT screenWidth, UINT screenHeight)
@@ -36,8 +36,43 @@ namespace SE_G {
 
 		// Passes
 		for (auto& pass : m_passes) {
-			pass->OnResize(m_screenWidth, m_screenHeight);
+			pass.second->OnResize(m_screenWidth, m_screenHeight);
 
 		}
 	}
+
+	void DeferredRenderer::Pass()
+	{
+		// Passes
+		for (UINT i = 0u; i < static_cast<UINT>(RenderPass::PassType::Count); i++)
+		{
+			if (m_passes.contains(static_cast<RenderPass::PassType>(i)))
+			{
+				auto pass = m_passes[static_cast<RenderPass::PassType>(i)].get();
+
+				if (!pass->IsEnabled())
+					continue;
+
+				m_context->ClearState();
+
+				pass->StartFrame();
+				pass->Pass();
+				pass->EndFrame();
+			}
+		}
+
+		/*
+		for (auto& pass : m_passes) {
+			if (!pass->IsEnabled())
+				continue;
+
+			m_context->ClearState();
+
+			pass->StartFrame();
+			pass->Pass();
+			pass->EndFrame();
+		}
+		*/
+	}
+
 }

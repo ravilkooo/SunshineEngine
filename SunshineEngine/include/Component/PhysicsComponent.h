@@ -76,8 +76,10 @@ private:
     JPH::ObjectLayer m_objectLayer = SE::Layers::NON_MOVING; // default layer
     JPH::ShapeRefC m_shape = nullptr;
 
-    // To-do: make weak_ptr or simple ptr?
-    // PhysicsSystem* m_physicsSystem;
+    SE::ColliderTransforms m_transformsData;
+    /*
+    ColliderTransformCB m_transformMat;
+    */
 };
 
 class RenderComponent_Info;
@@ -132,6 +134,9 @@ public:
     SE::ColliderSettings GetColliderSettings();
     void SetColliderSettings(SE::ColliderSettings settings);
     */
+    
+    bool m_isValid = false;
+    RenderComponent_Info* m_rc_info;
 
     // All colliders settings
     eastl::shared_ptr<SE::ColliderData> m_colliderData;

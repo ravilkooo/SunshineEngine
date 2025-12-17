@@ -38,9 +38,6 @@ namespace SE_G {
 			Texture(ID3D11Device* device, const Color* colorData, UINT width, UINT height, UINT slot = 0u,
 				Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER);
 
-			void ChangeTexture(ID3D11Device* device, const eastl::wstring& filePath);
-			void ChangeColor(ID3D11Device* device, SE_G::Color color);
-
 			void ClearTexture();
 
 			void Release() {
@@ -56,10 +53,6 @@ namespace SE_G {
 
 			void UpdateTextureView(ID3D11ShaderResourceView* pTextureView);
 
-			bool HasAlpha() const noexcept;
-			void Initialize1x1ColorTexture(ID3D11Device* device, const Color& colorData);
-			void InitializeColorTexture(ID3D11Device* device, const Color* colorData, UINT width, UINT height);
-
 			eastl::wstring GetCurrentTexturePath();
 			SE_G::Color GetCurrentColor();
 
@@ -68,6 +61,13 @@ namespace SE_G {
 			ResourceGUID GetGUID() const override;
 			size_t GetSizeInMemory() const override;
 		private:
+			void ChangeTexture(ID3D11Device* device, const eastl::wstring& filePath);
+			void ChangeColor(ID3D11Device* device, SE_G::Color color);
+
+			bool HasAlpha() const noexcept;
+			void Initialize1x1ColorTexture(ID3D11Device* device, const Color& colorData);
+			void InitializeColorTexture(ID3D11Device* device, const Color* colorData, UINT width, UINT height);
+
 			ResourceGUID m_GUID = 0;
 			size_t m_MemorySize = 0;
 

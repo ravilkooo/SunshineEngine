@@ -15,6 +15,11 @@ namespace SE_G {
 		m_techniques.clear();
 	}
 
+	void RenderPass::ClearTechniques()
+	{
+		m_techniques.clear();
+	}
+
 	eastl::string RenderPass::GetTechniqueTag()
 	{
 		return techniqueTag;
@@ -25,14 +30,40 @@ namespace SE_G {
 		BindAllPerFrame();
 
 		for (auto& tech : m_techniques) {
-			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-			tech->Pass(GetDeviceContext());
+			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+			tech.second->Pass(GetDeviceContext());
 		}
 	}
 
-	RenderTechnique* RenderPass::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
-		m_techniques.push_back(eastl::move(tech));
-		return m_techniques.back().get();
+	RenderTechnique* RenderPass::AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech)
+	{
+		const SE::UUID id = uuid;
+		auto [it, inserted] = m_techniques.emplace(id, nullptr);
+		if (!inserted)
+		{
+			printf("Duplicate UUID in RenderPass::AddGameObject\n");
+			//return nullptr;
+		}
+		it->second = std::move(tech);
+		return m_techniques[id].get();
+	}
+
+	RenderTechnique* RenderPass::GetTechnique(SE::UUID uuid)
+	{
+		auto it = m_techniques.find(uuid);
+		if (it == m_techniques.end())
+			return nullptr;
+
+		return it->second.get();
+	}
+
+	void RenderPass::RemoveTechnique(SE::UUID uuid)
+	{
+		auto it = m_techniques.find(uuid);
+		if (it == m_techniques.end())
+			return;
+
+		m_techniques.erase(it);
 	}
 
 	void RenderPass::AddPerFrameBind(Bind::Bindable* bind)

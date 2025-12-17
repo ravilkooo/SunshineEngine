@@ -1,4 +1,5 @@
 #include <Scene.h>
+#include <SceneHierarchy.h>
 
 Scene::Scene()
 {
@@ -68,6 +69,20 @@ eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
     return out;
 }
 
+void Scene::RestoreParents()
+{
+    for (auto& pair : uuidToObjectMap)
+    {
+        if (pair.second->m_parent.uuid != SE::UUID(0u))
+        {
+            ParentNode pn = pair.second->m_parent;
+            pn.ptr = uuidToObjectMap[pair.second->m_parent.uuid].get();
+
+            pair.second->SetParent(pn);
+        }
+    }
+}
+
 Scene_Info::Scene_Info()
 {
 }
@@ -78,18 +93,24 @@ Scene_Info::~Scene_Info()
 }
 
 void Scene_Info::ClearScene() {
-    for (size_t i = 0; i < gameObjects.size(); ++i)
+    if (!gameObjects.empty())
     {
-        SE::UUID uuid = gameObjects[i];
+        for (size_t i = 0; i < gameObjects.size(); ++i)
+        {
+            SE::UUID uuid = gameObjects[i];
 
-        auto it = uuidToObjectMap.find(uuid);
+            auto it = uuidToObjectMap.find(uuid);
 
-        if (it == uuidToObjectMap.end())
-            continue;
+            if (it == uuidToObjectMap.end())
+                continue;
 
-        uuidToObjectMap.erase(it);
+            uuidToObjectMap.erase(it);
+        }
     }
     gameObjects.clear();
+    uuidToObjectMap.clear();
+
+    m_sceneGraph->Clear();
 }
 
 SE::UUID Scene_Info::AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject)
@@ -134,4 +155,24 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::RemoveGameObjectByUUID(SE::UUID u
         }
     }
     return out;
+}
+
+void Scene_Info::RestoreParents()
+{
+    for (auto& pair : uuidToObjectMap)
+    {
+        if (pair.second->m_parent.uuid != SE::UUID(0u))
+        {
+            ParentNode pn = pair.second->m_parent;
+            pn.ptr = uuidToObjectMap[pair.second->m_parent.uuid].get();
+
+            pair.second->SetParent(pn);
+        }
+    }
+}
+
+void Scene_Info::InitHierarchy()
+{
+    m_sceneGraph = eastl::make_unique<SceneGraph>(uuidToObjectMap);
+    m_sceneGraph->Build();
 }

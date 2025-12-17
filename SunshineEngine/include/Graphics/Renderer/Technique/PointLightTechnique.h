@@ -28,15 +28,5 @@ namespace SE_G {
         LightPosition GetLightPositionInFrustum() override;
         bool IsFrustumInsideOfLight() override;
 
-    private:
-        static void InitStaticData(ID3D11Device* device);
-
-        static bool s_staticDataInitializated;
-        static eastl::shared_ptr<Bind::DepthStencilState> depthCompLess;
-        static eastl::shared_ptr<Bind::DepthStencilState> depthCompGreater;
-
-        static eastl::shared_ptr<Bind::Rasterizer> rastCullNone;
-        static eastl::shared_ptr<Bind::Rasterizer> rastCullBack;
-        static eastl::shared_ptr<Bind::Rasterizer> rastCullFront;
     };
 }

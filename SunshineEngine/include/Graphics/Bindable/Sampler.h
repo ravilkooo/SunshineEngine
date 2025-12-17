@@ -32,14 +32,15 @@ namespace SE_G {
 			~Sampler();
 			
 			void Release();
-			void ChangeSampler(ID3D11Device* device, SamplerPreset preset = SamplerPreset::Wrap);
+			void ChangePreset(ID3D11Device* device, SamplerPreset preset = SamplerPreset::Wrap);
+			SamplerPreset GetPreset();
 
 			void Bind(ID3D11DeviceContext* context) noexcept override;
 
-			SamplerPreset m_preset = SamplerPreset::Wrap;
 			PipelineStage m_pipelineStage = PipelineStage::PIXEL_SHADER;
 
 		private:
+			SamplerPreset m_preset = SamplerPreset::Wrap;
 			Microsoft::WRL::ComPtr<ID3D11SamplerState> pSampler;
 			UINT slot;
 			bool isNull = true;

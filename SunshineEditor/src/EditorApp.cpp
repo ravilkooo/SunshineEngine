@@ -91,15 +91,7 @@ EditorApp::~EditorApp() {
 
 void EditorApp::RunApp()
 {
-	ChooseProject();
-
-	while (!OpenProject())
-	{
-		ChooseProject();
-	}
-	ContentBrowserPanel::s_AssetsDirectory =
-		std::filesystem::path(m_openedProject->GetFullPath().c_str());
-	
+	SE::Project::SetWorldEditor(m_worldEditor.get());
 
 	float physicsUpdateFPS = 120.0f;
 	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
@@ -142,11 +134,28 @@ void EditorApp::RunApp()
 			FPSstatisticTimer -= 1.0f;
 
 			WCHAR text[256];
-			swprintf_s(text, TEXT("FPS: %f"), fps);
+
+			if (m_projectSelected)
+			{
+				if (m_loadedSceneType == SE::SceneType::Custom)
+					swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), m_openedProject->GetSubPath().c_str(), fps);
+				else
+				{
+					const char* sceneName = SE::ProjectSelector::SceneTypeToDisplayName(m_loadedSceneType);
+					swprintf_s(text, TEXT("SunshineEngine: %hs - FPS: %.1f"), sceneName, fps);
+				}
+					
+			}
+			else
+			{
+				swprintf_s(text, TEXT("SunshineEngine: Project Selector - FPS: %.1f"), fps);
+			}
+
 			SetWindowText(m_displayWindow.m_hWnd, text);
 
 			frameCount = 0;
 		}
+
 
 		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
 			while (accumulator >= physicsUpdateMs) {
@@ -161,12 +170,32 @@ void EditorApp::RunApp()
 				accumulator -= physicsUpdateMs;
 			}
 		}
-
+		
 		Render();
+
+		if (!m_projectSelected && imguiEditorPass->IsProjectSelected()) {
+			if (OpenProject()) {
+				m_projectSelected = true;
+				m_worldEditor->m_scene->InitHierarchy();
+			} else {
+				imguiEditorPass->ResetProjectSelection();
+				m_openedProject = nullptr;
+			}
+		}
+
+		if (!m_projectSelected && !imguiEditorPass->IsProjectSelectorVisible()) {
+			if (imguiEditorPass->IsProjectSelectorVisible())
+			{
+				imguiEditorPass->ResetProjectSelection();
+				m_openedProject = nullptr;
+			}
+			else
+				isExitRequested = true;
+		}
 	}
 	m_worldEditor->ClearScene();
 
-	SE::SaveProjects(m_projectsList);
+	SE::SaveProjects(imguiEditorPass->m_ProjectSelector.m_projectsList);
 }
 
 void EditorApp::UpdateGame(float deltaTime)
@@ -192,7 +221,8 @@ void EditorApp::UpdateGame(float deltaTime)
 		m_currentGame->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
 	}
 
-	m_currentGame->Update(deltaTime);
+	if (!m_gamePaused)
+		m_currentGame->Update(deltaTime);
 }
 
 void EditorApp::UpdateEditor(float deltaTime) 
@@ -430,9 +460,10 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 void EditorApp::RunGame() {
 	m_runtimeMode = RuntimeMode::GAME_MODE;
 
-	// To-do: there should be path to opened project
-	// to-do: class Project
-	m_worldEditor->SaveScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
+	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
+	{
+		m_openedProject->Save();
+	}
 	
 	m_worldEditor->Pause();
 
@@ -440,18 +471,45 @@ void EditorApp::RunGame() {
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
-	m_currentGame->SetupPhysics();
-	m_currentGame->LoadScene(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/scene.json").c_str());
-	m_currentGame->m_physicsSystem->FinalizeScene();
+	
+	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
+	{
+		eastl::wstring scenePath = m_openedProject->GetScenePath();
+		m_currentGame->LoadScene(scenePath.c_str());
+	}
+	else if (m_loadedSceneType == SE::SceneType::Default)
+	{
+		m_currentGame->LoadDefaultScene();
+	}
+	else if (m_loadedSceneType == SE::SceneType::GAI)
+	{
+		m_currentGame->LoadGAIScene();
+	}
+	else if (m_loadedSceneType == SE::SceneType::Parent)
+	{
+		m_currentGame->LoadParentScene();
+	}
+	else if (m_loadedSceneType == SE::SceneType::Lua)
+	{
+		m_currentGame->LoadLuaScene();
+	}
+	else if (m_loadedSceneType == SE::SceneType::Resources)
+	{
+		m_currentGame->LoadResourcesScene();
+	}
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
+}
 
-	// There should be saving scene from world editor (serializing) and loading to game (deserializing)
-	// m_worldEditor->SaveScene(...);
-	// m_currentGame->LoadScene(...);
+void EditorApp::PauseGame() {
+	m_gamePaused = true;
+}
+
+void EditorApp::ContinueGame() {
+	m_gamePaused = false;
 }
 
 void EditorApp::StopGame() {
@@ -470,215 +528,94 @@ void EditorApp::StopGame() {
 	// m_worldEditor->LoadScene(...);
 }
 
-void EditorApp::ChooseProject()
+void EditorApp::SaveProject()
 {
-	while (!SE::LoadProjects(m_projectsList))
+	if (m_openedProject && m_loadedSceneType == SE::SceneType::Custom)
 	{
-		SE::SaveProjects(m_projectsList);
-	}
-
-	// Console loop supports numeric selection and management commands:
-	//  - n : create new project
-	//  - a : add existing project to projectlist
-	//  - r : remove project from projectlist
-	//  - <index> : select project by index
-	while (true)
-	{
-		SE::PrintProjectsToConsole(m_projectsList);
-
-		std::cout << "Choose project (index), or 'n' (new), 'a' (add), 'r' (remove): ";
-
-		std::string input;
-		std::cin >> input;
-
-		if (input == "n") {
-			CreateProject();
-			SE::LoadProjects(m_projectsList);
-			continue;
-		}
-		else if (input == "a") {
-			AddProject();
-			SE::LoadProjects(m_projectsList);
-			continue;
-		}
-		else if (input == "r") {
-			RemoveProject();
-			SE::LoadProjects(m_projectsList);
-			continue;
-		}
-
-		bool allDigits = !input.empty() && std::all_of(input.begin(), input.end(), ::isdigit);
-		if (!allDigits) {
-			std::cout << "Unknown command. Try again.\n";
-			continue;
-		}
-
-		size_t chosenProject = static_cast<size_t>(std::stoul(input));
-		if (chosenProject < m_projectsList.size())
-		{
-			m_openedProject = &m_projectsList[chosenProject];
-			break;
-		}
-		else
-		{
-			std::cout << "Index out of range. Try again.\n";
-			continue;
-		}
-	}
-}
-
-void EditorApp::CreateProject()
-{
-	std::cout << "Enter new project folder name (relative to Projects/, e.g. MyProject): ";
-	std::string name;
-	std::cin >> name;
-	if (name.empty()) {
-		std::cout << "Empty name. Aborting.\n";
-		return;
-	}
-
-	// Convert to eastl::wstring
-	eastl::string name_e(name.c_str());
-	eastl::wstring subPath = Utf8ToWString(name_e);
-	if (subPath.back() != L'/' && subPath.back() != L'\\')
-		subPath.push_back(L'/');
-
-	// Check duplicate
-	for (const SE::Project& p : m_projectsList)
-	{
-		if (p.GetSubPath() == subPath)
-		{
-			std::cout << "Project already in projectlist.\n";
+		eastl::string error = m_openedProject->Save();
+		if (!error.empty())
 			return;
-		}
-	}
 
-	// Create directory
-	eastl::wstring fullPath = JoinWchar_Wstring(PROJECTS_DIR, subPath.c_str());
-	try {
-		std::filesystem::path dir(fullPath.c_str());
-		std::filesystem::create_directories(dir);
+		SE::SaveProjects(imguiEditorPass->m_ProjectSelector.m_projectsList);
+		imguiEditorPass->m_ProjectSelector.RefreshProjectList();
 	}
-	catch (const std::exception& e) {
-		std::cout << "Failed to create project directory: " << e.what() << "\n";
-		return;
-	}
-
-	// Create default scene and save
-	eastl::wstring sceneFile = JoinWchar_Wstring(fullPath.c_str(), L"scene.json");
-	eastl::wstring templateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/DefaultScene.json");
-	std::filesystem::copy(templateFile.c_str(), sceneFile.c_str());
-	//std::rename("from.txt", "to.txt")
-
-	// Add to project list and save
-	SE::Project p(subPath);
-	p.SetCreationDate(std::chrono::system_clock::now());
-	p.SetLastSavedTime(std::chrono::system_clock::now());
-	m_projectsList.push_back(eastl::move(p));
-	if (SE::SaveProjects(m_projectsList))
-		std::cout << "Project created and added to projlist.\n";
-	else
-		std::cout << "Failed to save project list.\n";
 }
-
-void EditorApp::AddProject()
-{
-	std::cout << "Enter existing project folder name (relative to Projects/, e.g. MyProject): ";
-	std::string name;
-	std::cin >> name;
-	if (name.empty()) {
-		std::cout << "Empty name. Aborting.\n";
-		return;
-	}
-
-	eastl::string name_e(name.c_str());
-	eastl::wstring subPath = Utf8ToWString(name_e);
-	if (subPath.back() != L'/' && subPath.back() != L'\\')
-		subPath.push_back(L'/');
-
-	// Check that folder contains scene.json
-	eastl::wstring fullPath = JoinWchar_Wstring(PROJECTS_DIR, subPath.c_str());
-	eastl::wstring sceneFile = JoinWchar_Wstring(fullPath.c_str(), L"scene.json");
-	if (!std::filesystem::exists(std::filesystem::path(sceneFile.c_str()))) {
-		std::cout << "scene.json not found under provided folder. Aborting.\n";
-		return;
-	}
-
-	// Check duplicate
-	for (const SE::Project& p : m_projectsList)
-	{
-		if (p.GetSubPath() == subPath)
-		{
-			std::cout << "Project already in projectlist.\n";
-			return;
-		}
-	}
-
-	// Set timestamps to now (we could read file times if desired)
-	SE::Project p(subPath);
-	p.SetCreationDate(std::chrono::system_clock::now());
-	p.SetLastSavedTime(std::chrono::system_clock::now());
-	m_projectsList.push_back(eastl::move(p));
-	if (SE::SaveProjects(m_projectsList))
-		std::cout << "Project added to projlist.\n";
-	else
-		std::cout << "Failed to save project list.\n";
-}
-
-void EditorApp::RemoveProject()
-{
-	if (m_projectsList.empty()) {
-		std::cout << "Project list is empty.\n";
-		return;
-	}
-
-	SE::PrintProjectsToConsole(m_projectsList);
-
-	std::cout << "Enter index of project to remove: ";
-	std::string input;
-	std::cin >> input;
-	if (input.empty() || !std::all_of(input.begin(), input.end(), ::isdigit)) {
-		std::cout << "Invalid index. Aborting.\n";
-		return;
-	}
-
-	size_t idx = static_cast<size_t>(std::stoul(input));
-	if (idx >= m_projectsList.size()) {
-		std::cout << "Index out of range. Aborting.\n";
-		return;
-	}
-
-	eastl::wstring removedSub = m_projectsList[idx].GetSubPath();
-
-	m_projectsList.erase(m_projectsList.begin() + idx);
-
-	if (m_openedProject && m_openedProject->GetSubPath() == removedSub)
-		m_openedProject = nullptr;
-
-	if (SE::SaveProjects(m_projectsList))
-		std::cout << "Project removed from projlist.\n";
-	else
-		std::cout << "Failed to save project list.\n";
-}
-
 
 bool EditorApp::OpenProject()
 {
-	/*
-	m_worldEditor->CreateDefaultScene();
-	return true;
-	*/
+	m_openedProject = imguiEditorPass->GetSelectedProject();
+	m_loadedSceneType = imguiEditorPass->m_ProjectSelector.GetSelectedSceneType();
+	if (m_loadedSceneType == SE::SceneType::Custom)
+	{
+		eastl::string error = m_openedProject->Open();
+		if (!error.empty())
+			return false;
+	}
+	else
+	{
+		switch (m_loadedSceneType)
+		{
+		case SE::SceneType::GAI:
+			m_worldEditor->CreateGAIScene();
+			break;
+		case SE::SceneType::Default:
+			m_worldEditor->CreateDefaultScene();
+			break;
+		case SE::SceneType::Parent:
+			m_worldEditor->CreateParentScene();
+			break;
+		case SE::SceneType::Resources:
+			m_worldEditor->CreateResourcesScene();
+			break;
+		}
+	}
 	
-	return m_worldEditor->LoadScene(JoinWchar_Wstring(
-		m_openedProject->GetFullPath().c_str(),
-		L"scene.json").c_str());
+	SetupAssetsDirectory();
+	
+	return true;
 }
 
-void EditorApp::SaveProject()
+void EditorApp::CloseProject()
 {
-	m_openedProject->UpdateSaveTime();
-	SE::SaveProjects(m_projectsList);
-	m_worldEditor->SaveScene(JoinWchar_Wstring(
-		m_openedProject->GetFullPath().c_str(),
-		L"scene.json").c_str());
+	m_projectSelected = NULL;
+	// m_openedProject = NULL;
+	// m_loadedSceneType = SE::SceneType::Custom;
+}
+
+void EditorApp::SetupAssetsDirectory()
+{
+	switch (m_loadedSceneType)
+	{
+	    case SE::SceneType::Custom:
+	        if (m_openedProject)
+	        {
+	            ContentBrowserPanel::s_AssetsDirectory = 
+	                std::filesystem::path(m_openedProject->GetFullPath().c_str());
+	        }
+	        break;
+	    case SE::SceneType::GAI:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"GAI/").GetFullPath().c_str());
+	        break;
+	    case SE::SceneType::Default:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
+	        break;
+	    case SE::SceneType::Parent:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"Hierarchy/").GetFullPath().c_str());
+	        break;
+	    case SE::SceneType::Lua:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"Lua/").GetFullPath().c_str());
+	        break;
+	    case SE::SceneType::Resources:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"Resources/").GetFullPath().c_str());
+	        break;
+	    default:
+	        ContentBrowserPanel::s_AssetsDirectory = 
+	            std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
+	        break;
+	}
 }

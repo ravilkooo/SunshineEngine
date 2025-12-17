@@ -2,16 +2,7 @@
     "gameObjects": [
         {
             "components": {
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "LightPass"
-                        },
-                        {
-                            "Tag": "IconPass"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -45,7 +36,7 @@
                     ]
                 }
             },
-            "m_UUID": 17826629471134943277,
+            "m_UUID": 10349756182875634575,
             "m_group": "Lighting",
             "m_lightData": {
                 "Power": 0.0,
@@ -56,10 +47,16 @@
                 }
             },
             "m_name": "SkyBox",
+            "m_parent": null,
             "m_type": "SkyBox"
         },
         {
             "components": {
+                "Mesh": {
+                    "Mesh": "Box_repeat",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultTexture.dds"
+                },
                 "Physics": {
                     "collider": {
                         "settings": {
@@ -82,11 +79,6 @@
                                 0.0,
                                 0.0,
                                 0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
                             ]
                         }
                     },
@@ -94,19 +86,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Box_repeat",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -124,14 +104,14 @@
                         1.0
                     ],
                     "m_position": [
+                        -0.20000000298023224,
                         0.0,
-                        -1.100000023841858,
                         0.0
                     ],
                     "m_rotation": [
-                        0.3490658104419708,
-                        0.15707963705062866,
-                        0.0
+                        0.595157265663147,
+                        0.4433135986328125,
+                        -0.8779006004333496
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -140,9 +120,10 @@
                     ]
                 }
             },
-            "m_UUID": 16430900976630392498,
+            "m_UUID": 15551142850770219886,
             "m_group": "Shapes",
             "m_name": "Box",
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -154,49 +135,12 @@
         },
         {
             "components": {
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "sphere": {
-                                "radius": 1.0
-                            }
-                        },
-                        "shapeType": "Sphere",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                "Mesh": {
+                    "Mesh": "Sphere",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -220,8 +164,8 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
-                        0.0
+                        -0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -230,9 +174,13 @@
                     ]
                 }
             },
-            "m_UUID": 8097716556737924282,
+            "m_UUID": 1179623425869587445,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": true,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -246,49 +194,12 @@
         },
         {
             "components": {
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "sphere": {
-                                "radius": 1.0
-                            }
-                        },
-                        "shapeType": "Sphere",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                "Mesh": {
+                    "Mesh": "Sphere",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -312,8 +223,8 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
-                        0.0
+                        -0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -322,9 +233,13 @@
                     ]
                 }
             },
-            "m_UUID": 11569227445919524935,
+            "m_UUID": 13836700115024532676,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": true,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -338,49 +253,12 @@
         },
         {
             "components": {
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "sphere": {
-                                "radius": 1.0
-                            }
-                        },
-                        "shapeType": "Sphere",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                "Mesh": {
+                    "Mesh": "Sphere",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -404,8 +282,8 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
-                        0.0
+                        -0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -414,9 +292,13 @@
                     ]
                 }
             },
-            "m_UUID": 6283691445334696310,
+            "m_UUID": 5252445742742597294,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": true,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -430,49 +312,12 @@
         },
         {
             "components": {
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "sphere": {
-                                "radius": 1.0
-                            }
-                        },
-                        "shapeType": "Sphere",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                "Mesh": {
+                    "Mesh": "Sphere",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -496,8 +341,8 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
-                        0.0
+                        -0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -506,9 +351,13 @@
                     ]
                 }
             },
-            "m_UUID": 7916166937418256408,
+            "m_UUID": 16981128559790429414,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": true,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -522,49 +371,12 @@
         },
         {
             "components": {
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "sphere": {
-                                "radius": 1.0
-                            }
-                        },
-                        "shapeType": "Sphere",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                "Mesh": {
+                    "Mesh": "Sphere",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -588,8 +400,8 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
-                        0.0
+                        -0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -598,9 +410,13 @@
                     ]
                 }
             },
-            "m_UUID": 4520362054595614873,
+            "m_UUID": 2639839029316881779,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": true,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -614,49 +430,12 @@
         },
         {
             "components": {
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "sphere": {
-                                "radius": 1.0
-                            }
-                        },
-                        "shapeType": "Sphere",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                "Mesh": {
+                    "Mesh": "Sphere",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -680,8 +459,8 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
-                        0.0
+                        -0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -690,9 +469,13 @@
                     ]
                 }
             },
-            "m_UUID": 11852838417961627037,
+            "m_UUID": 646582510600955799,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": true,
+                "uuid": 15551142850770219886
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -706,16 +489,7 @@
         },
         {
             "components": {
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "LightPass"
-                        },
-                        {
-                            "Tag": "IconPass"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -749,7 +523,7 @@
                     ]
                 }
             },
-            "m_UUID": 9681251556655004093,
+            "m_UUID": 15350749837127902739,
             "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
@@ -760,20 +534,13 @@
                 "AmbientPad": 1.0
             },
             "m_name": "AmbientLight",
+            "m_parent": null,
             "m_type": "AmbientLight"
         },
         {
+            "CastsShadow": true,
             "components": {
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "LightPass"
-                        },
-                        {
-                            "Tag": "IconPass"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -791,7 +558,7 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
+                        -4.5,
                         0.0,
                         0.0
                     ],
@@ -807,7 +574,7 @@
                     ]
                 }
             },
-            "m_UUID": 17078553366530198613,
+            "m_UUID": 6433801847370492395,
             "m_group": "Lighting",
             "m_lightData": {
                 "Diffuse": {
@@ -817,12 +584,11 @@
                 },
                 "DiffusePad": 1.0,
                 "Direction": {
-                    "x": 0.4364357590675354,
-                    "y": -0.8728715181350708,
-                    "z": 0.2182178795337677
+                    "x": 0.8464847207069397,
+                    "y": -0.7504915595054626
                 },
                 "Position": {
-                    "x": 0.0,
+                    "x": -4.5,
                     "y": 0.0,
                     "z": 0.0
                 },
@@ -836,20 +602,12 @@
                 "pad2": 0.0
             },
             "m_name": "DirectionalLight",
+            "m_parent": null,
             "m_type": "DirectionalLight"
         },
         {
             "components": {
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "LightPass"
-                        },
-                        {
-                            "Tag": "IconPass"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -883,7 +641,7 @@
                     ]
                 }
             },
-            "m_UUID": 6756281347671495456,
+            "m_UUID": 4259055904536338598,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
@@ -912,10 +670,16 @@
                 "pad": 0.0
             },
             "m_name": "PointLight",
+            "m_parent": null,
             "m_type": "PointLight"
         },
         {
             "components": {
+                "Mesh": {
+                    "Mesh": "Box_repeat",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultTexture.dds"
+                },
                 "Physics": {
                     "collider": {
                         "settings": {
@@ -938,11 +702,6 @@
                                 0.0,
                                 0.0,
                                 0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
                             ]
                         }
                     },
@@ -950,19 +709,7 @@
                     "m_collisionLayer": "NON_MOVING",
                     "m_motion": "Static"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Box_repeat",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -996,9 +743,10 @@
                     ]
                 }
             },
-            "m_UUID": 11500581972158810127,
+            "m_UUID": 2729350038267267073,
             "m_group": "Shapes",
             "m_name": "Box",
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 100.0,
@@ -1010,6 +758,11 @@
         },
         {
             "components": {
+                "Mesh": {
+                    "Mesh": "Sphere",
+                    "Sampler": 0,
+                    "Texture": "C:/Users/user/my_catalogue/Studyspace/SunshineEngine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                },
                 "Physics": {
                     "collider": {
                         "settings": {
@@ -1029,11 +782,6 @@
                                 0.0,
                                 0.0,
                                 0.0
-                            ],
-                            "scale": [
-                                1.0,
-                                1.0,
-                                1.0
                             ]
                         }
                     },
@@ -1041,19 +789,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_motion": "Dynamic"
                 },
-                "Render": {
-                    "techniques": [
-                        {
-                            "Tag": "ColliderPass"
-                        },
-                        {
-                            "Mesh": "Sphere",
-                            "Sampler": 0,
-                            "Tag": "GPass",
-                            "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
-                        }
-                    ]
-                },
+                "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1087,9 +823,13 @@
                     ]
                 }
             },
-            "m_UUID": 11609109931456864129,
+            "m_UUID": 2232906597439411555,
             "m_group": "Shapes",
             "m_name": "Sphere",
+            "m_parent": {
+                "attached": false,
+                "uuid": 2729350038267267073
+            },
             "m_shapeData": {
                 "Size": {
                     "x": 0.5,
@@ -1100,6 +840,123 @@
                 "StackCount": 10
             },
             "m_type": "Sphere"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": "Box_repeat",
+                    "Sampler": 0,
+                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -0.699999988079071,
+                        0.0,
+                        -2.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        -0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 16286738325577183270,
+            "m_group": "CustomMesh",
+            "m_name": "CustomObject",
+            "m_parent": {
+                "attached": true,
+                "uuid": 2232906597439411555
+            }
+        },
+        {
+            "components": {
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 13780240543166426970,
+            "m_group": "Lighting",
+            "m_lightData": {
+                "Att": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "Diffuse": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "DiffusePad": 1.0,
+                "Position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "Range": 20.0,
+                "Specular": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SpecularPad": 1.0,
+                "pad": 0.0
+            },
+            "m_name": "PointLight",
+            "m_parent": null,
+            "m_type": "PointLight"
         }
     ]
 }

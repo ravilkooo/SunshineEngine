@@ -1,13 +1,27 @@
 #include <EASTL/string.h>
+#include <EASTL/priority_queue.h>
 
 #include "assimp/SceneCombiner.h"
 
 #include "ImguiEditorPass.h"
 #include <EditorApp.h>
+#include <WorldEditor.h>
+#include <SceneHierarchy.h>
 
 #include <Component/LuaComponent.h>
 #include <Utils/DebugUtils.h>
+#include <Utils/StringUtils.h>
+#include <UI/FontStyles.h>
 
+#include <sstream>
+
+template <typename T>
+std::string toString(const T& t)
+{
+	std::ostringstream ss;
+	ss << t;
+	return ss.str();
+}
 
 ImguiEditorPass::ImguiEditorPass(
 	EditorApp* editorApp)
@@ -53,14 +67,11 @@ ImguiEditorPass::ImguiEditorPass(
 	m_windowViewport.MinDepth = 0;
 	m_windowViewport.MaxDepth = 1.0f;
 
-	selectedUUID = SE::UUID(0u);
+	// selectedUUID = SE::UUID(0u);
 
-	// Change font to Arial to support Russian
 	ImGuiIO& io = ImGui::GetIO();
-	ImFont* fontArial = io.Fonts->AddFontFromFileTTF(
-		MakeEngineAssetPath_String("Fonts/Arial.ttf").c_str(), //"..\\..\\SunshineEngine\\Assets\\Fonts\\Arial.ttf",
-		13.0f);
-	io.FontDefault = fontArial;
+	// Init fonts
+	EditorUI::FontStyles::Init(io);
 	ImGui_ImplDX11_InvalidateDeviceObjects();
 	ImGui_ImplDX11_CreateDeviceObjects();
 }
@@ -85,9 +96,31 @@ void ImguiEditorPass::Pass()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-
+	
+	if (!m_ProjectSelected)
+	{
+		m_ProjectSelector.SetWindowSize(ImVec2(m_editorAppWidth, m_editorAppHeight));
+		if (m_ProjectSelector.Show())
+		{
+			m_ProjectSelected = true;
+		}
+		
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		return;
+	}
+	
 	// Main Menu Bar
+	m_MainMenuBarPanel.SetEditorApp(m_editorApp);
+	m_MainMenuBarPanel.SetImguiEditorPass(this);
 	m_MainMenuBarPanel.OnImGuiRender();
+	if (!m_ProjectSelected)
+	{
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = SE::UUID(0u);
+		return;
+	}
 
 	// Toolbar
 	m_ToolbarPanel.OnImGuiRender(m_MainMenuBarPanel.GetHeight());
@@ -197,7 +230,11 @@ void ImguiEditorPass::Pass()
 			*/
 
 			if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
-				selectedUUID = m_editorApp->m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
+					auto selectedUUID = m_editorApp->m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
+				if (selectedUUID != SE::UUID(0u))
+				{
+					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
+				}
 				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 			}
 		}
@@ -261,8 +298,12 @@ void ImguiEditorPass::RenderGameWorld()
 
 void ImguiEditorPass::ShowSceneHierarchy()
 {
+	DrawSceneGraph(m_editorApp->m_worldEditor->m_scene->m_sceneGraph.get(), m_editorApp->m_worldEditor->m_hierarchySelection);
+	/*
+	InitHierarchy();
+
 	ImGui::Text("Scene Hierarchy");
-	if (ImGui::TreeNode("Root"))
+	if (ImGui::TreeNode(WStringToUtf8(m_editorApp->m_openedProject->GetSubPath()).c_str()))
 	{
 		auto& objects = m_editorApp->m_worldEditor->m_scene->gameObjects;
 		for (size_t i = 0; i < objects.size(); ++i)
@@ -288,8 +329,15 @@ void ImguiEditorPass::ShowSceneHierarchy()
 			}
 			ImGui::PopID();
 		}
+
+		for (auto& node : nodesHierarchy)
+		{
+			ShowNode(node);
+		}
+
 		ImGui::TreePop();
 	}
+	*/
 }
 
 void ImguiEditorPass::ShowContentBrowser()
@@ -300,46 +348,12 @@ void ImguiEditorPass::ShowContentBrowser()
 void ImguiEditorPass::ShowProperties()
 {
 	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
-	m_PropertyPanel.SetSelectedUUID(selectedUUID);
+	m_PropertyPanel.SetSelectedUUID(m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked);
 	m_PropertyPanel.OnImGuiRender();
 
 	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
-		selectedUUID
+		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
 	);
-
-	/*
-	if (!obj->HasComponent<LuaComponent_Info>())
-	{
-		if (ImGui::Button("Add Lua Script")) {
-			obj->AddComponent<LuaComponent_Info>();
-			auto lua2 = obj->GetComponent<LuaComponent_Info>();
-			lua2->Init(obj);
-		}
-		return;
-	}
-	*/
-	//ImGui::Begin("Properties);
-	// if (selectedUUID == SE::UUID(0u))
-	// 	return;
-	//
-	// GameObject* obj = m_worldEditor->m_scene.GetGameObjectByUUID(
-	// 	selectedUUID
-	// );
-	//
-	// if (!obj->HasComponent<LuaComponent>())
-	// {
-	// 	if (ImGui::Button("Add Lua Script")) {
-	// 		obj->AddComponent<LuaComponent>();
-	// 		auto lua2 = obj->GetComponent<LuaComponent>();
-	// 		lua2->Init(obj);
-	// 	}
-	// 	return;
-	// }
-	// else 
-	// {
-	// 	LuaImgui(obj);
-	// }
-	//ImGui::End();
 }
 
 void ImguiEditorPass::ShowBottomPanel()
@@ -364,62 +378,62 @@ void ImguiEditorPass::ShowOutputLog()
 	}
 }
 	
-void ImguiEditorPass::LuaImgui(GameObject* obj)
-{
-	eastl::shared_ptr<LuaComponent> testComponent = obj->GetComponent<LuaComponent>();
-
-	if (ImGui::BeginCombo("##LuaFile", testComponent->luaFiles.empty() ? "" : testComponent->luaFiles[testComponent->selectedLuaFile].c_str())) {
-		for (int i = 0; i < testComponent->luaFiles.size(); ++i) {
-			bool is_selected = (i == testComponent->selectedLuaFile);
-			if (ImGui::Selectable(testComponent->luaFiles[i].c_str(), is_selected))
-				testComponent->selectedLuaFile = i;
-			if (is_selected)
-				ImGui::SetItemDefaultFocus();
-		}
-		ImGui::EndCombo();
-	}
-	if (ImGui::Button("Load Script")) {
-		testComponent->LoadScript();
-	}
-
-	if (testComponent->scriptLoaded)
-	{
-		ImGui::Text("Function Name:"); ImGui::SameLine();
-		ImGui::InputText("##FunctionName", testComponent->functionName, IM_ARRAYSIZE(testComponent->functionName));
-		if (ImGui::Button("Find")) {
-			testComponent->FindFunction();
-		}
-
-		if (testComponent->foundFunction) {
-			ImGui::Text("Parameters:");
-
-			for (int i = 0; i < testComponent->params.size(); ++i) {
-				auto& param = testComponent->params[i];
-				ImGui::Text("%s (%s) =", param.name, param.type);
-				ImGui::SameLine();
-
-				if (!EASTLStringEqualsChar(param.type,"userdata")) {
-					ImGui::InputText(("##p" + to_string_eastl(i)).c_str(), param.value, sizeof(param.value));
-				}
-				else {
-					eastl::string objName = obj->m_name;
-					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), objName.c_str());
-				}
-			}
-
-			if (ImGui::Button("Call")) {
-				testComponent->CallFunction();
-			}
-			if (!testComponent->lastResult.empty()) {
-				ImGui::Text("%s", testComponent->lastResult);
-			}
-
-		}
-		else if (!sunshineErrorMessage.empty()) {
-			ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", sunshineErrorMessage);
-		}
-	}
-}
+//void ImguiEditorPass::LuaImgui(GameObject* obj)
+//{
+//	eastl::shared_ptr<LuaComponent_Info> testComponent = obj->GetComponent<LuaComponent_Info>();
+//
+//	if (ImGui::BeginCombo("##LuaFile", testComponent->luaFiles.empty() ? "" : testComponent->luaFiles[testComponent->selectedLuaFile].c_str())) {
+//		for (int i = 0; i < testComponent->luaFiles.size(); ++i) {
+//			bool is_selected = (i == testComponent->selectedLuaFile);
+//			if (ImGui::Selectable(testComponent->luaFiles[i].c_str(), is_selected))
+//				testComponent->selectedLuaFile = i;
+//			if (is_selected)
+//				ImGui::SetItemDefaultFocus();
+//		}
+//		ImGui::EndCombo();
+//	}
+//	if (ImGui::Button("Load Script")) {
+//		testComponent->LoadScript();
+//	}
+//
+//	if (testComponent->scriptLoaded)
+//	{
+//		ImGui::Text("Function Name:"); ImGui::SameLine();
+//		ImGui::InputText("##FunctionName", testComponent->functionName, IM_ARRAYSIZE(testComponent->functionName));
+//		if (ImGui::Button("Find")) {
+//			testComponent->FindFunction();
+//		}
+//
+//		if (testComponent->foundFunction) {
+//			ImGui::Text("Parameters:");
+//
+//			for (int i = 0; i < testComponent->params.size(); ++i) {
+//				auto& param = testComponent->params[i];
+//				ImGui::Text("%s (%s) =", param.name, param.type);
+//				ImGui::SameLine();
+//
+//				if (!EASTLStringEqualsChar(param.type,"userdata")) {
+//					ImGui::InputText(("##p" + to_string_eastl(i)).c_str(), param.value, sizeof(param.value));
+//				}
+//				else {
+//					eastl::string objName = obj->m_name;
+//					ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1), objName.c_str());
+//				}
+//			}
+//
+//			if (ImGui::Button("Call")) {
+//				testComponent->CallFunction();
+//			}
+//			if (!testComponent->lastResult.empty()) {
+//				ImGui::Text("%s", testComponent->lastResult);
+//			}
+//
+//		}
+//		else if (!sunshineErrorMessage.empty()) {
+//			ImGui::TextColored(ImVec4(1, 0, 0, 1), "%s", sunshineErrorMessage);
+//		}
+//	}
+//}
 
 void ImguiEditorPass::PreResize()
 {
@@ -467,4 +481,44 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	m_windowViewport.TopLeftY = 0;
 	m_windowViewport.MinDepth = 0;
 	m_windowViewport.MaxDepth = 1.0f;
+}
+
+void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
+		| ImGuiTreeNodeFlags_SpanFullWidth
+		| ImGuiTreeNodeFlags_DefaultOpen
+		| ImGuiTreeNodeFlags_DrawLinesToNodes;
+	const bool is_leaf = node->children.empty();
+	if (is_leaf)
+		flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+	if (sel.Contains(node->objUUID))
+		flags |= ImGuiTreeNodeFlags_Selected;
+
+	ImGui::PushID(node); // stable id (or use UUID string)
+	//bool open = ImGui::TreeNodeEx((void*)node, flags, "%s", node->objUUID.ToString().c_str());
+	bool open = ImGui::TreeNodeEx((void*)node, flags, "%s",
+		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_uuidToObjectMap[node->objUUID]->m_name);
+
+	// Selection handling: click label to select; arrow toggles open.
+	if (ImGui::IsItemClicked()) {
+		// To-do: uncomment when mutliple selection will be implemented
+		/*
+		if (ImGui::GetIO().KeyCtrl) sel.Toggle(node->objUUID);
+		else 
+		*/
+		sel.SetSingle(node->objUUID);
+		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = node->objUUID;
+	}
+
+	if (!is_leaf && open) {
+		for (auto* child : node->children)
+			DrawNode(child, sel);
+		ImGui::TreePop();
+	}
+	ImGui::PopID();
+}
+
+void ImguiEditorPass::DrawSceneGraph(SceneGraph* g, Selection& sel) {
+	for (auto* root : g->m_roots)
+		DrawNode(root, sel);
 }

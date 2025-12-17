@@ -4,6 +4,7 @@
 #include <Scripting/AutoBindings.h>
 #include <Utils/DebugUtils.h>
 #include <SimpleMath.h>
+#include <AI/Perception/PerceptionSystem.h>
 namespace DXSM = DirectX::SimpleMath;
 
 namespace ScriptingBindings {
@@ -18,6 +19,10 @@ void RegisterAll(sol::state& lua) {
 
     // Base GameObject type; component binders will append getters
     lua.new_usertype<GameObject>("GameObject");
+
+    lua.set_function("PerceptionSystem", []() -> PerceptionSystem& {
+        return PerceptionSystem::Get();
+        });
 
     // Execute all component binders registered via LUA_REGISTER_COMPONENT
     AutoBindings::RegisterAll(lua);

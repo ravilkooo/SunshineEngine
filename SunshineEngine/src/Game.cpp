@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <fstream>   // std::ofstream
+#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 Game::Game()
 {
@@ -63,6 +64,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		return false;
 	}
 
+	SetupPhysics();
 	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	/*
 	if (!loadedScene) {
@@ -106,6 +108,67 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_tracingSystem->FinalizeScene();
 	*/
 
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadGAIScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadDefaultScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadParentScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadLuaScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadResourcesScene()
+{
+	auto scene = eastl::make_shared<Scene>();
+	SetupPhysics();
+
+	// Add objects, add components, set parents
+
+	scene->RestoreParents();
+	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
@@ -179,7 +242,7 @@ void Game::Run()
 
 void Game::Update(float deltaTime) {
 
-	// m_luaManager.Update(m_scene, deltaTime);
+	 m_luaManager.Update(m_scene.get(), deltaTime);
 	 m_physicsSystem->Step(deltaTime);
 
 	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
@@ -196,11 +259,19 @@ void Game::Render()
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	//m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio(m_screenWidth * 1.0f / m_screenHeight);
 	if (resizeHeight == m_screenHeight)
-		m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio_horizontal(resizeWidth * 1.0f / resizeHeight);
-	else if (resizeWidth == m_screenWidth)
-		m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio_vertical(resizeWidth * 1.0f / resizeHeight);
-	else
+	{
 		m_renderer->GetMainCamera()->ResetCameraView(resizeWidth * 1.0f / resizeHeight);
+		//m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio_horizontal(resizeWidth * 1.0f / resizeHeight);
+	}
+	else if (resizeWidth == m_screenWidth)
+	{
+		m_renderer->GetMainCamera()->ResetCameraView(resizeWidth * 1.0f / resizeHeight);
+		//m_renderer->GetMainCamera()->SetUpCameraViewByAspectRatio_vertical(resizeWidth * 1.0f / resizeHeight);
+	}
+	else
+	{
+		m_renderer->GetMainCamera()->ResetCameraView(resizeWidth * 1.0f / resizeHeight);
+	}
 
 	m_screenWidth = resizeWidth;
 	m_screenHeight = resizeHeight;

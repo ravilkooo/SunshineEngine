@@ -23,6 +23,14 @@
 #include <Physics/PhysicsSystem.h>
 #include <LogManager.h>
 
+struct Selection {
+    eastl::unordered_set<SE::UUID> picked;
+    SE::UUID last_clicked = SE::UUID(0u);
+
+    bool Contains(const SE::UUID n) const { return picked.find(n) != picked.end(); }
+    void SetSingle(const SE::UUID n) { picked.clear(); picked.insert(n); last_clicked = n; }
+    void Toggle(const SE::UUID n) { if (!picked.erase(n)) picked.insert(n); last_clicked = n; }
+};
 
 class WorldEditor
 {
@@ -67,9 +75,16 @@ public:
     void Update(float deltaTime);
     //void SyncronizeTransforms();
     void Render();
+    void CloseProject();
     void ClearScene();
     
     void CreateDefaultScene();
+    void CreateParentScene();
+    void CreateGAIScene();
+    void CreateLuaScene();
+    void CreateResourcesScene();
+    void CreateCustomScene();
+
     void SaveScene(const wchar_t* scenePath);
     bool LoadScene(const wchar_t* scenePath);
 
@@ -97,6 +112,9 @@ public:
     SE_G::ColliderPass* m_colliderPass;
 
     float m_deltaTime = 0.0f;
+
+    // Hierarchy
+    Selection m_hierarchySelection;
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

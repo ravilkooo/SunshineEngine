@@ -30,7 +30,7 @@ AmbientLight::AmbientLight(
 		device, tc.get(),
 		"LightPass", camera, m_lightData);
 
-	auto rc = eastl::make_shared<RenderComponent>(renderSystem);
+	auto rc = eastl::make_shared<RenderComponent>(m_UUID, renderSystem);
 	rc->AddTechnique(eastl::move(lightTech));
 }
 
@@ -50,10 +50,9 @@ AmbientLight::AmbientLight(
 	if (j["components"].contains("Transform")) {
 		tc->FromJson(j["components"]["Transform"]);
 	}
-	//tc->m_position = m_lightData->Position;
 
 	// RenderComponent and Passes
-	auto rc = AddComponent<RenderComponent>(renderSystem);
+	auto rc = AddComponent<RenderComponent>(m_UUID, renderSystem);
 
 	// LightPass - LightTechnique
 	auto lightTech = eastl::make_unique<SE_G::AmbientLightTechnique>(
@@ -76,8 +75,7 @@ AmbientLight_Info::AmbientLight_Info(
 	auto device = renderSystem->GetDevice();
 
 	// TransformComponent
-	auto tc_info = AddComponent<TransformComponent_Info>();
-	tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
+	auto tc_info = AddComponent<TransformComponent_Info>(device);
 
 	// RenderComponent and Passes
 	// Need:
@@ -88,8 +86,7 @@ AmbientLight_Info::AmbientLight_Info(
 		device, tc_info->m_assignedComponent.get(),
 		"LightPass", camera, m_lightData);
 
-	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 	rc_info->AddTechnique(eastl::move(lightTech));
 
 	// IconPass
@@ -114,13 +111,9 @@ AmbientLight_Info::AmbientLight_Info(
 	auto device = renderSystem->GetDevice();
 
 	// TransformComponent
-	auto tc_info = AddComponent<TransformComponent_Info>();
+	auto tc_info = AddComponent<TransformComponent_Info>(device);
 	if (j["components"].contains("Transform")) {
-		//tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(renderSystem->GetDevice());
 		tc_info->FromJson(j["components"]["Transform"], device);
-	}
-	else {
-		tc_info->m_assignedComponent = eastl::make_unique<TransformComponent>(device);
 	}
 
 	// RenderComponent and Passes
@@ -132,8 +125,7 @@ AmbientLight_Info::AmbientLight_Info(
 		device, tc_info->m_assignedComponent.get(),
 		"LightPass", camera, m_lightData);
 
-	auto rc_info = AddComponent<RenderComponent_Info>();
-	rc_info->m_assignedComponent = eastl::make_unique<RenderComponent>(renderSystem);
+	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 	rc_info->AddTechnique(eastl::move(lightTech));
 
 	// IconPass

@@ -25,32 +25,93 @@ namespace SE_G {
 	{
 		// Passes
 		for (auto& pass : m_passes) {
-			if (!pass->IsEnabled())
+			if (!pass.second->IsEnabled())
 				continue;
 
 			m_context->ClearState();
 
-			pass->StartFrame();
-			pass->Pass();
-			pass->EndFrame();
+			pass.second->StartFrame();
+			pass.second->Pass();
+			pass.second->EndFrame();
 		}
 	}
 
-	RenderPass* RenderGroup::AddPass(eastl::unique_ptr<RenderPass> pass) {
-		m_passes.push_back(eastl::move(pass));
-		return m_passes.back().get();
+	RenderPass* RenderGroup::AddPass(eastl::unique_ptr<RenderPass> pass)
+	{
+		const SE_G::RenderPass::PassType passType = pass->m_passType;
+		auto [it, inserted] = m_passes.emplace(passType, nullptr);
+		if (!inserted)
+		{
+			printf("Duplicate Pass in RenderGroup::AddPass\n");
+			//return nullptr;
+		}
+		it->second = std::move(pass);
+		return m_passes[passType].get();
 	}
 
-	RenderTechnique* RenderGroup::AddTechnique(eastl::unique_ptr<RenderTechnique> tech) {
+	RenderPass* RenderGroup::GetPass(RenderPass::PassType passType)
+	{
+		if (!m_passes.contains(passType))
+		{
+			return nullptr;
+		}
+		else
+		{
+			return m_passes[passType].get();
+		}
+	}
+
+	void RenderGroup::RemovePass(RenderPass::PassType passType)
+	{
+		auto it = m_passes.find(passType);
+		if (it == m_passes.end())
+			return;
+
+		m_passes.erase(it);
+	}
+
+	RenderTechnique* RenderGroup::AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech)
+	{
 		for (auto& pass : m_passes)
 		{
-			if (pass->GetTechniqueTag() == tech->GetTechniqueTag())
+			if (pass.second->GetTechniqueTag() == tech->GetTechniqueTag())
 			{
-				return pass->AddTechnique(eastl::move(tech));
+				return pass.second->AddTechnique(uuid, eastl::move(tech));
 			}
 		}
 		// log << ("RenderGroup %s has not pass with %s tag", m_groupName, tech->GetTechniqueTag())
 		return nullptr;
+	}
+	
+	RenderTechnique* RenderGroup::GetTechnique(SE::UUID uuid, eastl::string techniqueTag)
+	{
+		for (auto& pass : m_passes)
+		{
+			if (pass.second->GetTechniqueTag() == techniqueTag)
+			{
+				return pass.second->GetTechnique(uuid);
+			}
+		}
+		return nullptr;
+	}
+
+	void RenderGroup::RemoveTechnique(SE::UUID uuid, eastl::string techniqueTag)
+	{
+		for (auto& pass : m_passes)
+		{
+			if (pass.second->GetTechniqueTag() == techniqueTag)
+			{
+				return pass.second->RemoveTechnique(uuid);
+			}
+		}
+	}
+	
+	void RenderGroup::ClearAllTechniques()
+	{
+		for (auto& pass : m_passes)
+		{
+			pass.second->ClearTechniques();
+		}
 	}
 
 	bool RenderGroup::IsEnabled() {

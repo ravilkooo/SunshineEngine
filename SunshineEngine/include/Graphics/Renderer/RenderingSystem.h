@@ -5,6 +5,7 @@
 #include <directxmath.h>
 
 #include <EASTL/shared_ptr.h>
+#include <EASTL/unordered_map.h>
 
 #include "Scene.h"
 #include <Graphics/Renderer/RenderGroup.h>

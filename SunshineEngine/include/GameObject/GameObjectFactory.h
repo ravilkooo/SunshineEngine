@@ -14,16 +14,30 @@ class GameObject;
 
 namespace SE_G {
 	class DeferredRenderer;
+	class Mesh;
 }
 
 class AmbientLight;
 class DirectionalLight;
 class PointLight;
+class SpotLight;
 class SkyBox;
 
 class GameObjectFactory
 {
 public:
+	static eastl::unique_ptr<GameObject> CreateCustomMesh(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
+	static eastl::unique_ptr<GameObject> CreateCustomMesh(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::shared_ptr<SE_G::Mesh> mesh);
+
+	static eastl::unique_ptr<GameObject> CreateCustomMesh(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::string filePath);
+
 	static eastl::unique_ptr<GameObject> CreateBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
 		float width, float height, float length);
@@ -74,7 +88,7 @@ public:
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
 			DXSM::Vector3::Zero, 0,
-			DXSM::Vector3(1, -1, 1), 0
+			DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
 		});
 
 	static eastl::unique_ptr<DirectionalLight> CreateDirectionalLightObject(
@@ -96,4 +110,21 @@ public:
 		SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
 		const json& j);
+
+	static eastl::unique_ptr<SpotLight> CreateSpotLightObject(
+		SE_G::DeferredRenderer* m_renderSystem,
+		eastl::shared_ptr<SE_G::Camera> camera,
+		SE_G::SpotLightData initData = {
+			DXSM::Vector3::One, 1.0f,
+			DXSM::Vector3::One, 1.0f,
+			DXSM::Vector3::Zero, 20,
+			DXSM::Vector2(0, -DX::XM_PIDIV4), 10, 0,
+			DXSM::Vector3::One, 0
+		});
+
+	static eastl::unique_ptr<SpotLight> CreateSpotLightObject(
+		SE_G::DeferredRenderer* renderSystem,
+		eastl::shared_ptr<SE_G::Camera> camera,
+		const json& j);
+
 };
