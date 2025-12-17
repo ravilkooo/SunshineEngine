@@ -37,15 +37,23 @@ namespace AutoBindings {
         } TYPE##__LuaAutoReg_Instance; \
     }
 
-//Register singleton
-#define LUA_REGISTER_TYPE(TYPE, LuaTypeName, FieldPairs, MethodPairs) \
-    namespace { \
-        struct TYPE##__LuaAutoReg { \
-            TYPE##__LuaAutoReg() { \
-                AutoBindings::AddBinder([](sol::state& lua){ \
-                    lua.new_usertype<TYPE>(LuaTypeName, sol::no_constructor, FieldPairs MethodPairs); \
-                }); \
-            } \
-        } TYPE##__LuaAutoReg_Instance; \
+
+// Register singleton / regular type
+#define LUA_REGISTER_TYPE(TYPE, LuaTypeName, FieldPairs, MethodPairs)      \
+    namespace {                                                            \
+        struct TYPE##__LuaAutoReg {                                        \
+            TYPE##__LuaAutoReg() {                                         \
+                AutoBindings::AddBinder(                                   \
+                    [](sol::state& lua) {                                  \
+                        lua.new_usertype<TYPE>(                            \
+                            LuaTypeName,                                   \
+                            sol::no_constructor,                           \
+                            FieldPairs                                     \
+                            MethodPairs                                    \
+                        );                                                 \
+                    }                                                      \
+                );                                                         \
+            }                                                              \
+        } TYPE##__LuaAutoReg_Instance;                                     \
     }
 

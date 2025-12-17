@@ -47,6 +47,12 @@ public:
         static PerceptionSystem instance;
         return instance;
     }
+
+    // Lua-friendly wrappers
+    bool Lua_AddSightTargetTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids);
+    bool Lua_AddHearingSourceTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids);
+    bool Lua_RemoveSightTargetTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids);
+    bool Lua_RemoveHearingSourceTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids);
 private:
 
     // Represents a team participating in the perception system
@@ -81,10 +87,10 @@ private:
 #define PERCEPTIONSYSTEM_LUA_METHODS_APPLY(FM) \
     FM("registerTeam", &PerceptionSystem::RegisterTeam) , \
     FM("unregisterTeam", &PerceptionSystem::UnregisterTeam) , \
-    FM("addSightTargetTeamIDsInTeam", &PerceptionSystem::AddSightTargetTeamIDsInTeam) , \
-    FM("addHearingSourceTeamIDsInTeam", &PerceptionSystem::AddHearingSourceTeamIDsInTeam) , \
-    FM("removeSightTargetTeamIDsInTeam", &PerceptionSystem::RemoveSightTargetTeamIDsInTeam) , \
-    FM("removeHearingSourceTeamIDsInTeam", &PerceptionSystem::RemoveHearingSourceTeamIDsInTeam) , \
+    FM("addSightTargetTeamIDsInTeam", &PerceptionSystem::Lua_AddSightTargetTeamIDsInTeam) , \
+    FM("addHearingSourceTeamIDsInTeam", &PerceptionSystem::Lua_AddHearingSourceTeamIDsInTeam) , \
+    FM("removeSightTargetTeamIDsInTeam", &PerceptionSystem::Lua_RemoveSightTargetTeamIDsInTeam) , \
+    FM("removeHearingSourceTeamIDsInTeam", &PerceptionSystem::Lua_RemoveHearingSourceTeamIDsInTeam) , \
     FM("clearSightTargetTeamIDsInTeam", &PerceptionSystem::ClearSightTargetTeamIDsInTeam) , \
     FM("clearHearingSourceTeamIDsInTeam", &PerceptionSystem::ClearHearingSourceTeamIDsInTeam) , \
     FM("addToTeam", &PerceptionSystem::AddToTeam) , \

@@ -311,6 +311,48 @@ bool PerceptionSystem::ClearTeam(uint32_t TeamId)
     return false;
 }
 
+bool PerceptionSystem::Lua_AddSightTargetTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids)
+{
+    eastl::vector<uint32_t> v;
+    v.reserve(ids.size());
+    for (uint32_t id : ids)
+        v.push_back(id);
+
+    return AddSightTargetTeamIDsInTeam(TeamId, v);
+}
+
+bool PerceptionSystem::Lua_AddHearingSourceTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids)
+{
+    eastl::vector<uint32_t> v;
+    v.reserve(ids.size());
+    for (uint32_t id : ids)
+        v.push_back(id);
+
+    return AddHearingSourceTeamIDsInTeam(TeamId, v);
+}
+
+bool PerceptionSystem::Lua_RemoveSightTargetTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids)
+{
+    eastl::vector<uint32_t> v;
+    v.reserve(ids.size());
+    for (uint32_t id : ids)
+        v.push_back(id);
+
+    return RemoveSightTargetTeamIDsInTeam(TeamId, v);
+}
+
+bool PerceptionSystem::Lua_RemoveHearingSourceTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids)
+{
+    eastl::vector<uint32_t> v;
+    v.reserve(ids.size());
+    for (uint32_t id : ids)
+        v.push_back(id);
+
+    return RemoveHearingSourceTeamIDsInTeam(TeamId, v);
+}
+
+
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- RUNTIME
 // ------------------------------------------------------------------------------------------------------
@@ -500,7 +542,6 @@ bool PerceptionSystem::ReportNoise(PerceptionComponent* SourcePC, float Loudness
 
 #define PS_ADD_FIELD(name) #name, &PerceptionSystem::name
 #define PS_FIELD_PAIRS 
-#undef  PS_ADD_FIELD
 
 #define PS_ADD_METHOD(k, fn) k, fn
 #define PS_METHOD_PAIRS PERCEPTIONSYSTEM_LUA_METHODS_APPLY(PS_ADD_METHOD)
