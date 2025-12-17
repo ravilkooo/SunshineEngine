@@ -76,6 +76,7 @@ ImguiEditorPass::ImguiEditorPass(
 	ImGui_ImplDX11_CreateDeviceObjects();
 
 	m_ToolbarPanel.Init(m_editorApp);
+	m_Gizmo.Init();
 }
 
 void ImguiEditorPass::SetVieportGBuffer(
@@ -98,6 +99,7 @@ void ImguiEditorPass::Pass()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	// ImGuizmo::BeginFrame();
 	
 	if (!m_ProjectSelected)
 	{
@@ -188,8 +190,7 @@ void ImguiEditorPass::Pass()
 
 	// Output Log 
 	ShowOutputLog();
-
-
+	
 	// Main Game Viewport
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -204,25 +205,40 @@ void ImguiEditorPass::Pass()
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoBringToFrontOnFocus |
 		ImGuiWindowFlags_NoNavFocus;
-
+	
 	ImGui::Begin("Main Game Viewport", nullptr, vp_flags);
+
+	ImGuizmo::BeginFrame();
 
 	IsFocusedGameViewport = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 	IsHoveredGameViewport = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
 
 	ImVec2 vMin = ImGui::GetWindowContentRegionMin();
 	ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+	ImVec2 windowPos = ImGui::GetWindowPos();
+
+	m_Gizmo.SetWorldEditor(m_editorApp->m_worldEditor);
+	m_Gizmo.SetViewportRect(
+		ImVec2(windowPos.x + vMin.x, windowPos.y + vMin.y),
+		ImVec2(vMax.x - vMin.x, vMax.y - vMin.y)
+	);
+
+	auto selectedObj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
+		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
+	);
+	m_Gizmo.SetSelectedObject(selectedObj);
+    
 
 	if (IsHoveredGameViewport)
 	{
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 		{
-			ImVec2 MousePosScreen = ImGui::GetMousePos();
-			ImVec2 WindowPos = ImGui::GetWindowPos();
+			ImVec2 mousePosScreen = ImGui::GetMousePos();
+			// ImVec2 WindowPos = ImGui::GetWindowPos();
 
 			m_mouseClickCoords = {
-				(UINT) (MousePosScreen.x - WindowPos.x - vMin.x),
-				(UINT) (MousePosScreen.y - WindowPos.y - vMin.y)
+				(UINT) (mousePosScreen.x - windowPos.x - vMin.x),
+				(UINT) (mousePosScreen.y - windowPos.y - vMin.y)
 			};
 			/*
 			m_worldEditor->DeprojectScreenToWorld(
@@ -259,7 +275,17 @@ void ImguiEditorPass::Pass()
 	}
 	m_lastGameViewportSize = contentSize;
 
+	if (selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
+	{
+		m_Gizmo.Update();
+	}
+	
 	RenderGameWorld();
+	
+	if (selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
+	{
+		m_Gizmo.Draw();
+	}
 
 	ImGui::End();
 	ImGui::PopStyleVar(4);

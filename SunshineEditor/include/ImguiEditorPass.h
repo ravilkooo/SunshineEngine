@@ -21,6 +21,7 @@
 #include "UI/LogPanel.h"
 #include "UI/PropertyPanel.h"
 #include "UI/ProjectSelector.h"
+#include "UI/Gizmo.h"
 
 class EditorApp;
 class WorldEditor;
@@ -79,6 +80,8 @@ public:
     bool m_ProjectSelected = false;
 
     using SceneType = SE::SceneType;
+
+    Gizmo m_Gizmo;
 
     bool m_ShowEditorLogPanel = false;
     bool m_ShowGameLogPanel = false;

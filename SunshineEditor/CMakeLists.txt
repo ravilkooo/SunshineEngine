@@ -26,6 +26,7 @@ target_link_libraries(SunshineEditor
     PRIVATE
         SunshineEngine
         imgui
+        ImGuizmo
 	    sol2_ImGui_Bindings
         FMOD
 )

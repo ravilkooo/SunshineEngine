@@ -215,8 +215,8 @@ void EditorApp::UpdateGame(float deltaTime)
 		- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
 		m_currentGame->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
 	}
-	if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
+	if (float up = (MovingPressed[(int)MoveKey::E] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::Q] ? 1.0f : 0.0f); up != 0.0f) {
 		m_currentGame->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
 	}
 
@@ -235,6 +235,12 @@ void EditorApp::UpdateEditor(float deltaTime)
 		return;
 	}
 
+	if (!IsRightMousePressed)
+	{
+		m_worldEditor->Update(deltaTime);
+		return;
+	}
+
 	if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
 		- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
 		m_worldEditor->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
@@ -243,8 +249,8 @@ void EditorApp::UpdateEditor(float deltaTime)
 		- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
 		m_worldEditor->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
 	}
-	if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
+	if (float up = (MovingPressed[(int)MoveKey::E] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::Q] ? 1.0f : 0.0f); up != 0.0f) {
 		m_worldEditor->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
 	}
 
@@ -312,9 +318,9 @@ void EditorApp::HandleKeyDown(Keys key)
 			break;
 		case Keys::A: MovingPressed[(int)MoveKey::A] = true;
 			break;
-		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = true;
+		case Keys::E: MovingPressed[(int)MoveKey::E] = true;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true;
+		case Keys::Q: MovingPressed[(int)MoveKey::Q] = true;
 			break;
 
 		case Keys::RightButton: IsRightMousePressed = true;
@@ -339,9 +345,9 @@ void EditorApp::HandleKeyDown(Keys key)
 			break;
 		case Keys::A: MovingPressed[(int)MoveKey::A] = true;
 			break;
-		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = true;
+		case Keys::E: MovingPressed[(int)MoveKey::E] = true;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true;
+		case Keys::Q: MovingPressed[(int)MoveKey::Q] = true;
 			break;
 
 		case Keys::RightButton: IsRightMousePressed = true;
@@ -372,9 +378,9 @@ void EditorApp::HandleKeyUp(Keys key)
 			break;
 		case Keys::A: MovingPressed[(int)MoveKey::A] = false;
 			break;
-		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = false;
+		case Keys::E: MovingPressed[(int)MoveKey::E] = false;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
+		case Keys::Q: MovingPressed[(int)MoveKey::Q] = false;
 			break;
 
 		case Keys::RightButton: IsRightMousePressed = false;
@@ -393,9 +399,9 @@ void EditorApp::HandleKeyUp(Keys key)
 			break;
 		case Keys::A: MovingPressed[(int)MoveKey::A] = false;
 			break;
-		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = false;
+		case Keys::E: MovingPressed[(int)MoveKey::E] = false;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
+		case Keys::Q: MovingPressed[(int)MoveKey::Q] = false;
 			break;
 
 		case Keys::RightButton: IsRightMousePressed = false;
