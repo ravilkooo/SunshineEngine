@@ -4,6 +4,8 @@
 #include <Utils/StringUtils.h>
 #include <EditorApp.h>
 
+#include "Utils/FileDialogManager.h"
+
 void ToolbarPanel::OnImGuiRender(float menuBarHeight)
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -13,8 +15,8 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
     ImGui::SetNextWindowViewport(viewport->ID);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 0));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 5));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 5));
 
     ImGui::Begin("Toolbar", nullptr,
         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -29,6 +31,19 @@ void ToolbarPanel::OnImGuiRender(float menuBarHeight)
 
     if (!isPlaying)
     {
+        if (ImGui::Button("Add"))
+        {
+            ImGui::OpenPopup("AddMenuPopup");
+        }
+        
+        if (ImGui::BeginPopup("AddMenuPopup"))
+        {
+            ShowAddMenu();
+            ImGui::EndPopup();
+        }
+        
+        ImGui::SameLine();
+        
         if (ImGui::Button("Play"))
         {
             isPlaying = true; 
@@ -85,7 +100,218 @@ void ToolbarPanel::SetHeight(float toolbarHeight)
     m_Height = toolbarHeight;
 }
 
-void ToolbarPanel::SetEditorApp(EditorApp* editorApp)
+void ToolbarPanel::SetScene(const eastl::shared_ptr<Scene_Info>& scene)
+{
+    m_scene = scene;
+}
+
+void ToolbarPanel::Init(EditorApp* editorApp)
 {
     m_editorApp = editorApp;
+    m_renderer = m_editorApp->m_worldEditor->m_renderer.get();
+    m_camera = m_editorApp->m_worldEditor->m_renderer->m_mainCamera;
+}
+
+void ToolbarPanel::ShowAddMenu()
+{
+    if (ImGui::BeginMenu("Shape"))
+    {
+        if (ImGui::MenuItem("Box")) 
+        {
+            AddBoxShape();
+        }
+        if (ImGui::MenuItem("Sphere")) 
+        {
+            AddSphereShape();
+        }
+        if (ImGui::MenuItem("Geosphere")) 
+        {
+            AddGeosphereShape();
+        }
+        ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Lightning"))
+    {
+        if (ImGui::MenuItem("SkyBox")) 
+        {
+            AddSkyBox();
+        }
+        if (ImGui::MenuItem("Ambient")) 
+        {
+            AddAmbientLight();
+        }
+        if (ImGui::MenuItem("Directional")) 
+        {
+            AddDirectionalLight();
+        }
+        if (ImGui::MenuItem("Point Light")) 
+        {
+            AddPointLight();
+        }
+        if (ImGui::MenuItem("Spot Light")) 
+        {
+            AddSpotLight();
+        }
+        ImGui::EndMenu();
+    }
+    
+    if (ImGui::MenuItem("Custom Mesh")) 
+    {
+        AddCustomMesh();
+    }
+}
+
+void ToolbarPanel::AddBoxShape()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        auto boxObject = EditorObjectFactory::CreateBoxObject(m_renderer, 1.0f, 1.0f, 1.0f);
+        
+        if (boxObject)
+        {
+            m_scene->AddGameObject(std::move(boxObject));
+        }
+    }
+}
+
+void ToolbarPanel::AddSphereShape()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        auto sphereObject = EditorObjectFactory::CreateSphereObject(m_renderer, 1.0f);
+        
+        if (sphereObject)
+        {
+            m_scene->AddGameObject(std::move(sphereObject));
+        }
+    }
+}
+
+void ToolbarPanel::AddGeosphereShape()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        auto geosphereObject = EditorObjectFactory::CreateGeosphereObject(m_renderer, 1.0f);
+        
+        if (geosphereObject)
+        {
+            m_scene->AddGameObject(std::move(geosphereObject));
+        }
+    }
+}
+
+void ToolbarPanel::AddSkyBox()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        if (m_camera)
+        {
+            auto skyboxObject = EditorObjectFactory::CreateSkyBox(m_renderer, m_camera);
+            
+            if (skyboxObject)
+            {
+                m_scene->AddGameObject(std::move(skyboxObject));
+            }
+        }
+    }
+}
+
+void ToolbarPanel::AddAmbientLight()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        if (m_camera)
+        {
+            auto ambientLightObject = EditorObjectFactory::CreateAmbientLightObject(m_renderer, m_camera);
+            
+            if (ambientLightObject)
+            {
+                m_scene->AddGameObject(std::move(ambientLightObject));
+            }
+        }
+    }
+}
+
+void ToolbarPanel::AddDirectionalLight()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        if (m_camera)
+        {
+            auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer, m_camera);
+            
+            if (directionalLightObject)
+            {
+                m_scene->AddGameObject(std::move(directionalLightObject));
+            }
+        }
+    }
+}
+
+void ToolbarPanel::AddPointLight()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        if (m_camera)
+        {
+            auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer, m_camera);
+            
+            if (pointLightObject)
+            {
+                m_scene->AddGameObject(std::move(pointLightObject));
+            }
+        }
+    }
+}
+
+void ToolbarPanel::AddSpotLight()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        if (m_camera)
+        {
+            auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer, m_camera);
+            
+            if (spotLightObject)
+            {
+                m_scene->AddGameObject(std::move(spotLightObject));
+            }
+        }
+    }
+}
+
+void ToolbarPanel::AddCustomMesh()
+{
+    if (m_renderer && m_scene)
+    {
+        // auto filters = FileDialogManager::Get3DModelFilters();
+        // auto modelPath = FileDialogManager::Get().OpenFile(
+        //     L"Select 3D Model",
+        //     filters,
+        //     ContentBrowserPanel::s_AssetsDirectory
+        // );
+        //
+        // if (!modelPath.empty())
+        // {
+        //     eastl::string filePath = FileDialogManager::ToUTF8(modelPath.wstring()).c_str();
+        //     
+        //     auto customMeshObject = EditorObjectFactory::CreateCustomMesh(m_renderer, filePath);
+        //     
+        //     if (customMeshObject)
+        //     {
+        //         m_scene->AddGameObject(std::move(customMeshObject));
+        //     }
+        // }
+
+        auto customMeshObject = EditorObjectFactory::CreateCustomMesh(m_renderer, eastl::string("Box"));
+            
+        if (customMeshObject)
+        {
+            m_scene->AddGameObject(std::move(customMeshObject));
+        }
+    }
+    else
+    {
+        LOG_EDITOR_ERROR("Cannot add Custom Mesh: Renderer or Scene not initialized");
+    }
 }

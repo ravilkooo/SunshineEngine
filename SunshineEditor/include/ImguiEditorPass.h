@@ -21,6 +21,7 @@
 #include "UI/LogPanel.h"
 #include "UI/PropertyPanel.h"
 #include "UI/ProjectSelector.h"
+#include "UI/Gizmo.h"
 
 class EditorApp;
 class WorldEditor;
@@ -52,6 +53,7 @@ public:
     bool IsProjectSelected() const { return m_ProjectSelected; }
     SE::Project* GetSelectedProject() { return m_ProjectSelector.GetSelectedProject(); }
     void ResetProjectSelection() { m_ProjectSelected = false; m_ProjectSelector.Close(); }
+    void SetScene(const eastl::shared_ptr<Scene_Info>& scene) { m_ToolbarPanel.SetScene(scene); }
 
     UINT m_editorAppWidth = 800;
     UINT m_editorAppHeight = 800;
@@ -78,6 +80,8 @@ public:
     bool m_ProjectSelected = false;
 
     using SceneType = SE::SceneType;
+
+    Gizmo m_Gizmo;
 
     bool m_ShowEditorLogPanel = false;
     bool m_ShowGameLogPanel = false;

@@ -82,3 +82,4 @@ Projects/*
 *.bak
 *.swp
 *.swo
+/Projects

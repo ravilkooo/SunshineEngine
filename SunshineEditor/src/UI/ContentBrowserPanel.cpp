@@ -11,6 +11,7 @@
 #include <shlobj.h>
 
 #include <Utils/StringUtils.h>
+#include "Utils/FileDialogManager.h"
 
 std::filesystem::path ContentBrowserPanel::s_AssetsDirectory =
     std::filesystem::path(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/").c_str());
@@ -38,16 +39,14 @@ inline std::string WStringToUTF8(const std::wstring& wstr)
 
 bool ContentBrowserPanel::FileCopy(const std::filesystem::path& src, const std::filesystem::path& dst)
 {
-    // If dst is directory, copy into it
     if (std::filesystem::is_directory(dst)) {
         std::filesystem::path target = dst / src.filename();
         std::filesystem::copy_file(src, target, std::filesystem::copy_options::skip_existing);
     } else {
-        // Copy file to dst (could be full file path)
         std::filesystem::copy_file(src, dst, std::filesystem::copy_options::skip_existing);
     }
     return true;
-}
+}   
 
 bool ContentBrowserPanel::FileMove(const std::filesystem::path& src, const std::filesystem::path& dst)
 {
@@ -82,14 +81,19 @@ std::filesystem::path ContentBrowserPanel::MakeUniquePath(const std::filesystem:
     }
 }
 
-// System clipboard path copy (only text).
 bool ContentBrowserPanel::CopyPathToClipboardSystem(const std::string& text)
 {
     if (!OpenClipboard(NULL)) return false;
     EmptyClipboard();
+    
     size_t sizeInBytes = (text.size() + 1) * sizeof(char);
     HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, sizeInBytes);
-    if (!hGlob) { CloseClipboard(); return false; }
+    if (!hGlob)
+    {
+        CloseClipboard();
+        return false;
+    }
+    
     void* pData = GlobalLock(hGlob);
     memcpy(pData, text.c_str(), sizeInBytes);
     GlobalUnlock(hGlob);
@@ -100,23 +104,28 @@ bool ContentBrowserPanel::CopyPathToClipboardSystem(const std::string& text)
 
 std::filesystem::path ContentBrowserPanel::OpenFileDialog()
 {
-    OPENFILENAMEW ofn;       
-    wchar_t szFile[260] = { 0 };
-    ZeroMemory(&ofn, sizeof(ofn));
-    ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = NULL;
-    ofn.lpstrFile = szFile;
-    ofn.nMaxFile = _countof(szFile);
-    ofn.lpstrFilter = FileCategories::GetAllFilter();
-    ofn.nFilterIndex = 1;
-    ofn.lpstrFileTitle = NULL;
-    ofn.nMaxFileTitle = 0;
-    ofn.lpstrInitialDir = NULL;
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+    // OPENFILENAMEW ofn;       
+    // wchar_t szFile[260] = { 0 };
+    // ZeroMemory(&ofn, sizeof(ofn));
+    // ofn.lStructSize = sizeof(ofn);
+    // ofn.hwndOwner = NULL;
+    // ofn.lpstrFile = szFile;
+    // ofn.nMaxFile = _countof(szFile);
+    // ofn.lpstrFilter = FileCategories::GetAllFilter();
+    // ofn.nFilterIndex = 1;
+    // ofn.lpstrFileTitle = NULL;
+    // ofn.nMaxFileTitle = 0;
+    // ofn.lpstrInitialDir = NULL;
+    // ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+    //
+    // if (GetOpenFileNameW(&ofn))
+    //     return std::filesystem::u8path(WStringToUTF8(szFile));
+    // return {};
 
-    if (GetOpenFileNameW(&ofn))
-        return std::filesystem::u8path(WStringToUTF8(szFile));
-    return {};
+    return FileDialogManager::Get().OpenFile(
+         FileDialogManager::DialogType::All,
+         L"Open File"
+     );
 }
 
 std::filesystem::path ContentBrowserPanel::SaveFileDialog(const wchar_t* filter, int filterIndex)
@@ -240,11 +249,23 @@ void ContentBrowserPanel::Action_Duplicate(const std::filesystem::path& p)
 
 void ContentBrowserPanel::Action_Import()
 {
-    auto selectedFile = OpenFileDialog();
+    // auto selectedFile = OpenFileDialog();
+    // if (!selectedFile.empty())
+    // {
+    //     std::filesystem::path dst = m_CurrentDirectory / selectedFile.filename();
+    //     
+    //     dst = MakeUniquePath(dst);
+    //     FileCopy(selectedFile, dst);
+    // }
+    
+    auto selectedFile = FileDialogManager::Get().OpenFile(
+        FileDialogManager::DialogType::All,
+        L"Import File"
+    );
+    
     if (!selectedFile.empty())
     {
         std::filesystem::path dst = m_CurrentDirectory / selectedFile.filename();
-        
         dst = MakeUniquePath(dst);
         FileCopy(selectedFile, dst);
     }
@@ -254,9 +275,15 @@ void ContentBrowserPanel::Action_Export(const std::filesystem::path& p)
 {
     std::string ext = p.extension().string();
     
-    auto [filter, index] = BuildFilterForType(ext);
+    auto dialogType = FileDialogManager::GetDialogTypeByExtension(StdToEASTLString(ext));
     
-    auto dstPath = SaveFileDialog(filter, index);
+    auto dstPath = FileDialogManager::Get().SaveFile(
+        dialogType,
+        L"Export File",
+        {},
+        p.filename().c_str()
+    );
+    
     if (!dstPath.empty())
     {
         if (std::filesystem::path(dstPath).extension().empty())
@@ -269,8 +296,6 @@ void ContentBrowserPanel::Action_Export(const std::filesystem::path& p)
         FileCopy(p, target);
     }
 }
-
-// ---------------- Render / UI ----------------
 
 void ContentBrowserPanel::DrawToolbar()
 {
