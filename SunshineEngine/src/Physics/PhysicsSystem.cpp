@@ -2,6 +2,9 @@
 #include <Scene.h>
 #include <Component/TransformComponent.h>
 
+#include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/CastResult.h>
+
 PhysicsSystem::PhysicsSystem() :
     m_bodyEntries(eastl::vector<PhysicsBodyEntry>())
 {
@@ -59,6 +62,57 @@ PhysicsSystem::~PhysicsSystem()
 
     m_bodyInterface = nullptr;
 }
+
+
+//////////////////////////////////////////
+// FOR TRACING ONLY (GAI)
+//////////////////////////////////////////
+
+bool PhysicsSystem::Trace(const JPH::RVec3& begin,
+    const JPH::Vec3& dir,
+    float length,
+    JPH::ObjectLayer layer,
+    const eastl::vector<SE::UUID>& ignore,
+    SE::UUID* out_id)
+{
+    if (!m_physicsSystem)
+        return false;
+
+    // Build ignore set
+    eastl::unordered_set<SE::UUID> ignore_set(ignore.begin(), ignore.end());
+
+    JPH::RRayCast ray(begin, begin + JPH::RVec3(dir * length));
+
+    JPH::RayCastResult   result;
+    
+    // Cast againts all layers
+    EmptyFilter layer_filter = EmptyFilter();
+    IgnoreUUIDBodyFilter body_filter(ignore_set, m_physicsSystem->GetBodyLockInterface());
+
+    auto& nq = m_physicsSystem->GetNarrowPhaseQuery(); // locking version for thread safety
+
+    bool hit = nq.CastRay(ray,
+        result,
+        JPH::BroadPhaseLayerFilter(), // accept all BP layers or plug your own
+        layer_filter,
+        body_filter);
+
+    if (!hit || !out_id)
+        return hit;
+
+    // Retrieve SE::UUID from hit body
+    JPH::BodyID body_id = result.mBodyID;
+
+    JPH::BodyLockRead lock(m_physicsSystem->GetBodyLockInterface(), body_id);
+    if (!lock.Succeeded())
+        return false;
+
+    const JPH::Body& body = lock.GetBody();
+    *out_id = *reinterpret_cast<const SE::UUID*>(body.GetUserData());
+    return true;
+}
+//////////////////////////////////////////
+//////////////////////////////////////////
 
 void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
 

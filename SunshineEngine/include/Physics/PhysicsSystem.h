@@ -50,6 +50,61 @@ public:
     eastl::unordered_map<SE::CollisionLayer, SE::CollisionGroup> m_layerToGroupMapping;
 };
 
+//////////////////////////////////////////
+// FOR TRACING ONLY (GAI)
+//////////////////////////////////////////
+
+class SingleLayerFilter : public JPH::ObjectLayerFilter
+{
+public:
+    explicit SingleLayerFilter(JPH::ObjectLayer layer) : m_layer(layer) {}
+
+    bool ShouldCollide(JPH::ObjectLayer layer) const override
+    {
+        return layer == m_layer;
+    }
+
+private:
+    JPH::ObjectLayer m_layer;
+};
+
+class EmptyFilter : public JPH::ObjectLayerFilter
+{
+public:
+    explicit EmptyFilter() {}
+
+    bool ShouldCollide(JPH::ObjectLayer layer) const override
+    {
+        return true;
+    }
+};
+
+class IgnoreUUIDBodyFilter : public JPH::BodyFilter
+{
+public:
+    IgnoreUUIDBodyFilter(const eastl::unordered_set<SE::UUID>& ignore,
+        const JPH::BodyLockInterface& body_lock)
+        : m_ignore(ignore), m_bodyLock(body_lock) {
+    }
+
+    bool ShouldCollide(const JPH::BodyID& body_id) const override
+    {
+        JPH::BodyLockRead lock(m_bodyLock, body_id);
+        if (!lock.Succeeded())
+            return false;
+
+        const JPH::Body& body = lock.GetBody();
+        SE::UUID id = *reinterpret_cast<const SE::UUID*>(body.GetUserData());
+
+        return m_ignore.find(id) == m_ignore.end();
+    }
+
+private:
+    const eastl::unordered_set<SE::UUID>& m_ignore;
+    const JPH::BodyLockInterface& m_bodyLock;
+};
+//////////////////////////////////////////
+//////////////////////////////////////////
 
 static void TraceImpl(const char* inFMT, ...)
 {
@@ -220,6 +275,14 @@ class PhysicsSystem
 public:
     PhysicsSystem();
     ~PhysicsSystem();
+
+    // begin: world-space start; dir: normalized; layerKey: your editor layer key
+    bool Trace(const JPH::RVec3& begin,
+        const JPH::Vec3& dir,
+        float length,
+        JPH::ObjectLayer layer,
+        const eastl::vector<SE::UUID>& ignore,
+        SE::UUID* out_id);
     
     void CreateAndAddBody(PhysicsComponent* physComp);
 
