@@ -196,7 +196,31 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             tc->m_rotation =
                 DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
                 );
-        }        
+        }
+        else if (m_bodyInterface->GetMotionType(bodyEntry.m_joltBodyId) == JPH::EMotionType::Kinematic)
+        {
+            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
+
+            auto gameObject = scene->GetGameObjectByUUID(objectUUID);
+            if (!gameObject)
+                continue;
+
+            auto tc = gameObject->GetComponent<TransformComponent>();
+            if (!tc)
+                continue;
+
+            // Push TransformComponent data into the kinematic body
+            const JPH::RVec3 targetPos(tc->m_position.x, tc->m_position.y, tc->m_position.z);
+            const DXSM::Quaternion dxQuat = DXSM::Quaternion::CreateFromYawPitchRoll(
+                tc->m_rotation.y, tc->m_rotation.x, tc->m_rotation.z);
+            const JPH::Quat targetRot(dxQuat.x, dxQuat.y, dxQuat.z, dxQuat.w);
+
+            m_bodyInterface->SetPositionAndRotation(
+                bodyEntry.m_joltBodyId,
+                targetPos,
+                targetRot,
+                JPH::EActivation::Activate);
+        }
     }
 }
 
