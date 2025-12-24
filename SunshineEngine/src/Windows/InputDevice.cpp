@@ -53,6 +53,14 @@ void InputDevice::OnKeyDown(KeyboardInputEventArgs args)
 
 	if (args.MakeCode == 42) key = Keys::LeftShift;
 	if (args.MakeCode == 54) key = Keys::RightShift;
+
+	if (key == Keys::LeftControl)
+	{
+		if (args.Flags > static_cast<unsigned short>(1u))
+			key = Keys::RightControl;
+	}
+
+	//printf("Key: %d;\t MakeCode: %hu;\t Flags: %hu\n", key, args.MakeCode, args.Flags);
 	
 	if (Break) 
 	{
