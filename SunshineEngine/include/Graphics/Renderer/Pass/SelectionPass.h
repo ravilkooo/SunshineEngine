@@ -32,13 +32,9 @@ namespace SE_G {
         void Pass() override;
         void EndFrame() override;
 
-        eastl::shared_ptr<Camera> GetCamera();
-        void SetCamera(eastl::shared_ptr<Camera> camera);
-
         void OnResize(UINT resizeWidth, UINT resizeHeight) override;
             //eastl::shared_ptr<GBuffer> pGBuffer);
 
-        eastl::shared_ptr<Camera> m_camera;
 
         UINT m_screenWidth = 800u;
         UINT m_screenHeight = 800u;

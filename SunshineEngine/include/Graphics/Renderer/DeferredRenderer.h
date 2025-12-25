@@ -30,8 +30,8 @@ namespace SE_G {
 
         void InitGBuffer(UINT screenWidth, UINT screenHeight);
 
-        void SetMainCamera(eastl::shared_ptr<Camera> camera) { m_mainCamera = camera; }
-        eastl::shared_ptr<Camera> GetMainCamera() { return m_mainCamera; };
+        void SetMainCamera(eastl::shared_ptr<Camera> camera);
+        eastl::shared_ptr<Camera> GetMainCamera();
 
         void OnResize(UINT resizeWidth, UINT resizeHeight);
         

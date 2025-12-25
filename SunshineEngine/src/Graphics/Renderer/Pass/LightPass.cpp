@@ -153,15 +153,6 @@ namespace SE_G {
 		context->OMSetRenderTargets(0, NULL, NULL);
 	}
 
-	eastl::shared_ptr<Camera> LightPass::GetCamera()
-	{
-		return m_camera;
-	}
-
-	void LightPass::SetCamera(eastl::shared_ptr<Camera> camera)
-	{
-		this->m_camera = camera;
-	}
 
 	void LightPass::OnResize(UINT resizeWidth, UINT resizeHeight)
 		//eastl::shared_ptr<GBuffer> pGBuffer)

@@ -35,6 +35,9 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_renderingSystem->AddRenderGroup(m_worldEditor->m_renderer.get());
 	m_renderingSystem->AddRenderGroup(m_worldEditor->m_playerObject.m_miniViewRenderer.get());
 
+	// PlayerObject
+	m_worldEditor->SetUpPlayerObject();
+
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
 	sol_ImGui::Init(m_lua);

@@ -12,6 +12,7 @@
 #include <Utils/DebugUtils.h>
 #include <Utils/StringUtils.h>
 #include <UI/FontStyles.h>
+#include "UI/PropertyPanel.h"
 
 #include <sstream>
 
@@ -417,19 +418,75 @@ void ImguiEditorPass::ShowGameObjectProperties()
 
 void ImguiEditorPass::ShowPlayerProperties()
 {
-	/*
-	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
-	m_PropertyPanel.SetSelectedUUID(m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked);
-	m_PropertyPanel.OnImGuiRender();
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+		ImGuiTreeNodeFlags_Framed |
+		ImGuiTreeNodeFlags_SpanAvailWidth;
+	EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+	if (ImGui::TreeNodeEx("Camera Settings", flags))
+	{
+		EditorUI::FontStyles::Pop();
 
-	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
-		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
-	);
-	*/
+		ImVec2 avail = ImGui::GetContentRegionAvail();
+		avail.y = avail.x * 360.0f / 640.0f;
+		ImGui::Image((ImTextureID)m_editorApp->m_worldEditor->m_playerObject.m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
 
-	ImVec2 avail = ImGui::GetContentRegionAvail();
-	avail.y = avail.x * 360.0f / 640.0f;
-	ImGui::Image((ImTextureID) m_editorApp->m_worldEditor->m_playerObject.m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
+		EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+		ImGui::Text("Stick Params");
+		EditorUI::FontStyles::Pop();
+		
+		float stickLength = m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickLength;
+		if (ImGui::DragFloat("Stick length", &stickLength, 0.1f, 0.1f, 90.0f, "%.1f m"))
+		{
+			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickLength = stickLength;
+		}
+
+		float stickYaw = m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickYaw;
+		stickYaw *= 360.0f / DirectX::XM_2PI;
+		if (ImGui::DragFloat("Stick yaw", &stickYaw, 0.1f, -90.0f, 90.0f, "%.1f"))
+		{
+			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickYaw =
+				DirectX::XM_2PI / 360.0f * stickYaw;
+		}
+
+		float stickPitch = m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickPitch;
+		stickPitch *= 360.0f / DirectX::XM_2PI;
+		if (ImGui::DragFloat("Stick pitch", &stickPitch, 0.1f, -80.0f, 80.0f, "%.1f"))
+		{
+			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickPitch =
+				DirectX::XM_2PI / 360.0f * stickPitch;
+		}
+
+		// ImGui::ColorEdit3("Camera Offset",
+		// 	&(m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.offset.x), ImGuiColorEditFlags_Float);
+		PropertyPanel::DrawVector3Control("Camera Offset",
+			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.offset, 0.0f);
+
+		//ImGui::ColorEdit3("Camera Rotation",
+		//	&(m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.viewPitchYawRoll.x), ImGuiColorEditFlags_Float);
+
+		DXSM::Vector3 viewPitchYawRoll = m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.viewPitchYawRoll * (180.0f / DirectX::XM_PI);
+		if (PropertyPanel::DrawVector3Control("Camera Rotation", viewPitchYawRoll, 0.0f))
+		{
+			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.viewPitchYawRoll = viewPitchYawRoll * (DirectX::XM_PI / 180.0f);
+		}
+
+		/*
+		float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
+		float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
+		if ()
+		{
+			lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
+		}
+		if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
+		{
+			lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
+		}
+		*/
+		ImGui::TreePop();
+	}
+	else
+		EditorUI::FontStyles::Pop();
+
 }
 
 void ImguiEditorPass::ShowBottomPanel()

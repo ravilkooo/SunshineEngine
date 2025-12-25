@@ -1,7 +1,7 @@
-
-
 #include "Graphics/Utils/Camera.h"
 #include <iostream>
+
+#include <PlayerObject/PlayerObject.h>
 
 
 namespace SE_G {
@@ -209,7 +209,60 @@ namespace SE_G {
         return referenceLen;
     }
 
-    void Camera::Update(float deltaTime, const DXSM::Matrix targetTransform)
+    void Camera::Update()
+    {
+        if (cameraMode == CAMERA_MODE::FOLLOW)
+        {
+            DXSM::Matrix targetTransform;
+            if (m_playerAsObject)
+            {
+                targetTransform = m_player.asObject->GetComponent<TransformComponent>()->GetWorldMatrix();
+            }
+            else
+            {
+                targetTransform = m_player.asInfo->GetComponent<TransformComponent_Info>()->m_assignedComponent->GetWorldMatrix();
+            }
+
+            DXSM::Vector3 targetPos;
+            targetPos.x = targetTransform._41;
+            targetPos.y = targetTransform._42;
+            targetPos.z = targetTransform._43;
+
+            Update(targetPos);
+        }
+    }
+
+    void Camera::Update(const DXSM::Vector3 targetPoistion)
+    {
+        if (cameraMode == CAMERA_MODE::FOLLOW)
+        {
+            //orbitalYaw += orbitalAngleSpeed * deltaTime;
+
+            DXSM::Vector3 stickVector(
+                -1.0f * sinf(m_stickParams.stickYaw) * cosf(m_stickParams.stickPitch),
+                1.0f * sinf(m_stickParams.stickPitch),
+                -1.0f * cosf(m_stickParams.stickYaw) * cosf(m_stickParams.stickPitch)
+            );
+
+            stickVector *= m_stickParams.stickLength;
+
+            position = targetPoistion + stickVector + m_stickParams.offset;
+
+            DXSM::Vector3 _forward(0.0f, 0.0f, 1.0f);
+            DXSM::Vector3 _up(0.0f, 1.0f, 0.0f);
+            auto rotateCam = DXSM::Matrix::CreateFromYawPitchRoll(
+                m_stickParams.viewPitchYawRoll.y,
+                -m_stickParams.viewPitchYawRoll.x,
+                -m_stickParams.viewPitchYawRoll.z);
+            _up = DXSM::Vector3::Transform(_up, rotateCam);
+            _forward = DXSM::Vector3::Transform(_forward, rotateCam);
+
+            up = _up;
+            target = position + _forward;
+        }
+    }
+
+    void Camera::Update(const DXSM::Matrix targetTransform)
     {
         if (cameraMode == CAMERA_MODE::ORBITAL)
         {
@@ -226,9 +279,18 @@ namespace SE_G {
 
             up = DXSM::Vector3::Transform(spinAxis, targetTransform) - orbitalTarget;
         }
+        else if (cameraMode == CAMERA_MODE::FOLLOW)
+        {
+            //orbitalYaw += orbitalAngleSpeed * deltaTime;
+
+            target = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
+
+            float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
+            position = target - cam2targetDist * (this->followDirection + sinf(followPitch) * up);
+        }
     }
 
-    void Camera::Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction)
+    void Camera::Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction)
     {
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
@@ -241,7 +303,7 @@ namespace SE_G {
         }
     }
 
-    void Camera::Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen)
+    void Camera::Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen)
     {
         this->referenceLen = referenceLen;
         if (cameraMode == CAMERA_MODE::FOLLOW)
@@ -255,8 +317,9 @@ namespace SE_G {
         }
     }
 
-    DX::XMMATRIX Camera::GetViewMatrix() const
+    DX::XMMATRIX Camera::GetViewMatrix()
     {
+        Update();
         return XMMatrixLookAtLH(position, target, up);
     }
 
@@ -388,15 +451,37 @@ namespace SE_G {
         cameraMode = CAMERA_MODE::FPS;
     }
 
-    void Camera::SwitchToFollowMode(DXSM::Vector3 followTarget, DXSM::Vector3 direction, float referenceLen)
+
+    void Camera::SwitchToFollowMode(PlayerObject* playerObject)
+    {
+        m_playerAsObject = true;
+        m_player.asObject = playerObject;
+        InitFollowModeParams();
+    }   
+
+    void Camera::SwitchToFollowMode(PlayerObject_Info* playerObject)
+    {
+        m_playerAsObject = false;
+        m_player.asInfo = playerObject;
+        InitFollowModeParams();
+    }
+
+    void Camera::InitFollowModeParams()
     {
         cameraMode = CAMERA_MODE::FOLLOW;
+
+        m_stickParams.stickLength = 10.0f;
+        m_stickParams.stickPitch = DX::XM_PI * 0.166f;
+        m_stickParams.stickYaw = 0.0f;
+
+        m_stickParams.viewPitchYawRoll = { -DX::XM_PI * 0.166f, 0.0f, 0.0f };
+
+        m_stickParams.offset = DXSM::Vector3::Zero;
+        /*
         followPitch = -DX::XM_PI * 0.166f;
-        target = followTarget;
         this->referenceLen = referenceLen;
         up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
-        float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
-        position = target - cam2targetDist * (direction + sinf(followPitch) * up);
+        */
     }
 
     void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget)

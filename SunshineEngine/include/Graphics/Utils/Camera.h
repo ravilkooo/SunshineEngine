@@ -11,6 +11,9 @@
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
+class PlayerObject;
+class PlayerObject_Info;
+
 namespace SE_G {
     class Camera
     {
@@ -69,11 +72,13 @@ namespace SE_G {
         void SetReferenceLen(float referenceLen);
         float GetReferenceLen();
 
-        void Update(float deltaTime, const DXSM::Matrix targetTransform);
-        void Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
-        void Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen);
+        void Update();
+        void Update(const DXSM::Vector3 targetPoistion);
+        void Update(const DXSM::Matrix targetTransform);
+        void Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
+        void Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen);
 
-        DX::XMMATRIX GetViewMatrix() const;
+        DX::XMMATRIX GetViewMatrix();
         DX::XMMATRIX GetProjectionMatrix() const;
 
         void MoveForward(float speed);
@@ -88,7 +93,9 @@ namespace SE_G {
 
         void SwitchToFPSMode();
 
-        void SwitchToFollowMode(DXSM::Vector3 followTarget, DXSM::Vector3 direction, float referenceLen);
+        void SwitchToFollowMode(PlayerObject* playerObject);
+        void SwitchToFollowMode(PlayerObject_Info* playerObject);
+        void InitFollowModeParams();
 
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget);
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis);
@@ -114,6 +121,18 @@ namespace SE_G {
 
         FrustumCorners GetFrustumCorners();
 
+        struct FollowStickParams
+        {
+            float stickLength;
+
+            float stickYaw;
+            float stickPitch;
+
+            DXSM::Vector3 viewPitchYawRoll;
+
+            DXSM::Vector3 offset;
+        } m_stickParams;
+
     private:
         void SetFOV(float fov);
         void SetAspectRatio(float aspectRatio);
@@ -121,6 +140,7 @@ namespace SE_G {
         void SetViewHeight(float viewHeight);
 
         DXSM::Vector3 position;
+        DXSM::Vector3 followDirection;
         DXSM::Vector3 target;
         DXSM::Vector3 up;
 
@@ -154,5 +174,13 @@ namespace SE_G {
 
         // for FOLLOW camera mode
         float followPitch;
+
+        // Follow PlayerObject
+        bool m_playerAsObject = false;
+
+        union {
+            PlayerObject* asObject;
+            PlayerObject_Info* asInfo;
+        } m_player;
     };
 }

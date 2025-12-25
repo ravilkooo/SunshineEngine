@@ -163,6 +163,16 @@ void WorldEditor::SetupRendering(
 	m_playerObject.InitMiniViewport(m_renderer.get());
 }
 
+void WorldEditor::SetUpPlayerObject()
+{
+	m_playerObject.AddTransformComponent(m_renderer->GetDevice());
+	m_playerObject.AddRenderComponent(m_renderer.get());
+	m_playerObject.AddMeshComponent();
+	m_playerObject.AddPhysicsComponent();
+
+	m_playerObject.SetUpCamera();
+}
+
 void WorldEditor::CreateParentScene()
 {
 	{

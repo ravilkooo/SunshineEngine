@@ -11,6 +11,14 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <PlayerObject/MiniViewRenderer.h>
 
+class PlayerObject : public GameObject
+{
+public:
+	// camera settings
+	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
+};
+
+
 class PlayerObject_Info : public GameObject_Info
 {
 public:
@@ -72,7 +80,10 @@ public:
 
 	void SetUpCamera()
 	{
-		//m_playerCamera = eastl::make_shared<SE_G::Camera>(device, screenWidth * 1.0f / screenHeight);
+		m_playerCamera = eastl::make_shared<SE_G::Camera>(
+			m_miniViewRenderer->GetDevice(), 640.0f / 360.0f);
+		m_playerCamera->SwitchToFollowMode(this);
+		m_miniViewRenderer->SetMainCamera(m_playerCamera);
 	}
 
 	void RenderViewport()

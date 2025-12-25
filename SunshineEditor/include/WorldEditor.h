@@ -69,6 +69,7 @@ public:
         eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
+    void SetUpPlayerObject();
 
     // Start/Pause worldEditor and it's rendering
     void Start();
