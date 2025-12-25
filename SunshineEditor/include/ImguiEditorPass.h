@@ -43,7 +43,11 @@ public:
 
     void RenderGameWorld();
     void ShowContentBrowser();
+
     void ShowProperties();
+    void ShowGameObjectProperties();
+    void ShowPlayerProperties();
+
     void ShowBottomPanel();
     void ShowOutputLog();
     void LuaImgui(GameObject*);

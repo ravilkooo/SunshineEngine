@@ -68,7 +68,6 @@ namespace SE_G {
 		eastl::unordered_map<SE::UUID, eastl::unique_ptr<SE_G::RenderTechnique>> m_techniques;
 
 
-	private:
 		bool m_enabled = true;
 	};
 }

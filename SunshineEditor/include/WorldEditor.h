@@ -20,6 +20,8 @@
 #include <GameObject/EditorObjectFactory.h>
 #include <Scripting/LuaManager.h>
 
+#include <PlayerObject/PlayerObject.h>
+
 #include <Physics/PhysicsSystem.h>
 #include <LogManager.h>
 
@@ -115,6 +117,9 @@ public:
 
     // Hierarchy
     Selection m_hierarchySelection;
+
+    // PlayerObject
+    PlayerObject_Info m_playerObject;
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

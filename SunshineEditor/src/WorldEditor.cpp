@@ -158,6 +158,9 @@ void WorldEditor::SetupRendering(
 
 	m_pixelUUIDHandler = new PixelUUIDHandler();
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
+
+	// PlayerViewport
+	m_playerObject.InitMiniViewport(m_renderer.get());
 }
 
 void WorldEditor::CreateParentScene()

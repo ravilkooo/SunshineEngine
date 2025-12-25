@@ -375,6 +375,37 @@ void ImguiEditorPass::ShowContentBrowser()
 
 void ImguiEditorPass::ShowProperties()
 {
+	ImGui::Begin("Properties");
+	if (ImGui::BeginTabBar("PropsTabBar"))
+	{
+		if (ImGui::BeginTabItem("Object Properties"))
+		{
+			m_editorApp->m_worldEditor->m_playerObject.m_miniViewRenderer->Disable();
+
+			ShowGameObjectProperties();
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Player Settings"))
+		{
+			m_editorApp->m_worldEditor->m_playerObject.m_miniViewRenderer->Enable();
+
+			ShowPlayerProperties();
+
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
+	}
+
+	ImGui::End();
+
+
+
+}
+
+void ImguiEditorPass::ShowGameObjectProperties()
+{
 	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
 	m_PropertyPanel.SetSelectedUUID(m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked);
 	m_PropertyPanel.OnImGuiRender();
@@ -382,6 +413,23 @@ void ImguiEditorPass::ShowProperties()
 	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
 		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
 	);
+}
+
+void ImguiEditorPass::ShowPlayerProperties()
+{
+	/*
+	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
+	m_PropertyPanel.SetSelectedUUID(m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked);
+	m_PropertyPanel.OnImGuiRender();
+
+	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
+		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
+	);
+	*/
+
+	ImVec2 avail = ImGui::GetContentRegionAvail();
+	avail.y = avail.x * 360.0f / 640.0f;
+	ImGui::Image((ImTextureID) m_editorApp->m_worldEditor->m_playerObject.m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
 }
 
 void ImguiEditorPass::ShowBottomPanel()

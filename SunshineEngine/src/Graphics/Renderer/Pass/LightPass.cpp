@@ -106,6 +106,7 @@ namespace SE_G {
 				static_cast<float>(m_screenWidth),
 				static_cast<float>(m_screenHeight)) });
 
+		BindAllPerFrame();
 		m_camera->UpdateBuffer(context.Get());
 		m_camera->BindBuffer(context.Get());
 	}
@@ -131,9 +132,6 @@ namespace SE_G {
 		}
 		*/
 		for (auto& tech : m_techniques) {
-
-			BindAllPerFrame();
-			m_camera->BindBuffer(context.Get());
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
 		}
