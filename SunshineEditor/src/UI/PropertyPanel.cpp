@@ -15,6 +15,12 @@
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 #include <UI/FontStyles.h>
 
+PropertyPanel::MeshEditor PropertyPanel::s_meshEditor =
+{
+    false, "", AssetPath::AssetSource::Engine, eastl::string(""),
+    false, "", AssetPath::AssetSource::Engine, eastl::string("")
+};
+
 PropertyPanel::PropertyPanel() {}
 
 void PropertyPanel::OnImGuiRender()
@@ -455,10 +461,7 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
 
             auto currentShape = colliderData->GetShapeType();
             const char* shapeItems = 
-                "Sphere\0Box\0Capsule\0TaperedCapsule\0Cylinder\0TaperedCylinder\0"
-                "Plane\0Triangle\0Empty\0ConvexHull\0Mesh\0HeightField\0"
-                "SoftBody\0StaticCompound\0MutableCompound\0Scaled\0"
-                "RotatedTranslated\0OffsetCenterOfMass\0";
+                "Sphere\0Box\0Capsule\0TaperedCapsule\0";
             if (ImGui::Combo("Shape Type", (int*)&currentShape, shapeItems))
             {
                 colliderData->SetShapeType(currentShape);
@@ -1088,7 +1091,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 {
     if (!obj->HasComponent<MeshComponent_Info>())
         return;
-
+    
     auto meshInfo = obj->GetComponent<MeshComponent_Info>();
 
     ImGui::Separator();
@@ -1153,6 +1156,55 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     } else {
         ImGui::TextDisabled("Mesh: (procedural or empty)");
     }
+
+    // Editing button
+    if (ImGui::SmallButton(s_meshEditor.m_editMesh ? "Close Mesh Editor" : "Edit Mesh")) {
+        s_meshEditor.m_editMesh = !s_meshEditor.m_editMesh;
+        s_meshEditor.m_meshError.clear();
+        // опционально: при открытии заполнить поля текущими значениями
+        if (s_meshEditor.m_editMesh && meshPtr) {
+            AssetPath cur = meshPtr->GetCurrentMeshPath();
+            std::wstring ws = cur.m_assetRelativePath.c_str();
+            std::string  s(ws.begin(), ws.end());
+            strncpy(s_meshEditor.m_meshPathBuf, s.c_str(), sizeof(s_meshEditor.m_meshPathBuf) - 1);
+            s_meshEditor.m_meshPathBuf[sizeof(s_meshEditor.m_meshPathBuf) - 1] = 0;
+            s_meshEditor.m_meshAssetSource = cur.m_assetSource;
+        }
+    }
+
+    // Editing panel
+    if (s_meshEditor.m_editMesh) {
+        ImGui::Separator();
+
+        ImGui::InputText("Mesh AssetPath", s_meshEditor.m_meshPathBuf, sizeof(s_meshEditor.m_meshPathBuf));
+
+        const char* srcItems = "Engine\0Project\0";
+        ImGui::Combo("Mesh Source", (int*)&s_meshEditor.m_meshAssetSource, srcItems);
+
+        if (ImGui::Button("Load Mesh")) {
+            s_meshEditor.m_meshError.clear();
+
+            AssetPath::AssetSource src = s_meshEditor.m_meshAssetSource;
+
+            std::string relNarrow = s_meshEditor.m_meshPathBuf;
+            std::wstring relWide(relNarrow.begin(), relNarrow.end());
+
+            AssetPath ap(relWide.c_str(), src);
+
+            //try
+            {
+                auto newMesh = eastl::make_shared<SE_G::Mesh>(m_WorldEditor->m_renderer->GetDevice(), ap);
+                assigned->SetMesh(newMesh);
+
+            }
+        }
+
+        if (!s_meshEditor.m_meshError.empty()) {
+            ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Mesh load error: %s", s_meshEditor.m_meshError.c_str());
+        }
+    }
+
+
     ImGui::Separator();
     // Texture
     auto tex = assigned->GetTexture();

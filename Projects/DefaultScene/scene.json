@@ -591,6 +591,11 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/MonoBehavior.lua",
+                    "selectedLuaFile": 2
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -625,7 +630,7 @@
                     },
                     "m_activation": "Activate",
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_motion": "Kinematic"
                 },
                 "Render": null,
                 "Transform": {
@@ -1049,8 +1054,8 @@
             "components": {
                 "Mesh": {
                     "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Box_repeat"
+                        "assetSource": 1,
+                        "relativePath": "plane.obj"
                     },
                     "Sampler": 0,
                     "Texture": {
@@ -1117,7 +1122,7 @@
                     ]
                 }
             },
-            "m_UUID": 8242215409784857311,
+            "m_UUID": 16360750645405899878,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1197,8 +1202,8 @@
             "components": {
                 "Mesh": {
                     "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Box_repeat"
+                        "assetSource": 1,
+                        "relativePath": "horse.obj"
                     },
                     "Sampler": 0,
                     "Texture": {
@@ -1259,13 +1264,13 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
+                        -3.050835609436035,
                         0.0
                     ],
                     "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        20.0,
+                        20.0,
+                        20.0
                     ]
                 }
             },

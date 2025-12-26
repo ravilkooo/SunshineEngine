@@ -18,6 +18,21 @@ class WorldEditor;
 class PropertyPanel
 {
 public:
+    static struct MeshEditor
+    {
+        bool m_editMesh;
+
+        char m_meshPathBuf[512];
+        AssetPath::AssetSource m_meshAssetSource;
+        eastl::string m_meshError;
+
+        bool m_editTexture;
+
+        char m_texPathBuf[512];
+        AssetPath::AssetSource m_texAssetSource;
+        eastl::string m_texError;
+    } s_meshEditor;
+
     PropertyPanel();
     
     void SetWorldEditor(eastl::shared_ptr<WorldEditor> worldEditor) { 
