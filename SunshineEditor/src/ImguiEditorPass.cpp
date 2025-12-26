@@ -232,7 +232,7 @@ void ImguiEditorPass::Pass()
 
 	if (IsHoveredGameViewport)
 	{
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		if (!ImGuizmo::IsOver() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 		{
 			ImVec2 mousePosScreen = ImGui::GetMousePos();
 			// ImVec2 WindowPos = ImGui::GetWindowPos();
@@ -276,14 +276,16 @@ void ImguiEditorPass::Pass()
 	}
 	m_lastGameViewportSize = contentSize;
 
-	if (selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
+	bool isEditorMode = (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE);
+	
+	if (isEditorMode && selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
 	{
 		m_Gizmo.Update();
 	}
 	
 	RenderGameWorld();
 	
-	if (selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
+	if (isEditorMode && selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
 	{
 		m_Gizmo.Draw();
 	}
