@@ -1145,10 +1145,14 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     // Texture
     auto tex = assigned->GetTexture();
     if (tex) {
-        eastl::wstring tpath = tex->GetCurrentTexturePath();
+        eastl::wstring tpath = tex->GetCurrentTexturePath().m_assetRelativePath;
         // convert wstring to narrow string for ImGui display
         std::wstring ws = tpath.c_str();
         std::string s(ws.begin(), ws.end());
+        if (tex->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
+        {
+            ImGui::Text("Engine asset");
+        }
         ImGui::Text("Texture: %s", s.c_str());
     } else {
         ImGui::TextDisabled("Texture: (none)");

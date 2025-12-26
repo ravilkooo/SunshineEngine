@@ -55,7 +55,10 @@
                 "Mesh": {
                     "Mesh": "Box_repeat",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -138,7 +141,10 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -222,7 +228,10 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -306,7 +315,10 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -390,7 +402,10 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -474,7 +489,10 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -558,7 +576,10 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -828,7 +849,10 @@
                 "Mesh": {
                     "Mesh": "Box_repeat",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -911,7 +935,10 @@
                 "Mesh": {
                     "Mesh": "Sphere",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -996,7 +1023,10 @@
                 "Mesh": {
                     "Mesh": "Box_repeat",
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -1057,7 +1087,7 @@
                     ]
                 }
             },
-            "m_UUID": 6089359285211171152,
+            "m_UUID": 8242215409784857311,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1138,7 +1168,10 @@
                 "Mesh": {
                     "Mesh": "Box_repeat",
                     "Sampler": 0,
-                    "Texture": ""
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {

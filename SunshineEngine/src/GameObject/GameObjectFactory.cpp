@@ -94,7 +94,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+        AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -116,7 +116,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+        AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -149,7 +149,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+        AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -170,7 +170,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -203,7 +203,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -224,7 +224,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -257,7 +257,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 

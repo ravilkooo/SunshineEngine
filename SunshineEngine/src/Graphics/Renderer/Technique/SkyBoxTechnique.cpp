@@ -8,7 +8,7 @@ namespace SE_G {
         eastl::string technique,
         eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<SkyBoxData> lightData,
-        eastl::wstring texturePath)
+        AssetPath assetPath)
         : LightTechnique(device, assignedTransform, technique, camera, lightData) {
 
         D3D11_BLEND_DESC blendDesc = {};
@@ -22,19 +22,10 @@ namespace SE_G {
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
         m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 
-        if (texturePath.empty() || texturePath == L"Default") {
-            m_texture = eastl::make_shared<SE_G::Bind::Texture>(
-                device,
-                MakeEngineAssetPath_Wstring(L"DefaultSkybox.dds").c_str(),
-                4u,
-                SE_G::Bind::PipelineStage::PIXEL_SHADER
-            );
-        }
-        else
         {
             m_texture = eastl::make_shared<SE_G::Bind::Texture>(
                 device,
-                texturePath,
+                assetPath,
                 4u,
                 SE_G::Bind::PipelineStage::PIXEL_SHADER
             );

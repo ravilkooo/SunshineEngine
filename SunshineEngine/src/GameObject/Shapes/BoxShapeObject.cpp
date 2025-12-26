@@ -28,7 +28,7 @@ BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 
 	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
 		rc_info->GetDevice(),
-		MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+		AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mesh_info->SetTexture(texture);
 }
@@ -66,7 +66,7 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 
 	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
 		rc_info->GetDevice(),
-		MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+		AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mesh_info->SetTexture(texture);
 

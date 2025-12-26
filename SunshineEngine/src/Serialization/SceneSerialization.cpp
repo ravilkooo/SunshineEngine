@@ -168,7 +168,7 @@ json MeshData::ToJson() const
         catch (...) {}
     }
     if (m_texture) {
-        try { j["Texture"] = WStringToUtf8(m_texture->GetCurrentTexturePath()).c_str(); }
+        try { j["Texture"] = m_texture->m_texturePath.ToJson(); }
         catch (...) {}
     }
     if (m_textureSampler) {
@@ -191,15 +191,18 @@ void MeshData::FromJson(const json& j, ID3D11Device* device)
     }
 
     // Texture
-    if (j.contains("Texture") && j["Texture"].is_string()) {
-        eastl::wstring texPath = Utf8ToWString(j["Texture"].get<std::string>().c_str());
+    if (j.contains("Texture"))
+    {
+        AssetPath texPath;
+        texPath.FromJson(j["Texture"]);
+
         m_texture = eastl::make_shared<SE_G::Bind::Texture>(
             device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
     }
     else {
         m_texture = eastl::make_shared<SE_G::Bind::Texture>(
             device,
-            MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+            AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
             SE_G::Bind::PipelineStage::PIXEL_SHADER);
     }
 

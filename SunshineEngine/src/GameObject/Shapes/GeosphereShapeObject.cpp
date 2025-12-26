@@ -22,7 +22,7 @@ GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
 
 	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
 		rc_info->GetDevice(),
-		MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+		AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mesh_info->SetTexture(texture);
 }
@@ -61,7 +61,7 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 
 	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
 		rc_info->GetDevice(),
-		MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+		AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mesh_info->SetTexture(texture);
 

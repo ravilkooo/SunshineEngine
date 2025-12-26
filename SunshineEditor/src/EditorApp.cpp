@@ -2,6 +2,7 @@
 #include "Utils/DebugUtils.h"
 #include <fstream>   // std::ofstream
 #include <filesystem>
+#include <Utils/AssetPath.h>
 
 EditorApp::EditorApp()
 {
@@ -583,7 +584,7 @@ bool EditorApp::OpenProject()
 	}
 	
 	SetupAssetsDirectory();
-	
+	AssetPath::s_projectPath = ContentBrowserPanel::s_AssetsDirectory.c_str();
 	return true;
 }
 
