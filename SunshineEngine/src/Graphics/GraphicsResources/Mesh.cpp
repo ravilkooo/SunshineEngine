@@ -402,9 +402,9 @@ namespace SE_G {
     void Mesh::FillGeosphereMesh(eastl::vector<Vertex>& vertices,
         eastl::vector<UINT>& indices,
         DXSM::Vector3 size,
-        UINT numSubdivisions)
+        uint32_t numSubdivisions)
     {
-        numSubdivisions = std::min<UINT>(numSubdivisions, 0u);
+        numSubdivisions = std::min<uint32_t>(std::max<uint32_t>(numSubdivisions, 0), 5);
 
         const float X = 0.525731f;
         const float Z = 0.850651f;
@@ -471,11 +471,10 @@ namespace SE_G {
             vertices[i].normal.Normalize();
 
             // [-pi, pi]
-            float theta = std::atan2f(vertices[i].normal.z, vertices[i].normal.x);
+            float theta = std::atan2f(vertices[i].normal.x, vertices[i].normal.z);
 
             // Put in [0, 2pi].
-            if (theta < 0.0f)
-                theta += DX::XM_PI;
+            theta += DX::XM_PI;
 
             float phi = acosf(vertices[i].normal.y);
 
@@ -725,7 +724,7 @@ namespace SE_G {
 
     eastl::shared_ptr<Mesh> Mesh::CreateGeosphereMesh(
         ID3D11Device* device,
-        DXSM::Vector3 size, UINT numSubdivisions)
+        DXSM::Vector3 size, uint32_t numSubdivisions)
     {
         eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
         eastl::vector<Vertex> vertices;

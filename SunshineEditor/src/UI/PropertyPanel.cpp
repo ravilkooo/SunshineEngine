@@ -389,7 +389,7 @@ void PropertyPanel::DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj)
         obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
     }
 
-    uint32_t min_numsubdiv = 3, max_numsubdiv = 64;
+    uint32_t min_numsubdiv = 0, max_numsubdiv = 5;
     if (DrawUIntControl("Subdivisions number", currentNumSubdiv, 6, 1.0f, min_numsubdiv, max_numsubdiv))
     {
         obj->SetNumSubdivisions(m_WorldEditor->m_renderer.get(), currentNumSubdiv);

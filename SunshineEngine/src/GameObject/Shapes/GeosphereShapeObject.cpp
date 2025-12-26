@@ -10,6 +10,7 @@ GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
 	m_type.m_asShape = ShapeObjectType::Geosphere;
 	m_name = "Geosphere";
 	m_shapeData = eastl::make_shared<GeosphereShapeData>(initData);
+	m_shapeData->NumSubdivisions = std::min<uint32_t>(std::max<uint32_t>(m_shapeData->NumSubdivisions, 0), 5);
 
 	// TransformComponent
 	auto tc_info = AddComponent<TransformComponent_Info>(device);
@@ -39,6 +40,7 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 
 	obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
 	obj->m_shapeData = eastl::make_shared<GeosphereShapeData>(j["m_shapeData"].get<GeosphereShapeData>());
+	obj->m_shapeData->NumSubdivisions = std::min<uint32_t>(std::max<uint32_t>(obj->m_shapeData->NumSubdivisions, 0), 5);
 	obj->m_name = "Geosphere";
 	obj->m_group = GameObjectGroup::Shapes;
 	obj->m_type.m_asShape = ShapeObjectType::Geosphere;
@@ -56,7 +58,7 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 
 	auto newMesh = SE_G::Mesh::CreateGeosphereMesh(
 		device, obj->m_shapeData->Size,
-		static_cast<UINT>(obj->m_shapeData->NumSubdivisions));
+		obj->m_shapeData->NumSubdivisions);
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	if (j["components"]["Mesh"].contains("Texture"))
@@ -102,11 +104,13 @@ void GeosphereShapeObject_Info::SetSize(SE_G::DeferredRenderer* renderSystem, DX
 }
 
 void GeosphereShapeObject_Info::SetNumSubdivisions(SE_G::DeferredRenderer* renderSystem, uint32_t newNumSubdivisions) {
-	m_shapeData->NumSubdivisions = newNumSubdivisions;
-	eastl::shared_ptr<SE_G::Mesh> newMesh =
-		SE_G::Mesh::CreateGeosphereMesh(renderSystem->GetDevice(),
-			m_shapeData->Size, static_cast<UINT>(m_shapeData->NumSubdivisions));
+	if (newNumSubdivisions > 0) {
+		m_shapeData->NumSubdivisions = std::min<uint32_t>(std::max<uint32_t>(newNumSubdivisions, 0), 5);
+		eastl::shared_ptr<SE_G::Mesh> newMesh =
+			SE_G::Mesh::CreateGeosphereMesh(renderSystem->GetDevice(),
+				m_shapeData->Size, static_cast<UINT>(m_shapeData->NumSubdivisions));
 
-	auto mc = GetComponent<MeshComponent_Info>();
-	mc->m_assignedComponent->SetMesh(newMesh);
+		auto mc = GetComponent<MeshComponent_Info>();
+		mc->m_assignedComponent->SetMesh(newMesh);
+	}
 }
