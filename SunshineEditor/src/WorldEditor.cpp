@@ -313,7 +313,7 @@ void WorldEditor::CreateParentScene()
 		{
 			SE::UUID customMeshId = m_scene->AddGameObject(
 				EditorObjectFactory::CreateCustomMesh(
-					m_renderer.get(), MakeEngineAssetPath_String("Meshes/plane.obj")
+					m_renderer.get(), AssetPath(L"Meshes/plane.obj", AssetPath::AssetSource::Project)
 				)
 			);
 			auto obj = m_scene->GetGameObjectByUUID(customMeshId);
@@ -468,7 +468,7 @@ void WorldEditor::CreateDefaultScene()
 		{
 			SE::UUID customMeshId = m_scene->AddGameObject(
 				EditorObjectFactory::CreateCustomMesh(
-					m_renderer.get(), MakeEngineAssetPath_String("Meshes/plane.obj")
+					m_renderer.get(), AssetPath(L"Meshes/plane.obj", AssetPath::AssetSource::Project)
 				)
 			);
 		}

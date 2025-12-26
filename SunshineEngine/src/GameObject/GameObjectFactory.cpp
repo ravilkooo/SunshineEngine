@@ -76,7 +76,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
     SE_G::DeferredRenderer* renderSystem,
-    eastl::string filePath)
+    AssetPath meshPath)
 {
     auto obj = eastl::make_unique<GameObject>();
     obj->m_name = "CustomObject";
@@ -89,12 +89,12 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
     // RenderComponent and technique
     auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-    auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc->GetDevice(), filePath);
+    auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc->GetDevice(), meshPath);
     auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+        AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -116,7 +116,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+        AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -147,11 +147,24 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
     auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, shapeData->Size);
     auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-        rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
-        SE_G::Bind::PipelineStage::PIXEL_SHADER);
-    mc->SetTexture(texture);
+    if (j["components"]["Mesh"].contains("Texture"))
+    {
+        AssetPath texPath;
+        texPath.FromJson(j["components"]["Mesh"]["Texture"]);
+
+        auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+        mc->SetTexture(texture);
+    }
+    else {
+        auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device,
+            AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
+            SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+        mc->SetTexture(texture);
+    }
 
     return obj;
 }
@@ -170,7 +183,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -201,11 +214,24 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
     auto meshPtr = SE_G::Mesh::CreateSphereMesh(device, shapeData->Size, shapeData->SliceCount, shapeData->StackCount);
     auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-        rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
-        SE_G::Bind::PipelineStage::PIXEL_SHADER);
-    mc->SetTexture(texture);
+    if (j["components"]["Mesh"].contains("Texture"))
+    {
+        AssetPath texPath;
+        texPath.FromJson(j["components"]["Mesh"]["Texture"]);
+
+        auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+        mc->SetTexture(texture);
+    }
+    else {
+        auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device,
+            AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
+            SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+        mc->SetTexture(texture);
+    }
 
     return obj;
 }
@@ -224,7 +250,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 
     auto texture = eastl::make_shared<SE_G::Bind::Texture>(
         rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
+        AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
         SE_G::Bind::PipelineStage::PIXEL_SHADER);
     mc->SetTexture(texture);
 
@@ -255,11 +281,24 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
     auto meshPtr = SE_G::Mesh::CreateGeosphereMesh(device, shapeData->Size, shapeData->NumSubdivisions);
     auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-    auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-        rc->GetDevice(),
-        MakeEngineAssetPath_Wstring(L"DefaultSphereTexture.dds"), 0u,
-        SE_G::Bind::PipelineStage::PIXEL_SHADER);
-    mc->SetTexture(texture);
+    if (j["components"]["Mesh"].contains("Texture"))
+    {
+        AssetPath texPath;
+        texPath.FromJson(j["components"]["Mesh"]["Texture"]);
+
+        auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+        mc->SetTexture(texture);
+    }
+    else {
+        auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device,
+            AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
+            SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+        mc->SetTexture(texture);
+    }
 
     return obj;
 }

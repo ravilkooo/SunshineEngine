@@ -4,6 +4,8 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/string.h>
 
+#include <Utils/AssetPath.h>
+
 #include "Component.h"
 // forward declare heavy graphics types used by pointer/shared_ptr - include actual headers in .cpp
 namespace SE_G { class Mesh; namespace Bind { class Texture; class Sampler; } }
@@ -46,7 +48,7 @@ class MeshComponent : public Component
     friend class MeshComponent_Info;
 public:
     MeshComponent() = default;
-    MeshComponent(RenderComponent* rc, TransformComponent* tc, SE::UUID uuid, const eastl::string& meshPath);
+    MeshComponent(RenderComponent* rc, TransformComponent* tc, SE::UUID uuid, AssetPath meshPath);
     MeshComponent(RenderComponent* rc, TransformComponent* tc, SE::UUID uuid, eastl::shared_ptr<SE_G::Mesh> mesh);
     ~MeshComponent();
 
@@ -82,7 +84,7 @@ class MeshComponent_Info : public Component_Info
 {
 public:
     MeshComponent_Info() = default;
-    MeshComponent_Info(RenderComponent_Info* rc, TransformComponent_Info* tc, SE::UUID uuid, const eastl::string& path);
+    MeshComponent_Info(RenderComponent_Info* rc, TransformComponent_Info* tc, SE::UUID uuid, AssetPath meshPath);
     MeshComponent_Info(RenderComponent_Info* rc, TransformComponent_Info* tc, SE::UUID uuid, eastl::shared_ptr<SE_G::Mesh> mesh);
     ~MeshComponent_Info() override;
 

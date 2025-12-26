@@ -5,50 +5,50 @@
 
 namespace SE_G {
     Mesh::Mesh(ID3D11Device* device,
-        const eastl::string& path) : m_path(path)
+        AssetPath meshPath) : m_meshPath(meshPath)
     {
-        ChangeMesh(device, path);
+        ChangeMesh(device, meshPath);
     }
 
     Mesh::~Mesh()
     {
         Release();
-        m_path.clear();
+        m_meshPath.m_assetRelativePath.clear();
     }
 
 
     void Mesh::ChangeMesh(ID3D11Device* device,
-        const eastl::string& path) {
+        AssetPath meshPath) {
         ClearMesh();
-        m_path = path;
+        m_meshPath = meshPath;
 
         eastl::vector<Vertex> vertices;
         eastl::vector<uint32_t> indices;
 
         UINT attrFlags = VertexAttributesFlags::POSITION | VertexAttributesFlags::UV | VertexAttributesFlags::NORMAL;
 
-        if (path == "Box") {
+        if (meshPath.m_assetRelativePath == L"Box") {
             FillUnwrappedBoxMesh(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
-        else if (path == "Sphere") {
+        else if (meshPath.m_assetRelativePath == L"Sphere") {
             FillSphereMesh(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
-        else if (path == "Geosphere") {
+        else if (meshPath.m_assetRelativePath == L"Geosphere") {
             FillGeosphereMesh(vertices, indices, DXSM::Vector3::One, 0u);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
-        else if (path == "Box_repeat") {
+        else if (meshPath.m_assetRelativePath == L"Box_repeat") {
             FillUnwrappedBoxMesh_repeat(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
-        else if (path == "ScreenAlignedQuad") {
+        else if (meshPath.m_assetRelativePath == L"ScreenAlignedQuad") {
             FillScreenAlignedQuad(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         }
-        else if (!LoadModel(vertices, indices, path, attrFlags)) {
-            m_path = "Box_repeat";
+        else if (!LoadModel(vertices, indices, meshPath, attrFlags)) {
+            m_meshPath = AssetPath(L"Box_repeat");
             FillUnwrappedBoxMesh_repeat(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
@@ -402,9 +402,9 @@ namespace SE_G {
     void Mesh::FillGeosphereMesh(eastl::vector<Vertex>& vertices,
         eastl::vector<UINT>& indices,
         DXSM::Vector3 size,
-        UINT numSubdivisions)
+        uint32_t numSubdivisions)
     {
-        numSubdivisions = std::min<UINT>(numSubdivisions, 0u);
+        numSubdivisions = std::min<uint32_t>(std::max<uint32_t>(numSubdivisions, 0), 5);
 
         const float X = 0.525731f;
         const float Z = 0.850651f;
@@ -471,11 +471,10 @@ namespace SE_G {
             vertices[i].normal.Normalize();
 
             // [-pi, pi]
-            float theta = std::atan2f(vertices[i].normal.z, vertices[i].normal.x);
+            float theta = std::atan2f(vertices[i].normal.x, vertices[i].normal.z);
 
             // Put in [0, 2pi].
-            if (theta < 0.0f)
-                theta += DX::XM_PI;
+            theta += DX::XM_PI;
 
             float phi = acosf(vertices[i].normal.y);
 
@@ -598,11 +597,11 @@ namespace SE_G {
 
     bool Mesh::LoadModel(eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices,
-        const eastl::string& path, UINT attrFlags)
+        AssetPath meshPath, UINT attrFlags)
     {
 
         Assimp::Importer importer;
-        const aiScene* pModel = importer.ReadFile(path.c_str(),
+        const aiScene* pModel = importer.ReadFile(WStringToUtf8(meshPath.GetFullPath()).c_str(),
             aiProcess_Triangulate | aiProcess_FlipUVs
             | (((attrFlags & VertexAttributesFlags::NORMAL) != 0) ? aiProcess_GenNormals : 0x0)
         );
@@ -679,7 +678,7 @@ namespace SE_G {
 
         FillUnwrappedBoxMesh(vertices, indices, size);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        mesh->m_path = "Box";
+        mesh->m_meshPath = AssetPath(L"Box");
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -697,7 +696,7 @@ namespace SE_G {
         FillUnwrappedBoxMesh_repeat(vertices, indices, size);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        mesh->m_path = "Box_repeat";
+        mesh->m_meshPath = AssetPath(L"Box_repeat");
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -715,8 +714,8 @@ namespace SE_G {
 
         FillSphereMesh(vertices, indices, size, sliceCount, stackCount);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        mesh->m_path = "Sphere";
+        
+        mesh->m_meshPath = AssetPath(L"Sphere");
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -725,7 +724,7 @@ namespace SE_G {
 
     eastl::shared_ptr<Mesh> Mesh::CreateGeosphereMesh(
         ID3D11Device* device,
-        DXSM::Vector3 size, UINT numSubdivisions)
+        DXSM::Vector3 size, uint32_t numSubdivisions)
     {
         eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
         eastl::vector<Vertex> vertices;
@@ -734,7 +733,7 @@ namespace SE_G {
         FillGeosphereMesh(vertices, indices, size, numSubdivisions);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        mesh->m_path = "Geosphere";
+        mesh->m_meshPath = AssetPath(L"Geosphere");
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -750,7 +749,7 @@ namespace SE_G {
         FillScreenAlignedQuad(vertices, indices);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-        mesh->m_path = "ScreenAlignedQuad";
+        mesh->m_meshPath = AssetPath(L"ScreenAlignedQuad");
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -783,7 +782,7 @@ namespace SE_G {
         if (m_indexBuffer)
             m_indexBuffer->Release();
         m_indexCount = 0;
-        m_path.clear();
+        m_meshPath.m_assetRelativePath.clear();
     }
 
     void Mesh::Release()
@@ -791,8 +790,8 @@ namespace SE_G {
         ClearMesh();
     }
 
-    eastl::string Mesh::GetCurrentMeshPath()
+    AssetPath Mesh::GetCurrentMeshPath()
     {
-        return m_path;
+        return m_meshPath;
     }
 }

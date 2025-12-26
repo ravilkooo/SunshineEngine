@@ -53,9 +53,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Box_repeat",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSkybox.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -136,9 +142,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "football.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -212,17 +224,23 @@
                     "y": 1.0,
                     "z": 1.0
                 },
-                "SliceCount": 10,
-                "StackCount": 10
+                "SliceCount": 19,
+                "StackCount": 11
             },
             "m_type": "Sphere"
         },
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -304,9 +322,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -388,9 +412,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "pixeleye.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -472,9 +502,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "basketball.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -555,10 +591,21 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/MonoBehavior.lua",
+                    "selectedLuaFile": 2
+                },
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "eye.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -583,7 +630,7 @@
                     },
                     "m_activation": "Activate",
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_motion": "Kinematic"
                 },
                 "Render": null,
                 "Transform": {
@@ -826,9 +873,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Box_repeat",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "carpet.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -909,9 +962,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "DefaultSphereTexture.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -994,9 +1053,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Box_repeat",
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "plane.obj"
+                    },
                     "Sampler": 0,
-                    "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "plane_Diffuse.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -1057,7 +1122,7 @@
                     ]
                 }
             },
-            "m_UUID": 6089359285211171152,
+            "m_UUID": 5671762299653499202,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1136,9 +1201,15 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Box_repeat",
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "horse.obj"
+                    },
                     "Sampler": 0,
-                    "Texture": ""
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "horse_Diffuse.dds"
+                    }
                 },
                 "Physics": {
                     "collider": {
@@ -1193,13 +1264,13 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
+                        -3.050835609436035,
                         0.0
                     ],
                     "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        20.0,
+                        20.0,
+                        20.0
                     ]
                 }
             },
@@ -1224,6 +1295,92 @@
                     ]
                 }
             }
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Geosphere"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "eye.dds"
+                    }
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.100000023841858
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        8.5,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 3619104566789212522,
+            "m_group": "Shapes",
+            "m_name": "Geosphere",
+            "m_parent": null,
+            "m_shapeData": {
+                "NumSubdivisions": 5,
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            },
+            "m_type": "Geosphere"
         }
     ]
 }

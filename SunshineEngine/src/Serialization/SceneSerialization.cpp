@@ -164,11 +164,11 @@ json MeshData::ToJson() const
 {
     json j;
     if (m_mesh) {
-        try { j["Mesh"] = std::string(m_mesh->GetCurrentMeshPath().c_str()); }
+        try { j["Mesh"] = m_mesh->GetCurrentMeshPath().ToJson(); }
         catch (...) {}
     }
     if (m_texture) {
-        try { j["Texture"] = WStringToUtf8(m_texture->GetCurrentTexturePath()).c_str(); }
+        try { j["Texture"] = m_texture->m_texturePath.ToJson(); }
         catch (...) {}
     }
     if (m_textureSampler) {
@@ -181,25 +181,31 @@ json MeshData::ToJson() const
 void MeshData::FromJson(const json& j, ID3D11Device* device)
 {
     // Mesh
-    if (j.contains("Mesh") && j["Mesh"].is_string()) {
-        std::string meshPath = j["Mesh"].get<std::string>();
-        m_mesh = eastl::make_shared<SE_G::Mesh>(device, eastl::string(meshPath.c_str()));
+    if (j.contains("Mesh")) {
+
+        AssetPath meshPath;
+        meshPath.FromJson(j["Mesh"]);
+
+        m_mesh = eastl::make_shared<SE_G::Mesh>(device, meshPath);
     }
     else
     {
-        m_mesh = eastl::make_shared<SE_G::Mesh>(device, "Box_repeat");
+        m_mesh = eastl::make_shared<SE_G::Mesh>(device, AssetPath(L"Box_repeat"));
     }
 
     // Texture
-    if (j.contains("Texture") && j["Texture"].is_string()) {
-        eastl::wstring texPath = Utf8ToWString(j["Texture"].get<std::string>().c_str());
+    if (j.contains("Texture"))
+    {
+        AssetPath texPath;
+        texPath.FromJson(j["Texture"]);
+
         m_texture = eastl::make_shared<SE_G::Bind::Texture>(
             device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
     }
     else {
         m_texture = eastl::make_shared<SE_G::Bind::Texture>(
             device,
-            MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+            AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
             SE_G::Bind::PipelineStage::PIXEL_SHADER);
     }
 
@@ -217,7 +223,7 @@ void MeshComponent::FromJson(const json& j, ID3D11Device* device,
     RenderComponent* rc, TransformComponent* tc,
     SE::UUID uuid)
 {
-    if (j.contains("Mesh") && j["Mesh"].is_string()) {
+    if (j.contains("Mesh")) {
         m_meshData = eastl::make_shared<MeshData>();
         m_meshData->FromJson(j, device);
 

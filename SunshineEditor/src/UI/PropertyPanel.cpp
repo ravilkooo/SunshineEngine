@@ -15,6 +15,12 @@
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 #include <UI/FontStyles.h>
 
+PropertyPanel::MeshEditor PropertyPanel::s_meshEditor =
+{
+    false, "", AssetPath::AssetSource::Engine, eastl::string(""),
+    false, "", AssetPath::AssetSource::Engine, eastl::string("")
+};
+
 PropertyPanel::PropertyPanel() {}
 
 void PropertyPanel::OnImGuiRender()
@@ -383,7 +389,7 @@ void PropertyPanel::DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj)
         obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
     }
 
-    uint32_t min_numsubdiv = 3, max_numsubdiv = 64;
+    uint32_t min_numsubdiv = 0, max_numsubdiv = 5;
     if (DrawUIntControl("Subdivisions number", currentNumSubdiv, 6, 1.0f, min_numsubdiv, max_numsubdiv))
     {
         obj->SetNumSubdivisions(m_WorldEditor->m_renderer.get(), currentNumSubdiv);
@@ -455,10 +461,7 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
 
             auto currentShape = colliderData->GetShapeType();
             const char* shapeItems = 
-                "Sphere\0Box\0Capsule\0TaperedCapsule\0Cylinder\0TaperedCylinder\0"
-                "Plane\0Triangle\0Empty\0ConvexHull\0Mesh\0HeightField\0"
-                "SoftBody\0StaticCompound\0MutableCompound\0Scaled\0"
-                "RotatedTranslated\0OffsetCenterOfMass\0";
+                "Sphere\0Box\0Capsule\0TaperedCapsule\0";
             if (ImGui::Combo("Shape Type", (int*)&currentShape, shapeItems))
             {
                 colliderData->SetShapeType(currentShape);
@@ -1088,7 +1091,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 {
     if (!obj->HasComponent<MeshComponent_Info>())
         return;
-
+    
     auto meshInfo = obj->GetComponent<MeshComponent_Info>();
 
     ImGui::Separator();
@@ -1135,27 +1138,162 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 
     // Mesh path
     auto meshPtr = assigned->GetMesh();
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+    ImGui::Text("Mesh settings");
+    EditorUI::FontStyles::Pop();
+
     if (meshPtr) {
-        eastl::string path = meshPtr->GetCurrentMeshPath();
-        ImGui::Text("Mesh: %s", path.c_str());
+        eastl::wstring mpath = meshPtr->GetCurrentMeshPath().m_assetRelativePath;
+        // convert wstring to narrow string for ImGui display
+        std::wstring ws = mpath.c_str();
+        std::string s(ws.begin(), ws.end());
+        if (meshPtr->GetCurrentMeshPath().m_assetSource == AssetPath::AssetSource::Engine)
+        {
+            ImGui::Text("Engine asset");
+        }
+        ImGui::Text("Mesh: %s", s.c_str());
     } else {
         ImGui::TextDisabled("Mesh: (procedural or empty)");
     }
 
+    if (!(obj->m_group == GameObjectGroup::Shapes))
+    {
+        // Editing button
+        if (ImGui::SmallButton(s_meshEditor.m_editMesh ? "Close Mesh Editor" : "Edit Mesh")) {
+            s_meshEditor.m_editMesh = !s_meshEditor.m_editMesh;
+            s_meshEditor.m_meshError.clear();
+            // опционально: при открытии заполнить поля текущими значениями
+            if (s_meshEditor.m_editMesh && meshPtr) {
+                AssetPath cur = meshPtr->GetCurrentMeshPath();
+                std::wstring ws = cur.m_assetRelativePath.c_str();
+                std::string  s(ws.begin(), ws.end());
+                strncpy(s_meshEditor.m_meshPathBuf, s.c_str(), sizeof(s_meshEditor.m_meshPathBuf) - 1);
+                s_meshEditor.m_meshPathBuf[sizeof(s_meshEditor.m_meshPathBuf) - 1] = 0;
+                s_meshEditor.m_meshAssetSource = cur.m_assetSource;
+            }
+        }
+
+        // Editing panel
+        if (s_meshEditor.m_editMesh) {
+            ImGui::Separator();
+
+            ImGui::InputText("Mesh asset path", s_meshEditor.m_meshPathBuf, sizeof(s_meshEditor.m_meshPathBuf));
+
+            const char* srcItems = "Engine\0Project\0";
+            ImGui::Combo("Mesh Source", (int*)&s_meshEditor.m_meshAssetSource, srcItems);
+
+            if (ImGui::Button("Load Mesh")) {
+                s_meshEditor.m_meshError.clear();
+
+                AssetPath::AssetSource src = s_meshEditor.m_meshAssetSource;
+
+                std::string relNarrow = s_meshEditor.m_meshPathBuf;
+                std::wstring relWide(relNarrow.begin(), relNarrow.end());
+
+                AssetPath ap(relWide.c_str(), src);
+
+                {
+                    auto newMesh = eastl::make_shared<SE_G::Mesh>(m_WorldEditor->m_renderer->GetDevice(), ap);
+                    assigned->SetMesh(newMesh);
+
+                }
+                
+                s_meshEditor.m_editMesh = false;
+            }
+
+            if (!s_meshEditor.m_meshError.empty()) {
+                ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Mesh load error: %s", s_meshEditor.m_meshError.c_str());
+            }
+        }
+    }
+    else
+    {
+        ImGui::BeginDisabled();
+        ImGui::Button("Edit Mesh");
+        ImGui::SetItemTooltip("Mesh editor disabled for shapes");
+        ImGui::EndDisabled();
+    }
+
+    ImGui::Separator();
     // Texture
     auto tex = assigned->GetTexture();
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+    ImGui::Text("Texture settings");
+    EditorUI::FontStyles::Pop();
+
     if (tex) {
-        eastl::wstring tpath = tex->GetCurrentTexturePath();
+
+        eastl::wstring tpath = tex->GetCurrentTexturePath().m_assetRelativePath;
         // convert wstring to narrow string for ImGui display
         std::wstring ws = tpath.c_str();
         std::string s(ws.begin(), ws.end());
+        if (tex->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
+        {
+            ImGui::Text("Engine asset");
+        }
         ImGui::Text("Texture: %s", s.c_str());
     } else {
         ImGui::TextDisabled("Texture: (none)");
     }
 
+    // Editing button
+    if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
+        s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
+        s_meshEditor.m_texError.clear();
+        // опционально: при открытии заполнить поля текущими значениями
+        if (s_meshEditor.m_editTexture && tex) {
+            AssetPath cur = tex->GetCurrentTexturePath();
+            std::wstring ws = cur.m_assetRelativePath.c_str();
+            std::string  s(ws.begin(), ws.end());
+            strncpy(s_meshEditor.m_texPathBuf, s.c_str(), sizeof(s_meshEditor.m_texPathBuf) - 1);
+            s_meshEditor.m_texPathBuf[sizeof(s_meshEditor.m_texPathBuf) - 1] = 0;
+            s_meshEditor.m_texAssetSource = cur.m_assetSource;
+        }
+    }
+
+    // Editing panel
+    if (s_meshEditor.m_editTexture) {
+        ImGui::Separator();
+
+        ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
+
+        const char* srcItems = "Engine\0Project\0";
+        ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
+
+        if (ImGui::Button("Load Texture")) {
+            s_meshEditor.m_texError.clear();
+
+            AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
+
+            std::string relNarrow = s_meshEditor.m_texPathBuf;
+            std::wstring relWide(relNarrow.begin(), relNarrow.end());
+
+            AssetPath ap(relWide.c_str(), src);
+
+            {
+                auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap);
+                assigned->SetTexture(newTexture);
+            }
+
+            s_meshEditor.m_editTexture = false;
+        }
+
+        if (!s_meshEditor.m_texError.empty()) {
+            ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
+        }
+    }
+
+    ImGui::Separator();
+
     // Sampler
     auto sampler = assigned->GetTextureSamplerPreset();
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+    ImGui::Text("Sampler settings");
+    EditorUI::FontStyles::Pop();
+
     if (sampler) {
         auto preset = sampler->GetPreset();
         const char* presetName = "Unknown";

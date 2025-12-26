@@ -12,7 +12,7 @@
 SkyBox::SkyBox(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,
-	eastl::wstring texturePath,
+	AssetPath assetPath,
 	SE_G::SkyBoxData initData)
 {
 	m_lightData = eastl::make_shared<SE_G::SkyBoxData>(initData);
@@ -29,7 +29,7 @@ SkyBox::SkyBox(
 	auto lightTech =
 		eastl::make_unique<SE_G::SkyBoxTechnique>(
 			device, tc.get(), "LightPass",
-			camera, m_lightData, texturePath);
+			camera, m_lightData, assetPath);
 	rc->AddTechnique(eastl::move(lightTech));
 
 	// IconPass
@@ -71,7 +71,7 @@ SkyBox::SkyBox(
 SkyBox_Info::SkyBox_Info(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,
-	eastl::wstring texturePath,
+	AssetPath assetPath,
 	SE_G::SkyBoxData initData)
 {
 	m_lightData = eastl::make_shared<SE_G::SkyBoxData>(initData);
@@ -91,7 +91,7 @@ SkyBox_Info::SkyBox_Info(
 	auto lightTech =
 		eastl::make_unique<SE_G::SkyBoxTechnique>(
 			device, tc_info->m_assignedComponent.get(), "LightPass",
-			camera, m_lightData, texturePath);
+			camera, m_lightData, assetPath);
 	rc_info->AddTechnique(eastl::move(lightTech));
 
 	// IconPass
