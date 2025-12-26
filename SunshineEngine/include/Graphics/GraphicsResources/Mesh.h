@@ -19,6 +19,8 @@
 #include <EASTL/vector.h>
 #include <EASTL/string.h>
 
+#include <Utils/AssetPath.h>
+
 #include <Graphics/Bindable/VertexBuffer.h>
 #include <Graphics/Bindable/IndexBuffer.h>
 #include <Graphics/Bindable/Topology.h>
@@ -49,14 +51,14 @@ namespace SE_G {
     public:
         Mesh() {};
         Mesh(ID3D11Device* device,
-            const eastl::string& path);
+            AssetPath meshPath);
         ~Mesh();
 
         void ClearMesh();
 
         static bool LoadModel(eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            const eastl::string& path,
+            AssetPath meshPath,
             UINT attrFlags = VertexAttributesFlags::POSITION);
 
         static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh(
@@ -124,7 +126,8 @@ namespace SE_G {
         void Draw(ID3D11DeviceContext* context) const;
         void Release();
 
-        eastl::string GetCurrentMeshPath();
+        AssetPath m_meshPath;
+        AssetPath GetCurrentMeshPath();
 
         //UINT GetIndexCount() const { return m_indexCount; }
 
@@ -134,10 +137,11 @@ namespace SE_G {
         eastl::unique_ptr<Bind::VertexBuffer> m_vertexBuffer;
         eastl::unique_ptr<Bind::Topology> m_topology;
 
-        eastl::string m_path;
+        //eastl::string m_path;
+
 
     // private cause every mesh should correspond to its key in ResourceManager
         void ChangeMesh(ID3D11Device* device,
-            const eastl::string& path);
+            AssetPath meshPath);
     };
 }

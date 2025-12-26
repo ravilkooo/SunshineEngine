@@ -26,7 +26,7 @@ class EditorObjectFactory
 public:
 	static eastl::unique_ptr<GameObject_Info> CreateCustomMesh(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::string filePath);
+		AssetPath meshPath);
 
 	static eastl::unique_ptr<GameObject_Info> CreateCustomMesh(
 		SE_G::DeferredRenderer* renderSystem,

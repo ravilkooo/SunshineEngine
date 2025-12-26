@@ -303,7 +303,9 @@ void ToolbarPanel::AddCustomMesh()
         //     }
         // }
 
-        auto customMeshObject = EditorObjectFactory::CreateCustomMesh(m_renderer, eastl::string("Box"));
+        auto customMeshObject = EditorObjectFactory::CreateCustomMesh(
+            m_renderer,
+            AssetPath(L"Box"));
             
         if (customMeshObject)
         {

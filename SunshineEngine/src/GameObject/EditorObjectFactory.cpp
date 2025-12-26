@@ -15,7 +15,7 @@
 
 eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::string filePath)
+	AssetPath meshPath)
 {
 
 	auto obj = eastl::make_unique<GameObject_Info>();
@@ -30,7 +30,7 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	// RenderComponent and techniques
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc_info->GetDevice(), filePath);
+	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc_info->GetDevice(), meshPath);
 	auto mc_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, meshPtr);
 
 	auto texture = eastl::make_shared<SE_G::Bind::Texture>(

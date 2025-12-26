@@ -53,7 +53,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Box_repeat",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -139,7 +142,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -226,7 +232,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -313,7 +322,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -400,7 +412,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -487,7 +502,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -574,7 +592,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -847,7 +868,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Box_repeat",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -933,7 +957,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Sphere",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -1021,7 +1048,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Box_repeat",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
@@ -1166,7 +1196,10 @@
         {
             "components": {
                 "Mesh": {
-                    "Mesh": "Box_repeat",
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,

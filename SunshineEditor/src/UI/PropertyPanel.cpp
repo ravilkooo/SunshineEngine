@@ -1136,8 +1136,15 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     // Mesh path
     auto meshPtr = assigned->GetMesh();
     if (meshPtr) {
-        eastl::string path = meshPtr->GetCurrentMeshPath();
-        ImGui::Text("Mesh: %s", path.c_str());
+        eastl::wstring mpath = meshPtr->GetCurrentMeshPath().m_assetRelativePath;
+        // convert wstring to narrow string for ImGui display
+        std::wstring ws = mpath.c_str();
+        std::string s(ws.begin(), ws.end());
+        if (meshPtr->GetCurrentMeshPath().m_assetSource == AssetPath::AssetSource::Engine)
+        {
+            ImGui::Text("Engine asset");
+        }
+        ImGui::Text("Mesh: %s", s.c_str());
     } else {
         ImGui::TextDisabled("Mesh: (procedural or empty)");
     }

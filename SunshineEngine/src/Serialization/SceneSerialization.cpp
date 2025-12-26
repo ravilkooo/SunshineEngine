@@ -164,7 +164,7 @@ json MeshData::ToJson() const
 {
     json j;
     if (m_mesh) {
-        try { j["Mesh"] = std::string(m_mesh->GetCurrentMeshPath().c_str()); }
+        try { j["Mesh"] = m_mesh->GetCurrentMeshPath().ToJson(); }
         catch (...) {}
     }
     if (m_texture) {
@@ -181,13 +181,16 @@ json MeshData::ToJson() const
 void MeshData::FromJson(const json& j, ID3D11Device* device)
 {
     // Mesh
-    if (j.contains("Mesh") && j["Mesh"].is_string()) {
-        std::string meshPath = j["Mesh"].get<std::string>();
-        m_mesh = eastl::make_shared<SE_G::Mesh>(device, eastl::string(meshPath.c_str()));
+    if (j.contains("Mesh")) {
+
+        AssetPath meshPath;
+        meshPath.FromJson(j["Mesh"]);
+
+        m_mesh = eastl::make_shared<SE_G::Mesh>(device, meshPath);
     }
     else
     {
-        m_mesh = eastl::make_shared<SE_G::Mesh>(device, "Box_repeat");
+        m_mesh = eastl::make_shared<SE_G::Mesh>(device, AssetPath(L"Box_repeat"));
     }
 
     // Texture
@@ -220,7 +223,7 @@ void MeshComponent::FromJson(const json& j, ID3D11Device* device,
     RenderComponent* rc, TransformComponent* tc,
     SE::UUID uuid)
 {
-    if (j.contains("Mesh") && j["Mesh"].is_string()) {
+    if (j.contains("Mesh")) {
         m_meshData = eastl::make_shared<MeshData>();
         m_meshData->FromJson(j, device);
 
