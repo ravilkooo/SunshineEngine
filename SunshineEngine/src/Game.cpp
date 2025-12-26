@@ -67,6 +67,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	SetupPhysics();
 	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
+	m_playerObject = m_scene->m_playerObject;
 	/*
 	if (!loadedScene) {
 		LOG_EDITOR_ERROR("Scene load error\n");
@@ -110,28 +111,6 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	*/
 
 	m_physicsSystem->FinalizeScene();
-	return true;
-}
-
-bool Game::LoadPlayerObject(const wchar_t* scenePath)
-{
-	std::ifstream file(scenePath);
-	if (!file) {
-		//LOG_EDITOR_ERROR("File input error");
-		return false;
-	}
-	json j;
-	try {
-		file >> j; // прочитать json из файла
-	}
-	catch (const std::exception& e) {
-		//LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()));
-		return false;
-	}
-
-	//m_playerObject.FromJson(j, m_renderer->GetMainCamera());
-	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
-	
 	return true;
 }
 
@@ -266,6 +245,8 @@ void Game::Run()
 void Game::Update(float deltaTime) {
 
 	 m_luaManager.Update(m_scene.get(), deltaTime);
+	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+
 	 m_physicsSystem->Step(deltaTime);
 
 	 m_physicsSystem->SyncronizeTransforms(m_scene.get());

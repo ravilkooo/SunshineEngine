@@ -10,6 +10,7 @@
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <PlayerObject/MiniViewRenderer.h>
+#include <PlayerObject/PlayerController.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -19,6 +20,9 @@ class PlayerObject : public GameObject
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
+
+	// Input
+	PlayerController m_playerController;
 
 	PlayerObject() : GameObject()
 	{

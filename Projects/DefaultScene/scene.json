@@ -109,9 +109,9 @@
                         0.0
                     ],
                     "m_rotation": [
-                        0.595157265663147,
-                        0.4433135986328125,
-                        -0.8779006004333496
+                        0.0,
+                        0.0,
+                        0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -140,6 +140,31 @@
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -158,7 +183,7 @@
                         1.0
                     ],
                     "m_position": [
-                        3.0,
+                        2.799999952316284,
                         0.0,
                         0.0
                     ],
@@ -178,7 +203,7 @@
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
-                "attached": true,
+                "attached": false,
                 "uuid": 15551142850770219886
             },
             "m_shapeData": {
@@ -199,6 +224,31 @@
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -217,9 +267,9 @@
                         1.0
                     ],
                     "m_position": [
-                        1.0,
-                        1.100000023841858,
-                        -1.2000000476837158
+                        2.700000047683716,
+                        2.5,
+                        2.4000000953674316
                     ],
                     "m_rotation": [
                         0.0,
@@ -237,7 +287,7 @@
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
-                "attached": true,
+                "attached": false,
                 "uuid": 15551142850770219886
             },
             "m_shapeData": {
@@ -258,6 +308,31 @@
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -276,7 +351,7 @@
                         1.0
                     ],
                     "m_position": [
-                        -1.500000238418579,
+                        -1.700000286102295,
                         2.598076105117798,
                         0.0
                     ],
@@ -296,7 +371,7 @@
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
-                "attached": true,
+                "attached": false,
                 "uuid": 15551142850770219886
             },
             "m_shapeData": {
@@ -317,6 +392,31 @@
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -335,7 +435,7 @@
                         1.0
                     ],
                     "m_position": [
-                        -3.0,
+                        -3.200000047683716,
                         -2.6226831550957286e-07,
                         0.0
                     ],
@@ -355,7 +455,7 @@
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
-                "attached": true,
+                "attached": false,
                 "uuid": 15551142850770219886
             },
             "m_shapeData": {
@@ -376,6 +476,31 @@
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -394,13 +519,13 @@
                         1.0
                     ],
                     "m_position": [
-                        -2.852388858795166,
+                        -3.052388906478882,
                         -2.598076343536377,
                         0.0
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
+                        -0.0,
                         -0.0
                     ],
                     "m_scaleFactor": [
@@ -414,7 +539,7 @@
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
-                "attached": true,
+                "attached": false,
                 "uuid": 15551142850770219886
             },
             "m_shapeData": {
@@ -435,6 +560,31 @@
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultSphereTexture.dds"
                 },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -453,7 +603,7 @@
                         1.0
                     ],
                     "m_position": [
-                        1.500001072883606,
+                        1.3000010251998901,
                         -2.5980756282806396,
                         0.0
                     ],
@@ -473,7 +623,7 @@
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
-                "attached": true,
+                "attached": false,
                 "uuid": 15551142850770219886
             },
             "m_shapeData": {
@@ -848,6 +998,31 @@
                     "Sampler": 0,
                     "Texture": "D:/Studyspace/Sunshine/SunshineEngine/Assets/DefaultTexture.dds"
                 },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -866,8 +1041,8 @@
                         1.0
                     ],
                     "m_position": [
-                        -0.699999988079071,
-                        0.0,
+                        4.900000095367432,
+                        2.0,
                         -2.0
                     ],
                     "m_rotation": [
@@ -882,11 +1057,11 @@
                     ]
                 }
             },
-            "m_UUID": 12793997240312441279,
+            "m_UUID": 6089359285211171152,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
-                "attached": true,
+                "attached": false,
                 "uuid": 2232906597439411555
             }
         },
@@ -1014,7 +1189,7 @@
                     "m_position": [
                         0.0,
                         0.0,
-                        0.0
+                        -4.5
                     ],
                     "m_rotation": [
                         0.0,
@@ -1035,11 +1210,11 @@
             "settings": {
                 "camera": {
                     "offset": [
-                        -10.0,
+                        0.30000001192092896,
                         0.0,
                         0.0
                     ],
-                    "stickLength": 26.700000762939453,
+                    "stickLength": 14.399999618530273,
                     "stickPitch": 0.5215044021606445,
                     "stickYaw": 0.0,
                     "viewPitchYawRoll": [

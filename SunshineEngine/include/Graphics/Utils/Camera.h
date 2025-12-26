@@ -125,6 +125,14 @@ namespace SE_G {
 
         FrustumCorners GetFrustumCorners();
 
+        DXSM::Vector3 position;
+        DXSM::Vector3 followDirection;
+        DXSM::Vector3 target;
+        DXSM::Vector3 up;
+        DXSM::Vector3 forward;
+
+        DXSM::Matrix rotateCamToForward;
+
         struct FollowStickParams
         {
             float stickLength = 10.0f;
@@ -136,17 +144,13 @@ namespace SE_G {
 
             DXSM::Vector3 offset = DXSM::Vector3::Zero;
         } m_stickParams;
+        void RotateStickYawPitch(float deltaYaw, float deltaPitch);
 
     private:
         void SetFOV(float fov);
         void SetAspectRatio(float aspectRatio);
         void SetViewWidth(float viewWidth);
         void SetViewHeight(float viewHeight);
-
-        DXSM::Vector3 position;
-        DXSM::Vector3 followDirection;
-        DXSM::Vector3 target;
-        DXSM::Vector3 up;
 
         bool isPerspective = true;
 

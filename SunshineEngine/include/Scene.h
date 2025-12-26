@@ -11,6 +11,7 @@
 using json = nlohmann::json;
 class PhysicsSystem;
 class SceneGraph;
+class PlayerObject;
 
 class Scene
 {
@@ -43,7 +44,8 @@ public:
     void RestoreParents();
 
     // PlayerObject
-    SE::UUID m_playerObject = SE::UUID(0u);
+    SE::UUID m_playerObjectUUID = SE::UUID(0u);
+    PlayerObject* m_playerObject = nullptr;
 
 private:
 };

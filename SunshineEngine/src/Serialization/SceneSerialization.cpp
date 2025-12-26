@@ -651,7 +651,7 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     playerObj->SettingsFromJson(_empty, camera);
                 }
                 playerObj->AssignSceneToCamera(scene.get());
-                scene->m_playerObject = playerObj->m_UUID;
+                scene->m_playerObjectUUID = playerObj->m_UUID;
                 break;
             }
             case GameObjectGroup::Other:
@@ -663,8 +663,7 @@ eastl::shared_ptr<Scene> Scene::FromJson(
             if (go) {
                 // Other components (Physics, Lua)
                 
-                if (objJ["components"].contains("Physics")
-                    && objJ["m_group"] != GameObjectGroup::Player) {
+                if (objJ["components"].contains("Physics")) {
                     auto c = go->AddComponent<PhysicsComponent>(
                         go->m_UUID, go->GetComponent<TransformComponent>().get());
                     c->FromJson(objJ["components"]["Physics"]);
@@ -683,7 +682,11 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
                 }
 
-                scene->AddGameObject(eastl::move(go));
+                auto objUUID = scene->AddGameObject(eastl::move(go));
+                if (objGroup == GameObjectGroup::Player)
+                {
+                    scene->m_playerObject = static_cast<PlayerObject*>(scene->GetGameObjectByUUID(objUUID));
+                }
             }
         }
     }

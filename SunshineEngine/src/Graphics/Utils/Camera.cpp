@@ -257,14 +257,15 @@ namespace SE_G {
 
             DXSM::Vector3 _forward(0.0f, 0.0f, 1.0f);
             DXSM::Vector3 _up(0.0f, 1.0f, 0.0f);
-            auto rotateCam = DXSM::Matrix::CreateFromYawPitchRoll(
+            rotateCamToForward = DXSM::Matrix::CreateFromYawPitchRoll(
                 m_stickParams.viewPitchYawRoll.y,
                 -m_stickParams.viewPitchYawRoll.x,
                 -m_stickParams.viewPitchYawRoll.z);
-            _up = DXSM::Vector3::Transform(_up, rotateCam);
-            _forward = DXSM::Vector3::Transform(_forward, rotateCam);
+            _up = DXSM::Vector3::Transform(_up, rotateCamToForward);
+            _forward = DXSM::Vector3::Transform(_forward, rotateCamToForward);
 
             up = _up;
+            forward = _forward;
             target = position + _forward;
         }
     }
@@ -609,5 +610,26 @@ namespace SE_G {
         }
 
         return corners;
+    }
+
+    void Camera::RotateStickYawPitch(float deltaYaw, float deltaPitch)
+    {
+        float _stickYaw = m_stickParams.stickYaw + deltaYaw;
+        float _stickPitch = m_stickParams.stickPitch + deltaPitch;
+
+        _stickPitch = fmax(-80.0f * DX::XM_PIDIV2 / 90.0f, fmin(_stickPitch, 80.0f * DX::XM_PIDIV2 / 90.0f));
+        deltaPitch = _stickPitch - m_stickParams.stickPitch;
+
+        m_stickParams.stickPitch = _stickPitch;
+        m_stickParams.viewPitchYawRoll.x -= deltaPitch;
+
+        deltaYaw = _stickYaw - m_stickParams.stickYaw;
+        m_stickParams.stickYaw = _stickYaw;
+        m_stickParams.viewPitchYawRoll.y += deltaYaw;
+
+        _stickYaw = _stickYaw > DX::XM_PI ? (_stickYaw - DX::XM_2PI) : _stickYaw;
+        _stickYaw = _stickYaw < -DX::XM_PI ? (_stickYaw + DX::XM_2PI) : _stickYaw;
+
+        
     }
 }

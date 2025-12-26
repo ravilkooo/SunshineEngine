@@ -21,13 +21,7 @@ PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem)
 		j["components"]["Mesh"],
 		device, rc, tc, m_UUID);
 
-	auto pc = AddComponent<PhysicsComponent>(
-		m_UUID, tc).get();
-
-	if (j["components"].contains("Physics"))
-	{
-		pc->FromJson(j["components"]["Physics"]);
-	}
+	m_playerController.SetPlayerObject(this);
 }
 
 PlayerObject_Info::PlayerObject_Info() : GameObject_Info()
