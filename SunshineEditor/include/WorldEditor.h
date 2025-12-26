@@ -25,6 +25,12 @@
 #include <Physics/PhysicsSystem.h>
 #include <LogManager.h>
 
+
+namespace SE_G
+{
+    class RenderingSystem;
+};
+
 struct Selection {
     eastl::unordered_set<SE::UUID> picked;
     SE::UUID last_clicked = SE::UUID(0u);
@@ -91,11 +97,18 @@ public:
     void SaveScene(const wchar_t* scenePath);
     bool LoadScene(const wchar_t* scenePath);
 
+    /*
+    void SavePlayer(const wchar_t* playerPath);
+    bool LoadPlayer(const wchar_t* playerPath);
+    */
+
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 
     // void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
 
     SE::UUID ChooseObjectByClick(UINT x, UINT y);
+
+    SE_G::RenderingSystem* m_renderingSystem;
 
     GameTimer m_timer;
     eastl::shared_ptr<Scene_Info> m_scene;
@@ -120,7 +133,7 @@ public:
     Selection m_hierarchySelection;
 
     // PlayerObject
-    PlayerObject_Info m_playerObject;
+    SE::UUID m_playerObject = SE::UUID(0u);
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

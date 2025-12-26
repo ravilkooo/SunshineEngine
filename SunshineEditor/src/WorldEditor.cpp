@@ -1,4 +1,6 @@
 #include "WorldEditor.h"
+#include <Graphics/Renderer/RenderingSystem.h>
+
 #include <Component/LuaComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <fstream>   // std::ofstream
@@ -113,6 +115,8 @@ void WorldEditor::SetupRendering(
 	this->m_screenWidth = screenWidth;
 	this->m_screenHeight = screenHeight;
 
+	this->m_renderingSystem = renderSystem.get();
+
 	this->m_renderer = eastl::make_unique<SE_G::DeferredRenderer>(
 		"WorldEditorDeferred", renderSystem->GetDevice(),
 		renderSystem->GetDeviceContext(),
@@ -159,18 +163,7 @@ void WorldEditor::SetupRendering(
 	m_pixelUUIDHandler = new PixelUUIDHandler();
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
 
-	// PlayerViewport
-	m_playerObject.InitMiniViewport(m_renderer.get());
-}
-
-void WorldEditor::SetUpPlayerObject()
-{
-	m_playerObject.AddTransformComponent(m_renderer->GetDevice());
-	m_playerObject.AddRenderComponent(m_renderer.get());
-	m_playerObject.AddMeshComponent();
-	m_playerObject.AddPhysicsComponent();
-
-	m_playerObject.SetUpCamera();
+	m_renderingSystem->AddRenderGroup(m_renderer.get());
 }
 
 void WorldEditor::CreateParentScene()
@@ -628,7 +621,32 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	LOG_EDITOR_INFO("Scene loaded");
 
 	m_selectionPass->m_scene = m_scene.get();
+	
+	if (m_scene->m_playerObject == SE::UUID(0u))
+	{
+		auto go = eastl::make_unique<PlayerObject_Info>();
 
+		go->AddTransformComponent(m_renderer->GetDevice());
+		go->AddRenderComponent(m_renderer.get());
+		go->AddMeshComponent();
+		go->AddPhysicsComponent();
+
+		json _empty;
+		go->SettingsFromJson(_empty, m_renderer.get());
+		go->AssignSceneToCamera(m_scene.get());
+		
+		m_playerObject = m_scene->AddGameObject(eastl::move(go));
+		m_scene->m_playerObject = m_playerObject;
+	}
+	else
+	{
+		m_playerObject = m_scene->m_playerObject;
+	}
+
+	// PlayerObject
+	auto pObj = static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject));
+
+	m_renderingSystem->AddRenderGroup(pObj->m_miniViewRenderer.get());
 
 	return true;
 }

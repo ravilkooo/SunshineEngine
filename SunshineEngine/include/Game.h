@@ -27,6 +27,8 @@
 #include <Utils/ILogManager.h>
 #include <Scripting/LuaManager.h>
 
+#include <PlayerObject/PlayerObject.h>
+
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
 
@@ -41,6 +43,7 @@ public:
         eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
+    void SetUpPlayerObject();
 
     void SetupPhysics();
 
@@ -54,6 +57,7 @@ public:
     void ClearScene();
 
     bool LoadScene(const wchar_t* scenePath);
+    bool LoadPlayerObject(const wchar_t* scenePath);
 
     bool LoadGAIScene();
     bool LoadDefaultScene();
@@ -82,6 +86,9 @@ public:
     SE_G::LightPass* m_lightPass;
 
     float m_deltaTime = 0.0f;
+
+    // PlayerObject
+    PlayerObject m_playerObject;
 
     // GAI
     void CreateGAIScene();

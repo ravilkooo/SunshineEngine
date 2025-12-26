@@ -248,13 +248,14 @@ protected:
 };
 
 enum class GameObjectGroup {
-    Lighting, Shapes, CustomMesh, Other
+    Lighting, Shapes, CustomMesh, Player, Other
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(GameObjectGroup, {
     {GameObjectGroup::Lighting, "Lighting"},
     {GameObjectGroup::Shapes, "Shapes"},
     {GameObjectGroup::CustomMesh, "CustomMesh"},
+    {GameObjectGroup::Player, "Player"},
     {GameObjectGroup::Other, "Other"},
     })
 

@@ -11,11 +11,30 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <PlayerObject/MiniViewRenderer.h>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 class PlayerObject : public GameObject
 {
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
+
+	PlayerObject() : GameObject()
+	{
+		m_name = "PlayerObject";
+	};
+
+	void SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera);
+
+	void SetUpCamera(SE_G::DeferredRenderer* renderSystem)
+	{
+		m_playerCamera = eastl::make_shared<SE_G::Camera>(
+			renderSystem->GetDevice(), renderSystem->m_screenWidth / renderSystem->m_screenHeight);
+		m_playerCamera->SetFollowPlayer(m_UUID);
+	}
+
+	PlayerLuaKeyActionsMapping m_luaActionMapping;
 };
 
 
@@ -36,10 +55,14 @@ public:
 	MeshComponent_Info* m_meshComp;
 	PhysicsComponent_Info* m_physComp;
 	
-	PlayerObject_Info() : GameObject_Info()
-	{
+	PlayerObject_Info();
 
-	};
+	PlayerObject_Info(const json& j, SE_G::DeferredRenderer* renderSystem);
+
+	virtual json ToJson() const override;
+
+	json SettingsToJson() const;
+	void SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer);
 
 	void AddRenderComponent(SE_G::DeferredRenderer* renderSystem)
 	{
@@ -77,12 +100,17 @@ public:
 		m_miniViewRenderer->SetParentRenderer(defRenderer);
 		m_miniViewRenderer->Disable();
 	}
+	
+	void AssignSceneToCamera(Scene_Info* scene)
+	{
+		m_playerCamera->AssignScene(scene);
+	}
 
 	void SetUpCamera()
 	{
 		m_playerCamera = eastl::make_shared<SE_G::Camera>(
 			m_miniViewRenderer->GetDevice(), 640.0f / 360.0f);
-		m_playerCamera->SwitchToFollowMode(this);
+		m_playerCamera->SetFollowPlayer(m_UUID);
 		m_miniViewRenderer->SetMainCamera(m_playerCamera);
 	}
 

@@ -42,6 +42,9 @@ public:
 
     void RestoreParents();
 
+    // PlayerObject
+    SE::UUID m_playerObject = SE::UUID(0u);
+
 private:
 };
 
@@ -79,4 +82,7 @@ public:
     // Hierarchy
     eastl::unique_ptr<SceneGraph> m_sceneGraph;
     void InitHierarchy();
+
+    // PlayerObject
+    SE::UUID m_playerObject = SE::UUID(0u);
 };

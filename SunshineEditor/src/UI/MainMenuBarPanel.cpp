@@ -277,7 +277,7 @@ void MainMenuBarPanel::CloseCurrentProject()
         
         if (m_editorApp->m_worldEditor)
         {
-            m_editorApp->m_worldEditor->ClearScene();
+            m_editorApp->m_worldEditor->CloseProject();
         }
         
         m_editorApp->m_openedProject = nullptr;

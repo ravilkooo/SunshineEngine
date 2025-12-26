@@ -882,7 +882,7 @@
                     ]
                 }
             },
-            "m_UUID": 4204723489720651855,
+            "m_UUID": 14363371778822704165,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -957,6 +957,98 @@
             "m_name": "PointLight",
             "m_parent": null,
             "m_type": "PointLight"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": "Box_repeat",
+                    "Sampler": 0,
+                    "Texture": ""
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Kinematic"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 1087253342462268591,
+            "m_group": "Player",
+            "m_name": "PlayerObject",
+            "m_parent": null,
+            "settings": {
+                "camera": {
+                    "offset": [
+                        4.699999809265137,
+                        0.0,
+                        0.0
+                    ],
+                    "stickLength": 21.799999237060547,
+                    "stickPitch": 0.5215044021606445,
+                    "stickYaw": 0.0,
+                    "viewPitchYawRoll": [
+                        -0.5023057460784912,
+                        0.0,
+                        0.0
+                    ]
+                }
+            }
         }
     ]
 }

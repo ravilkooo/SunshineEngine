@@ -1,6 +1,7 @@
 #include "Graphics/Utils/Camera.h"
 #include <iostream>
 
+#include <Scene.h>
 #include <PlayerObject/PlayerObject.h>
 
 
@@ -216,11 +217,13 @@ namespace SE_G {
             DXSM::Matrix targetTransform;
             if (m_playerAsObject)
             {
-                targetTransform = m_player.asObject->GetComponent<TransformComponent>()->GetWorldMatrix();
+                auto pObj = m_scene.asScene->GetGameObjectByUUID(m_player);
+                targetTransform = pObj->GetComponent<TransformComponent>()->GetWorldMatrix();
             }
             else
             {
-                targetTransform = m_player.asInfo->GetComponent<TransformComponent_Info>()->m_assignedComponent->GetWorldMatrix();
+                auto pObj = m_scene.asInfo->GetGameObjectByUUID(m_player);
+                targetTransform = pObj->GetComponent<TransformComponent_Info>()->m_assignedComponent->GetWorldMatrix();
             }
 
             DXSM::Vector3 targetPos;
@@ -451,18 +454,21 @@ namespace SE_G {
         cameraMode = CAMERA_MODE::FPS;
     }
 
-
-    void Camera::SwitchToFollowMode(PlayerObject* playerObject)
+    void Camera::AssignScene(Scene* scene)
     {
         m_playerAsObject = true;
-        m_player.asObject = playerObject;
-        InitFollowModeParams();
-    }   
+        m_scene.asScene = scene;
+    }
 
-    void Camera::SwitchToFollowMode(PlayerObject_Info* playerObject)
+    void Camera::AssignScene(Scene_Info* scene)
     {
         m_playerAsObject = false;
-        m_player.asInfo = playerObject;
+        m_scene.asInfo = scene;
+    }
+
+    void Camera::SetFollowPlayer(SE::UUID playerUUID)
+    {
+        m_player = playerUUID;
         InitFollowModeParams();
     }
 

@@ -379,9 +379,12 @@ void ImguiEditorPass::ShowProperties()
 	ImGui::Begin("Properties");
 	if (ImGui::BeginTabBar("PropsTabBar"))
 	{
+		auto pObj = static_cast<PlayerObject_Info*>(
+			m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(m_editorApp->m_worldEditor->m_playerObject));
+
 		if (ImGui::BeginTabItem("Object Properties"))
 		{
-			m_editorApp->m_worldEditor->m_playerObject.m_miniViewRenderer->Disable();
+			pObj->m_miniViewRenderer->Disable();
 
 			ShowGameObjectProperties();
 			ImGui::EndTabItem();
@@ -389,7 +392,7 @@ void ImguiEditorPass::ShowProperties()
 
 		if (ImGui::BeginTabItem("Player Settings"))
 		{
-			m_editorApp->m_worldEditor->m_playerObject.m_miniViewRenderer->Enable();
+			pObj->m_miniViewRenderer->Enable();
 
 			ShowPlayerProperties();
 
@@ -428,46 +431,50 @@ void ImguiEditorPass::ShowPlayerProperties()
 
 		ImVec2 avail = ImGui::GetContentRegionAvail();
 		avail.y = avail.x * 360.0f / 640.0f;
-		ImGui::Image((ImTextureID)m_editorApp->m_worldEditor->m_playerObject.m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
+
+		auto pObj = static_cast<PlayerObject_Info*>(
+			m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(m_editorApp->m_worldEditor->m_playerObject));
+
+		ImGui::Image((ImTextureID)pObj->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
 
 		EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
 		ImGui::Text("Stick Params");
 		EditorUI::FontStyles::Pop();
-		
-		float stickLength = m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickLength;
+
+		float stickLength = pObj->m_playerCamera->m_stickParams.stickLength;
 		if (ImGui::DragFloat("Stick length", &stickLength, 0.1f, 0.1f, 90.0f, "%.1f m"))
 		{
-			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickLength = stickLength;
+			pObj->m_playerCamera->m_stickParams.stickLength = stickLength;
 		}
 
-		float stickYaw = m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickYaw;
+		float stickYaw = pObj->m_playerCamera->m_stickParams.stickYaw;
 		stickYaw *= 360.0f / DirectX::XM_2PI;
 		if (ImGui::DragFloat("Stick yaw", &stickYaw, 0.1f, -90.0f, 90.0f, "%.1f"))
 		{
-			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickYaw =
+			pObj->m_playerCamera->m_stickParams.stickYaw =
 				DirectX::XM_2PI / 360.0f * stickYaw;
 		}
 
-		float stickPitch = m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickPitch;
+		float stickPitch = pObj->m_playerCamera->m_stickParams.stickPitch;
 		stickPitch *= 360.0f / DirectX::XM_2PI;
 		if (ImGui::DragFloat("Stick pitch", &stickPitch, 0.1f, -80.0f, 80.0f, "%.1f"))
 		{
-			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.stickPitch =
+			pObj->m_playerCamera->m_stickParams.stickPitch =
 				DirectX::XM_2PI / 360.0f * stickPitch;
 		}
 
 		// ImGui::ColorEdit3("Camera Offset",
-		// 	&(m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.offset.x), ImGuiColorEditFlags_Float);
+		// 	&(pObj->m_playerCamera->m_stickParams.offset.x), ImGuiColorEditFlags_Float);
 		PropertyPanel::DrawVector3Control("Camera Offset",
-			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.offset, 0.0f);
+			pObj->m_playerCamera->m_stickParams.offset, 0.0f);
 
 		//ImGui::ColorEdit3("Camera Rotation",
-		//	&(m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.viewPitchYawRoll.x), ImGuiColorEditFlags_Float);
+		//	&(pObj->m_playerCamera->m_stickParams.viewPitchYawRoll.x), ImGuiColorEditFlags_Float);
 
-		DXSM::Vector3 viewPitchYawRoll = m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.viewPitchYawRoll * (180.0f / DirectX::XM_PI);
+		DXSM::Vector3 viewPitchYawRoll = pObj->m_playerCamera->m_stickParams.viewPitchYawRoll * (180.0f / DirectX::XM_PI);
 		if (PropertyPanel::DrawVector3Control("Camera Rotation", viewPitchYawRoll, 0.0f))
 		{
-			m_editorApp->m_worldEditor->m_playerObject.m_playerCamera->m_stickParams.viewPitchYawRoll = viewPitchYawRoll * (DirectX::XM_PI / 180.0f);
+			pObj->m_playerCamera->m_stickParams.viewPitchYawRoll = viewPitchYawRoll * (DirectX::XM_PI / 180.0f);
 		}
 
 		/*

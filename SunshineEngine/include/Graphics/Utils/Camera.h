@@ -7,12 +7,14 @@
 #include <SimpleMath.h>
 
 #include "Graphics/Bindable/ConstantBuffer.h"
+#include <Utils/UUID.h>
 
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
-class PlayerObject;
-class PlayerObject_Info;
+class Scene;
+class Scene_Info;
+
 
 namespace SE_G {
     class Camera
@@ -93,8 +95,10 @@ namespace SE_G {
 
         void SwitchToFPSMode();
 
-        void SwitchToFollowMode(PlayerObject* playerObject);
-        void SwitchToFollowMode(PlayerObject_Info* playerObject);
+        void AssignScene(Scene* scene);
+        void AssignScene(Scene_Info* scene);
+
+        void SetFollowPlayer(SE::UUID playerUUID);
         void InitFollowModeParams();
 
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget);
@@ -123,14 +127,14 @@ namespace SE_G {
 
         struct FollowStickParams
         {
-            float stickLength;
+            float stickLength = 10.0f;
 
-            float stickYaw;
-            float stickPitch;
+            float stickYaw = 0.0f;
+            float stickPitch = 0.0f;
 
-            DXSM::Vector3 viewPitchYawRoll;
+            DXSM::Vector3 viewPitchYawRoll = DXSM::Vector3::Zero;
 
-            DXSM::Vector3 offset;
+            DXSM::Vector3 offset = DXSM::Vector3::Zero;
         } m_stickParams;
 
     private:
@@ -179,8 +183,10 @@ namespace SE_G {
         bool m_playerAsObject = false;
 
         union {
-            PlayerObject* asObject;
-            PlayerObject_Info* asInfo;
-        } m_player;
+            Scene* asScene;
+            Scene_Info* asInfo;
+        } m_scene;
+
+        SE::UUID m_player = SE::UUID(0u);
     };
 }

@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <fstream>   // std::ofstream
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
+#include <PlayerObject/PlayerObject.h>
 
 Game::Game()
 {
@@ -109,6 +110,28 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	*/
 
 	m_physicsSystem->FinalizeScene();
+	return true;
+}
+
+bool Game::LoadPlayerObject(const wchar_t* scenePath)
+{
+	std::ifstream file(scenePath);
+	if (!file) {
+		//LOG_EDITOR_ERROR("File input error");
+		return false;
+	}
+	json j;
+	try {
+		file >> j; // прочитать json из файла
+	}
+	catch (const std::exception& e) {
+		//LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()));
+		return false;
+	}
+
+	//m_playerObject.FromJson(j, m_renderer->GetMainCamera());
+	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
+	
 	return true;
 }
 
