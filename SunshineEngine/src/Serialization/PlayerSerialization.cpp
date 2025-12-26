@@ -8,8 +8,30 @@ using json = nlohmann::json;
 void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera)
 {
 	m_playerCamera = camera;
+	m_playerCamera->SetFollowPlayer(m_UUID);
 
-
+	if (j.contains("camera"))
+	{
+		if (j["camera"].contains("stickLength")) {
+			m_playerCamera->m_stickParams.stickLength = j["camera"]["stickLength"].get<float>();
+		}
+		if (j["camera"].contains("stickYaw")) {
+			m_playerCamera->m_stickParams.stickYaw = j["camera"]["stickYaw"].get<float>();
+		}
+		if (j["camera"].contains("stickPitch")) {
+			m_playerCamera->m_stickParams.stickPitch = j["camera"]["stickPitch"].get<float>();
+		}
+		if (j["camera"].contains("viewPitchYawRoll") && j["camera"]["viewPitchYawRoll"].is_array() && j["camera"]["viewPitchYawRoll"].size() >= 3) {
+			m_playerCamera->m_stickParams.viewPitchYawRoll.x = j["camera"]["viewPitchYawRoll"][0].get<float>();
+			m_playerCamera->m_stickParams.viewPitchYawRoll.y = j["camera"]["viewPitchYawRoll"][1].get<float>();
+			m_playerCamera->m_stickParams.viewPitchYawRoll.z = j["camera"]["viewPitchYawRoll"][2].get<float>();
+		}
+		if (j["camera"].contains("offset") && j["camera"]["offset"].is_array() && j["camera"]["offset"].size() >= 3) {
+			m_playerCamera->m_stickParams.offset.x = j["camera"]["offset"][0].get<float>();
+			m_playerCamera->m_stickParams.offset.y = j["camera"]["offset"][1].get<float>();
+			m_playerCamera->m_stickParams.offset.z = j["camera"]["offset"][2].get<float>();
+		}
+	}
 }
 
 json PlayerObject_Info::ToJson() const {

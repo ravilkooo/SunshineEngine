@@ -882,7 +882,7 @@
                     ]
                 }
             },
-            "m_UUID": 14363371778822704165,
+            "m_UUID": 12793997240312441279,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1035,15 +1035,15 @@
             "settings": {
                 "camera": {
                     "offset": [
-                        4.699999809265137,
+                        -10.0,
                         0.0,
                         0.0
                     ],
-                    "stickLength": 21.799999237060547,
+                    "stickLength": 26.700000762939453,
                     "stickPitch": 0.5215044021606445,
                     "stickYaw": 0.0,
                     "viewPitchYawRoll": [
-                        -0.5023057460784912,
+                        -0.5057964324951172,
                         0.0,
                         0.0
                     ]

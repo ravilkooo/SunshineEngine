@@ -214,17 +214,21 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
-            DXSM::Matrix targetTransform;
-            if (m_playerAsObject)
+            if (!m_playerTransform)
             {
-                auto pObj = m_scene.asScene->GetGameObjectByUUID(m_player);
-                targetTransform = pObj->GetComponent<TransformComponent>()->GetWorldMatrix();
+                if (m_playerAsObject)
+                {
+                    auto pObj = m_scene.asScene->GetGameObjectByUUID(m_playerUUID);
+
+                    m_playerTransform = pObj->GetComponent<TransformComponent>().get();
+                }
+                else
+                {
+                    auto pObj = m_scene.asInfo->GetGameObjectByUUID(m_playerUUID);
+                    m_playerTransform = pObj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+                }
             }
-            else
-            {
-                auto pObj = m_scene.asInfo->GetGameObjectByUUID(m_player);
-                targetTransform = pObj->GetComponent<TransformComponent_Info>()->m_assignedComponent->GetWorldMatrix();
-            }
+            DXSM::Matrix targetTransform = m_playerTransform->GetWorldMatrix();;
 
             DXSM::Vector3 targetPos;
             targetPos.x = targetTransform._41;
@@ -468,7 +472,7 @@ namespace SE_G {
 
     void Camera::SetFollowPlayer(SE::UUID playerUUID)
     {
-        m_player = playerUUID;
+        m_playerUUID = playerUUID;
         InitFollowModeParams();
     }
 

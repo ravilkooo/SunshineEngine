@@ -25,6 +25,8 @@ public:
 		m_name = "PlayerObject";
 	};
 
+	PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem);
+
 	void SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera);
 
 	void SetUpCamera(SE_G::DeferredRenderer* renderSystem)
@@ -33,6 +35,13 @@ public:
 			renderSystem->GetDevice(), renderSystem->m_screenWidth / renderSystem->m_screenHeight);
 		m_playerCamera->SetFollowPlayer(m_UUID);
 	}
+
+	void AssignSceneToCamera(Scene* scene)
+	{
+		m_playerCamera->AssignScene(scene);
+	}
+
+	void SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer);
 
 	PlayerLuaKeyActionsMapping m_luaActionMapping;
 };
@@ -68,7 +77,6 @@ public:
 	{
 		m_renderComp = this->AddComponent<RenderComponent_Info>(this->m_UUID, renderSystem).get();
 	};
-	
 
 	void AddTransformComponent(ID3D11Device* device)
 	{

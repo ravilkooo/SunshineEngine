@@ -639,7 +639,19 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                 break;
             case GameObjectGroup::Player:
             {
-                
+                go = eastl::make_unique<PlayerObject>(objJ, renderSystem);
+                auto playerObj = static_cast<PlayerObject*>(go.get());
+                if (objJ.contains("settings"))
+                {
+                    playerObj->SettingsFromJson(objJ["settings"], camera);
+                }
+                else
+                {
+                    json _empty;
+                    playerObj->SettingsFromJson(_empty, camera);
+                }
+                playerObj->AssignSceneToCamera(scene.get());
+                scene->m_playerObject = playerObj->m_UUID;
                 break;
             }
             case GameObjectGroup::Other:
@@ -651,7 +663,8 @@ eastl::shared_ptr<Scene> Scene::FromJson(
             if (go) {
                 // Other components (Physics, Lua)
                 
-                if (objJ["components"].contains("Physics")) {
+                if (objJ["components"].contains("Physics")
+                    && objJ["m_group"] != GameObjectGroup::Player) {
                     auto c = go->AddComponent<PhysicsComponent>(
                         go->m_UUID, go->GetComponent<TransformComponent>().get());
                     c->FromJson(objJ["components"]["Physics"]);

@@ -14,7 +14,7 @@ namespace DXSM = DirectX::SimpleMath;
 
 class Scene;
 class Scene_Info;
-
+class TransformComponent;
 
 namespace SE_G {
     class Camera
@@ -187,6 +187,15 @@ namespace SE_G {
             Scene_Info* asInfo;
         } m_scene;
 
-        SE::UUID m_player = SE::UUID(0u);
+        /*
+        union {
+            PlayerObject* asObject;
+            PlayerObject_Info* asInfo;
+        } m_player;
+        */
+        TransformComponent* m_playerTransform = nullptr;
+        bool m_playerPointerInited = false;
+
+        SE::UUID m_playerUUID = SE::UUID(0u);
     };
 }
