@@ -2,6 +2,7 @@
 #include <Project.h>
 #include <Utils/StringUtils.h>
 #include <WorldEditor.h>
+#include <Utils/AssetPath.h>
 
 #include "EASTL/shared_ptr.h"
 
@@ -76,6 +77,9 @@ namespace SE
 			return "WorldEditor is null";
     
 		eastl::wstring scenePath = GetScenePath();
+
+		//GetFullPath();
+		AssetPath::s_projectPath = GetFullPath();
 		
 		if (!std::filesystem::exists(scenePath.c_str()))
 		{

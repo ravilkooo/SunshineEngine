@@ -255,6 +255,8 @@ void ImguiEditorPass::Pass()
 					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
 				}
 				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+				m_PropertyPanel.s_meshEditor.m_editMesh = false;
+				m_PropertyPanel.s_meshEditor.m_editTexture = false;
 			}
 		}
 	}

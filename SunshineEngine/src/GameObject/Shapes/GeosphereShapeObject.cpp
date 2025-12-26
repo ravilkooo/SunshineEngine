@@ -59,11 +59,24 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 		static_cast<UINT>(obj->m_shapeData->NumSubdivisions));
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc_info->GetDevice(),
-		AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	mesh_info->SetTexture(texture);
+	if (j["components"]["Mesh"].contains("Texture"))
+	{
+		AssetPath texPath;
+		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
+
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+		mesh_info->SetTexture(texture);
+	}
+	else {
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			device,
+			AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
+			SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+		mesh_info->SetTexture(texture);
+	}
 
 	return obj;
 }

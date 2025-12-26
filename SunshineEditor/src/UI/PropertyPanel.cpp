@@ -1157,53 +1157,63 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
         ImGui::TextDisabled("Mesh: (procedural or empty)");
     }
 
-    // Editing button
-    if (ImGui::SmallButton(s_meshEditor.m_editMesh ? "Close Mesh Editor" : "Edit Mesh")) {
-        s_meshEditor.m_editMesh = !s_meshEditor.m_editMesh;
-        s_meshEditor.m_meshError.clear();
-        // опционально: при открытии заполнить поля текущими значениями
-        if (s_meshEditor.m_editMesh && meshPtr) {
-            AssetPath cur = meshPtr->GetCurrentMeshPath();
-            std::wstring ws = cur.m_assetRelativePath.c_str();
-            std::string  s(ws.begin(), ws.end());
-            strncpy(s_meshEditor.m_meshPathBuf, s.c_str(), sizeof(s_meshEditor.m_meshPathBuf) - 1);
-            s_meshEditor.m_meshPathBuf[sizeof(s_meshEditor.m_meshPathBuf) - 1] = 0;
-            s_meshEditor.m_meshAssetSource = cur.m_assetSource;
-        }
-    }
-
-    // Editing panel
-    if (s_meshEditor.m_editMesh) {
-        ImGui::Separator();
-
-        ImGui::InputText("Mesh AssetPath", s_meshEditor.m_meshPathBuf, sizeof(s_meshEditor.m_meshPathBuf));
-
-        const char* srcItems = "Engine\0Project\0";
-        ImGui::Combo("Mesh Source", (int*)&s_meshEditor.m_meshAssetSource, srcItems);
-
-        if (ImGui::Button("Load Mesh")) {
+    if (!(obj->m_group == GameObjectGroup::Shapes))
+    {
+        // Editing button
+        if (ImGui::SmallButton(s_meshEditor.m_editMesh ? "Close Mesh Editor" : "Edit Mesh")) {
+            s_meshEditor.m_editMesh = !s_meshEditor.m_editMesh;
             s_meshEditor.m_meshError.clear();
-
-            AssetPath::AssetSource src = s_meshEditor.m_meshAssetSource;
-
-            std::string relNarrow = s_meshEditor.m_meshPathBuf;
-            std::wstring relWide(relNarrow.begin(), relNarrow.end());
-
-            AssetPath ap(relWide.c_str(), src);
-
-            //try
-            {
-                auto newMesh = eastl::make_shared<SE_G::Mesh>(m_WorldEditor->m_renderer->GetDevice(), ap);
-                assigned->SetMesh(newMesh);
-
+            // опционально: при открытии заполнить поля текущими значениями
+            if (s_meshEditor.m_editMesh && meshPtr) {
+                AssetPath cur = meshPtr->GetCurrentMeshPath();
+                std::wstring ws = cur.m_assetRelativePath.c_str();
+                std::string  s(ws.begin(), ws.end());
+                strncpy(s_meshEditor.m_meshPathBuf, s.c_str(), sizeof(s_meshEditor.m_meshPathBuf) - 1);
+                s_meshEditor.m_meshPathBuf[sizeof(s_meshEditor.m_meshPathBuf) - 1] = 0;
+                s_meshEditor.m_meshAssetSource = cur.m_assetSource;
             }
         }
 
-        if (!s_meshEditor.m_meshError.empty()) {
-            ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Mesh load error: %s", s_meshEditor.m_meshError.c_str());
+        // Editing panel
+        if (s_meshEditor.m_editMesh) {
+            ImGui::Separator();
+
+            ImGui::InputText("Mesh asset path", s_meshEditor.m_meshPathBuf, sizeof(s_meshEditor.m_meshPathBuf));
+
+            const char* srcItems = "Engine\0Project\0";
+            ImGui::Combo("Mesh Source", (int*)&s_meshEditor.m_meshAssetSource, srcItems);
+
+            if (ImGui::Button("Load Mesh")) {
+                s_meshEditor.m_meshError.clear();
+
+                AssetPath::AssetSource src = s_meshEditor.m_meshAssetSource;
+
+                std::string relNarrow = s_meshEditor.m_meshPathBuf;
+                std::wstring relWide(relNarrow.begin(), relNarrow.end());
+
+                AssetPath ap(relWide.c_str(), src);
+
+                {
+                    auto newMesh = eastl::make_shared<SE_G::Mesh>(m_WorldEditor->m_renderer->GetDevice(), ap);
+                    assigned->SetMesh(newMesh);
+
+                }
+                
+                s_meshEditor.m_editMesh = false;
+            }
+
+            if (!s_meshEditor.m_meshError.empty()) {
+                ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Mesh load error: %s", s_meshEditor.m_meshError.c_str());
+            }
         }
     }
-
+    else
+    {
+        ImGui::BeginDisabled();
+        ImGui::Button("Edit Mesh");
+        ImGui::SetItemTooltip("Mesh editor disabled for shapes");
+        ImGui::EndDisabled();
+    }
 
     ImGui::Separator();
     // Texture
@@ -1227,6 +1237,54 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     } else {
         ImGui::TextDisabled("Texture: (none)");
     }
+
+    // Editing button
+    if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
+        s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
+        s_meshEditor.m_texError.clear();
+        // опционально: при открытии заполнить поля текущими значениями
+        if (s_meshEditor.m_editTexture && tex) {
+            AssetPath cur = tex->GetCurrentTexturePath();
+            std::wstring ws = cur.m_assetRelativePath.c_str();
+            std::string  s(ws.begin(), ws.end());
+            strncpy(s_meshEditor.m_texPathBuf, s.c_str(), sizeof(s_meshEditor.m_texPathBuf) - 1);
+            s_meshEditor.m_texPathBuf[sizeof(s_meshEditor.m_texPathBuf) - 1] = 0;
+            s_meshEditor.m_texAssetSource = cur.m_assetSource;
+        }
+    }
+
+    // Editing panel
+    if (s_meshEditor.m_editTexture) {
+        ImGui::Separator();
+
+        ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
+
+        const char* srcItems = "Engine\0Project\0";
+        ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
+
+        if (ImGui::Button("Load Texture")) {
+            s_meshEditor.m_texError.clear();
+
+            AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
+
+            std::string relNarrow = s_meshEditor.m_texPathBuf;
+            std::wstring relWide(relNarrow.begin(), relNarrow.end());
+
+            AssetPath ap(relWide.c_str(), src);
+
+            {
+                auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap);
+                assigned->SetTexture(newTexture);
+            }
+
+            s_meshEditor.m_editTexture = false;
+        }
+
+        if (!s_meshEditor.m_texError.empty()) {
+            ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
+        }
+    }
+
     ImGui::Separator();
 
     // Sampler

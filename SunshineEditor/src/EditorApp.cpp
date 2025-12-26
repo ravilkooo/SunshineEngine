@@ -584,7 +584,6 @@ bool EditorApp::OpenProject()
 	}
 	
 	SetupAssetsDirectory();
-	AssetPath::s_projectPath = ContentBrowserPanel::s_AssetsDirectory.c_str();
 	return true;
 }
 

@@ -60,18 +60,35 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
+	/*
+	auto mc_info = obj->AddComponent<MeshComponent_Info>();
+	mc_info->FromJson(j["components"]["Mesh"],
+		device, rc_info.get(),
+		tc_info.get(), obj->m_UUID);
+	*/
+
 	// MeshComponent (holds shared mesh resource)
 	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, obj->m_shapeData->Size);
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc_info->GetDevice(),
-		AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	mesh_info->SetTexture(texture);
+	if (j["components"]["Mesh"].contains("Texture"))
+	{
+		AssetPath texPath;
+		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
 
-	// PhysicsComponent
-	//auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+		
+		mesh_info->SetTexture(texture);
+	}
+	else {
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			device,
+			AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
+			SE_G::Bind::PipelineStage::PIXEL_SHADER);
+	
+		mesh_info->SetTexture(texture);
+	}
 
 	return obj;
 }

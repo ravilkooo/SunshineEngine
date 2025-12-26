@@ -60,7 +60,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
-                        "relativePath": "DefaultTexture.dds"
+                        "relativePath": "DefaultSkybox.dds"
                     }
                 },
                 "Physics": {
@@ -148,8 +148,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "DefaultSphereTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "football.dds"
                     }
                 },
                 "Physics": {
@@ -224,8 +224,8 @@
                     "y": 1.0,
                     "z": 1.0
                 },
-                "SliceCount": 10,
-                "StackCount": 10
+                "SliceCount": 19,
+                "StackCount": 11
             },
             "m_type": "Sphere"
         },
@@ -418,8 +418,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "DefaultSphereTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "pixeleye.dds"
                     }
                 },
                 "Physics": {
@@ -508,8 +508,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "DefaultSphereTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "basketball.dds"
                     }
                 },
                 "Physics": {
@@ -603,8 +603,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "DefaultSphereTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "eye.dds"
                     }
                 },
                 "Physics": {
@@ -879,8 +879,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "DefaultTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "carpet.dds"
                     }
                 },
                 "Physics": {
@@ -1059,8 +1059,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "DefaultTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "plane_Diffuse.dds"
                     }
                 },
                 "Physics": {
@@ -1122,7 +1122,7 @@
                     ]
                 }
             },
-            "m_UUID": 16360750645405899878,
+            "m_UUID": 12360228434478380947,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1207,8 +1207,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "DefaultTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "horse_Diffuse.dds"
                     }
                 },
                 "Physics": {
@@ -1295,6 +1295,92 @@
                     ]
                 }
             }
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Geosphere"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "eye.dds"
+                    }
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        8.5,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 3619104566789212522,
+            "m_group": "Shapes",
+            "m_name": "Geosphere",
+            "m_parent": null,
+            "m_shapeData": {
+                "NumSubdivisions": 13,
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            },
+            "m_type": "Geosphere"
         }
     ]
 }

@@ -59,22 +59,24 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	auto newMesh = SE_G::Mesh::CreateSphereMesh(device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc_info->GetDevice(),
-		AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	mesh_info->SetTexture(texture);
+	if (j["components"]["Mesh"].contains("Texture"))
+	{
+		AssetPath texPath;
+		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
 
-	// PhysicsComponent
-	/*
-	if (j["components"].contains("Physics")) {
-		auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
-		pc_info->FromJson(j["components"]["Physics"]);
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+		mesh_info->SetTexture(texture);
 	}
 	else {
-		
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			device,
+			AssetPath(L"DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
+			SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+		mesh_info->SetTexture(texture);
 	}
-	*/
 
 	return obj;
 }
