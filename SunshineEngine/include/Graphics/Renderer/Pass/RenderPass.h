@@ -57,6 +57,10 @@ namespace SE_G {
 
 		PassType m_passType;
 
+		eastl::shared_ptr<Camera> GetCamera();
+		virtual void SetCamera(eastl::shared_ptr<Camera> camera);
+		eastl::shared_ptr<Camera> m_camera;
+
 	protected:
 		eastl::string techniqueTag;
 		eastl::vector<Bind::Bindable*> perFrameBindables;
@@ -68,7 +72,6 @@ namespace SE_G {
 		eastl::unordered_map<SE::UUID, eastl::unique_ptr<SE_G::RenderTechnique>> m_techniques;
 
 
-	private:
 		bool m_enabled = true;
 	};
 }

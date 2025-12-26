@@ -10,7 +10,7 @@ namespace SE_G {
 		this->screenWidth = pGBuffer->m_screenWidth;
 		this->screenHeight = pGBuffer->m_screenHeight;
 		this->pGBuffer = pGBuffer;
-		this->camera = camera;
+		this->m_camera = camera;
 		m_passType = PassType::GPass;
 
 		// Set RTVs
@@ -52,8 +52,8 @@ namespace SE_G {
 		context->RSSetViewports(1, &viewport);
 
 		// Bind camera buffer to 1u slot
-		camera->UpdateBuffer(context.Get());
-		camera->BindBuffer(context.Get());
+		m_camera->UpdateBuffer(context.Get());
+		m_camera->BindBuffer(context.Get());
 	}
 
 	void GPass::Pass()
@@ -79,16 +79,6 @@ namespace SE_G {
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
 		}
-	}
-
-	eastl::shared_ptr<Camera> GPass::GetCamera()
-	{
-		return camera;
-	}
-
-	void GPass::SetCamera(eastl::shared_ptr<Camera> camera)
-	{
-		this->camera = camera;
 	}
 
 	void GPass::EndFrame()

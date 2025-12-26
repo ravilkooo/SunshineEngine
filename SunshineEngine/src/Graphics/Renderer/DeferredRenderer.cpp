@@ -28,6 +28,20 @@ namespace SE_G {
 		m_mainCamera->SetPosition({ 0, 0, -10 });
 	}
 
+	void DeferredRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)
+	{ 
+		m_mainCamera = camera;
+		
+		for (auto& pass : m_passes) {
+			pass.second->SetCamera(m_mainCamera);
+		}
+	}
+
+	eastl::shared_ptr<Camera> DeferredRenderer::GetMainCamera()
+	{ 
+		return m_mainCamera;
+	};
+
 	void DeferredRenderer::OnResize(UINT resizeWidth, UINT resizeHeight)
 	{
 		m_screenWidth = resizeWidth;

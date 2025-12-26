@@ -27,6 +27,8 @@
 #include <Utils/ILogManager.h>
 #include <Scripting/LuaManager.h>
 
+#include <PlayerObject/PlayerObject.h>
+
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
 
@@ -54,7 +56,7 @@ public:
     void ClearScene();
 
     bool LoadScene(const wchar_t* scenePath);
-
+    
     bool LoadGAIScene();
     bool LoadDefaultScene();
     bool LoadParentScene();
@@ -82,6 +84,9 @@ public:
     SE_G::LightPass* m_lightPass;
 
     float m_deltaTime = 0.0f;
+
+    // PlayerObject
+    PlayerObject* m_playerObject;
 
     // GAI
     void CreateGAIScene();

@@ -17,6 +17,8 @@
 #include <GameObject/EditorObjectFactory.h>
 #include <GameObject/GameObjectFactory.h>
 
+#include <PlayerObject/PlayerObject.h>
+
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Utils/Camera.h>
 
@@ -70,8 +72,6 @@ void TransformComponent_Info::FromJson(const json& j, ID3D11Device* device) {
 
 void TransformComponent::FromJson(const json& j)
 {
-
-
     if (j.contains("m_position") && j["m_position"].is_array() && j["m_position"].size() >= 3) {
         m_position.x = j["m_position"][0].get<float>();
         m_position.y = j["m_position"][1].get<float>();
@@ -419,17 +419,31 @@ json GameObject_Info::ToJson() const {
     switch (m_group)
     {
     case GameObjectGroup::Lighting:
+    {
         j["m_type"] = m_type.m_asLight;
         break;
+    }
     case GameObjectGroup::Shapes:
+    {
         j["m_type"] = m_type.m_asShape;
         break;
+    }
     case GameObjectGroup::CustomMesh:
+    {
         break;
+    }
+    case GameObjectGroup::Player:
+    {
+        break;
+    }
     case GameObjectGroup::Other:
+    {
         break;
+    }
     default:
+    {
         break;
+    }
     }
 
     j["components"] = json::object();
@@ -623,6 +637,23 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     renderSystem, objJ);
             }
                 break;
+            case GameObjectGroup::Player:
+            {
+                go = eastl::make_unique<PlayerObject>(objJ, renderSystem);
+                auto playerObj = static_cast<PlayerObject*>(go.get());
+                if (objJ.contains("settings"))
+                {
+                    playerObj->SettingsFromJson(objJ["settings"], camera);
+                }
+                else
+                {
+                    json _empty;
+                    playerObj->SettingsFromJson(_empty, camera);
+                }
+                playerObj->AssignSceneToCamera(scene.get());
+                scene->m_playerObjectUUID = playerObj->m_UUID;
+                break;
+            }
             case GameObjectGroup::Other:
                 break;
             default:
@@ -651,7 +682,11 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
                 }
 
-                scene->AddGameObject(eastl::move(go));
+                auto objUUID = scene->AddGameObject(eastl::move(go));
+                if (objGroup == GameObjectGroup::Player)
+                {
+                    scene->m_playerObject = static_cast<PlayerObject*>(scene->GetGameObjectByUUID(objUUID));
+                }
             }
         }
     }
@@ -678,6 +713,7 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
     const json& j)
 {
     auto scene = eastl::make_shared<Scene_Info>();
+
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
             GameObjectGroup objGroup = objJ["m_group"];
@@ -739,6 +775,24 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 go = EditorObjectFactory::CreateCustomMesh(renderSystem, objJ);
             }
                 break;
+
+            case GameObjectGroup::Player:
+            {
+                go = eastl::make_unique<PlayerObject_Info>(objJ, renderSystem);
+                auto playerObj = static_cast<PlayerObject_Info*>(go.get());
+                if (objJ.contains("settings"))
+                {
+                    playerObj->SettingsFromJson(objJ["settings"], renderSystem);
+                }
+                else
+                {
+                    json _empty;
+                    playerObj->SettingsFromJson(_empty, renderSystem);
+                }
+                playerObj->AssignSceneToCamera(scene.get());
+                scene->m_playerObject = playerObj->m_UUID;
+                break;
+            }
             case GameObjectGroup::Other:
                 break;
             default:
@@ -748,7 +802,9 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
 
             if (go) {
 
-                if (objJ["components"].contains("Physics")) {
+                if (objJ["components"].contains("Physics")
+                    && objJ["m_group"] != GameObjectGroup::Player)
+                {
                     auto c = go->AddComponent<PhysicsComponent_Info>(
                         go->GetComponent<RenderComponent_Info>().get(),
                         go->GetComponent<TransformComponent_Info>().get());

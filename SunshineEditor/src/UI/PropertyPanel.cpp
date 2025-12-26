@@ -18,13 +18,10 @@
 PropertyPanel::PropertyPanel() {}
 
 void PropertyPanel::OnImGuiRender()
-{
-    ImGui::Begin("Properties");
-    
+{   
     if (m_SelectedUUID == SE::UUID(0u) || !m_WorldEditor)
     {
         ImGui::Text("No object selected");
-        ImGui::End();
         return;
     }
 
@@ -32,7 +29,6 @@ void PropertyPanel::OnImGuiRender()
     if (!obj)
     {
         ImGui::Text("Object not found");
-        ImGui::End();
         return;
     }
     
@@ -46,8 +42,6 @@ void PropertyPanel::OnImGuiRender()
     DrawDetails(obj);
     
     DrawComponentAddPopup(obj);
-
-    ImGui::End();
 }
 
 void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)

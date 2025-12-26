@@ -101,4 +101,14 @@ namespace SE_G {
 		m_enabled = true;
 	}
 
+	eastl::shared_ptr<Camera> RenderPass::GetCamera()
+	{
+		return m_camera;
+	}
+
+	void RenderPass::SetCamera(eastl::shared_ptr<Camera> camera)
+	{
+		this->m_camera = camera;
+	}
+
 }
