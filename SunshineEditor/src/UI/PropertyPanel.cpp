@@ -1135,6 +1135,11 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 
     // Mesh path
     auto meshPtr = assigned->GetMesh();
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+    ImGui::Text("Mesh settings");
+    EditorUI::FontStyles::Pop();
+
     if (meshPtr) {
         eastl::wstring mpath = meshPtr->GetCurrentMeshPath().m_assetRelativePath;
         // convert wstring to narrow string for ImGui display
@@ -1148,10 +1153,16 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     } else {
         ImGui::TextDisabled("Mesh: (procedural or empty)");
     }
-
+    ImGui::Separator();
     // Texture
     auto tex = assigned->GetTexture();
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+    ImGui::Text("Texture settings");
+    EditorUI::FontStyles::Pop();
+
     if (tex) {
+
         eastl::wstring tpath = tex->GetCurrentTexturePath().m_assetRelativePath;
         // convert wstring to narrow string for ImGui display
         std::wstring ws = tpath.c_str();
@@ -1164,9 +1175,15 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     } else {
         ImGui::TextDisabled("Texture: (none)");
     }
+    ImGui::Separator();
 
     // Sampler
     auto sampler = assigned->GetTextureSamplerPreset();
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+    ImGui::Text("Sampler settings");
+    EditorUI::FontStyles::Pop();
+
     if (sampler) {
         auto preset = sampler->GetPreset();
         const char* presetName = "Unknown";
