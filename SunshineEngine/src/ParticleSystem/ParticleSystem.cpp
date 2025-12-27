@@ -1,6 +1,7 @@
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
 
+#include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/BlendState.h>
@@ -285,6 +286,8 @@ namespace SE
 		context->ClearState();
 
 		// Emitter Pass
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Emitter Pass");
+
 		context->CSSetShader(m_emitParticlesCShader.Get(), nullptr, 0);
 		context->CSSetConstantBuffers(0, 1, m_sceneConstantBuffer.GetAddressOf());
 
@@ -295,19 +298,25 @@ namespace SE
 		
 		context->CSSetShader(nullptr, nullptr, 0);
 		context->ClearState();
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 
 		// Init simulate dispatch args
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Init simulate dispatch args Pass");
+
 		context->CSSetShader(m_initSimulateDispatchArgsCShader.Get(), nullptr, 0);
-		
+
 		for (auto emitter : m_emitters)
 		{
 			emitter.second->InitSimDispatchArgsPass();
 		}
-		
+
 		context->CSSetShader(nullptr, nullptr, 0);
 		context->ClearState();
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 
 		// Simulate Pass
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Simulate Pass");
+
 		context->CSSetShader(m_simulateParticlesCShader.Get(), nullptr, 0);
 		context->CSSetConstantBuffers(0, 1, m_sceneConstantBuffer.GetAddressOf());
 
@@ -318,10 +327,13 @@ namespace SE
 
 		context->CSSetShader(nullptr, nullptr, 0);
 		context->ClearState();
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
 	void ParticleSystem::Update(float deltaTime)
 	{
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"ParticleSystem Update");
+
 		UpdateAllEmitters(deltaTime);
 
 		m_sceneConstantBufferData.camPosition = DXSM::Vector4(m_camera->GetPosition());
@@ -335,6 +347,8 @@ namespace SE
 		context->Map(m_sceneConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
 		memcpy(mappedResource.pData, &m_sceneConstantBufferData, ParticleEmitter::Align(sizeof(m_sceneConstantBufferData), 16u)); // aligned size
 		context->Unmap(m_sceneConstantBuffer.Get(), 0);
+
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
 	void ParticleSystem::UpdateAllEmitters(float deltaTime)

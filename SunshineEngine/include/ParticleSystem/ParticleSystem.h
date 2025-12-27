@@ -36,6 +36,7 @@ namespace SE
 	class ParticleSystem
 	{
 	public:
+
 		// Common Shaders
 		Microsoft::WRL::ComPtr<ID3D11InputLayout>       m_inputLayout;
 		Microsoft::WRL::ComPtr<ID3DBlob>				m_vertexShaderBytecodeBlob;

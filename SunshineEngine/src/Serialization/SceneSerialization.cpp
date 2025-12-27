@@ -704,9 +704,14 @@ eastl::shared_ptr<Scene> Scene::FromJson(
 json Scene_Info::ToJson() const {
     json j;
     j["gameObjects"] = json::array();
-    for (auto& uuid : gameObjects) {
+    for (auto& uuid : gameObjects)
+    {
         auto it = uuidToObjectMap.find(uuid);
-        if (it != uuidToObjectMap.end() && it->second) {
+        if (it != uuidToObjectMap.end() && it->second)
+        {
+            if (it->second->m_group == GameObjectGroup::Other)
+                continue;
+
             j["gameObjects"].push_back(it->second->ToJson());
         }
     }

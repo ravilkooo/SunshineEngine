@@ -23,7 +23,8 @@ namespace SE
     class ParticleSystem;
 
     class ParticleEmitter :
-        public GameObject
+        public GameObject_Info
+        //public GameObject
     {
     public:
         static constexpr uint32_t Align(uint32_t value, uint32_t alignment) { return (value + (alignment - 1)) & ~(alignment - 1); };

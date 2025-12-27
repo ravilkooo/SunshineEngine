@@ -7,6 +7,7 @@
 
 // temp
 #include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/ParticleEmitter.h>
 
 WorldEditor::WorldEditor()
 {
@@ -537,7 +538,10 @@ void WorldEditor::Pause() {
 	m_renderer->Disable();
 }
 
-void WorldEditor::Update(float deltaTime) {
+void WorldEditor::Update(float deltaTime)
+{
+	if (m_particleSystem)
+		m_particleSystem->Update(deltaTime);
 
 	//m_luaManager.Update(m_scene, deltaTime);
 	//m_physicsSystem->Step(deltaTime);
@@ -631,32 +635,86 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	LOG_EDITOR_INFO("Scene loaded");
 
 	m_selectionPass->m_scene = m_scene.get();
-	
-	if (m_scene->m_playerObject == SE::UUID(0u))
-	{
-		auto go = eastl::make_unique<PlayerObject_Info>();
-
-		go->AddTransformComponent(m_renderer->GetDevice());
-		go->AddRenderComponent(m_renderer.get());
-		go->AddMeshComponent();
-		go->AddPhysicsComponent();
-
-		json _empty;
-		go->SettingsFromJson(_empty, m_renderer.get());
-		go->AssignSceneToCamera(m_scene.get());
-		
-		m_playerObject = m_scene->AddGameObject(eastl::move(go));
-		m_scene->m_playerObject = m_playerObject;
-	}
-	else
-	{
-		m_playerObject = m_scene->m_playerObject;
-	}
 
 	// PlayerObject
-	auto pObj = static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject));
+	{
+		if (m_scene->m_playerObject == SE::UUID(0u))
+		{
+			auto go = eastl::make_unique<PlayerObject_Info>();
 
-	m_renderingSystem->AddRenderGroup(pObj->m_miniViewRenderer.get());
+			go->AddTransformComponent(m_renderer->GetDevice());
+			go->AddRenderComponent(m_renderer.get());
+			go->AddMeshComponent();
+			go->AddPhysicsComponent();
+
+			json _empty;
+			go->SettingsFromJson(_empty, m_renderer.get());
+			go->AssignSceneToCamera(m_scene.get());
+
+			m_playerObject = m_scene->AddGameObject(eastl::move(go));
+			m_scene->m_playerObject = m_playerObject;
+		}
+		else
+		{
+			m_playerObject = m_scene->m_playerObject;
+		}
+
+		auto pObj = static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject));
+
+		m_renderingSystem->AddRenderGroup(pObj->m_miniViewRenderer.get());
+	}
+
+	// TestEmitter
+	{
+		SE::ParticleEmitter::EmitterPointConstantBuffer emitterDesc;
+		SE::ParticleEmitter::SimulateParticlesConstantBuffer simulatorDesc;
+
+		// Bubble Particles
+		emitterDesc =
+		{
+			DXSM::Matrix::Identity,
+			{ 0, 40, 0, 1 },
+			{ 1, 1, 1, 1 },
+			{ 1, 1, 1, 1 },
+			100, 8, 8, 1,
+			0.5, 0.5,
+			0, 3.1415 * 2,
+			3.1415 / 10, 0, 0, 0
+		};
+		simulatorDesc = {
+			{ 0, -5, 0, 0 }
+		};
+
+		auto go = eastl::make_unique<SE::ParticleEmitter>(
+			m_particleSystem.get(),
+			emitterDesc,
+			simulatorDesc);
+
+		/*
+		particleBlendDesc = CD3D11_BLEND_DESC(CD3D11_DEFAULT{});
+		particleBlendDesc.RenderTarget[0].BlendEnable = TRUE;
+		particleBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		particleBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		particleBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		particleBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		particleBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		particleBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		particleBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		bubbleParticleSystem->SetBlendState(
+			new Bind::BlendState(renderer->GetDevice(), particleBlendDesc, particleBlendFactor, sampleMask));
+		*/
+
+		AssetPath bubble(L"bubble24bpp.dds");
+
+		auto bubbleTex = eastl::make_unique<SE_G::Bind::Texture>(m_renderer->GetDevice(), bubble, 0u);
+
+		go->SetTexture(eastl::move(bubbleTex));
+		go->SetEmissionRate(40);
+
+		auto bubbleUUID = m_scene->AddGameObject(eastl::move(go));
+
+		m_particleSystem->m_emitters["bubble"] = static_cast<SE::ParticleEmitter*>(m_scene->GetGameObjectByUUID(bubbleUUID));
+	}
 
 	return true;
 }

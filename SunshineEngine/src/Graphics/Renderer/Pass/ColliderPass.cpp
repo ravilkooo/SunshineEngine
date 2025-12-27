@@ -1,6 +1,9 @@
-﻿#include <Graphics/Renderer/Pass/ColliderPass.h>
+﻿#include <Graphics/Renderer/RenderingSystem.h>
+
+#include <Graphics/Renderer/Pass/ColliderPass.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
+
 #include <Graphics/Bindable/Sampler.h>
 #include <Utils/StringUtils.h>
 
@@ -76,6 +79,8 @@ namespace SE_G {
 
 	void ColliderPass::StartFrame()
 	{
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Collider Pass");
+
 		context->OMSetRenderTargets(2, m_bufferRTVs, m_GBuffer->pDepthDSV.Get());
 
 		context->RSSetViewports(1, &m_viewport);
@@ -125,6 +130,8 @@ namespace SE_G {
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
 		context->OMSetRenderTargets(1, nullRTVs, *nullDSVs);
+
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
 	void ColliderPass::OnResize(UINT resizeWidth, UINT resizeHeight)

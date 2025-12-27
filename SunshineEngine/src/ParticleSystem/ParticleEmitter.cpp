@@ -8,11 +8,14 @@ namespace SE
 {
     ParticleEmitter::ParticleEmitter(ParticleSystem* particleSystem,
         EmitterPointConstantBuffer emitterDesc,
-        SimulateParticlesConstantBuffer simulatorDesc)
-        : m_particleSystem(particleSystem),
-        m_emitterConstantBufferData(emitterDesc),
-        m_simulateParticlesConstantBufferData(simulatorDesc)
+        SimulateParticlesConstantBuffer simulatorDesc) : GameObject_Info()
     {
+        m_particleSystem = particleSystem;
+        m_emitterConstantBufferData = emitterDesc;
+        m_simulateParticlesConstantBufferData = simulatorDesc;
+        m_group = GameObjectGroup::Other;
+        m_name = "ParticleEmitter";
+
         auto device = m_particleSystem->m_renderer->GetDevice();
 
         D3D11_BUFFER_DESC particleBufferDesc;

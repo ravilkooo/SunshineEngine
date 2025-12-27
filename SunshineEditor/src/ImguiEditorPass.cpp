@@ -1,3 +1,5 @@
+#include <Graphics/Renderer/RenderingSystem.h>
+
 #include <EASTL/string.h>
 #include <EASTL/priority_queue.h>
 
@@ -88,6 +90,8 @@ void ImguiEditorPass::SetVieportGBuffer(
 
 void ImguiEditorPass::StartFrame()
 {
+	if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"ImguiEditor Pass");
+
 	context->OMSetRenderTargets(1u, m_renderTargetView.GetAddressOf(), m_pDSV.Get());
 	float color[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	context->ClearRenderTargetView(m_renderTargetView.Get(), color);
@@ -319,6 +323,8 @@ void ImguiEditorPass::EndFrame()
 	context->PSSetShaderResources(0, 1, nullSRVs);
 	ID3D11RenderTargetView* nullRTVs[] = { nullptr };
 	context->OMSetRenderTargets(1, nullRTVs, nullptr);
+
+	if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 }
 
 void ImguiEditorPass::RenderGameWorld()

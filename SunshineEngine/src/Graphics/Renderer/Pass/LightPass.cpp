@@ -1,3 +1,5 @@
+#include <Graphics/Renderer/RenderingSystem.h>
+
 #include <Graphics/Renderer/Pass/LightPass.h>
 #include <ParticleSystem/ParticleSystem.h>
 
@@ -88,6 +90,8 @@ namespace SE_G {
 
 	void LightPass::StartFrame()
 	{
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Light Pass");
+
 		context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
 		float colorBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		context->ClearRenderTargetView(m_GBuffer->pLightRTV.Get(), colorBlack);
@@ -138,6 +142,8 @@ namespace SE_G {
 		if (m_particleSystem)
 		{
 			m_particleSystem->ComputePassForAllEmitters();
+			context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
+			context->RSSetViewports(1, &m_viewport);
 			m_particleSystem->RenderAllEmitters();
 		}
 
@@ -147,10 +153,9 @@ namespace SE_G {
 
 	void LightPass::EndFrame()
 	{
-		//ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr, nullptr, nullptr };
-
-		//context->PSSetShaderResources(0, NULL, NULL);
 		context->OMSetRenderTargets(0, NULL, NULL);
+
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
 
