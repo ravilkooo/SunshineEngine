@@ -673,16 +673,18 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 		emitterDesc =
 		{
 			DXSM::Matrix::Identity,
-			{ 0, 40, 0, 1 },
-			{ 1, 1, 1, 1 },
-			{ 1, 1, 1, 1 },
-			100, 8, 8, 1,
-			0.5, 0.5,
-			0, 3.1415 * 2,
-			3.1415 / 10, 0, 0, 0
+			{ 15, 0, 0 }, 3,
+			{ 1, 1, 1 }, 8,
+			{ 1, 1, 1 }, 1,
+			
+			0.2, 0.5, 0, DX::XM_2PI,
+
+			-DX::XM_PI / 10, DX::XM_PI / 10, 100u, 0,
+
+			/*0, 0, 0*/
 		};
 		simulatorDesc = {
-			{ 0, -5, 0, 0 }
+			{ 0, -5, 0 }, 0
 		};
 
 		auto go = eastl::make_unique<SE::ParticleEmitter>(

@@ -45,23 +45,24 @@ cbuffer emitterPointConstantBuffer : register(b2)
 {
     row_major float4x4 rotMatrix;
     
-    float4 emitterPosition;
-    float4 colorStart;
-    float4 colorEnd;
-    
-    uint emitterMaxSpawn;
+    float3 emitterPosition;
     float particlesLifeSpan;
+    
+    float3 colorStart;
     float particlesBaseSpeed;
+    
+    float3 colorEnd;
     float particlesMass;
     
     float particleSizeStart;
     float particleSizeEnd;
-    
     float longitudeMin;
     float longitudeMax;
 
+    float latitudeMin;
     float latitudeMax;
-    float3 emitterPadding;
+    uint emitterMaxSpawn;
+    float emitterPadding;
 };
 
 ConsumeStructuredBuffer<uint> deadListBuffer : register(u0);
@@ -80,24 +81,24 @@ void main(uint3 id : SV_DispatchThreadID)
         
         Particle p = (Particle) 0;
         
-        p.position = emitterPosition;
-        p.position.w = 1.0;
+        p.position = float4(emitterPosition, 1.0f);
 
-        float colatitude = latitudeMax * rand_xorshift_normalized(rng_state); // 3.1415
+        float colatitude = latitudeMin
+            + (latitudeMax - latitudeMin) * rand_xorshift_normalized(rng_state); // 3.1415
         float longitude = longitudeMin
             + (longitudeMax - longitudeMin) * rand_xorshift_normalized(rng_state_2); // 2 * 3.1415
         
         float radius = 1.0f;
-        p.velocity.x = radius * sin(colatitude) * cos(longitude);
-        p.velocity.z = radius * sin(colatitude) * sin(longitude);
-        p.velocity.y = radius * cos(colatitude);
+        p.velocity.x = radius * cos(colatitude) * cos(longitude);
+        p.velocity.z = radius * cos(colatitude) * sin(longitude);
+        p.velocity.y = radius * sin(colatitude);
         p.velocity.w = 1.0f;
         
         p.velocity = particlesBaseSpeed * normalize(p.velocity);
         p.velocity = mul(rotMatrix, p.velocity);
         
-        p.colorStart = colorStart;
-        p.colorEnd = colorEnd;
+        p.colorStart = float4(colorStart, 1.0f);
+        p.colorEnd = float4(colorEnd, 1.0f);
         
         p.sizeStart = particleSizeStart;
         p.sizeEnd = particleSizeEnd;

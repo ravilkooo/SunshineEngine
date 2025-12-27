@@ -1,19 +1,30 @@
-#include "UI/PropertyPanel.h"
+#include "DirectXMath.h"
+
 #include "WorldEditor.h"
-#include "GameObject/GameObject.h"
-#include "Component/TransformComponent.h"
-#include "Component/RenderComponent.h"
-#include "Component/PhysicsComponent.h"
-#include "Component/MeshComponent.h"
+
 #include <Graphics/GraphicsResources/Mesh.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/Bindable/Sampler.h>
-#include "Component/LuaComponent.h"
-#include "DirectXMath.h"
-#include "GameObject/Lighting/LightObject.h"
-#include "Graphics/Lighting/LightData.h"
-#include "Graphics/Renderer/Technique/PointLightTechnique.h"
+#include <Graphics/Lighting/LightData.h>
+#include <Graphics/Renderer/Technique/PointLightTechnique.h>
+
+#include <GameObject/GameObject.h>
+#include <GameObject/Lighting/LightObject.h>
+
+#include <GameObject/Shapes/ShapeCollection.h>
+#include "GameObject/Shapes/ShapeObject.h"
+
+#include <ParticleSystem/ParticleEmitter.h>
+
+#include <Component/TransformComponent.h>
+#include <Component/RenderComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/MeshComponent.h>
+#include <Component/LuaComponent.h>
+
+#include <UI/PropertyPanel.h>
 #include <UI/FontStyles.h>
+
 
 PropertyPanel::MeshEditor PropertyPanel::s_meshEditor =
 {
@@ -220,6 +231,12 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
             default:
                 break;
             }
+        }
+        else if (obj->m_group == GameObjectGroup::ParticleEmitter)
+        {
+            auto emitterObj = static_cast<SE::ParticleEmitter*>(obj);
+            DrawEmitterDetails(&emitterObj->m_emitterConstantBufferData,
+                &emitterObj->m_simulateParticlesConstantBufferData);
         }
 
         DrawMeshComponent(obj);
@@ -1306,5 +1323,74 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
         ImGui::Text("Sampler: %s", presetName);
     } else {
         ImGui::TextDisabled("Sampler: (none)");
+    }
+}
+
+void PropertyPanel::DrawEmitterDetails(
+    SE::ParticleEmitter::EmitterPointConstantBuffer* emitterPointBuffer,
+    SE::ParticleEmitter::SimulateParticlesConstantBuffer* simulateParticlesBuffer
+    )
+{
+    if (emitterPointBuffer)
+    {
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Particle Emitter");
+        EditorUI::FontStyles::Pop();
+
+        DrawVector3Control("Position", emitterPointBuffer->position, 0.0f);
+
+        ImGui::ColorEdit3("Color start", &emitterPointBuffer->colorStart.x, ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit3("Color end", &emitterPointBuffer->colorEnd.x, ImGuiColorEditFlags_Float);
+
+        ImGui::DragFloat("Particles lifetime", &emitterPointBuffer->particlesLifeSpan,
+            0.1f, 0.1f, 10.0f, "%.1f sec");
+
+        ImGui::DragFloat("Particles base speed", &emitterPointBuffer->particlesBaseSpeed,
+            0.1f, 0.0f, 20.0f, "%.1f m/s");
+
+        ImGui::DragFloat("Particles mass", &emitterPointBuffer->particlesMass,
+            0.1f, 0.0f, 10.0f, "%.1f");
+
+        ImGui::DragFloat("Particles start size", &emitterPointBuffer->particleSizeStart,
+            0.1f, 0.0f, 10.0f, "%.1f m");
+
+        ImGui::DragFloat("Particles end size", &emitterPointBuffer->particleSizeEnd,
+            0.1f, 0.0f, 10.0f, "%.1f m");
+
+        float longitudeMin = emitterPointBuffer->longitudeMin * (180.0f / DirectX::XM_PI);
+        ImGui::Text("Random longitude range:");
+        if (ImGui::DragFloat("Longitude min", &longitudeMin, 0.1f,
+            0.0f, emitterPointBuffer->longitudeMax, "%.1f"))
+        {
+            emitterPointBuffer->longitudeMin = longitudeMin * (DirectX::XM_PI / 180.0f);
+        }
+        float longitudeMax = emitterPointBuffer->longitudeMax * (180.0f / DirectX::XM_PI);
+        if (ImGui::DragFloat("Longitude max", &longitudeMax, 0.1f,
+            emitterPointBuffer->longitudeMin, DX::XM_2PI, "%.1f"))
+        {
+            emitterPointBuffer->longitudeMax = longitudeMax * (DirectX::XM_PI / 180.0f);
+        }
+
+        float latitudeMin = emitterPointBuffer->latitudeMin * (180.0f / DirectX::XM_PI);
+        ImGui::Text("Random latitude range:");
+        if (ImGui::DragFloat("Latitude min", &latitudeMin, 0.1f,
+            -DX::XM_PIDIV2, emitterPointBuffer->latitudeMax, "%.1f"))
+        {
+            emitterPointBuffer->latitudeMin = latitudeMin * (DirectX::XM_PI / 180.0f);
+        }
+        float latitudeMax = emitterPointBuffer->latitudeMax * (180.0f / DirectX::XM_PI);
+        if (ImGui::DragFloat("Latitude max", &latitudeMax, 0.1f,
+            emitterPointBuffer->latitudeMin, DX::XM_PIDIV2, "%.1f"))
+        {
+            emitterPointBuffer->latitudeMax = latitudeMax * (DirectX::XM_PI / 180.0f);
+        }
+
+        ImGui::Separator();
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Particle force");
+        EditorUI::FontStyles::Pop();
+
+        DrawVector3Control("Force vector", simulateParticlesBuffer->force, 0.0f);
     }
 }

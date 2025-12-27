@@ -13,7 +13,7 @@ namespace SE
         m_particleSystem = particleSystem;
         m_emitterConstantBufferData = emitterDesc;
         m_simulateParticlesConstantBufferData = simulatorDesc;
-        m_group = GameObjectGroup::Other;
+        m_group = GameObjectGroup::ParticleEmitter;
         m_name = "ParticleEmitter";
 
         auto device = m_particleSystem->m_renderer->GetDevice();
@@ -290,6 +290,7 @@ namespace SE
         context->CopyStructureCount(m_aliveListCountConstantBuffer.Get(), 0, m_aliveIndexUAV[m_currentAliveBuffer].Get());
         context->CSSetConstantBuffers(1, 1, m_aliveListCountConstantBuffer.GetAddressOf());
 
+        context->UpdateSubresource(m_simulateParticlesConstantBuffer.Get(), 0, nullptr, &m_simulateParticlesConstantBufferData, 0, 0);
         context->CSSetConstantBuffers(2, 1, m_simulateParticlesConstantBuffer.GetAddressOf());
 
         UINT initialCount[] = { (UINT)-1 };
@@ -414,7 +415,7 @@ namespace SE
         SetEmissionRate(m_emissionRate - deltaEmissionRate);
     }
 
-    void ParticleEmitter::SetEmitPosition(DXSM::Vector4 newPosition)
+    void ParticleEmitter::SetEmitPosition(DXSM::Vector3 newPosition)
     {
         m_emitterConstantBufferData.position = newPosition;
     }

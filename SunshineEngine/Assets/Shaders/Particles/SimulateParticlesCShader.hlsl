@@ -114,7 +114,8 @@ cbuffer aliveListCountConstantBuffer : register(b1)
 
 cbuffer simulateParticlesConstantBuffer : register(b2)
 {
-    float4 force;
+    float3 force;
+    float force_pad;
 }
 
 RWBuffer<uint> indirectDrawArgs : register(u0);
@@ -191,7 +192,7 @@ void main(uint3 id : SV_DispatchThreadID, uint groupId : SV_GroupIndex) //SV_Gro
         }
 
         //float4 force = float4(0, -2.0, 0, 0); // tool
-        float4 acceleration = force / p.mass;
+        float4 acceleration = float4(force / p.mass, 1.0f);
             
         //TEMP
         //float cap = 1.0;

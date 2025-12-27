@@ -709,7 +709,7 @@ json Scene_Info::ToJson() const {
         auto it = uuidToObjectMap.find(uuid);
         if (it != uuidToObjectMap.end() && it->second)
         {
-            if (it->second->m_group == GameObjectGroup::Other)
+            if (it->second->m_group == GameObjectGroup::ParticleEmitter)
                 continue;
 
             j["gameObjects"].push_back(it->second->ToJson());

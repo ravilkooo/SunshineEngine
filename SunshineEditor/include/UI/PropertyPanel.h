@@ -1,15 +1,18 @@
 #pragma once
 
 #include <EASTL/shared_ptr.h>
-#include "SimpleMath.h"
+#include <SimpleMath.h>
 #include <Graphics/Lighting/LightData.h>
-#include <GameObject/Shapes/ShapeCollection.h>
 
+#include <Utils/UUID.h>
 
-#include "GameObject/Shapes/ShapeObject.h"
-#include "Utils/UUID.h"
+#include <ParticleSystem/ParticleEmitter.h>
 
 class GameObject_Info;
+class BoxShapeObject_Info;
+class SphereShapeObject_Info;
+class GeosphereShapeObject_Info;
+
 class TransformComponent;
 class RenderComponent;
 class LuaComponent;
@@ -57,6 +60,10 @@ private:
     void DrawTransformComponent(GameObject_Info* obj);
     void DrawDetails(GameObject_Info* obj);
     void DrawComponentAddPopup(GameObject_Info* obj);
+
+    void DrawEmitterDetails(
+        SE::ParticleEmitter::EmitterPointConstantBuffer* emitterPointBuffer,
+        SE::ParticleEmitter::SimulateParticlesConstantBuffer* simulateParticlesBuffer);
 
     void DrawAmbientLightDetails(SE_G::AmbientLightData* lightData);
     void DrawDirectionalLightDetails(SE_G::DirectionalLightData* lightData);

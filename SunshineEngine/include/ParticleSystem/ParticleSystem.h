@@ -80,7 +80,7 @@ namespace SE
 			eastl::shared_ptr<SE_G::Camera> camera);
 		~ParticleSystem();
 
-		void LoadCS(AssetPath shaderPath, ID3D11ComputeShader* m_computeShader);
+		void LoadCS(AssetPath shaderPath, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& m_computeShader);
 
 		void ComputePassForAllEmitters();
 		void Update(float deltaTime);

@@ -11,7 +11,7 @@
 
 namespace SE
 {
-	void ParticleSystem::LoadCS(AssetPath shaderPath, ID3D11ComputeShader* m_computeShader)
+	void ParticleSystem::LoadCS(AssetPath shaderPath, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& m_computeShader)
 	{
 
 		Microsoft::WRL::ComPtr<ID3DBlob> cs_blob;
@@ -46,7 +46,7 @@ namespace SE
 			cs_blob->GetBufferPointer(),
 			cs_blob->GetBufferSize(),
 			nullptr,
-			&m_computeShader
+			m_computeShader.GetAddressOf()
 		);
 
 		cs_blob.Reset();
@@ -61,19 +61,19 @@ namespace SE
 		auto device = m_renderer->GetDevice();
 
 		AssetPath shaderPath(L"Shaders/Particles/ResetCShader.hlsl");
-		LoadCS(shaderPath, m_resetCShader.Get());
+		LoadCS(shaderPath, m_resetCShader);
 
 		shaderPath.m_assetRelativePath =
 			L"Shaders/Particles/InitSimulateDispatchArgsCShader.hlsl";
-		LoadCS(shaderPath, m_initSimulateDispatchArgsCShader.Get());
+		LoadCS(shaderPath, m_initSimulateDispatchArgsCShader);
 
 		shaderPath.m_assetRelativePath =
 			L"Shaders/Particles/EmitParticlesCShader.hlsl";
-		LoadCS(shaderPath, m_emitParticlesCShader.Get());
+		LoadCS(shaderPath, m_emitParticlesCShader);
 
 		shaderPath.m_assetRelativePath =
 			L"Shaders/Particles/SimulateParticlesCShader.hlsl";
-		LoadCS(shaderPath, m_simulateParticlesCShader.Get());
+		LoadCS(shaderPath, m_simulateParticlesCShader);
 
 		HRESULT hr;
 		Microsoft::WRL::ComPtr<ID3DBlob> error_blob;

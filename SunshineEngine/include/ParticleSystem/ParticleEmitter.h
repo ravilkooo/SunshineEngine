@@ -79,13 +79,13 @@ namespace SE
         {
             DXSM::Matrix rotMatrix;
 
-            DXSM::Vector4 position;
-            DXSM::Vector4 colorStart;
-            DXSM::Vector4 colorEnd;
-
-            uint32_t maxSpawn;
+            DXSM::Vector3 position;
             float particlesLifeSpan;
+            
+            DXSM::Vector3 colorStart;
             float particlesBaseSpeed;
+
+            DXSM::Vector3 colorEnd;
             float particlesMass;
 
             float particleSizeStart;
@@ -93,10 +93,16 @@ namespace SE
             float longitudeMin;
             float longitudeMax;
 
+            float latitudeMin;
             float latitudeMax;
+            uint32_t maxSpawn;
+            float emitterPadding;
+
+            /*
             float particleScreenSpinSpeed;
             float particleWorldSpinSpeed;
             uint32_t particleOrientation;
+            */
 
         };
 
@@ -105,7 +111,8 @@ namespace SE
 
         struct SimulateParticlesConstantBuffer
         {
-            DXSM::Vector4 force;
+            DXSM::Vector3 force;
+            float pad;
         };
 
         SimulateParticlesConstantBuffer  m_simulateParticlesConstantBufferData;
@@ -134,7 +141,7 @@ namespace SE
         void IncrementEmissionRate(float deltaEmissionRate);
         void DecrementEmissionRate(float deltaEmissionRate);
 
-        void SetEmitPosition(DXSM::Vector4 newPosition);
+        void SetEmitPosition(DXSM::Vector3 newPosition);
         void SetEmitDir(DXSM::Vector3 newEmitDir);
 
         void SetTexture(eastl::unique_ptr<SE_G::Bind::Texture> newTexture);
