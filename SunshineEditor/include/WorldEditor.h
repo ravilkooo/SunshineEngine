@@ -25,6 +25,10 @@
 #include <Physics/PhysicsSystem.h>
 #include <LogManager.h>
 
+namespace SE
+{
+    class ParticleSystem;
+}
 
 namespace SE_G
 {
@@ -134,6 +138,8 @@ public:
 
     // PlayerObject
     SE::UUID m_playerObject = SE::UUID(0u);
+
+    eastl::unique_ptr<SE::ParticleSystem> m_particleSystem;
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

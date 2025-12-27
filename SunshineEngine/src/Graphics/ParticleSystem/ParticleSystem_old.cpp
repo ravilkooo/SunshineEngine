@@ -1,7 +1,8 @@
-#include "Graphics/ParticleSystem/ParticleSystem.h"
+#include "Graphics/ParticleSystem/ParticleSystem_old.h"
 
+/*
 namespace SE_G {
-	ParticleSystem::ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* context,
+	ParticleSystem_old::ParticleSystem_old(ID3D11Device* device, ID3D11DeviceContext* context,
 		EmitterPointConstantBuffer emitterDesc,
 		SimulateParticlesConstantBuffer simulatorDesc)
 		: m_d3dDevice(device), m_d3dContext(context)
@@ -80,20 +81,6 @@ namespace SE_G {
 		m_d3dDevice->CreateUnorderedAccessView(m_aliveIndexBuffer[0].Get(), &aliveIndexUAVDesc, &m_aliveIndexUAV[0]);
 
 		m_d3dDevice->CreateUnorderedAccessView(m_aliveIndexBuffer[1].Get(), &aliveIndexUAVDesc, &m_aliveIndexUAV[1]);
-
-		/*
-		//Same UAV as before but for sorting
-		D3D11_UNORDERED_ACCESS_VIEW_DESC aliveIndexUAVSortingDesc;
-		aliveIndexUAVSortingDesc.Format = DXGI_FORMAT_UNKNOWN;
-		aliveIndexUAVSortingDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-		aliveIndexUAVSortingDesc.Buffer.FirstElement = 0;
-		aliveIndexUAVSortingDesc.Buffer.NumElements = m_maxParticles;
-		aliveIndexUAVSortingDesc.Buffer.Flags = 0;
-
-		m_d3dDevice->CreateUnorderedAccessView(m_aliveIndexBuffer[0].Get(), &aliveIndexUAVSortingDesc, &m_aliveIndexUAVSorting[0]);
-
-		m_d3dDevice->CreateUnorderedAccessView(m_aliveIndexBuffer[1].Get(), &aliveIndexUAVSortingDesc, &m_aliveIndexUAVSorting[1]);
-		*/
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC aliveIndexSRVDesc;
 		aliveIndexSRVDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -383,7 +370,7 @@ namespace SE_G {
 		ResetParticles();
 	}
 
-	ParticleSystem::~ParticleSystem() {
+	ParticleSystem_old::~ParticleSystem_old() {
 		m_particleBuffer.Reset();
 		m_particleSRV.Reset();
 		m_particleUAV.Reset();
@@ -426,7 +413,7 @@ namespace SE_G {
 		additionalBindablesForSimulationPass.clear();
 	}
 
-	void ParticleSystem::LoadCS(LPCWSTR computeFilename, ID3D11ComputeShader* m_computeShader)
+	void ParticleSystem_old::LoadCS(LPCWSTR computeFilename, ID3D11ComputeShader* m_computeShader)
 	{
 
 		Microsoft::WRL::ComPtr<ID3DBlob> cs_blob;
@@ -462,7 +449,7 @@ namespace SE_G {
 		);
 	}
 
-	void ParticleSystem::ResetParticles()
+	void ParticleSystem_old::ResetParticles()
 	{
 		UINT initialCount[] = { 0 };
 		m_d3dContext->CSSetUnorderedAccessViews(0, 1, m_deadListUAV.GetAddressOf(), initialCount);
@@ -476,7 +463,7 @@ namespace SE_G {
 		m_d3dContext->CSSetUnorderedAccessViews(0, 3, uavs, nullptr);
 	}
 
-	void ParticleSystem::Update(float deltaTime)
+	void ParticleSystem_old::Update(float deltaTime)
 	{
 		UpdateEmitter(deltaTime);
 
@@ -495,7 +482,7 @@ namespace SE_G {
 
 	}
 
-	void ParticleSystem::UpdateEmitter(float deltaTime)
+	void ParticleSystem_old::UpdateEmitter(float deltaTime)
 	{
 		m_emissionRateAccumulation += m_emissionRate * deltaTime;
 
@@ -506,7 +493,7 @@ namespace SE_G {
 
 			m_d3dContext->CopyStructureCount(m_deadListCountConstantBuffer.Get(), 0, m_deadListUAV.Get());
 			m_d3dContext->CopyResource(m_deadListCountConstantBuffer_2.Get(), m_deadListCountConstantBuffer.Get());
-			//m_deadLi\=stCountConstantBuffer.
+			//m_deadListCountConstantBuffer.
 			D3D11_MAPPED_SUBRESOURCE mappedData;
 			m_d3dContext->Map(m_deadListCountConstantBuffer_2.Get(), 0, D3D11_MAP_READ, 0, &mappedData);
 			DeadListCountConstantBuffer* dataView = reinterpret_cast<DeadListCountConstantBuffer*>(mappedData.pData);
@@ -522,7 +509,7 @@ namespace SE_G {
 		}
 	}
 
-	void ParticleSystem::Render()
+	void ParticleSystem_old::Render()
 	{
 		Emit();
 
@@ -531,7 +518,7 @@ namespace SE_G {
 		Draw();
 	}
 
-	void ParticleSystem::Emit()
+	void ParticleSystem_old::Emit()
 	{
 
 		if (m_emitterConstantBufferData.maxSpawn == 0)
@@ -571,7 +558,7 @@ namespace SE_G {
 		m_d3dContext->CSSetUnorderedAccessViews(0, 4, uavsNull, nullptr);
 	}
 
-	void ParticleSystem::Simulate()
+	void ParticleSystem_old::Simulate()
 	{
 		//init indirect dispatch args (align)
 		m_initSimulateDispatchArgsData.nbThreadGroupX = 256.0f;
@@ -608,25 +595,7 @@ namespace SE_G {
 
 		initialCount[0] = 0;
 		m_d3dContext->CSSetUnorderedAccessViews(1, 1, m_aliveIndexUAV[(m_currentAliveBuffer + 1) % 2].GetAddressOf(), initialCount);
-		/*
-		m_d3dContext->CSSetShaderResources(0, 1, m_attractorsSRV.GetAddressOf());
-		m_d3dContext->CSSetShaderResources(1, 1, m_noiseTextureSRV.GetAddressOf());
-		m_d3dContext->CSSetShaderResources(2, 1, m_forceFieldTextureSRV.GetAddressOf());
-		switch (m_forceFieldSampleMode)
-		{
-		case 0:
-			m_d3dContext->CSSetSamplers(0, 1, RenderStatesHelper::LinearWrap().GetAddressOf());
-			break;
-		case 1:
-			m_d3dContext->CSSetSamplers(0, 1, RenderStatesHelper::LinearBorder().GetAddressOf());
-			break;
-		case 2:
-			m_d3dContext->CSSetSamplers(0, 1, RenderStatesHelper::LinearClamp().GetAddressOf());
-			break;
-		default:
-			break;
-		}
-		*/
+
 		m_d3dContext->CSSetShader(m_simulateParticlesCShader.Get(), nullptr, 0);
 
 		for (auto bindable : additionalBindablesForSimulationPass) {
@@ -638,18 +607,14 @@ namespace SE_G {
 
 		ID3D11UnorderedAccessView* uavsNull[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 		m_d3dContext->CSSetUnorderedAccessViews(0, 6, uavsNull, nullptr);
-		/*
-		m_d3dContext->setSRV(0, nullptr);
-		m_d3dContext->setSRV(1, nullptr);
-		m_d3dContext->setSRV(2, nullptr);
-		*/
+
 		m_d3dContext->CopyStructureCount(m_aliveListCountConstantBuffer.Get(), 0, m_aliveIndexUAV[(m_currentAliveBuffer + 1) % 2].Get());
 
 		//increment current alive
 		m_currentAliveBuffer = (m_currentAliveBuffer + 1) % 2;
 	}
 
-	void ParticleSystem::Draw()
+	void ParticleSystem_old::Draw()
 	{
 		m_d3dContext->VSSetShader(m_renderParticleVS.Get(), nullptr, 0u);
 		m_d3dContext->GSSetShader(m_renderParticleGS.Get(), nullptr, 0u);
@@ -706,39 +671,40 @@ namespace SE_G {
 		//m_d3dContext->ClearState();
 	}
 
-	void ParticleSystem::SetEmissionRate(float emissionRate)
-	{
-		m_emissionRate = eastl::max(0, eastl::min(emissionRate, m_maxParticles * 1.f / 4.0f));
-	}
-
-	void ParticleSystem::IncrementEmissionRate(float deltaEmissionRate)
-	{
-		SetEmissionRate(m_emissionRate + deltaEmissionRate);
-	}
-
-	void ParticleSystem::DecrementEmissionRate(float deltaEmissionRate)
-	{
-		SetEmissionRate(m_emissionRate - deltaEmissionRate);
-	}
-
-	void ParticleSystem::SetBlendState(eastl::unique_ptr<Bind::BlendState> newBlendState)
+	void ParticleSystem_old::SetBlendState(eastl::unique_ptr<Bind::BlendState> newBlendState)
 	{
 		m_blendState = eastl::move(newBlendState);
 	}
 
-	void ParticleSystem::SetTexture(eastl::unique_ptr<Bind::Texture> newTexture)
+	void ParticleSystem_old::SetEmissionRate(float emissionRate)
+	{
+		m_emissionRate = eastl::max(0, eastl::min(emissionRate, m_maxParticles * 1.f / 4.0f));
+	}
+
+	void ParticleSystem_old::IncrementEmissionRate(float deltaEmissionRate)
+	{
+		SetEmissionRate(m_emissionRate + deltaEmissionRate);
+	}
+
+	void ParticleSystem_old::DecrementEmissionRate(float deltaEmissionRate)
+	{
+		SetEmissionRate(m_emissionRate - deltaEmissionRate);
+	}
+
+	void ParticleSystem_old::SetTexture(eastl::unique_ptr<Bind::Texture> newTexture)
 	{
 		m_texture = eastl::move(newTexture);
 	}
 
-	void ParticleSystem::SetEmitPosition(DXSM::Vector4 newPosition)
+	void ParticleSystem_old::SetEmitPosition(DXSM::Vector4 newPosition)
 	{
 		m_emitterConstantBufferData.position = newPosition;
 	}
 
-	void ParticleSystem::SetEmitDir(DXSM::Vector3 newEmitDir)
+	void ParticleSystem_old::SetEmitDir(DXSM::Vector3 newEmitDir)
 	{
 		m_emitterConstantBufferData.rotMatrix =
 			DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::FromToRotation({ 0,1,0 }, newEmitDir));
 	}
 }
+*/

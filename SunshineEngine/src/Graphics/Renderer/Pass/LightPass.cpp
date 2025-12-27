@@ -1,5 +1,5 @@
 #include <Graphics/Renderer/Pass/LightPass.h>
-
+#include <ParticleSystem/ParticleSystem.h>
 
 namespace SE_G {
 	LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
@@ -84,7 +84,6 @@ namespace SE_G {
 
 	LightPass::~LightPass()
 	{
-		particleSystems.clear();
 	}
 
 	void LightPass::StartFrame()
@@ -136,13 +135,14 @@ namespace SE_G {
 			tech.second->Pass(GetDeviceContext());
 		}
 
-		ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr, nullptr, nullptr };
-		context->PSSetShaderResources(0, 4, nullSRVs);
-
-		for (auto ps : particleSystems) {
-			ps->Render();
+		if (m_particleSystem)
+		{
+			m_particleSystem->ComputePassForAllEmitters();
+			m_particleSystem->RenderAllEmitters();
 		}
 
+		ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr, nullptr, nullptr };
+		context->PSSetShaderResources(0, 4, nullSRVs);
 	}
 
 	void LightPass::EndFrame()

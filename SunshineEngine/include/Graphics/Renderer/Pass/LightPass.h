@@ -11,8 +11,9 @@
 
 #include <GameObject/Lighting/LightCollection.h>
 
-// temp
-#include <Graphics/ParticleSystem/ParticleSystem.h>
+namespace SE {
+    class ParticleSystem;
+}
 
 namespace SE_G {
     class LightPass :
@@ -60,7 +61,7 @@ namespace SE_G {
         eastl::shared_ptr<Bind::Texture> m_WorldPosTexture;
 
     public:
-        eastl::vector<ParticleSystem*> particleSystems;
+        SE::ParticleSystem* m_particleSystem = nullptr;
 
     };
 }

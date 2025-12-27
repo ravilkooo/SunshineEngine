@@ -5,6 +5,9 @@
 #include <Component/PhysicsComponent.h>
 #include <fstream>   // std::ofstream
 
+// temp
+#include <ParticleSystem/ParticleSystem.h>
+
 WorldEditor::WorldEditor()
 {
 }
@@ -164,6 +167,13 @@ void WorldEditor::SetupRendering(
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
 
 	m_renderingSystem->AddRenderGroup(m_renderer.get());
+
+	// temp
+	{
+		m_particleSystem = eastl::make_unique<SE::ParticleSystem>(m_renderer.get(), m_renderer->GetMainCamera());
+
+		m_lightPass->m_particleSystem = m_particleSystem.get();
+	}
 }
 
 void WorldEditor::CreateParentScene()
