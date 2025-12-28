@@ -28,7 +28,7 @@ MeshData& MeshData::operator=(MeshData&& other) noexcept
 }
 
 MeshComponent::MeshComponent(RenderComponent* rc, TransformComponent* tc,
-    SE::UUID uuid, const eastl::string& meshPath)
+    SE::UUID uuid, AssetPath meshPath)
 {
     m_meshData = eastl::make_shared<MeshData>();
 
@@ -97,11 +97,11 @@ void MeshComponent::Bind(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 
 MeshComponent_Info::MeshComponent_Info(
     RenderComponent_Info* rc_info, TransformComponent_Info* tc_info,
-    SE::UUID uuid, const eastl::string& path)
+    SE::UUID uuid, AssetPath meshPath)
 {
     m_assignedComponent = eastl::make_unique<MeshComponent>(
         rc_info->m_assignedComponent.get(),
-        tc_info->m_assignedComponent.get(), uuid, path);
+        tc_info->m_assignedComponent.get(), uuid, meshPath);
     
     rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
 

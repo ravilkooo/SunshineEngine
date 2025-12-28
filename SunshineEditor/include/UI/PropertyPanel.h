@@ -18,6 +18,21 @@ class WorldEditor;
 class PropertyPanel
 {
 public:
+    static struct MeshEditor
+    {
+        bool m_editMesh;
+
+        char m_meshPathBuf[512];
+        AssetPath::AssetSource m_meshAssetSource;
+        eastl::string m_meshError;
+
+        bool m_editTexture;
+
+        char m_texPathBuf[512];
+        AssetPath::AssetSource m_texAssetSource;
+        eastl::string m_texError;
+    } s_meshEditor;
+
     PropertyPanel();
     
     void SetWorldEditor(eastl::shared_ptr<WorldEditor> worldEditor) { 
@@ -30,6 +45,7 @@ public:
     
     void OnImGuiRender();
 
+    static bool DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 private:
     eastl::shared_ptr<WorldEditor> m_WorldEditor;
     SE::UUID m_SelectedUUID = SE::UUID(0u);
@@ -59,7 +75,6 @@ private:
     void DrawLuaComponent(GameObject_Info* obj);
     void DrawLuaFunctions(LuaComponent* luaComp);
     
-    bool DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
     bool DrawFloatControl(const char* label, float& value, float resetValue = 0.0f,
                        float speed = 0.1f, float min = 0.0f, float max = 0.0f,
                        const char* format = "%.3f", float columnWidth = 100.0f);

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <EASTL/string.h>
 #include <EASTL/hash_map.h>
 #include <EASTL/vector.h>
 #include <EASTL/shared_ptr.h>
@@ -15,7 +14,6 @@
 
 enum class EActionCondition
 {
-    Created,
     Running,
     Succeeded,
     Failed,
@@ -44,7 +42,7 @@ using OnCompleteFunc = eastl::function<void(const SE::UUID& GOID, const eastl::s
 using EvaluateUtilityFunc = eastl::function<float(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
 
 using CheckFunc = eastl::function<bool(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)>;
-using AbortFunc = eastl::function<void(const eastl::string& ToState)>;
+using AbortFunc = eastl::function<void(const std::string& ToState)>;
 
 
 class Action
@@ -52,15 +50,24 @@ class Action
     friend class Pattern;
 
 public:
-    explicit Action(const eastl::string& InName) : Name(InName) {}
+    explicit Action(const std::string& InName) : Name(InName) {}
 
+
+    // --- Lua friendly ---
+    const std::string& GetName() const { return Name; }
+
+    void Lua_SetOnStart(const sol::function& Func);
+    void Lua_SetOnUpdate(const sol::function& Func);
+    void Lua_SetOnAbort(const sol::function& Func);
+    void Lua_SetOnComplete(const sol::function& Func);
+    //
+
+    std::string Name;
 
     OnDefaultFunc OnActionStart = nullptr;
     OnActionUpdateFunc OnActionUpdate = nullptr;
     OnDefaultFunc OnActionAbort = nullptr;
     OnCompleteFunc OnActionComplete = nullptr;
-
-    eastl::string Name;
 
 private:
     EActionCondition Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
@@ -83,13 +90,22 @@ public:
     void AddAction(eastl::shared_ptr<Action> NewAction);
     void InsertAction(eastl::shared_ptr<Action> NewAction, size_t Index);
 
-    eastl::shared_ptr<Action> GetActionByName(const eastl::string& Name) const;
+    eastl::shared_ptr<Action> GetActionByName(const std::string& Name) const;
     eastl::shared_ptr<Action> GetActionByIndex(size_t Index) const;
 
-    bool RemoveActionByName(const eastl::string& Name);
+    bool RemoveActionByName(const std::string& Name);
     bool RemoveActionByIndex(size_t Index);
 
     eastl::vector<eastl::shared_ptr<Action>> GetAllActions() const { return Actions; }
+
+    // --- Lua friendly ---
+    void Lua_SetEvaluateUtility(const sol::function& Func);
+
+    void Lua_SetOnStart(const sol::function& Func);
+    void Lua_SetOnUpdate(const sol::function& Func);
+    void Lua_SetOnAbort(const sol::function& Func);
+    void Lua_SetOnComplete(const sol::function& Func);
+    //
 
 
     EvaluateUtilityFunc EvaluateUtility = nullptr;
@@ -118,30 +134,30 @@ private:
 class ConditionTransition
 {
 public:
-    explicit ConditionTransition(const eastl::string& InToState, CheckFunc InCheck) : ToState(InToState), Check(InCheck) { }
+    explicit ConditionTransition(const std::string& InToState, CheckFunc InCheck) : ToState(InToState), Check(InCheck) { }
 
 
     CheckFunc Check = nullptr;
 
-    eastl::string ToState;
+    std::string ToState;
 };
 
 
 class EventTransition
 {
 public:
-    explicit EventTransition(const eastl::string& InToState, CheckFunc InCheck, BehaviorController* FSM);
+    explicit EventTransition(const std::string& InToState, CheckFunc InCheck, BehaviorController* FSM);
 
     void Trigger(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard);
 
-    void ChangeToState(const eastl::string& InToState, BehaviorController* FSM);
+    void ChangeToState(const std::string& InToState, BehaviorController* FSM);
 
 
     CheckFunc Check = nullptr;
 
     AbortFunc Abort = nullptr;
 
-    eastl::string ToState;
+    std::string ToState;
 };
 
 
@@ -152,11 +168,20 @@ class State
 public:
     State() = default;
 
-    bool AddPattern(const eastl::string& Name, eastl::shared_ptr<Pattern> Pattern);
-    eastl::shared_ptr<Pattern> GetPattern(const eastl::string& Name);
-    bool RemovePattern(const eastl::string& Name);
+    bool AddPattern(const std::string& Name, eastl::shared_ptr<Pattern> Pattern);
+    eastl::shared_ptr<Pattern> GetPattern(const std::string& Name);
+    bool RemovePattern(const std::string& Name);
 
-    eastl::hash_map<eastl::string, eastl::shared_ptr<Pattern>> GetAllPatternsCopy() { return Patterns; };
+    eastl::hash_map<std::string, eastl::shared_ptr<Pattern>> GetAllPatternsCopy() { return Patterns; };
+
+    // --- Lua friendly ---
+    sol::table Lua_GetAllPatterns(sol::this_state ts) const;
+
+    void Lua_SetOnEnter(const sol::function& Func);
+    void Lua_SetOnUpdate(const sol::function& Func);
+    void Lua_SetOnAbort(const sol::function& Func);
+    void Lua_SetOnExit(const sol::function& Func);
+    //
 
 
     OnDefaultFunc OnStateEnter = nullptr;
@@ -165,11 +190,11 @@ public:
     OnDefaultFunc OnStateExit = nullptr;
 
 private:
-    void AddConditionTransition(const eastl::string& InToState, CheckFunc InCheck);
-    void AddEventTransition(const eastl::string& InToState, CheckFunc InCheck, BehaviorController* FSM);
+    void AddConditionTransition(const std::string& InToState, CheckFunc InCheck);
+    void AddEventTransition(const std::string& InToState, CheckFunc InCheck, BehaviorController* FSM);
 
-    bool RemoveConditionTransition(const eastl::string& ToState);
-    bool RemoveEventTransition(const eastl::string& ToState);
+    bool RemoveConditionTransition(const std::string& ToState);
+    bool RemoveEventTransition(const std::string& ToState);
 
     bool Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
 
@@ -179,7 +204,7 @@ private:
     eastl::vector<eastl::shared_ptr<ConditionTransition>> ConditionTransitions;
     eastl::vector<eastl::shared_ptr<EventTransition>> EventTransitions;
 
-    eastl::hash_map<eastl::string, eastl::shared_ptr<Pattern>> Patterns;
+    eastl::hash_map<std::string, eastl::shared_ptr<Pattern>> Patterns;
     eastl::shared_ptr<Pattern> CurrentPattern = nullptr;
 
     bool IsRunning = false;
@@ -188,38 +213,45 @@ private:
 
 class BehaviorController : public Component
 {
-    //friend class ***;
+    friend class Game;
     friend class EventTransition;
 
 public:
-    BehaviorController(const SE::UUID& InGOID) : GOID(InGOID) {};
+    BehaviorController(const SE::UUID& InGOID) : GOID(InGOID) { MBoard = eastl::shared_ptr<MemoryBoard>(new MemoryBoard()); };
 
     // --- MemoryBoard ---
     void SetMemoryBoard(const eastl::shared_ptr<MemoryBoard>& InMemoryBoard);
     eastl::shared_ptr<MemoryBoard> GetMemoryBoard() { return MBoard; };
+    //
 
     // --- States ---
-    bool AddState(const eastl::string& Name, const eastl::shared_ptr<State>& NewState);
-    eastl::shared_ptr<State> GetState(const eastl::string& Name);
-    bool RemoveState(const eastl::string& Name);
+    bool AddState(const std::string& Name, const eastl::shared_ptr<State>& NewState);
+    eastl::shared_ptr<State> GetState(const std::string& Name);
+    bool RemoveState(const std::string& Name);
 
-    bool SetInitialState(const eastl::string& Name);
-    const eastl::string& GetCurrentStateName() const { return CurrentStateName; }
+    bool SetInitialState(const std::string& Name);
+    const std::string& GetCurrentStateName() const { return CurrentStateName; }
 
-    eastl::hash_map<eastl::string, eastl::shared_ptr<State>> GetAllStatesCopy() const { return States; }
+    eastl::hash_map<std::string, eastl::shared_ptr<State>> GetAllStatesCopy() const { return States; }
+    //
 
     // --- Conditions ---
-    bool AddConditionTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck);
-    bool AddEventTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck);
+    bool AddConditionTransition(const std::string& FromState, const std::string& ToState, CheckFunc InCheck);
+    bool AddEventTransition(const std::string& FromState, const std::string& ToState, CheckFunc InCheck);
 
-    bool ChangeToStateInConditionTransition(const eastl::string& FromState, const eastl::string& OldToState, const eastl::string& NewToState);
-    bool ChangeToStateInEventTransition(const eastl::string& FromState, const eastl::string& OldToState, const eastl::string& NewToState);
+    bool ChangeToStateInConditionTransition(const std::string& FromState, const std::string& OldToState, const std::string& NewToState);
+    bool ChangeToStateInEventTransition(const std::string& FromState, const std::string& OldToState, const std::string& NewToState);
 
-    bool ChangeCheckFuncInConditionTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck);
-    bool ChangeCheckFuncInEventTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck);
+    bool ChangeCheckFuncInConditionTransition(const std::string& FromState, const std::string& ToState, CheckFunc InCheck);
+    bool ChangeCheckFuncInEventTransition(const std::string& FromState, const std::string& ToState, CheckFunc InCheck);
 
-    bool RemoveConditionTransition(const eastl::string& FromState, const eastl::string& ToState);
-    bool RemoveEventTransition(const eastl::string& FromState, const eastl::string& ToState);
+    bool RemoveConditionTransition(const std::string& FromState, const std::string& ToState);
+    bool RemoveEventTransition(const std::string& FromState, const std::string& ToState);
+    //
+
+
+    // LUA
+    sol::table Lua_GetAllStates(sol::this_state ts);
 
 
     bool IsEnabled = true;
@@ -227,19 +259,19 @@ public:
 private:
     void Update(float DeltaTime);
 
-    void Abort(const eastl::string& ToState);
+    void Abort(const std::string& ToState);
 
-    void ChangeState(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const eastl::string& NewState);
+    void ChangeState(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const std::string& NewState);
 
 
     SE::UUID GOID;
     eastl::shared_ptr<MemoryBoard> MBoard = nullptr;
 
-    eastl::hash_map<eastl::string, eastl::shared_ptr<State>> States;
-    eastl::string CurrentStateName;
+    eastl::hash_map<std::string, eastl::shared_ptr<State>> States;
+    std::string CurrentStateName;
     eastl::shared_ptr<State> CurrentState = nullptr;
 
-    eastl::string AfterAbortStateName;
+    std::string AfterAbortStateName;
     bool IsClosedForAbort = false;
 };
 
@@ -258,3 +290,74 @@ public:
 
     BehaviorController* Controller;
 };
+
+
+
+// --- LUA BINDING ---
+#ifndef ACTION_LUA_METHODS_APPLY
+#define ACTION_LUA_METHODS_APPLY(FM) \
+    FM("getName",        &Action::GetName) , \
+    FM("setOnStart",     &Action::Lua_SetOnStart) , \
+    FM("setOnUpdate",    &Action::Lua_SetOnUpdate) , \
+    FM("setOnAbort",     &Action::Lua_SetOnAbort) , \
+    FM("setOnComplete",  &Action::Lua_SetOnComplete)
+#endif
+
+
+
+#ifndef PATTERN_LUA_METHODS_APPLY
+#define PATTERN_LUA_METHODS_APPLY(FM) \
+    FM("addAction",            &Pattern::AddAction) , \
+    FM("insertAction",         &Pattern::InsertAction) , \
+    FM("getActionByName",      &Pattern::GetActionByName) , \
+    FM("getActionByIndex",     &Pattern::GetActionByIndex) , \
+    FM("removeActionByName",   &Pattern::RemoveActionByName) , \
+    FM("removeActionByIndex",  &Pattern::RemoveActionByIndex) , \
+    FM("getAllActions",        &Pattern::GetAllActions) , \
+    FM("setEvaluateUtility",   &Pattern::Lua_SetEvaluateUtility) , \
+    FM("setOnStart",           &Pattern::Lua_SetOnStart) , \
+    FM("setOnUpdate",          &Pattern::Lua_SetOnUpdate) , \
+    FM("setOnAbort",           &Pattern::Lua_SetOnAbort) , \
+    FM("setOnComplete",        &Pattern::Lua_SetOnComplete)
+#endif
+
+
+
+#ifndef STATE_LUA_METHODS_APPLY
+#define STATE_LUA_METHODS_APPLY(FM) \
+    FM("addPattern",         &State::AddPattern) , \
+    FM("getPattern",         &State::GetPattern) , \
+    FM("removePattern",      &State::RemovePattern) , \
+    FM("getAllPatterns",     &State::Lua_GetAllPatterns) , \
+    FM("setOnEnter",         &State::Lua_SetOnEnter) , \
+    FM("setOnUpdate",        &State::Lua_SetOnUpdate) , \
+    FM("setOnAbort",         &State::Lua_SetOnAbort) , \
+    FM("setOnExit",          &State::Lua_SetOnExit)
+#endif
+
+
+
+#ifndef BEHAVIORCONTROLLER_LUA_FIELDS_APPLY
+#define BEHAVIORCONTROLLER_LUA_FIELDS_APPLY(F) \
+    F(IsEnabled)
+#endif
+
+#ifndef BEHAVIORCONTROLLER_LUA_METHODS_APPLY
+#define BEHAVIORCONTROLLER_LUA_METHODS_APPLY(FM) \
+    FM("setMemoryBoard",                 &BehaviorController::SetMemoryBoard) , \
+    FM("getMemoryBoard",                 &BehaviorController::GetMemoryBoard) , \
+    FM("addState",                       &BehaviorController::AddState) , \
+    FM("getState",                       &BehaviorController::GetState) , \
+    FM("removeState",                    &BehaviorController::RemoveState) , \
+    FM("setInitialState",                &BehaviorController::SetInitialState) , \
+    FM("getCurrentStateName",            &BehaviorController::GetCurrentStateName) , \
+    FM("getAllStates",                   &BehaviorController::Lua_GetAllStates) , \
+    FM("addConditionTransition",         &BehaviorController::AddConditionTransition) , \
+    FM("addEventTransition",             &BehaviorController::AddEventTransition) , \
+    FM("changeConditionToState",         &BehaviorController::ChangeToStateInConditionTransition) , \
+    FM("changeEventToState",             &BehaviorController::ChangeToStateInEventTransition) , \
+    FM("changeConditionCheck",           &BehaviorController::ChangeCheckFuncInConditionTransition) , \
+    FM("changeEventCheck",               &BehaviorController::ChangeCheckFuncInEventTransition) , \
+    FM("removeConditionTransition",      &BehaviorController::RemoveConditionTransition) , \
+    FM("removeEventTransition",          &BehaviorController::RemoveEventTransition)
+#endif

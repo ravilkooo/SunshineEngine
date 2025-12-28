@@ -19,7 +19,7 @@ namespace SE_G {
 	{
 		m_passType = PassType::Shadow;
 
-		m_playerCamera = gPass->camera.get();
+		m_playerCamera = gPass->m_camera.get();
 
 		m_lightViewCamera = eastl::make_unique<SE_G::Camera>(device,
 			m_shadowMap.m_mapWidth / m_shadowMap.m_mapHeight);
@@ -256,6 +256,7 @@ namespace SE_G {
 		// всех остальных вдоль оси направления света, затем отмеряем назад значение nearZ
 		// и выбираем ровно посередине исходя из значений исполььзованных при расчёте SetViewWidth и SetViewHeight
 		// farestZ - макс расстояние от SetPosition до вершин фрустума вдоль направление света
+		m_playerCamera = m_gPass->m_camera.get();
 
 		float playerNearZ = m_playerCamera->GetNearZ();
 		float playerFarZ = m_playerCamera->GetFarZ();

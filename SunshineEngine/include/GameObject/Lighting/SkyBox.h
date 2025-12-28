@@ -12,6 +12,9 @@
 
 #include <Serialization/LightDataSerialization.h>
 #include <Serialization/DXSMSerialization.h>
+
+#include <Utils/AssetPath.h>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -28,7 +31,7 @@ class SkyBox :
 public:
     SkyBox(SE_G::DeferredRenderer* renderSystem,
         eastl::shared_ptr<SE_G::Camera> camera,
-        eastl::wstring texturePath = eastl::wstring(L"Default"),
+        AssetPath assetPath = AssetPath(L"DefaultSkybox.dds", AssetPath::AssetSource::Engine),
         SE_G::SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
 
     SkyBox(
@@ -45,7 +48,7 @@ public:
     SkyBox_Info(
         SE_G::DeferredRenderer* renderSystem,
         eastl::shared_ptr<SE_G::Camera> camera,
-        eastl::wstring texturePath = eastl::wstring(L"Default"),
+        AssetPath assetPath = AssetPath(L"DefaultSkybox.dds", AssetPath::AssetSource::Engine),
         SE_G::SkyBoxData initData = { DXSM::Vector3::One , 0.0f });
 
     SkyBox_Info(

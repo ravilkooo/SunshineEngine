@@ -11,6 +11,7 @@
 using json = nlohmann::json;
 class PhysicsSystem;
 class SceneGraph;
+class PlayerObject;
 
 class Scene
 {
@@ -41,6 +42,10 @@ public:
         eastl::shared_ptr<SE_G::Camera> camera, const json& j);
 
     void RestoreParents();
+
+    // PlayerObject
+    SE::UUID m_playerObjectUUID = SE::UUID(0u);
+    PlayerObject* m_playerObject = nullptr;
 
 private:
 };
@@ -79,4 +84,7 @@ public:
     // Hierarchy
     eastl::unique_ptr<SceneGraph> m_sceneGraph;
     void InitHierarchy();
+
+    // PlayerObject
+    SE::UUID m_playerObject = SE::UUID(0u);
 };

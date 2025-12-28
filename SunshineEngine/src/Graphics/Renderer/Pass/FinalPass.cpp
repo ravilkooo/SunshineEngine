@@ -14,7 +14,7 @@ namespace SE_G {
 		this->backBuffer = backBuffer;
 		this->screenWidth = pGBuffer->m_screenWidth;
 		this->screenHeight = pGBuffer->m_screenHeight;
-		this->camera = camera;
+		this->m_camera = camera;
 
 		// rtv
 		HRESULT hr = device->CreateRenderTargetView(backBuffer, nullptr, &renderTargetView);
@@ -80,18 +80,8 @@ namespace SE_G {
 		context->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH, 1.0f, 0u);
 		context->RSSetViewports(1, &viewport);
 
-		camera->UpdateBuffer(context.Get());
-		camera->BindBuffer(context.Get());
-	}
-
-	eastl::shared_ptr<Camera> FinalPass::GetCamera()
-	{
-		return camera;
-	}
-
-	void FinalPass::SetCamera(eastl::shared_ptr<Camera> camera)
-	{
-		this->camera = camera;
+		m_camera->UpdateBuffer(context.Get());
+		m_camera->BindBuffer(context.Get());
 	}
 
 	void FinalPass::EndFrame()

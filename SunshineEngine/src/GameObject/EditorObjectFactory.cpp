@@ -13,10 +13,9 @@
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
-
 eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::string filePath)
+	AssetPath meshPath)
 {
 
 	auto obj = eastl::make_unique<GameObject_Info>();
@@ -31,12 +30,12 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	// RenderComponent and techniques
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc_info->GetDevice(), filePath);
+	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc_info->GetDevice(), meshPath);
 	auto mc_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, meshPtr);
 
 	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
 		rc_info->GetDevice(),
-		MakeEngineAssetPath_Wstring(L"DefaultTexture.dds"), 0u,
+		AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mc_info->SetTexture(texture);
 
@@ -123,10 +122,10 @@ eastl::unique_ptr<GeosphereShapeObject_Info> EditorObjectFactory::CreateGeospher
 eastl::unique_ptr<SkyBox_Info> EditorObjectFactory::CreateSkyBox(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,
-	eastl::wstring texturePath,
+	AssetPath assetPath,
 	SE_G::SkyBoxData initData)
 {
-	auto obj = eastl::make_unique<SkyBox_Info>(renderSystem, camera, texturePath, initData);
+	auto obj = eastl::make_unique<SkyBox_Info>(renderSystem, camera, assetPath, initData);
 	return obj;
 }
 

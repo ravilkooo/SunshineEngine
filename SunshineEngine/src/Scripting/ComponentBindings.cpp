@@ -20,12 +20,17 @@ void RegisterAll(sol::state& lua) {
     // Base GameObject type; component binders will append getters
     lua.new_usertype<GameObject>("GameObject");
 
-    lua.set_function("PerceptionSystem", []() -> PerceptionSystem& {
-        return PerceptionSystem::Get();
-        });
-
     // Execute all component binders registered via LUA_REGISTER_COMPONENT
     AutoBindings::RegisterAll(lua);
+
+    //lua.new_usertype<PerceptionSystem>("PerceptionSystem",
+    //    sol::no_constructor, 
+    //    "registerTeam", &PerceptionSystem::RegisterTeam
+    //);
+
+    lua.set_function("GetPerceptionSystem", []() -> PerceptionSystem& {
+        return PerceptionSystem::Get();
+        });
 }
 
 } // namespace ScriptingBindings

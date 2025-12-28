@@ -19,9 +19,6 @@ namespace SE_G {
         void StartFrame() override;
         void EndFrame() override;
 
-        eastl::shared_ptr<Camera> GetCamera();
-        void SetCamera(eastl::shared_ptr<Camera> camera);
-        eastl::shared_ptr<Camera> camera;
     protected:
         UINT screenWidth = 800;
         UINT screenHeight = 800;

@@ -59,8 +59,7 @@ namespace SE_G {
 
 		m_iconSprites = eastl::make_unique<Bind::Texture>(
 			device,
-			MakeEngineAssetPath_Wstring(L"EditorIcons.dds"),
-			0u,
+			AssetPath(L"EditorIcons.dds", AssetPath::AssetSource::Engine), 0u,
 			Bind::PipelineStage::PIXEL_SHADER
 		);
 

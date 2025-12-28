@@ -30,12 +30,12 @@ namespace SE_G {
 
         void InitGBuffer(UINT screenWidth, UINT screenHeight);
 
-        void SetMainCamera(eastl::shared_ptr<Camera> camera) { m_mainCamera = camera; }
-        eastl::shared_ptr<Camera> GetMainCamera() { return m_mainCamera; };
+        void SetMainCamera(eastl::shared_ptr<Camera> camera);
+        eastl::shared_ptr<Camera> GetMainCamera();
 
         void OnResize(UINT resizeWidth, UINT resizeHeight);
         
-        void Pass() override;
+        virtual void Pass() override;
 
         eastl::shared_ptr<Camera> m_mainCamera;
 
@@ -44,7 +44,7 @@ namespace SE_G {
         UINT m_screenWidth = 800u;
         UINT m_screenHeight = 800u;
 
-    private:
+    protected:
         ID3D11Device* m_device;
         ID3D11DeviceContext* m_context;
     };

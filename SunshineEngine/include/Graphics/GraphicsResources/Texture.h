@@ -11,6 +11,8 @@
 #include <Graphics/Bindable/Sampler.h>
 #include <ResourceManager/IResource.h>
 
+#include <Utils/AssetPath.h>
+
 #include <EASTL/string.h>
 
 
@@ -22,7 +24,7 @@ namespace SE_G {
 			, public IResource
 		{
 		public:
-			Texture(ID3D11Device* device, const eastl::wstring& filePath, UINT slot = 0u,
+			Texture(ID3D11Device* device, AssetPath texturePath, UINT slot = 0u,
 				Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER);
 
 			Texture(ID3D11Device* device, ID3D11Resource* pTexture, D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc,
@@ -53,7 +55,8 @@ namespace SE_G {
 
 			void UpdateTextureView(ID3D11ShaderResourceView* pTextureView);
 
-			eastl::wstring GetCurrentTexturePath();
+			AssetPath m_texturePath;
+			AssetPath GetCurrentTexturePath();
 			SE_G::Color GetCurrentColor();
 
 			// Inherited via IResource
@@ -61,7 +64,7 @@ namespace SE_G {
 			ResourceGUID GetGUID() const override;
 			size_t GetSizeInMemory() const override;
 		private:
-			void ChangeTexture(ID3D11Device* device, const eastl::wstring& filePath);
+			void ChangeTexture(ID3D11Device* device, AssetPath texturePath);
 			void ChangeColor(ID3D11Device* device, SE_G::Color color);
 
 			bool HasAlpha() const noexcept;
@@ -74,7 +77,8 @@ namespace SE_G {
 			bool isNull = true;
 
 			UINT m_slot;
-			eastl::wstring m_filePath;
+			// eastl::wstring m_filePath;
+
 			bool hasAlpha = false;
 			Microsoft::WRL::ComPtr<ID3D11Resource> pTexture;
 			Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView;

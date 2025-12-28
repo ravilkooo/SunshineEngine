@@ -7,9 +7,14 @@
 #include <SimpleMath.h>
 
 #include "Graphics/Bindable/ConstantBuffer.h"
+#include <Utils/UUID.h>
 
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
+
+class Scene;
+class Scene_Info;
+class TransformComponent;
 
 namespace SE_G {
     class Camera
@@ -69,11 +74,13 @@ namespace SE_G {
         void SetReferenceLen(float referenceLen);
         float GetReferenceLen();
 
-        void Update(float deltaTime, const DXSM::Matrix targetTransform);
-        void Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
-        void Update(float deltaTime, const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen);
+        void Update();
+        void Update(const DXSM::Vector3 targetPoistion);
+        void Update(const DXSM::Matrix targetTransform);
+        void Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
+        void Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen);
 
-        DX::XMMATRIX GetViewMatrix() const;
+        DX::XMMATRIX GetViewMatrix();
         DX::XMMATRIX GetProjectionMatrix() const;
 
         void MoveForward(float speed);
@@ -88,7 +95,11 @@ namespace SE_G {
 
         void SwitchToFPSMode();
 
-        void SwitchToFollowMode(DXSM::Vector3 followTarget, DXSM::Vector3 direction, float referenceLen);
+        void AssignScene(Scene* scene);
+        void AssignScene(Scene_Info* scene);
+
+        void SetFollowPlayer(SE::UUID playerUUID);
+        void InitFollowModeParams();
 
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget);
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis);
@@ -114,15 +125,32 @@ namespace SE_G {
 
         FrustumCorners GetFrustumCorners();
 
+        DXSM::Vector3 position;
+        DXSM::Vector3 followDirection;
+        DXSM::Vector3 target;
+        DXSM::Vector3 up;
+        DXSM::Vector3 forward;
+
+        DXSM::Matrix rotateCamToForward;
+
+        struct FollowStickParams
+        {
+            float stickLength = 10.0f;
+
+            float stickYaw = 0.0f;
+            float stickPitch = 0.0f;
+
+            DXSM::Vector3 viewPitchYawRoll = DXSM::Vector3::Zero;
+
+            DXSM::Vector3 offset = DXSM::Vector3::Zero;
+        } m_stickParams;
+        void RotateStickYawPitch(float deltaYaw, float deltaPitch);
+
     private:
         void SetFOV(float fov);
         void SetAspectRatio(float aspectRatio);
         void SetViewWidth(float viewWidth);
         void SetViewHeight(float viewHeight);
-
-        DXSM::Vector3 position;
-        DXSM::Vector3 target;
-        DXSM::Vector3 up;
 
         bool isPerspective = true;
 
@@ -154,5 +182,24 @@ namespace SE_G {
 
         // for FOLLOW camera mode
         float followPitch;
+
+        // Follow PlayerObject
+        bool m_playerAsObject = false;
+
+        union {
+            Scene* asScene;
+            Scene_Info* asInfo;
+        } m_scene;
+
+        /*
+        union {
+            PlayerObject* asObject;
+            PlayerObject_Info* asInfo;
+        } m_player;
+        */
+        TransformComponent* m_playerTransform = nullptr;
+        bool m_playerPointerInited = false;
+
+        SE::UUID m_playerUUID = SE::UUID(0u);
     };
 }

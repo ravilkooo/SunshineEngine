@@ -1,3 +1,4 @@
+
 #pragma once
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
@@ -6,6 +7,8 @@
 #include <d3d11.h>
 #include <Graphics/Utils/Camera.h>
 #include <Graphics/Lighting/LightData.h>
+
+#include <Utils/AssetPath.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -36,7 +39,7 @@ public:
 
 	static eastl::unique_ptr<GameObject> CreateCustomMesh(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::string filePath);
+		AssetPath meshPath);
 
 	static eastl::unique_ptr<GameObject> CreateBoxObject(
 		SE_G::DeferredRenderer* renderSystem,

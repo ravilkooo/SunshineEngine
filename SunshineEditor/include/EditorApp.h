@@ -35,8 +35,8 @@ enum class MoveKey
     S, 
     D, 
     A,
-    Shift, 
-    Ctrl 
+    E, 
+    Q 
 };
 
 struct Ray

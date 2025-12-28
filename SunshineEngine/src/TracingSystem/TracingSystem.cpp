@@ -11,6 +11,7 @@
 #include <Component/TransformComponent.h>
 #include <Scene.h>
 
+/*
 // Minimal trace function used when TracingSystem manages its own Jolt runtime
 static void TracingSystem_Trace(const char* inFMT, ...)
 {
@@ -21,49 +22,6 @@ static void TracingSystem_Trace(const char* inFMT, ...)
     vsnprintf(buffer, sizeof(buffer), inFMT, args);
     va_end(args);
     // optionally print: std::cout << buffer << std::endl;
-}
-
-bool TracingSystem::Trace(const JPH::RVec3& begin,
-    const JPH::Vec3& dir,
-    float length,
-    JPH::ObjectLayer layer,
-    const eastl::vector<SE::UUID>& ignore,
-    SE::UUID* out_id)
-{
-    if (!m_physics)
-        return false;
-
-    // Build ignore set
-    eastl::unordered_set<SE::UUID> ignore_set(ignore.begin(), ignore.end());
-
-    JPH::RRayCast ray(begin, begin + JPH::RVec3(dir * length));
-
-    JPH::RayCastResult   result;
-
-    SingleLayerFilter layer_filter(layer);
-    IgnoreUUIDBodyFilter body_filter(ignore_set, m_physics->GetBodyLockInterface());
-
-    auto& nq = m_physics->GetNarrowPhaseQuery(); // locking version for thread safety
-
-    bool hit = nq.CastRay(ray,
-        result,
-        JPH::BroadPhaseLayerFilter(), // accept all BP layers or plug your own
-        layer_filter,
-        body_filter);
-
-    if (!hit || !out_id)
-        return hit;
-
-    // Retrieve SE::UUID from hit body
-    JPH::BodyID body_id = result.mBodyID;
-
-    JPH::BodyLockRead lock(m_physics->GetBodyLockInterface(), body_id);
-    if (!lock.Succeeded())
-        return false;
-
-    const JPH::Body& body = lock.GetBody();
-    *out_id = *reinterpret_cast<const SE::UUID*>(body.GetUserData());
-    return true;
 }
 
 TracingSystem::TracingSystem()
@@ -196,3 +154,4 @@ void TracingSystem::ClearAllBodies()
     }
     m_bodyEntries.clear();
 }
+*/

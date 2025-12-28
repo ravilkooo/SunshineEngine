@@ -2,6 +2,7 @@
 #include "Utils/DebugUtils.h"
 #include <fstream>   // std::ofstream
 #include <filesystem>
+#include <Utils/AssetPath.h>
 
 EditorApp::EditorApp()
 {
@@ -31,9 +32,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Init WorldEditor with all it's passes
 	m_worldEditor = eastl::make_shared<WorldEditor>();
 	m_worldEditor->SetupRendering(m_renderingSystem, worldEditorWidth, worldEditorHeight);
-
-	m_renderingSystem->AddRenderGroup(m_worldEditor->m_renderer.get());
-
+	
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
 	sol_ImGui::Init(m_lua);
@@ -74,8 +73,6 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Show window
 	// ShowWindow(m_displayWindow.m_hWnd, SW_SHOWDEFAULT);
 	// UpdateWindow(m_displayWindow.m_hWnd);
-	
-	imguiEditorPass->m_ToolbarPanel.SetEditorApp(this);
 
 	InputDevice::getInstance().OnKeyPressed.AddRaw(this, &EditorApp::HandleKeyDown);
 	InputDevice::getInstance().OnKeyReleased.AddRaw(this, &EditorApp::HandleKeyUp);
@@ -177,6 +174,7 @@ void EditorApp::RunApp()
 			if (OpenProject()) {
 				m_projectSelected = true;
 				m_worldEditor->m_scene->InitHierarchy();
+				imguiEditorPass->SetScene(m_worldEditor->m_scene);
 			} else {
 				imguiEditorPass->ResetProjectSelection();
 				m_openedProject = nullptr;
@@ -207,20 +205,21 @@ void EditorApp::UpdateGame(float deltaTime)
 
 		IsRightMousePressed = false;
 	}
-
-	if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
-		m_currentGame->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
+	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
+	{
+		if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
+			- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
+			m_currentGame->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
+		}
+		if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
+			- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
+			m_currentGame->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
+		}
+		if (float up = (MovingPressed[(int)MoveKey::E] ? 1.0f : 0.0f)
+			- (MovingPressed[(int)MoveKey::Q] ? 1.0f : 0.0f); up != 0.0f) {
+			m_currentGame->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
+		}
 	}
-	if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
-		m_currentGame->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
-	}
-	if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
-		m_currentGame->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
-	}
-
 	if (!m_gamePaused)
 		m_currentGame->Update(deltaTime);
 }
@@ -236,6 +235,12 @@ void EditorApp::UpdateEditor(float deltaTime)
 		return;
 	}
 
+	if (!IsRightMousePressed)
+	{
+		m_worldEditor->Update(deltaTime);
+		return;
+	}
+
 	if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
 		- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
 		m_worldEditor->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
@@ -244,8 +249,8 @@ void EditorApp::UpdateEditor(float deltaTime)
 		- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
 		m_worldEditor->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
 	}
-	if (float up = (MovingPressed[(int)MoveKey::Shift] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::Ctrl] ? 1.0f : 0.0f); up != 0.0f) {
+	if (float up = (MovingPressed[(int)MoveKey::E] ? 1.0f : 0.0f)
+		- (MovingPressed[(int)MoveKey::Q] ? 1.0f : 0.0f); up != 0.0f) {
 		m_worldEditor->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
 	}
 
@@ -256,6 +261,7 @@ void EditorApp::Render() {
 
 	// Passes
 	m_renderingSystem->Render();
+
 	m_renderingSystem->PresentFrame();
 }
 
@@ -303,6 +309,7 @@ void EditorApp::HandleKeyDown(Keys key)
 		return;
 
 	if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+		/*
 		switch (key)
 		{
 		case Keys::W: MovingPressed[(int)MoveKey::W] = true;
@@ -313,9 +320,9 @@ void EditorApp::HandleKeyDown(Keys key)
 			break;
 		case Keys::A: MovingPressed[(int)MoveKey::A] = true;
 			break;
-		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = true;
+		case Keys::E: MovingPressed[(int)MoveKey::E] = true;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true;
+		case Keys::Q: MovingPressed[(int)MoveKey::Q] = true;
 			break;
 
 		case Keys::RightButton: IsRightMousePressed = true;
@@ -327,9 +334,10 @@ void EditorApp::HandleKeyDown(Keys key)
 			}
 			break;
 		}
+		*/
+		m_currentGame->m_playerObject->m_playerController.HandleKeyDown(key);
 	}
-	
-	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
+	else if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
 		switch (key)
 		{
 		case Keys::W: MovingPressed[(int)MoveKey::W] = true;
@@ -340,9 +348,9 @@ void EditorApp::HandleKeyDown(Keys key)
 			break;
 		case Keys::A: MovingPressed[(int)MoveKey::A] = true;
 			break;
-		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = true;
+		case Keys::E: MovingPressed[(int)MoveKey::E] = true;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = true;
+		case Keys::Q: MovingPressed[(int)MoveKey::Q] = true;
 			break;
 
 		case Keys::RightButton: IsRightMousePressed = true;
@@ -373,17 +381,17 @@ void EditorApp::HandleKeyUp(Keys key)
 			break;
 		case Keys::A: MovingPressed[(int)MoveKey::A] = false;
 			break;
-		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = false;
+		case Keys::E: MovingPressed[(int)MoveKey::E] = false;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
+		case Keys::Q: MovingPressed[(int)MoveKey::Q] = false;
 			break;
 
 		case Keys::RightButton: IsRightMousePressed = false;
 			break;
 		}
 	}
-
-	if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+	else if (m_runtimeMode == RuntimeMode::GAME_MODE) {
+		/*
 		switch (key)
 		{
 		case Keys::W: MovingPressed[(int)MoveKey::W] = false;
@@ -394,14 +402,16 @@ void EditorApp::HandleKeyUp(Keys key)
 			break;
 		case Keys::A: MovingPressed[(int)MoveKey::A] = false;
 			break;
-		case Keys::LeftShift: MovingPressed[(int)MoveKey::Shift] = false;
+		case Keys::E: MovingPressed[(int)MoveKey::E] = false;
 			break;
-		case Keys::LeftControl: MovingPressed[(int)MoveKey::Ctrl] = false;
+		case Keys::Q: MovingPressed[(int)MoveKey::Q] = false;
 			break;
 
 		case Keys::RightButton: IsRightMousePressed = false;
 			break;
 		}
+		*/
+		m_currentGame->m_playerObject->m_playerController.HandleKeyUp(key);
 	}
 }
 
@@ -435,6 +445,7 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 
 	if (m_runtimeMode == RuntimeMode::GAME_MODE)
 	{
+		/*
 		if (IsRightMousePressed)
 		{
 			float deltaTime = m_timer.GetDeltaTime();
@@ -454,6 +465,8 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 			else if (CameraSpeed > MaxCameraSpeed)
 				CameraSpeed = MaxCameraSpeed;
 		}
+		*/
+		m_currentGame->m_playerObject->m_playerController.HandleMouseMove(args);
 	}
 }
 
@@ -571,13 +584,14 @@ bool EditorApp::OpenProject()
 	}
 	
 	SetupAssetsDirectory();
-	
 	return true;
 }
 
 void EditorApp::CloseProject()
 {
 	m_projectSelected = NULL;
+
+	m_renderingSystem->RemoveRenderGroup("PlayerViewport");
 	// m_openedProject = NULL;
 	// m_loadedSceneType = SE::SceneType::Custom;
 }

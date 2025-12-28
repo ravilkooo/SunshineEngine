@@ -23,6 +23,7 @@
 
 #include <Utils/UUID.h>
 
+/*
 
 class SingleLayerFilter : public JPH::ObjectLayerFilter
 {
@@ -80,13 +81,6 @@ public:
 
     ~TracingSystem();
 
-    // begin: world-space start; dir: normalized; layerKey: your editor layer key
-    bool Trace(const JPH::RVec3& begin,
-        const JPH::Vec3& dir,
-        float length,
-        JPH::ObjectLayer layer,
-        const eastl::vector<SE::UUID>& ignore,
-        SE::UUID* out_id);
 
     void CreateAndAddBody(TracedBody* tracedBody);
 
@@ -119,4 +113,4 @@ private:
 
     eastl::vector<JPH::BodyID> m_bodyEntries;
 };
-
+*/

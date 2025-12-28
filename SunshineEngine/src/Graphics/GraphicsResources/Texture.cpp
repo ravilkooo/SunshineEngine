@@ -34,10 +34,10 @@ namespace SE_G {
 			isNull = false;
 		}
 
-		Texture::Texture(ID3D11Device* device, const eastl::wstring& filePath, UINT slot, Bind::PipelineStage pipelineStage)
-			: m_slot(slot), m_filePath(filePath), pipelineStage(pipelineStage)
+		Texture::Texture(ID3D11Device* device, AssetPath texturePath, UINT slot, Bind::PipelineStage pipelineStage)
+			: m_slot(slot), m_texturePath(texturePath), pipelineStage(pipelineStage)
 		{
-			ChangeTexture(device, filePath);
+			ChangeTexture(device, m_texturePath);
 			isNull = false;
 		}
 
@@ -55,16 +55,16 @@ namespace SE_G {
 			isNull = false;
 		}
 
-		void Texture::ChangeTexture(ID3D11Device* device, const eastl::wstring& filePath) {
+		void Texture::ChangeTexture(ID3D11Device* device, AssetPath texturePath) {
 			ClearTexture();
 			m_colored = false;
-			m_filePath = filePath;
+			m_texturePath = texturePath;
 
-			if (StringHelper::GetFileExtension(filePath) == L"dds")
+			if (StringHelper::GetFileExtension(m_texturePath.GetFullPath()) == L"dds")
 			{
 				//std::cout << "DDS loaded!!! " << filePath << " :: " << StringHelper::GetFileExtension(filePath) << "\n";
 				HRESULT hr = DirectX::CreateDDSTextureFromFile(device,
-					(filePath).c_str(), &pTexture, &pTextureView);
+					m_texturePath.GetFullPath().c_str(), &pTexture, &pTextureView);
 				if (FAILED(hr))
 				{
 					this->Initialize1x1ColorTexture(device, Colors::UnloadedTextureColor);
@@ -73,7 +73,7 @@ namespace SE_G {
 			}
 			else
 			{
-				wprintf(L"Wrong texture file extension: %ls\n", StringHelper::GetFileExtension(filePath).c_str());
+				wprintf(L"Wrong texture file extension: %ls\n", StringHelper::GetFileExtension(m_texturePath.GetFullPath()).c_str());
 				this->Initialize1x1ColorTexture(device, Colors::UnloadedTextureColor);
 				/*
 				HRESULT hr = DirectX::CreateWICTextureFromFile(device, StringHelper::StringToWide(filePath).c_str(), *pTexture, GetTextureResourceViewAddress());
@@ -96,7 +96,7 @@ namespace SE_G {
 		}
 
 		void Texture::ClearTexture() {
-			m_filePath.clear();
+			m_texturePath.m_assetRelativePath.clear();
 			if (!isNull) {
 				pTexture.Reset();
 				pTextureView.Reset();
@@ -175,9 +175,8 @@ namespace SE_G {
 			this->pTextureView = pTextureView;
 		}
 
-
-		eastl::wstring Texture::GetCurrentTexturePath() {
-			return m_filePath;
+		AssetPath Texture::GetCurrentTexturePath() {
+			return m_texturePath;
 		}
 
 		SE_G::Color Texture::GetCurrentColor() {

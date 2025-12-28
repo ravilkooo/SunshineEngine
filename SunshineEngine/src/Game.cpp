@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <fstream>   // std::ofstream
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
+#include <PlayerObject/PlayerObject.h>
 
 Game::Game()
 {
@@ -66,6 +67,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	SetupPhysics();
 	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
+	m_playerObject = m_scene->m_playerObject;
 	/*
 	if (!loadedScene) {
 		LOG_EDITOR_ERROR("Scene load error\n");
@@ -243,6 +245,8 @@ void Game::Run()
 void Game::Update(float deltaTime) {
 
 	 m_luaManager.Update(m_scene.get(), deltaTime);
+	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+
 	 m_physicsSystem->Step(deltaTime);
 
 	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
