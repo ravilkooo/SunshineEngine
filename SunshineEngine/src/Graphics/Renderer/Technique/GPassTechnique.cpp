@@ -10,6 +10,9 @@
 #include <Component/MeshComponent.h>
 #include <Utils/StringUtils.h>
 #include <ResourceManager/ResourceManagerFacade.h>
+#include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
+
 
 namespace SE_G {
 	GPassTechnique::GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
@@ -73,7 +76,7 @@ namespace SE_G {
 
 		//m_colored = true;
 		m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-			renderSystem->GetDevice(), MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
+			device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
 
 		
 		//eastl::string texturePath = "Assets/Textures/UnloadedTextureColor.dds";
@@ -84,15 +87,15 @@ namespace SE_G {
 		//// Сохраняем для дальнейшего использования в рендере (в shared_ptr, если требуется)
 		//m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(tex, [](SE_G::Bind::Texture*) {});
 
-		m_texture = eastl::make_shared<SE_G::Bind::Texture>(renderSystem->GetDevice(),
+		m_texture = eastl::make_shared<SE_G::Bind::Texture>(device,
 			SE_G::Colors::UnloadedTextureColor,
 			0u,
 			SE_G::Bind::PipelineStage::PIXEL_SHADER);
 
 		m_textureSampler = eastl::make_unique<SE_G::Bind::Sampler>(
-			renderSystem->GetDevice(),
+			device,
 			SE_G::Bind::SamplerPreset::Wrap);
-			device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
+			device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str();
 	}
 
 	GPassTechnique::~GPassTechnique()
