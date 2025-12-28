@@ -62,8 +62,8 @@ private:
     void DrawComponentAddPopup(GameObject_Info* obj);
 
     void DrawEmitterDetails(
-        SE::ParticleEmitter::EmitterPointConstantBuffer* emitterPointBuffer,
-        SE::ParticleEmitter::SimulateParticlesConstantBuffer* simulateParticlesBuffer);
+        SE::ParticleData::EmitterPointConstantBuffer* emitterPointBuffer,
+        SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer);
 
     void DrawAmbientLightDetails(SE_G::AmbientLightData* lightData);
     void DrawDirectionalLightDetails(SE_G::DirectionalLightData* lightData);

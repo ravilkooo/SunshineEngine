@@ -6,15 +6,50 @@
 
 namespace SE
 {
-    ParticleEmitter::ParticleEmitter(ParticleSystem* particleSystem,
+    ParticleEmitter::ParticleEmitter(
+        ParticleSystem* particleSystem,
+        ParticleData::EmitterPointConstantBuffer emitterDesc,
+        ParticleData::SimulateParticlesConstantBuffer simulatorDesc
+    )
+        : GameObject()
+    {
+        m_particleData = eastl::make_unique<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
+
+        m_name = "ParticleEmitter";
+
+    }
+
+    ParticleEmitter::~ParticleEmitter()
+    {
+
+    }
+
+    ParticleEmitter_Info::ParticleEmitter_Info(
+        ParticleSystem* particleSystem,
+        ParticleData::EmitterPointConstantBuffer emitterDesc,
+        ParticleData::SimulateParticlesConstantBuffer simulatorDesc
+    )
+        : GameObject_Info()
+    {
+        m_particleData = eastl::make_unique<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
+
+        m_group = GameObjectGroup::ParticleEmitter;
+        m_name = "ParticleEmitter";
+
+    }
+
+    ParticleEmitter_Info::~ParticleEmitter_Info()
+    {
+
+    }
+
+    ParticleData::ParticleData(ParticleSystem* particleSystem,
         EmitterPointConstantBuffer emitterDesc,
-        SimulateParticlesConstantBuffer simulatorDesc) : GameObject_Info()
+        SimulateParticlesConstantBuffer simulatorDesc)
     {
         m_particleSystem = particleSystem;
         m_emitterConstantBufferData = emitterDesc;
         m_simulateParticlesConstantBufferData = simulatorDesc;
-        m_group = GameObjectGroup::ParticleEmitter;
-        m_name = "ParticleEmitter";
 
         auto device = m_particleSystem->m_renderer->GetDevice();
 
@@ -178,7 +213,7 @@ namespace SE
         ResetParticlesPass();
     }
 
-    ParticleEmitter::~ParticleEmitter()
+    ParticleData::~ParticleData()
     {
         m_particleBuffer.Reset();
         m_particleSRV.Reset();
@@ -205,7 +240,7 @@ namespace SE
         m_simulateParticlesConstantBuffer.Reset();
     }
 
-    void ParticleEmitter::ResetParticlesPass()
+    void ParticleData::ResetParticlesPass()
     {
         auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
@@ -223,7 +258,7 @@ namespace SE
         context->CSSetUnorderedAccessViews(0, 3, uavs, nullptr);
     }
 
-    void ParticleEmitter::EmitPass()
+    void ParticleData::EmitPass()
     {
         if (m_emitterConstantBufferData.maxSpawn == 0)
         {
@@ -260,7 +295,7 @@ namespace SE
         context->CSSetUnorderedAccessViews(0, 4, uavsNull, nullptr);
     }
 
-    void ParticleEmitter::InitSimDispatchArgsPass()
+    void ParticleData::InitSimDispatchArgsPass()
     {
         auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
@@ -272,12 +307,12 @@ namespace SE
         UINT initCount[] = { (UINT)-1 };
         context->CSSetUnorderedAccessViews(0, 1, m_indirectDispatchArgsUAV[m_currentAliveBuffer].GetAddressOf(), initCount);
         context->Dispatch(1, 1, 1);
-        
+
         ID3D11UnorderedAccessView* uavs[] = { nullptr };
         context->CSSetUnorderedAccessViews(0, 1, uavs, nullptr);
     }
 
-    void ParticleEmitter::SimulatePass()
+    void ParticleData::SimulatePass()
     {
         //simulation
         auto context = m_particleSystem->m_renderer->GetDeviceContext();
@@ -302,7 +337,7 @@ namespace SE
 
         initialCount[0] = 0;
         context->CSSetUnorderedAccessViews(1, 1, m_aliveIndexUAV[(m_currentAliveBuffer + 1) % 2].GetAddressOf(), initialCount);
-        
+
         /*
         context->CSSetShaderResources(0, 1, m_attractorsSRV.GetAddressOf());
         context->CSSetShaderResources(1, 1, m_noiseTextureSRV.GetAddressOf());
@@ -345,7 +380,7 @@ namespace SE
         m_currentAliveBuffer = (m_currentAliveBuffer + 1) % 2;
     }
 
-    void ParticleEmitter::RenderPass()
+    void ParticleData::RenderPass()
     {
         auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
@@ -368,7 +403,7 @@ namespace SE
         context->PSSetShaderResources(0, 1, nullSRVsPS);
     }
 
-    void ParticleEmitter::UpdateEmitter(float deltaTime)
+    void ParticleData::UpdateEmitter(float deltaTime)
     {
         auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
@@ -397,7 +432,7 @@ namespace SE
         }
     }
 
-    void ParticleEmitter::SetEmissionRate(float emissionRate)
+    void ParticleData::SetEmissionRate(float emissionRate)
     {
         float particleLifeTime = m_emitterConstantBufferData.particlesLifeSpan;
         float emissionRateLimit = m_maxParticles / particleLifeTime * 0.9f;
@@ -405,28 +440,28 @@ namespace SE
         m_emissionRate = eastl::max(0, eastl::min(emissionRate, emissionRateLimit));
     }
 
-    void ParticleEmitter::IncrementEmissionRate(float deltaEmissionRate)
+    void ParticleData::IncrementEmissionRate(float deltaEmissionRate)
     {
         SetEmissionRate(m_emissionRate + deltaEmissionRate);
     }
 
-    void ParticleEmitter::DecrementEmissionRate(float deltaEmissionRate)
+    void ParticleData::DecrementEmissionRate(float deltaEmissionRate)
     {
         SetEmissionRate(m_emissionRate - deltaEmissionRate);
     }
 
-    void ParticleEmitter::SetEmitPosition(DXSM::Vector3 newPosition)
+    void ParticleData::SetEmitPosition(DXSM::Vector3 newPosition)
     {
         m_emitterConstantBufferData.position = newPosition;
     }
 
-    void ParticleEmitter::SetEmitDir(DXSM::Vector3 newEmitDir)
+    void ParticleData::SetEmitDir(DXSM::Vector3 newEmitDir)
     {
         m_emitterConstantBufferData.rotMatrix =
             DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::FromToRotation({ 0,1,0 }, newEmitDir));
     }
 
-    void ParticleEmitter::SetTexture(eastl::unique_ptr<SE_G::Bind::Texture> newTexture)
+    void ParticleData::SetTexture(eastl::unique_ptr<SE_G::Bind::Texture> newTexture)
     {
         m_texture = eastl::move(newTexture);
     }

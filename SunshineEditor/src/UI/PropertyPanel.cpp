@@ -234,9 +234,9 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         }
         else if (obj->m_group == GameObjectGroup::ParticleEmitter)
         {
-            auto emitterObj = static_cast<SE::ParticleEmitter*>(obj);
-            DrawEmitterDetails(&emitterObj->m_emitterConstantBufferData,
-                &emitterObj->m_simulateParticlesConstantBufferData);
+            auto emitterData = static_cast<SE::ParticleEmitter_Info*>(obj)->m_particleData.get();
+            DrawEmitterDetails(&emitterData->m_emitterConstantBufferData,
+                &emitterData->m_simulateParticlesConstantBufferData);
         }
 
         DrawMeshComponent(obj);
@@ -1327,8 +1327,8 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 }
 
 void PropertyPanel::DrawEmitterDetails(
-    SE::ParticleEmitter::EmitterPointConstantBuffer* emitterPointBuffer,
-    SE::ParticleEmitter::SimulateParticlesConstantBuffer* simulateParticlesBuffer
+    SE::ParticleData::EmitterPointConstantBuffer* emitterPointBuffer,
+    SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer
     )
 {
     if (emitterPointBuffer)

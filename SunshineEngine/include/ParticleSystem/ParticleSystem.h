@@ -11,6 +11,8 @@
 
 #include <ParticleSystem/Particle.h>
 
+#include <Utils/UUID.h>
+
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
@@ -31,7 +33,7 @@ namespace SE_G
 
 namespace SE
 {
-	class ParticleEmitter;
+	class ParticleData;
 
 	class ParticleSystem
 	{
@@ -80,6 +82,8 @@ namespace SE
 			eastl::shared_ptr<SE_G::Camera> camera);
 		~ParticleSystem();
 
+		void AddEmitter(SE::UUID uuid, ParticleData* particleData);
+
 		void LoadCS(AssetPath shaderPath, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& m_computeShader);
 
 		void ComputePassForAllEmitters();
@@ -91,6 +95,6 @@ namespace SE
 
 		void SetBlendState(eastl::unique_ptr<SE_G::Bind::BlendState> newBlendState);
 
-		eastl::unordered_map<eastl::string, ParticleEmitter*> m_emitters;
+		eastl::unordered_map<SE::UUID, ParticleData*> m_emitters;
 	};
 }

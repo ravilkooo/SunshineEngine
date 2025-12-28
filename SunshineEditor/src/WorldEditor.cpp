@@ -666,8 +666,8 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 
 	// TestEmitter
 	{
-		SE::ParticleEmitter::EmitterPointConstantBuffer emitterDesc;
-		SE::ParticleEmitter::SimulateParticlesConstantBuffer simulatorDesc;
+		SE::ParticleData::EmitterPointConstantBuffer emitterDesc;
+		SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc;
 
 		// Bubble Particles
 		emitterDesc =
@@ -687,35 +687,22 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 			{ 0, -5, 0 }, 0
 		};
 
-		auto go = eastl::make_unique<SE::ParticleEmitter>(
+		auto go = eastl::make_unique<SE::ParticleEmitter_Info>(
 			m_particleSystem.get(),
 			emitterDesc,
 			simulatorDesc);
-
-		/*
-		particleBlendDesc = CD3D11_BLEND_DESC(CD3D11_DEFAULT{});
-		particleBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-		particleBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		particleBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		particleBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		particleBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		particleBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-		particleBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-		particleBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		bubbleParticleSystem->SetBlendState(
-			new Bind::BlendState(renderer->GetDevice(), particleBlendDesc, particleBlendFactor, sampleMask));
-		*/
 
 		AssetPath bubble(L"bubble24bpp.dds");
 
 		auto bubbleTex = eastl::make_unique<SE_G::Bind::Texture>(m_renderer->GetDevice(), bubble, 0u);
 
-		go->SetTexture(eastl::move(bubbleTex));
-		go->SetEmissionRate(40);
+		go->m_particleData->SetTexture(eastl::move(bubbleTex));
+		go->m_particleData->SetEmissionRate(40);
 
 		auto bubbleUUID = m_scene->AddGameObject(eastl::move(go));
 
-		m_particleSystem->m_emitters["bubble"] = static_cast<SE::ParticleEmitter*>(m_scene->GetGameObjectByUUID(bubbleUUID));
+		m_particleSystem->AddEmitter(bubbleUUID,
+			static_cast<SE::ParticleEmitter_Info*>(m_scene->GetGameObjectByUUID(bubbleUUID))->m_particleData.get());
 	}
 
 	return true;

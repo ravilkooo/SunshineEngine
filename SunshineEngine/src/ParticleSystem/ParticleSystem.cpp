@@ -246,7 +246,7 @@ namespace SE
 		cbd.Usage = D3D11_USAGE_DYNAMIC;
 		cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		cbd.MiscFlags = 0u;
-		cbd.ByteWidth = ParticleEmitter::Align(sizeof(TransformsParticles), 16u);
+		cbd.ByteWidth = ParticleData::Align(sizeof(TransformsParticles), 16u);
 		cbd.StructureByteStride = 0u;
 		device->CreateBuffer(&cbd, nullptr, &m_viewProjBuffer);
 
@@ -254,7 +254,7 @@ namespace SE
 		cbd.Usage = D3D11_USAGE_DYNAMIC;
 		cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		cbd.MiscFlags = 0u;
-		cbd.ByteWidth = ParticleEmitter::Align(sizeof(SceneConstantBuffer), 16u);
+		cbd.ByteWidth = ParticleData::Align(sizeof(SceneConstantBuffer), 16u);
 		cbd.StructureByteStride = 0u;
 		device->CreateBuffer(&cbd, nullptr, &m_sceneConstantBuffer);
 
@@ -276,8 +276,20 @@ namespace SE
 
 		m_sceneConstantBuffer.Reset();
 		m_viewProjBuffer.Reset();
-		
+
 		m_emitters.clear();
+	}
+
+	void ParticleSystem::AddEmitter(SE::UUID uuid, ParticleData* particleData)
+	{
+		const SE::UUID id = uuid;
+		auto [it, inserted] = m_emitters.emplace(id, nullptr);
+		if (!inserted)
+		{
+			printf("Duplicate UUID in ParticleSystem::AddEmitter");
+			return;
+		}
+		it->second = particleData;
 	}
 
 	void ParticleSystem::ComputePassForAllEmitters()
@@ -295,7 +307,7 @@ namespace SE
 		{
 			emitter.second->EmitPass();
 		}
-		
+
 		context->CSSetShader(nullptr, nullptr, 0);
 		context->ClearState();
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
@@ -345,7 +357,7 @@ namespace SE
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		context->Map(m_sceneConstantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
-		memcpy(mappedResource.pData, &m_sceneConstantBufferData, ParticleEmitter::Align(sizeof(m_sceneConstantBufferData), 16u)); // aligned size
+		memcpy(mappedResource.pData, &m_sceneConstantBufferData, ParticleData::Align(sizeof(m_sceneConstantBufferData), 16u)); // aligned size
 		context->Unmap(m_sceneConstantBuffer.Get(), 0);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
@@ -386,7 +398,7 @@ namespace SE
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		context->Map(m_viewProjBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mappedResource);
-		memcpy(mappedResource.pData, &tf, ParticleEmitter::Align(sizeof(tf), 16)); // aligned size
+		memcpy(mappedResource.pData, &tf, ParticleData::Align(sizeof(tf), 16)); // aligned size
 		context->Unmap(m_viewProjBuffer.Get(), 0);
 
 		context->GSSetConstantBuffers(0, 1, m_viewProjBuffer.GetAddressOf());

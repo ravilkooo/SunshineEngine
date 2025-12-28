@@ -5,6 +5,8 @@
 
 #include <GameObject/GameObject.h>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
@@ -22,9 +24,7 @@ namespace SE
 {
     class ParticleSystem;
 
-    class ParticleEmitter :
-        public GameObject_Info
-        //public GameObject
+    class ParticleData
     {
     public:
         static constexpr uint32_t Align(uint32_t value, uint32_t alignment) { return (value + (alignment - 1)) & ~(alignment - 1); };
@@ -42,8 +42,8 @@ namespace SE
         
         int                                                 m_currentAliveBuffer = 0;
 
-        Microsoft::WRL::ComPtr<ID3D11Buffer>                m_indirectDispatchArgsBuffer[2];    // для комп шейдера
-        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView>   m_indirectDispatchArgsUAV[2];       // для рендеринга
+        Microsoft::WRL::ComPtr<ID3D11Buffer>                m_indirectDispatchArgsBuffer[2];    // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView>   m_indirectDispatchArgsUAV[2];       // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
         struct InitIndirectComputeArgs1DConstantBuffer
         {
@@ -122,10 +122,10 @@ namespace SE
 
         ParticleSystem* m_particleSystem;
 
-        ParticleEmitter(ParticleSystem* particleSystem,
+        ParticleData(ParticleSystem* particleSystem,
             EmitterPointConstantBuffer emitterDesc,
             SimulateParticlesConstantBuffer simulatorDesc);
-        ~ParticleEmitter();
+        ~ParticleData();
 
         void UpdateEmitter(float deltaTime);
 
@@ -146,4 +146,35 @@ namespace SE
 
         void SetTexture(eastl::unique_ptr<SE_G::Bind::Texture> newTexture);
     };
+
+    class ParticleEmitter :
+        public GameObject
+        //public GameObject
+    {
+    public:
+        eastl::unique_ptr<ParticleData> m_particleData;
+
+        ParticleEmitter(
+            ParticleSystem* particleSystem,
+            ParticleData::EmitterPointConstantBuffer emitterDesc,
+            ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
+
+        ~ParticleEmitter();
+    };
+
+    class ParticleEmitter_Info :
+        public GameObject_Info
+        //public GameObject
+    {
+    public:
+        eastl::unique_ptr<ParticleData> m_particleData;
+
+        ParticleEmitter_Info(
+            ParticleSystem* particleSystem,
+            ParticleData::EmitterPointConstantBuffer emitterDesc,
+            ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
+
+        ~ParticleEmitter_Info();
+    };
+
 }
