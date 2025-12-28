@@ -10,23 +10,14 @@
 #include <Scene.h>
 
 
-class PhysicsSystem;
-
-
 // Handles registration of teams and propagation of sensory events
 // This system acts as a global hub that connects all AI agents through perception channels
 class PerceptionSystem
 {
-    friend class Game;
+    //friend class ***;
     friend class PerceptionComponent;
 
 public:
-    static PerceptionSystem& Get()
-    {
-        static PerceptionSystem instance;
-        return instance;
-    }
-
     // --- TEAMS ---
     // Registers a new team in the perception system.
     // Id Unique team identifier.
@@ -51,14 +42,18 @@ public:
     bool ClearTeam(uint32_t TeamId);
     //
 
-    // --- Lua-friendly wrappers ---
+    static PerceptionSystem& Get()
+    {
+        static PerceptionSystem instance;
+        return instance;
+    }
+
+    // Lua-friendly wrappers
     bool Lua_AddSightTargetTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids);
     bool Lua_AddHearingSourceTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids);
     bool Lua_RemoveSightTargetTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids);
     bool Lua_RemoveHearingSourceTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids);
-    //
 private:
-    void SetPhysicsSystem(eastl::shared_ptr<PhysicsSystem> physicsSystem) { PhysicsSystemSP = physicsSystem; }
 
     // Represents a team participating in the perception system
     // Each team contains perceivers (GameObject with perception components)
@@ -84,25 +79,21 @@ private:
 
 
     eastl::shared_ptr<Scene> SceneSP;
-    eastl::shared_ptr<PhysicsSystem> PhysicsSystemSP;
 
     eastl::hash_map<uint32_t, TeamSctruct> Teams;
 };
 
-
-
-// --- LUA BINDING ---
 #ifndef PERCEPTIONSYSTEM_LUA_METHODS_APPLY
 #define PERCEPTIONSYSTEM_LUA_METHODS_APPLY(FM) \
-    FM("registerTeam",                     &PerceptionSystem::RegisterTeam) , \
-    FM("unregisterTeam",                   &PerceptionSystem::UnregisterTeam) , \
-    FM("addSightTargetTeamIDsInTeam",      &PerceptionSystem::Lua_AddSightTargetTeamIDsInTeam) , \
-    FM("addHearingSourceTeamIDsInTeam",    &PerceptionSystem::Lua_AddHearingSourceTeamIDsInTeam) , \
-    FM("removeSightTargetTeamIDsInTeam",   &PerceptionSystem::Lua_RemoveSightTargetTeamIDsInTeam) , \
+    FM("registerTeam", &PerceptionSystem::RegisterTeam) , \
+    FM("unregisterTeam", &PerceptionSystem::UnregisterTeam) , \
+    FM("addSightTargetTeamIDsInTeam", &PerceptionSystem::Lua_AddSightTargetTeamIDsInTeam) , \
+    FM("addHearingSourceTeamIDsInTeam", &PerceptionSystem::Lua_AddHearingSourceTeamIDsInTeam) , \
+    FM("removeSightTargetTeamIDsInTeam", &PerceptionSystem::Lua_RemoveSightTargetTeamIDsInTeam) , \
     FM("removeHearingSourceTeamIDsInTeam", &PerceptionSystem::Lua_RemoveHearingSourceTeamIDsInTeam) , \
-    FM("clearSightTargetTeamIDsInTeam",    &PerceptionSystem::ClearSightTargetTeamIDsInTeam) , \
-    FM("clearHearingSourceTeamIDsInTeam",  &PerceptionSystem::ClearHearingSourceTeamIDsInTeam) , \
-    FM("addToTeam",                        &PerceptionSystem::AddToTeam) , \
-    FM("removeFromTeam",                   &PerceptionSystem::RemoveFromTeam) , \
-    FM("clearTeam",                        &PerceptionSystem::ClearTeam)
+    FM("clearSightTargetTeamIDsInTeam", &PerceptionSystem::ClearSightTargetTeamIDsInTeam) , \
+    FM("clearHearingSourceTeamIDsInTeam", &PerceptionSystem::ClearHearingSourceTeamIDsInTeam) , \
+    FM("addToTeam", &PerceptionSystem::AddToTeam) , \
+    FM("removeFromTeam", &PerceptionSystem::RemoveFromTeam) , \
+    FM("clearTeam", &PerceptionSystem::ClearTeam)
 #endif
