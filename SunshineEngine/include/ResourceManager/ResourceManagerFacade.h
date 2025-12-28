@@ -11,6 +11,7 @@
 #include <ResourceManager/IResource.h>
 #include "ResourceLoader/CompositeResourceLoader.h"
 #include <Utils/DebugUtils.h>
+#include "MemoryManager/StackMemoryManager.h"
 
 // Simple, convenient facade over the engine ResourceManager stack.
 // Responsibilities:
@@ -25,6 +26,8 @@ public:
         static ResourceManagerFacade inst;
         return inst;
     }
+
+    static void Initialize(size_t maxMemorySize);
 
     // Load by file path (auto-detects loader by extension). Increments refcount on reuse.
     ResourceHandle LoadByPath(const eastl::string& path);
@@ -53,6 +56,8 @@ public:
 
     size_t GetTotalMemoryUsage() const;
 
+
+
 private:
     ResourceManagerFacade() = default;
     ~ResourceManagerFacade() = default;
@@ -62,5 +67,5 @@ private:
 
 private:
     ResourceRegistry m_registry;
-    HeapMemoryManager* m_memoryManager; // default heap-backed
+    eastl::unique_ptr<StackMemoryManager> m_memoryManager;
 };
