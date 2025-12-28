@@ -4,9 +4,11 @@
 #include <Component/TransformComponent.h>
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>
+#include <Physics/PhysicsSystem.h>
 
 // C++
 #include <iostream>
+
 
 
 // ------------------------------------------------------------------------------------------------------
@@ -65,9 +67,13 @@ bool PerceptionSystem::UnregisterTeam(uint32_t Id)
     return true;
 }
 
+
+
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- TARGETS AND SOURCES
 // ------------------------------------------------------------------------------------------------------
+
 bool PerceptionSystem::AddSightTargetTeamIDsInTeam(uint32_t TeamId, eastl::vector<uint32_t>& InSightTargetTeamIDs)
 {
     auto It = Teams.find(TeamId);
@@ -210,6 +216,9 @@ bool PerceptionSystem::ClearHearingSourceTeamIDsInTeam(uint32_t TeamId)
     return true;
 }
 
+
+
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- PERCEPTION COMPONENTS
 // ------------------------------------------------------------------------------------------------------
@@ -311,6 +320,13 @@ bool PerceptionSystem::ClearTeam(uint32_t TeamId)
     return false;
 }
 
+
+
+
+// ------------------------------------------------------------------------------------------------------
+// ---------------------------------- LUA
+// ------------------------------------------------------------------------------------------------------
+
 bool PerceptionSystem::Lua_AddSightTargetTeamIDsInTeam(uint32_t TeamId, const std::vector<uint32_t>& ids)
 {
     eastl::vector<uint32_t> v;
@@ -377,8 +393,16 @@ void PerceptionSystem::CheckSights()
 
             auto ViewerTC = ViewerGO->GetComponent<TransformComponent>();
 
-            DXSM::Vector3 ViewerPos = ViewerTC->m_position;
-            DXSM::Vector3 ViewerForward; //= ViewerTC->m_forward;
+            DXSM::Vector3 ViewerPos = ViewerTC->m_position + ViewerPC->EyesOffset;
+
+            DXSM::Vector3 z_plus = DXSM::Vector3(0.0f, 0.0f, 1.0f);
+            const auto wMat = ViewerTC->GetWorldMatrix();
+            DXSM::Matrix A = wMat;
+            A._41 = 0; A._42 = 0; A._43 = 0; A._44 = 1;
+            const auto wMatInvTranspose = (A.Invert()).Transpose();
+
+            DXSM::Vector3 ViewerForward = DXSM::Vector3::Transform(z_plus, wMatInvTranspose);
+            ViewerForward.Normalize();
 
             for (uint32_t TargetTeamId : Team.SightTargetTeamIDs)
             {
@@ -412,7 +436,8 @@ void PerceptionSystem::CheckSights()
                     DXSM::Vector3 DirNorm = Dir;
                     DirNorm.Normalize();
 
-                    bool WasVisible = eastl::find(ViewerPC->GOCanSee.begin(), ViewerPC->GOCanSee.end(), TargetPC->GetOwnerID()) != ViewerPC->GOCanSee.end();
+                    bool WasVisible = eastl::find(ViewerPC->GOCanSee.begin(), ViewerPC->GOCanSee.end(), 
+                        TargetPC->GetOwnerID()) != ViewerPC->GOCanSee.end();
 
                     if (WasVisible)
                     {
@@ -439,7 +464,14 @@ void PerceptionSystem::CheckSights()
                     }
                     else
                     {
-                        //
+                        eastl::vector<SE::UUID> Ignore;
+                        Ignore.reserve(2);
+                        Ignore.push_back(ViewerPC->OwnerID);
+                        Ignore.push_back(TargetPC->OwnerID);
+
+                        HitTarget = !PhysicsSystemSP->Trace(JPH::RVec3(ViewerPos.x, ViewerPos.y, ViewerPos.z), 
+                            JPH::Vec3(DirNorm.x, DirNorm.y, DirNorm.z),
+                            Dist, 0, Ignore, nullptr );
                     }
 
                     if (HitTarget)
@@ -539,6 +571,12 @@ bool PerceptionSystem::ReportNoise(PerceptionComponent* SourcePC, float Loudness
 
     return true;
 }
+
+
+
+// ------------------------------------------------------------------------------------------------------
+// ---------------------------------- LUA BINDING
+// ------------------------------------------------------------------------------------------------------
 
 #define PS_ADD_FIELD(name) #name, &PerceptionSystem::name
 #define PS_FIELD_PAIRS 

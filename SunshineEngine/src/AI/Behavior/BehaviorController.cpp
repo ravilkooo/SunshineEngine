@@ -1,11 +1,77 @@
 #include "AI/Behavior/BehaviorController.h"
 
+// C++
 #include <iostream>
+
+// Lua
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
+
 
 
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- Action
 // ------------------------------------------------------------------------------------------------------
+
+void Action::Lua_SetOnStart(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnActionStart = nullptr;
+		return;
+	}
+
+	OnActionStart =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+		{
+			Func(GOID, MBoard);
+		};
+}
+
+void Action::Lua_SetOnUpdate(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnActionUpdate = nullptr;
+		return;
+	}
+
+	OnActionUpdate =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime) -> EActionResult
+		{
+			return static_cast<EActionResult>(Func(GOID, MBoard, DeltaTime));
+		};
+}
+
+void Action::Lua_SetOnAbort(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnActionAbort = nullptr;
+		return;
+	}
+
+	OnActionAbort =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+		{
+			Func(GOID, MBoard);
+		};
+}
+
+void Action::Lua_SetOnComplete(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnActionComplete = nullptr;
+		return;
+	}
+
+	OnActionComplete =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, EActionResult Result)
+		{
+			Func(GOID, MBoard, Result);
+		};
+}
 
 EActionCondition Action::Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
 {
@@ -55,6 +121,7 @@ EActionCondition Action::Update(const SE::UUID& GOID, const eastl::shared_ptr<Me
 }
 
 
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- Pattern
 // ------------------------------------------------------------------------------------------------------
@@ -90,7 +157,7 @@ void Pattern::InsertAction(eastl::shared_ptr<Action> NewAction, size_t Index)
 
 }
 
-eastl::shared_ptr<Action> Pattern::GetActionByName(const eastl::string& Name) const
+eastl::shared_ptr<Action> Pattern::GetActionByName(const std::string& Name) const
 {
 	for (auto& A : Actions)
 	{
@@ -115,7 +182,7 @@ eastl::shared_ptr<Action> Pattern::GetActionByIndex(size_t Index) const
 	return Actions[Index];
 }
 
-bool Pattern::RemoveActionByName(const eastl::string& Name)
+bool Pattern::RemoveActionByName(const std::string& Name)
 {
 	for (size_t i = 0; i < Actions.size(); ++i)
 	{
@@ -141,6 +208,81 @@ bool Pattern::RemoveActionByIndex(size_t Index)
 	Actions.erase(Actions.begin() + Index);
 
 	return true;
+}
+
+void Pattern::Lua_SetEvaluateUtility(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		EvaluateUtility = nullptr;
+		return;
+	}
+
+	EvaluateUtility =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard) -> float
+		{
+			return Func(GOID, MBoard);
+		};
+}
+
+void Pattern::Lua_SetOnStart(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnPatternStart = nullptr;
+		return;
+	}
+
+	OnPatternStart =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+		{
+			Func(GOID, MBoard);
+		};
+}
+
+void Pattern::Lua_SetOnUpdate(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnPatternUpdate = nullptr;
+		return;
+	}
+
+	OnPatternUpdate =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
+		{
+			Func(GOID, MBoard, DeltaTime);
+		};
+}
+
+void Pattern::Lua_SetOnAbort(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnPatternAbort = nullptr;
+		return;
+	}
+
+	OnPatternAbort =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+		{
+			Func(GOID, MBoard);
+		};
+}
+
+void Pattern::Lua_SetOnComplete(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnPatternComplete = nullptr;
+		return;
+	}
+
+	OnPatternComplete =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, EActionResult Result)
+		{
+			Func(GOID, MBoard, Result);
+		};
 }
 
 EActionCondition Pattern::Update(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
@@ -218,7 +360,9 @@ EActionCondition Pattern::Update(const SE::UUID& GOID, const eastl::shared_ptr<M
 void Pattern::AbortCurrentAction()
 {
 	if (!Actions.empty() && CurrentActionIndex < Actions.size() && Actions[CurrentActionIndex])
+	{
 		Actions[CurrentActionIndex]->Abort();
+	}
 }
 
 void Pattern::Reset()
@@ -228,19 +372,21 @@ void Pattern::Reset()
 }
 
 
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- EventTransition
 // ------------------------------------------------------------------------------------------------------
 
-EventTransition::EventTransition(const eastl::string& InToState, CheckFunc InCheck, BehaviorController* FSM) : ToState(InToState), Check(InCheck)
+EventTransition::EventTransition(const std::string& InToState, CheckFunc InCheck, BehaviorController* FSM) : ToState(InToState), Check(InCheck)
 {
-	Abort = [FSM](const eastl::string& ToState)
+	Abort =
+		[FSM](const std::string& ToState)
+		{
+			if (FSM)
 			{
-				if (FSM)
-				{
-					FSM->Abort(ToState);
-				}
-			};
+				FSM->Abort(ToState);
+			}
+		};
 }
 
 void EventTransition::Trigger(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
@@ -258,11 +404,11 @@ void EventTransition::Trigger(const SE::UUID& GOID, const eastl::shared_ptr<Memo
 	}
 }
 
-void EventTransition::ChangeToState(const eastl::string& InToState, BehaviorController* FSM)
+void EventTransition::ChangeToState(const std::string& InToState, BehaviorController* FSM)
 {
 	ToState = InToState;
 
-	Abort = [FSM](const eastl::string& ToState)
+	Abort = [FSM](const std::string& ToState)
 		{
 			if (FSM)
 			{
@@ -272,11 +418,12 @@ void EventTransition::ChangeToState(const eastl::string& InToState, BehaviorCont
 }
 
 
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- State
 // ------------------------------------------------------------------------------------------------------
 
-bool State::AddPattern(const eastl::string& Name, eastl::shared_ptr<Pattern> NewPattern)
+bool State::AddPattern(const std::string& Name, eastl::shared_ptr<Pattern> NewPattern)
 {
 	if (!NewPattern)
 	{
@@ -295,7 +442,7 @@ bool State::AddPattern(const eastl::string& Name, eastl::shared_ptr<Pattern> New
 	return true;
 }
 
-eastl::shared_ptr<Pattern> State::GetPattern(const eastl::string& Name)
+eastl::shared_ptr<Pattern> State::GetPattern(const std::string& Name)
 {
 	auto it = Patterns.find(Name);
 
@@ -308,7 +455,7 @@ eastl::shared_ptr<Pattern> State::GetPattern(const eastl::string& Name)
 	return it->second;
 }
 
-bool State::RemovePattern(const eastl::string& Name)
+bool State::RemovePattern(const std::string& Name)
 {
 	auto it = Patterns.find(Name);
 
@@ -323,21 +470,94 @@ bool State::RemovePattern(const eastl::string& Name)
 	return true;
 }
 
-void State::AddConditionTransition(const eastl::string& InToState, CheckFunc InCheck)
+sol::table State::Lua_GetAllPatterns(sol::this_state ts) const
+{
+	sol::state_view lua(ts);
+	sol::table t = lua.create_table();
+
+	for (auto& [name, pattern] : Patterns)
+	{
+		t[name.c_str()] = pattern;
+	}
+
+	return t;
+}
+
+void State::Lua_SetOnEnter(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnStateEnter = nullptr;
+		return;
+	}
+
+	OnStateEnter =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+		{
+			Func(GOID, MBoard);
+		};
+}
+
+void State::Lua_SetOnUpdate(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnStateUpdate = nullptr;
+		return;
+	}
+
+	OnStateUpdate =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
+		{
+			Func(GOID, MBoard, DeltaTime);
+		};
+}
+
+void State::Lua_SetOnAbort(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnStateAbort = nullptr;
+		return;
+	}
+
+	OnStateAbort =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+		{
+			Func(GOID, MBoard);
+		};
+}
+
+void State::Lua_SetOnExit(const sol::function& Func)
+{
+	if (!Func.valid())
+	{
+		OnStateExit = nullptr;
+		return;
+	}
+
+	OnStateExit =
+		[Func](const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard)
+		{
+			Func(GOID, MBoard);
+		};
+}
+
+void State::AddConditionTransition(const std::string& InToState, CheckFunc InCheck)
 {
 	auto Transition = eastl::make_shared<ConditionTransition>(InToState, InCheck);
 
 	ConditionTransitions.push_back(Transition);
 }
 
-void State::AddEventTransition(const eastl::string& InToState, CheckFunc InCheck, BehaviorController* FSM)
+void State::AddEventTransition(const std::string& InToState, CheckFunc InCheck, BehaviorController* FSM)
 {
 	auto Transition = eastl::make_shared<EventTransition>(InToState, InCheck, FSM);
 
 	EventTransitions.push_back(Transition);
 }
 
-bool State::RemoveConditionTransition(const eastl::string& ToState)
+bool State::RemoveConditionTransition(const std::string& ToState)
 {
 	for (auto it = ConditionTransitions.begin(); it != ConditionTransitions.end(); ++it)
 	{
@@ -351,7 +571,7 @@ bool State::RemoveConditionTransition(const eastl::string& ToState)
 	return false;
 }
 
-bool State::RemoveEventTransition(const eastl::string& ToState)
+bool State::RemoveEventTransition(const std::string& ToState)
 {
 	for (auto it = EventTransitions.begin(); it != EventTransitions.end(); ++it)
 	{
@@ -456,6 +676,7 @@ eastl::shared_ptr<ConditionTransition> State::CheckConditionTransitions(const SE
 }
 
 
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- BehaviorController
 // ------------------------------------------------------------------------------------------------------
@@ -471,7 +692,7 @@ void BehaviorController::SetMemoryBoard(const eastl::shared_ptr<MemoryBoard>& In
 	MBoard = eastl::make_shared<MemoryBoard>(*InMemoryBoard);
 }
 
-bool BehaviorController::AddState(const eastl::string& Name, const eastl::shared_ptr<State>& NewState)
+bool BehaviorController::AddState(const std::string& Name, const eastl::shared_ptr<State>& NewState)
 {
 	if (!NewState)
 	{
@@ -490,7 +711,7 @@ bool BehaviorController::AddState(const eastl::string& Name, const eastl::shared
 	return true;
 }
 
-bool BehaviorController::RemoveState(const eastl::string& Name)
+bool BehaviorController::RemoveState(const std::string& Name)
 {
 	auto it = States.find(Name);
 
@@ -511,7 +732,7 @@ bool BehaviorController::RemoveState(const eastl::string& Name)
 	return true;
 }
 
-eastl::shared_ptr<State> BehaviorController::GetState(const eastl::string& Name)
+eastl::shared_ptr<State> BehaviorController::GetState(const std::string& Name)
 {
 	auto it = States.find(Name);
 
@@ -524,7 +745,7 @@ eastl::shared_ptr<State> BehaviorController::GetState(const eastl::string& Name)
 	return it->second;
 }
 
-bool BehaviorController::SetInitialState(const eastl::string& Name)
+bool BehaviorController::SetInitialState(const std::string& Name)
 {
 	auto it = States.find(Name);
 
@@ -540,7 +761,7 @@ bool BehaviorController::SetInitialState(const eastl::string& Name)
 	return true;
 }
 
-bool BehaviorController::AddConditionTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck)
+bool BehaviorController::AddConditionTransition(const std::string& FromState, const std::string& ToState, CheckFunc InCheck)
 {
 	auto From = GetState(FromState);
 	auto To = GetState(ToState);
@@ -564,7 +785,7 @@ bool BehaviorController::AddConditionTransition(const eastl::string& FromState, 
 	return true;
 }
 
-bool BehaviorController::AddEventTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck)
+bool BehaviorController::AddEventTransition(const std::string& FromState, const std::string& ToState, CheckFunc InCheck)
 {
 	auto From = GetState(FromState);
 	auto To = GetState(ToState);
@@ -588,7 +809,7 @@ bool BehaviorController::AddEventTransition(const eastl::string& FromState, cons
 	return true;
 }
 
-bool BehaviorController::ChangeToStateInConditionTransition(const eastl::string& FromState, const eastl::string& OldToState, const eastl::string& NewToState)
+bool BehaviorController::ChangeToStateInConditionTransition(const std::string& FromState, const std::string& OldToState, const std::string& NewToState)
 {
 	auto From = GetState(FromState);
 
@@ -610,7 +831,7 @@ bool BehaviorController::ChangeToStateInConditionTransition(const eastl::string&
 	return false; 
 }
 
-bool BehaviorController::ChangeToStateInEventTransition(const eastl::string& FromState, const eastl::string& OldToState, const eastl::string& NewToState)
+bool BehaviorController::ChangeToStateInEventTransition(const std::string& FromState, const std::string& OldToState, const std::string& NewToState)
 {
 	auto From = GetState(FromState);
 
@@ -632,7 +853,7 @@ bool BehaviorController::ChangeToStateInEventTransition(const eastl::string& Fro
 	return false;
 }
 
-bool BehaviorController::ChangeCheckFuncInConditionTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck)
+bool BehaviorController::ChangeCheckFuncInConditionTransition(const std::string& FromState, const std::string& ToState, CheckFunc InCheck)
 {
 	auto From = GetState(FromState);
 
@@ -654,7 +875,7 @@ bool BehaviorController::ChangeCheckFuncInConditionTransition(const eastl::strin
 	return false;
 }
 
-bool BehaviorController::ChangeCheckFuncInEventTransition(const eastl::string& FromState, const eastl::string& ToState, CheckFunc InCheck)
+bool BehaviorController::ChangeCheckFuncInEventTransition(const std::string& FromState, const std::string& ToState, CheckFunc InCheck)
 {
 	auto From = GetState(FromState);
 
@@ -676,7 +897,7 @@ bool BehaviorController::ChangeCheckFuncInEventTransition(const eastl::string& F
 	return false;
 }
 
-bool BehaviorController::RemoveConditionTransition(const eastl::string& FromState, const eastl::string& ToState)
+bool BehaviorController::RemoveConditionTransition(const std::string& FromState, const std::string& ToState)
 {
 	auto From = GetState(FromState);
 
@@ -696,7 +917,7 @@ bool BehaviorController::RemoveConditionTransition(const eastl::string& FromStat
 	}
 }
 
-bool BehaviorController::RemoveEventTransition(const eastl::string& FromState, const eastl::string& ToState)
+bool BehaviorController::RemoveEventTransition(const std::string& FromState, const std::string& ToState)
 {
 	auto From = GetState(FromState);
 
@@ -714,6 +935,19 @@ bool BehaviorController::RemoveEventTransition(const eastl::string& FromState, c
 		std::cerr << "[Warning] BehaviorController::RemoveEventTransition: tried to remove non-existing transition from " << FromState.c_str() << " to " << ToState.c_str() << "\n";
 		return false;
 	}
+}
+
+sol::table BehaviorController::Lua_GetAllStates(sol::this_state ts)
+{
+	sol::state_view lua(ts);
+	sol::table t = lua.create_table();
+
+	for (auto& [name, state] : States)
+	{
+		t[name.c_str()] = state;
+	}
+
+	return t;
 }
 
 void BehaviorController::Update(float DeltaTime)
@@ -751,7 +985,7 @@ void BehaviorController::Update(float DeltaTime)
 	}
 }
 
-void BehaviorController::Abort(const eastl::string& ToState)
+void BehaviorController::Abort(const std::string& ToState)
 {
 	AfterAbortStateName = ToState;
 
@@ -759,7 +993,7 @@ void BehaviorController::Abort(const eastl::string& ToState)
 		CurrentState->CurrentPattern->AbortCurrentAction();
 }
 
-void BehaviorController::ChangeState(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const eastl::string& NewState)
+void BehaviorController::ChangeState(const SE::UUID& GOID, const eastl::shared_ptr<MemoryBoard>& MBoard, const std::string& NewState)
 {
 	if (NewState.empty())
 	{
@@ -781,3 +1015,77 @@ void BehaviorController::ChangeState(const SE::UUID& GOID, const eastl::shared_p
 		CurrentState = it->second;
 	}
 }
+
+
+
+// ------------------------------------------------------------------------------------------------------
+// ---------------------------------- LUA BINDING
+// ------------------------------------------------------------------------------------------------------
+
+#define ACTION_ADD_FIELD(name) #name, &Action::name
+#define ACTION_FIELD_PAIRS
+
+#define ACTION_ADD_METHOD(k, fn) k, fn
+#define ACTION_METHOD_PAIRS ACTION_LUA_METHODS_APPLY(ACTION_ADD_METHOD)
+
+LUA_REGISTER_TYPE(Action, "Action", ACTION_FIELD_PAIRS, ACTION_METHOD_PAIRS)
+
+#undef ACTION_ADD_METHOD
+#undef ACTION_FIELD_PAIRS
+
+
+
+#define PATTERN_ADD_FIELD(name) #name, &Pattern::name
+#define PATTERN_FIELD_PAIRS
+
+#define PATTERN_ADD_METHOD(k, fn) k, fn
+#define PATTERN_METHOD_PAIRS PATTERN_LUA_METHODS_APPLY(PATTERN_ADD_METHOD)
+
+LUA_REGISTER_TYPE(Pattern, "Pattern", PATTERN_FIELD_PAIRS, PATTERN_METHOD_PAIRS)
+
+#undef PATTERN_ADD_METHOD
+#undef PATTERN_FIELD_PAIRS
+
+
+
+#define STATE_ADD_METHOD(k, fn) k, fn
+#define STATE_METHOD_PAIRS STATE_LUA_METHODS_APPLY(STATE_ADD_METHOD)
+
+#define STATE_FIELD_PAIRS
+LUA_REGISTER_TYPE(State, "State", STATE_FIELD_PAIRS, STATE_METHOD_PAIRS)
+
+#undef STATE_ADD_METHOD
+#undef STATE_FIELD_PAIRS
+
+
+/*
+#define ADD_METHOD(k, fn) k, fn
+
+LUA_REGISTER_COMPONENT(
+	BehaviorController,
+	"BehaviorController",
+	//,
+	BEHAVIORCONTROLLER_LUA_METHODS_APPLY(ADD_METHOD),
+	"getBehaviorController"
+)
+
+
+#define BC_ADD_FIELD(name) #name, &BehaviorController::name
+#define BEHAVIORCONTROLLER_FIELD_PAIRS \
+    BEHAVIORCONTROLLER_LUA_FIELDS_APPLY(BC_ADD_FIELD)
+#undef BC_ADD_FIELD
+
+#define BC_ADD_METHOD_WITH_LEAD(k, fn) , k, fn
+#define BEHAVIORCONTROLLER_METHOD_PAIRS \
+    BEHAVIORCONTROLLER_LUA_METHODS_APPLY(BC_ADD_METHOD_WITH_LEAD)
+#undef BC_ADD_METHOD_WITH_LEAD
+
+
+LUA_REGISTER_COMPONENT(
+	BehaviorController,
+	"BehaviorController",
+	BEHAVIORCONTROLLER_FIELD_PAIRS
+	BEHAVIORCONTROLLER_METHOD_PAIRS,
+	"getBehaviorController"
+)
+*/
