@@ -3,6 +3,9 @@
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
 #include <PlayerObject/PlayerObject.h>
 
+#include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/ParticleEmitter.h>
+
 Game::Game()
 {
 	//Initialize();
@@ -26,6 +29,9 @@ void Game::SetupRendering(
 		renderSystem->GetDeviceContext(),
 		m_screenWidth, m_screenHeight);
 
+	this->m_renderer->InitParticleSystem();
+	this->m_particleSystem = this->m_renderer->m_particleSystem.get();
+	
 	{
 		m_gPass = static_cast<SE_G::GPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::GPass>(
@@ -39,6 +45,8 @@ void Game::SetupRendering(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
+
+		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 	}
 }
 
@@ -250,7 +258,10 @@ void Game::Update(float deltaTime) {
 	 m_physicsSystem->Step(deltaTime);
 
 	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
-	 
+
+	 if (m_particleSystem)
+		 m_particleSystem->Update(deltaTime);
+
 	 // For Volodya
 	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
 }

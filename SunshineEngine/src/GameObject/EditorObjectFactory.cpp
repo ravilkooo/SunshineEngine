@@ -5,6 +5,9 @@
 
 #include <GameObject/Shapes/ShapeCollection.h>
 
+#include <ParticleSystem/ParticleEmitter.h>
+#include <ParticleSystem/ParticleSystem.h>
+
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 
@@ -12,6 +15,46 @@
 
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+
+
+eastl::unique_ptr<SE::ParticleEmitter_Info> EditorObjectFactory::CreateParticleEmitter(
+	SE::ParticleSystem* particleSystem)
+{
+	SE::ParticleData::EmitterPointConstantBuffer emitterDesc;
+	SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc;
+
+	// Bubble Particles
+	emitterDesc =
+	{
+		DXSM::Matrix::Identity,
+		{ 15, 0, 0 }, 3.0f,
+		{ 1, 1, 1 }, 1.0f,
+		{ 1, 1, 1 }, 1.0f,
+
+		8, 1, 0.2, 0.5,
+		
+		0, DX::XM_2PI, -DX::XM_PI / 10, DX::XM_PI / 10,
+		
+		100u, { 0, 0, 0 },
+	};
+	simulatorDesc = {
+		{ 0, -5, 0 }, 0
+	};
+
+	auto go = eastl::make_unique<SE::ParticleEmitter_Info>(
+		particleSystem,
+		emitterDesc,
+		simulatorDesc);
+
+	AssetPath particleTexPath(L"DefaultTexture.dds");
+
+	auto particleTex = eastl::make_shared<SE_G::Bind::Texture>(particleSystem->m_renderer->GetDevice(), particleTexPath, 0u);
+
+	go->m_particleData->SetTexture(particleTex);
+	go->m_particleData->SetEmissionRate(40);
+
+	return go;
+}
 
 eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	SE_G::DeferredRenderer* renderSystem,

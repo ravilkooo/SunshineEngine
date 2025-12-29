@@ -15,10 +15,9 @@ namespace SE_G {
 
 		template <class C>
 		class ConstantBuffer : public Bindable {
-		protected:
+		public:
 			Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
 			UINT slot;
-		public:
 			virtual void Update(ID3D11DeviceContext* context, const C& consts)
 			{
 				if (!pConstantBuffer) return;
@@ -120,9 +119,9 @@ namespace SE_G {
 		template<typename C>
 		class GeometryConstantBuffer : public ConstantBuffer<C>
 		{
+		public:
 			using ConstantBuffer<C>::pConstantBuffer;
 			using ConstantBuffer<C>::slot;
-		public:
 			using ConstantBuffer<C>::ConstantBuffer;
 			void Bind(ID3D11DeviceContext* context) noexcept override
 			{
@@ -136,9 +135,9 @@ namespace SE_G {
 		template<typename C>
 		class VertexConstantBuffer : public ConstantBuffer<C>
 		{
+		public:
 			using ConstantBuffer<C>::pConstantBuffer;
 			using ConstantBuffer<C>::slot;
-		public:
 			using ConstantBuffer<C>::ConstantBuffer;
 			void Bind(ID3D11DeviceContext* context) noexcept override
 			{
@@ -152,9 +151,9 @@ namespace SE_G {
 		template<typename C>
 		class PixelConstantBuffer : public ConstantBuffer<C>
 		{
+		public:
 			using ConstantBuffer<C>::pConstantBuffer;
 			using ConstantBuffer<C>::slot;
-		public:
 			using ConstantBuffer<C>::ConstantBuffer;
 			void Bind(ID3D11DeviceContext* context) noexcept override
 			{
@@ -169,9 +168,9 @@ namespace SE_G {
 		template<typename C>
 		class ComputeConstantBuffer : public ConstantBuffer<C>
 		{
+		public:
 			using ConstantBuffer<C>::pConstantBuffer;
 			using ConstantBuffer<C>::slot;
-		public:
 			using ConstantBuffer<C>::ConstantBuffer;
 			void Bind(ID3D11DeviceContext* context) noexcept override
 			{

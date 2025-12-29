@@ -27,6 +27,11 @@
 
 #include <ResourceManager/ResourceLoaderFactory.h>
 
+namespace SE
+{
+    class ParticleSystem;
+}
+
 namespace SE_G
 {
     class RenderingSystem;
@@ -135,6 +140,8 @@ public:
 
     // PlayerObject
     SE::UUID m_playerObject = SE::UUID(0u);
+
+    SE::ParticleSystem* m_particleSystem;
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

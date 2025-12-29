@@ -32,6 +32,10 @@
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
 
+namespace SE
+{
+    class ParticleSystem;
+}
 
 class SUNSHINE_ENGINE_API Game
 {
@@ -87,6 +91,8 @@ public:
 
     // PlayerObject
     PlayerObject* m_playerObject;
+
+    SE::ParticleSystem* m_particleSystem;
 
     // GAI
     void CreateGAIScene();

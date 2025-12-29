@@ -19,6 +19,9 @@
 
 #include <PlayerObject/PlayerObject.h>
 
+#include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/ParticleEmitter.h>
+
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Utils/Camera.h>
 
@@ -660,6 +663,12 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                 scene->m_playerObjectUUID = playerObj->m_UUID;
                 break;
             }
+            case GameObjectGroup::ParticleEmitter:
+            {
+                go = SE::ParticleEmitter::FromJson(objJ, renderSystem->m_particleSystem.get());
+
+                break;
+            }
             case GameObjectGroup::Other:
                 break;
             default:
@@ -704,9 +713,14 @@ eastl::shared_ptr<Scene> Scene::FromJson(
 json Scene_Info::ToJson() const {
     json j;
     j["gameObjects"] = json::array();
-    for (auto& uuid : gameObjects) {
+    for (auto& uuid : gameObjects)
+    {
         auto it = uuidToObjectMap.find(uuid);
-        if (it != uuidToObjectMap.end() && it->second) {
+        if (it != uuidToObjectMap.end() && it->second)
+        {
+            // if (it->second->m_group == GameObjectGroup::ParticleEmitter)
+            //     continue;
+
             j["gameObjects"].push_back(it->second->ToJson());
         }
     }
@@ -797,6 +811,12 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 }
                 playerObj->AssignSceneToCamera(scene.get());
                 scene->m_playerObject = playerObj->m_UUID;
+                break;
+            }
+            case GameObjectGroup::ParticleEmitter:
+            {
+                go = SE::ParticleEmitter_Info::FromJson(objJ, renderSystem->m_particleSystem.get());
+                    
                 break;
             }
             case GameObjectGroup::Other:

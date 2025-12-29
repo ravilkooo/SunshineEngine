@@ -1,20 +1,34 @@
-#include "UI/PropertyPanel.h"
+#include "DirectXMath.h"
+
 #include "WorldEditor.h"
-#include "GameObject/GameObject.h"
-#include "Component/TransformComponent.h"
-#include "Component/RenderComponent.h"
-#include "Component/PhysicsComponent.h"
-#include "Component/MeshComponent.h"
+
 #include <Graphics/GraphicsResources/Mesh.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/Bindable/Sampler.h>
-#include "Component/LuaComponent.h"
-#include "DirectXMath.h"
-#include "GameObject/Lighting/LightObject.h"
-#include "Graphics/Lighting/LightData.h"
-#include "Graphics/Renderer/Technique/PointLightTechnique.h"
+#include <Graphics/Lighting/LightData.h>
+#include <Graphics/Renderer/Technique/PointLightTechnique.h>
+#include <Graphics/Renderer/Technique/SkyBoxTechnique.h>
+
+#include <GameObject/GameObject.h>
+#include <GameObject/Lighting/LightObject.h>
+#include <GameObject/Lighting/SkyBox.h>
+
+#include <GameObject/Shapes/ShapeCollection.h>
+#include <GameObject/Shapes/ShapeObject.h>
+
+
+#include <ParticleSystem/ParticleEmitter.h>
+
+#include <Component/TransformComponent.h>
+#include <Component/RenderComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/MeshComponent.h>
+#include <Component/LuaComponent.h>
+
+#include <UI/PropertyPanel.h>
 #include <UI/FontStyles.h>
 #include <ResourceManager/ResourceManagerFacade.h>
+
 
 PropertyPanel::MeshEditor PropertyPanel::s_meshEditor =
 {
@@ -183,9 +197,9 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
                 break;
 
             case LightObjectType::SkyBox:
-                if (auto lightObj = static_cast<LightObject_Info<SE_G::SkyBoxData>*>(obj))
+                if (auto lightObj = static_cast<SkyBox_Info*>(obj))
                 {
-                    DrawSkyBoxDetails(lightObj->m_lightData.get());
+                    DrawSkyBoxDetails(lightObj);
                 }
                 break;
 
@@ -221,6 +235,11 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
             default:
                 break;
             }
+        }
+        else if (obj->m_group == GameObjectGroup::ParticleEmitter)
+        {
+            auto emitterObj = static_cast<SE::ParticleEmitter_Info*>(obj);
+            DrawEmitterDetails(emitterObj);
         }
 
         DrawMeshComponent(obj);
@@ -321,16 +340,89 @@ void PropertyPanel::DrawSpotLightDetails(SE_G::SpotLightData* lightData)
     }
 }
 
-void PropertyPanel::DrawSkyBoxDetails(SE_G::SkyBoxData* lightData)
+void PropertyPanel::DrawSkyBoxDetails(SkyBox_Info* skyBoxObj)
 {
-    if (lightData)
+    if (skyBoxObj)
     {
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Skybox");
         EditorUI::FontStyles::Pop();
         
-        ImGui::ColorEdit3("Sky Tint", &lightData->Tint.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Intensity", &lightData->Power, 0.1f, 0.0f, 10.0f, "%.1f");
+        ImGui::ColorEdit3("Sky Tint", &skyBoxObj->m_lightData.get()->Tint.x, ImGuiColorEditFlags_Float);
+        ImGui::DragFloat("Intensity", &skyBoxObj->m_lightData.get()->Power, 0.1f, 0.0f, 10.0f, "%.1f");
+
+        ImGui::Separator();
+        // Texture
+
+        auto tex = skyBoxObj->m_lightTech->m_texture;
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("Texture settings");
+        EditorUI::FontStyles::Pop();
+
+        if (tex) {
+            eastl::wstring tpath = tex->GetCurrentTexturePath().m_assetRelativePath;
+            // convert wstring to narrow string for ImGui display
+            std::wstring ws = tpath.c_str();
+            std::string s(ws.begin(), ws.end());
+            if (tex->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
+            {
+                ImGui::Text("Engine asset");
+            }
+            ImGui::Text("Texture: %s", s.c_str());
+        }
+        else {
+            ImGui::TextDisabled("Texture: (none)");
+        }
+
+        // Editing button
+        if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
+            s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
+            s_meshEditor.m_texError.clear();
+            // опционально: при открытии заполнить поля текущими значениями
+            if (s_meshEditor.m_editTexture && tex) {
+                AssetPath cur = tex->GetCurrentTexturePath();
+                std::wstring ws = cur.m_assetRelativePath.c_str();
+                std::string  s(ws.begin(), ws.end());
+                strncpy(s_meshEditor.m_texPathBuf, s.c_str(), sizeof(s_meshEditor.m_texPathBuf) - 1);
+                s_meshEditor.m_texPathBuf[sizeof(s_meshEditor.m_texPathBuf) - 1] = 0;
+                s_meshEditor.m_texAssetSource = cur.m_assetSource;
+            }
+        }
+
+        // Editing panel
+        if (s_meshEditor.m_editTexture) {
+            ImGui::Separator();
+
+            ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
+
+            const char* srcItems = "Engine\0Project\0";
+            ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
+
+            if (ImGui::Button("Load Texture")) {
+                s_meshEditor.m_texError.clear();
+
+                AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
+
+                std::string relNarrow = s_meshEditor.m_texPathBuf;
+                std::wstring relWide(relNarrow.begin(), relNarrow.end());
+
+                AssetPath ap(relWide.c_str(), src);
+
+                {
+                    auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap, 4u);
+                    skyBoxObj->SetTexture(newTexture);
+                }
+
+                s_meshEditor.m_editTexture = false;
+            }
+
+            if (!s_meshEditor.m_texError.empty()) {
+                ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
+            }
+        }
+
+        ImGui::Separator();
     }
 }
 
@@ -1342,5 +1434,190 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
         ImGui::Text("Sampler: %s", presetName);
     } else {
         ImGui::TextDisabled("Sampler: (none)");
+    }
+}
+
+void PropertyPanel::DrawEmitterDetails(
+    SE::ParticleEmitter_Info* emitterObj
+    /*
+    SE::ParticleData::EmitterPointConstantBuffer* emitterPointBuffer,
+    SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer
+    */
+    )
+{
+    if (emitterObj)
+    {
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Particle Emitter");
+        EditorUI::FontStyles::Pop();
+
+        auto emitterData = emitterObj->m_particleData.get();
+        auto emitterPointBuffer = &emitterData->m_emitterConstantBufferData;
+        auto simulateParticlesBuffer = &emitterData->m_simulateParticlesConstantBufferData;
+
+        // Enable button
+        if (ImGui::SmallButton(emitterData->m_enabled ? "Hide particles" : "Show particles")) {
+            emitterData->m_enabled = !emitterData->m_enabled;
+            if (emitterData->m_enabled)
+            {
+                emitterData->EnableEmission();
+            }
+            else
+            {
+                emitterData->DisableEmission();
+            }
+        }
+
+
+        DrawVector3Control("Position", emitterPointBuffer->position, 0.0f);
+
+        ImGui::ColorEdit3("Color start", &emitterPointBuffer->colorStart.x, ImGuiColorEditFlags_Float);
+        ImGui::ColorEdit3("Color end", &emitterPointBuffer->colorEnd.x, ImGuiColorEditFlags_Float);
+
+        float alphaStart = emitterPointBuffer->alphaStart * 255.0f;
+        if (ImGui::DragFloat("Alpha start", &alphaStart,
+            1.0f, 0.0f, 255.0f, "%.1f"))
+        {
+            emitterPointBuffer->alphaStart = alphaStart / 255.0f;
+        }
+
+        float alphaEnd = emitterPointBuffer->alphaEnd * 255.0f;
+        if (ImGui::DragFloat("Alpha end", &alphaEnd,
+            1.0f, 0.0f, 255.0f, "%.1f"))
+        {
+            emitterPointBuffer->alphaEnd = alphaEnd / 255.0f;
+        }
+
+        uint32_t min_count = 3, max_count = 64;
+        if (DrawUIntControl("Max particles count", emitterData->m_maxParticles, 0u, 1u, min_count, max_count))
+        {
+        }
+
+        ImGui::DragFloat("Emission rate", &emitterData->m_deaultEmissionRate,
+            0.1f, 0.0f, 100.0f, "%.1f");
+
+        ImGui::DragFloat("Particles lifetime", &emitterPointBuffer->particlesLifeSpan,
+            0.1f, 0.1f, 10.0f, "%.1f sec");
+
+        ImGui::DragFloat("Particles base speed", &emitterPointBuffer->particlesBaseSpeed,
+            0.1f, 0.0f, 20.0f, "%.1f m/s");
+
+        ImGui::DragFloat("Particles mass", &emitterPointBuffer->particlesMass,
+            0.1f, 0.0f, 10.0f, "%.1f");
+
+        ImGui::DragFloat("Particles start size", &emitterPointBuffer->particleSizeStart,
+            0.1f, 0.0f, 10.0f, "%.1f m");
+
+        ImGui::DragFloat("Particles end size", &emitterPointBuffer->particleSizeEnd,
+            0.1f, 0.0f, 10.0f, "%.1f m");
+
+        float longitudeMin = emitterPointBuffer->longitudeMin * (180.0f / DirectX::XM_PI);
+        ImGui::Text("Random longitude range:");
+        if (ImGui::DragFloat("Longitude min", &longitudeMin, 0.1f,
+            0.0f, emitterPointBuffer->longitudeMax * (180.0f / DirectX::XM_PI), "%.1f"))
+        {
+            emitterPointBuffer->longitudeMin = longitudeMin * (DirectX::XM_PI / 180.0f);
+        }
+        float longitudeMax = emitterPointBuffer->longitudeMax * (180.0f / DirectX::XM_PI);
+        if (ImGui::DragFloat("Longitude max", &longitudeMax, 0.1f,
+            emitterPointBuffer->longitudeMin * (180.0f / DirectX::XM_PI), 360.0f, "%.1f"))
+        {
+            emitterPointBuffer->longitudeMax = longitudeMax * (DirectX::XM_PI / 180.0f);
+        }
+
+        float latitudeMin = emitterPointBuffer->latitudeMin * (180.0f / DirectX::XM_PI);
+        ImGui::Text("Random latitude range:");
+        if (ImGui::DragFloat("Latitude min", &latitudeMin, 0.1f,
+            -90.0f, emitterPointBuffer->latitudeMax * (180.0f / DirectX::XM_PI), "%.1f"))
+        {
+            emitterPointBuffer->latitudeMin = latitudeMin * (DirectX::XM_PI / 180.0f);
+        }
+        float latitudeMax = emitterPointBuffer->latitudeMax * (180.0f / DirectX::XM_PI);
+        if (ImGui::DragFloat("Latitude max", &latitudeMax, 0.1f,
+            emitterPointBuffer->latitudeMin * (180.0f / DirectX::XM_PI), 90.0f, "%.1f"))
+        {
+            emitterPointBuffer->latitudeMax = latitudeMax * (DirectX::XM_PI / 180.0f);
+        }
+
+        ImGui::Separator();
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Particle force");
+        EditorUI::FontStyles::Pop();
+
+        DrawVector3Control("Force vector", simulateParticlesBuffer->force, 0.0f);
+
+        ImGui::Separator();
+        // Texture
+        
+        auto tex = emitterObj->m_particleData->m_texture;
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("Texture settings");
+        EditorUI::FontStyles::Pop();
+
+        if (tex) {
+            eastl::wstring tpath = tex->GetCurrentTexturePath().m_assetRelativePath;
+            // convert wstring to narrow string for ImGui display
+            std::wstring ws = tpath.c_str();
+            std::string s(ws.begin(), ws.end());
+            if (tex->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
+            {
+                ImGui::Text("Engine asset");
+            }
+            ImGui::Text("Texture: %s", s.c_str());
+        }
+        else {
+            ImGui::TextDisabled("Texture: (none)");
+        }
+
+        // Editing button
+        if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
+            s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
+            s_meshEditor.m_texError.clear();
+            // опционально: при открытии заполнить поля текущими значениями
+            if (s_meshEditor.m_editTexture && tex) {
+                AssetPath cur = tex->GetCurrentTexturePath();
+                std::wstring ws = cur.m_assetRelativePath.c_str();
+                std::string  s(ws.begin(), ws.end());
+                strncpy(s_meshEditor.m_texPathBuf, s.c_str(), sizeof(s_meshEditor.m_texPathBuf) - 1);
+                s_meshEditor.m_texPathBuf[sizeof(s_meshEditor.m_texPathBuf) - 1] = 0;
+                s_meshEditor.m_texAssetSource = cur.m_assetSource;
+            }
+        }
+
+        // Editing panel
+        if (s_meshEditor.m_editTexture) {
+            ImGui::Separator();
+
+            ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
+
+            const char* srcItems = "Engine\0Project\0";
+            ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
+
+            if (ImGui::Button("Load Texture")) {
+                s_meshEditor.m_texError.clear();
+
+                AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
+
+                std::string relNarrow = s_meshEditor.m_texPathBuf;
+                std::wstring relWide(relNarrow.begin(), relNarrow.end());
+
+                AssetPath ap(relWide.c_str(), src);
+
+                {
+                    auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap);
+                    emitterObj->m_particleData->SetTexture(newTexture);
+                }
+
+                s_meshEditor.m_editTexture = false;
+            }
+
+            if (!s_meshEditor.m_texError.empty()) {
+                ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
+            }
+        }
+
+        ImGui::Separator();
     }
 }

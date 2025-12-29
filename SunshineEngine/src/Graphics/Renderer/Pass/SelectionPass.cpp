@@ -1,3 +1,5 @@
+#include <Graphics/Renderer/RenderingSystem.h>
+
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
@@ -112,6 +114,7 @@ namespace SE_G {
 
 	void SelectionPass::StartFrame()
 	{
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Selection Pass");
 	}
 
 	void SelectionPass::Pass()
@@ -228,6 +231,7 @@ namespace SE_G {
 
 	void SelectionPass::EndFrame()
 	{
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
 	void SelectionPass::OnResize(UINT resizeWidth, UINT resizeHeight)

@@ -15,6 +15,12 @@
 
 //#include <Scene.h>
 
+namespace SE
+{
+    class ParticleSystem;
+}
+
+
 namespace SE_G {
     class DeferredRenderer :
         public RenderGroup
@@ -29,6 +35,7 @@ namespace SE_G {
         ID3D11DeviceContext* GetDeviceContext() { return m_context; }
 
         void InitGBuffer(UINT screenWidth, UINT screenHeight);
+        void InitParticleSystem();
 
         void SetMainCamera(eastl::shared_ptr<Camera> camera);
         eastl::shared_ptr<Camera> GetMainCamera();
@@ -43,6 +50,8 @@ namespace SE_G {
 
         UINT m_screenWidth = 800u;
         UINT m_screenHeight = 800u;
+
+        eastl::unique_ptr<SE::ParticleSystem> m_particleSystem;
 
     protected:
         ID3D11Device* m_device;

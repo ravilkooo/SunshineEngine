@@ -21,6 +21,8 @@ using json = nlohmann::json;
 namespace SE_G {
     class DeferredRenderer;
     class Camera;
+
+    class SkyBoxTechnique;
 };
 
 namespace DXSM = DirectX::SimpleMath;
@@ -55,4 +57,9 @@ public:
         SE_G::DeferredRenderer* renderSystem,
         eastl::shared_ptr<SE_G::Camera> camera,
         const json& j);
+
+    void SetTexture(eastl::shared_ptr<SE_G::Bind::Texture> tex);
+    void SetTexture(SE_G::DeferredRenderer* renderSystem, AssetPath assetPath);
+
+    SE_G::SkyBoxTechnique* m_lightTech = nullptr;
 };

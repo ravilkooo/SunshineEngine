@@ -14,8 +14,9 @@
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
+/*
 namespace SE_G {
-    class ParticleSystem
+    class ParticleSystem_old
     {
 
     public:
@@ -42,7 +43,6 @@ namespace SE_G {
             float orientation;
             DX::XMFLOAT3 padding;
         };
-
 
         struct EmitterPointConstantBuffer
         {
@@ -87,7 +87,7 @@ namespace SE_G {
             DXSM::Vector4 force;
         };
 
-        int m_maxParticles = 4 * 1024;
+        UINT m_maxParticles = 4u * 1024u;
         //int m_maxParticles = 512;
 
 
@@ -119,11 +119,11 @@ namespace SE_G {
         Microsoft::WRL::ComPtr<ID3D11Buffer>                m_deadListCountConstantBuffer_2;
         Microsoft::WRL::ComPtr<ID3D11Buffer>                m_aliveListCountConstantBuffer;
 
-        ParticleSystem() {};
-        ParticleSystem(ID3D11Device* device, ID3D11DeviceContext* context,
+        ParticleSystem_old() {};
+        ParticleSystem_old(ID3D11Device* device, ID3D11DeviceContext* context,
             EmitterPointConstantBuffer emitterDesc,
             SimulateParticlesConstantBuffer simulatorDesc);
-        ~ParticleSystem();
+        ~ParticleSystem_old();
 
         void LoadCS(LPCWSTR computeFilename, ID3D11ComputeShader* m_computeShader);
         void ResetParticles();
@@ -216,3 +216,4 @@ namespace SE_G {
         //  reflect particle
     };
 }
+*/

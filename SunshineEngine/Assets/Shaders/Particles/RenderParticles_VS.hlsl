@@ -33,10 +33,10 @@ GeometryShaderInput main(uint vertexId : SV_VertexID)
     output.Position = p.position;
     output.oPosition = p.position.xyz;
     output.velocity = p.velocity.xyz;
-
-    //float alpha = smoothstep(0.0, abs(p.lifeSpan), p.age);
+    
     float alpha = 1 - smoothstep(0.0, abs(p.lifeSpan), p.age);
-    output.Color = normalize(lerp(p.colorStart, p.colorEnd, 1.0 - p.age / p.lifeSpan));
+    output.Color.xyz = lerp(p.colorStart, p.colorEnd, 1.0 - p.age / p.lifeSpan);
+    output.Color.a = lerp(p.alphaStart, p.alphaEnd, 1.0 - p.age / p.lifeSpan);
     //output.Color.a *= (1 - alpha);
     //output.Normal = p.normal;
 

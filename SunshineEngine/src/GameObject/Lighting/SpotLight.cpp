@@ -102,7 +102,7 @@ SpotLight_Info::SpotLight_Info(
     // IconPass
     auto iconTech =
         eastl::make_unique<SE_G::IconTechnique>(device, tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
-            SE_G::IconData{ 4u, 0u, 1u, 1u, m_UUID.GetHilo() });
+            SE_G::IconData{ 6u, 0u, 1u, 1u, m_UUID.GetHilo() });
 
     rc_info->AddTechnique(eastl::move(iconTech));
 }
