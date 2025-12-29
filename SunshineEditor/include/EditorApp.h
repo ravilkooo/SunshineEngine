@@ -28,6 +28,7 @@
 #include <Project.h>
 #include <WorldEditor.h>
 #include <ImguiEditorPass.h>
+#include <Audio/AudioEditor.h>
 
 enum class MoveKey
 {
@@ -129,6 +130,7 @@ private:
     bool m_initialized = false;
 
     bool m_projectSelected = false;
+    std::unique_ptr<AudioEditor> m_audioEditor; 
 
 private:
     // Only for testing

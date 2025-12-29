@@ -111,6 +111,11 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	*/
 
 	m_physicsSystem->FinalizeScene();
+	
+	if (!m_audioSystem) {
+		SetUpAudio();
+	}
+	
 	return true;
 }
 
@@ -123,6 +128,11 @@ bool Game::LoadGAIScene()
 
 	scene->RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	if (!m_audioSystem) {
+		SetUpAudio();
+	}
+	
 	return true;
 }
 
@@ -135,6 +145,11 @@ bool Game::LoadDefaultScene()
 
 	scene->RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	if (!m_audioSystem) {
+		SetUpAudio();
+	}
+	
 	return true;
 }
 
@@ -147,6 +162,11 @@ bool Game::LoadParentScene()
 
 	scene->RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	if (!m_audioSystem) {
+		SetUpAudio();
+	}
+	
 	return true;
 }
 
@@ -159,6 +179,11 @@ bool Game::LoadLuaScene()
 
 	scene->RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	if (!m_audioSystem) {
+		SetUpAudio();
+	}
+	
 	return true;
 }
 
@@ -171,7 +196,21 @@ bool Game::LoadResourcesScene()
 
 	scene->RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	if (!m_audioSystem) {
+		SetUpAudio();
+	}
+	
 	return true;
+}
+
+void Game::SetUpAudio()
+{
+	*m_audioSystem = AudioSystem();
+    
+	m_audioSystem->LoadFromJson("assets/config/audio_tracks.json");
+    
+	// m_audioSystem->Play("ambient_forest");
 }
 
 

@@ -23,6 +23,7 @@
 #include <Physics/PhysicsSystem.h>
 
 #include <TracingSystem/TracingSystem.h>
+#include <Audio/AudioSystem.h>
 
 #include <Utils/ILogManager.h>
 #include <Scripting/LuaManager.h>
@@ -45,6 +46,8 @@ public:
         UINT screenHeight = 600u);
 
     void SetupPhysics();
+
+    void SetUpAudio();
 
     void Run();
 
@@ -82,6 +85,8 @@ public:
     SE_G::ShadowMapPass* m_shadowMapPass;
     SE_G::GPass* m_gPass;
     SE_G::LightPass* m_lightPass;
+
+    AudioSystem* m_audioSystem;
 
     float m_deltaTime = 0.0f;
 

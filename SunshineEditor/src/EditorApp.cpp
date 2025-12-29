@@ -25,6 +25,10 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_renderingSystem = eastl::make_shared<SE_G::RenderingSystem>(
 		m_displayWindow.m_hWnd,
 		m_winWidth, m_winHeight);
+
+	m_audioEditor = nullptr; 
+    
+	m_audioEditor->LoadFromJson("assets/config/audio_tracks.json");
 	
 	UINT worldEditorWidth = winWidth / 2;
 	UINT worldEditorHeight = winHeight / 2;
@@ -65,6 +69,8 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_worldEditor->m_renderer->m_GBuffer.get());
+
+	imguiEditorPass->SetAudioEditor(m_audioEditor.get());
 
 	m_initialized = true;
 
@@ -484,6 +490,10 @@ void EditorApp::RunGame() {
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
+
+	if (m_audioEditor && m_currentGame) {
+		m_audioEditor->SetAudioSystem(m_currentGame->m_audioSystem);
+	}
 	
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
@@ -528,6 +538,9 @@ void EditorApp::ContinueGame() {
 void EditorApp::StopGame() {
 	m_currentGame->Stop();
 	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
+	if (m_audioEditor) {
+		m_audioEditor->SetAudioSystem(nullptr);
+	}
 	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
 
