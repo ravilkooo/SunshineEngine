@@ -3,6 +3,7 @@
 // EASTL
 #include <EASTL/hash_map.h>
 #include <EASTL/shared_ptr.h>
+#include <EASTL/string.h>
 #include <EASTL/vector.h>
 #include <EASTL/functional.h>
 
@@ -46,36 +47,27 @@ public:
     };
 
     // --- SETTERS ---
-    bool SetInt(const std::string& Key, int Value)                      { return SetTypedValue<int>(Key, Value); }
-    bool SetFloat(const std::string& Key, float Value)                  { return SetTypedValue<float>(Key, Value); }
-    bool SetBool(const std::string& Key, bool Value)                    { return SetTypedValue<bool>(Key, Value); }
-    bool SetString(const std::string& Key, const std::string& Value)    { return SetTypedValue<std::string>(Key, Value); }
-    bool SetVector3(const std::string& Key, const DXSM::Vector3& Value) { return SetTypedValue<DXSM::Vector3>(Key, Value); }
-    bool SetUUID(const std::string& Key, const SE::UUID& Value)         { return SetTypedValue<SE::UUID>(Key, Value); }
+    bool SetInt(const eastl::string& Key, int Value) { return SetTypedValue<int>(Key, Value); }
+    bool SetFloat(const eastl::string& Key, float Value) { return SetTypedValue<float>(Key, Value); }
+    bool SetBool(const eastl::string& Key, bool Value) { return SetTypedValue<bool>(Key, Value); }
+    bool SetString(const eastl::string& Key, const eastl::string& Value) { return SetTypedValue<eastl::string>(Key, Value); }
+    bool SetVector3(const eastl::string& Key, const DXSM::Vector3& Value) { return SetTypedValue<DXSM::Vector3>(Key, Value); }
+    bool SetUUID(const eastl::string& Key, const SE::UUID& Value) { return SetTypedValue<SE::UUID>(Key, Value); }
     //
 
     // --- GETTERS ---
-    bool GetInt(const std::string& Key, int& OutValue) const               { return GetTypedValue<int>(Key, OutValue); }
-    bool GetFloat(const std::string& Key, float& OutValue) const           { return GetTypedValue<float>(Key, OutValue); }
-    bool GetBool(const std::string& Key, bool& OutValue) const             { return GetTypedValue<bool>(Key, OutValue); }
-    bool GetString(const std::string& Key, std::string& OutValue) const    { return GetTypedValue<std::string>(Key, OutValue); }
-    bool GetVector3(const std::string& Key, DXSM::Vector3& OutValue) const { return GetTypedValue<DXSM::Vector3>(Key, OutValue); }
-    bool GetUUID(const std::string& Key, SE::UUID& OutValue) const         { return GetTypedValue<SE::UUID>(Key, OutValue); }
-    //
-
-    // --- LUA-FRIENDLY GETTERS ---
-    sol::object Lua_GetInt(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetFloat(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetBool(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetString(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetVector3(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetUUID(const std::string& Key, sol::this_state L) const;
+    bool GetInt(const eastl::string& Key, int& OutValue) const { return GetTypedValue<int>(Key, OutValue); }
+    bool GetFloat(const eastl::string& Key, float& OutValue) const { return GetTypedValue<float>(Key, OutValue); }
+    bool GetBool(const eastl::string& Key, bool& OutValue) const { return GetTypedValue<bool>(Key, OutValue); }
+    bool GetString(const eastl::string& Key, eastl::string& OutValue) const { return GetTypedValue<eastl::string>(Key, OutValue); }
+    bool GetVector3(const eastl::string& Key, DXSM::Vector3& OutValue) const { return GetTypedValue<DXSM::Vector3>(Key, OutValue); }
+    bool GetUUID(const eastl::string& Key, SE::UUID& OutValue) const { return GetTypedValue<SE::UUID>(Key, OutValue); }
     //
 
     // --- GENERAL OPERATIONS ---
-    bool HasKey(const std::string& Key) const { return Data.find(Key) != Data.end(); }
-    void RemoveKey(const std::string& Key)    { Data.erase(Key); }
-    void Clear()                              { Data.clear(); }
+    bool HasKey(const eastl::string& Key) const { return Data.find(Key) != Data.end(); }
+    void RemoveKey(const eastl::string& Key) { Data.erase(Key); }
+    void Clear() { Data.clear(); }
     //
 
     // --- CALLBACK MANAGEMENT ---
@@ -83,16 +75,16 @@ public:
 
     // Subscribe to a key's changes. Returns a unique callback ID.
     // If the key doesn't exist yet, returns UINT64_MAX.
-    uint64_t AddCallback(const std::string& Key, const sol::function& Callback);
+    uint64_t AddCallback(const eastl::string& Key, const sol::function& Callback);
 
-    void RemoveCallback(const std::string& Key, uint64_t CallbackId);
-    void ClearCallbacks(const std::string& Key) { Callbacks.erase(Key); }
+    void RemoveCallback(const eastl::string& Key, uint64_t CallbackId);
+    void ClearCallbacks(const eastl::string& Key) { Callbacks.erase(Key); }
     //
 
 private:
     // --- INTERNAL GENERIC IMPLEMENTATION ---
     template<typename T>
-    bool SetTypedValue(const std::string& Key, const T& Value)
+    bool SetTypedValue(const eastl::string& Key, const T& Value)
     {
         auto it = Data.find(Key);
 
@@ -131,7 +123,7 @@ private:
     }
 
     template<typename T>
-    bool GetTypedValue(const std::string& Key, T& OutValue) const
+    bool GetTypedValue(const eastl::string& Key, T& OutValue) const
     {
         auto it = Data.find(Key);
 
@@ -155,31 +147,8 @@ private:
     //
 
 
-    eastl::hash_map<std::string, eastl::shared_ptr<HolderStructInterface>> Data;
+    eastl::hash_map<eastl::string, eastl::shared_ptr<HolderStructInterface>> Data;
 
-    eastl::hash_map<std::string, eastl::vector<CallbackWrapper>> Callbacks;
+    eastl::hash_map<eastl::string, eastl::vector<CallbackWrapper>> Callbacks;
     uint64_t NextCallbackId = 0u;
 };
-
-
-#ifndef MEMORYBOARD_LUA_METHODS_APPLY
-#define MEMORYBOARD_LUA_METHODS_APPLY(FM) \
-    FM("setInt",         &MemoryBoard::SetInt) , \
-    FM("setFloat",       &MemoryBoard::SetFloat) , \
-    FM("setBool",        &MemoryBoard::SetBool) , \
-    FM("setString",      &MemoryBoard::SetString) , \
-    FM("setVector3",     &MemoryBoard::SetVector3) , \
-    FM("setUUID",        &MemoryBoard::SetUUID) , \
-    FM("getInt",         &MemoryBoard::Lua_GetInt) , \
-    FM("getFloat",       &MemoryBoard::Lua_GetFloat) , \
-    FM("getBool",        &MemoryBoard::Lua_GetBool) , \
-    FM("getString",      &MemoryBoard::Lua_GetString) , \
-    FM("getVector3",     &MemoryBoard::Lua_GetVector3) , \
-    FM("getUUID",        &MemoryBoard::Lua_GetUUID) , \
-    FM("hasKey",         &MemoryBoard::HasKey) , \
-    FM("removeKey",      &MemoryBoard::RemoveKey) , \
-    FM("clear",          &MemoryBoard::Clear) , \
-    FM("addCallback",    &MemoryBoard::AddCallback) , \
-    FM("removeCallback", &MemoryBoard::RemoveCallback) , \
-    FM("clearCallbacks", &MemoryBoard::ClearCallbacks)
-#endif
