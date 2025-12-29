@@ -4,6 +4,9 @@
 #include <Component/LuaComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <fstream>   // std::ofstream
+#include <ResourceManager/ResourceLoader/TextureLoader.h>
+#include <EASTL/unique_ptr.h>
+#include <ResourceManager/ResourceManagerFacade.h>
 
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
@@ -72,7 +75,18 @@ void WorldEditor::PixelUUIDHandler::Init(ID3D11Device* device) {
 		nullptr,
 		m_UUIDOnMouseClickShader.GetAddressOf()
 	);
+	InitResourceLoaders(device);
 	return;
+}
+
+void WorldEditor::PixelUUIDHandler::InitResourceLoaders(ID3D11Device* device)
+{
+
+	ResourceManagerFacade::Instance().Initialize(256 * 1024 * 1024);
+
+	auto texLoader = eastl::make_unique<TextureLoader>(device);
+	ResourceLoaderFactory::RegisterLoader(SunshineResource::ResourceType::TEXTURE,
+		eastl::move(texLoader));
 }
 
 SE::UUID WorldEditor::PixelUUIDHandler::GetUUID(ID3D11DeviceContext* context,
@@ -313,7 +327,7 @@ void WorldEditor::CreateParentScene()
 			collSettings.data.asCapsule = { 1.0f, 0.2f };
 
 			pc_info->m_colliderData->SetColliderSettings(collSettings);
-			
+
 			obj->SetParent({ floorId, m_scene->GetGameObjectByUUID(floorId), false });
 		}
 
@@ -550,7 +564,7 @@ void WorldEditor::SyncronizeTransforms() {
 */
 
 void WorldEditor::Render() {
-	
+
 }
 
 void WorldEditor::CloseProject()
@@ -631,7 +645,7 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	LOG_EDITOR_INFO("Scene loaded");
 
 	m_selectionPass->m_scene = m_scene.get();
-
+  
 	// PlayerObject
 	{
 		if (m_scene->m_playerObject == SE::UUID(0u))

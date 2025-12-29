@@ -25,6 +25,8 @@
 #include <Physics/PhysicsSystem.h>
 #include <LogManager.h>
 
+#include <ResourceManager/ResourceLoaderFactory.h>
+
 namespace SE
 {
     class ParticleSystem;
@@ -63,7 +65,7 @@ public:
         ~PixelUUIDHandler();
 
         void Init(ID3D11Device* device);
-
+        void InitResourceLoaders(ID3D11Device* device);
         SE::UUID GetUUID(ID3D11DeviceContext* context,
             ID3D11ShaderResourceView* UUIDTextureView,
             UINT mouseClickX, UINT mouseClickY);
@@ -90,7 +92,7 @@ public:
     void Render();
     void CloseProject();
     void ClearScene();
-    
+
     void CreateDefaultScene();
     void CreateParentScene();
     void CreateGAIScene();

@@ -9,11 +9,12 @@
 #include <assimp/scene.h>
 #include <assimp/material.h>
 #include <assimp/postprocess.h>
+#include <ResourceManager/MemoryManager/StackMemoryManager.h>
 
 
 IResource* CompositeResourceLoader::Load(const eastl::string& path,
     ResourceRegistry* pRegistry,
-    ResourceMemoryManager* pMemMgr)
+    StackMemoryManager* pMemMgr)
 {
     // Track loading paths to detect circular dependencies
     static thread_local eastl::unordered_set<eastl::string> loadingPaths;

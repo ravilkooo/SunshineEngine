@@ -1,5 +1,11 @@
 #include <ResourceManager/ResourceManagerFacade.h>
 
+void ResourceManagerFacade::Initialize(size_t maxMemorySize)
+{
+    auto& rm = ResourceManagerFacade::Instance();
+    rm.m_memoryManager = eastl::make_unique<StackMemoryManager>(maxMemorySize);
+}
+
 ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
 {
     const ResourceGUID guid = ComputeGUID(path);
@@ -11,9 +17,14 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
         return entry ? entry->handle : ResourceHandle{ guid, 0u };
     }
 
-    // Create or get the composite loader
-    static CompositeResourceLoader compositeLoader;
-    IResource* res = compositeLoader.Load(path, &m_registry, m_memoryManager);
+    IResourceLoader* loader = ResourceLoaderFactory::GetLoaderForFile(path);
+
+    if (!loader) {
+        static CompositeResourceLoader compositeLoader;
+        loader = &compositeLoader;
+    }
+
+    IResource* res = loader->Load(path, &m_registry, m_memoryManager.get());
 
     if (!res) {
         printSunshineErrorMessage(("Failed to load resource: {}", path.c_str()));
