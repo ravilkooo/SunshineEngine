@@ -66,3 +66,18 @@ eastl::wstring StringHelper::GetFileNameWithoutExtension(const eastl::wstring& f
     }
     return filenameWithExtension.substr(0, dotOff);
 }
+
+eastl::wstring StringHelper::StringToWide(const eastl::string& s)
+{
+    if (s.empty())
+        return eastl::wstring();
+
+    size_t len = mbstowcs(nullptr, s.c_str(), 0);
+    if (len == static_cast<size_t>(-1))
+        return eastl::wstring();
+
+    eastl::wstring result;
+    result.resize(len);
+    mbstowcs(&result[0], s.c_str(), len);
+    return result;
+}

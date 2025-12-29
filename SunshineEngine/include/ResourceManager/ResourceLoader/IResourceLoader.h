@@ -3,6 +3,7 @@
 #include <ResourceManager/IResource.h>
 #include <ResourceManager/ResourceRegistry.h>
 #include <ResourceManager/Resources/Model.h>
+#include <ResourceManager/MemoryManager/StackMemoryManager.h>
 
 class IResourceLoader
 {
@@ -11,7 +12,7 @@ public:
 
     virtual IResource* Load(const eastl::string& path,
         ResourceRegistry* pRegistry,
-        ResourceMemoryManager* pMemMgr) = 0;
+        StackMemoryManager* pMemMgr) = 0;
 
     virtual SunshineResource::ResourceType GetResourceType(IResource* pDepResource, Model* pModel, ResourceGUID depGUID) const = 0;
 
