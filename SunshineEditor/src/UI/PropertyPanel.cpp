@@ -16,6 +16,8 @@
 #include <UI/FontStyles.h>
 #include "Audio/AudioEditor.h"
 #include "Audio/AudioSystem.h"
+#include "UI/ContentBrowserPanel.h"
+#include "Utils/FileDialogManager.h"
 
 PropertyPanel::MeshEditor PropertyPanel::s_meshEditor =
 {
@@ -825,6 +827,11 @@ void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
 
 void PropertyPanel::DrawAudioPanel()
 {
+    if (!m_AudioEditor) {
+        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: Audio Editor is NULL");
+        ImGui::TextDisabled("Check EditorApp initialization order");
+        return; 
+    }
     static float listWidth = 200.0f;
     
     ImGui::BeginGroup();
@@ -835,39 +842,69 @@ void PropertyPanel::DrawAudioPanel()
         ImGui::BeginChild("TrackList", ImVec2(listWidth, -40), true);
 
         const auto& trackList = m_AudioEditor->GetTrackList();
-        for (const auto& track : trackList) 
+        if (!trackList.empty())
         {
-            std::string itemLabel = track.id + "##" + track.id; 
-            bool isSelected = (m_selectedAudioID == track.id);
-    
-            if (ImGui::Selectable(itemLabel.c_str(), isSelected))
+            for (const auto& track : trackList) 
             {
-                m_selectedAudioID = track.id;
+                std::string itemLabel = track.id + "##" + track.id; 
+                bool isSelected = (m_selectedAudioID == track.id);
+    
+                if (ImGui::Selectable(itemLabel.c_str(), isSelected))
+                {
+                    m_selectedAudioID = track.id;
+                }
             }
         }
-        
+        else
+        {
+            ImGui::TextDisabled("No tracks found");
+        }
         
         ImGui::EndChild();
 
-        if (ImGui::Button("Add Track", ImVec2(listWidth, 30)))
-        {
-            // ????? ????? ??????? ?????? ?????? ?????
-            // ????????: m_AudioEditor->AddTrack("assets/audio/new_sound.wav");
-            ImGui::OpenPopup("AddAudioPopup");
-        }
-        
-        if (ImGui::BeginPopup("AddAudioPopup"))
-        {
-            static char pathBuf[256] = "";
-            ImGui::InputText("Path", pathBuf, 256);
-            if (ImGui::Button("Add"))
-            {
-                m_AudioEditor->AddTrack(pathBuf);
-                ImGui::CloseCurrentPopup();
-                memset(pathBuf, 0, 256);
-            }
-            ImGui::EndPopup();
-        }
+        // if (ImGui::Button("Import Audio", ImVec2(listWidth, 30)))
+        // {
+        //     std::filesystem::path selectedPath = FileDialogManager::Get().OpenFile(
+        //         FileDialogManager::DialogType::Audio, 
+        //         L"Import Audio Track"
+        //     );
+        //
+        //     if (!selectedPath.empty())
+        //     {
+        //         std::filesystem::path destDir = ContentBrowserPanel::s_AssetsDirectory;
+        //         std::filesystem::path destPath = destDir / selectedPath.filename();
+        //
+        //         if (std::filesystem::exists(destPath)) {
+        //             try {
+        //                 std::filesystem::copy_file(selectedPath, destPath);
+        //                 const auto& trackList = m_AudioEditor->GetTrackList();
+        //             } catch (std::filesystem::filesystem_error& e) {
+        //                 LOG_EDITOR_ERROR("Import error %s", e.what());
+        //             }
+        //         }
+        //     }
+        // }
+        // if (ImGui::Button("Scan Assets", ImVec2(listWidth, 30))) {
+        //     m_AudioEditor->ScanForAudioFiles(ContentBrowserPanel::s_AssetsDirectory);
+        // }
+        // if (ImGui::Button("Add Track", ImVec2(listWidth, 30)))
+        // {
+        //     ImGui::OpenPopup("AddAudioPopup");
+        // }
+        //     
+        // if (ImGui::BeginPopup("AddAudioPopup"))
+        // {
+        //     static char pathBuf[256] = "";
+        //     ImGui::InputText("Path", pathBuf, 256);
+            // if (ImGui::Button("Add"))
+            // {
+            //     m_AudioEditor->AddTrack(pathBuf);
+            //     ImGui::CloseCurrentPopup();
+            //     memset(pathBuf, 0, 256);
+            // }
+            //
+            // ImGui::EndPopup();
+        // }
     }
     ImGui::EndGroup();
 
@@ -875,76 +912,82 @@ void PropertyPanel::DrawAudioPanel()
 
     ImGui::BeginGroup();
     {
-        ImGui::BeginChild("TrackDetails", ImVec2(0, -40), true);
-        
+        ImGui::Text("Track Details");
+        ImGui::Separator();
         AudioTrack* selectedTrack = m_AudioEditor->getTrack(m_selectedAudioID);
-
-        if (selectedTrack)
+        ImGui::BeginChild("TrackDetails", ImVec2(0, -40), true);
+        if (selectedTrack != nullptr)
         {
             EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
-            ImGui::Text("%s", selectedTrack->id.c_str());
-            EditorUI::FontStyles::Pop();
-            ImGui::Separator();
+                ImGui::Text("%s", selectedTrack->id.c_str());
+                EditorUI::FontStyles::Pop();
+                
+                ImGui::Separator();
 
-            ImGui::TextDisabled("File: %s", selectedTrack->filePath.c_str());
-            ImGui::Spacing();
+                ImGui::TextDisabled("File: %s", selectedTrack->filePath.c_str());
+                
+                ImGui::Spacing();
 
-            if (ImGui::Button("Play Preview", ImVec2(100, 0)))
-            {
-                m_AudioEditor->PlayPreview(selectedTrack->id);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Stop", ImVec2(100, 0)))
-            {
-                m_AudioEditor->StopPreview();
-            }
+                if (ImGui::Button("Play Preview", ImVec2(100, 0)))
+                {
+                    m_AudioEditor->PlayPreview(selectedTrack->id);
+                }
+                
+                ImGui::SameLine();
+                
+                if (ImGui::Button("Stop", ImVec2(100, 0)))
+                {
+                    m_AudioEditor->StopPreview();
+                }
 
-            ImGui::Separator();
-            ImGui::Text("Settings");
+                ImGui::Separator();
+                
+                ImGui::Text("Settings");
 
-            float vol = selectedTrack->volume;
-            if (ImGui::SliderFloat("Volume", &vol, 0.0f, 1.0f))
-            {
-                m_AudioEditor->SetVolume(selectedTrack->id, vol);
-            }
+                float vol = selectedTrack->volume;
+                if (ImGui::SliderFloat("Volume", &vol, 0.0f, 1.0f))
+                {
+                    m_AudioEditor->SetVolume(selectedTrack->id, vol);
+                }
 
-            bool loop = selectedTrack->loop;
-            if (ImGui::Checkbox("Loop", &loop))
-            {
-                m_AudioEditor->SetLoop(selectedTrack->id, loop);
-            }
-            
-            static char tagBuf[64];
-            strncpy(tagBuf, selectedTrack->tag.c_str(), sizeof(tagBuf));
-            if (ImGui::InputText("Tag", tagBuf, sizeof(tagBuf)))
-            {
-                selectedTrack->tag = std::string(tagBuf);
-            }
+                if (ImGui::Checkbox("Loop", &selectedTrack->loop))
+                {
+                    m_AudioEditor->SetLoop(selectedTrack->id, selectedTrack->loop);
+                    std::cout<< "selectedTrack->loop = " << selectedTrack->loop << std::endl;
+                }
+                
+                static char tagBuf[64];
+                strncpy(tagBuf, selectedTrack->tag.c_str(), sizeof(tagBuf));
+                if (ImGui::InputText("Tag", tagBuf, sizeof(tagBuf)))
+                {
+                    selectedTrack->tag = std::string(tagBuf);
+                }
 
-            ImGui::Spacing();
-            ImGui::Separator();
-            
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
-            if (ImGui::Button("Delete Track", ImVec2(-1, 30)))
-            {
-                m_AudioEditor->RemoveTrack(selectedTrack->id);
-                m_selectedAudioID = ""; 
-            }
-            ImGui::PopStyleColor();
+                ImGui::Spacing();
+                ImGui::Separator();
+                
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+                // if (ImGui::Button("Delete Track", ImVec2(-1, 30)))
+                // {
+                //     m_AudioEditor->RemoveTrack(selectedTrack->id);
+                //     m_selectedAudioID = ""; 
+                // }
+                ImGui::PopStyleColor();
+                
+                if (ImGui::Button("Save Audio Config", ImVec2(-1, 30)))
+                {
+                    m_AudioEditor->Save();
+                }
         }
         else
         {
-            ImGui::TextDisabled("Select a track to edit settings");
+            ImGui::TextDisabled("Select a track to edit details");
         }
-        
         ImGui::EndChild();
         
-        if (ImGui::Button("Save Audio Config", ImVec2(-1, 30)))
-        {
-            m_AudioEditor->SaveToJson("assets/config/audio_tracks.json");
-        }
     }
     ImGui::EndGroup();
+    
 }
 
 void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
@@ -1289,7 +1332,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
         if (ImGui::SmallButton(s_meshEditor.m_editMesh ? "Close Mesh Editor" : "Edit Mesh")) {
             s_meshEditor.m_editMesh = !s_meshEditor.m_editMesh;
             s_meshEditor.m_meshError.clear();
-            // опционально: при открытии заполнить поля текущими значениями
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if (s_meshEditor.m_editMesh && meshPtr) {
                 AssetPath cur = meshPtr->GetCurrentMeshPath();
                 std::wstring ws = cur.m_assetRelativePath.c_str();
@@ -1368,7 +1411,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
         s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
         s_meshEditor.m_texError.clear();
-        // опционально: при открытии заполнить поля текущими значениями
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (s_meshEditor.m_editTexture && tex) {
             AssetPath cur = tex->GetCurrentTexturePath();
             std::wstring ws = cur.m_assetRelativePath.c_str();

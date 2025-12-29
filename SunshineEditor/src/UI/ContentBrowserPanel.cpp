@@ -13,8 +13,10 @@
 #include <Utils/StringUtils.h>
 #include "Utils/FileDialogManager.h"
 
+// std::filesystem::path ContentBrowserPanel::s_AssetsDirectory =
+//     std::filesystem::path(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/").c_str());
 std::filesystem::path ContentBrowserPanel::s_AssetsDirectory =
-    std::filesystem::path(JoinWchar_Wstring(PROJECTS_DIR, L"DefaultScene/").c_str());
+    std::filesystem::path(EDITOR_ASSETS_DIR);
 
 ContentBrowserPanel::ContentBrowserPanel()
     : m_CurrentDirectory(s_AssetsDirectory)

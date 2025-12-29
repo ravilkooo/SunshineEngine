@@ -59,7 +59,7 @@ public:
     SE::Project* GetSelectedProject() { return m_ProjectSelector.GetSelectedProject(); }
     void ResetProjectSelection() { m_ProjectSelected = false; m_ProjectSelector.Close(); }
     void SetScene(const eastl::shared_ptr<Scene_Info>& scene) { m_ToolbarPanel.SetScene(scene); }
-    void SetAudioEditor(AudioEditor* editor) { m_AudioEditor = editor; }
+    void SetAudioEditor(AudioEditor* editor) { m_AudioEditor = editor; m_PropertyPanel.SetAudioEditor(editor);}
 
     UINT m_editorAppWidth = 800;
     UINT m_editorAppHeight = 800;

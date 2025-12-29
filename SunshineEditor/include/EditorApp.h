@@ -130,7 +130,8 @@ private:
     bool m_initialized = false;
 
     bool m_projectSelected = false;
-    std::unique_ptr<AudioEditor> m_audioEditor; 
+    eastl::unique_ptr<AudioEditor> m_audioEditor;
+    std::unique_ptr<AudioSystem> m_editorAudioSystem;
 
 private:
     // Only for testing

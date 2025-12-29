@@ -1,6 +1,7 @@
 #pragma once
 #include <fmod.hpp>
 #include <fmod_errors.h>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
@@ -39,6 +40,7 @@ private:
     void CheckError(FMOD_RESULT result) {
         if (result != FMOD_OK) {
             // LOG_EDITOR_ERROR("FMOD Error: %d - %s\n", result, FMOD_ErrorString(result));
+            std::cout << FMOD_ErrorString(result);
         }
     }
 

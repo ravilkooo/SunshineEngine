@@ -26,9 +26,15 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 		m_displayWindow.m_hWnd,
 		m_winWidth, m_winHeight);
 
-	m_audioEditor = nullptr; 
-    
-	m_audioEditor->LoadFromJson("assets/config/audio_tracks.json");
+	m_editorAudioSystem = std::make_unique<AudioSystem>();
+	// m_audioEditor = eastl::make_unique<AudioEditor>(nullptr);
+	m_audioEditor = eastl::make_unique<AudioEditor>(m_editorAudioSystem.get());
+
+	eastl::wstring configPathW = JoinWchar_Wstring(EDITOR_ASSETS_DIR, L"Config/audio_tracks.json");
+	std::wstring stdPathW(configPathW.c_str());
+	std::string configPathStr(stdPathW.begin(), stdPathW.end());
+
+	m_audioEditor->LoadFromJson(configPathStr);
 	
 	UINT worldEditorWidth = winWidth / 2;
 	UINT worldEditorHeight = winHeight / 2;
@@ -232,6 +238,10 @@ void EditorApp::UpdateGame(float deltaTime)
 
 void EditorApp::UpdateEditor(float deltaTime) 
 {
+	if (m_audioEditor) {
+		m_audioEditor->Update(deltaTime, EDITOR_ASSETS_DIR);
+	}
+	
 	if (!imguiEditorPass->IsFocusedGameViewport)
 	{
 		for (int i = 0; i < 6; ++i)
@@ -523,6 +533,11 @@ void EditorApp::RunGame() {
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
 
+	if (m_audioEditor && m_currentGame) {
+		if (m_currentGame->m_audioSystem)
+			m_audioEditor->SetAudioSystem(m_currentGame->m_audioSystem);
+	}
+	
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
 }
@@ -539,7 +554,7 @@ void EditorApp::StopGame() {
 	m_currentGame->Stop();
 	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
 	if (m_audioEditor) {
-		m_audioEditor->SetAudioSystem(nullptr);
+		m_audioEditor->SetAudioSystem(m_editorAudioSystem.get());
 	}
 	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
