@@ -25,7 +25,13 @@ float rand_xorshift_normalized(uint rng_state)
     return float(rand_xorshift(rng_state)) * (1.0 / 4294967296.0);
 }
 
-cbuffer sceneConstantBuffer : register(b0)
+cbuffer TransformCBuf : register(b0)
+{
+    row_major float4x4 wMat;
+    row_major float4x4 wInvTransposeMat;
+}
+
+cbuffer sceneConstantBuffer : register(b1)
 {
     float4 camPosition;
     float dt;
@@ -34,35 +40,38 @@ cbuffer sceneConstantBuffer : register(b0)
     float2 padding;
 };
 
-cbuffer deadListCountConstantBuffer : register(b1)
+cbuffer deadListCountConstantBuffer : register(b2)
 {
     uint nbDeadParticles;
 
     uint3 deadListPadding;
 };
 
-cbuffer emitterPointConstantBuffer : register(b2)
+cbuffer emitterPointConstantBuffer : register(b3)
 {
     row_major float4x4 rotMatrix;
     
-    float3 emitterPosition;
+    float3 emitterPositionOffset;
     float particlesLifeSpan;
     
     float3 colorStart;
-    float particlesBaseSpeed;
+    float alphaStart;
     
     float3 colorEnd;
-    float particlesMass;
+    float alphaEnd;
     
+    float particlesBaseSpeed;
+    float particlesMass;
     float particleSizeStart;
     float particleSizeEnd;
+    
     float longitudeMin;
     float longitudeMax;
-
     float latitudeMin;
     float latitudeMax;
+    
     uint emitterMaxSpawn;
-    float emitterPadding;
+    float3 emitterPadding;
 };
 
 ConsumeStructuredBuffer<uint> deadListBuffer : register(u0);
@@ -81,7 +90,11 @@ void main(uint3 id : SV_DispatchThreadID)
         
         Particle p = (Particle) 0;
         
-        p.position = float4(emitterPosition, 1.0f);
+        float4 emitterPos = float4(0.0, 0.0, 0.0, 1.0);
+        emitterPos = mul(emitterPos, wMat);
+        emitterPos = emitterPos / emitterPos.w;
+        
+        p.position = emitterPos + float4(emitterPositionOffset, 0.0f);
 
         float colatitude = latitudeMin
             + (latitudeMax - latitudeMin) * rand_xorshift_normalized(rng_state); // 3.1415
@@ -92,13 +105,18 @@ void main(uint3 id : SV_DispatchThreadID)
         p.velocity.x = radius * cos(colatitude) * cos(longitude);
         p.velocity.z = radius * cos(colatitude) * sin(longitude);
         p.velocity.y = radius * sin(colatitude);
-        p.velocity.w = 1.0f;
+        p.velocity.w = 0.0f;
         
-        p.velocity = particlesBaseSpeed * normalize(p.velocity);
-        p.velocity = mul(rotMatrix, p.velocity);
+        p.velocity = normalize(mul(p.velocity, wInvTransposeMat));
         
-        p.colorStart = float4(colorStart, 1.0f);
-        p.colorEnd = float4(colorEnd, 1.0f);
+        p.velocity = particlesBaseSpeed * p.velocity;
+        // p.velocity = mul(rotMatrix, p.velocity);
+        
+        p.colorStart = colorStart;
+        p.colorEnd = colorEnd;
+        
+        p.alphaStart = alphaStart;
+        p.alphaEnd = alphaEnd;
         
         p.sizeStart = particleSizeStart;
         p.sizeEnd = particleSizeEnd;

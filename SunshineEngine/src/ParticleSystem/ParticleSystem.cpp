@@ -8,6 +8,7 @@
 
 #include <Utils/AssetPath.h>
 
+#include <Component/TransformComponent.h>
 
 namespace SE
 {
@@ -215,7 +216,7 @@ namespace SE
 		particleBlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 		particleBlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		particleBlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		particleBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		particleBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
 		particleBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 		particleBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		particleBlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
@@ -280,7 +281,7 @@ namespace SE
 		m_emitters.clear();
 	}
 
-	void ParticleSystem::AddEmitter(SE::UUID uuid, ParticleData* particleData)
+	void ParticleSystem::AddEmitter(SE::UUID uuid, eastl::shared_ptr<ParticleData> particleData)
 	{
 		const SE::UUID id = uuid;
 		auto [it, inserted] = m_emitters.emplace(id, nullptr);
@@ -301,7 +302,7 @@ namespace SE
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Emitter Pass");
 
 		context->CSSetShader(m_emitParticlesCShader.Get(), nullptr, 0);
-		context->CSSetConstantBuffers(0, 1, m_sceneConstantBuffer.GetAddressOf());
+		context->CSSetConstantBuffers(1, 1, m_sceneConstantBuffer.GetAddressOf());
 
 		for (auto emitter : m_emitters)
 		{

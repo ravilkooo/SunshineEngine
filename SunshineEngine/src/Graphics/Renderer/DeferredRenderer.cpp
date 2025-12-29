@@ -1,4 +1,8 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
+
+#include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/ParticleEmitter.h>
+
 #include <iostream>
 
 namespace SE_G {
@@ -26,6 +30,12 @@ namespace SE_G {
 		m_GBuffer = eastl::make_shared<GBuffer>(m_device, screenWidth, screenHeight);
 		m_mainCamera = eastl::make_shared<Camera>(m_device, screenWidth * 1.0f / screenHeight);
 		m_mainCamera->SetPosition({ 0, 0, -10 });
+	}
+
+	void DeferredRenderer::InitParticleSystem()
+	{
+		m_particleSystem = eastl::make_unique<SE::ParticleSystem>(
+			this, GetMainCamera());
 	}
 
 	void DeferredRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)

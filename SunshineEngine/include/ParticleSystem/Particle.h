@@ -14,8 +14,12 @@ namespace SE
     struct Particle {
         DX::XMFLOAT4 Position;
         DX::XMFLOAT4 Velocity;
-        DX::XMFLOAT4 ColorStart;
-        DX::XMFLOAT4 ColorEnd;
+
+        DX::XMFLOAT3 ColorStart;
+        float AlphaStart;
+
+        DX::XMFLOAT3 ColorEnd;
+        float AlphaEnd;
 
         float SizeStart;
         float SizeEnd;

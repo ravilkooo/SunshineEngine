@@ -15,6 +15,11 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+namespace SE_G
+{
+	class IconTechnique;
+}
+
 class PlayerObject : public GameObject
 {
 public:
@@ -67,8 +72,10 @@ public:
 	TransformComponent_Info* m_transformComp;
 	MeshComponent_Info* m_meshComp;
 	PhysicsComponent_Info* m_physComp;
+	SE_G::IconTechnique* m_iconTech;
 	
 	PlayerObject_Info();
+	PlayerObject_Info(SE_G::DeferredRenderer* renderSystem);
 
 	PlayerObject_Info(const json& j, SE_G::DeferredRenderer* renderSystem);
 

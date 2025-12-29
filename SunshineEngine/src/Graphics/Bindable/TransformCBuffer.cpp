@@ -19,7 +19,7 @@ namespace SE_G {
 			
 		}
 
-		void TransformCBuffer::Bind(ID3D11DeviceContext* context) noexcept
+		void TransformCBuffer::Update(ID3D11DeviceContext* context) noexcept
 		{
 			const auto wMat = pParent->GetWorldMatrix();
 			DXSM::Matrix A = wMat;
@@ -35,6 +35,10 @@ namespace SE_G {
 					wMat, wMatInvTranspose,
 			};
 			pVcbuf->Update(context, tf);
+		}
+		void TransformCBuffer::Bind(ID3D11DeviceContext* context) noexcept
+		{
+			Update(context);
 			pVcbuf->Bind(context);
 
 			/*

@@ -18,6 +18,8 @@ namespace DXSM = DirectX::SimpleMath;
 
 class AssetPath;
 
+class TransformComponent;
+
 namespace SE_G
 {
 	class DeferredRenderer;
@@ -82,7 +84,7 @@ namespace SE
 			eastl::shared_ptr<SE_G::Camera> camera);
 		~ParticleSystem();
 
-		void AddEmitter(SE::UUID uuid, ParticleData* particleData);
+		void AddEmitter(SE::UUID uuid, eastl::shared_ptr<ParticleData> particleData);
 
 		void LoadCS(AssetPath shaderPath, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& m_computeShader);
 
@@ -95,6 +97,6 @@ namespace SE
 
 		void SetBlendState(eastl::unique_ptr<SE_G::Bind::BlendState> newBlendState);
 
-		eastl::unordered_map<SE::UUID, ParticleData*> m_emitters;
+		eastl::unordered_map<SE::UUID, eastl::shared_ptr<ParticleData>> m_emitters;
 	};
 }

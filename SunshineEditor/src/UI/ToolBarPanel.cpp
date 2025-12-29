@@ -159,6 +159,11 @@ void ToolbarPanel::ShowAddMenu()
     {
         AddCustomMesh();
     }
+
+    if (ImGui::MenuItem("Particle Emitter"))
+    {
+        AddParticleEmitter();
+    }
 }
 
 void ToolbarPanel::AddBoxShape()
@@ -310,6 +315,25 @@ void ToolbarPanel::AddCustomMesh()
         if (customMeshObject)
         {
             m_scene->AddGameObject(std::move(customMeshObject));
+        }
+    }
+    else
+    {
+        LOG_EDITOR_ERROR("Cannot add Custom Mesh: Renderer or Scene not initialized");
+    }
+}
+
+
+void ToolbarPanel::AddParticleEmitter()
+{
+    if (m_renderer && m_scene)
+    {
+        auto particleEmitter = EditorObjectFactory::CreateParticleEmitter(
+            m_renderer->m_particleSystem.get());
+
+        if (particleEmitter)
+        {
+            m_scene->AddGameObject(std::move(particleEmitter));
         }
     }
     else

@@ -1,5 +1,7 @@
 #include <PlayerObject/PlayerObject.h>
 
+#include <Graphics/Renderer/Technique/IconTechnique.h>
+
 PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -30,6 +32,22 @@ PlayerObject_Info::PlayerObject_Info() : GameObject_Info()
 	m_group = GameObjectGroup::Player;
 };
 
+PlayerObject_Info::PlayerObject_Info(SE_G::DeferredRenderer* renderSystem) : GameObject_Info()
+{
+	m_name = "PlayerObject";
+	m_group = GameObjectGroup::Player;
+
+	auto tc_info = AddComponent<TransformComponent_Info>(renderSystem->GetDevice());
+	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
+
+	auto iconTech =
+		eastl::make_unique<SE_G::IconTechnique>(renderSystem->GetDevice(),
+			tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
+			SE_G::IconData{ 4u, 0u, 1u, 1u, m_UUID.GetHilo() });
+
+	m_iconTech = static_cast<SE_G::IconTechnique*>(rc_info->AddTechnique(eastl::move(iconTech)));
+};
+
 PlayerObject_Info::PlayerObject_Info(const json& j, SE_G::DeferredRenderer* renderSystem)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -45,6 +63,13 @@ PlayerObject_Info::PlayerObject_Info(const json& j, SE_G::DeferredRenderer* rend
 	}
 
 	m_renderComp = AddComponent<RenderComponent_Info>(m_UUID, renderSystem).get();
+
+	auto iconTech =
+		eastl::make_unique<SE_G::IconTechnique>(renderSystem->GetDevice(),
+			m_transformComp->m_assignedComponent.get(), eastl::string("IconPass"),
+			SE_G::IconData{ 4u, 0u, 1u, 1u, m_UUID.GetHilo() });
+
+	m_iconTech = static_cast<SE_G::IconTechnique*>(m_renderComp->AddTechnique(eastl::move(iconTech)));
 
 	m_meshComp = AddComponent<MeshComponent_Info>().get();
 	m_meshComp->FromJson(

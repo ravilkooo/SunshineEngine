@@ -5,7 +5,6 @@
 #include <Component/PhysicsComponent.h>
 #include <fstream>   // std::ofstream
 
-// temp
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
 
@@ -126,6 +125,8 @@ void WorldEditor::SetupRendering(
 		renderSystem->GetDeviceContext(),
 		m_screenWidth, m_screenHeight
 	);
+	this->m_renderer->InitParticleSystem();
+	this->m_particleSystem = this->m_renderer->m_particleSystem.get();
 
 	{
 		m_gPass = static_cast<SE_G::GPass*>(
@@ -140,6 +141,8 @@ void WorldEditor::SetupRendering(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
+
+		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 	}
 	{
 		m_colliderPass = static_cast<SE_G::ColliderPass*>(
@@ -168,13 +171,6 @@ void WorldEditor::SetupRendering(
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
 
 	m_renderingSystem->AddRenderGroup(m_renderer.get());
-
-	// temp
-	{
-		m_particleSystem = eastl::make_unique<SE::ParticleSystem>(m_renderer.get(), m_renderer->GetMainCamera());
-
-		m_lightPass->m_particleSystem = m_particleSystem.get();
-	}
 }
 
 void WorldEditor::CreateParentScene()
@@ -666,6 +662,7 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 
 	// TestEmitter
 	{
+		/*
 		SE::ParticleData::EmitterPointConstantBuffer emitterDesc;
 		SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc;
 
@@ -679,9 +676,7 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 			
 			0.2, 0.5, 0, DX::XM_2PI,
 
-			-DX::XM_PI / 10, DX::XM_PI / 10, 100u, 0,
-
-			/*0, 0, 0*/
+			-DX::XM_PI / 10, DX::XM_PI / 10, 100u, 0
 		};
 		simulatorDesc = {
 			{ 0, -5, 0 }, 0
@@ -698,11 +693,11 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 
 		go->m_particleData->SetTexture(eastl::move(bubbleTex));
 		go->m_particleData->SetEmissionRate(40);
-
+		*/
+		/*
+		auto go = EditorObjectFactory::CreateParticleEmitter(m_particleSystem);
 		auto bubbleUUID = m_scene->AddGameObject(eastl::move(go));
-
-		m_particleSystem->AddEmitter(bubbleUUID,
-			static_cast<SE::ParticleEmitter_Info*>(m_scene->GetGameObjectByUUID(bubbleUUID))->m_particleData.get());
+		*/
 	}
 
 	return true;

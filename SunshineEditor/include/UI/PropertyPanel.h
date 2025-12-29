@@ -12,6 +12,7 @@ class GameObject_Info;
 class BoxShapeObject_Info;
 class SphereShapeObject_Info;
 class GeosphereShapeObject_Info;
+class SkyBox_Info;
 
 class TransformComponent;
 class RenderComponent;
@@ -62,15 +63,19 @@ private:
     void DrawComponentAddPopup(GameObject_Info* obj);
 
     void DrawEmitterDetails(
+        SE::ParticleEmitter_Info* emitterObj
+        /*
         SE::ParticleData::EmitterPointConstantBuffer* emitterPointBuffer,
-        SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer);
+        SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer
+        */
+        );
 
     void DrawAmbientLightDetails(SE_G::AmbientLightData* lightData);
     void DrawDirectionalLightDetails(SE_G::DirectionalLightData* lightData);
     void DrawPointLightDetails(SE_G::PointLightData* lightData);
     void DrawSpotLightDetails(SE_G::SpotLightData* lightData);
     
-    void DrawSkyBoxDetails(SE_G::SkyBoxData* lightData);
+    void DrawSkyBoxDetails(SkyBox_Info* skyBoxObj);
 
     void DrawBoxShapeDetails(BoxShapeObject_Info* obj);
     void DrawSphereShapeDetails(SphereShapeObject_Info* obj);

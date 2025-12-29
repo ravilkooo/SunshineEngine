@@ -232,6 +232,7 @@ void EditorApp::UpdateEditor(float deltaTime)
 			MovingPressed[i] = false;
 
 		IsRightMousePressed = false;
+		m_worldEditor->Update(deltaTime);
 		return;
 	}
 

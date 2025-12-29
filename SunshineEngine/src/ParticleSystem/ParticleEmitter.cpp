@@ -2,10 +2,16 @@
 #include <ParticleSystem/ParticleSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/GraphicsResources/Texture.h>
+#include <Utils/AssetPath.h>
 
+#include <Graphics/Renderer/Technique/IconTechnique.h>
 
 namespace SE
 {
+    ParticleEmitter::ParticleEmitter()
+    {
+    }
+
     ParticleEmitter::ParticleEmitter(
         ParticleSystem* particleSystem,
         ParticleData::EmitterPointConstantBuffer emitterDesc,
@@ -13,15 +19,51 @@ namespace SE
     )
         : GameObject()
     {
-        m_particleData = eastl::make_unique<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
+        auto tc = AddComponent<TransformComponent>(particleSystem->m_renderer->GetDevice());
+
+        m_particleData = eastl::make_shared<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
+        m_particleData->m_transformComp = tc.get();
+        particleSystem->AddEmitter(m_UUID, m_particleData);
 
         m_name = "ParticleEmitter";
-
     }
 
     ParticleEmitter::~ParticleEmitter()
     {
 
+    }
+
+    eastl::unique_ptr<ParticleEmitter> ParticleEmitter::FromJson(const json& j, ParticleSystem* particleSystem)
+    {
+        eastl::unique_ptr<ParticleEmitter> obj = eastl::make_unique<ParticleEmitter>();
+
+        obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+        obj->m_name = j["m_name"].get<std::string>().c_str();
+
+        if (j.contains("emitterData"))
+        {
+            obj->m_particleData = SE::ParticleData::FromJson(j["emitterData"], particleSystem);
+        }
+        else
+        {
+            json je;
+            obj->m_particleData = SE::ParticleData::FromJson(je, particleSystem);
+        }
+
+        auto tc = obj->AddComponent<TransformComponent>(particleSystem->m_renderer->GetDevice());
+        if (j["components"].contains("Transform")) {
+            tc->FromJson(j["components"]["Transform"]);
+        }
+
+        obj->m_particleData->EnableEmission();
+        obj->m_particleData->m_transformComp = tc.get();
+        particleSystem->AddEmitter(obj->m_UUID, obj->m_particleData);
+
+        return obj;
+    }
+
+    ParticleEmitter_Info::ParticleEmitter_Info()
+    {
     }
 
     ParticleEmitter_Info::ParticleEmitter_Info(
@@ -31,17 +73,77 @@ namespace SE
     )
         : GameObject_Info()
     {
-        m_particleData = eastl::make_unique<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
-
         m_group = GameObjectGroup::ParticleEmitter;
         m_name = "ParticleEmitter";
 
+        auto tc_info = AddComponent<TransformComponent_Info>(particleSystem->m_renderer->GetDevice());
+        auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, particleSystem->m_renderer);
+
+        // IconPass
+        auto iconTech = eastl::make_unique<SE_G::IconTechnique>(
+            particleSystem->m_renderer->GetDevice(),
+            tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
+            SE_G::IconData{ 5u, 0u, 1u, 1u, m_UUID.GetHilo() });
+
+        rc_info->AddTechnique(eastl::move(iconTech));
+
+        m_particleData = eastl::make_shared<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
+        m_particleData->m_transformComp = tc_info->m_assignedComponent.get();
+        particleSystem->AddEmitter(m_UUID, m_particleData);
     }
 
     ParticleEmitter_Info::~ParticleEmitter_Info()
     {
 
     }
+
+    json ParticleEmitter_Info::ToJson() const {
+        json j = GameObject_Info::ToJson();
+        j["emitterData"] = m_particleData->ToJson();
+        return j;
+    }
+
+    eastl::unique_ptr<ParticleEmitter_Info> ParticleEmitter_Info::FromJson(const json& j, ParticleSystem* particleSystem)
+    {
+        eastl::unique_ptr<ParticleEmitter_Info> obj = eastl::make_unique<ParticleEmitter_Info>();
+
+        obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+        obj->m_name = j["m_name"].get<std::string>().c_str();
+        obj->m_group = GameObjectGroup::ParticleEmitter;
+
+        if (j.contains("emitterData"))
+        {
+            obj->m_particleData = SE::ParticleData::FromJson(j["emitterData"], particleSystem);
+        }
+        else
+        {
+            json je;
+            obj->m_particleData = SE::ParticleData::FromJson(je, particleSystem);
+        }
+
+        // TransformComponent
+        auto tc_info = obj->AddComponent<TransformComponent_Info>(particleSystem->m_renderer->GetDevice());
+        if (j["components"].contains("Transform")) {
+            tc_info->FromJson(j["components"]["Transform"], particleSystem->m_renderer->GetDevice());
+        }
+        auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, particleSystem->m_renderer);
+
+        // IconPass
+        auto iconTech = eastl::make_unique<SE_G::IconTechnique>(
+            particleSystem->m_renderer->GetDevice(),
+            tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
+            SE_G::IconData{ 5u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
+
+        rc_info->AddTechnique(eastl::move(iconTech));
+
+        obj->m_particleData->m_transformComp = tc_info->m_assignedComponent.get();
+        particleSystem->AddEmitter(obj->m_UUID, obj->m_particleData);
+
+        return obj;
+    }
+
+    ParticleData::ParticleData()
+    { }
 
     ParticleData::ParticleData(ParticleSystem* particleSystem,
         EmitterPointConstantBuffer emitterDesc,
@@ -51,6 +153,11 @@ namespace SE
         m_emitterConstantBufferData = emitterDesc;
         m_simulateParticlesConstantBufferData = simulatorDesc;
 
+        InitGraphicsResources();
+    }
+
+    void ParticleData::InitGraphicsResources()
+    {
         auto device = m_particleSystem->m_renderer->GetDevice();
 
         D3D11_BUFFER_DESC particleBufferDesc;
@@ -260,175 +367,192 @@ namespace SE
 
     void ParticleData::EmitPass()
     {
-        if (m_emitterConstantBufferData.maxSpawn == 0)
+        if (m_enabled)
         {
-            return;
-        }
+            if (m_emitterConstantBufferData.maxSpawn == 0)
+            {
+                return;
+            }
 
-        auto context = m_particleSystem->m_renderer->GetDeviceContext();
+            auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
-        UINT initialCounts[] = { (UINT)-1, (UINT)-1, (UINT)-1, (UINT)-1 };
-        ID3D11UnorderedAccessView* uavs[] = {
-            m_deadListUAV.Get(),
-            m_particleUAV.Get(),
-            m_aliveIndexUAV[m_currentAliveBuffer].Get(),
-            m_indirectDispatchArgsUAV[m_currentAliveBuffer].Get()
-        };
+            UINT initialCounts[] = { (UINT)-1, (UINT)-1, (UINT)-1, (UINT)-1 };
+            ID3D11UnorderedAccessView* uavs[] = {
+                m_deadListUAV.Get(),
+                m_particleUAV.Get(),
+                m_aliveIndexUAV[m_currentAliveBuffer].Get(),
+                m_indirectDispatchArgsUAV[m_currentAliveBuffer].Get()
+            };
 
-        context->CSSetUnorderedAccessViews(0, 4, uavs, initialCounts);
+            context->CSSetUnorderedAccessViews(0, 4, uavs, initialCounts);
 
-        {
+            m_transformComp->transformBuffer->Update(context);
+            context->CSSetConstantBuffers(0u, 1u,
+                m_transformComp->transformBuffer->pVcbuf->pConstantBuffer.GetAddressOf());
+
             //copy the deadList counter to a constantBuffer
             context->CopyStructureCount(m_deadListCountConstantBuffer.Get(), 0, m_deadListUAV.Get());
 
-            context->CSSetConstantBuffers(1, 1, m_deadListCountConstantBuffer.GetAddressOf());
+            context->CSSetConstantBuffers(2, 1, m_deadListCountConstantBuffer.GetAddressOf());
 
             context->UpdateSubresource(m_emitterConstantBuffer.Get(), 0, nullptr, &m_emitterConstantBufferData, 0, 0);
 
-            context->CSSetConstantBuffers(2, 1, m_emitterConstantBuffer.GetAddressOf());
+            context->CSSetConstantBuffers(3, 1, m_emitterConstantBuffer.GetAddressOf());
 
             //maxSpawn / 256 as group max so and in shader it's 256 so we spawn maxspawn aligned to 256 threads
             context->Dispatch(Align(m_emitterConstantBufferData.maxSpawn, 256u) / 256, 1, 1);
-        }
 
-        ID3D11UnorderedAccessView* uavsNull[] = { nullptr, nullptr, nullptr, nullptr };
-        context->CSSetUnorderedAccessViews(0, 4, uavsNull, nullptr);
+            ID3D11UnorderedAccessView* uavsNull[] = { nullptr, nullptr, nullptr, nullptr };
+            context->CSSetUnorderedAccessViews(0, 4, uavsNull, nullptr);
+        }
     }
 
     void ParticleData::InitSimDispatchArgsPass()
     {
-        auto context = m_particleSystem->m_renderer->GetDeviceContext();
+        if (m_enabled)
+        {
+            auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
-        //init indirect dispatch args (align)
-        m_initSimulateDispatchArgsData.nbThreadGroupX = 256.0f;
-        context->UpdateSubresource(m_initSimulateDispatchArgsBuffer.Get(), 0, nullptr, &m_initSimulateDispatchArgsData, 0, 0);
+            //init indirect dispatch args (align)
+            m_initSimulateDispatchArgsData.nbThreadGroupX = 256.0f;
+            context->UpdateSubresource(m_initSimulateDispatchArgsBuffer.Get(), 0, nullptr, &m_initSimulateDispatchArgsData, 0, 0);
 
-        context->CSSetConstantBuffers(0, 1, m_initSimulateDispatchArgsBuffer.GetAddressOf());
-        UINT initCount[] = { (UINT)-1 };
-        context->CSSetUnorderedAccessViews(0, 1, m_indirectDispatchArgsUAV[m_currentAliveBuffer].GetAddressOf(), initCount);
-        context->Dispatch(1, 1, 1);
+            context->CSSetConstantBuffers(0, 1, m_initSimulateDispatchArgsBuffer.GetAddressOf());
+            UINT initCount[] = { (UINT)-1 };
+            context->CSSetUnorderedAccessViews(0, 1, m_indirectDispatchArgsUAV[m_currentAliveBuffer].GetAddressOf(), initCount);
+            context->Dispatch(1, 1, 1);
 
-        ID3D11UnorderedAccessView* uavs[] = { nullptr };
-        context->CSSetUnorderedAccessViews(0, 1, uavs, nullptr);
+            ID3D11UnorderedAccessView* uavs[] = { nullptr };
+            context->CSSetUnorderedAccessViews(0, 1, uavs, nullptr);
+        }
     }
 
     void ParticleData::SimulatePass()
     {
-        //simulation
-        auto context = m_particleSystem->m_renderer->GetDeviceContext();
-
-        //m_d3dContext->UpdateSubresource(m_simulateParticlesBuffer.Get(), 0, nullptr, &m_simulateParticlesBufferData, 0, 0);
-
-        //m_d3dContext->CSSetConstantBuffers(4, 1, m_simulateParticlesBuffer.GetAddressOf());
-
-
-        context->CopyStructureCount(m_aliveListCountConstantBuffer.Get(), 0, m_aliveIndexUAV[m_currentAliveBuffer].Get());
-        context->CSSetConstantBuffers(1, 1, m_aliveListCountConstantBuffer.GetAddressOf());
-
-        context->UpdateSubresource(m_simulateParticlesConstantBuffer.Get(), 0, nullptr, &m_simulateParticlesConstantBufferData, 0, 0);
-        context->CSSetConstantBuffers(2, 1, m_simulateParticlesConstantBuffer.GetAddressOf());
-
-        UINT initialCount[] = { (UINT)-1 };
-        context->CSSetUnorderedAccessViews(0, 1, m_indirectDrawArgsUAV.GetAddressOf(), initialCount);
-        context->CSSetUnorderedAccessViews(2, 1, m_deadListUAV.GetAddressOf(), initialCount);
-        context->CSSetUnorderedAccessViews(3, 1, m_particleUAV.GetAddressOf(), initialCount);
-        context->CSSetUnorderedAccessViews(4, 1, m_aliveIndexUAV[m_currentAliveBuffer].GetAddressOf(), initialCount);
-        context->CSSetUnorderedAccessViews(5, 1, m_indirectDispatchArgsUAV[(m_currentAliveBuffer + 1) % 2].GetAddressOf(), initialCount);
-
-        initialCount[0] = 0;
-        context->CSSetUnorderedAccessViews(1, 1, m_aliveIndexUAV[(m_currentAliveBuffer + 1) % 2].GetAddressOf(), initialCount);
-
-        /*
-        context->CSSetShaderResources(0, 1, m_attractorsSRV.GetAddressOf());
-        context->CSSetShaderResources(1, 1, m_noiseTextureSRV.GetAddressOf());
-        context->CSSetShaderResources(2, 1, m_forceFieldTextureSRV.GetAddressOf());
-        switch (m_forceFieldSampleMode)
+        if (m_enabled)
         {
-        case 0:
-            context->CSSetSamplers(0, 1, RenderStatesHelper::LinearWrap().GetAddressOf());
-            break;
-        case 1:
-            context->CSSetSamplers(0, 1, RenderStatesHelper::LinearBorder().GetAddressOf());
-            break;
-        case 2:
-            context->CSSetSamplers(0, 1, RenderStatesHelper::LinearClamp().GetAddressOf());
-            break;
-        default:
-            break;
+            //simulation
+            auto context = m_particleSystem->m_renderer->GetDeviceContext();
+
+            //m_d3dContext->UpdateSubresource(m_simulateParticlesBuffer.Get(), 0, nullptr, &m_simulateParticlesBufferData, 0, 0);
+
+            //m_d3dContext->CSSetConstantBuffers(4, 1, m_simulateParticlesBuffer.GetAddressOf());
+
+
+            context->CopyStructureCount(m_aliveListCountConstantBuffer.Get(), 0, m_aliveIndexUAV[m_currentAliveBuffer].Get());
+            context->CSSetConstantBuffers(1, 1, m_aliveListCountConstantBuffer.GetAddressOf());
+
+            context->UpdateSubresource(m_simulateParticlesConstantBuffer.Get(), 0, nullptr, &m_simulateParticlesConstantBufferData, 0, 0);
+            context->CSSetConstantBuffers(2, 1, m_simulateParticlesConstantBuffer.GetAddressOf());
+
+            UINT initialCount[] = { (UINT)-1 };
+            context->CSSetUnorderedAccessViews(0, 1, m_indirectDrawArgsUAV.GetAddressOf(), initialCount);
+            context->CSSetUnorderedAccessViews(2, 1, m_deadListUAV.GetAddressOf(), initialCount);
+            context->CSSetUnorderedAccessViews(3, 1, m_particleUAV.GetAddressOf(), initialCount);
+            context->CSSetUnorderedAccessViews(4, 1, m_aliveIndexUAV[m_currentAliveBuffer].GetAddressOf(), initialCount);
+            context->CSSetUnorderedAccessViews(5, 1, m_indirectDispatchArgsUAV[(m_currentAliveBuffer + 1) % 2].GetAddressOf(), initialCount);
+
+            initialCount[0] = 0;
+            context->CSSetUnorderedAccessViews(1, 1, m_aliveIndexUAV[(m_currentAliveBuffer + 1) % 2].GetAddressOf(), initialCount);
+
+            /*
+            context->CSSetShaderResources(0, 1, m_attractorsSRV.GetAddressOf());
+            context->CSSetShaderResources(1, 1, m_noiseTextureSRV.GetAddressOf());
+            context->CSSetShaderResources(2, 1, m_forceFieldTextureSRV.GetAddressOf());
+            switch (m_forceFieldSampleMode)
+            {
+            case 0:
+                context->CSSetSamplers(0, 1, RenderStatesHelper::LinearWrap().GetAddressOf());
+                break;
+            case 1:
+                context->CSSetSamplers(0, 1, RenderStatesHelper::LinearBorder().GetAddressOf());
+                break;
+            case 2:
+                context->CSSetSamplers(0, 1, RenderStatesHelper::LinearClamp().GetAddressOf());
+                break;
+            default:
+                break;
+            }
+            */
+
+            /*
+            for (auto bindable : additionalBindablesForSimulationPass) {
+                bindable->Bind(context.Get());
+            }
+            */
+
+            context->DispatchIndirect(m_indirectDispatchArgsBuffer[m_currentAliveBuffer].Get(), 0);
+
+            ID3D11UnorderedAccessView* uavsNull[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+            context->CSSetUnorderedAccessViews(0, 6, uavsNull, nullptr);
+
+            /*
+            context->setSRV(0, nullptr);
+            context->setSRV(1, nullptr);
+            context->setSRV(2, nullptr);
+            */
+            context->CopyStructureCount(m_aliveListCountConstantBuffer.Get(), 0, m_aliveIndexUAV[(m_currentAliveBuffer + 1) % 2].Get());
+
+            //increment current alive
+            m_currentAliveBuffer = (m_currentAliveBuffer + 1) % 2;
         }
-        */
-
-        /*
-        for (auto bindable : additionalBindablesForSimulationPass) {
-            bindable->Bind(context.Get());
-        }
-        */
-
-        context->DispatchIndirect(m_indirectDispatchArgsBuffer[m_currentAliveBuffer].Get(), 0);
-
-        ID3D11UnorderedAccessView* uavsNull[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-        context->CSSetUnorderedAccessViews(0, 6, uavsNull, nullptr);
-
-        /*
-        context->setSRV(0, nullptr);
-        context->setSRV(1, nullptr);
-        context->setSRV(2, nullptr);
-        */
-        context->CopyStructureCount(m_aliveListCountConstantBuffer.Get(), 0, m_aliveIndexUAV[(m_currentAliveBuffer + 1) % 2].Get());
-
-        //increment current alive
-        m_currentAliveBuffer = (m_currentAliveBuffer + 1) % 2;
     }
 
     void ParticleData::RenderPass()
     {
-        auto context = m_particleSystem->m_renderer->GetDeviceContext();
+        if (m_enabled)
+        {
+            auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
-        ID3D11ShaderResourceView* vertexShaderSRVs[] = { m_particleSRV.Get(), m_aliveIndexSRV[m_currentAliveBuffer].Get() };
-        context->VSSetShaderResources(0, 2, vertexShaderSRVs);
-        context->VSSetConstantBuffers(3, 1, m_aliveListCountConstantBuffer.GetAddressOf());
+            ID3D11ShaderResourceView* vertexShaderSRVs[] = { m_particleSRV.Get(), m_aliveIndexSRV[m_currentAliveBuffer].Get() };
+            context->VSSetShaderResources(0, 2, vertexShaderSRVs);
+            context->VSSetConstantBuffers(3, 1, m_aliveListCountConstantBuffer.GetAddressOf());
 
-        //const float blendFactor[4] = { 1.f, 1.f, 1.f, 1.f };
+            //const float blendFactor[4] = { 1.f, 1.f, 1.f, 1.f };
 
-        //context->PSSetSamplers(0, 1, RenderStatesHelper::LinearClamp().GetAddressOf());
-        //context-> // m_renderParticlePS->setSRV(0, m_particleTexture1SRV);
-        m_texture->Bind(context);
+            //context->PSSetSamplers(0, 1, RenderStatesHelper::LinearClamp().GetAddressOf());
+            //context-> // m_renderParticlePS->setSRV(0, m_particleTexture1SRV);
+            m_texture->Bind(context);
 
-        context->DrawInstancedIndirect(m_indirectDrawArgsBuffer.Get(), 0);
+            context->DrawInstancedIndirect(m_indirectDrawArgsBuffer.Get(), 0);
 
 
-        ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr };
-        ID3D11ShaderResourceView* nullSRVsPS[] = { nullptr };
-        context->VSSetShaderResources(0, 2, nullSRVs);
-        context->PSSetShaderResources(0, 1, nullSRVsPS);
+            ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr };
+            ID3D11ShaderResourceView* nullSRVsPS[] = { nullptr };
+            context->VSSetShaderResources(0, 2, nullSRVs);
+            context->PSSetShaderResources(0, 1, nullSRVsPS);
+        }
     }
 
     void ParticleData::UpdateEmitter(float deltaTime)
     {
-        auto context = m_particleSystem->m_renderer->GetDeviceContext();
-
-        m_emissionRateAccumulation += m_emissionRate * deltaTime;
-
-        if (m_emissionRateAccumulation > 1.0f)
+        if (m_enabled)
         {
-            float integerPart = 0.0f;
-            float fraction = modf(m_emissionRateAccumulation, &integerPart);
+            auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
-            context->CopyStructureCount(m_deadListCountConstantBuffer.Get(), 0, m_deadListUAV.Get());
-            context->CopyResource(m_deadListCountConstantBuffer_2.Get(), m_deadListCountConstantBuffer.Get());
-            //m_deadListCountConstantBuffer.
-            D3D11_MAPPED_SUBRESOURCE mappedData;
-            context->Map(m_deadListCountConstantBuffer_2.Get(), 0, D3D11_MAP_READ, 0, &mappedData);
-            DeadListCountConstantBuffer* dataView = reinterpret_cast<DeadListCountConstantBuffer*>(mappedData.pData);
-            UINT nbDeadParticles = dataView->nbDeadParticles;
-            context->Unmap(m_deadListCountConstantBuffer_2.Get(), 0);
+            m_emissionRateAccumulation += m_emissionRate * deltaTime;
 
-            m_emitterConstantBufferData.maxSpawn = (UINT)eastl::min(nbDeadParticles, integerPart);
-            m_emissionRateAccumulation = fraction + (integerPart - m_emitterConstantBufferData.maxSpawn);
-        }
-        else
-        {
-            m_emitterConstantBufferData.maxSpawn = 0;
+            if (m_emissionRateAccumulation > 1.0f)
+            {
+                float integerPart = 0.0f;
+                float fraction = modf(m_emissionRateAccumulation, &integerPart);
+
+                context->CopyStructureCount(m_deadListCountConstantBuffer.Get(), 0, m_deadListUAV.Get());
+                context->CopyResource(m_deadListCountConstantBuffer_2.Get(), m_deadListCountConstantBuffer.Get());
+                //m_deadListCountConstantBuffer.
+                D3D11_MAPPED_SUBRESOURCE mappedData;
+                context->Map(m_deadListCountConstantBuffer_2.Get(), 0, D3D11_MAP_READ, 0, &mappedData);
+                DeadListCountConstantBuffer* dataView = reinterpret_cast<DeadListCountConstantBuffer*>(mappedData.pData);
+                UINT nbDeadParticles = dataView->nbDeadParticles;
+                context->Unmap(m_deadListCountConstantBuffer_2.Get(), 0);
+
+                m_emitterConstantBufferData.maxSpawn = (UINT)eastl::min(nbDeadParticles, integerPart);
+                m_emissionRateAccumulation = fraction + (integerPart - m_emitterConstantBufferData.maxSpawn);
+            }
+            else
+            {
+                m_emitterConstantBufferData.maxSpawn = 0;
+            }
         }
     }
 
@@ -438,6 +562,22 @@ namespace SE
         float emissionRateLimit = m_maxParticles / particleLifeTime * 0.9f;
 
         m_emissionRate = eastl::max(0, eastl::min(emissionRate, emissionRateLimit));
+    }
+
+    void ParticleData::EnableEmission()
+    {
+        m_enabled = true;
+        SetEmissionRate(m_deaultEmissionRate);
+        ResetParticlesPass();
+        SetEmissionRate(m_deaultEmissionRate);
+    }
+
+    void ParticleData::DisableEmission()
+    {
+        m_enabled = false;
+        SetEmissionRate(0u);
+        ResetParticlesPass();
+        SetEmissionRate(0u);
     }
 
     void ParticleData::IncrementEmissionRate(float deltaEmissionRate)
@@ -461,9 +601,181 @@ namespace SE
             DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::FromToRotation({ 0,1,0 }, newEmitDir));
     }
 
-    void ParticleData::SetTexture(eastl::unique_ptr<SE_G::Bind::Texture> newTexture)
+    void ParticleData::SetTexture(eastl::shared_ptr<SE_G::Bind::Texture> newTexture)
     {
-        m_texture = eastl::move(newTexture);
+        m_texture = newTexture;
     }
 
+    eastl::shared_ptr<ParticleData> ParticleData::FromJson(const json& j, ParticleSystem* particleSystem)
+    {
+        auto particleData = eastl::make_shared<ParticleData>();
+
+        particleData->m_particleSystem = particleSystem;
+        // Deserialize particle system data
+
+        // Optional: max particles and emission rate
+        if (j.contains("MaxParticles") && j["MaxParticles"].is_number_unsigned()) {
+            particleData->m_maxParticles = j["MaxParticles"].get<uint32_t>();
+        }
+        if (j.contains("EmissionRate") && j["EmissionRate"].is_number()) {
+            particleData->m_emissionRate = j["EmissionRate"].get<float>();
+            particleData->m_deaultEmissionRate = particleData->m_emissionRate;
+        }
+
+        // Emitter description
+        if (j.contains("Emitter") && j["Emitter"].is_object()) {
+            const auto& je = j["Emitter"];
+
+            if (je.contains("position") && je["position"].is_array() && je["position"].size() >= 3) {
+                particleData->m_emitterConstantBufferData.position.x = je["position"][0].get<float>();
+                particleData->m_emitterConstantBufferData.position.y = je["position"][1].get<float>();
+                particleData->m_emitterConstantBufferData.position.z = je["position"][2].get<float>();
+            }
+            if (je.contains("particlesLifeSpan") && je["particlesLifeSpan"].is_number())
+                particleData->m_emitterConstantBufferData.particlesLifeSpan = je["particlesLifeSpan"].get<float>();
+
+            if (je.contains("colorStart") && je["colorStart"].is_array() && je["colorStart"].size() >= 3) {
+                particleData->m_emitterConstantBufferData.colorStart.x = je["colorStart"][0].get<float>();
+                particleData->m_emitterConstantBufferData.colorStart.y = je["colorStart"][1].get<float>();
+                particleData->m_emitterConstantBufferData.colorStart.z = je["colorStart"][2].get<float>();
+            }
+            if (je.contains("particlesBaseSpeed") && je["particlesBaseSpeed"].is_number())
+                particleData->m_emitterConstantBufferData.particlesBaseSpeed = je["particlesBaseSpeed"].get<float>();
+
+            if (je.contains("colorEnd") && je["colorEnd"].is_array() && je["colorEnd"].size() >= 3) {
+                particleData->m_emitterConstantBufferData.colorEnd.x = je["colorEnd"][0].get<float>();
+                particleData->m_emitterConstantBufferData.colorEnd.y = je["colorEnd"][1].get<float>();
+                particleData->m_emitterConstantBufferData.colorEnd.z = je["colorEnd"][2].get<float>();
+            }
+            if (je.contains("particlesMass") && je["particlesMass"].is_number())
+                particleData->m_emitterConstantBufferData.particlesMass = je["particlesMass"].get<float>();
+
+            if (je.contains("particleSizeStart") && je["particleSizeStart"].is_number())
+                particleData->m_emitterConstantBufferData.particleSizeStart = je["particleSizeStart"].get<float>();
+            if (je.contains("particleSizeEnd") && je["particleSizeEnd"].is_number())
+                particleData->m_emitterConstantBufferData.particleSizeEnd = je["particleSizeEnd"].get<float>();
+
+            if (je.contains("alphaStart") && je["alphaStart"].is_number())
+                particleData->m_emitterConstantBufferData.alphaStart = je["alphaStart"].get<float>();
+            if (je.contains("alphaEnd") && je["alphaEnd"].is_number())
+                particleData->m_emitterConstantBufferData.alphaEnd = je["alphaEnd"].get<float>();
+
+            if (je.contains("longitudeMin") && je["longitudeMin"].is_number())
+                particleData->m_emitterConstantBufferData.longitudeMin = je["longitudeMin"].get<float>();
+            if (je.contains("longitudeMax") && je["longitudeMax"].is_number())
+                particleData->m_emitterConstantBufferData.longitudeMax = je["longitudeMax"].get<float>();
+
+            if (je.contains("latitudeMin") && je["latitudeMin"].is_number())
+                particleData->m_emitterConstantBufferData.latitudeMin = je["latitudeMin"].get<float>();
+            if (je.contains("latitudeMax") && je["latitudeMax"].is_number())
+                particleData->m_emitterConstantBufferData.latitudeMax = je["latitudeMax"].get<float>();
+
+            if (je.contains("maxSpawn") && je["maxSpawn"].is_number_unsigned())
+                particleData->m_emitterConstantBufferData.maxSpawn = je["maxSpawn"].get<uint32_t>();
+
+            // Rotation: accept either a 16-element matrix or an emitDir vector
+            if (je.contains("rotMatrix") && je["rotMatrix"].is_array() && je["rotMatrix"].size() == 16) {
+                // Fill row-major
+                auto& M = particleData->m_emitterConstantBufferData.rotMatrix;
+                int idx = 0;
+                for (int r = 0; r < 4; ++r) {
+                    for (int c = 0; c < 4; ++c) {
+                        M(r, c) = je["rotMatrix"][idx++].get<float>();
+                    }
+                }
+            }
+            else if (je.contains("emitDir") && je["emitDir"].is_array() && je["emitDir"].size() >= 3) {
+                DXSM::Vector3 dir;
+                dir.x = je["emitDir"][0].get<float>();
+                dir.y = je["emitDir"][1].get<float>();
+                dir.z = je["emitDir"][2].get<float>();
+                particleData->m_emitterConstantBufferData.rotMatrix = DXSM::Matrix::CreateFromQuaternion(
+                    DXSM::Quaternion::FromToRotation({ 0, 1, 0 }, dir));
+            }
+        }
+
+        // Simulation description
+        if (j.contains("Simulate") && j["Simulate"].is_object()) {
+            const auto& js = j["Simulate"];
+            if (js.contains("force") && js["force"].is_array() && js["force"].size() >= 3) {
+                particleData->m_simulateParticlesConstantBufferData.force.x = js["force"][0].get<float>();
+                particleData->m_simulateParticlesConstantBufferData.force.y = js["force"][1].get<float>();
+                particleData->m_simulateParticlesConstantBufferData.force.z = js["force"][2].get<float>();
+            }
+        }
+
+        // Texture
+        if (j.contains("Texture")) {
+            AssetPath texPath;
+            texPath.FromJson(j["Texture"]);
+
+            auto device = particleData->m_particleSystem->m_renderer->GetDevice();
+            auto tex = eastl::make_shared<SE_G::Bind::Texture>(device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+            particleData->SetTexture(tex);
+        }
+        else {
+            auto device = particleData->m_particleSystem->m_renderer->GetDevice();
+            auto tex = eastl::make_shared<SE_G::Bind::Texture>(device,
+                AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
+                SE_G::Bind::PipelineStage::PIXEL_SHADER);
+            particleData->SetTexture(tex);
+        }
+
+        particleData->InitGraphicsResources();
+
+        return particleData;
+    }
+
+    json ParticleData::ToJson() const
+    {
+        json j;
+
+        j["MaxParticles"] = m_maxParticles;
+        j["EmissionRate"] = m_deaultEmissionRate;
+
+        // Texture path if available
+        if (m_texture) {
+            j["Texture"] = m_texture->GetCurrentTexturePath().ToJson();
+        }
+
+        // Emitter
+        const auto& E = m_emitterConstantBufferData;
+        json je;
+        je["position"] = { E.position.x, E.position.y, E.position.z };
+        je["colorStart"] = { E.colorStart.x, E.colorStart.y, E.colorStart.z };
+        je["colorEnd"] = { E.colorEnd.x, E.colorEnd.y, E.colorEnd.z };
+
+        je["alphaStart"] = E.alphaStart;
+        je["alphaEnd"] = E.alphaEnd;
+
+        je["particlesLifeSpan"] = E.particlesLifeSpan;
+        je["particlesBaseSpeed"] = E.particlesBaseSpeed;
+        je["particlesMass"] = E.particlesMass;
+        je["particleSizeStart"] = E.particleSizeStart;
+        je["particleSizeEnd"] = E.particleSizeEnd;
+        je["longitudeMin"] = E.longitudeMin;
+        je["longitudeMax"] = E.longitudeMax;
+        je["latitudeMin"] = E.latitudeMin;
+        je["latitudeMax"] = E.latitudeMax;
+        je["maxSpawn"] = E.maxSpawn;
+
+        // rotMatrix 4x4 row-major
+        json mat = json::array();
+        for (int r = 0; r < 4; ++r) {
+            for (int c = 0; c < 4; ++c) {
+                mat.push_back(E.rotMatrix(r, c));
+            }
+        }
+        je["rotMatrix"] = mat;
+
+        j["Emitter"] = je;
+
+        // Simulation
+        const auto& S = m_simulateParticlesConstantBufferData;
+        json js;
+        js["force"] = { S.force.x, S.force.y, S.force.z };
+        j["Simulate"] = js;
+
+        return j;
+    }
 }

@@ -42,8 +42,8 @@ namespace SE
         
         int                                                 m_currentAliveBuffer = 0;
 
-        Microsoft::WRL::ComPtr<ID3D11Buffer>                m_indirectDispatchArgsBuffer[2];    // ��� ���� �������
-        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView>   m_indirectDispatchArgsUAV[2];       // ��� ����������
+        Microsoft::WRL::ComPtr<ID3D11Buffer>                m_indirectDispatchArgsBuffer[2];
+        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView>   m_indirectDispatchArgsUAV[2];
 
         struct InitIndirectComputeArgs1DConstantBuffer
         {
@@ -72,7 +72,9 @@ namespace SE
 
         uint32_t m_maxParticles = 4 * 1024;
 
-        float m_emissionRate = 100.0f;  // tool
+        bool m_enabled = false;
+        float m_deaultEmissionRate = 0.0f;
+        float m_emissionRate = 0.0f;
         float m_emissionRateAccumulation = 0.0f;
 
         struct EmitterPointConstantBuffer
@@ -83,20 +85,23 @@ namespace SE
             float particlesLifeSpan;
             
             DXSM::Vector3 colorStart;
-            float particlesBaseSpeed;
+            float alphaStart;
 
             DXSM::Vector3 colorEnd;
-            float particlesMass;
+            float alphaEnd;
 
+            float particlesBaseSpeed;
+            float particlesMass;
             float particleSizeStart;
             float particleSizeEnd;
+
             float longitudeMin;
             float longitudeMax;
-
             float latitudeMin;
             float latitudeMax;
+
             uint32_t maxSpawn;
-            float emitterPadding;
+            DXSM::Vector3 emitterPadding;
 
             /*
             float particleScreenSpinSpeed;
@@ -118,14 +123,19 @@ namespace SE
         SimulateParticlesConstantBuffer  m_simulateParticlesConstantBufferData;
         Microsoft::WRL::ComPtr<ID3D11Buffer>    m_simulateParticlesConstantBuffer;
 
-        eastl::unique_ptr<SE_G::Bind::Texture> m_texture;
+        eastl::shared_ptr<SE_G::Bind::Texture> m_texture;
+
+        TransformComponent* m_transformComp = nullptr;
 
         ParticleSystem* m_particleSystem;
 
+        ParticleData();
         ParticleData(ParticleSystem* particleSystem,
             EmitterPointConstantBuffer emitterDesc,
             SimulateParticlesConstantBuffer simulatorDesc);
         ~ParticleData();
+
+        void InitGraphicsResources();
 
         void UpdateEmitter(float deltaTime);
 
@@ -138,13 +148,20 @@ namespace SE
         void RenderPass();
 
         void SetEmissionRate(float emissionRate);
+
+        void EnableEmission();
+        void DisableEmission();
+
         void IncrementEmissionRate(float deltaEmissionRate);
         void DecrementEmissionRate(float deltaEmissionRate);
 
         void SetEmitPosition(DXSM::Vector3 newPosition);
         void SetEmitDir(DXSM::Vector3 newEmitDir);
 
-        void SetTexture(eastl::unique_ptr<SE_G::Bind::Texture> newTexture);
+        void SetTexture(eastl::shared_ptr<SE_G::Bind::Texture> newTexture);
+
+        static eastl::shared_ptr<ParticleData> FromJson(const json& j, ParticleSystem* particleSystem);
+        json ToJson() const;
     };
 
     class ParticleEmitter :
@@ -152,7 +169,9 @@ namespace SE
         //public GameObject
     {
     public:
-        eastl::unique_ptr<ParticleData> m_particleData;
+        eastl::shared_ptr<ParticleData> m_particleData;
+
+        ParticleEmitter();
 
         ParticleEmitter(
             ParticleSystem* particleSystem,
@@ -160,6 +179,9 @@ namespace SE
             ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
 
         ~ParticleEmitter();
+
+        static eastl::unique_ptr<ParticleEmitter> FromJson(
+            const json& j, ParticleSystem* particleSystem);
     };
 
     class ParticleEmitter_Info :
@@ -167,7 +189,9 @@ namespace SE
         //public GameObject
     {
     public:
-        eastl::unique_ptr<ParticleData> m_particleData;
+        eastl::shared_ptr<ParticleData> m_particleData;
+
+        ParticleEmitter_Info();
 
         ParticleEmitter_Info(
             ParticleSystem* particleSystem,
@@ -175,6 +199,11 @@ namespace SE
             ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
 
         ~ParticleEmitter_Info();
+
+        virtual json ToJson() const override;
+
+        static eastl::unique_ptr<ParticleEmitter_Info> FromJson(
+            const json& j, ParticleSystem* particleSystem);
     };
 
 }

@@ -139,7 +139,7 @@ public:
     // PlayerObject
     SE::UUID m_playerObject = SE::UUID(0u);
 
-    eastl::unique_ptr<SE::ParticleSystem> m_particleSystem;
+    SE::ParticleSystem* m_particleSystem;
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
