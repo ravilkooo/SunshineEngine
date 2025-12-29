@@ -14,6 +14,7 @@
 #include "Graphics/Lighting/LightData.h"
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 #include <UI/FontStyles.h>
+#include <ResourceManager/ResourceManagerFacade.h>
 
 PropertyPanel::MeshEditor PropertyPanel::s_meshEditor =
 {
@@ -1262,23 +1263,58 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
         const char* srcItems = "Engine\0Project\0";
         ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
 
+        //if (ImGui::Button("Load Texture")) {
+        //    s_meshEditor.m_texError.clear();
+
+        //    AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
+
+        //    std::string relNarrow = s_meshEditor.m_texPathBuf;
+        //    std::wstring relWide(relNarrow.begin(), relNarrow.end());
+
+        //    AssetPath ap(relWide.c_str(), src);
+
+        //    {
+        //        auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap);
+        //        assigned->SetTexture(newTexture);
+        //    }
+
+        //    s_meshEditor.m_editTexture = false;
+        //}
+
         if (ImGui::Button("Load Texture")) {
             s_meshEditor.m_texError.clear();
 
             AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
-
             std::string relNarrow = s_meshEditor.m_texPathBuf;
             std::wstring relWide(relNarrow.begin(), relNarrow.end());
-
             AssetPath ap(relWide.c_str(), src);
 
-            {
-                auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap);
-                assigned->SetTexture(newTexture);
+            eastl::string filePath(relNarrow.c_str());  
+
+            ResourceHandle texHandle = ResourceManagerFacade::Instance().LoadByPath(filePath);
+
+            if (texHandle.guid == 0) {
+                //s_meshEditor.m_texError = "Failed to load texture: " + relNarrow;
+            }
+            else {
+                SE_G::Bind::Texture* texture =
+                    ResourceManagerFacade::Instance().Get<SE_G::Bind::Texture>(texHandle);
+
+                if (texture) {
+                    auto newTexture = eastl::shared_ptr<SE_G::Bind::Texture>(
+                        texture,
+                        [](SE_G::Bind::Texture*) {}
+                    );
+                    assigned->SetTexture(newTexture);
+                }
+                else {
+                    s_meshEditor.m_texError = "Failed to cast loaded resource to Texture";
+                }
             }
 
             s_meshEditor.m_editTexture = false;
         }
+
 
         if (!s_meshEditor.m_texError.empty()) {
             ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
