@@ -542,10 +542,12 @@ void WorldEditor::CreateResourcesScene()
 
 void WorldEditor::Start() {
 	m_renderer->Enable();
+	static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject))->m_miniViewRenderer->Enable();
 }
 
 void WorldEditor::Pause() {
 	m_renderer->Disable();
+	static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject))->m_miniViewRenderer->Disable();
 }
 
 void WorldEditor::Update(float deltaTime)
@@ -562,10 +564,6 @@ void WorldEditor::SyncronizeTransforms() {
 	m_physicsSystem->SyncronizeTransforms(&m_scene);
 }
 */
-
-void WorldEditor::Render() {
-
-}
 
 void WorldEditor::CloseProject()
 {

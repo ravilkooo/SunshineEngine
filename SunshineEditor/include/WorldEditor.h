@@ -89,7 +89,6 @@ public:
 
     void Update(float deltaTime);
     //void SyncronizeTransforms();
-    void Render();
     void CloseProject();
     void ClearScene();
 

@@ -10,6 +10,9 @@
 
 #include <Component/TransformComponent.h>
 
+#include <cstdlib>
+#include <ctime>
+
 namespace SE
 {
 	void ParticleSystem::LoadCS(AssetPath shaderPath, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& m_computeShader)
@@ -59,6 +62,9 @@ namespace SE
 		eastl::shared_ptr<SE_G::Camera> camera)
 		: m_renderer(renderer), m_camera(camera)
 	{
+		// Seed random number generator for particle emission
+		std::srand(static_cast<unsigned int>(std::time(nullptr)));
+		
 		auto device = m_renderer->GetDevice();
 
 		AssetPath shaderPath(L"Shaders/Particles/ResetCShader.hlsl");

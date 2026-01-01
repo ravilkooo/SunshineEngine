@@ -95,6 +95,7 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	auto device = renderSystem->GetDevice();
 	obj->m_group = GameObjectGroup::CustomMesh;
 	obj->m_name = "CustomObject";
+	obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
 
 	// TransformComponent
 	auto tc_info = obj->AddComponent<TransformComponent_Info>(device);

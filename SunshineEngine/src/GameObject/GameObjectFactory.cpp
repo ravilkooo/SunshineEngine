@@ -32,6 +32,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
 {
 	auto obj = eastl::make_unique<GameObject>();
 	obj->m_name = "CustomObject";
+	obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
 
 	auto device = renderSystem->GetDevice();
 

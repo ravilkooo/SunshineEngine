@@ -56,7 +56,6 @@ public:
     void Stop();
 
     virtual void Update(float deltaTime);
-    void Render();
     void ClearScene();
 
     bool LoadScene(const wchar_t* scenePath);

@@ -8,12 +8,12 @@
 
 Game::Game()
 {
-	//Initialize();
+	// Initialize();
 }
 
 Game::~Game()
 {
-	// Освобождение ресурсов
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 }
 
 void Game::SetupRendering(
@@ -66,7 +66,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	}
 	json j;
 	try {
-		file >> j; // прочитать json из файла
+		file >> j; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ json пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	}
 	catch (const std::exception& e) {
 		//LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()));
@@ -264,11 +264,6 @@ void Game::Update(float deltaTime) {
 
 	 // For Volodya
 	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
-}
-
-void Game::Render()
-{
-	// m_renderer->RenderScene(m_scene);
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {

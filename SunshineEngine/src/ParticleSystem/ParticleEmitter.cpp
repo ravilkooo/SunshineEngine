@@ -357,12 +357,17 @@ namespace SE
         context->CSSetUnorderedAccessViews(1, 1, m_particleUAV.GetAddressOf(), initialCount);
         context->CSSetUnorderedAccessViews(2, 1, m_indirectDispatchArgsUAV[m_currentAliveBuffer].GetAddressOf(), initialCount);
 
+        // Reset alive list counters so subsequent appends start at 0
+        UINT zeroCount[] = { 0 };
+        context->CSSetUnorderedAccessViews(3, 1, m_aliveIndexUAV[0].GetAddressOf(), zeroCount);
+        context->CSSetUnorderedAccessViews(4, 1, m_aliveIndexUAV[1].GetAddressOf(), zeroCount);
+
         context->CSSetShader(m_particleSystem->m_resetCShader.Get(), nullptr, 0);
 
         context->Dispatch(Align(m_maxParticles, 256u) / 256, 1, 1);
 
-        ID3D11UnorderedAccessView* uavs[] = { nullptr,nullptr,nullptr };
-        context->CSSetUnorderedAccessViews(0, 3, uavs, nullptr);
+        ID3D11UnorderedAccessView* uavs[] = { nullptr,nullptr,nullptr,nullptr,nullptr };
+        context->CSSetUnorderedAccessViews(0, 5, uavs, nullptr);
     }
 
     void ParticleData::EmitPass()
