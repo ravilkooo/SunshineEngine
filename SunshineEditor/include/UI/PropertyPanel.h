@@ -98,4 +98,7 @@ private:
 
     eastl::shared_ptr<SE_G::Bind::Texture> DrawTextureSettings(
         eastl::shared_ptr<SE_G::Bind::Texture> texture);
+
+    eastl::shared_ptr<SE_G::Mesh> DrawMeshSettings(
+        eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group);
 };

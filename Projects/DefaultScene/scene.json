@@ -650,14 +650,14 @@
                         1.0
                     ],
                     "m_position": [
-                        1.3000010251998901,
+                        1.3000009059906006,
                         -2.5980756282806396,
                         0.0
                     ],
                     "m_rotation": [
-                        0.0,
-                        -0.8290314078330994,
-                        -0.9738937020301819
+                        -0.00024592416593804955,
+                        -0.014467237517237663,
+                        -0.016997652128338814
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -1122,7 +1122,7 @@
                     ]
                 }
             },
-            "m_UUID": 8982412768983775847,
+            "m_UUID": 10932223924122014009,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1483,6 +1483,58 @@
             "m_UUID": 18132964941149930345,
             "m_group": "ParticleEmitter",
             "m_name": "ParticleEmitter",
+            "m_parent": null
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/horse.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/horse_Diffuse.dds"
+                    }
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -5.012403964996338,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        20.0,
+                        20.0,
+                        20.0
+                    ]
+                }
+            },
+            "m_UUID": 10322786320495140855,
+            "m_group": "CustomMesh",
+            "m_name": "CustomObject",
             "m_parent": null
         }
     ]
