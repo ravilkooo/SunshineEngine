@@ -30,7 +30,7 @@ namespace SE_G {
 		constexpr BYTE GetA() const;
 		void SetA(BYTE a);
 
-	private:
+	//private:
 		union
 		{
 			BYTE rgba[4];

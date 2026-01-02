@@ -65,7 +65,6 @@ public:
         ~PixelUUIDHandler();
 
         void Init(ID3D11Device* device);
-        void InitResourceLoaders(ID3D11Device* device);
         SE::UUID GetUUID(ID3D11DeviceContext* context,
             ID3D11ShaderResourceView* UUIDTextureView,
             UINT mouseClickX, UINT mouseClickY);
@@ -82,6 +81,8 @@ public:
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
     void SetUpPlayerObject();
+
+    void InitResourceLoaders(ID3D11Device* device);
 
     // Start/Pause worldEditor and it's rendering
     void Start();

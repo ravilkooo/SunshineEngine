@@ -3,10 +3,50 @@
 #include <ResourceManager/Enums/ResourceType.h>
 #include <ResourceManager/ResourceHandle.h>
 
+#include <EASTL/internal/char_traits.h>
+
 
 namespace SE_G {
 	namespace Bind
 	{
+		SE_G::Color Texture::GetColorFromPath(eastl::wstring path)
+		{
+			// L"Color:#####.dds"
+
+			constexpr const wchar_t* kPrefix = L"Color:";
+			constexpr const wchar_t* kSuffix = L".dds";
+
+			const auto p0 = path.find(kPrefix);
+			if (p0 == eastl::wstring::npos)
+				return SE_G::Colors::UnloadedTextureColor;
+
+			const auto start = p0 + 6u;
+
+			const auto p1 = path.find(kSuffix, start);
+			if (p1 == eastl::wstring::npos || p1 < start)
+				return SE_G::Colors::UnloadedTextureColor;
+
+			eastl::wstring numStr = path.substr(start, p1 - start);
+
+			wchar_t* end = nullptr;
+			unsigned long v = std::wcstoul(numStr.c_str(), &end, 10); // base 10
+
+			if (end == numStr.c_str() || *end != L'\0')
+				return SE_G::Colors::UnloadedTextureColor;
+
+			SE_G::Color col;
+			col.color = static_cast<unsigned int>(v);
+			
+			return col;
+		}
+
+		eastl::wstring Texture::ColorToPath(SE_G::Color col)
+		{
+			return eastl::wstring(L"Color:")
+				+ eastl::to_wstring(col.color)
+				+ eastl::wstring(L".dds");
+		}
+
 		Texture::Texture(ID3D11Device* device, ID3D11Resource* pTexture,
 			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc, UINT slot, Bind::PipelineStage pipelineStage)
 			: pTexture(pTexture), m_slot(slot), pipelineStage(pipelineStage)
@@ -44,6 +84,9 @@ namespace SE_G {
 		Texture::Texture(ID3D11Device* device, const Color& color, UINT slot, Bind::PipelineStage pipelineStage)
 			: m_slot(slot), pipelineStage(pipelineStage)
 		{
+			this->m_texturePath = AssetPath(
+				Texture::ColorToPath(color),
+				AssetPath::AssetSource::Engine);
 			this->Initialize1x1ColorTexture(device, color);
 			isNull = false;
 		}
@@ -51,6 +94,9 @@ namespace SE_G {
 		Texture::Texture(ID3D11Device* device, const Color* colorData, UINT width, UINT height, UINT slot, Bind::PipelineStage pipelineStage)
 			: m_slot(slot), pipelineStage(pipelineStage)
 		{
+			this->m_texturePath = AssetPath(
+				Texture::ColorToPath(*colorData),
+				AssetPath::AssetSource::Engine);
 			this->InitializeColorTexture(device, colorData, width, height);
 			isNull = false;
 		}

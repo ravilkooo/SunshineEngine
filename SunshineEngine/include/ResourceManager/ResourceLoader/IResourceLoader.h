@@ -7,6 +7,8 @@
 
 #include <Utils/AssetPath.h>
 
+#include <EASTL/vector.h>
+
 class IResourceLoader
 {
 public:

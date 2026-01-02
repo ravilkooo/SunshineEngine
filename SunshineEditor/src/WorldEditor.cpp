@@ -4,9 +4,7 @@
 #include <Component/LuaComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <fstream>   // std::ofstream
-#include <ResourceManager/ResourceLoader/TextureLoader.h>
 #include <EASTL/unique_ptr.h>
-#include <ResourceManager/ResourceManagerFacade.h>
 
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
@@ -75,18 +73,7 @@ void WorldEditor::PixelUUIDHandler::Init(ID3D11Device* device) {
 		nullptr,
 		m_UUIDOnMouseClickShader.GetAddressOf()
 	);
-	InitResourceLoaders(device);
 	return;
-}
-
-void WorldEditor::PixelUUIDHandler::InitResourceLoaders(ID3D11Device* device)
-{
-
-	ResourceManagerFacade::Instance().Initialize(256 * 1024 * 1024);
-
-	auto texLoader = eastl::make_unique<TextureLoader>(device);
-	ResourceLoaderFactory::RegisterLoader(SunshineResource::ResourceType::TEXTURE,
-		eastl::move(texLoader));
 }
 
 SE::UUID WorldEditor::PixelUUIDHandler::GetUUID(ID3D11DeviceContext* context,

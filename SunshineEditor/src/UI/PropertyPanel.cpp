@@ -1485,7 +1485,7 @@ eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
                         texture,
                         [](SE_G::Bind::Texture*) {}
                     );
-                    newTexture->m_texturePath = ap;
+                    newTexture->m_texturePath = texture->m_texturePath;
                 }
                 else {
                     s_meshEditor.m_texError = "Failed to cast loaded resource to Texture";

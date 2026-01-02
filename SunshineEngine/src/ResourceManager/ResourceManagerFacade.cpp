@@ -1,5 +1,7 @@
 #include <ResourceManager/ResourceManagerFacade.h>
 
+#include <Graphics/GraphicsResources/Texture.h>
+
 void ResourceManagerFacade::Initialize(size_t maxMemorySize)
 {
     auto& rm = ResourceManagerFacade::Instance();
@@ -9,7 +11,7 @@ void ResourceManagerFacade::Initialize(size_t maxMemorySize)
 ResourceHandle ResourceManagerFacade::LoadByPath(const AssetPath& path)
 {
     auto fullPath = WStringToUtf8(path.GetFullPath());
-    const ResourceGUID guid = ComputeGUID(fullPath);
+    ResourceGUID guid = ComputeGUID(fullPath);
 
     // If already present, just bump ref and return
     if (m_registry.Contains(guid)) {
@@ -30,6 +32,19 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const AssetPath& path)
     if (!res) {
         printSunshineErrorMessage(("Failed to load resource: {}", fullPath.c_str()));
         return ResourceHandle{ guid, 0u };
+    }
+
+    if (res->GetType() == SunshineResource::ResourceType::TEXTURE)
+    {
+        fullPath = WStringToUtf8(static_cast<SE_G::Bind::Texture*>(res)->m_texturePath.GetFullPath());
+        guid = ComputeGUID(fullPath);
+        /*
+        if (m_registry.Contains(guid)) {
+            m_registry.IncrementRefCount(guid);
+            ResourceEntry* entry = m_registry.GetEntry(guid);
+            return entry ? entry->handle : ResourceHandle{ guid, 0u };
+        }
+        */
     }
 
     // Post-load initialization
