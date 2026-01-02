@@ -10,16 +10,18 @@ class AssetPath
 {
 public:
 	enum class AssetSource {
-		Engine, Project
+		Engine,
+		Project,
+		/* Only for devs! Don't show t0 users!*/ Absolute,
 	} m_assetSource = AssetSource::Project;
 
 	static eastl::wstring s_projectPath;
 
-	AssetPath(eastl::wstring relativePath = L"", AssetSource assetSource = AssetSource::Engine);
+	explicit AssetPath(eastl::wstring relativePath = L"", AssetSource assetSource = AssetSource::Engine);
 
 	eastl::wstring m_assetRelativePath;
 
-	eastl::wstring GetFullPath();
+	eastl::wstring GetFullPath() const;
 
 	json ToJson() const;
 	void FromJson(const json& j);
@@ -28,5 +30,6 @@ public:
 	NLOHMANN_JSON_SERIALIZE_ENUM(AssetSource, {
 		{AssetSource::Engine, "Engine"},
 		{AssetSource::Project, "Project"},
+		{AssetSource::Absolute, "Absolute"},
 		});
 };

@@ -8,15 +8,19 @@ AssetPath::AssetPath(eastl::wstring relativePath, AssetSource assetSource)
 
 eastl::wstring AssetPath::s_projectPath = eastl::wstring(L"");
 
-eastl::wstring AssetPath::GetFullPath()
+eastl::wstring AssetPath::GetFullPath() const
 {
 	if (m_assetSource == AssetSource::Project)
 	{
 		return s_projectPath + m_assetRelativePath;
 	}
-	else
+	else if (m_assetSource == AssetSource::Engine)
 	{
 		return ENGINE_ASSETS_DIR + m_assetRelativePath;
+	}
+	else if (m_assetSource == AssetSource::Absolute)
+	{
+		return m_assetRelativePath;
 	}
 }
 

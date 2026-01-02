@@ -6,6 +6,8 @@
 
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
 namespace SE
 {
     ParticleEmitter::ParticleEmitter()
@@ -512,7 +514,7 @@ namespace SE
 
             //context->PSSetSamplers(0, 1, RenderStatesHelper::LinearClamp().GetAddressOf());
             //context-> // m_renderParticlePS->setSRV(0, m_particleTexture1SRV);
-            m_texture->Bind(context);
+            m_texture->Bind(context, 0u);
 
             context->DrawInstancedIndirect(m_indirectDrawArgsBuffer.Get(), 0);
 
@@ -705,21 +707,37 @@ namespace SE
         }
 
         // Texture
+        auto device = particleData->m_particleSystem->m_renderer->GetDevice();
+        auto& rm = ResourceManagerFacade::Instance();
+        AssetPath texPath;
         if (j.contains("Texture")) {
-            AssetPath texPath;
             texPath.FromJson(j["Texture"]);
-
-            auto device = particleData->m_particleSystem->m_renderer->GetDevice();
-            auto tex = eastl::make_shared<SE_G::Bind::Texture>(device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
-            particleData->SetTexture(tex);
         }
         else {
-            auto device = particleData->m_particleSystem->m_renderer->GetDevice();
-            auto tex = eastl::make_shared<SE_G::Bind::Texture>(device,
-                AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
-                SE_G::Bind::PipelineStage::PIXEL_SHADER);
-            particleData->SetTexture(tex);
+            texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
         }
+        ResourceHandle texHandle = rm.LoadByPath(texPath);
+        SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+        if (texRes)
+        {
+            auto particleTex = eastl::shared_ptr<SE_G::Bind::Texture>(
+                texRes,
+                [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+            particleData->SetTexture(particleTex);
+        }
+        else
+        {
+            auto particleTex = eastl::make_shared<SE_G::Bind::Texture>(
+                device, texPath, 0u,
+                SE_G::Bind::PipelineStage::PIXEL_SHADER);
+            particleData->SetTexture(particleTex);
+        }
+        /*
+        auto device = particleData->m_particleSystem->m_renderer->GetDevice();
+        auto tex = eastl::make_shared<SE_G::Bind::Texture>(device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+        particleData->SetTexture(tex);
+        */
 
         particleData->InitGraphicsResources();
 

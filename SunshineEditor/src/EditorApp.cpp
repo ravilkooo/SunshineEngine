@@ -4,6 +4,9 @@
 #include <filesystem>
 #include <Utils/AssetPath.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+#include <ResourceManager/ResourceLoader/TextureLoader.h>
+
 EditorApp::EditorApp()
 {
 
@@ -32,7 +35,8 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Init WorldEditor with all it's passes
 	m_worldEditor = eastl::make_shared<WorldEditor>();
 	m_worldEditor->SetupRendering(m_renderingSystem, worldEditorWidth, worldEditorHeight);
-	
+	InitResourceLoaders(m_renderingSystem->GetDevice());
+
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
 	sol_ImGui::Init(m_lua);
@@ -194,6 +198,25 @@ void EditorApp::RunApp()
 	m_worldEditor->ClearScene();
 
 	SE::SaveProjects(imguiEditorPass->m_ProjectSelector.m_projectsList);
+}
+
+void EditorApp::InitResourceLoaders(ID3D11Device* device)
+{
+	ResourceManagerFacade::Instance().Initialize(256 * 1024 * 1024);
+
+	auto texLoader = eastl::make_unique<TextureLoader>(device);
+	ResourceLoaderFactory::RegisterLoader(SunshineResource::ResourceType::TEXTURE,
+		eastl::move(texLoader));
+
+	AssetPath ap(
+		SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnhandledTextureColor),
+		AssetPath::AssetSource::Engine);
+	ResourceManagerFacade::Instance().LoadByPath(ap);
+
+	ap = AssetPath(
+		SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
+		AssetPath::AssetSource::Engine);
+	ResourceManagerFacade::Instance().LoadByPath(ap);
 }
 
 void EditorApp::UpdateGame(float deltaTime)

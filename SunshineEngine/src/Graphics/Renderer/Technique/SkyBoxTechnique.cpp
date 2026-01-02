@@ -3,6 +3,8 @@
 #include <Utils/StringUtils.h>
 #include <Component/TransformComponent.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
 namespace SE_G {
     SkyBoxTechnique::SkyBoxTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
         eastl::string technique,
@@ -22,13 +24,33 @@ namespace SE_G {
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
         m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 
+        /*
+        m_texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device,
+            assetPath,
+            4u,
+            SE_G::Bind::PipelineStage::PIXEL_SHADER
+        );
+        */
+
+        auto& rm = ResourceManagerFacade::Instance();
+        ResourceHandle texHandle = rm.LoadByPath(assetPath);
+        SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+        if (texRes)
+        {
+            m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+                texRes,
+                [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+            m_texture->SetSlot(4u);
+        }
+        else
         {
             m_texture = eastl::make_shared<SE_G::Bind::Texture>(
                 device,
                 assetPath,
                 4u,
-                SE_G::Bind::PipelineStage::PIXEL_SHADER
-            );
+                SE_G::Bind::PipelineStage::PIXEL_SHADER);
         }
 
         m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
@@ -49,6 +71,54 @@ namespace SE_G {
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
             device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/SkyBoxPShader.hlsl").c_str());
 
+    }
+
+    void SkyBoxTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    {
+        for (size_t i = 0; i < m_bindables.size(); i++)
+        {
+            m_bindables[i]->Bind(context.Get());
+        }
+
+        if (m_vertexShader) {
+            m_vertexShader->Bind(context.Get());
+        }
+
+        if (m_pixelShader) {
+            m_pixelShader->Bind(context.Get());
+        }
+
+        if (m_texture) {
+            m_texture->Bind(context.Get(), 4u);
+        }
+
+        if (m_textureSampler) {
+            m_textureSampler->Bind(context.Get());
+        }
+
+        if (m_lightDataBuffer) {
+            m_lightDataBuffer->Bind(context.Get());
+        }
+
+        if (m_blendState)
+            m_blendState->Bind(context.Get());
+
+        if (m_mesh)
+            m_mesh->Bind(context.Get());
+
+        LightPosition lightPos = GetLightPositionInFrustum();
+        // Choose rasterizer
+        ChooseRasterizer(context.Get(), lightPos);
+        // Choose depthState
+        ChooseDepthStencilState(context.Get(), lightPos);
+
+        // Bind rasterizer
+        if (m_rasterizer)
+            m_rasterizer->Bind(context.Get());
+
+        // Bind depthState
+        if (m_depthStencilState)
+            m_depthStencilState->Bind(context.Get());
     }
 
     void SkyBoxTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

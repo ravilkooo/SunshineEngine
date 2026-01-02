@@ -1,14 +1,17 @@
 #include <ResourceManager/ResourceManagerFacade.h>
 
+#include <Graphics/GraphicsResources/Texture.h>
+
 void ResourceManagerFacade::Initialize(size_t maxMemorySize)
 {
     auto& rm = ResourceManagerFacade::Instance();
     rm.m_memoryManager = eastl::make_unique<StackMemoryManager>(maxMemorySize);
 }
 
-ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
+ResourceHandle ResourceManagerFacade::LoadByPath(const AssetPath& path)
 {
-    const ResourceGUID guid = ComputeGUID(path);
+    auto fullPath = WStringToUtf8(path.GetFullPath());
+    ResourceGUID guid = ComputeGUID(fullPath);
 
     // If already present, just bump ref and return
     if (m_registry.Contains(guid)) {
@@ -17,7 +20,7 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
         return entry ? entry->handle : ResourceHandle{ guid, 0u };
     }
 
-    IResourceLoader* loader = ResourceLoaderFactory::GetLoaderForFile(path);
+    IResourceLoader* loader = ResourceLoaderFactory::GetLoaderForFile(fullPath);
 
     if (!loader) {
         static CompositeResourceLoader compositeLoader;
@@ -27,8 +30,21 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
     IResource* res = loader->Load(path, &m_registry, m_memoryManager.get());
 
     if (!res) {
-        printSunshineErrorMessage(("Failed to load resource: {}", path.c_str()));
+        printSunshineErrorMessage(("Failed to load resource: {}", fullPath.c_str()));
         return ResourceHandle{ guid, 0u };
+    }
+
+    if (res->GetType() == SunshineResource::ResourceType::TEXTURE)
+    {
+        fullPath = WStringToUtf8(static_cast<SE_G::Bind::Texture*>(res)->m_texturePath.GetFullPath());
+        guid = ComputeGUID(fullPath);
+        /*
+        if (m_registry.Contains(guid)) {
+            m_registry.IncrementRefCount(guid);
+            ResourceEntry* entry = m_registry.GetEntry(guid);
+            return entry ? entry->handle : ResourceHandle{ guid, 0u };
+        }
+        */
     }
 
     // Post-load initialization
@@ -37,8 +53,8 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const eastl::string& path)
     // Register in registry if not already registered by the loader
     if (!m_registry.Contains(guid)) {
         ResourceHandle handle{ guid, 1u };
-        if (!m_registry.Register(handle, res, path)) {
-            printSunshineErrorMessage(("Failed to register resource: {}", path.c_str()));
+        if (!m_registry.Register(handle, res, fullPath)) {
+            printSunshineErrorMessage(("Failed to register resource: {}", fullPath.c_str()));
             res->PreUnload();
             m_memoryManager->Deallocate(res, res->GetSizeInMemory());
             return ResourceHandle{ guid, 0u };
