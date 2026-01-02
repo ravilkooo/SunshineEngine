@@ -1,8 +1,12 @@
 #include <GameObject/Shapes/SphereShapeObject.h>
-#include <Graphics/Renderer/Technique/ColliderTechnique.h>
+
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>
+
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Graphics/GraphicsResources/Texture.h>
+
+#include <ResourceManager/ResourceManagerFacade.h>
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	SE_G::DeferredRenderer* renderSystem, SphereShapeData initData)
@@ -22,11 +26,32 @@ SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	auto mesh = SE_G::Mesh::CreateSphereMesh(device, initData.Size, initData.SliceCount, initData.StackCount);
 	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, mesh);
 
+	/*
 	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
 		rc_info->GetDevice(),
 		AssetPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mesh_info->SetTexture(texture);
+	*/
+	auto& rm = ResourceManagerFacade::Instance();
+	AssetPath texPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
+	ResourceHandle texHandle = rm.LoadByPath(texPath);
+	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+	if (texRes)
+	{
+		auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+			texRes,
+			[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+		mesh_info->SetTexture(texture);
+	}
+	else
+	{
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			renderSystem->GetDevice(), texPath, 0u,
+			SE_G::Bind::PipelineStage::PIXEL_SHADER);
+		mesh_info->SetTexture(texture);
+	}
 }
 
 SphereShapeObject_Info::SphereShapeObject_Info(SE_G::DeferredRenderer* renderSystem, SphereShapeData initData) :
@@ -59,22 +84,31 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	auto newMesh = SE_G::Mesh::CreateSphereMesh(device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
+	AssetPath texPath;
 	if (j["components"]["Mesh"].contains("Texture"))
 	{
-		AssetPath texPath;
 		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
-
-		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-			device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
-
-		mesh_info->SetTexture(texture);
 	}
 	else {
-		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-			device,
-			AssetPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
-			SE_G::Bind::PipelineStage::PIXEL_SHADER);
+		texPath = AssetPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
+	}
 
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle texHandle = rm.LoadByPath(texPath);
+	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+	if (texRes)
+	{
+		auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+			texRes,
+			[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+		mesh_info->SetTexture(texture);
+	}
+	else
+	{
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			renderSystem->GetDevice(), texPath, 0u,
+			SE_G::Bind::PipelineStage::PIXEL_SHADER);
 		mesh_info->SetTexture(texture);
 	}
 

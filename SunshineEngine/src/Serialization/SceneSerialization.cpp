@@ -36,6 +36,8 @@
 
 #include <Physics/PhysicsSystem.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -197,20 +199,42 @@ void MeshData::FromJson(const json& j, ID3D11Device* device)
     }
 
     // Texture
+    AssetPath texPath;
     if (j.contains("Texture"))
     {
-        AssetPath texPath;
         texPath.FromJson(j["Texture"]);
-
-        m_texture = eastl::make_shared<SE_G::Bind::Texture>(
-            device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
     }
     else {
+        texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
+    }
+    /*
+    m_texture = eastl::make_shared<SE_G::Bind::Texture>(
+        device,
+        texPath, 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    */
+    auto& rm = ResourceManagerFacade::Instance();
+    ResourceHandle texHandle = rm.LoadByPath(texPath);
+    SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+    if (texRes)
+    {
+        m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+            texRes,
+            [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+        //mc_info->SetTexture(texture);
+    }
+    else
+    {
         m_texture = eastl::make_shared<SE_G::Bind::Texture>(
             device,
-            AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
+            AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine),
+            0u,
             SE_G::Bind::PipelineStage::PIXEL_SHADER);
+        //mc_info->SetTexture(texture);
     }
+
+
 
     // Sampler
     if (j.contains("Sampler")) {

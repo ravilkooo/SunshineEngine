@@ -238,8 +238,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Textures/DefaultSphereTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "Textures/eye.dds"
                     }
                 },
                 "Physics": {
@@ -968,8 +968,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Textures/DefaultSphereTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "Textures/pixeleye.dds"
                     }
                 },
                 "Physics": {
@@ -1122,7 +1122,7 @@
                     ]
                 }
             },
-            "m_UUID": 9395943354370303731,
+            "m_UUID": 8982412768983775847,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1419,7 +1419,7 @@
                 }
             },
             "emitterData": {
-                "EmissionRate": 30.0,
+                "EmissionRate": 1.0,
                 "Emitter": {
                     "alphaEnd": 0.0,
                     "alphaStart": 1.0,
@@ -1437,7 +1437,7 @@
                     "latitudeMin": 0.0,
                     "longitudeMax": 6.2831854820251465,
                     "longitudeMin": 0.0,
-                    "maxSpawn": 1,
+                    "maxSpawn": 0,
                     "particleSizeEnd": 0.800000011920929,
                     "particleSizeStart": 0.4000000059604645,
                     "particlesBaseSpeed": 6.0,
@@ -1467,7 +1467,7 @@
                         1.0
                     ]
                 },
-                "MaxParticles": 4096,
+                "MaxParticles": 1024,
                 "Simulate": {
                     "force": [
                         0.0,

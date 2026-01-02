@@ -3,6 +3,8 @@
 #include <Utils/StringUtils.h>
 #include <Component/TransformComponent.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
 namespace SE_G {
     SkyBoxTechnique::SkyBoxTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
         eastl::string technique,
@@ -22,13 +24,33 @@ namespace SE_G {
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
         m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 
+        /*
+        m_texture = eastl::make_shared<SE_G::Bind::Texture>(
+            device,
+            assetPath,
+            4u,
+            SE_G::Bind::PipelineStage::PIXEL_SHADER
+        );
+        */
+
+        auto& rm = ResourceManagerFacade::Instance();
+        ResourceHandle texHandle = rm.LoadByPath(assetPath);
+        SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+        if (texRes)
+        {
+            m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+                texRes,
+                [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+            m_texture->SetSlot(4u);
+        }
+        else
         {
             m_texture = eastl::make_shared<SE_G::Bind::Texture>(
                 device,
                 assetPath,
                 4u,
-                SE_G::Bind::PipelineStage::PIXEL_SHADER
-            );
+                SE_G::Bind::PipelineStage::PIXEL_SHADER);
         }
 
         m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
