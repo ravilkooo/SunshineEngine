@@ -156,9 +156,14 @@ namespace SE_G {
 				context->PSSetShaderResources(m_slot, 1u, pTextureView.GetAddressOf());
 			else if (pipelineStage == Bind::PipelineStage::COMPUTE_SHADER)
 				context->CSSetShaderResources(m_slot, 1u, pTextureView.GetAddressOf());
-			//context->PSSetShaderResources(0, 1u, pTextureView.GetAddressOf());
+		}
 
-
+		void Texture::Bind(ID3D11DeviceContext* context, UINT slot) noexcept
+		{
+			if (pipelineStage == Bind::PipelineStage::PIXEL_SHADER)
+				context->PSSetShaderResources(slot, 1u, pTextureView.GetAddressOf());
+			else if (pipelineStage == Bind::PipelineStage::COMPUTE_SHADER)
+				context->CSSetShaderResources(slot, 1u, pTextureView.GetAddressOf());
 		}
 
 		void Texture::Unbind(ID3D11DeviceContext* context) noexcept

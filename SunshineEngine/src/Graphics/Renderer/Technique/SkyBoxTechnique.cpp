@@ -73,6 +73,54 @@ namespace SE_G {
 
     }
 
+    void SkyBoxTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    {
+        for (size_t i = 0; i < m_bindables.size(); i++)
+        {
+            m_bindables[i]->Bind(context.Get());
+        }
+
+        if (m_vertexShader) {
+            m_vertexShader->Bind(context.Get());
+        }
+
+        if (m_pixelShader) {
+            m_pixelShader->Bind(context.Get());
+        }
+
+        if (m_texture) {
+            m_texture->Bind(context.Get(), 4u);
+        }
+
+        if (m_textureSampler) {
+            m_textureSampler->Bind(context.Get());
+        }
+
+        if (m_lightDataBuffer) {
+            m_lightDataBuffer->Bind(context.Get());
+        }
+
+        if (m_blendState)
+            m_blendState->Bind(context.Get());
+
+        if (m_mesh)
+            m_mesh->Bind(context.Get());
+
+        LightPosition lightPos = GetLightPositionInFrustum();
+        // Choose rasterizer
+        ChooseRasterizer(context.Get(), lightPos);
+        // Choose depthState
+        ChooseDepthStencilState(context.Get(), lightPos);
+
+        // Bind rasterizer
+        if (m_rasterizer)
+            m_rasterizer->Bind(context.Get());
+
+        // Bind depthState
+        if (m_depthStencilState)
+            m_depthStencilState->Bind(context.Get());
+    }
+
     void SkyBoxTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
     {
         // to-do: update only when changed

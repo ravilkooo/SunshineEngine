@@ -127,7 +127,7 @@ GPassTechnique& GPassTechnique::operator=(GPassTechnique&& other) noexcept
 		RenderTechnique::BindAll(context);
 		m_uuidBuffer->Bind(context.Get());
 		m_meshData->m_mesh->Bind(context.Get());
-		m_meshData->m_texture->Bind(context.Get());
+		m_meshData->m_texture->Bind(context.Get(), 0u);
 		m_meshData->m_textureSampler->Bind(context.Get());
 	}
 

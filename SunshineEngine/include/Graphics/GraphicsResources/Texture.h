@@ -54,6 +54,7 @@ namespace SE_G {
 			};
 
 			void Bind(ID3D11DeviceContext* context) noexcept override;
+			void Bind(ID3D11DeviceContext* context, UINT slot) noexcept override;
 			void Unbind(ID3D11DeviceContext* context) noexcept override;
 
 			void UpdateTextureView(ID3D11ShaderResourceView* pTextureView);

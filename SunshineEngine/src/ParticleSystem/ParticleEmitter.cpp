@@ -514,7 +514,7 @@ namespace SE
 
             //context->PSSetSamplers(0, 1, RenderStatesHelper::LinearClamp().GetAddressOf());
             //context-> // m_renderParticlePS->setSRV(0, m_particleTexture1SRV);
-            m_texture->Bind(context);
+            m_texture->Bind(context, 0u);
 
             context->DrawInstancedIndirect(m_indirectDrawArgsBuffer.Get(), 0);
 
