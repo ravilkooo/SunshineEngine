@@ -356,70 +356,11 @@ void PropertyPanel::DrawSkyBoxDetails(SkyBox_Info* skyBoxObj)
 
         auto tex = skyBoxObj->m_lightTech->m_texture;
 
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
-        ImGui::Text("Texture settings");
-        EditorUI::FontStyles::Pop();
-
-        if (tex) {
-            eastl::wstring tpath = tex->GetCurrentTexturePath().m_assetRelativePath;
-            // convert wstring to narrow string for ImGui display
-            std::wstring ws = tpath.c_str();
-            std::string s(ws.begin(), ws.end());
-            if (tex->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
-            {
-                ImGui::Text("Engine asset");
-            }
-            ImGui::Text("Texture: %s", s.c_str());
-        }
-        else {
-            ImGui::TextDisabled("Texture: (none)");
-        }
-
-        // Editing button
-        if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
-            s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
-            s_meshEditor.m_texError.clear();
-            // опционально: при открытии заполнить поля текущими значениями
-            if (s_meshEditor.m_editTexture && tex) {
-                AssetPath cur = tex->GetCurrentTexturePath();
-                std::wstring ws = cur.m_assetRelativePath.c_str();
-                std::string  s(ws.begin(), ws.end());
-                strncpy(s_meshEditor.m_texPathBuf, s.c_str(), sizeof(s_meshEditor.m_texPathBuf) - 1);
-                s_meshEditor.m_texPathBuf[sizeof(s_meshEditor.m_texPathBuf) - 1] = 0;
-                s_meshEditor.m_texAssetSource = cur.m_assetSource;
-            }
-        }
-
-        // Editing panel
-        if (s_meshEditor.m_editTexture) {
-            ImGui::Separator();
-
-            ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
-
-            const char* srcItems = "Engine\0Project\0";
-            ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
-
-            if (ImGui::Button("Load Texture")) {
-                s_meshEditor.m_texError.clear();
-
-                AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
-
-                std::string relNarrow = s_meshEditor.m_texPathBuf;
-                std::wstring relWide(relNarrow.begin(), relNarrow.end());
-
-                AssetPath ap(relWide.c_str(), src);
-
-                {
-                    auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap, 4u);
-                    skyBoxObj->SetTexture(newTexture);
-                }
-
-                s_meshEditor.m_editTexture = false;
-            }
-
-            if (!s_meshEditor.m_texError.empty()) {
-                ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
-            }
+        auto newTexture = DrawTextureSettings(tex);
+        if (newTexture)
+        {
+            newTexture->SetSlot(4u);
+            skyBoxObj->SetTexture(newTexture);
         }
 
         ImGui::Separator();
@@ -1312,107 +1253,12 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     // Texture
     auto tex = assigned->GetTexture();
 
-    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
-    ImGui::Text("Texture settings");
-    EditorUI::FontStyles::Pop();
-
-    if (tex) {
-
-        eastl::wstring tpath = tex->GetCurrentTexturePath().m_assetRelativePath;
-        // convert wstring to narrow string for ImGui display
-        std::wstring ws = tpath.c_str();
-        std::string s(ws.begin(), ws.end());
-        if (tex->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
-        {
-            ImGui::Text("Engine asset");
-        }
-        ImGui::Text("Texture: %s", s.c_str());
-    } else {
-        ImGui::TextDisabled("Texture: (none)");
+    auto newTexture = DrawTextureSettings(tex);
+    if (newTexture)
+    {
+        newTexture->SetSlot(0u);
+        assigned->SetTexture(newTexture);
     }
-
-    // Editing button
-    if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
-        s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
-        s_meshEditor.m_texError.clear();
-        // опционально: при открытии заполнить поля текущими значениями
-        if (s_meshEditor.m_editTexture && tex) {
-            AssetPath cur = tex->GetCurrentTexturePath();
-            std::wstring ws = cur.m_assetRelativePath.c_str();
-            std::string  s(ws.begin(), ws.end());
-            strncpy(s_meshEditor.m_texPathBuf, s.c_str(), sizeof(s_meshEditor.m_texPathBuf) - 1);
-            s_meshEditor.m_texPathBuf[sizeof(s_meshEditor.m_texPathBuf) - 1] = 0;
-            s_meshEditor.m_texAssetSource = cur.m_assetSource;
-        }
-    }
-
-    // Editing panel
-    if (s_meshEditor.m_editTexture) {
-        ImGui::Separator();
-
-        ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
-
-        const char* srcItems = "Engine\0Project\0";
-        ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
-
-        //if (ImGui::Button("Load Texture")) {
-        //    s_meshEditor.m_texError.clear();
-
-        //    AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
-
-        //    std::string relNarrow = s_meshEditor.m_texPathBuf;
-        //    std::wstring relWide(relNarrow.begin(), relNarrow.end());
-
-        //    AssetPath ap(relWide.c_str(), src);
-
-        //    {
-        //        auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap);
-        //        assigned->SetTexture(newTexture);
-        //    }
-
-        //    s_meshEditor.m_editTexture = false;
-        //}
-
-        if (ImGui::Button("Load Texture")) {
-            s_meshEditor.m_texError.clear();
-
-            AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
-            std::string relNarrow = s_meshEditor.m_texPathBuf;
-            std::wstring relWide(relNarrow.begin(), relNarrow.end());
-            AssetPath ap(relWide.c_str(), src);
-
-            eastl::string filePath(relNarrow.c_str());  
-
-            ResourceHandle texHandle = ResourceManagerFacade::Instance().LoadByPath(filePath);
-
-            if (texHandle.guid == 0) {
-                //s_meshEditor.m_texError = "Failed to load texture: " + relNarrow;
-            }
-            else {
-                SE_G::Bind::Texture* texture =
-                    ResourceManagerFacade::Instance().Get<SE_G::Bind::Texture>(texHandle);
-
-                if (texture) {
-                    auto newTexture = eastl::shared_ptr<SE_G::Bind::Texture>(
-                        texture,
-                        [](SE_G::Bind::Texture*) {}
-                    );
-                    assigned->SetTexture(newTexture);
-                }
-                else {
-                    s_meshEditor.m_texError = "Failed to cast loaded resource to Texture";
-                }
-            }
-
-            s_meshEditor.m_editTexture = false;
-        }
-
-
-        if (!s_meshEditor.m_texError.empty()) {
-            ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
-        }
-    }
-
     ImGui::Separator();
 
     // Sampler
@@ -1552,72 +1398,105 @@ void PropertyPanel::DrawEmitterDetails(
         
         auto tex = emitterObj->m_particleData->m_texture;
 
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
-        ImGui::Text("Texture settings");
-        EditorUI::FontStyles::Pop();
-
-        if (tex) {
-            eastl::wstring tpath = tex->GetCurrentTexturePath().m_assetRelativePath;
-            // convert wstring to narrow string for ImGui display
-            std::wstring ws = tpath.c_str();
-            std::string s(ws.begin(), ws.end());
-            if (tex->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
-            {
-                ImGui::Text("Engine asset");
-            }
-            ImGui::Text("Texture: %s", s.c_str());
-        }
-        else {
-            ImGui::TextDisabled("Texture: (none)");
-        }
-
-        // Editing button
-        if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
-            s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
-            s_meshEditor.m_texError.clear();
-            // опционально: при открытии заполнить поля текущими значениями
-            if (s_meshEditor.m_editTexture && tex) {
-                AssetPath cur = tex->GetCurrentTexturePath();
-                std::wstring ws = cur.m_assetRelativePath.c_str();
-                std::string  s(ws.begin(), ws.end());
-                strncpy(s_meshEditor.m_texPathBuf, s.c_str(), sizeof(s_meshEditor.m_texPathBuf) - 1);
-                s_meshEditor.m_texPathBuf[sizeof(s_meshEditor.m_texPathBuf) - 1] = 0;
-                s_meshEditor.m_texAssetSource = cur.m_assetSource;
-            }
-        }
-
-        // Editing panel
-        if (s_meshEditor.m_editTexture) {
-            ImGui::Separator();
-
-            ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
-
-            const char* srcItems = "Engine\0Project\0";
-            ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
-
-            if (ImGui::Button("Load Texture")) {
-                s_meshEditor.m_texError.clear();
-
-                AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
-
-                std::string relNarrow = s_meshEditor.m_texPathBuf;
-                std::wstring relWide(relNarrow.begin(), relNarrow.end());
-
-                AssetPath ap(relWide.c_str(), src);
-
-                {
-                    auto newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap);
-                    emitterObj->m_particleData->SetTexture(newTexture);
-                }
-
-                s_meshEditor.m_editTexture = false;
-            }
-
-            if (!s_meshEditor.m_texError.empty()) {
-                ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
-            }
+        auto newTexture = DrawTextureSettings(tex);
+        if (newTexture)
+        {
+            newTexture->SetSlot(0u);
+            emitterObj->m_particleData->SetTexture(newTexture);
         }
 
         ImGui::Separator();
     }
+}
+
+eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
+    eastl::shared_ptr<SE_G::Bind::Texture> texture)
+{
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+    ImGui::Text("Texture settings");
+    EditorUI::FontStyles::Pop();
+
+    if (texture) {
+        eastl::wstring tpath = texture->GetCurrentTexturePath().m_assetRelativePath;
+        // convert wstring to narrow string for ImGui display
+        std::wstring ws = tpath.c_str();
+        std::string s(ws.begin(), ws.end());
+        if (texture->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
+        {
+            ImGui::Text("Engine asset");
+        }
+        ImGui::Text("Texture: %s", s.c_str());
+    }
+    else {
+        ImGui::TextDisabled("Texture: (none)");
+    }
+
+    // Editing button
+    if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
+        s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
+        s_meshEditor.m_texError.clear();
+        // опционально: при открытии заполнить поля текущими значениями
+        if (s_meshEditor.m_editTexture && texture) {
+            AssetPath cur = texture->GetCurrentTexturePath();
+            std::wstring ws = cur.m_assetRelativePath.c_str();
+            std::string  s(ws.begin(), ws.end());
+            strncpy(s_meshEditor.m_texPathBuf, s.c_str(), sizeof(s_meshEditor.m_texPathBuf) - 1);
+            s_meshEditor.m_texPathBuf[sizeof(s_meshEditor.m_texPathBuf) - 1] = 0;
+            s_meshEditor.m_texAssetSource = cur.m_assetSource;
+        }
+    }
+    eastl::shared_ptr<SE_G::Bind::Texture> newTexture;
+    // Editing panel
+    if (s_meshEditor.m_editTexture) {
+        ImGui::Separator();
+
+        ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
+
+        const char* srcItems = "Engine\0Project\0";
+        ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
+
+        if (ImGui::Button("Load Texture")) {
+            s_meshEditor.m_texError.clear();
+
+            AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
+            std::string relNarrow = s_meshEditor.m_texPathBuf;
+            std::wstring relWide(relNarrow.begin(), relNarrow.end());
+            AssetPath ap(relWide.c_str(), src);
+            // Without Resource manager
+            /*
+            {
+                newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap, 4u);
+                // skyBoxObj->SetTexture(newTexture);
+                
+            }
+            */
+            // Using Resource manager
+            ResourceHandle texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+
+            if (texHandle.guid == 0) {
+                //s_meshEditor.m_texError = "Failed to load texture: " + relNarrow;
+            }
+            else {
+                SE_G::Bind::Texture* texture =
+                    ResourceManagerFacade::Instance().Get<SE_G::Bind::Texture>(texHandle);
+
+                if (texture) {
+                    newTexture = eastl::shared_ptr<SE_G::Bind::Texture>(
+                        texture,
+                        [](SE_G::Bind::Texture*) {}
+                    );
+                    newTexture->m_texturePath = ap;
+                }
+                else {
+                    s_meshEditor.m_texError = "Failed to cast loaded resource to Texture";
+                }
+            }
+            s_meshEditor.m_editTexture = false;
+        }
+
+        if (!s_meshEditor.m_texError.empty()) {
+            ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "Texture load error: %s", s_meshEditor.m_texError.c_str());
+        }
+    }
+    return newTexture;
 }

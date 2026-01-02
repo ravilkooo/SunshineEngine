@@ -7,15 +7,13 @@ TextureLoader::TextureLoader(ID3D11Device* device) : m_device(device)
 {
 }
 
-IResource* TextureLoader::Load(const eastl::string& path, ResourceRegistry* pRegistry, StackMemoryManager* pMemMgr)
+IResource* TextureLoader::Load(const AssetPath& path, ResourceRegistry* pRegistry, StackMemoryManager* pMemMgr)
 {
-    eastl::wstring wpath = StringHelper::StringToWide(path);
-
     void* mem = pMemMgr->Allocate(sizeof(SE_G::Bind::Texture), SunshineResource::ResourceType::TEXTURE);
 
     if (!mem) return nullptr;
 
-    auto tex = new (mem) SE_G::Bind::Texture(m_device, wpath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    auto tex = new (mem) SE_G::Bind::Texture(m_device, path, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
 
     return tex;
 }

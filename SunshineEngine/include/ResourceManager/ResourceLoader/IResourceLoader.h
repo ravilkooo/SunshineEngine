@@ -5,12 +5,14 @@
 #include <ResourceManager/Resources/Model.h>
 #include <ResourceManager/MemoryManager/StackMemoryManager.h>
 
+#include <Utils/AssetPath.h>
+
 class IResourceLoader
 {
 public:
     virtual ~IResourceLoader() = default;
 
-    virtual IResource* Load(const eastl::string& path,
+    virtual IResource* Load(const AssetPath& path,
         ResourceRegistry* pRegistry,
         StackMemoryManager* pMemMgr) = 0;
 

@@ -716,7 +716,7 @@ namespace SE
         else {
             auto device = particleData->m_particleSystem->m_renderer->GetDevice();
             auto tex = eastl::make_shared<SE_G::Bind::Texture>(device,
-                AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
+                AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
                 SE_G::Bind::PipelineStage::PIXEL_SHADER);
             particleData->SetTexture(tex);
         }

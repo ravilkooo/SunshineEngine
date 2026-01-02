@@ -12,7 +12,7 @@ namespace SE_G {
             TransformComponent* assignedTransform, eastl::string technique,
             eastl::shared_ptr<Camera> camera,
             eastl::shared_ptr<SkyBoxData> lightData,
-            AssetPath assetPath = AssetPath(L"DefaultSkybox.dds", AssetPath::AssetSource::Engine));
+            AssetPath assetPath = AssetPath(eastl::wstring(L"Textures/DefaultSkybox.dds"), AssetPath::AssetSource::Engine));
 
         //void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
         void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;

@@ -10,7 +10,7 @@ class TextureLoader : public IResourceLoader
 public:
     explicit TextureLoader(ID3D11Device* device);
 
-    IResource* Load(const eastl::string& path,
+    IResource* Load(const AssetPath& path,
         ResourceRegistry* pRegistry,
         StackMemoryManager* pMemMgr) override;
 

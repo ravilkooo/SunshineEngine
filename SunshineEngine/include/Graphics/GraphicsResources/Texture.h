@@ -63,6 +63,9 @@ namespace SE_G {
 			SunshineResource::ResourceType GetType() const override;
 			ResourceGUID GetGUID() const override;
 			size_t GetSizeInMemory() const override;
+
+			void SetSlot(UINT slot);
+			UINT GetSlot();
 		private:
 			void ChangeTexture(ID3D11Device* device, AssetPath texturePath);
 			void ChangeColor(ID3D11Device* device, SE_G::Color color);

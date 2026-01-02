@@ -194,5 +194,15 @@ namespace SE_G {
 		{
 			return m_MemorySize;
 		}
+
+		void Texture::SetSlot(UINT slot)
+		{
+			m_slot = slot;
+		}
+
+		UINT Texture::GetSlot()
+		{
+			return m_slot;
+		}
 	}
 }

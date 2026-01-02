@@ -208,7 +208,7 @@ void MeshData::FromJson(const json& j, ID3D11Device* device)
     else {
         m_texture = eastl::make_shared<SE_G::Bind::Texture>(
             device,
-            AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
+            AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
             SE_G::Bind::PipelineStage::PIXEL_SHADER);
     }
 

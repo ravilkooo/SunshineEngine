@@ -701,7 +701,7 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 			emitterDesc,
 			simulatorDesc);
 
-		AssetPath bubble(L"bubble24bpp.dds");
+		AssetPath bubble(L"Textures/bubble24bpp.dds");
 
 		auto bubbleTex = eastl::make_unique<SE_G::Bind::Texture>(m_renderer->GetDevice(), bubble, 0u);
 

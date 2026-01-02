@@ -46,7 +46,7 @@ eastl::unique_ptr<SE::ParticleEmitter_Info> EditorObjectFactory::CreateParticleE
 		emitterDesc,
 		simulatorDesc);
 
-	AssetPath particleTexPath(L"DefaultTexture.dds");
+	AssetPath particleTexPath(L"Textures/DefaultTexture.dds");
 
 	auto particleTex = eastl::make_shared<SE_G::Bind::Texture>(particleSystem->m_renderer->GetDevice(), particleTexPath, 0u);
 
@@ -78,7 +78,7 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 
 	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
 		rc_info->GetDevice(),
-		AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
+		AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mc_info->SetTexture(texture);
 
