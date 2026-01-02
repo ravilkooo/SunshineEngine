@@ -26,7 +26,8 @@ IResource* TextureLoader::Load(const AssetPath& path, ResourceRegistry* pRegistr
     //if (path.m_assetRelativePath.substr(0u, 6u) == eastl::wstring(L"Color:"))
     if (p0 != eastl::wstring::npos)
     {
-        SE_G::Color col = SE_G::Bind::Texture::GetColorFromPath(path.m_assetRelativePath);
+        //SE_G::Color col = SE_G::Bind::Texture::GetColorFromPath(path.m_assetRelativePath);
+        SE_G::Color col = SE_G::Bind::Texture::GetRGBAColorFromPath(path.m_assetRelativePath);
         tex = new (mem) SE_G::Bind::Texture(m_device, col, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
     }
     else if (FileExistsNoThrow(fp))

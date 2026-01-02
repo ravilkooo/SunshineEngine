@@ -4,6 +4,7 @@
 #include <ResourceManager/ResourceHandle.h>
 
 #include <EASTL/internal/char_traits.h>
+#include "Graphics/Utils/Color.h"
 
 
 namespace SE_G {
@@ -40,10 +41,52 @@ namespace SE_G {
 			return col;
 		}
 
+		SE_G::Color Texture::GetRGBAColorFromPath(eastl::wstring path)
+		{
+			// L"Color:#####.dds"
+
+			constexpr const wchar_t* kPrefix = L"Color:";
+			constexpr const wchar_t* kSuffix = L".dds";
+
+			const auto p0 = path.find(kPrefix);
+			if (p0 == eastl::wstring::npos) return SE_G::Colors::UnloadedTextureColor;
+
+			size_t i = p0 + 6u;
+			const auto p1 = path.find(kSuffix, i);
+			if (p1 == eastl::wstring::npos) return SE_G::Colors::UnloadedTextureColor;
+
+			const wchar_t* p = path.c_str() + i;
+			const wchar_t* endExpected = path.c_str() + p1;
+
+			SE_G::Color col = SE_G::Colors::UnloadedTextureColor;
+
+			for (int c = 0; c < 4; ++c)
+			{
+				wchar_t* endNum = nullptr;
+				unsigned long v = std::wcstoul(p, &endNum, 10);
+				if (endNum == p) return SE_G::Colors::UnloadedTextureColor;
+				if (v > 255ul) return SE_G::Colors::UnloadedTextureColor;
+
+				col.rgba[c] = static_cast<unsigned char>(v);
+
+				p = endNum;
+				if (c != 3) {
+					if (*p != L',') return SE_G::Colors::UnloadedTextureColor;
+					++p;
+				}
+			}
+
+			// После 4 чисел должны упереться ровно в ".dds"
+			return (p == endExpected) ? col : SE_G::Colors::UnloadedTextureColor;
+		}
 		eastl::wstring Texture::ColorToPath(SE_G::Color col)
 		{
 			return eastl::wstring(L"Color:")
-				+ eastl::to_wstring(col.color)
+				//+ eastl::to_wstring(col.color)
+				+ eastl::to_wstring(col.rgba[0]) + L","
+				+ eastl::to_wstring(col.rgba[1]) + L","
+				+ eastl::to_wstring(col.rgba[2]) + L","
+				+ eastl::to_wstring(col.rgba[3])
 				+ eastl::wstring(L".dds");
 		}
 

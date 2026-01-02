@@ -1347,12 +1347,17 @@ eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
     if (texture) {
         eastl::wstring tpath = texture->GetCurrentTexturePath().m_assetRelativePath;
         // convert wstring to narrow string for ImGui display
-        std::wstring ws = tpath.c_str();
-        std::string s(ws.begin(), ws.end());
         if (texture->GetCurrentTexturePath().m_assetSource == AssetPath::AssetSource::Engine)
         {
-            ImGui::Text("Engine asset");
+            ImGui::TextDisabled("Engine asset");
         }
+        else
+        {
+            ImGui::TextDisabled("Project asset");
+        }
+
+        std::wstring ws = tpath.c_str();
+        std::string s(ws.begin(), ws.end());
         ImGui::Text("Texture: %s", s.c_str());
     }
     else {
@@ -1443,7 +1448,11 @@ eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
         std::string s(ws.begin(), ws.end());
         if (meshPtr->GetCurrentMeshPath().m_assetSource == AssetPath::AssetSource::Engine)
         {
-            ImGui::Text("Engine asset");
+            ImGui::TextDisabled("Engine asset");
+        }
+        else
+        {
+            ImGui::TextDisabled("Project asset");
         }
         ImGui::Text("Mesh: %s", s.c_str());
     }

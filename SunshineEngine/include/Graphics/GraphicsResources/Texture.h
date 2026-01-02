@@ -25,6 +25,7 @@ namespace SE_G {
 		{
 		public:
 			static SE_G::Color GetColorFromPath(eastl::wstring path);
+			static SE_G::Color GetRGBAColorFromPath(eastl::wstring path);
 			static eastl::wstring ColorToPath(SE_G::Color col);
 
 			Texture(ID3D11Device* device, AssetPath texturePath, UINT slot = 0u,
