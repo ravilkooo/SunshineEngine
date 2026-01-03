@@ -24,6 +24,10 @@ namespace SE_G {
 			, public IResource
 		{
 		public:
+			static SE_G::Color GetColorFromPath(eastl::wstring path);
+			static SE_G::Color GetRGBAColorFromPath(eastl::wstring path);
+			static eastl::wstring ColorToPath(SE_G::Color col);
+
 			Texture(ID3D11Device* device, AssetPath texturePath, UINT slot = 0u,
 				Bind::PipelineStage pipelineStage = Bind::PipelineStage::PIXEL_SHADER);
 
@@ -51,6 +55,7 @@ namespace SE_G {
 			};
 
 			void Bind(ID3D11DeviceContext* context) noexcept override;
+			void Bind(ID3D11DeviceContext* context, UINT slot) noexcept override;
 			void Unbind(ID3D11DeviceContext* context) noexcept override;
 
 			void UpdateTextureView(ID3D11ShaderResourceView* pTextureView);
@@ -63,6 +68,9 @@ namespace SE_G {
 			SunshineResource::ResourceType GetType() const override;
 			ResourceGUID GetGUID() const override;
 			size_t GetSizeInMemory() const override;
+
+			void SetSlot(UINT slot);
+			UINT GetSlot();
 		private:
 			void ChangeTexture(ID3D11Device* device, AssetPath texturePath);
 			void ChangeColor(ID3D11Device* device, SE_G::Color color);

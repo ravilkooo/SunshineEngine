@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 
 #include <EASTL/shared_ptr.h>
 #include <SimpleMath.h>
@@ -94,4 +95,10 @@ private:
     bool DrawUIntControl(const char* label, uint32_t& value, uint32_t resetValue = 0,
                        float speed = 1.0f, uint32_t min = 0, uint32_t max = 100,
                        const char* format = "%u", float columnWidth = 100.0f);
+
+    eastl::shared_ptr<SE_G::Bind::Texture> DrawTextureSettings(
+        eastl::shared_ptr<SE_G::Bind::Texture> texture);
+
+    eastl::shared_ptr<SE_G::Mesh> DrawMeshSettings(
+        eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group);
 };

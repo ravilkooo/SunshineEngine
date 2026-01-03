@@ -3,10 +3,93 @@
 #include <ResourceManager/Enums/ResourceType.h>
 #include <ResourceManager/ResourceHandle.h>
 
+#include <EASTL/internal/char_traits.h>
+#include "Graphics/Utils/Color.h"
+
 
 namespace SE_G {
 	namespace Bind
 	{
+		SE_G::Color Texture::GetColorFromPath(eastl::wstring path)
+		{
+			// L"Color:#####.dds"
+
+			constexpr const wchar_t* kPrefix = L"Color:";
+			constexpr const wchar_t* kSuffix = L".dds";
+
+			const auto p0 = path.find(kPrefix);
+			if (p0 == eastl::wstring::npos)
+				return SE_G::Colors::UnloadedTextureColor;
+
+			const auto start = p0 + 6u;
+
+			const auto p1 = path.find(kSuffix, start);
+			if (p1 == eastl::wstring::npos || p1 < start)
+				return SE_G::Colors::UnloadedTextureColor;
+
+			eastl::wstring numStr = path.substr(start, p1 - start);
+
+			wchar_t* end = nullptr;
+			unsigned long v = std::wcstoul(numStr.c_str(), &end, 10); // base 10
+
+			if (end == numStr.c_str() || *end != L'\0')
+				return SE_G::Colors::UnloadedTextureColor;
+
+			SE_G::Color col;
+			col.color = static_cast<unsigned int>(v);
+			
+			return col;
+		}
+
+		SE_G::Color Texture::GetRGBAColorFromPath(eastl::wstring path)
+		{
+			// L"Color:#####.dds"
+
+			constexpr const wchar_t* kPrefix = L"Color:";
+			constexpr const wchar_t* kSuffix = L".dds";
+
+			const auto p0 = path.find(kPrefix);
+			if (p0 == eastl::wstring::npos) return SE_G::Colors::UnloadedTextureColor;
+
+			size_t i = p0 + 6u;
+			const auto p1 = path.find(kSuffix, i);
+			if (p1 == eastl::wstring::npos) return SE_G::Colors::UnloadedTextureColor;
+
+			const wchar_t* p = path.c_str() + i;
+			const wchar_t* endExpected = path.c_str() + p1;
+
+			SE_G::Color col = SE_G::Colors::UnloadedTextureColor;
+
+			for (int c = 0; c < 4; ++c)
+			{
+				wchar_t* endNum = nullptr;
+				unsigned long v = std::wcstoul(p, &endNum, 10);
+				if (endNum == p) return SE_G::Colors::UnloadedTextureColor;
+				if (v > 255ul) return SE_G::Colors::UnloadedTextureColor;
+
+				col.rgba[c] = static_cast<unsigned char>(v);
+
+				p = endNum;
+				if (c != 3) {
+					if (*p != L',') return SE_G::Colors::UnloadedTextureColor;
+					++p;
+				}
+			}
+
+			// После 4 чисел должны упереться ровно в ".dds"
+			return (p == endExpected) ? col : SE_G::Colors::UnloadedTextureColor;
+		}
+		eastl::wstring Texture::ColorToPath(SE_G::Color col)
+		{
+			return eastl::wstring(L"Color:")
+				//+ eastl::to_wstring(col.color)
+				+ eastl::to_wstring(col.rgba[0]) + L","
+				+ eastl::to_wstring(col.rgba[1]) + L","
+				+ eastl::to_wstring(col.rgba[2]) + L","
+				+ eastl::to_wstring(col.rgba[3])
+				+ eastl::wstring(L".dds");
+		}
+
 		Texture::Texture(ID3D11Device* device, ID3D11Resource* pTexture,
 			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc, UINT slot, Bind::PipelineStage pipelineStage)
 			: pTexture(pTexture), m_slot(slot), pipelineStage(pipelineStage)
@@ -44,6 +127,9 @@ namespace SE_G {
 		Texture::Texture(ID3D11Device* device, const Color& color, UINT slot, Bind::PipelineStage pipelineStage)
 			: m_slot(slot), pipelineStage(pipelineStage)
 		{
+			this->m_texturePath = AssetPath(
+				Texture::ColorToPath(color),
+				AssetPath::AssetSource::Engine);
 			this->Initialize1x1ColorTexture(device, color);
 			isNull = false;
 		}
@@ -51,6 +137,9 @@ namespace SE_G {
 		Texture::Texture(ID3D11Device* device, const Color* colorData, UINT width, UINT height, UINT slot, Bind::PipelineStage pipelineStage)
 			: m_slot(slot), pipelineStage(pipelineStage)
 		{
+			this->m_texturePath = AssetPath(
+				Texture::ColorToPath(*colorData),
+				AssetPath::AssetSource::Engine);
 			this->InitializeColorTexture(device, colorData, width, height);
 			isNull = false;
 		}
@@ -110,9 +199,14 @@ namespace SE_G {
 				context->PSSetShaderResources(m_slot, 1u, pTextureView.GetAddressOf());
 			else if (pipelineStage == Bind::PipelineStage::COMPUTE_SHADER)
 				context->CSSetShaderResources(m_slot, 1u, pTextureView.GetAddressOf());
-			//context->PSSetShaderResources(0, 1u, pTextureView.GetAddressOf());
+		}
 
-
+		void Texture::Bind(ID3D11DeviceContext* context, UINT slot) noexcept
+		{
+			if (pipelineStage == Bind::PipelineStage::PIXEL_SHADER)
+				context->PSSetShaderResources(slot, 1u, pTextureView.GetAddressOf());
+			else if (pipelineStage == Bind::PipelineStage::COMPUTE_SHADER)
+				context->CSSetShaderResources(slot, 1u, pTextureView.GetAddressOf());
 		}
 
 		void Texture::Unbind(ID3D11DeviceContext* context) noexcept
@@ -193,6 +287,16 @@ namespace SE_G {
 		size_t Texture::GetSizeInMemory() const
 		{
 			return m_MemorySize;
+		}
+
+		void Texture::SetSlot(UINT slot)
+		{
+			m_slot = slot;
+		}
+
+		UINT Texture::GetSlot()
+		{
+			return m_slot;
 		}
 	}
 }

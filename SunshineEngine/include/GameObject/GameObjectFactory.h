@@ -66,7 +66,7 @@ public:
 	static eastl::unique_ptr<SkyBox> CreateSkyBox(
 		SE_G::DeferredRenderer* m_renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
-		eastl::wstring texturePath = eastl::wstring(L"Default"),
+		AssetPath texturePath = AssetPath(eastl::wstring(L"Textures/DefaultSkybox.dds"), AssetPath::AssetSource::Engine),
 		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f });
 
 	static eastl::unique_ptr<SkyBox> CreateSkyBox(

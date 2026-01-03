@@ -71,6 +71,8 @@ public:
 
     void RunApp();
 
+    void InitResourceLoaders(ID3D11Device* device);
+
     void RunGame();
     void StopGame();
 

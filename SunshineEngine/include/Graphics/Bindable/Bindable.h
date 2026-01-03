@@ -15,6 +15,7 @@ namespace SE_G
 		{
 		public:
 			virtual void Bind(ID3D11DeviceContext* context) noexcept = 0;
+			virtual void Bind(ID3D11DeviceContext* context, UINT slot) noexcept { Bind(context); };
 			virtual void Unbind(ID3D11DeviceContext* context) noexcept {};
 			//virtual void Update();
 			virtual ~Bindable() = default;

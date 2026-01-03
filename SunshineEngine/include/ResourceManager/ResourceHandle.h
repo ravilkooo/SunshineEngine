@@ -13,6 +13,11 @@ struct ResourceHandle
     {
         return guid == other.guid && version == other.version;
     }
+
+    bool operator!=(const ResourceHandle& other) const
+    {
+        return guid != other.guid || version != other.version;
+    }
 };
 
 inline ResourceGUID ComputeGUID(const eastl::string& path)

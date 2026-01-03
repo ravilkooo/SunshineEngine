@@ -9,11 +9,11 @@ class CompositeResourceLoader : public IResourceLoader
 {
 public:
     
-    IResource* Load(const eastl::string& path,
+    IResource* Load(const AssetPath& path,
         ResourceRegistry* pRegistry,
         StackMemoryManager* pMemMgr) override;
 
-    eastl::vector<eastl::string> ResolveDependencies(const eastl::string& path);
+    eastl::vector<AssetPath> ResolveDependencies(const AssetPath& path);
 
     SunshineResource::ResourceType GetResourceType(IResource* pDepResource, Model* pModel, ResourceGUID depGUID) const override;
 
