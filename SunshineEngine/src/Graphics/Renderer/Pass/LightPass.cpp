@@ -142,8 +142,6 @@ namespace SE_G {
 		if (m_particleSystem)
 		{
 			context->ClearState();
-			m_particleSystem->ComputePassForAllEmitters();
-			context->ClearState();
 			context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
 			context->RSSetViewports(1, &m_viewport);
 			m_particleSystem->RenderAllEmitters();

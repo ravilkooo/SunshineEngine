@@ -28,9 +28,10 @@ void Game::SetupRendering(
 		"GameDeferred", renderSystem->GetDevice(),
 		renderSystem->GetDeviceContext(),
 		m_screenWidth, m_screenHeight);
-
+	/*
 	this->m_renderer->InitParticleSystem();
 	this->m_particleSystem = this->m_renderer->m_particleSystem.get();
+	*/
 	
 	{
 		m_gPass = static_cast<SE_G::GPass*>(
@@ -46,8 +47,15 @@ void Game::SetupRendering(
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
 
-		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
+		//m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 	}
+}
+
+void Game::SetParticleSystem(eastl::shared_ptr <SE::ParticleSystem> ps)
+{
+	this->m_renderer->SetParticleSystem(ps);
+	this->m_particleSystem = m_renderer->m_particleSystem.get();
+	this->m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 }
 
 void Game::SetupPhysics()
@@ -185,10 +193,12 @@ bool Game::LoadResourcesScene()
 
 void Game::Start() {
 	m_renderer->Enable();
+	m_particleSystem->Enable();
 }
 
 void Game::Stop() {
 	m_renderer->Disable();
+	m_particleSystem->Disable();
 }
 
 void Game::Run()

@@ -11,6 +11,7 @@ public:
 
     void Tick();
     float GetDeltaTime() const;
+    void Reset();
 
 private:
     std::chrono::high_resolution_clock::time_point lastTime;

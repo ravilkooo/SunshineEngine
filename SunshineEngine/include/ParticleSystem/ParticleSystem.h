@@ -80,6 +80,8 @@ namespace SE
 		};
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_viewProjBuffer;
 
+		bool m_enabled = true;
+
 		ParticleSystem(SE_G::DeferredRenderer* renderer,
 			eastl::shared_ptr<SE_G::Camera> camera);
 		~ParticleSystem();
@@ -91,11 +93,19 @@ namespace SE
 		void ComputePassForAllEmitters();
 		void Update(float deltaTime);
 		void UpdateAllEmitters(float deltaTime);
+		void DisableAllEmitters();
+		void EnableAllEmitters();
 		void RenderAllEmitters();
 
 		//void Update(float deltaTime);
 
 		void SetBlendState(eastl::unique_ptr<SE_G::Bind::BlendState> newBlendState);
+
+		void SetRenderer(SE_G::DeferredRenderer* renderer);
+		void SetCamera(eastl::shared_ptr<SE_G::Camera> camera);
+
+		void Enable();
+		void Disable();
 
 		eastl::unordered_map<SE::UUID, eastl::shared_ptr<ParticleData>> m_emitters;
 	};

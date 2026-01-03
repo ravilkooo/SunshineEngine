@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <Utils/AssetPath.h>
 
+#include <ParticleSystem/ParticleSystem.h>
+
 EditorApp::EditorApp()
 {
 
@@ -116,11 +118,16 @@ void EditorApp::RunApp()
 			continue;
 		}
 
-
 		m_timer.Tick();
 		m_deltaTime = m_timer.GetDeltaTime();
-		accumulator += m_deltaTime;
-		accumulator = eastl::min(4.0f * physicsUpdateMs, accumulator);
+		if (m_runtimeMode != RuntimeMode::GAME_MODE || !m_gamePaused) {
+			accumulator += m_deltaTime;
+			accumulator = eastl::min(accumulatorLimit, accumulator);
+		}
+		else
+		{
+			accumulator = 0.0f;
+		}
 
 		// FPS statistic
 		FPSstatisticTimer += m_deltaTime;
@@ -162,9 +169,12 @@ void EditorApp::RunApp()
 			}
 		}
 		else {
-			while (accumulator >= physicsUpdateMs) {
-				UpdateGame(physicsUpdateMs);
-				accumulator -= physicsUpdateMs;
+			if (!m_gamePaused)
+			{
+				while (accumulator >= physicsUpdateMs) {
+					UpdateGame(physicsUpdateMs);
+					accumulator -= physicsUpdateMs;
+				}
 			}
 		}
 		
@@ -198,6 +208,9 @@ void EditorApp::RunApp()
 
 void EditorApp::UpdateGame(float deltaTime)
 {
+	if (m_gamePaused)
+		return;
+
 	if (!imguiEditorPass->IsFocusedGameViewport)
 	{
 		for (int i = 0; i < 6; ++i)
@@ -220,8 +233,7 @@ void EditorApp::UpdateGame(float deltaTime)
 			m_currentGame->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
 		}
 	}
-	if (!m_gamePaused)
-		m_currentGame->Update(deltaTime);
+	m_currentGame->Update(deltaTime);
 }
 
 void EditorApp::UpdateEditor(float deltaTime) 
@@ -471,20 +483,24 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 	}
 }
 
-void EditorApp::RunGame() {
+void EditorApp::RunGame()
+{
 	m_runtimeMode = RuntimeMode::GAME_MODE;
 
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
 		m_openedProject->Save();
 	}
-	
+	m_worldEditor->m_particleSystem->DisableAllEmitters();
 	m_worldEditor->Pause();
 
 	// Init WorldEditor with all it's passes
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
+	m_currentGame->SetParticleSystem(m_worldEditor->m_renderer->m_particleSystem);
+	m_currentGame->m_particleSystem->Enable();
+	m_currentGame->m_particleSystem->EnableAllEmitters();
 	
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
@@ -516,6 +532,8 @@ void EditorApp::RunGame() {
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
+
+	m_timer.Reset();
 }
 
 void EditorApp::PauseGame() {
@@ -524,10 +542,14 @@ void EditorApp::PauseGame() {
 
 void EditorApp::ContinueGame() {
 	m_gamePaused = false;
+
+	m_timer.Reset();
 }
 
 void EditorApp::StopGame() {
 	m_currentGame->Stop();
+	m_currentGame->m_particleSystem->DisableAllEmitters();
+	m_currentGame->m_particleSystem;
 	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
 	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
@@ -536,6 +558,8 @@ void EditorApp::StopGame() {
 	imguiEditorPass->SetVieportGBuffer(
 		m_worldEditor->m_renderer->m_GBuffer.get());
 
+	m_worldEditor->m_renderer->m_particleSystem->SetRenderer(m_worldEditor->m_renderer.get());
+	m_worldEditor->m_lightPass->m_particleSystem = m_worldEditor->m_renderer->m_particleSystem.get();
 	m_worldEditor->Start();
 	// There should be loading scene to world editor (deserializing)
 	// m_currentGame->UnloadScene(...);
