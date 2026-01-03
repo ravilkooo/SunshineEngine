@@ -238,8 +238,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 1,
-                        "relativePath": "Textures/eye.dds"
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultSphereTexture.dds"
                     }
                 },
                 "Physics": {
@@ -650,14 +650,14 @@
                         1.0
                     ],
                     "m_position": [
-                        1.3000009059906006,
+                        1.3000010251998901,
                         -2.5980756282806396,
                         0.0
                     ],
                     "m_rotation": [
-                        -0.00024592416593804955,
-                        -0.014467237517237663,
-                        -0.016997652128338814
+                        0.0,
+                        -0.8290314078330994,
+                        -0.9738937020301819
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -968,8 +968,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 1,
-                        "relativePath": "Textures/pixeleye.dds"
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultSphereTexture.dds"
                     }
                 },
                 "Physics": {
@@ -1054,8 +1054,8 @@
             "components": {
                 "Mesh": {
                     "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Box_repeat"
+                        "assetSource": 1,
+                        "relativePath": "Meshes/horse.obj"
                     },
                     "Sampler": 0,
                     "Texture": {
@@ -1116,13 +1116,13 @@
                         4.0153999236736126e-08
                     ],
                     "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        20.0,
+                        20.0,
+                        20.0
                     ]
                 }
             },
-            "m_UUID": 5575831770551095168,
+            "m_UUID": 701588890976834624,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1487,17 +1487,6 @@
         },
         {
             "components": {
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 1,
-                        "relativePath": "Meshes/horse.obj"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 1,
-                        "relativePath": "Textures/horse_Diffuse.dds"
-                    }
-                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -1516,7 +1505,7 @@
                         1.0
                     ],
                     "m_position": [
-                        -5.012403964996338,
+                        -10.13733196258545,
                         0.0,
                         0.0
                     ],
@@ -1526,15 +1515,77 @@
                         -0.0
                     ],
                     "m_scaleFactor": [
-                        20.0,
-                        20.0,
-                        20.0
+                        1.0,
+                        1.0,
+                        1.0
                     ]
                 }
             },
-            "m_UUID": 6803865000379161691,
-            "m_group": "CustomMesh",
-            "m_name": "CustomObject",
+            "emitterData": {
+                "EmissionRate": 10.0,
+                "Emitter": {
+                    "alphaEnd": 1.0,
+                    "alphaStart": 1.0,
+                    "colorEnd": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "colorStart": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "latitudeMax": 0.3141592741012573,
+                    "latitudeMin": -0.3141592741012573,
+                    "longitudeMax": 6.2831854820251465,
+                    "longitudeMin": 0.0,
+                    "maxSpawn": 0,
+                    "particleSizeEnd": 0.5,
+                    "particleSizeStart": 0.20000000298023224,
+                    "particlesBaseSpeed": 8.0,
+                    "particlesLifeSpan": 3.0,
+                    "particlesMass": 1.0,
+                    "position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "rotMatrix": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                },
+                "MaxParticles": 4096,
+                "Simulate": {
+                    "force": [
+                        0.0,
+                        -5.0,
+                        0.0
+                    ]
+                },
+                "Texture": {
+                    "assetSource": 0,
+                    "relativePath": "Textures/DefaultTexture.dds"
+                }
+            },
+            "m_UUID": 3591371132865286047,
+            "m_group": "ParticleEmitter",
+            "m_name": "ParticleEmitter2",
             "m_parent": null
         }
     ]

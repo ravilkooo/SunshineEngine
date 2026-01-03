@@ -713,7 +713,6 @@ namespace SE
 
         // Texture
         auto device = particleData->m_particleSystem->m_renderer->GetDevice();
-        auto& rm = ResourceManagerFacade::Instance();
         AssetPath texPath;
         if (j.contains("Texture")) {
             texPath.FromJson(j["Texture"]);
@@ -721,6 +720,7 @@ namespace SE
         else {
             texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
         }
+        auto& rm = ResourceManagerFacade::Instance();
         ResourceHandle texHandle = rm.LoadByPath(texPath);
         SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
@@ -728,7 +728,7 @@ namespace SE
         {
             auto particleTex = eastl::shared_ptr<SE_G::Bind::Texture>(
                 texRes,
-                [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+                [](SE_G::Bind::Texture*) {});
             particleData->SetTexture(particleTex);
         }
         else
