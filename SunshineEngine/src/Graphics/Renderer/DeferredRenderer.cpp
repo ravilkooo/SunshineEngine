@@ -34,8 +34,15 @@ namespace SE_G {
 
 	void DeferredRenderer::InitParticleSystem()
 	{
-		m_particleSystem = eastl::make_unique<SE::ParticleSystem>(
+		m_particleSystem = eastl::make_shared<SE::ParticleSystem>(
 			this, GetMainCamera());
+	}
+
+	void DeferredRenderer::SetParticleSystem(eastl::shared_ptr<SE::ParticleSystem> ps)
+	{
+		m_particleSystem = ps;
+		m_particleSystem->SetRenderer(this);
+		m_particleSystem->SetCamera(this->GetMainCamera());
 	}
 
 	void DeferredRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)

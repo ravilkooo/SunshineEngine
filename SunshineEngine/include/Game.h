@@ -47,6 +47,7 @@ public:
         eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
+    void SetParticleSystem(eastl::shared_ptr<SE::ParticleSystem> ps);
 
     void SetupPhysics();
 
@@ -56,7 +57,6 @@ public:
     void Stop();
 
     virtual void Update(float deltaTime);
-    void Render();
     void ClearScene();
 
     bool LoadScene(const wchar_t* scenePath);

@@ -16,3 +16,9 @@ float GameTimer::GetDeltaTime() const
 {
     return deltaTime;
 }
+
+void GameTimer::Reset()
+{
+    deltaTime = 0.0f;
+    lastTime = std::chrono::high_resolution_clock::now();
+}

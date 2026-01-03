@@ -1054,8 +1054,8 @@
             "components": {
                 "Mesh": {
                     "Mesh": {
-                        "assetSource": 1,
-                        "relativePath": "Meshes/horse.obj"
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
                     },
                     "Sampler": 0,
                     "Texture": {
@@ -1116,9 +1116,9 @@
                         4.0153999236736126e-08
                     ],
                     "m_scaleFactor": [
-                        20.0,
-                        20.0,
-                        20.0
+                        1.0,
+                        1.0,
+                        1.0
                     ]
                 }
             },
@@ -1258,14 +1258,14 @@
                         1.0
                     ],
                     "m_position": [
-                        4.039439678192139,
-                        -3.4086039066314697,
-                        -5.372364044189453
+                        6.729291915893555,
+                        -2.875474214553833,
+                        -7.510225772857666
                     ],
                     "m_rotation": [
-                        3.325054365177493e-08,
-                        -5.924660399614368e-06,
-                        -5.316578972269781e-05
+                        5.802355262929382e-10,
+                        -1.034048295878165e-07,
+                        -9.279180517296481e-07
                     ],
                     "m_scaleFactor": [
                         2.999999761581421,
@@ -1419,7 +1419,7 @@
                 }
             },
             "emitterData": {
-                "EmissionRate": 1.0,
+                "EmissionRate": 10.0,
                 "Emitter": {
                     "alphaEnd": 0.0,
                     "alphaStart": 1.0,
@@ -1441,7 +1441,7 @@
                     "particleSizeEnd": 0.800000011920929,
                     "particleSizeStart": 0.4000000059604645,
                     "particlesBaseSpeed": 6.0,
-                    "particlesLifeSpan": 2.0,
+                    "particlesLifeSpan": 1.0,
                     "particlesMass": 1.0,
                     "position": [
                         0.0,

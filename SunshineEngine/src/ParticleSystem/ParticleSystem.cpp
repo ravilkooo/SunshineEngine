@@ -10,6 +10,9 @@
 
 #include <Component/TransformComponent.h>
 
+#include <cstdlib>
+#include <ctime>
+
 namespace SE
 {
 	void ParticleSystem::LoadCS(AssetPath shaderPath, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& m_computeShader)
@@ -59,6 +62,9 @@ namespace SE
 		eastl::shared_ptr<SE_G::Camera> camera)
 		: m_renderer(renderer), m_camera(camera)
 	{
+		// Seed random number generator for particle emission
+		std::srand(static_cast<unsigned int>(std::time(nullptr)));
+		
 		auto device = m_renderer->GetDevice();
 
 		AssetPath shaderPath(L"Shaders/Particles/ResetCShader.hlsl");
@@ -295,11 +301,14 @@ namespace SE
 
 	void ParticleSystem::ComputePassForAllEmitters()
 	{
+		if (!m_enabled)
+			return;
+
 		auto context = m_renderer->GetDeviceContext();
 		context->ClearState();
 
 		// Emitter Pass
-		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Emitter Pass");
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Emitter Compute Pass");
 
 		context->CSSetShader(m_emitParticlesCShader.Get(), nullptr, 0);
 		context->CSSetConstantBuffers(1, 1, m_sceneConstantBuffer.GetAddressOf());
@@ -345,6 +354,9 @@ namespace SE
 
 	void ParticleSystem::Update(float deltaTime)
 	{
+		if (!m_enabled)
+			return;
+
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"ParticleSystem Update");
 
 		UpdateAllEmitters(deltaTime);
@@ -362,18 +374,44 @@ namespace SE
 		context->Unmap(m_sceneConstantBuffer.Get(), 0);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
+
+		context->ClearState();
+		ComputePassForAllEmitters();
+		context->ClearState();
 	}
 
 	void ParticleSystem::UpdateAllEmitters(float deltaTime)
 	{
+		if (!m_enabled)
+			return;
+
 		for (auto emitter : m_emitters) {
 
 			emitter.second->UpdateEmitter(deltaTime);
 		}
 	}
 
+	void ParticleSystem::DisableAllEmitters()
+	{
+		for (auto emitter : m_emitters) {
+
+			emitter.second->DisableEmission();
+		}
+	}
+
+	void ParticleSystem::EnableAllEmitters()
+	{
+		for (auto emitter : m_emitters) {
+
+			emitter.second->EnableEmission();
+		}
+	}
+
 	void ParticleSystem::RenderAllEmitters()
 	{
+		if (!m_enabled)
+			return;
+
 		auto context = m_renderer->GetDeviceContext();
 
 		context->VSSetShader(m_renderParticleVS.Get(), nullptr, 0u);
@@ -430,4 +468,26 @@ namespace SE
 	}
 	*/
 
+	void ParticleSystem::SetRenderer(SE_G::DeferredRenderer* renderer)
+	{
+		m_renderer = renderer;
+
+		if (renderer)
+			m_camera = renderer->GetMainCamera();
+	}
+
+	void ParticleSystem::SetCamera(eastl::shared_ptr<SE_G::Camera> camera)
+	{
+		m_camera = camera;
+	}
+
+	void ParticleSystem::Enable()
+	{
+		m_enabled = true;
+	}
+
+	void ParticleSystem::Disable()
+	{
+		m_enabled = false;
+	}
 }
