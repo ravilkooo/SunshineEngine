@@ -1434,8 +1434,8 @@
                         1.0
                     ],
                     "latitudeMax": 1.5707963705062866,
-                    "latitudeMin": 0.0,
-                    "longitudeMax": 6.2831854820251465,
+                    "latitudeMin": -0.7853981852531433,
+                    "longitudeMax": 1.5707963705062866,
                     "longitudeMin": 0.0,
                     "maxSpawn": 0,
                     "particleSizeEnd": 0.800000011920929,

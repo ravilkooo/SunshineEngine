@@ -1,13 +1,29 @@
-#include "WorldEditor.h"
-#include <Graphics/Renderer/RenderingSystem.h>
+#include <WorldEditor.h>
 
-#include <Component/LuaComponent.h>
-#include <Component/PhysicsComponent.h>
 #include <fstream>   // std::ofstream
 #include <EASTL/unique_ptr.h>
 
+#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
+#include <Graphics/Renderer/Pass/IconPass.h>
+#include <Graphics/Renderer/Pass/ColliderPass.h>
+#include <Graphics/Renderer/Pass/EmitterDebugPass.h>
+
+#include <GameObject/GameObject.h>
+#include <GameObject/EditorObjectFactory.h>
+
+#include <PlayerObject/PlayerObject.h>
+
+#include <Component/PhysicsComponent.h>
+#include <Component/LuaComponent.h>
+
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
+
+#include <ResourceManager/ResourceLoaderFactory.h>
 
 WorldEditor::WorldEditor()
 {
@@ -148,6 +164,13 @@ void WorldEditor::SetupRendering(
 	{
 		m_colliderPass = static_cast<SE_G::ColliderPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::ColliderPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+	}
+	{
+		m_emitterPass = static_cast<SE_G::EmitterDebugPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::EmitterDebugPass>(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
