@@ -5,6 +5,7 @@
 #include <Utils/AssetPath.h>
 
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/Renderer/Technique/EmitterTechnique.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 
@@ -92,6 +93,12 @@ namespace SE
         m_particleData = eastl::make_shared<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
         m_particleData->m_transformComp = tc_info->m_assignedComponent.get();
         particleSystem->AddEmitter(m_UUID, m_particleData);
+
+        auto emitTech = eastl::make_unique<SE_G::EmitterTechnique>(
+            particleSystem->m_renderer->GetDevice(),
+            tc_info->m_assignedComponent.get(), eastl::string("EmitterDebugPass"),
+            m_particleData.get());
+        rc_info->AddTechnique(eastl::move(emitTech));
     }
 
     ParticleEmitter_Info::~ParticleEmitter_Info()
@@ -140,6 +147,12 @@ namespace SE
 
         obj->m_particleData->m_transformComp = tc_info->m_assignedComponent.get();
         particleSystem->AddEmitter(obj->m_UUID, obj->m_particleData);
+
+        auto emitTech = eastl::make_unique<SE_G::EmitterTechnique>(
+            particleSystem->m_renderer->GetDevice(),
+            tc_info->m_assignedComponent.get(), eastl::string("EmitterDebugPass"),
+            obj->m_particleData.get());
+        rc_info->AddTechnique(eastl::move(emitTech));
 
         return obj;
     }

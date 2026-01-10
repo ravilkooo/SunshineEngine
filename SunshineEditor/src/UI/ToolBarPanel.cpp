@@ -3,6 +3,7 @@
 #include <ostream>
 #include <Utils/StringUtils.h>
 #include <EditorApp.h>
+#include <GameObject/EditorObjectFactory.h>
 
 #include "Utils/FileDialogManager.h"
 

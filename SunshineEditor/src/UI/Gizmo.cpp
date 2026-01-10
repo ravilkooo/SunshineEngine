@@ -1,4 +1,7 @@
 #include "UI/Gizmo.h"
+
+#include <Graphics/Renderer/DeferredRenderer.h>
+
 #include <Component/TransformComponent.h>
 
 #include "WorldEditor.h"

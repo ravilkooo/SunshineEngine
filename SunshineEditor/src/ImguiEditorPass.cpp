@@ -1,4 +1,5 @@
 #include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
 
 #include <EASTL/string.h>
 #include <EASTL/priority_queue.h>
