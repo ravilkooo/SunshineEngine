@@ -26,6 +26,9 @@ public:
 
     eastl::unordered_map<Keys, bool> m_isKeyPressed;
 
+    // Lua integration mode
+    bool m_useLuaCallbacks = false;
+
     void SetPlayerObject(PlayerObject* player);
 
     void HandleKeyDown(Keys key);
@@ -34,4 +37,8 @@ public:
     void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
 
     void UpdatePlayer(float deltaTime);
+
+    // Enable/disable Lua callback mode
+    void SetLuaCallbackMode(bool enabled) { m_useLuaCallbacks = enabled; }
+    bool IsLuaCallbackMode() const { return m_useLuaCallbacks; }
 };

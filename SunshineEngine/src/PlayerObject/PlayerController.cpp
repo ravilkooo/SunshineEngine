@@ -8,13 +8,17 @@ void PlayerController::SetPlayerObject(PlayerObject* player)
 
 void PlayerController::HandleKeyDown(Keys key)
 {
-	// InputDevice::instance->IsKeyDown(key);
-	/*
-	m_moveDir = DXSM::Vector3::Zero;
-	auto forward = m_player->m_playerCamera->forward;
-	auto up = m_player->m_playerCamera->up;
-	DXSM::Vector3 right = forward.Cross(up);
-	*/
+	// Try Lua callback first if enabled
+	if (m_useLuaCallbacks && m_player) {
+		bool handled = m_player->m_luaActionMapping.ExecuteKeyAction(key, "down");
+		if (handled) {
+			// Lua handled the input, update key state
+			m_isKeyPressed[key] = true;
+			return;
+		}
+	}
+
+	// Fallback to C++ handling
 	switch (key)
 	{
 	case Keys::W:
@@ -26,14 +30,21 @@ void PlayerController::HandleKeyDown(Keys key)
 		break;
 	}
 	}
-	/*
-	m_moveDir.Normalize();
-	m_moveDir = DXSM::Vector3::Transform(m_moveDir, m_player->m_playerCamera->rotateCamToForward);
-	*/
 }
 
 void PlayerController::HandleKeyUp(Keys key)
 {
+	// Try Lua callback first if enabled
+	if (m_useLuaCallbacks && m_player) {
+		bool handled = m_player->m_luaActionMapping.ExecuteKeyAction(key, "up");
+		if (handled) {
+			// Lua handled the input, update key state
+			m_isKeyPressed[key] = false;
+			return;
+		}
+	}
+
+	// Fallback to C++ handling
 	switch (key)
 	{
 	case Keys::W:
@@ -45,10 +56,6 @@ void PlayerController::HandleKeyUp(Keys key)
 		break;
 	}
 	}
-	/*
-	m_moveDir.Normalize();
-	m_moveDir = DXSM::Vector3::Transform(m_moveDir, m_player->m_playerCamera->rotateCamToForward);
-	*/
 }
 
 void PlayerController::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)

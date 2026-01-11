@@ -2,6 +2,9 @@
 
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
+#include <Utils/AssetPath.h>
+#include <Utils/StringUtils.h>
+
 PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -24,6 +27,24 @@ PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem)
 		device, rc, tc, m_UUID);
 
 	m_playerController.SetPlayerObject(this);
+	
+	SetupLuaActionMapping_test();
+}
+
+void PlayerObject::SetupLuaActionMapping_test()
+{
+	// In your PlayerObject constructor or initialization:
+	AssetPath scriptPath(L"player_controller.lua", AssetPath::AssetSource::Project);
+
+	m_luaActionMapping.Initialize(WStringToUtf8(scriptPath.GetFullPath()));
+	m_luaActionMapping.SetPlayerObject(this);
+
+	// Bind keys
+	m_luaActionMapping.BindKey(Keys::Q, "onMoveForward");
+	m_luaActionMapping.BindKey(Keys::E, "onJump");
+
+	// Enable Lua mode
+	m_playerController.SetLuaCallbackMode(true);
 }
 
 PlayerObject_Info::PlayerObject_Info() : GameObject_Info()

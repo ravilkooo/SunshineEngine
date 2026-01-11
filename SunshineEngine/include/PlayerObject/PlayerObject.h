@@ -52,6 +52,8 @@ public:
 
 	void SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer);
 
+	void SetupLuaActionMapping_test();
+
 	PlayerLuaKeyActionsMapping m_luaActionMapping;
 };
 

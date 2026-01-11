@@ -257,15 +257,15 @@ namespace SE_G {
 
             DXSM::Vector3 _forward(0.0f, 0.0f, 1.0f);
             DXSM::Vector3 _up(0.0f, 1.0f, 0.0f);
+            DXSM::Vector3 _right(1.0f, 0.0f, 0.0f);
             rotateCamToForward = DXSM::Matrix::CreateFromYawPitchRoll(
                 m_stickParams.viewPitchYawRoll.y,
                 -m_stickParams.viewPitchYawRoll.x,
                 -m_stickParams.viewPitchYawRoll.z);
-            _up = DXSM::Vector3::Transform(_up, rotateCamToForward);
-            _forward = DXSM::Vector3::Transform(_forward, rotateCamToForward);
+            up = DXSM::Vector3::Transform(_up, rotateCamToForward);
+            forward = DXSM::Vector3::Transform(_forward, rotateCamToForward);
+            right = DXSM::Vector3::Transform(_right, rotateCamToForward);
 
-            up = _up;
-            forward = _forward;
             target = position + _forward;
         }
     }
