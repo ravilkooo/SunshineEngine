@@ -29,16 +29,6 @@
 #include <WorldEditor.h>
 #include <ImguiEditorPass.h>
 
-enum class MoveKey
-{
-    W,
-    S, 
-    D, 
-    A,
-    E, 
-    Q 
-};
-
 struct Ray
 {
     DX::XMVECTOR Origin;
@@ -91,10 +81,10 @@ public:
     eastl::shared_ptr<SE_G::RenderingSystem> m_renderingSystem;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;
-    SE::Project* m_openedProject;
+    SE::Project* m_openedProject = nullptr;
     eastl::unique_ptr<Game> m_currentGame;
 
-    GameTimer m_timer;
+    //GameTimer m_timer;
 
     float m_deltaTime = 0.0f;
 
@@ -107,27 +97,14 @@ public:
     bool m_gamePaused = false;
 
 private:
-    // Camera movings
     void HandleKeyDown(Keys key);
     void HandleKeyUp(Keys key);
-
     void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
-
-    bool MovingPressed[6] = { false };
-
-    float CameraSpeed = 20.0f;
-    float const MaxCameraSpeed = 100.0f;
-    float const MinCameraSpeed = 10.0f;
-    float const CameraSpeedStep = 10.0f;
-
-    bool IsRightMousePressed = false;
-
-    float const CameraRotateSpeed = 0.5f;
 
     bool is_layout_initialized = false;
 
     eastl::unique_ptr<SE_G::RenderGroup> m_imguiRenderGroup;
-    ImguiEditorPass* imguiEditorPass;
+    ImguiEditorPass* imguiEditorPass = nullptr;
     bool m_initialized = false;
 
     bool m_projectSelected = false;

@@ -69,6 +69,11 @@ public:
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 
+    // Input handling
+    void HandleKeyDown(Keys key);
+    void HandleKeyUp(Keys key);
+    void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
+
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
