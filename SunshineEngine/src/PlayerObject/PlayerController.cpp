@@ -84,7 +84,7 @@ void PlayerController::ExecuteAllOnKeyDown()
 void PlayerController::UpdatePlayer(float deltaTime)
 {
 	// Update input state for this frame - computes edge events
-	//m_inputManager.Update();
+	m_inputManager.Update();
 
 	// Handle camera rotation
 	m_player->m_playerCamera->RotateStickYawPitch(deltaTime * m_stickYawMoveDir, deltaTime * m_stickPitchMoveDir);

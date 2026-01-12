@@ -123,7 +123,6 @@ void EditorApp::RunApp()
 
 		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
 		{
-
 			m_worldEditor->m_timer.Tick();
 			m_deltaTime = m_worldEditor->m_timer.GetDeltaTime();
 
@@ -245,7 +244,7 @@ void EditorApp::UpdateGame(float deltaTime)
 {
 	if (m_gamePaused)
 		return;
-	m_currentGame->m_playerObject->m_playerController.m_inputManager.Update();
+	//m_currentGame->m_playerObject->m_playerController.m_inputManager.Update();
 	m_currentGame->Update(deltaTime);
 }
 
@@ -256,13 +255,11 @@ void EditorApp::UpdateEditor(float deltaTime)
 		// Reset input state when not focused
 		m_worldEditor->m_editorInputManager.Reset();
 		m_worldEditor->IsRightMousePressed = false;
-		m_worldEditor->Update(deltaTime);
-		return;
 	}
-
-	// Update input manager for edge detection
-	m_worldEditor->m_editorInputManager.Update();
-
+	else {
+		// Update input manager for edge detection
+		m_worldEditor->m_editorInputManager.Update();
+	}
 	m_worldEditor->Update(deltaTime);
 }
 

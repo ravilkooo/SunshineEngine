@@ -28,8 +28,8 @@ Frame N:       [Current Keys]
 
 ### Integration Points
 1. **PlayerController** - Game player input
-2. **EditorApp** - Editor camera controls
-3. Separate instances for game vs editor (no conflicts)
+2. **WorldEditor** - Editor camera controls
+3. Separate instances for game vs world editor (no conflicts)
 
 ---
 
@@ -311,9 +311,9 @@ void UpdateDebug(float deltaTime)
 
 ---
 
-## Integration in Your Engine
+## Integration in Engine
 
-### PlayerController Integration (Already Done)
+### PlayerController Integration
 
 ```cpp
 // In PlayerController.h
@@ -344,26 +344,29 @@ void PlayerController::UpdatePlayer(float deltaTime) {
 }
 ```
 
-### EditorApp Integration (Already Done)
+### WorldEditor Integration (Already Done)
 
 ```cpp
-// In EditorApp.h
+// In WorldEditor.h
 #include <Windows/InputManager.h>
 
-class EditorApp {
+class WorldEditor {
     InputManager m_editorInputManager; // Separate instance for editor
     // ...
 };
 
 // In EditorApp.cpp
 void EditorApp::UpdateEditor(float deltaTime) {
-    // Update editor input
-    m_editorInputManager.Update();
-    
-    // Use for camera movement
-    if (m_editorInputManager.IsKeyDown(Keys::W)) {
-        camera->MoveForward(speed * deltaTime);
-    }
+	if (!imguiEditorPass->IsFocusedGameViewport) {
+		// Reset input state when not focused
+		m_worldEditor->m_editorInputManager.Reset();
+		m_worldEditor->IsRightMousePressed = false;
+	}
+	else {
+		// Update input manager for edge detection
+		m_worldEditor->m_editorInputManager.Update();
+	}
+	m_worldEditor->Update(deltaTime);
 }
 ```
 
@@ -540,18 +543,6 @@ const eastl::unordered_set<Keys>& GetKeysDown() const; // Get all pressed keys
 
 ---
 
-## Advantages Over Old System
-
-| Old System | New InputManager |
-|-----------|-----------------|
-| Manual state tracking | Automatic frame-to-frame tracking |
-| No edge detection | Built-in press/release detection |
-| Bug-prone held keys | Reliable held state |
-| Missed short taps | Catches 1-frame presses |
-| Hard to debug | Clear state query API |
-| Mode switch issues | Reset() for clean transitions |
-
----
 
 ## File Locations
 
@@ -593,5 +584,3 @@ const eastl::unordered_set<Keys>& GetKeysDown() const; // Get all pressed keys
 **Solution**: Check that game mode is routing input correctly
 
 ---
-
-**Questions?** The system is fully integrated and ready to use!

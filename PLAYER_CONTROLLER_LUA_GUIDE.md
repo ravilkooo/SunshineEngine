@@ -21,31 +21,47 @@ Input Event → PlayerController → Lua Binding Lookup → Lua Function Executi
 
 ### 1. Initialize Lua System
 ```cpp
-PlayerObject player;
+void PlayerObject::SetupLuaActionMapping_test()
+{
+	// In your PlayerObject constructor or initialization:
+	AssetPath scriptPath(L"player_controller.lua", AssetPath::AssetSource::Project);
 
-// Load Lua script
-eastl::string scriptPath = "Projects/Templates/player_controller.lua";
-player.m_luaActionMapping.Initialize(scriptPath);
-player.m_luaActionMapping.SetPlayerObject(&player);
+	m_luaActionMapping.Initialize(WStringToUtf8(scriptPath.GetFullPath()));
+	m_luaActionMapping.SetPlayerObject(this);
+
+	// Bind keys
+	m_luaActionMapping.BindKey(Keys::Q, "onMoveForward");
+	m_luaActionMapping.BindKey(Keys::E, "onJump");
+
+	// Enable Lua mode
+	m_playerController.SetLuaCallbackMode(true);
+}
 ```
 
 ### 2. Bind Keys to Lua Functions
 ```cpp
-player.m_luaActionMapping.BindKey(Keys::W, "onMoveForward");
-player.m_luaActionMapping.BindKey(Keys::Space, "onJump");
-player.m_luaActionMapping.BindKey(Keys::E, "onInteract");
+	// Bind keys
+	m_luaActionMapping.BindKey(Keys::Q, "onMoveForward");
+	m_luaActionMapping.BindKey(Keys::E, "onJump");
 ```
 
 ### 3. Enable Lua Mode
 ```cpp
-player.m_playerController.SetLuaCallbackMode(true);
+    // Enable Lua mode
+	m_playerController.SetLuaCallbackMode(true);
 ```
 
-### 4. Input Handling (Already Implemented)
+### 4. Input Handling
 ```cpp
-// Your existing input code works automatically:
-player.m_playerController.HandleKeyDown(Keys::W);
-player.m_playerController.HandleKeyUp(Keys::W);
+void Game::HandleKeyDown(Keys key)
+{
+	m_playerObject->m_playerController.HandleKeyDown(key);
+}
+
+void Game::HandleKeyUp(Keys key)
+{
+	m_playerObject->m_playerController.HandleKeyUp(key);
+}
 ```
 
 ## Lua Script Structure
@@ -96,41 +112,68 @@ local len = v:Length()
 
 ### Example 1: Basic Setup in PlayerObject Constructor
 ```cpp
-PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem)
+void PlayerObject::SetupLuaActionMapping_test()
 {
-    // ... existing initialization ...
+	// In your PlayerObject constructor or initialization:
+	AssetPath scriptPath(L"player_controller.lua", AssetPath::AssetSource::Project);
 
-    // Initialize Lua
-    m_luaActionMapping.Initialize("Projects/Templates/player_controller.lua");
-    m_luaActionMapping.SetPlayerObject(this);
+	m_luaActionMapping.Initialize(WStringToUtf8(scriptPath.GetFullPath()));
+	m_luaActionMapping.SetPlayerObject(this);
 
-    // Bind keys
-    m_luaActionMapping.BindKey(Keys::W, "onMoveForward");
-    m_luaActionMapping.BindKey(Keys::S, "onMoveBackward");
-    m_luaActionMapping.BindKey(Keys::A, "onStrafeLeft");
-    m_luaActionMapping.BindKey(Keys::D, "onStrafeRight");
-    m_luaActionMapping.BindKey(Keys::Space, "onJump");
+	// Bind keys
+	m_luaActionMapping.BindKey(Keys::Q, "onMoveForward");
+	m_luaActionMapping.BindKey(Keys::E, "onJump");
 
-    // Enable Lua callbacks
-    m_playerController.SetLuaCallbackMode(true);
+	// Enable Lua mode
+	m_playerController.SetLuaCallbackMode(true);
 }
 ```
 
 ### Example 2: Input Polling Loop
 ```cpp
-void Game::Update(float deltaTime)
-{
-    // Your existing input system
-    if (InputDevice::instance->IsKeyDown(Keys::W)) {
-        m_player->m_playerController.HandleKeyDown(Keys::W);
-    }
-    
-    if (InputDevice::instance->IsKeyUp(Keys::W)) {
-        m_player->m_playerController.HandleKeyUp(Keys::W);
-    }
+void Game::Update(float deltaTime) {
 
-    // Update player (calls Lua if enabled)
-    m_player->m_playerController.UpdatePlayer(deltaTime);
+	 m_luaManager.Update(m_scene.get(), deltaTime);
+
+	 m_physicsSystem->Step(deltaTime);
+
+	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
+
+	 if (m_particleSystem)
+		 m_particleSystem->Update(deltaTime);
+
+	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+}
+
+void PlayerController::UpdatePlayer(float deltaTime)
+{
+	// Update input state for this frame - computes edge events
+	m_inputManager.Update();
+
+	// Handle camera rotation
+	m_player->m_playerCamera->RotateStickYawPitch(deltaTime * m_stickYawMoveDir, deltaTime * m_stickPitchMoveDir);
+	ExecuteAllOnKeyDown();
+
+	// Handle movement using InputManager (supports key held)
+	if (m_inputManager.IsKeyDown(Keys::W) ||
+		m_inputManager.IsKeyDown(Keys::A) ||
+		m_inputManager.IsKeyDown(Keys::S) ||
+		m_inputManager.IsKeyDown(Keys::D))
+	{
+		m_moveDir =
+		{
+			(m_inputManager.IsKeyDown(Keys::D) - m_inputManager.IsKeyDown(Keys::A)) * 1.0f,
+			0.0f,
+			(m_inputManager.IsKeyDown(Keys::W) - m_inputManager.IsKeyDown(Keys::S)) * 1.0f
+		};
+		m_moveDir.Normalize();
+		m_moveDir = DXSM::Vector3::Transform(m_moveDir, m_player->m_playerCamera->rotateCamToForward);
+		m_player->GetComponent<TransformComponent>()->m_position += m_moveDir * m_moveSpeed;
+	}
+
+	m_stickYawMoveDir = 0.0f;
+	m_stickPitchMoveDir = 0.0f;
+	m_moveDir = DXSM::Vector3::Zero;
 }
 ```
 
@@ -139,6 +182,25 @@ void Game::Update(float deltaTime)
 // Call Lua function directly with custom parameters
 m_player->m_luaActionMapping.ExecuteLuaFunction("onUpdate", deltaTime);
 m_player->m_luaActionMapping.ExecuteLuaFunction("onLookAround", mouseX, mouseY);
+
+void PlayerController::HandleKeyDown(Keys key)
+{
+	// Feed input to InputManager for proper edge detection
+	m_inputManager.ProcessKeyDown(key);
+
+	// Try Lua callback for key press (edge event)
+	if (m_useLuaCallbacks && m_player) {
+		// Only call Lua on the press event (not every frame while held)
+		if (m_inputManager.IsKeyPressed(key))
+		{
+			m_player->m_luaActionMapping.ExecuteKeyAction(key, "pressed");
+		}
+		else if (m_inputManager.IsKeyDown(key))
+		{
+			m_player->m_luaActionMapping.ExecuteKeyAction(key, "down");
+		}
+	}
+}
 ```
 
 ## Error Handling
@@ -236,7 +298,7 @@ end
 
 ## Performance Considerations
 
-1. **Lua Overhead**: ~1-5 microseconds per function call (negligible for input)
+1. **Lua Overhead**: per function call (negligible for input)
 2. **Use C++ for Hot Paths**: Keep per-frame physics/rendering in C++
 3. **Cache Lua Functions**: Don't look up functions every frame
 4. **Batch Operations**: Pass multiple values in one call vs many calls
@@ -302,8 +364,7 @@ end
 - Implementation: `SunshineEngine/src/PlayerObject/PlayerLuaKeyActionsMapping.cpp`
 - Controller Header: `SunshineEngine/include/PlayerObject/PlayerController.h`
 - Controller Impl: `SunshineEngine/src/PlayerObject/PlayerController.cpp`
-- Example Script: `Projects/Templates/player_controller.lua`
-- Integration Examples: `SunshineEngine/src/PlayerObject/PlayerLuaKeyActionsMapping_Examples.cpp`
+- Example Script: `Projects/$ProjectName$/player_controller.lua`
 
 ## Troubleshooting
 
@@ -330,15 +391,3 @@ end
 5. **Hot-Reload in Debug**: Enable script reloading for faster iteration
 6. **Keep Scripts Simple**: Complex logic should be in C++
 7. **Document Functions**: Add comments to Lua functions for team members
-
-## Next Steps
-
-1. Test basic movement with Lua callbacks
-2. Add more component bindings (Health, Inventory, etc.)
-3. Implement config file for key bindings
-4. Add Lua debugging tools
-5. Create more complex gameplay scripts
-
----
-
-**Questions?** Check `PlayerLuaKeyActionsMapping_Examples.cpp` for complete working examples.
