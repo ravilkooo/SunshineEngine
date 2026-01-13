@@ -129,10 +129,11 @@ void PlayerSettingPanel::DrawPlayerControllerDetails()
         EditorUI::FontStyles::Pop();
 
         const AssetPath& currentScript = m_playerObject->GetLuaScriptPath();
-        eastl::string scriptPath = WStringToUtf8(currentScript.GetFullPath());
+        eastl::string scriptPath = WStringToUtf8(currentScript.m_assetRelativePath);
         
         ImGui::SameLine();
-        if (m_playerObject->HasLuaScript()) {
+        if (m_playerObject->HasLuaScript())
+        {
             ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "%.50s", scriptPath.c_str());
         } else {
             ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "[Not Set]");
