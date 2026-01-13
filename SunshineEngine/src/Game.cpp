@@ -9,6 +9,7 @@
 Game::Game()
 {
 	// Initialize();
+	m_timer = GameTimer();
 }
 
 Game::~Game()
@@ -263,7 +264,6 @@ void Game::Run()
 void Game::Update(float deltaTime) {
 
 	 m_luaManager.Update(m_scene.get(), deltaTime);
-	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
 	 m_physicsSystem->Step(deltaTime);
 
@@ -271,6 +271,8 @@ void Game::Update(float deltaTime) {
 
 	 if (m_particleSystem)
 		 m_particleSystem->Update(deltaTime);
+
+	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
 	 // For Volodya
 	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
@@ -297,4 +299,20 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_screenHeight = resizeHeight;
 
 	m_renderer->OnResize(resizeWidth, resizeHeight);
+}
+
+
+void Game::HandleKeyDown(Keys key)
+{
+	m_playerObject->m_playerController.HandleKeyDown(key);
+}
+
+void Game::HandleKeyUp(Keys key)
+{
+	m_playerObject->m_playerController.HandleKeyUp(key);
+}
+
+void Game::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
+{
+	m_playerObject->m_playerController.HandleMouseMove(args);
 }

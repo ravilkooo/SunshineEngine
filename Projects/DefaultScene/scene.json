@@ -1293,6 +1293,20 @@
                         0.0,
                         0.0
                     ]
+                },
+                "keyFunctionMappings": [
+                    {
+                        "functionName": "onJump",
+                        "key": 69
+                    },
+                    {
+                        "functionName": "onMoveForward",
+                        "key": 81
+                    }
+                ],
+                "luaScript": {
+                    "assetSource": 1,
+                    "relativePath": "Scripts/player_controller.lua"
                 }
             }
         },

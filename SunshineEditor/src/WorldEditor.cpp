@@ -27,6 +27,7 @@
 
 WorldEditor::WorldEditor()
 {
+	m_timer = GameTimer();
 }
 
 WorldEditor::~WorldEditor()
@@ -551,6 +552,50 @@ void WorldEditor::CreateResourcesScene()
 	m_selectionPass->m_scene = m_scene.get();
 }
 
+void WorldEditor::HandleKeyDown(Keys key)
+{
+	// In editor mode, use editor input manager
+	m_editorInputManager.ProcessKeyDown(key);
+
+	// Handle special editor keys
+	if (key == Keys::RightButton) {
+		IsRightMousePressed = true;
+	}
+}
+void WorldEditor::HandleKeyUp(Keys key)
+{
+	// In editor mode, use editor input manager
+	m_editorInputManager.ProcessKeyUp(key);
+
+	// Handle special editor keys
+	if (key == Keys::RightButton) {
+		IsRightMousePressed = false;
+	}
+}
+
+void WorldEditor::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
+{
+	if (IsRightMousePressed)
+	{
+		float deltaTime = m_timer.GetDeltaTime();
+
+		m_renderer->m_mainCamera->RotateYaw(deltaTime * args.Offset.x * CameraRotateSpeed);
+		m_renderer->m_mainCamera->RotatePitch(-deltaTime * args.Offset.y * CameraRotateSpeed);
+	}
+
+	if (args.WheelDelta != 0.0f)
+	{
+		float deltaTime = m_timer.GetDeltaTime();
+
+		CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
+
+		if (CameraSpeed < MinCameraSpeed)
+			CameraSpeed = MinCameraSpeed;
+		else if (CameraSpeed > MaxCameraSpeed)
+			CameraSpeed = MaxCameraSpeed;
+	}
+}
+
 void WorldEditor::Start() {
 	m_renderer->Enable();
 	static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject))->m_miniViewRenderer->Enable();
@@ -568,6 +613,27 @@ void WorldEditor::Update(float deltaTime)
 	if (m_particleSystem)
 		m_particleSystem->Update(deltaTime);
 
+	if (IsRightMousePressed)
+	{
+		// Use InputManager for camera movement (supports held keys)
+		if (m_editorInputManager.IsKeyDown(Keys::W) || m_editorInputManager.IsKeyDown(Keys::S)) {
+			float forward = (m_editorInputManager.IsKeyDown(Keys::W) ? 1.0f : 0.0f)
+				- (m_editorInputManager.IsKeyDown(Keys::S) ? 1.0f : 0.0f);
+			m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
+		}
+
+		if (m_editorInputManager.IsKeyDown(Keys::D) || m_editorInputManager.IsKeyDown(Keys::A)) {
+			float right = (m_editorInputManager.IsKeyDown(Keys::D) ? 1.0f : 0.0f)
+				- (m_editorInputManager.IsKeyDown(Keys::A) ? 1.0f : 0.0f);
+			m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
+		}
+
+		if (m_editorInputManager.IsKeyDown(Keys::E) || m_editorInputManager.IsKeyDown(Keys::Q)) {
+			float up = (m_editorInputManager.IsKeyDown(Keys::E) ? 1.0f : 0.0f)
+				- (m_editorInputManager.IsKeyDown(Keys::Q) ? 1.0f : 0.0f);
+			m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
+		}
+	}
 	//m_luaManager.Update(m_scene, deltaTime);
 	//m_physicsSystem->Step(deltaTime);
 }

@@ -59,6 +59,7 @@ namespace SE
 		static WorldEditor* s_worldEditor;
 
 		eastl::string createDirectory() const;
+        eastl::string createScriptsDirectory() const;
 		static eastl::string createInitialScene(const Project& project);
 		// eastl::string copyTemplateFile(SceneType sceneType) const;
 		eastl::string renameDirectory(const eastl::wstring& newPath) const;

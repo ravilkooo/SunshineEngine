@@ -15,6 +15,9 @@
 
 #include <LogManager.h>
 
+#include <Windows/InputManager.h>
+#include <Windows/InputDevice.h>
+
 namespace SE
 {
     class ParticleSystem;
@@ -136,6 +139,20 @@ public:
     SE::UUID m_playerObject = SE::UUID(0u);
 
     SE::ParticleSystem* m_particleSystem;
+
+    // Robust input system for editor camera
+    InputManager m_editorInputManager;
+    // Input handling
+    void HandleKeyDown(Keys key);
+    void HandleKeyUp(Keys key);
+    void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
+
+    bool IsRightMousePressed = false;
+    float CameraSpeed = 20.0f;
+    float const MaxCameraSpeed = 100.0f;
+    float const MinCameraSpeed = 10.0f;
+    float const CameraSpeedStep = 10.0f;
+    float const CameraRotateSpeed = 0.5f;
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;
