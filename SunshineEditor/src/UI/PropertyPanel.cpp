@@ -16,6 +16,7 @@
 #include <GameObject/Shapes/ShapeCollection.h>
 #include <GameObject/Shapes/ShapeObject.h>
 
+#include <PlayerObject/PlayerObject.h>
 
 #include <ParticleSystem/ParticleEmitter.h>
 

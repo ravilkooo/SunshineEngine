@@ -51,6 +51,9 @@ PlayerObject_Info::PlayerObject_Info() : GameObject_Info()
 {
 	m_name = "PlayerObject";
 	m_group = GameObjectGroup::Player;
+	
+	m_luaScriptPath = AssetPath();
+	m_keyFunctionMapping = eastl::vector<KeyFunctionPair>();
 };
 
 PlayerObject_Info::PlayerObject_Info(SE_G::DeferredRenderer* renderSystem) : GameObject_Info()
@@ -67,6 +70,9 @@ PlayerObject_Info::PlayerObject_Info(SE_G::DeferredRenderer* renderSystem) : Gam
 			SE_G::IconData{ 4u, 0u, 1u, 1u, m_UUID.GetHilo() });
 
 	m_iconTech = static_cast<SE_G::IconTechnique*>(rc_info->AddTechnique(eastl::move(iconTech)));
+	
+	m_luaScriptPath = AssetPath();
+	m_keyFunctionMapping = eastl::vector<KeyFunctionPair>();
 };
 
 PlayerObject_Info::PlayerObject_Info(const json& j, SE_G::DeferredRenderer* renderSystem)
@@ -103,5 +109,19 @@ PlayerObject_Info::PlayerObject_Info(const json& j, SE_G::DeferredRenderer* rend
 	if (j["components"].contains("Physics"))
 	{
 		m_physComp->FromJson(j["components"]["Physics"]);
+	}
+
+	// Load Lua script configuration
+	if (j.contains("luaScript")) {
+		m_luaScriptPath.FromJson(j["luaScript"]);
+	}
+
+	// Load key-function mappings
+	if (j.contains("keyFunctionMappings")) {
+		//m_keyFunctionMapping.clear();
+		m_keyFunctionMapping = eastl::vector<KeyFunctionPair>();
+		for (const auto& pairJson : j["keyFunctionMappings"]) {
+			m_keyFunctionMapping.push_back(KeyFunctionPair::FromJson(pairJson));
+		}
 	}
 }

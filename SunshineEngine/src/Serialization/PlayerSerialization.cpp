@@ -60,6 +60,15 @@ json PlayerObject_Info::SettingsToJson() const
 		m_playerCamera->m_stickParams.offset.z
 	};
 
+	// Serialize Lua script path
+	j["luaScript"] = m_luaScriptPath.ToJson();
+
+	// Serialize key-function mappings
+	j["keyFunctionMappings"] = json::array();
+	for (const auto& pair : m_keyFunctionMapping) {
+		j["keyFunctionMappings"].push_back(pair.ToJson());
+	}
+
 	return j;
 }
 
@@ -88,6 +97,19 @@ void PlayerObject_Info::SettingsFromJson(const json& j, SE_G::DeferredRenderer* 
 			m_playerCamera->m_stickParams.offset.x = j["camera"]["offset"][0].get<float>();
 			m_playerCamera->m_stickParams.offset.y = j["camera"]["offset"][1].get<float>();
 			m_playerCamera->m_stickParams.offset.z = j["camera"]["offset"][2].get<float>();
+		}
+	}
+	
+	// Load Lua script
+	if (j.contains("luaScript")) {
+		m_luaScriptPath.FromJson(j["luaScript"]);
+	}
+
+	// Load key-function mappings
+	if (j.contains("keyFunctionMappings")) {
+		m_keyFunctionMapping.clear();
+		for (const auto& pairJson : j["keyFunctionMappings"]) {
+			m_keyFunctionMapping.push_back(KeyFunctionPair::FromJson(pairJson));
 		}
 	}
 }

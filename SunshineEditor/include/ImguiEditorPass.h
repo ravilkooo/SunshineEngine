@@ -14,14 +14,15 @@
 #include <Graphics/Renderer/Pass/RenderPass.h>
 #include <Graphics/Renderer/GBuffer.h>
 
-#include "UI/ContentBrowserPanel.h"
-#include "UI/MainMenuBarPanel.h"
-#include "UI/ToolbarPanel.h"
-#include "UI/BottomBarPanel.h"
-#include "UI/LogPanel.h"
-#include "UI/PropertyPanel.h"
-#include "UI/ProjectSelector.h"
-#include "UI/Gizmo.h"
+#include <UI/ContentBrowserPanel.h>
+#include <UI/MainMenuBarPanel.h>
+#include <UI/ToolbarPanel.h>
+#include <UI/BottomBarPanel.h>
+#include <UI/LogPanel.h>
+#include <UI/PropertyPanel.h>
+#include <UI/ProjectSelector.h>
+#include <UI/Gizmo.h>
+#include <UI/PlayerSettingPanel.h>
 
 class EditorApp;
 class WorldEditor;
@@ -80,6 +81,8 @@ public:
     LogPanel m_GameLogPanel = LogPanel{"Game Output Log", LogManager::LogTarget::Game};
     BottomBarPanel m_BottomPanel;
     PropertyPanel m_PropertyPanel;
+	PlayerSettingPanel m_PlayerSettingPanel;
+
     SE::ProjectSelector m_ProjectSelector;
     bool m_ProjectSelected = false;
 
