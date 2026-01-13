@@ -7,9 +7,6 @@ using json = nlohmann::json;
 
 void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera)
 {
-	m_playerCamera = camera;
-	m_playerCamera->SetFollowPlayer(m_UUID);
-
 	if (j.contains("camera"))
 	{
 		if (j["camera"].contains("stickLength")) {
@@ -31,6 +28,16 @@ void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camer
 			m_playerCamera->m_stickParams.offset.y = j["camera"]["offset"][1].get<float>();
 			m_playerCamera->m_stickParams.offset.z = j["camera"]["offset"][2].get<float>();
 		}
+	}
+
+	// Load Lua script
+	if (j.contains("luaScript") && j.contains("keyFunctionMappings"))
+	{
+		SetupLuaActionMapping(j);
+	}
+	else
+	{
+		SetDefaultLuaActionMapping();
 	}
 }
 

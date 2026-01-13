@@ -5,7 +5,7 @@
 #include <Utils/AssetPath.h>
 #include <Utils/StringUtils.h>
 
-PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem)
+PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, eastl::shared_ptr<SE_G::Camera> camera)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
 	m_name = "PlayerObject";
@@ -27,21 +27,46 @@ PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem)
 		device, rc, tc, m_UUID);
 
 	m_playerController.SetPlayerObject(this);
-	
-	SetupLuaActionMapping_test();
+
+	m_playerCamera = camera;
+	m_playerCamera->SetFollowPlayer(m_UUID);
+
+	if (j.contains("settings"))
+	{
+		SettingsFromJson(j["settings"], camera);
+	}
+	else
+	{
+		json _empty;
+		SettingsFromJson(_empty, camera);
+	}
 }
 
-void PlayerObject::SetupLuaActionMapping_test()
+void PlayerObject::SetDefaultLuaActionMapping()
 {
 	// In your PlayerObject constructor or initialization:
-	AssetPath scriptPath(L"player_controller.lua", AssetPath::AssetSource::Project);
+	AssetPath scriptPath(L"Scripts/player_controller.lua", AssetPath::AssetSource::Project);
 
-	m_luaActionMapping.Initialize(WStringToUtf8(scriptPath.GetFullPath()));
+	m_luaActionMapping.Initialize(scriptPath);
 	m_luaActionMapping.SetPlayerObject(this);
 
 	// Bind keys
 	m_luaActionMapping.BindKey(Keys::Q, "onMoveForward");
 	m_luaActionMapping.BindKey(Keys::E, "onJump");
+
+	// Enable Lua mode
+	m_playerController.SetLuaCallbackMode(true);
+}
+
+void PlayerObject::SetupLuaActionMapping(const json& j)
+{
+	AssetPath scriptPath; scriptPath.FromJson(j["luaScript"]);
+
+	m_luaActionMapping.Initialize(scriptPath);
+	m_luaActionMapping.SetPlayerObject(this);
+
+	// Bind keys
+	m_luaActionMapping.InitBindingFromJson(j["keyFunctionMappings"]);
 
 	// Enable Lua mode
 	m_playerController.SetLuaCallbackMode(true);
@@ -110,18 +135,14 @@ PlayerObject_Info::PlayerObject_Info(const json& j, SE_G::DeferredRenderer* rend
 	{
 		m_physComp->FromJson(j["components"]["Physics"]);
 	}
-
-	// Load Lua script configuration
-	if (j.contains("luaScript")) {
-		m_luaScriptPath.FromJson(j["luaScript"]);
+	
+	if (j.contains("settings"))
+	{
+		SettingsFromJson(j["settings"], renderSystem);
 	}
-
-	// Load key-function mappings
-	if (j.contains("keyFunctionMappings")) {
-		//m_keyFunctionMapping.clear();
-		m_keyFunctionMapping = eastl::vector<KeyFunctionPair>();
-		for (const auto& pairJson : j["keyFunctionMappings"]) {
-			m_keyFunctionMapping.push_back(KeyFunctionPair::FromJson(pairJson));
-		}
+	else
+	{
+		json _empty;
+		SettingsFromJson(_empty, renderSystem);
 	}
 }

@@ -37,7 +37,7 @@ public:
 		m_name = "PlayerObject";
 	};
 
-	PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem);
+	PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, eastl::shared_ptr<SE_G::Camera> camera);
 
 	void SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera);
 
@@ -55,7 +55,8 @@ public:
 
 	void SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer);
 
-	void SetupLuaActionMapping_test();
+	void SetDefaultLuaActionMapping();
+	void SetupLuaActionMapping(const json& j);
 
 	PlayerLuaKeyActionsMapping m_luaActionMapping;
 };

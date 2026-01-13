@@ -672,17 +672,8 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                 break;
             case GameObjectGroup::Player:
             {
-                go = eastl::make_unique<PlayerObject>(objJ, renderSystem);
+                go = eastl::make_unique<PlayerObject>(objJ, renderSystem, camera);
                 auto playerObj = static_cast<PlayerObject*>(go.get());
-                if (objJ.contains("settings"))
-                {
-                    playerObj->SettingsFromJson(objJ["settings"], camera);
-                }
-                else
-                {
-                    json _empty;
-                    playerObj->SettingsFromJson(_empty, camera);
-                }
                 playerObj->AssignSceneToCamera(scene.get());
                 scene->m_playerObjectUUID = playerObj->m_UUID;
                 break;
@@ -824,15 +815,6 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
             {
                 go = eastl::make_unique<PlayerObject_Info>(objJ, renderSystem);
                 auto playerObj = static_cast<PlayerObject_Info*>(go.get());
-                if (objJ.contains("settings"))
-                {
-                    playerObj->SettingsFromJson(objJ["settings"], renderSystem);
-                }
-                else
-                {
-                    json _empty;
-                    playerObj->SettingsFromJson(_empty, renderSystem);
-                }
                 playerObj->AssignSceneToCamera(scene.get());
                 scene->m_playerObject = playerObj->m_UUID;
                 break;

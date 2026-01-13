@@ -1305,8 +1305,8 @@
                     }
                 ],
                 "luaScript": {
-                    "assetSource": 0,
-                    "relativePath": ""
+                    "assetSource": 1,
+                    "relativePath": "Scripts/player_controller.lua"
                 }
             }
         },

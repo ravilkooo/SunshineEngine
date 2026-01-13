@@ -7,15 +7,16 @@
 
 PlayerLuaKeyActionsMapping::PlayerLuaKeyActionsMapping()
 {
+	m_keyActionMapping = eastl::unordered_map<Keys, eastl::string>();
 }
 
 PlayerLuaKeyActionsMapping::~PlayerLuaKeyActionsMapping()
 {
 }
 
-bool PlayerLuaKeyActionsMapping::Initialize(const eastl::string& scriptPath)
+bool PlayerLuaKeyActionsMapping::Initialize(const AssetPath& scriptPath)
 {
-	m_scriptPath = scriptPath;
+	m_luaScriptPath = scriptPath;
 	m_luaState = eastl::make_unique<sol::state>();
 
 	// Open standard Lua libraries
@@ -32,7 +33,7 @@ bool PlayerLuaKeyActionsMapping::Initialize(const eastl::string& scriptPath)
 
 	// Load the Lua script
 	try {
-		auto result = m_luaState->safe_script_file(scriptPath.c_str());
+		auto result = m_luaState->safe_script_file(WStringToUtf8(m_luaScriptPath.GetFullPath()).c_str());
 		if (!result.valid()) {
 			sol::error err = result;
 			LogError("Failed to load Lua script: " + eastl::string(err.what()));
@@ -71,6 +72,16 @@ void PlayerLuaKeyActionsMapping::BindKeyByString(const eastl::string& keyName, c
 	}
 }
 
+
+void PlayerLuaKeyActionsMapping::InitBindingFromJson(const json& j)
+{
+	// Load key-function mappings
+	for (const auto& pairJson : j) {
+		auto pair = KeyFunctionPair::FromJson(pairJson);
+		BindKey(pair.key, pair.functionName);
+	}
+}
+
 void PlayerLuaKeyActionsMapping::UnbindKey(Keys key)
 {
 	m_keyActionMapping.erase(key);
@@ -102,8 +113,8 @@ eastl::optional<eastl::string> PlayerLuaKeyActionsMapping::GetBoundFunction(Keys
 
 bool PlayerLuaKeyActionsMapping::ReloadScript()
 {
-	if (m_scriptPath.empty()) return false;
-	return Initialize(m_scriptPath);
+	if (m_luaScriptPath.m_assetRelativePath.empty()) return false;
+	return Initialize(m_luaScriptPath);
 }
 
 void PlayerLuaKeyActionsMapping::LogError(const eastl::string& message)
