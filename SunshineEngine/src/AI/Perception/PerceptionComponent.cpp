@@ -11,6 +11,7 @@
 #include <Scripting/ComponentBindings.h>
 
 
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- SIGHT
 // ------------------------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@ PerceptionComponent::~PerceptionComponent()
 	PerceptionSystem::Get().RemoveFromTeam(TeamId, this);
 }
 
-bool PerceptionComponent::SetSight(float NewSightRadius, float NewLoseRadius, float NewFieldOfView, bool NewCanSeeThroughObjects)
+bool PerceptionComponent::SetSight(float NewSightRadius, float NewLoseRadius, float NewFieldOfView, DXSM::Vector3 NewEyesOffset, bool NewCanSeeThroughObjects)
 {
 	if (NewSightRadius < 0.0f || NewLoseRadius < 0.0f)
 	{
@@ -40,9 +41,10 @@ bool PerceptionComponent::SetSight(float NewSightRadius, float NewLoseRadius, fl
 		return false;
 	}
 
-	SightRadius = SightRadius;
+	SightRadius = NewSightRadius;
 	LoseRadius = NewLoseRadius;
 	FieldOfView = NewFieldOfView;
+	EyesOffset = NewEyesOffset;
 	CanSeeThroughObjects = NewCanSeeThroughObjects;
 
 	return true;
@@ -99,6 +101,9 @@ bool PerceptionComponent::SetFieldOfView(float NewFieldOfView)
 
 	return true;
 }
+
+
+
 
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- HEARING
@@ -170,6 +175,9 @@ bool PerceptionComponent::SetSensitivity(float NewSensitivity)
 	return true;
 }
 
+
+
+
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- LISTENERS
 // ------------------------------------------------------------------------------------------------------
@@ -197,6 +205,9 @@ uint64_t PerceptionComponent::AddDamageCallback(const sol::function& Callback)
 
 	return id;
 }
+
+
+
 
 // ------------------------------------------------------------------------------------------------------
 // ---------------------------------- EVENTS
@@ -280,5 +291,3 @@ LUA_REGISTER_COMPONENT(
 	PERCEPTIONCOMPONENT_LUA_METHODS_APPLY(ADD_METHOD),
 	"getPerceptionComponent"
 )
-
-#undef ADD_METHOD

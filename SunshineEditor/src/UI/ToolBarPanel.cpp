@@ -243,7 +243,13 @@ void ToolbarPanel::AddDirectionalLight()
     {
         if (m_camera)
         {
-            auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer, m_camera);
+            auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer, m_camera,
+                {
+                    DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+                    DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+                    DXSM::Vector3::Zero, 0,
+                    DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
+                });
             
             if (directionalLightObject)
             {
@@ -259,7 +265,13 @@ void ToolbarPanel::AddPointLight()
     {
         if (m_camera)
         {
-            auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer, m_camera);
+            auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer, m_camera,
+                {
+                    DXSM::Vector3::One, 1.0f,
+                    DXSM::Vector3::One, 1.0f,
+                    DXSM::Vector3::Zero, 20,
+                    DXSM::Vector3::One, 0
+                });
             
             if (pointLightObject)
             {
@@ -275,7 +287,14 @@ void ToolbarPanel::AddSpotLight()
     {
         if (m_camera)
         {
-            auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer, m_camera);
+            auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer, m_camera,
+                {
+                    DXSM::Vector3::One, 1.0f,
+                    DXSM::Vector3::One, 1.0f,
+                    DXSM::Vector3::Zero, 20,
+                    DXSM::Vector2(0, -DX::XM_PIDIV4), 10, 0,
+                    DXSM::Vector3::One, 0
+                });
             
             if (spotLightObject)
             {

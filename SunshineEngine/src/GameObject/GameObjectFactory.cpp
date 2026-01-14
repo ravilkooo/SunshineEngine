@@ -501,7 +501,7 @@ eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObj
 	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::DirectionalLightData initData)
 {
-	auto obj = eastl::make_unique<DirectionalLight>(renderSystem, camera, initData);
+	auto obj = eastl::make_unique<DirectionalLight>(renderSystem, camera, initData, true);
 	return obj;
 }
 

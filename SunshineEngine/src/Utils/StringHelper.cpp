@@ -81,3 +81,13 @@ eastl::wstring StringHelper::StringToWide(const eastl::string& s)
     mbstowcs(&result[0], s.c_str(), len);
     return result;
 }
+
+eastl::string StringHelper::ToEASTL(const std::string& str)
+{
+    return eastl::string(str.c_str(), str.size());
+}
+
+std::string StringHelper::ToSTD(const eastl::string& str)
+{
+    return std::string(str.c_str(), str.size());
+}

@@ -229,7 +229,7 @@ eastl::unique_ptr<DirectionalLight_Info> EditorObjectFactory::CreateDirectionalL
 	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::DirectionalLightData initData)
 {
-	auto obj = eastl::make_unique<DirectionalLight_Info>(renderSystem, camera, initData);
+	auto obj = eastl::make_unique<DirectionalLight_Info>(renderSystem, camera, initData, true);
 	return obj;
 }
 
