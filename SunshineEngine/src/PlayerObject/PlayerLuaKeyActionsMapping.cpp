@@ -140,10 +140,50 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 	// Register Camera type
 	m_luaState->new_usertype<SE_G::Camera>("Camera",
 		sol::no_constructor,
+		// Properties (read-only)
 		"forward", sol::readonly(&SE_G::Camera::forward),
 		"up", sol::readonly(&SE_G::Camera::up),
 		"right", sol::readonly(&SE_G::Camera::right),
-		"position", sol::readonly(&SE_G::Camera::position)
+		"position", sol::readonly(&SE_G::Camera::position),
+		// Position methods
+		"SetPosition", &SE_G::Camera::SetPosition,
+		"GetPosition", &SE_G::Camera::GetPosition,
+		// Target methods
+		"SetTarget", &SE_G::Camera::SetTarget,
+		"GetTarget", &SE_G::Camera::GetTarget,
+		// Up vector methods
+		"SetUp", &SE_G::Camera::SetUp,
+		"GetUp", &SE_G::Camera::GetUp,
+		// Near/Far Z methods
+		"SetNearZ", &SE_G::Camera::SetNearZ,
+		"GetNearZ", &SE_G::Camera::GetNearZ,
+		"SetFarZ", &SE_G::Camera::SetFarZ,
+		"GetFarZ", &SE_G::Camera::GetFarZ,
+		// Reference length
+		"SetReferenceLen", &SE_G::Camera::SetReferenceLen,
+		"GetReferenceLen", &SE_G::Camera::GetReferenceLen,
+		// View dimensions
+		"GetViewWidth", &SE_G::Camera::GetViewWidth,
+		"GetViewHeight", &SE_G::Camera::GetViewHeight,
+		// Movement methods
+		"MoveForward", &SE_G::Camera::MoveForward,
+		"MoveBackward", &SE_G::Camera::MoveBackward,
+		"MoveLeft", &SE_G::Camera::MoveLeft,
+		"MoveRight", &SE_G::Camera::MoveRight,
+		"MoveUp", &SE_G::Camera::MoveUp,
+		"MoveDown", &SE_G::Camera::MoveDown,
+		// Rotation methods
+		"RotateYaw", &SE_G::Camera::RotateYaw,
+		"RotatePitch", &SE_G::Camera::RotatePitch,
+		// Camera mode
+		"SwitchToFPSMode", &SE_G::Camera::SwitchToFPSMode
+		/*
+		// Update methods
+		"Update", sol::overload(
+			static_cast<void (SE_G::Camera::*)()>(&SE_G::Camera::Update),
+			static_cast<void (SE_G::Camera::*)(const DXSM::Vector3)>(&SE_G::Camera::Update)
+		)
+		*/
 	);
 
 	// Register TransformComponent

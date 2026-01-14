@@ -577,16 +577,12 @@ void WorldEditor::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
 	if (IsRightMousePressed)
 	{
-		float deltaTime = m_timer.GetDeltaTime();
-
-		m_renderer->m_mainCamera->RotateYaw(deltaTime * args.Offset.x * CameraRotateSpeed);
-		m_renderer->m_mainCamera->RotatePitch(-deltaTime * args.Offset.y * CameraRotateSpeed);
+		m_renderer->m_mainCamera->RotateYaw(args.Offset.x * CameraRotateSpeed);
+		m_renderer->m_mainCamera->RotatePitch(-args.Offset.y * CameraRotateSpeed);
 	}
 
 	if (args.WheelDelta != 0.0f)
 	{
-		float deltaTime = m_timer.GetDeltaTime();
-
 		CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
 
 		if (CameraSpeed < MinCameraSpeed)
@@ -619,23 +615,34 @@ void WorldEditor::Update(float deltaTime)
 		if (m_editorInputManager.IsKeyDown(Keys::W) || m_editorInputManager.IsKeyDown(Keys::S)) {
 			float forward = (m_editorInputManager.IsKeyDown(Keys::W) ? 1.0f : 0.0f)
 				- (m_editorInputManager.IsKeyDown(Keys::S) ? 1.0f : 0.0f);
-			m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
+			m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed);
 		}
 
 		if (m_editorInputManager.IsKeyDown(Keys::D) || m_editorInputManager.IsKeyDown(Keys::A)) {
 			float right = (m_editorInputManager.IsKeyDown(Keys::D) ? 1.0f : 0.0f)
 				- (m_editorInputManager.IsKeyDown(Keys::A) ? 1.0f : 0.0f);
-			m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
+			m_renderer->m_mainCamera->MoveRight(right * CameraSpeed);
 		}
 
 		if (m_editorInputManager.IsKeyDown(Keys::E) || m_editorInputManager.IsKeyDown(Keys::Q)) {
 			float up = (m_editorInputManager.IsKeyDown(Keys::E) ? 1.0f : 0.0f)
 				- (m_editorInputManager.IsKeyDown(Keys::Q) ? 1.0f : 0.0f);
-			m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
+			m_renderer->m_mainCamera->MoveUp(up * CameraSpeed);
 		}
 	}
 	//m_luaManager.Update(m_scene, deltaTime);
 	//m_physicsSystem->Step(deltaTime);
+
+	m_renderer->GetMainCamera()->Update(deltaTime);
+
+	if (m_scene && (m_scene->m_playerObject != SE::UUID(0u)))
+	{
+		static_cast<PlayerObject_Info*>(
+			m_scene->GetGameObjectByUUID(m_scene->m_playerObject))->m_playerCamera->Update(deltaTime);
+	}
+	//scene->m_playerObject
+
+	//m_playerObject->m_playerCamera->Update(deltaTime);
 }
 
 /*
@@ -820,5 +827,3 @@ void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::
 	// trComp->m_position = DXSM::Vector3(worldPos);
 }
 */
-
-

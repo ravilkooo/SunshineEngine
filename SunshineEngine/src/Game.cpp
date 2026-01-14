@@ -274,6 +274,7 @@ void Game::Update(float deltaTime) {
 
 	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
+	 m_renderer->GetMainCamera()->Update(deltaTime);
 	 // For Volodya
 	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
 }

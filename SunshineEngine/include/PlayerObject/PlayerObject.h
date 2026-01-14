@@ -4,16 +4,13 @@
 #include <EASTL/vector.h>
 
 #include <GameObject/GameObject.h>
-#include <Component/TransformComponent.h>
-#include <Component/MeshComponent.h>
-#include <Graphics/Utils/Camera.h>
+
+#include <PlayerObject/PlayerController.h>
 #include <PlayerObject/PlayerLuaKeyActionsMapping.h>
 #include <PlayerObject/KeyFunctionPair.h>
-#include <Utils/AssetPath.h>
-
-#include <Graphics/Renderer/DeferredRenderer.h>
 #include <PlayerObject/MiniViewRenderer.h>
-#include <PlayerObject/PlayerController.h>
+
+#include <Utils/AssetPath.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -32,26 +29,15 @@ public:
 	// Input
 	PlayerController m_playerController;
 
-	PlayerObject() : GameObject()
-	{
-		m_name = "PlayerObject";
-	};
+	PlayerObject();
 
 	PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, eastl::shared_ptr<SE_G::Camera> camera);
 
 	void SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera);
 
-	void SetUpCamera(SE_G::DeferredRenderer* renderSystem)
-	{
-		m_playerCamera = eastl::make_shared<SE_G::Camera>(
-			renderSystem->GetDevice(), renderSystem->m_screenWidth / renderSystem->m_screenHeight);
-		m_playerCamera->SetFollowPlayer(m_UUID);
-	}
+	void SetUpCamera(SE_G::DeferredRenderer* renderSystem);
 
-	void AssignSceneToCamera(Scene* scene)
-	{
-		m_playerCamera->AssignScene(scene);
-	}
+	void AssignSceneToCamera(Scene* scene);
 
 	void SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer);
 
@@ -99,202 +85,84 @@ public:
 	/**
 	 * Set the Lua script path
 	 */
-	void SetLuaScriptPath(const AssetPath& scriptPath)
-	{
-		m_luaScriptPath = scriptPath;
-	}
+	void SetLuaScriptPath(const AssetPath& scriptPath);
 
 	/**
 	 * Get the Lua script path
 	 */
-	const AssetPath& GetLuaScriptPath() const
-	{
-		return m_luaScriptPath;
-	}
+	const AssetPath& GetLuaScriptPath() const;
 
 	/**
 	 * Check if a Lua script is set
 	 */
-	bool HasLuaScript() const
-	{
-		return !m_luaScriptPath.GetFullPath().empty();
-	}
+	bool HasLuaScript() const;
 
 	// ===== Key-Function Pair Management =====
 
 	/**
 	 * Add a new key-function binding pair
 	 */
-	void AddKeyFunctionPair(Keys key, const eastl::string& functionName)
-	{
-		if (key != Keys::None && !functionName.empty()) {
-			m_keyFunctionMapping.push_back(KeyFunctionPair(key, functionName));
-		}
-	}
+	void AddKeyFunctionPair(Keys key, const eastl::string& functionName);
 
 	/**
 	 * Add a key-function pair
 	 */
-	void AddKeyFunctionPair(const KeyFunctionPair& pair)
-	{
-		if (pair.IsValid()) {
-			m_keyFunctionMapping.push_back(pair);
-		}
-	}
+	void AddKeyFunctionPair(const KeyFunctionPair& pair);
 
 	/**
 	 * Remove a key-function pair by index
 	 */
-	bool RemoveKeyFunctionPair(size_t index)
-	{
-		if (index < m_keyFunctionMapping.size()) {
-			m_keyFunctionMapping.erase(m_keyFunctionMapping.begin() + index);
-			return true;
-		}
-		return false;
-	}
+	bool RemoveKeyFunctionPair(size_t index);
 
 	/**
 	 * Edit a key-function pair at specific index
 	 */
-	bool EditKeyFunctionPair(size_t index, Keys newKey, const eastl::string& newFunctionName)
-	{
-		if (index < m_keyFunctionMapping.size()) {
-			if (newKey != Keys::None && !newFunctionName.empty()) {
-				m_keyFunctionMapping[index].key = newKey;
-				m_keyFunctionMapping[index].functionName = newFunctionName;
-				return true;
-			}
-		}
-		return false;
-	}
+	bool EditKeyFunctionPair(size_t index, Keys newKey, const eastl::string& newFunctionName);
 
 	/**
 	 * Edit key for a specific pair
 	 */
-	bool EditKeyFunctionPairKey(size_t index, Keys newKey)
-	{
-		if (index < m_keyFunctionMapping.size() && newKey != Keys::None) {
-			m_keyFunctionMapping[index].key = newKey;
-			return true;
-		}
-		return false;
-	}
+	bool EditKeyFunctionPairKey(size_t index, Keys newKey);
 
 	/**
 	 * Edit function name for a specific pair
 	 */
-	bool EditKeyFunctionPairFunction(size_t index, const eastl::string& newFunctionName)
-	{
-		if (index < m_keyFunctionMapping.size() && !newFunctionName.empty()) {
-			m_keyFunctionMapping[index].functionName = newFunctionName;
-			return true;
-		}
-		return false;
-	}
+	bool EditKeyFunctionPairFunction(size_t index, const eastl::string& newFunctionName);
 
 	/**
 	 * Get a key-function pair by index
 	 */
-	const KeyFunctionPair* GetKeyFunctionPair(size_t index) const
-	{
-		if (index < m_keyFunctionMapping.size()) {
-			return &m_keyFunctionMapping[index];
-		}
-		return nullptr;
-	}
+	const KeyFunctionPair* GetKeyFunctionPair(size_t index) const;
 
 	/**
 	 * Get all key-function pairs
 	 */
-	const eastl::vector<KeyFunctionPair>& GetAllKeyFunctionPairs() const
-	{
-		return m_keyFunctionMapping;
-	}
+	const eastl::vector<KeyFunctionPair>& GetAllKeyFunctionPairs() const;
 
 	/**
 	 * Get number of key-function pairs
 	 */
-	size_t GetKeyFunctionPairCount() const
-	{
-		return m_keyFunctionMapping.size();
-	}
+	size_t GetKeyFunctionPairCount() const;
 
 	/**
 	 * Clear all key-function pairs
 	 */
-	void ClearKeyFunctionPairs()
-	{
-		m_keyFunctionMapping.clear();
-	}
+	void ClearKeyFunctionPairs();
 
 	/**
 	 * Find index of pair by key
 	 */
-	int FindPairIndexByKey(Keys key) const
-	{
-		for (size_t i = 0; i < m_keyFunctionMapping.size(); ++i) {
-			if (m_keyFunctionMapping[i].key == key) {
-				return static_cast<int>(i);
-			}
-		}
-		return -1;
-	}
+	int FindPairIndexByKey(Keys key) const;
 
-	void AddRenderComponent(SE_G::DeferredRenderer* renderSystem)
-	{
-		m_renderComp = this->AddComponent<RenderComponent_Info>(this->m_UUID, renderSystem).get();
-	};
+	void AddRenderComponent(SE_G::DeferredRenderer* renderSystem);
+	void AddTransformComponent(ID3D11Device* device);
+	void AddMeshComponent();
+	void AddPhysicsComponent();
 
-	void AddTransformComponent(ID3D11Device* device)
-	{
-		m_transformComp = this->AddComponent<TransformComponent_Info>(device).get();
-	};
-
-	void AddMeshComponent()
-	{
-		auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-			m_renderComp->GetDevice(),
-			DXSM::Vector3(1.0f, 1.0f, 1.0f)
-		);
-		m_meshComp = this->AddComponent<MeshComponent_Info>(
-			m_renderComp, m_transformComp, this->m_UUID, meshPtr).get();
-	};
-
-	void AddPhysicsComponent()
-	{
-		m_physComp = this->AddComponent<PhysicsComponent_Info>(
-			m_renderComp, m_transformComp).get();
-
-		m_physComp->SetMotion(SE::PhysicsMotionType::Kinematic);
-	};
-
-	void InitMiniViewport(SE_G::DeferredRenderer* defRenderer)
-	{
-		m_miniViewRenderer = eastl::make_shared<SE_G::MiniViewRenderer>(
-			"PlayerViewport", defRenderer->GetDevice(), defRenderer->GetDeviceContext());
-		m_miniViewRenderer->SetParentRenderer(defRenderer);
-		m_miniViewRenderer->Disable();
-	}
-	
-	void AssignSceneToCamera(Scene_Info* scene)
-	{
-		m_playerCamera->AssignScene(scene);
-	}
-
-	void SetUpCamera()
-	{
-		m_playerCamera = eastl::make_shared<SE_G::Camera>(
-			m_miniViewRenderer->GetDevice(), 640.0f / 360.0f);
-		m_playerCamera->SetFollowPlayer(m_UUID);
-		m_miniViewRenderer->SetMainCamera(m_playerCamera);
-	}
-
-	void RenderViewport()
-	{
-		m_miniViewRenderer->Pass();
-	}
-
+	void InitMiniViewport(SE_G::DeferredRenderer* defRenderer);
+	void AssignSceneToCamera(Scene_Info* scene);
+	void SetUpCamera();
+	void RenderViewport();
 
 public:
 
