@@ -210,8 +210,10 @@ namespace SE_G {
         return referenceLen;
     }
 
-    void Camera::Update()
+    void Camera::Update(float deltaTime)
     {
+		m_deltaTime = deltaTime;
+
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
             if (!m_playerTransform)
@@ -327,7 +329,6 @@ namespace SE_G {
 
     DX::XMMATRIX Camera::GetViewMatrix()
     {
-        Update();
         return XMMatrixLookAtLH(position, target, up);
     }
 
@@ -343,23 +344,23 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::ORBITAL)
         {
-            orbitalDistance = eastl::max(orbitalDistance - speed, referenceLen);
+            orbitalDistance = eastl::max(orbitalDistance - speed * m_deltaTime, referenceLen);
         }
         else
         {
             //DX::XMVECTOR forward = XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position));
             DXSM::Vector3 forward = target - position;
             forward.Normalize();
-            position.x += speed * forward.x;
-            position.y += speed * forward.y;
-            position.z += speed * forward.z;
-            target.x += speed * forward.x;
-            target.y += speed * forward.y;
-            target.z += speed * forward.z;
+            position.x += speed * m_deltaTime * forward.x;
+            position.y += speed * m_deltaTime * forward.y;
+            position.z += speed * m_deltaTime * forward.z;
+            target.x += speed * m_deltaTime * forward.x;
+            target.y += speed * m_deltaTime * forward.y;
+            target.z += speed * m_deltaTime * forward.z;
         }
         if (!isPerspective)
         {
-            orthZ = eastl::max(orthZ + speed, nearZ * 1.1f);
+            orthZ = eastl::max(orthZ + speed * m_deltaTime, nearZ * 1.1f);
         }
     }
 
@@ -372,7 +373,7 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::ORBITAL)
         {
-            orbitalYaw -= speed;
+            orbitalYaw -= speed * m_deltaTime;
         }
         else
         {
@@ -384,12 +385,12 @@ namespace SE_G {
             */
             DXSM::Vector3 right = (target - position).Cross(up);
             right.Normalize();
-            position.x += speed * right.x;
-            position.y += speed * right.y;
-            position.z += speed * right.z;
-            target.x += speed * right.x;
-            target.y += speed * right.y;
-            target.z += speed * right.z;
+            position.x += speed * m_deltaTime * right.x;
+            position.y += speed * m_deltaTime * right.y;
+            position.z += speed * m_deltaTime * right.z;
+            target.x += speed * m_deltaTime * right.x;
+            target.y += speed * m_deltaTime * right.y;
+            target.z += speed * m_deltaTime * right.z;
         }
     }
 
@@ -402,12 +403,12 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::ORBITAL)
         {
-            orbitalPitch += speed;
+            orbitalPitch += speed * m_deltaTime;
         }
         else
         {
-            position.y += speed;
-            target.y += speed;
+            position.y += speed * m_deltaTime;
+            target.y += speed * m_deltaTime;
         }
     }
 
@@ -420,12 +421,12 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::ORBITAL)
         {
-            orbitalYaw += angle;
+            orbitalYaw += angle * m_deltaTime;
         }
         else
         {
             DXSM::Vector3 look_dir = DXSM::Vector3::Transform(target - position,
-                DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(up, angle)));
+                DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(up, angle * m_deltaTime)));
             target = position + look_dir;
         }
     }
@@ -434,11 +435,11 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::ORBITAL)
         {
-            orbitalPitch += angle;
+            orbitalPitch += angle * m_deltaTime;
         }
         else if (cameraMode == CAMERA_MODE::FOLLOW)
         {
-            followPitch = eastl::min(eastl::max(-DX::XM_PIDIV2 * 0.9f, followPitch + angle), 0.0f);
+            followPitch = eastl::min(eastl::max(-DX::XM_PIDIV2 * 0.9f, followPitch + angle * m_deltaTime), 0.0f);
             float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
             DXSM::Vector3 direction = (target - position);
             direction.y = 0; direction.Normalize();
@@ -449,7 +450,7 @@ namespace SE_G {
             DXSM::Vector3 look_dir = target - position;
             DXSM::Vector3 _axis = up.Cross(look_dir);
             look_dir = DXSM::Vector3::Transform(look_dir,
-                DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(_axis, -angle)));
+                DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(_axis, -angle * m_deltaTime)));
             target = position + look_dir;
         }
     }

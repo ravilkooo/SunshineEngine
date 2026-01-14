@@ -74,7 +74,7 @@ namespace SE_G {
         void SetReferenceLen(float referenceLen);
         float GetReferenceLen();
 
-        void Update();
+        void Update(float deltaTime);
         void Update(const DXSM::Vector3 targetPoistion);
         void Update(const DXSM::Matrix targetTransform);
         void Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
@@ -202,5 +202,7 @@ namespace SE_G {
         bool m_playerPointerInited = false;
 
         SE::UUID m_playerUUID = SE::UUID(0u);
+
+        float m_deltaTime = 1.0f;
     };
 }
