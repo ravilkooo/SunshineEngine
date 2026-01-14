@@ -1,3 +1,5 @@
-!DefaultScene
+!DefaultScene/
+!DefaultScene/**
 !Templates
-!Hierarchy
+!Hierarchy/
+!Hierarchy/**

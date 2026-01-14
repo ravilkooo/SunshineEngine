@@ -112,9 +112,10 @@ Simple 3D Game Engine
    cmake .. -G "Visual Studio 17 2022" -A x64
    ```
 3. Open project `Sunshine.sln`
-4. Build `ALL_BUILD` (see in *CMakePredefinedTargets*)
-5. '*Set as Startup Project*' on `SunshineEditor` (VS 2022)
-6. Run Editor
+4. Copy fmodL.dll file to build: from `$RepoFolder$\ThirdParty\FMOD\api\lib\x64` to `$RepoFolder$\build\bin\Debug`
+5. Build `ALL_BUILD` (see in *CMakePredefinedTargets*)
+6. '*Set as Startup Project*' on `SunshineEditor` (VS 2022)
+7. Run Editor
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -133,10 +134,11 @@ Make simple games with our Sunshine Engine!
 ## Roadmap
 
 - [x] Add Graphics module
-- [ ] Add Physics and Collision module (Jolt)
+- [x] Add Physics and Collision module (Jolt)
 - [ ] Add audio module (fmod)
-- [ ] Lua integration
-- [ ] World Editor
+- [x] Lua integration
+- [x] World Editor
+- [x] PlayerController
 
 See the [open issues](https://github.com/ravilkooo/SunshineEngine/issues) for a full list of proposed features (and known issues).
 

@@ -1,0 +1,176 @@
+#include <PlayerObject/PlayerLuaKeyActionsMapping.h>
+#include <PlayerObject/PlayerObject.h>
+#include <Component/TransformComponent.h>
+#include <Graphics/Utils/Camera.h>
+
+#include <iostream>
+
+PlayerLuaKeyActionsMapping::PlayerLuaKeyActionsMapping()
+{
+	m_keyActionMapping = eastl::unordered_map<Keys, eastl::string>();
+}
+
+PlayerLuaKeyActionsMapping::~PlayerLuaKeyActionsMapping()
+{
+}
+
+bool PlayerLuaKeyActionsMapping::Initialize(const AssetPath& scriptPath)
+{
+	m_luaScriptPath = scriptPath;
+	m_luaState = eastl::make_unique<sol::state>();
+
+	// Open standard Lua libraries
+	m_luaState->open_libraries(
+		sol::lib::base,
+		sol::lib::package,
+		sol::lib::math,
+		sol::lib::string,
+		sol::lib::table
+	);
+
+	// Register C++ bindings
+	RegisterLuaBindings();
+
+	// Load the Lua script
+	try {
+		auto result = m_luaState->safe_script_file(WStringToUtf8(m_luaScriptPath.GetFullPath()).c_str());
+		if (!result.valid()) {
+			sol::error err = result;
+			LogError("Failed to load Lua script: " + eastl::string(err.what()));
+			return false;
+		}
+	}
+	catch (const sol::error& e) {
+		LogError("Lua script loading exception: " + eastl::string(e.what()));
+		return false;
+	}
+
+	return true;
+}
+
+void PlayerLuaKeyActionsMapping::BindKey(Keys key, const eastl::string& luaFunctionName)
+{
+	m_keyActionMapping[key] = luaFunctionName;
+}
+
+void PlayerLuaKeyActionsMapping::BindKeyByString(const eastl::string& keyName, const eastl::string& luaFunctionName)
+{
+	// Simple string to Keys mapping (extend as needed)
+	static const eastl::unordered_map<eastl::string, Keys> keyMap = {
+		{"W", Keys::W}, {"A", Keys::A}, {"S", Keys::S}, {"D", Keys::D},
+        {"E", Keys::E}, {"Q", Keys::Q},
+		{"Space", Keys::Space},
+        // {"Shift", Keys::ShiftKey},
+		// {"Ctrl", Keys::ControlKey},
+	};
+
+	auto it = keyMap.find(keyName);
+	if (it != keyMap.end()) {
+		BindKey(it->second, luaFunctionName);
+	} else {
+		LogError("Unknown key name: " + keyName);
+	}
+}
+
+
+void PlayerLuaKeyActionsMapping::InitBindingFromJson(const json& j)
+{
+	// Load key-function mappings
+	for (const auto& pairJson : j) {
+		auto pair = KeyFunctionPair::FromJson(pairJson);
+		BindKey(pair.key, pair.functionName);
+	}
+}
+
+void PlayerLuaKeyActionsMapping::UnbindKey(Keys key)
+{
+	m_keyActionMapping.erase(key);
+}
+
+void PlayerLuaKeyActionsMapping::SetPlayerObject(PlayerObject* player)
+{
+	m_playerObject = player;
+
+	// Update Lua global with player reference
+	if (m_luaState && player) {
+		(*m_luaState)["player"] = player;
+	}
+}
+
+bool PlayerLuaKeyActionsMapping::IsKeyBound(Keys key) const
+{
+	return m_keyActionMapping.find(key) != m_keyActionMapping.end();
+}
+
+eastl::optional<eastl::string> PlayerLuaKeyActionsMapping::GetBoundFunction(Keys key) const
+{
+	auto it = m_keyActionMapping.find(key);
+	if (it != m_keyActionMapping.end()) {
+		return it->second;
+	}
+	return eastl::nullopt;
+}
+
+bool PlayerLuaKeyActionsMapping::ReloadScript()
+{
+	if (m_luaScriptPath.m_assetRelativePath.empty()) return false;
+	return Initialize(m_luaScriptPath);
+}
+
+void PlayerLuaKeyActionsMapping::LogError(const eastl::string& message)
+{
+	// Replace with your engine's logging system
+	std::cerr << "[PlayerLuaKeyActionsMapping Error] " << message.c_str() << std::endl;
+}
+
+void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
+{
+	if (!m_luaState) return;
+
+	// Register Vector3 type
+	m_luaState->new_usertype<DXSM::Vector3>("Vector3",
+		sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float)>(),
+		"x", &DXSM::Vector3::x,
+		"y", &DXSM::Vector3::y,
+		"z", &DXSM::Vector3::z,
+		//"Normalize", &DXSM::Vector3::Normalize,
+		"Length", &DXSM::Vector3::Length
+	);
+
+	// Register Camera type
+	m_luaState->new_usertype<SE_G::Camera>("Camera",
+		sol::no_constructor,
+		"forward", sol::readonly(&SE_G::Camera::forward),
+		"up", sol::readonly(&SE_G::Camera::up),
+		"right", sol::readonly(&SE_G::Camera::right),
+		"position", sol::readonly(&SE_G::Camera::position)
+	);
+
+	// Register TransformComponent
+	m_luaState->new_usertype<TransformComponent>("TransformComponent",
+		sol::no_constructor,
+		"position", &TransformComponent::m_position,
+		"rotation", &TransformComponent::m_rotation,
+		"scale", &TransformComponent::m_scaleFactor
+	);
+
+	// Register PlayerObject
+	m_luaState->new_usertype<PlayerObject>("PlayerObject",
+		sol::no_constructor,
+		"GetTransform", [](PlayerObject* player) {
+			return player->GetComponent<TransformComponent>().get();
+		},
+		"GetCamera", [](PlayerObject* player) {
+			return player->m_playerCamera.get();
+		},
+		"GetName", [](PlayerObject* player) {
+			return player->m_name.c_str();
+		}
+	);
+
+	// Helper functions
+	(*m_luaState)["print"] = [](const std::string& msg) {
+		// std::cout << "[Lua] " << msg << std::endl;
+        printf("%s\n", msg.c_str());
+	};
+}

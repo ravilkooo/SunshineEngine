@@ -130,6 +130,7 @@ namespace SE_G {
         DXSM::Vector3 target;
         DXSM::Vector3 up;
         DXSM::Vector3 forward;
+        DXSM::Vector3 right;
 
         DXSM::Matrix rotateCamToForward;
 
