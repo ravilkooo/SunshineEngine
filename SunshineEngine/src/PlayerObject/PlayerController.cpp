@@ -41,8 +41,11 @@ void PlayerController::HandleKeyUp(Keys key)
 
 void PlayerController::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
-	m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
-	m_stickPitchMoveDir = args.Offset.y * m_stickYawPitchSpeed;
+	if (!m_player->m_fixeCamera)
+	{
+		m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
+		m_stickPitchMoveDir = -args.Offset.y * m_stickYawPitchSpeed;
+	}
 }
 
 void PlayerController::ExecuteAllOnKeyDown()
@@ -61,7 +64,11 @@ void PlayerController::UpdatePlayer(float deltaTime)
 	m_inputManager.Update();
 
 	// Handle camera rotation
-	m_player->m_playerCamera->RotateStickYawPitch(deltaTime * m_stickYawMoveDir, deltaTime * m_stickPitchMoveDir);
+	if (!m_player->m_fixeCamera)
+	{
+		m_player->m_playerCamera->RotateStickYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
+	}
+
 	ExecuteAllOnKeyDown();
 
 	// Handle movement using InputManager (supports key held)

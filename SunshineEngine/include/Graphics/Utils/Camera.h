@@ -145,7 +145,7 @@ namespace SE_G {
 
             DXSM::Vector3 offset = DXSM::Vector3::Zero;
         } m_stickParams;
-        void RotateStickYawPitch(float deltaYaw, float deltaPitch);
+        void RotateStickYawPitch(float yawSpeed, float pitchSpeed);
 
     private:
         void SetFOV(float fov);

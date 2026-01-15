@@ -1281,15 +1281,15 @@
             "settings": {
                 "camera": {
                     "offset": [
-                        0.30000001192092896,
-                        0.0,
-                        0.0
+                        3.299999952316284,
+                        3.0,
+                        -12.699999809265137
                     ],
-                    "stickLength": 5.900000095367432,
-                    "stickPitch": 0.45378559827804565,
-                    "stickYaw": 0.0,
+                    "stickLength": 19.399999618530273,
+                    "stickPitch": -0.6841690540313721,
+                    "stickYaw": 0.9197885394096375,
                     "viewPitchYawRoll": [
-                        -0.4363323152065277,
+                        0.0,
                         0.0,
                         0.0
                     ]
@@ -1300,7 +1300,7 @@
                         "key": 69
                     },
                     {
-                        "functionName": "onMoveForward",
+                        "functionName": "onDown",
                         "key": 81
                     }
                 ],

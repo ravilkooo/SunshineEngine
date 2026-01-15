@@ -25,7 +25,7 @@ class PlayerObject : public GameObject
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
-	bool m_fixeCamera = true;
+	bool m_fixeCamera = false;
 
 	// Input
 	PlayerController m_playerController;
@@ -55,7 +55,7 @@ class PlayerObject_Info : public GameObject_Info
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
-	bool m_fixeCamera = true;
+	bool m_fixeCamera = false;
 
 	// Lua script configuration
 	AssetPath m_luaScriptPath;
