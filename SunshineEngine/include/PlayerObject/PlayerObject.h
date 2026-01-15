@@ -25,6 +25,7 @@ class PlayerObject : public GameObject
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
+	bool m_fixedCamera = false;
 
 	// Input
 	PlayerController m_playerController;
@@ -45,6 +46,8 @@ public:
 	void SetupLuaActionMapping(const json& j);
 
 	PlayerLuaKeyActionsMapping m_luaActionMapping;
+
+
 };
 
 class PlayerObject_Info : public GameObject_Info
@@ -52,12 +55,16 @@ class PlayerObject_Info : public GameObject_Info
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
+	bool m_fixeCamera = false;
 
 	// Lua script configuration
 	AssetPath m_luaScriptPath;
 	
 	// input mapping: key -> lua function name
 	eastl::vector<KeyFunctionPair> m_keyFunctionMapping;
+
+	// Lua function for mouse args
+	eastl::string m_mouseActionsHandlingFunction;
 
 	// MiniViewRenderer
 	eastl::shared_ptr<SE_G::MiniViewRenderer> m_miniViewRenderer;

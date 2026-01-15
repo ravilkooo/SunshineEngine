@@ -24,6 +24,7 @@
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Utils/Camera.h>
+#include <Graphics/GraphicsResources/Texture.h>
 
 #include <Serialization/GraphicsSerialization.h>
 

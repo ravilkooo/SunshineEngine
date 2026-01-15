@@ -7,6 +7,8 @@
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 
+#include <Serialization/LightDataSerialization.h>
+
 SpotLight::SpotLight(
     SE_G::DeferredRenderer* renderSystem,
     eastl::shared_ptr<SE_G::Camera> camera,

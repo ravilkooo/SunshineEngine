@@ -8,8 +8,6 @@
 #include "Scene.h"
 #include <Graphics/Bindable/Bindable.h>
 #include <GameObject/GameObject.h>
-#include <Component/RenderComponent.h>
-#include <Component/TransformComponent.h>
 
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 

@@ -76,6 +76,8 @@ json PlayerObject_Info::SettingsToJson() const
 		j["keyFunctionMappings"].push_back(pair.ToJson());
 	}
 
+	j["mouseFunctionMapping"] = m_mouseActionsHandlingFunction.c_str();
+
 	return j;
 }
 
@@ -118,5 +120,9 @@ void PlayerObject_Info::SettingsFromJson(const json& j, SE_G::DeferredRenderer* 
 		for (const auto& pairJson : j["keyFunctionMappings"]) {
 			m_keyFunctionMapping.push_back(KeyFunctionPair::FromJson(pairJson));
 		}
+	}
+
+	if (j.contains("mouseFunctionMapping")) {
+		m_mouseActionsHandlingFunction = j["mouseFunctionMapping"].get<std::string>().c_str();
 	}
 }

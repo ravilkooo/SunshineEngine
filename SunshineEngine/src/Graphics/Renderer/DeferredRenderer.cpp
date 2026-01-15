@@ -1,4 +1,5 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
 
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
@@ -91,19 +92,5 @@ namespace SE_G {
 				pass->EndFrame();
 			}
 		}
-
-		/*
-		for (auto& pass : m_passes) {
-			if (!pass->IsEnabled())
-				continue;
-
-			m_context->ClearState();
-
-			pass->StartFrame();
-			pass->Pass();
-			pass->EndFrame();
-		}
-		*/
 	}
-
 }

@@ -15,4 +15,3 @@ private:
 	void DrawPlayerCameraDetails();
 	void DrawPlayerControllerDetails();
 };
-

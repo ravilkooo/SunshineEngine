@@ -89,7 +89,8 @@ void PlayerObject::SetupLuaActionMapping(const json& j)
 	m_luaActionMapping.SetPlayerObject(this);
 
 	// Bind keys
-	m_luaActionMapping.InitBindingFromJson(j["keyFunctionMappings"]);
+	m_luaActionMapping.InitKeyBindingFromJson(j["keyFunctionMappings"]);
+	m_luaActionMapping.InitMouseActionHandler(j["mouseFunctionMapping"].get<std::string>().c_str());
 
 	// Enable Lua mode
 	m_playerController.SetLuaCallbackMode(true);

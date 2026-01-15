@@ -72,8 +72,7 @@ void PlayerLuaKeyActionsMapping::BindKeyByString(const eastl::string& keyName, c
 	}
 }
 
-
-void PlayerLuaKeyActionsMapping::InitBindingFromJson(const json& j)
+void PlayerLuaKeyActionsMapping::InitKeyBindingFromJson(const json& j)
 {
 	// Load key-function mappings
 	for (const auto& pairJson : j) {
@@ -82,9 +81,46 @@ void PlayerLuaKeyActionsMapping::InitBindingFromJson(const json& j)
 	}
 }
 
+void PlayerLuaKeyActionsMapping::InitMouseActionHandler(const eastl::string& functionName)
+{
+	m_mouseActionsHandlingFunction = functionName;
+}
+
 void PlayerLuaKeyActionsMapping::UnbindKey(Keys key)
 {
 	m_keyActionMapping.erase(key);
+}
+
+bool PlayerLuaKeyActionsMapping::ExecuteMouseMoveAction(InputDevice::MouseMoveEventArgs mouseArgs)
+{
+	// If no Lua state or no handler name configured, abort
+	if (!m_luaState) return false;
+	if (m_mouseActionsHandlingFunction.empty()) return false;
+
+	// try
+	{
+		sol::protected_function func = (*m_luaState)[m_mouseActionsHandlingFunction.c_str()];
+		if (!func.valid()) {
+			LogError("Lua mouse move handler not found: " + m_mouseActionsHandlingFunction);
+			return false;
+		}
+
+		// Pass mouse delta (dx, dy) and wheel delta to Lua. Signature: function(dx, dy, wheelDelta)
+		auto result = func(mouseArgs.Offset.x, mouseArgs.Offset.y, mouseArgs.WheelDelta);
+		if (!result.valid()) {
+			sol::error err = result;
+			LogError("Lua execution error in mouse handler: " + eastl::string(err.what()));
+			return false;
+		}
+
+		return true;
+	}
+	/*
+	catch (const sol::error& e) {
+		LogError("Lua exception in mouse handler: " + eastl::string(e.what()));
+		return false;
+	}
+	*/
 }
 
 void PlayerLuaKeyActionsMapping::SetPlayerObject(PlayerObject* player)
@@ -145,6 +181,8 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"up", sol::readonly(&SE_G::Camera::up),
 		"right", sol::readonly(&SE_G::Camera::right),
 		"position", sol::readonly(&SE_G::Camera::position),
+		// delta time
+		"deltaTime", sol::readonly(&SE_G::Camera::m_deltaTime),
 		// Position methods
 		"SetPosition", &SE_G::Camera::SetPosition,
 		"GetPosition", &SE_G::Camera::GetPosition,
@@ -175,6 +213,8 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		// Rotation methods
 		"RotateYaw", &SE_G::Camera::RotateYaw,
 		"RotatePitch", &SE_G::Camera::RotatePitch,
+		// GetStickDirection
+		"GetStickDirection", &SE_G::Camera::GetStickDirection,
 		// Camera mode
 		"SwitchToFPSMode", &SE_G::Camera::SwitchToFPSMode
 		/*

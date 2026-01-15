@@ -245,8 +245,38 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
-            //orbitalYaw += orbitalAngleSpeed * deltaTime;
+            stickDirection = DXSM::Vector3(
+                cosf(m_stickParams.stickPitch) * sinf(m_stickParams.stickYaw),
+                sinf(m_stickParams.stickPitch),
+                cosf(m_stickParams.stickPitch) * cosf(m_stickParams.stickYaw));
+            
+            DXSM::Vector3 _camPos = -m_stickParams.stickLength * stickDirection;
+            
+            position = targetPoistion + _camPos;
 
+            right = DXSM::Vector3(sinf(m_stickParams.stickYaw + DX::XM_PIDIV2), 0.0f, cosf(m_stickParams.stickYaw + DX::XM_PIDIV2));
+            up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
+            forward = DXSM::Vector3(sinf(m_stickParams.stickYaw), 0.0f, cosf(m_stickParams.stickYaw));
+            
+            /*
+            rotateCamToForward = DXSM::Matrix::CreateFromYawPitchRoll(
+                -m_stickParams.stickYaw,
+                -m_stickParams.stickPitch,
+                0.0f);
+
+            _up = DXSM::Vector3::Transform(_up, rotateCamToForward);
+            _forward = DXSM::Vector3::Transform(_forward, rotateCamToForward);
+            _right = DXSM::Vector3::Transform(_right, rotateCamToForward);
+            */
+
+            position = position
+                + right * m_stickParams.offset.x
+                + up * m_stickParams.offset.y
+                + forward * m_stickParams.offset.z;
+            
+            target = position - _camPos;
+
+            /*
             DXSM::Vector3 stickVector(
                 -1.0f * sinf(m_stickParams.stickYaw) * cosf(m_stickParams.stickPitch),
                 1.0f * sinf(m_stickParams.stickPitch),
@@ -269,6 +299,7 @@ namespace SE_G {
             right = DXSM::Vector3::Transform(_right, rotateCamToForward);
 
             target = position + _forward;
+            */
         }
     }
 
@@ -486,7 +517,8 @@ namespace SE_G {
         m_stickParams.stickPitch = DX::XM_PI * 0.166f;
         m_stickParams.stickYaw = 0.0f;
 
-        m_stickParams.viewPitchYawRoll = { -DX::XM_PI * 0.166f, 0.0f, 0.0f };
+        //m_stickParams.viewPitchYawRoll = { -DX::XM_PI * 0.166f, 0.0f, 0.0f };
+        m_stickParams.viewPitchYawRoll = { 0.0f, 0.0f, 0.0f };
 
         m_stickParams.offset = DXSM::Vector3::Zero;
         /*
@@ -613,24 +645,32 @@ namespace SE_G {
         return corners;
     }
 
-    void Camera::RotateStickYawPitch(float deltaYaw, float deltaPitch)
+    void Camera::RotateStickYawPitch(float yawSpeed, float pitchSpeed)
     {
+        float deltaYaw = yawSpeed * m_deltaTime;
+        float deltaPitch = pitchSpeed * m_deltaTime;
+
         float _stickYaw = m_stickParams.stickYaw + deltaYaw;
         float _stickPitch = m_stickParams.stickPitch + deltaPitch;
 
         _stickPitch = fmax(-80.0f * DX::XM_PIDIV2 / 90.0f, fmin(_stickPitch, 80.0f * DX::XM_PIDIV2 / 90.0f));
-        deltaPitch = _stickPitch - m_stickParams.stickPitch;
+        //deltaPitch = _stickPitch - m_stickParams.stickPitch;
 
         m_stickParams.stickPitch = _stickPitch;
-        m_stickParams.viewPitchYawRoll.x -= deltaPitch;
+        //m_stickParams.viewPitchYawRoll.x -= deltaPitch;
 
-        deltaYaw = _stickYaw - m_stickParams.stickYaw;
+        //deltaYaw = _stickYaw - m_stickParams.stickYaw;
         m_stickParams.stickYaw = _stickYaw;
-        m_stickParams.viewPitchYawRoll.y += deltaYaw;
+        //m_stickParams.viewPitchYawRoll.y += deltaYaw;
 
-        _stickYaw = _stickYaw > DX::XM_PI ? (_stickYaw - DX::XM_2PI) : _stickYaw;
-        _stickYaw = _stickYaw < -DX::XM_PI ? (_stickYaw + DX::XM_2PI) : _stickYaw;
+        // _stickYaw = _stickYaw > DX::XM_PI ? (_stickYaw - DX::XM_2PI) : _stickYaw;
+        // _stickYaw = _stickYaw < -DX::XM_PI ? (_stickYaw + DX::XM_2PI) : _stickYaw;
 
         
+    }
+
+    DXSM::Vector3 Camera::GetStickDirection()
+    {
+        return stickDirection;
     }
 }

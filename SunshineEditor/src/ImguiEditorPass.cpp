@@ -1,5 +1,6 @@
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
+#include <Graphics/Renderer/GBuffer.h>
 
 #include <EASTL/string.h>
 #include <EASTL/priority_queue.h>
@@ -11,9 +12,13 @@
 #include <WorldEditor.h>
 #include <SceneHierarchy.h>
 
+#include <PlayerObject/PlayerObject.h>
+
 #include <Component/LuaComponent.h>
+
 #include <Utils/DebugUtils.h>
 #include <Utils/StringUtils.h>
+
 #include <UI/FontStyles.h>
 #include "UI/PropertyPanel.h"
 
