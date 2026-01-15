@@ -1,6 +1,7 @@
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 #include <Graphics/GraphicsResources/Mesh.h>
 #include <Utils/StringUtils.h>
+#include <Component/TransformComponent.h>
 
 namespace SE_G {
     PointLightTechnique::PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,

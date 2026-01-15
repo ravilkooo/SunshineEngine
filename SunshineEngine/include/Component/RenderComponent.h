@@ -9,7 +9,6 @@
 
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
-#include <Graphics/Bindable/Bindable.h>
 
 #include <Component/Component.h>
 #include <Utils/UUID.h>
@@ -42,12 +41,6 @@ public:
     SE_G::RenderTechnique* AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique>);
     SE_G::RenderTechnique* GetTechnique(eastl::string technique);
     void RemoveTechnique(eastl::string technique);
-
-    /*
-    bool HasTechnique(eastl::string technique);
-
-    void PassTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
-    */
 
     const std::type_info& getType() const override {
         return typeid(RenderComponent);

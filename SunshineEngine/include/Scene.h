@@ -9,6 +9,7 @@
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
 class PhysicsSystem;
 class SceneGraph;
 class PlayerObject;

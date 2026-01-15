@@ -1,5 +1,8 @@
 #include "Graphics/Renderer/Technique/SpotLightTechnique.h"
 #include <Graphics/GraphicsResources/Mesh.h>
+
+#include <Component/TransformComponent.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {

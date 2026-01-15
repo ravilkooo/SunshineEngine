@@ -11,6 +11,7 @@
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 
+#include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <Graphics/Renderer/Technique/GPassTechnique.h>

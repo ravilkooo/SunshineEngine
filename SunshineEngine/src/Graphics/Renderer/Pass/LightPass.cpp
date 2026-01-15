@@ -1,6 +1,10 @@
-#include <Graphics/Renderer/RenderingSystem.h>
-
 #include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Bindable/Bindable.h>
+#include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/Bindable/Sampler.h>
+#include <Graphics/Bindable/BlendState.h>
+
 #include <ParticleSystem/ParticleSystem.h>
 
 namespace SE_G {

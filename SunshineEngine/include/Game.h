@@ -9,9 +9,6 @@
 
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
-#include <Graphics/Renderer/Pass/GPass.h>
-#include <Graphics/Renderer/Pass/LightPass.h>
-#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 #include <GameObject/GameObjectFactory.h>
 #include <GameObject/GameObject.h>
@@ -22,19 +19,26 @@
 
 #include <Physics/PhysicsSystem.h>
 
-#include <TracingSystem/TracingSystem.h>
+#include <Windows/InputDevice.h>
 
-#include <Utils/ILogManager.h>
 #include <Scripting/LuaManager.h>
-
-#include <PlayerObject/PlayerObject.h>
+#include <Utils/ILogManager.h>
 
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
 
+class PlayerObject;
+
 namespace SE
 {
     class ParticleSystem;
+}
+
+namespace SE_G
+{
+    class ShadowMapPass;
+    class GPass;
+    class LightPass;
 }
 
 class SUNSHINE_ENGINE_API Game
@@ -81,9 +85,6 @@ public:
     eastl::shared_ptr<Scene> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
     eastl::unique_ptr<PhysicsSystem> m_physicsSystem;
-    
-    // For Volodya
-    //eastl::unique_ptr<TracingSystem> m_tracingSystem;
 
     LuaManager m_luaManager;
 

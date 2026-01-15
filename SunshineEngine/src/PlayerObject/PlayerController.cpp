@@ -8,19 +8,6 @@ void PlayerController::SetPlayerObject(PlayerObject* player)
 
 void PlayerController::HandleKeyDown(Keys key)
 {
-	/*
-	// Try Lua callback first if enabled
-	if (m_useLuaCallbacks && m_player) {
-		bool handled = m_player->m_luaActionMapping.ExecuteKeyAction(key, "down");
-		if (handled) {
-			// Lua handled the input, update key state
-			m_isKeyPressed[key] = true;
-			return;
-		}
-	}
-	return;
-	*/
-
 	// Feed input to InputManager for proper edge detection
 	m_inputManager.ProcessKeyDown(key);
 
@@ -40,19 +27,6 @@ void PlayerController::HandleKeyDown(Keys key)
 
 void PlayerController::HandleKeyUp(Keys key)
 {
-	/*
-	// Try Lua callback first if enabled
-	if (m_useLuaCallbacks && m_player) {
-		bool handled = m_player->m_luaActionMapping.ExecuteKeyAction(key, "up");
-		if (handled) {
-			// Lua handled the input, update key state
-			m_isKeyPressed[key] = false;
-			return;
-		}
-	}
-	return;
-	*/
-
 	// Feed input to InputManager for proper edge detection
 	m_inputManager.ProcessKeyUp(key);
 

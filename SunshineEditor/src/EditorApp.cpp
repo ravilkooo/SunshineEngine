@@ -8,6 +8,13 @@
 #include <ResourceManager/ResourceManagerFacade.h>
 #include <ResourceManager/ResourceLoader/TextureLoader.h>
 
+#include <Graphics/Renderer/Pass/RenderPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+
+#include <ImguiEditorPass.h>
+
+#include <Project.h>
+
 EditorApp::EditorApp()
 {
 

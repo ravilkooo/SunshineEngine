@@ -7,7 +7,7 @@
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 
-
+#include <Serialization/LightDataSerialization.h>
 
 AmbientLight::AmbientLight(
 	SE_G::DeferredRenderer* renderSystem,

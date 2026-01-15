@@ -10,8 +10,6 @@
 #include <GameObject/Lighting/LightObject.h>
 #include <Graphics/Lighting/LightData.h>
 
-#include <Serialization/LightDataSerialization.h>
-#include <Serialization/DXSMSerialization.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 

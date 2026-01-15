@@ -1,10 +1,13 @@
 #include "Game.h"
 #include <fstream>   // std::ofstream
-#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 #include <PlayerObject/PlayerObject.h>
 
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
+
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 Game::Game()
 {
@@ -62,8 +65,6 @@ void Game::SetParticleSystem(eastl::shared_ptr <SE::ParticleSystem> ps)
 void Game::SetupPhysics()
 {
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
-	// For Volodya
-	//m_tracingSystem = eastl::make_unique<TracingSystem>();
 }
 
 bool Game::LoadScene(const wchar_t* scenePath)
@@ -275,8 +276,6 @@ void Game::Update(float deltaTime) {
 	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
 	 m_renderer->GetMainCamera()->Update(deltaTime);
-	 // For Volodya
-	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {

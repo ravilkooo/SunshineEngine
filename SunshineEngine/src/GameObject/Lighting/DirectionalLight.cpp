@@ -9,7 +9,7 @@
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 
-
+#include <Serialization/LightDataSerialization.h>
 
 DirectionalLight::DirectionalLight(
     SE_G::DeferredRenderer* renderSystem,
@@ -231,4 +231,10 @@ void DirectionalLight_Info::EnableShadow(
 
 void DirectionalLight_Info::DisableShadow() {
 	m_lightTech->DisableShadow();
+}
+
+json DirectionalLight_Info::ToJson() const {
+	json j = LightObject_Info<SE_G::DirectionalLightData>::ToJson();
+	j["CastsShadow"] = m_lightTech->m_castsShadow;
+	return j;
 }

@@ -17,7 +17,6 @@
 // SunshineLibs
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/RenderGroup.h>
-#include <Graphics/Renderer/Pass/RenderPass.h>
 
 #include <Windows/WindowsApp.h>
 
@@ -25,10 +24,18 @@
 #include <GameTimer.h>
 #include <Game.h>
 
-#include <Project.h>
 #include <WorldEditor.h>
-#include <ImguiEditorPass.h>
 
+#include <UI/ProjectSelector.h>
+
+
+class ImguiEditorPass;
+
+namespace SE
+{
+    class Project;
+
+}
 struct Ray
 {
     DX::XMVECTOR Origin;

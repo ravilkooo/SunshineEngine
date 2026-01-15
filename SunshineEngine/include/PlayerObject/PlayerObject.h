@@ -25,6 +25,7 @@ class PlayerObject : public GameObject
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
+	bool m_fixeCamera = true;
 
 	// Input
 	PlayerController m_playerController;
@@ -45,6 +46,8 @@ public:
 	void SetupLuaActionMapping(const json& j);
 
 	PlayerLuaKeyActionsMapping m_luaActionMapping;
+
+
 };
 
 class PlayerObject_Info : public GameObject_Info
@@ -52,6 +55,7 @@ class PlayerObject_Info : public GameObject_Info
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
+	bool m_fixeCamera = true;
 
 	// Lua script configuration
 	AssetPath m_luaScriptPath;
