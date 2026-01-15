@@ -182,6 +182,78 @@ void PlayerSettingPanel::DrawPlayerControllerDetails()
         ImGui::Separator();
         ImGui::Spacing();
 
+        // ===== MOUSE ACTIONS CONFIGURATION =====
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("Mouse Actions");
+        EditorUI::FontStyles::Pop();
+
+        ImGui::Text("Mouse Handler Function:");
+        ImGui::SameLine();
+
+        static char mouseHandlerBuffer[256] = "";
+        // Initialize buffer with current value
+        static bool mouseBufferInitialized = false;
+        if (!mouseBufferInitialized && m_playerObject) {
+            eastl::string currentHandler = m_playerObject->m_luaActionMapping.GetMouseActionsHandlingFunction();
+            if (!currentHandler.empty()) {
+                strncpy_s(mouseHandlerBuffer, currentHandler.c_str(), sizeof(mouseHandlerBuffer) - 1);
+            }
+            else {
+                strncpy_s(mouseHandlerBuffer, "onLookAround", sizeof(mouseHandlerBuffer) - 1);
+            }
+            mouseBufferInitialized = true;
+        }
+
+        float total = ImGui::GetContentRegionAvail().x;
+        ImGui::SetNextItemWidth(total * 0.7f);
+        ImGui::InputText("##MouseHandler", mouseHandlerBuffer, IM_ARRAYSIZE(mouseHandlerBuffer));
+        ImGui::SameLine();
+
+        if (ImGui::Button("Set##MouseHandler", ImVec2(0, 0))) {
+            if (mouseHandlerBuffer[0] != '\0' && m_playerObject) {
+                // Validate function exists in Lua
+                sol::state* luaState = m_playerObject->m_luaActionMapping.GetLuaState();
+                if (luaState) {
+                    sol::function func = (*luaState)[mouseHandlerBuffer];
+                    if (func.valid()) {
+                        m_playerObject->m_luaActionMapping.SetMouseActionsHandlingFunction(
+                            eastl::string(mouseHandlerBuffer));
+                        ImGui::OpenPopup("MouseHandlerSetPopup");
+                    }
+                    else {
+                        ImGui::OpenPopup("MouseHandlerErrorPopup");
+                    }
+                }
+            }
+        }
+
+        ImGui::TextDisabled("(function signature: function(deltaX, deltaY, wheelDelta))");
+
+        // Success message
+        if (ImGui::BeginPopupModal("MouseHandlerSetPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "Mouse handler set successfully!");
+            ImGui::Text("Function: %s", mouseHandlerBuffer);
+            if (ImGui::Button("OK##MouseHandlerSet", ImVec2(100, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // Error message
+        if (ImGui::BeginPopupModal("MouseHandlerErrorPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Error: Function not found!");
+            ImGui::Text("Function '%s' not found in Lua script.", mouseHandlerBuffer);
+            ImGui::TextDisabled("Make sure the function is defined in your Lua script.");
+            if (ImGui::Button("OK##MouseHandlerError", ImVec2(100, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+
         // ===== KEY-FUNCTION PAIR MANAGEMENT =====
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         ImGui::Text("Key Bindings");

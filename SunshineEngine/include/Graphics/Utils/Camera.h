@@ -151,6 +151,7 @@ namespace SE_G {
 
         void RotateStickYawPitch(float yawSpeed, float pitchSpeed);
 
+        float m_deltaTime = 1.0f;
     private:
         void SetFOV(float fov);
         void SetAspectRatio(float aspectRatio);
@@ -207,6 +208,5 @@ namespace SE_G {
 
         SE::UUID m_playerUUID = SE::UUID(0u);
 
-        float m_deltaTime = 1.0f;
     };
 }

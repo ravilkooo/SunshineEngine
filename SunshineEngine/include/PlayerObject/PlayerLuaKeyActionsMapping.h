@@ -9,6 +9,7 @@
 #include <Utils/AssetPath.h>
 
 #include <Windows/Keys.h>
+#include <Windows/InputDevice.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -27,7 +28,8 @@ public:
 	// Bind a key to a Lua function name
 	void BindKey(Keys key, const eastl::string& luaFunctionName);
 	void BindKeyByString(const eastl::string& keyName, const eastl::string& luaFunctionName);
-	void InitBindingFromJson(const json& j);
+	void InitKeyBindingFromJson(const json& j);
+	void InitMouseActionHandler(const eastl::string& functionName);
 
 	// Remove a key binding
 	void UnbindKey(Keys key);
@@ -72,11 +74,26 @@ public:
 		}
 	}
 
+	// Execute Lua function for mouse args
+	bool ExecuteMouseMoveAction(InputDevice::MouseMoveEventArgs mouseArgs);
+
 	// Get the Lua state (for advanced usage)
 	sol::state* GetLuaState() { return m_luaState.get(); }
 
 	// Set player object reference for Lua callbacks
 	void SetPlayerObject(PlayerObject* player);
+
+	// Set mouse actions handling function name
+	void SetMouseActionsHandlingFunction(const eastl::string& functionName)
+	{
+		m_mouseActionsHandlingFunction = functionName;
+	}
+
+	// Get mouse actions handling function name
+	const eastl::string& GetMouseActionsHandlingFunction() const
+	{
+		return m_mouseActionsHandlingFunction;
+	}
 
 	// Check if a key is bound
 	bool IsKeyBound(Keys key) const;
@@ -95,6 +112,8 @@ private:
 
 	// Key -> Lua function name mapping
 	eastl::unordered_map<Keys, eastl::string> m_keyActionMapping;
+	// Lua function for mouse args
+	eastl::string m_mouseActionsHandlingFunction;
 
 	// Player object reference (passed to Lua)
 	PlayerObject* m_playerObject = nullptr;
@@ -104,4 +123,5 @@ private:
 
 	// Register C++ objects and functions to Lua
 	void RegisterLuaBindings();
+
 };

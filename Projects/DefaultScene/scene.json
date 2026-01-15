@@ -1263,9 +1263,9 @@
                         -7.510225772857666
                     ],
                     "m_rotation": [
-                        5.802355262929382e-10,
-                        -1.034048295878165e-07,
-                        -9.279180517296481e-07
+                        5.802353597594845e-10,
+                        -1.5707963705062866,
+                        -9.279170853915275e-07
                     ],
                     "m_scaleFactor": [
                         2.999999761581421,
@@ -1287,7 +1287,7 @@
                     ],
                     "stickLength": 19.399999618530273,
                     "stickPitch": -0.6841690540313721,
-                    "stickYaw": 0.9197885394096375,
+                    "stickYaw": 0.0,
                     "viewPitchYawRoll": [
                         0.0,
                         0.0,
@@ -1323,7 +1323,8 @@
                 "luaScript": {
                     "assetSource": 1,
                     "relativePath": "Scripts/player_controller.lua"
-                }
+                },
+                "mouseFunctionMapping": "onLookAround"
             }
         },
         {
