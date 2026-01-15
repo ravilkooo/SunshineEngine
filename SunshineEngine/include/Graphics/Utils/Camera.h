@@ -148,6 +148,8 @@ namespace SE_G {
         DXSM::Vector3 stickDirection;
         
         DXSM::Vector3 GetStickDirection();
+        float GetStickLength() { return m_stickParams.stickLength; };
+        void SetStickLength(float newLen) { m_stickParams.stickLength = fmin(fmax(0.0f, newLen), 100.0f); };
 
         void RotateStickYawPitch(float yawSpeed, float pitchSpeed);
 
