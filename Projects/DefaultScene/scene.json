@@ -1302,6 +1302,22 @@
                     {
                         "functionName": "onDown",
                         "key": 81
+                    },
+                    {
+                        "functionName": "onMoveForward",
+                        "key": 87
+                    },
+                    {
+                        "functionName": "onStrafeLeft",
+                        "key": 65
+                    },
+                    {
+                        "functionName": "onMoveBackward",
+                        "key": 83
+                    },
+                    {
+                        "functionName": "onStrafeRight",
+                        "key": 68
                     }
                 ],
                 "luaScript": {

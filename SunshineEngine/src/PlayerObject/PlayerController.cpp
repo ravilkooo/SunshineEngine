@@ -71,6 +71,7 @@ void PlayerController::UpdatePlayer(float deltaTime)
 
 	ExecuteAllOnKeyDown();
 
+	/*
 	// Handle movement using InputManager (supports key held)
 	if (m_inputManager.IsKeyDown(Keys::W) ||
 		m_inputManager.IsKeyDown(Keys::A) ||
@@ -87,8 +88,9 @@ void PlayerController::UpdatePlayer(float deltaTime)
 		m_moveDir = DXSM::Vector3::Transform(m_moveDir, m_player->m_playerCamera->rotateCamToForward);
 		m_player->GetComponent<TransformComponent>()->m_position += m_moveDir * m_moveSpeed;
 	}
+	m_moveDir = DXSM::Vector3::Zero;
+	*/
 
 	m_stickYawMoveDir = 0.0f;
 	m_stickPitchMoveDir = 0.0f;
-	m_moveDir = DXSM::Vector3::Zero;
 }

@@ -245,16 +245,18 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
-            DXSM::Vector3 _camPos = DXSM::Vector3(
-                -m_stickParams.stickLength * cosf(m_stickParams.stickPitch) * sinf(m_stickParams.stickYaw),
-                -m_stickParams.stickLength * sinf(m_stickParams.stickPitch),
-                -m_stickParams.stickLength * cosf(m_stickParams.stickPitch) * cosf(m_stickParams.stickYaw));
+            stickDirection = DXSM::Vector3(
+                cosf(m_stickParams.stickPitch) * sinf(m_stickParams.stickYaw),
+                sinf(m_stickParams.stickPitch),
+                cosf(m_stickParams.stickPitch) * cosf(m_stickParams.stickYaw));
+            
+            DXSM::Vector3 _camPos = -m_stickParams.stickLength * stickDirection;
             
             position = targetPoistion + _camPos;
 
-            DXSM::Vector3 _right(sinf(m_stickParams.stickYaw + DX::XM_PIDIV2), 0.0f, cosf(m_stickParams.stickYaw + DX::XM_PIDIV2));
-            DXSM::Vector3 _up(0.0f, 1.0f, 0.0f);
-            DXSM::Vector3 _forward(sinf(m_stickParams.stickYaw), 0.0f, cosf(m_stickParams.stickYaw));
+            right = DXSM::Vector3(sinf(m_stickParams.stickYaw + DX::XM_PIDIV2), 0.0f, cosf(m_stickParams.stickYaw + DX::XM_PIDIV2));
+            up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
+            forward = DXSM::Vector3(sinf(m_stickParams.stickYaw), 0.0f, cosf(m_stickParams.stickYaw));
             
             /*
             rotateCamToForward = DXSM::Matrix::CreateFromYawPitchRoll(
@@ -268,9 +270,9 @@ namespace SE_G {
             */
 
             position = position
-                + _right * m_stickParams.offset.x
-                + _up * m_stickParams.offset.y
-                + _forward * m_stickParams.offset.z;
+                + right * m_stickParams.offset.x
+                + up * m_stickParams.offset.y
+                + forward * m_stickParams.offset.z;
             
             target = position - _camPos;
 
@@ -665,5 +667,10 @@ namespace SE_G {
         // _stickYaw = _stickYaw < -DX::XM_PI ? (_stickYaw + DX::XM_2PI) : _stickYaw;
 
         
+    }
+
+    DXSM::Vector3 Camera::GetStickDirection()
+    {
+        return stickDirection;
     }
 }

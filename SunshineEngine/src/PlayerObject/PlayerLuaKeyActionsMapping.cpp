@@ -175,6 +175,8 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		// Rotation methods
 		"RotateYaw", &SE_G::Camera::RotateYaw,
 		"RotatePitch", &SE_G::Camera::RotatePitch,
+		// GetStickDirection
+		"GetStickDirection", &SE_G::Camera::GetStickDirection,
 		// Camera mode
 		"SwitchToFPSMode", &SE_G::Camera::SwitchToFPSMode
 		/*
