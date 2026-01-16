@@ -41,6 +41,7 @@ void PlayerController::HandleKeyUp(Keys key)
 
 void PlayerController::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
+	SUNSHINE_ROOT_DIR;
 	if (!m_player->m_fixedCamera)
 	{
 		m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;

@@ -39,3 +39,6 @@ add_subdirectory(ThirdParty)
 
 # Projects path
 target_compile_definitions(SunshineEditor PUBLIC PROJECTS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Projects/")
+
+# Engine root path
+target_compile_definitions(SunshineEngine PUBLIC SUNSHINE_ROOT_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/")

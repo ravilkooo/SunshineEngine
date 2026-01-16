@@ -271,7 +271,7 @@ void EditorApp::UpdateEditor(float deltaTime)
 }
 
 void EditorApp::Render() {
-
+	SUNSHINE_ROOT_DIR;
 	// Passes
 	m_renderingSystem->Render();
 

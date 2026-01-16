@@ -26,7 +26,8 @@ bool PlayerLuaKeyActionsMapping::Initialize(const AssetPath& scriptPath)
 		sol::lib::package,
 		sol::lib::math,
 		sol::lib::string,
-		sol::lib::table
+		sol::lib::table,
+		sol::lib::os
 	);
 
 	// Register C++ bindings
