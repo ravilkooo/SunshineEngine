@@ -35,7 +35,6 @@ eastl::wstring StringHelper::GetDirectoryFromPath(const eastl::wstring& filepath
 
 eastl::wstring StringHelper::GetFileNameWithoutExtension(const eastl::wstring& filepath)
 {
-    // Извлекаем имя файла с расширением из полного пути
     size_t slashOff1 = filepath.find_last_of('\\');
     size_t slashOff2 = filepath.find_last_of('/');
     size_t slashOff = (slashOff1 == eastl::wstring::npos) ?
@@ -48,20 +47,16 @@ eastl::wstring StringHelper::GetFileNameWithoutExtension(const eastl::wstring& f
     eastl::wstring filenameWithExtension;
     if (slashOff == eastl::wstring::npos)
     {
-        // Если слэшей нет, то это уже имя файла
         filenameWithExtension = filepath;
     }
     else
     {
-        // Иначе извлекаем подстроку после последнего слэша
         filenameWithExtension = filepath.substr(slashOff + 1);
     }
 
-    // Удаляем расширение
     size_t dotOff = filenameWithExtension.find_last_of('.');
     if (dotOff == eastl::wstring::npos)
     {
-        // Если точки нет, возвращаем имя файла как есть
         return filenameWithExtension;
     }
     return filenameWithExtension.substr(0, dotOff);
@@ -91,3 +86,18 @@ std::string StringHelper::ToSTD(const eastl::string& str)
 {
     return std::string(str.c_str(), str.size());
 }
+eastl::string StringHelper::WideToString(const eastl::wstring& ws)
+{
+    if (ws.empty())
+        return eastl::string();
+
+    size_t len = wcstombs(nullptr, ws.c_str(), 0);
+    if (len == static_cast<size_t>(-1))
+        return eastl::string();
+
+    eastl::string result;
+    result.resize(len);
+    wcstombs(&result[0], ws.c_str(), len);
+    return result;
+}
+
