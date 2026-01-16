@@ -9,12 +9,13 @@
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 #include <Jolt/Physics/EActivation.h>
 
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
+
 #include <Component/Component.h>
 #include <Physics/CollisionUtils.h>
 #include <Physics/PhysicsEnums.h>
 #include <Utils/UUID.h>
 
-#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
 class TransformComponent;
 
@@ -44,6 +45,35 @@ public:
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
     }
+
+    // Apply force to physics object
+    void AddForce(const DXSM::Vector3& inForce);
+
+    // Apply impulse to physics object
+    void AddImpulse(const DXSM::Vector3& inImpulse);
+
+    // Apply torque to physics object
+    void AddTorque(const DXSM::Vector3& inTorque);
+
+    // Apply angular impulse to physics object
+    void AddAngularImpulse(const DXSM::Vector3& inAngularImpulse);
+
+    // Query accumulated forces/torques and velocities
+    DXSM::Vector3 GetAccumulatedForce();
+    DXSM::Vector3 GetAccumulatedTorque();
+    DXSM::Vector3 GetAngularVelocity();
+    DXSM::Vector3 GetLinearVelocity();
+    DXSM::Vector3 GetPointVelocity(const DXSM::Vector3& inPoint);
+    DXSM::Vector3 GetPosition();
+    DXSM::Quaternion GetRotation();
+
+    // Reset accumulated force/torque
+    void ResetForce();
+    void ResetTorque();
+
+    // Set velocities
+    void SetAngularVelocity(const DXSM::Vector3& inAngularVelocity);
+    void SetLinearVelocity(const DXSM::Vector3& inLinearVelocity);
     
     // Setters for configuration before adding body
     void SetObjecUUID(SE::UUID objectUUID);
@@ -62,6 +92,8 @@ public:
     void FromJson(const json& j) override;
 
 private:
+    PhysicsSystem* m_physicsSystem;
+
     TransformComponent* transformComp;
 
     SE::UUID m_objectUUID;
@@ -147,3 +179,23 @@ public:
     SE::CollisionLayer m_collisionLayer = {};
 
 };
+
+// Macro listing methods of PhysicsComponent to expose in Lua bindings
+#ifndef PHYSICSCOMPONENT_LUA_METHODS_APPLY
+#define PHYSICSCOMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("AddForce", [](PhysicsComponent* self, const DXSM::Vector3& inForce){ self->AddForce(inForce); }), \
+    FM("AddImpulse", [](PhysicsComponent* self, const DXSM::Vector3& inImpulse){ self->AddImpulse(inImpulse); }), \
+    FM("AddTorque", [](PhysicsComponent* self, const DXSM::Vector3& inTorque){ self->AddTorque(inTorque); }), \
+    FM("AddAngularImpulse", [](PhysicsComponent* self, const DXSM::Vector3& inAngularImpulse){ self->AddAngularImpulse(inAngularImpulse); }), \
+    FM("GetAccumulatedForce", [](PhysicsComponent* self){ return self->GetAccumulatedForce(); }), \
+    FM("GetAccumulatedTorque", [](PhysicsComponent* self){ return self->GetAccumulatedTorque(); }), \
+    FM("GetAngularVelocity", [](PhysicsComponent* self){ return self->GetAngularVelocity(); }), \
+    FM("GetLinearVelocity", [](PhysicsComponent* self){ return self->GetLinearVelocity(); }), \
+    FM("GetPointVelocity", [](PhysicsComponent* self, const DXSM::Vector3& pt){ return self->GetPointVelocity(pt); }), \
+    FM("GetPosition", [](PhysicsComponent* self){ return self->GetPosition(); }), \
+    FM("GetRotation", [](PhysicsComponent* self){ return self->GetRotation(); }), \
+    FM("ResetForce", [](PhysicsComponent* self){ self->ResetForce(); }), \
+    FM("ResetTorque", [](PhysicsComponent* self){ self->ResetTorque(); }), \
+    FM("SetAngularVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetAngularVelocity(v); }), \
+    FM("SetLinearVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetLinearVelocity(v); })
+#endif

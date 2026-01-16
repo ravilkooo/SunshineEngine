@@ -888,7 +888,7 @@
                         "settings": {
                             "box": {
                                 "size": [
-                                    100.0,
+                                    98.0999984741211,
                                     0.10000000149011612,
                                     100.0
                                 ]
@@ -1200,6 +1200,11 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/playerObject_dynamicPhysics.lua",
+                    "selectedLuaFile": 5
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 1,
@@ -1216,9 +1221,9 @@
                         "settings": {
                             "box": {
                                 "size": [
-                                    2.700000047683716,
-                                    1.0,
-                                    2.200000047683716
+                                    2.799999952316284,
+                                    0.4000000059604645,
+                                    3.0999999046325684
                                 ]
                             }
                         },
@@ -1238,7 +1243,7 @@
                     },
                     "m_activation": "Activate",
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Kinematic"
+                    "m_motion": "Dynamic"
                 },
                 "Render": null,
                 "Transform": {
@@ -1318,17 +1323,34 @@
                     {
                         "functionName": "onStrafeRight",
                         "key": 68
+                    },
+                    {
+                        "functionName": "onTorque",
+                        "key": 49
+                    },
+                    {
+                        "functionName": "onAngularImpulse",
+                        "key": 50
+                    },
+                    {
+                        "functionName": "onJump",
+                        "key": 51
                     }
                 ],
                 "luaScript": {
                     "assetSource": 1,
-                    "relativePath": "Scripts/player_controller.lua"
+                    "relativePath": "Scripts/player_controller_dynamic.lua"
                 },
                 "mouseFunctionMapping": "onLookAround"
             }
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/offsetPosition_dynamicPhysics.lua",
+                    "selectedLuaFile": 4
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -1388,14 +1410,14 @@
                         0.0
                     ],
                     "m_rotation": [
-                        0.0,
-                        -7.281513690948486,
+                        -0.0,
+                        -0.12708641588687897,
                         0.0
                     ],
                     "m_scaleFactor": [
+                        0.9999998807907104,
                         1.0,
-                        1.0,
-                        1.0
+                        0.9999998807907104
                     ]
                 }
             },
