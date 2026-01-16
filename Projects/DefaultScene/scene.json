@@ -1200,6 +1200,11 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/playerObject_dynamicPhysics.lua",
+                    "selectedLuaFile": 5
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 1,
@@ -1318,6 +1323,18 @@
                     {
                         "functionName": "onStrafeRight",
                         "key": 68
+                    },
+                    {
+                        "functionName": "onTorque",
+                        "key": 49
+                    },
+                    {
+                        "functionName": "onAngularImpulse",
+                        "key": 50
+                    },
+                    {
+                        "functionName": "onJump",
+                        "key": 51
                     }
                 ],
                 "luaScript": {

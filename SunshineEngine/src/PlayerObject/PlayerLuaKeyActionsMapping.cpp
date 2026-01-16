@@ -241,7 +241,20 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 	m_luaState->new_usertype<PhysicsComponent>("PhysicsComponent",
 		sol::no_constructor,
 		"AddForce", &PhysicsComponent::AddForce,
-		"AddImpulse", &PhysicsComponent::AddImpulse
+		"AddImpulse", &PhysicsComponent::AddImpulse,
+		"AddTorque", &PhysicsComponent::AddTorque,
+		"AddAngularImpulse", &PhysicsComponent::AddAngularImpulse,
+		"GetAccumulatedForce", &PhysicsComponent::GetAccumulatedForce,
+		"GetAccumulatedTorque", &PhysicsComponent::GetAccumulatedTorque,
+		"GetAngularVelocity", &PhysicsComponent::GetAngularVelocity,
+		"GetLinearVelocity", &PhysicsComponent::GetLinearVelocity,
+		"GetPointVelocity", &PhysicsComponent::GetPointVelocity,
+		"GetPosition", &PhysicsComponent::GetPosition,
+		"GetRotation", &PhysicsComponent::GetRotation,
+		"ResetForce", &PhysicsComponent::ResetForce,
+		"ResetTorque", &PhysicsComponent::ResetTorque,
+		"SetAngularVelocity", &PhysicsComponent::SetAngularVelocity,
+		"SetLinearVelocity", &PhysicsComponent::SetLinearVelocity
 	);
 
 	// Register PlayerObject
