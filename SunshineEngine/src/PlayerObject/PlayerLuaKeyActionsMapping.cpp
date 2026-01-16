@@ -1,6 +1,7 @@
 #include <PlayerObject/PlayerLuaKeyActionsMapping.h>
 #include <PlayerObject/PlayerObject.h>
 #include <Component/TransformComponent.h>
+#include <Component/PhysicsComponent.h>
 #include <Graphics/Utils/Camera.h>
 
 #include <iostream>
@@ -236,11 +237,21 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"scale", &TransformComponent::m_scaleFactor
 	);
 
+	// Register PhysicsComponent
+	m_luaState->new_usertype<PhysicsComponent>("PhysicsComponent",
+		sol::no_constructor,
+		"AddForce", &PhysicsComponent::AddForce,
+		"AddImpulse", &PhysicsComponent::AddImpulse
+	);
+
 	// Register PlayerObject
 	m_luaState->new_usertype<PlayerObject>("PlayerObject",
 		sol::no_constructor,
 		"GetTransform", [](PlayerObject* player) {
 			return player->GetComponent<TransformComponent>().get();
+		},
+		"GetPhysics", [](PlayerObject* player) {
+			return player->GetComponent<PhysicsComponent>().get();
 		},
 		"GetCamera", [](PlayerObject* player) {
 			return player->m_playerCamera.get();

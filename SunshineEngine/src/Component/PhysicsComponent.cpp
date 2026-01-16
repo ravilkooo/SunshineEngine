@@ -6,6 +6,8 @@
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
 
 PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
 {
@@ -16,6 +18,34 @@ PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
 PhysicsComponent::~PhysicsComponent()
 {
 
+}
+
+void PhysicsComponent::AddForce(const DXSM::Vector3& inForce)
+{
+    if (!m_physicsSystem)
+        return;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+
+    JPH::Vec3 joltForce(
+        inForce.x, inForce.y, inForce.z
+    );
+
+    bodyInterface.AddForce(m_joltBodyId, joltForce);
+}
+
+void PhysicsComponent::AddImpulse(const DXSM::Vector3& inImpulse)
+{
+    if (!m_physicsSystem)
+        return;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+
+    JPH::Vec3 joltImpulse(
+        inImpulse.x, inImpulse.y, inImpulse.z
+    );
+
+    bodyInterface.AddImpulse(m_joltBodyId, joltImpulse);
 }
 
 void PhysicsComponent::SetObjecUUID(SE::UUID objectUUID) {
@@ -98,3 +128,13 @@ void PhysicsComponent_Info::SetActivation(SE::PhysicsActivation activation) { m_
 const SE::CollisionLayer& PhysicsComponent_Info::GetCollisionLayer() const { return m_collisionLayer; }
 void PhysicsComponent_Info::SetCollisionLayer(const SE::CollisionLayer& layer) { m_collisionLayer = layer; }
 void PhysicsComponent_Info::SetCollisionLayer(SE::CollisionLayer&& layer) { m_collisionLayer = eastl::move(layer); }
+
+#define PC_ADD_METHOD(k, fn) k, fn
+
+LUA_REGISTER_COMPONENT(
+    PhysicsComponent,
+    "PhysicsComponent",
+    /* no fields */,
+    PHYSICSCOMPONENT_LUA_METHODS_APPLY(PC_ADD_METHOD),
+    "getPhysics")
+#undef PC_ADD_METHOD

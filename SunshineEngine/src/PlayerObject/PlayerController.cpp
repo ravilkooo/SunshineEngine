@@ -63,6 +63,16 @@ void PlayerController::ExecuteAllOnKeyDown()
 
 void PlayerController::UpdatePlayer(float deltaTime)
 {
+	/*
+	auto pc = m_player->GetComponent<PhysicsComponent>();
+	if (pc)
+	{
+		// Sync kinematic physics body with TransformComponent
+		pc->AddForce(DXSM::Vector3(0, 0, 0.5f * deltaTime));
+		pc->AddImpulse(DXSM::Vector3(0, 0.5f * deltaTime, 0));
+	}
+	*/
+
 	// Update input state for this frame - computes edge events
 	m_inputManager.Update();
 

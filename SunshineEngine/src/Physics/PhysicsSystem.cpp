@@ -129,6 +129,7 @@ void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
     physComp->m_joltBody = bodyInterface.CreateBody(settings);
     physComp->m_joltBodyId = physComp->m_joltBody->GetID();
     physComp->m_joltBody->SetUserData(physComp->m_objectUUID.m_UUID);
+	physComp->m_physicsSystem = this;
 
     m_bodyEntries.push_back({ physComp->m_joltBodyId });
     m_bodyInterface->AddBody(physComp->m_joltBodyId, physComp->m_activation);

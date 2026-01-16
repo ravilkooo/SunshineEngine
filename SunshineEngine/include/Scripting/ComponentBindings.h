@@ -5,6 +5,7 @@
 
 class TransformComponent;
 class RenderComponent;
+class PhysicsComponent;
 class PerceptionComponent;
 
 namespace ScriptingBindings {
@@ -21,5 +22,6 @@ namespace ScriptingBindings {
 #define GAMEOBJECT_LUA_GETTERS_APPLY(F) \
     F(TransformComponent, "getTransform") , \
     F(RenderComponent, "getRender") , \
+    F(PhysicsComponent, "getPhysics") , \
     F(PerceptionComponent, "getPerception")
 #endif

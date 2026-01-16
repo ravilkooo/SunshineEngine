@@ -9,12 +9,13 @@
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 #include <Jolt/Physics/EActivation.h>
 
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
+
 #include <Component/Component.h>
 #include <Physics/CollisionUtils.h>
 #include <Physics/PhysicsEnums.h>
 #include <Utils/UUID.h>
 
-#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
 class TransformComponent;
 
@@ -44,6 +45,12 @@ public:
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
     }
+
+    // Apply force to physics object
+    void AddForce(const DXSM::Vector3& inForce);
+
+    // Apply impulse to physics object
+    void AddImpulse(const DXSM::Vector3& inImpulse);
     
     // Setters for configuration before adding body
     void SetObjecUUID(SE::UUID objectUUID);
@@ -62,6 +69,8 @@ public:
     void FromJson(const json& j) override;
 
 private:
+    PhysicsSystem* m_physicsSystem;
+
     TransformComponent* transformComp;
 
     SE::UUID m_objectUUID;
@@ -147,3 +156,10 @@ public:
     SE::CollisionLayer m_collisionLayer = {};
 
 };
+
+// Macro listing methods of PhysicsComponent to expose in Lua bindings
+#ifndef PHYSICSCOMPONENT_LUA_METHODS_APPLY
+#define PHYSICSCOMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("AddForce", [](PhysicsComponent* self, const DXSM::Vector3& inForce){ self->AddForce(inForce); }), \
+    FM("AddImpulse", [](PhysicsComponent* self, const DXSM::Vector3& inImpulse){ self->AddImpulse(inImpulse); })
+#endif
