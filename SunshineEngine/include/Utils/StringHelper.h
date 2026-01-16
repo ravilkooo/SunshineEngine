@@ -14,5 +14,6 @@ public:
 
 	static eastl::string ToEASTL(const std::string& str);
 	static std::string ToSTD(const eastl::string& str);
+	static eastl::string WideToString(const eastl::wstring& ws);
 };
 
