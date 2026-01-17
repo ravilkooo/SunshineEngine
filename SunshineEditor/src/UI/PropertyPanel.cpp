@@ -26,6 +26,8 @@
 #include <Component/MeshComponent.h>
 #include <Component/LuaComponent.h>
 
+#include <SceneHierarchy.h>
+
 #include <UI/PropertyPanel.h>
 #include <UI/FontStyles.h>
 #include <ResourceManager/ResourceManagerFacade.h>
@@ -85,18 +87,71 @@ void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
 
 void PropertyPanel::DrawParentnes(GameObject_Info* obj)
 {
-    if (obj->m_parent.uuid == SE::UUID(0u) || !(obj->m_parent.ptr))
-    {
-        ImGui::Text("No parent object");
+    // Build list of available objects (name + uuid) for selection
+    if (!m_WorldEditor || !m_WorldEditor->m_scene) {
+        ImGui::Text("No scene available");
         return;
     }
 
-    ImGui::Text("Parent: ");
+    auto& scene = *m_WorldEditor->m_scene;
+    eastl::vector<eastl::string> comboItems;
+    comboItems.reserve(scene.gameObjects.size() + 1);
+
+    // First entry = None
+    comboItems.push_back(eastl::string("None"));
+
+    int currentIndex = 0; // default to None
+    for (int i = 0; i < (int)scene.gameObjects.size(); ++i) {
+        SE::UUID u = scene.gameObjects[i];
+        GameObject_Info* go = scene.GetGameObjectByUUID(u);
+        char buf[512];
+        if (go) snprintf(buf, sizeof(buf), "%s (%llu)", go->m_name.c_str(), u.m_UUID);
+        else snprintf(buf, sizeof(buf), "Unknown (%llu)", u.m_UUID);
+        comboItems.push_back(eastl::string(buf));
+
+        if (u == obj->m_parent.uuid) currentIndex = i + 1; // +1 because of None at 0
+    }
+
+    ImGui::Text("Parent:");
     ImGui::SameLine();
-    ImGui::Text(obj->m_parent.ptr->m_name.c_str());
-
     ImGui::SetNextItemWidth(-FLT_MIN);
+    const char* preview = comboItems.size() > 0 ? comboItems[currentIndex].c_str() : "None";
+    if (ImGui::BeginCombo("##ParentCombo", preview)) {
+        for (int i = 0; i < (int)comboItems.size(); ++i) {
+            bool selected = (i == currentIndex);
+            if (ImGui::Selectable(comboItems[i].c_str(), selected)) {
+                if (i == 0) {
+                    // None selected: detach
+                    if (obj->m_parent.ptr) obj->DetachFromParent();
+                    obj->m_parent.uuid = SE::UUID(0u);
+                    obj->m_parent.ptr = nullptr;
+                    obj->m_parent.attached = false;
 
+                    m_WorldEditor->m_scene->m_sceneGraph->Reparent(obj->m_UUID, SE::UUID(0u));
+                }
+                else {
+                    // select by UUID from scene.gameObjects[i-1]
+                    SE::UUID sel = scene.gameObjects[i-1];
+                    GameObject_Info* parentObj = scene.GetGameObjectByUUID(sel);
+                    if (parentObj) {
+                        ParentNode<GameObject_Info> pn;
+                        pn.uuid = sel;
+                        pn.ptr = parentObj;
+                        pn.attached = obj->m_parent.attached; // preserve attach flag
+                        obj->SetParent(pn);
+
+                        m_WorldEditor->m_scene->m_sceneGraph->Reparent(obj->m_UUID, sel);
+                    }
+                }
+                currentIndex = i;
+            }
+            if (selected) ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    // Attached checkbox (preserve behavior)
+    ImGui::SetNextItemWidth(-FLT_MIN);
     bool attached = obj->m_parent.attached;
     ImGui::Checkbox("Attached to parent: ", &attached); ImGui::SameLine();
     if (attached != obj->m_parent.attached)
@@ -1369,7 +1424,7 @@ eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
     if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
         s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
         s_meshEditor.m_texError.clear();
-        // опционально: при открытии заполнить поля текущими значениями
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (s_meshEditor.m_editTexture && texture) {
             AssetPath cur = texture->GetCurrentTexturePath();
             std::wstring ws = cur.m_assetRelativePath.c_str();
@@ -1468,7 +1523,7 @@ eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
         if (ImGui::SmallButton(s_meshEditor.m_editMesh ? "Close Mesh Editor" : "Edit Mesh")) {
             s_meshEditor.m_editMesh = !s_meshEditor.m_editMesh;
             s_meshEditor.m_meshError.clear();
-            // опционально: при открытии заполнить поля текущими значениями
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if (s_meshEditor.m_editMesh && meshPtr) {
                 AssetPath cur = meshPtr->GetCurrentMeshPath();
                 std::wstring ws = cur.m_assetRelativePath.c_str();

@@ -572,21 +572,27 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	m_windowViewport.MaxDepth = 1.0f;
 }
 
-void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
+void ImguiEditorPass::DrawNode(SE::UUID nodeUUID, Selection& sel) {
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
 		| ImGuiTreeNodeFlags_SpanFullWidth
 		| ImGuiTreeNodeFlags_DefaultOpen
 		| ImGuiTreeNodeFlags_DrawLinesToNodes;
-	const bool is_leaf = node->children.empty();
+
+	auto node = m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_nodes[
+		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_byObjUUID[nodeUUID]
+	];
+	auto obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(nodeUUID);
+
+	const bool is_leaf = node.children.empty();
 	if (is_leaf)
 		flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-	if (sel.Contains(node->objUUID))
+	if (sel.Contains(nodeUUID))
 		flags |= ImGuiTreeNodeFlags_Selected;
 
-	ImGui::PushID(node); // stable id (or use UUID string)
+	ImGui::PushID(obj); // stable id (or use UUID string)
 	//bool open = ImGui::TreeNodeEx((void*)node, flags, "%s", node->objUUID.ToString().c_str());
-	bool open = ImGui::TreeNodeEx((void*)node, flags, "%s",
-		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_uuidToObjectMap[node->objUUID]->m_name);
+	bool open = ImGui::TreeNodeEx((void*)obj, flags, "%s",
+		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_uuidToObjectMap[nodeUUID]->m_name);
 
 	// Selection handling: click label to select; arrow toggles open.
 	if (ImGui::IsItemClicked()) {
@@ -595,12 +601,15 @@ void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
 		if (ImGui::GetIO().KeyCtrl) sel.Toggle(node->objUUID);
 		else 
 		*/
-		sel.SetSingle(node->objUUID);
-		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = node->objUUID;
+		sel.SetSingle(nodeUUID);
+		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = nodeUUID;
 	}
 
+	ImGui::SameLine();
+	ImGui::TextDisabled("(%s)", nodeUUID.ToString().c_str());
+
 	if (!is_leaf && open) {
-		for (auto* child : node->children)
+		for (auto child : node.children)
 			DrawNode(child, sel);
 		ImGui::TreePop();
 	}
@@ -608,6 +617,6 @@ void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
 }
 
 void ImguiEditorPass::DrawSceneGraph(SceneGraph* g, Selection& sel) {
-	for (auto* root : g->m_roots)
+	for (auto root : g->m_roots)
 		DrawNode(root, sel);
 }

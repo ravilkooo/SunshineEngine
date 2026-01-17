@@ -200,9 +200,9 @@
                         -1.203254222869873
                     ],
                     "m_rotation": [
-                        -0.008924972265958786,
                         -0.008438218384981155,
-                        7.531134178861976e-05
+                        -0.008924972265958786,
+                        7.531134906457737e-05
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -214,10 +214,7 @@
             "m_UUID": 1179623425869587445,
             "m_group": "Shapes",
             "m_name": "Sphere",
-            "m_parent": {
-                "attached": false,
-                "uuid": 15551142850770219886
-            },
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -381,7 +378,7 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        0.0,
+                        -0.0,
                         -0.0
                     ],
                     "m_scaleFactor": [
@@ -394,10 +391,7 @@
             "m_UUID": 5252445742742597294,
             "m_group": "Shapes",
             "m_name": "Sphere",
-            "m_parent": {
-                "attached": false,
-                "uuid": 15551142850770219886
-            },
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,

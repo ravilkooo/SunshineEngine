@@ -111,6 +111,7 @@ void Scene_Info::ClearScene() {
     uuidToObjectMap.clear();
 
     m_sceneGraph->Clear();
+    m_playerObject = SE::UUID(0u);
 }
 
 SE::UUID Scene_Info::AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject)
