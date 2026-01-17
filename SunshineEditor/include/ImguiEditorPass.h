@@ -113,7 +113,7 @@ public:
     } m_mouseClickCoords = { 0u, 0u };
 
     void ShowSceneHierarchy();
-    void DrawNode(SceneNode* node, Selection& sel);
+    void DrawNode(SE::UUID nodeUUID, Selection& sel);
     void DrawSceneGraph(SceneGraph* g, Selection& sel);
 private:
     //int selectedIdx = -1;

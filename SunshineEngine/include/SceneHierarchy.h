@@ -7,17 +7,17 @@
 #include <GameObject/ParentNode.h>
 
 struct SceneNode {
-    SE::UUID objUUID = SE::UUID(0u);    // non-owning
-    SceneNode* parent = nullptr;        // non-owning
-    eastl::vector<SceneNode*> children;
+    SE::UUID objUUID = SE::UUID(0u);
+    SE::UUID parent = SE::UUID(0u);
+    eastl::vector<SE::UUID> children;
 };
 
 class SceneGraph
 {
 public:
     eastl::vector<SceneNode> m_nodes;                       // storage
-    eastl::vector<SceneNode*> m_roots;                      // top-level nodes
-    eastl::unordered_map<SE::UUID, SceneNode*> m_byObjUUID; // fast lookup for SceneNodes
+    eastl::vector<SE::UUID> m_roots;                        // top-level node UUIDs
+    eastl::unordered_map<SE::UUID, int> m_byObjUUID;        // UUID -> index mapping
 
     std::unordered_map<SE::UUID, eastl::unique_ptr<GameObject_Info>>& m_uuidToObjectMap; // fast lookup for GameObjects
 
@@ -41,83 +41,103 @@ public:
 
     void Build() {
         m_nodes.clear(); m_roots.clear(); m_byObjUUID.clear();
-        m_nodes.reserve(m_uuidToObjectMap.size()); // keep pointers stable
+        m_nodes.reserve(m_uuidToObjectMap.size());
         // Filling nodes storage
-        for (auto& o : m_uuidToObjectMap) { m_nodes.push_back(SceneNode{ o.first, nullptr, {} }); }
+        for (auto& o : m_uuidToObjectMap) { m_nodes.push_back(SceneNode{ o.first, SE::UUID(0u), {} }); }
 
         // Filling lookup map for SceneNodes
-        for (auto& n : m_nodes) m_byObjUUID[n.objUUID] = &n;
+        for (int i = 0; i < m_nodes.size(); ++i) m_byObjUUID[m_nodes[i].objUUID] = i;
 
-        // Filling root nodes vector and save parentnes
+        // Filling root nodes vector and save parents
         for (auto& n : m_nodes) {
             GameObject_Info* p = m_uuidToObjectMap.at(n.objUUID)->m_parent.ptr;
             if (p) {
                 auto it = m_byObjUUID.find(p->m_UUID);
                 if (it != m_byObjUUID.end()) {
-                    n.parent = it->second;
-                    it->second->children.push_back(&n);
+                    n.parent = p->m_UUID;
+                    m_nodes[it->second].children.push_back(n.objUUID);
                 }
                 else {
                     // parent not present => treat as root
-                    // Not possible?
-                    m_roots.push_back(&n);
+                    m_roots.push_back(n.objUUID);
                 }
             }
             else {
-                m_roots.push_back(&n);
+                m_roots.push_back(n.objUUID);
             }
         }
     }
 
-    void Attach(SceneNode* child, SceneNode* newParent) {
+    void Attach(SE::UUID childUUID, SE::UUID newParentUUID) {
+        auto childIt = m_byObjUUID.find(childUUID);
+        if (childIt == m_byObjUUID.end()) return;
+        SceneNode& child = m_nodes[childIt->second];
+
         // detach from old parent/roots
-        if (child->parent) {
-            auto& siblings = child->parent->children;
-            siblings.erase(eastl::remove(siblings.begin(), siblings.end(), child), siblings.end());
+        if (child.parent != SE::UUID(0u)) {
+            auto parentIt = m_byObjUUID.find(child.parent);
+            if (parentIt != m_byObjUUID.end()) {
+                auto& siblings = m_nodes[parentIt->second].children;
+                siblings.erase(eastl::remove(siblings.begin(), siblings.end(), childUUID), siblings.end());
+            }
         }
         else {
-            m_roots.erase(eastl::remove(m_roots.begin(), m_roots.end(), child), m_roots.end());
+            m_roots.erase(eastl::remove(m_roots.begin(), m_roots.end(), childUUID), m_roots.end());
         }
         // attach to new parent or roots
-        child->parent = newParent;
-        if (newParent) newParent->children.push_back(child);
-        else m_roots.push_back(child);
+        child.parent = newParentUUID;
+        if (newParentUUID != SE::UUID(0u)) {
+            auto newParentIt = m_byObjUUID.find(newParentUUID);
+            if (newParentIt != m_byObjUUID.end()) {
+                m_nodes[newParentIt->second].children.push_back(childUUID);
+            }
+        }
+        else {
+            m_roots.push_back(childUUID);
+        }
     }
 
-    SceneNode* Add(SE::UUID objUUID)
+    SE::UUID Add(SE::UUID objUUID)
     {
-        m_nodes.push_back(SceneNode{ objUUID, nullptr, {} });
-        SceneNode* n = &m_nodes.back();
-        m_byObjUUID[objUUID] = n;
-        Attach(n, m_uuidToObjectMap[objUUID]->m_parent.ptr ?
-            m_byObjUUID[m_uuidToObjectMap[objUUID]->m_parent.ptr->m_UUID] : nullptr);
-
-        return n;
+        m_nodes.push_back(SceneNode{ objUUID, SE::UUID(0u), {} });
+        m_byObjUUID[objUUID] = m_nodes.size() - 1;
+        SE::UUID parentUUID = SE::UUID(0u);
+        if (m_uuidToObjectMap[objUUID]->m_parent.ptr) {
+            parentUUID = m_uuidToObjectMap[objUUID]->m_parent.ptr->m_UUID;
+        }
+        Attach(objUUID, parentUUID);
+        return objUUID;
     }
 
     void Reparent(SE::UUID objUUID, SE::UUID newParent) {
-        SceneNode* n = m_byObjUUID[objUUID];
-        SceneNode* p = newParent ? m_byObjUUID[newParent] : nullptr;
-        Attach(n, p);
+        Attach(objUUID, newParent);
     }
 
-    void EraseSubtree(SceneNode* n) {
+    void EraseSubtree(SE::UUID nodeUUID) {
+        auto nodeIt = m_byObjUUID.find(nodeUUID);
+        if (nodeIt == m_byObjUUID.end()) return;
+        SceneNode& n = m_nodes[nodeIt->second];
+S
         // remove mapping for subtree first
-        eastl::vector<SceneNode*> stack{ n };
+        eastl::vector<SE::UUID> stack{ nodeUUID };
         while (!stack.empty()) {
-            SceneNode* cur = stack.back(); stack.pop_back();
-            for (auto* c : cur->children) stack.push_back(c);
-            m_byObjUUID.erase(cur->objUUID);
+            SE::UUID cur = stack.back(); stack.pop_back();
+            auto curIt = m_byObjUUID.find(cur);
+            if (curIt != m_byObjUUID.end()) {
+                for (auto childUUID : m_nodes[curIt->second].children) stack.push_back(childUUID);
+                m_byObjUUID.erase(cur);
+            }
         }
         // detach from parent/roots
-        if (n->parent) {
-            auto& siblings = n->parent->children;
-            siblings.erase(eastl::remove(siblings.begin(), siblings.end(), n), siblings.end());
+        if (n.parent != SE::UUID(0u)) {
+            auto parentIt = m_byObjUUID.find(n.parent);
+            if (parentIt != m_byObjUUID.end()) {
+                auto& siblings = m_nodes[parentIt->second].children;
+                siblings.erase(eastl::remove(siblings.begin(), siblings.end(), nodeUUID), siblings.end());
+            }
         }
         else {
-            m_roots.erase(eastl::remove(m_roots.begin(), m_roots.end(), n), m_roots.end());
+            m_roots.erase(eastl::remove(m_roots.begin(), m_roots.end(), nodeUUID), m_roots.end());
         }
-        // optional: actually remove storage for the subtree; otherwise mark deleted
-        // (erasing from 'nodes' invalidates pointers; prefer a free-list or tombstone flag).
     }
 };
