@@ -117,7 +117,7 @@ public:
         auto nodeIt = m_byObjUUID.find(nodeUUID);
         if (nodeIt == m_byObjUUID.end()) return;
         SceneNode& n = m_nodes[nodeIt->second];
-S
+
         // remove mapping for subtree first
         eastl::vector<SE::UUID> stack{ nodeUUID };
         while (!stack.empty()) {

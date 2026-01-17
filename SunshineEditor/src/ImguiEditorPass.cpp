@@ -605,6 +605,9 @@ void ImguiEditorPass::DrawNode(SE::UUID nodeUUID, Selection& sel) {
 		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = nodeUUID;
 	}
 
+	ImGui::SameLine();
+	ImGui::TextDisabled("(%s)", nodeUUID.ToString().c_str());
+
 	if (!is_leaf && open) {
 		for (auto child : node.children)
 			DrawNode(child, sel);
