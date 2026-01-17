@@ -81,10 +81,10 @@ The main global object representing the player. Access it via the `player` globa
 
 **Methods:**
 ```lua
-player:GetTransform()    -- Returns TransformComponent
-player:GetCamera()       -- Returns Camera
-player:GetPhysics()      -- Returns PhysicsComponent
-player:GetName()         -- Returns string (player name)
+player:getTransform()    -- Returns TransformComponent
+player:getCamera()       -- Returns Camera
+player:getPhysics()      -- Returns PhysicsComponent
+player:getName()         -- Returns string (player name)
 ```
 
 **Example:**
@@ -92,9 +92,10 @@ player:GetName()         -- Returns string (player name)
 function onMoveForward(action)
     if not player then return end
     
-    local transform = player:GetTransform()
-    local camera = player:GetCamera()
-    local physics = player:GetPhysics()
+    local transform = player:getTransform()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    local physics = player:getPhysics()
 end
 ```
 
@@ -113,7 +114,7 @@ Represents position, rotation, and scale of the player object.
 ```lua
 function onMoveForward(action)
     if action == "down" then
-        local transform = player:GetTransform()
+        local transform = player:getTransform()
         
         -- Modify position directly
         transform.position.x = transform.position.x + 0.1
@@ -165,6 +166,19 @@ local moveVector = Vector3(
 
 ---
 
+### CameraComponent
+
+The camera component provides control over the camera's view, position, rotation, and various camera modes. It manages the player's perspective with support for first-person, orbital, and follow camera modes.
+
+#### Getting the Component
+
+```lua
+local cameraComponent = player:getCameraComponent()
+local camera = cameraComponent:getCamera()
+```
+
+---
+
 ### Camera
 
 Handles view frustum, direction vectors, and stick-based camera control (orbiting/third-person).
@@ -180,48 +194,48 @@ Handles view frustum, direction vectors, and stick-based camera control (orbitin
 
 Position Movement:
 ```lua
-camera:SetPosition(x, y, z)
-camera:GetPosition()
-camera:MoveForward(moveSpeed)
-camera:MoveBackward(moveSpeed)
-camera:MoveLeft(moveSpeed)
-camera:MoveRight(moveSpeed)
-camera:MoveUp(moveSpeed)
-camera:MoveDown(moveSpeed)
+camera:setPosition(x, y, z)
+camera:getPosition()
+camera:moveForward(moveSpeed)
+camera:moveBackward(moveSpeed)
+camera:moveLeft(moveSpeed)
+camera:moveRight(moveSpeed)
+camera:moveUp(moveSpeed)
+camera:moveDown(moveSpeed)
 ```
 
 Target & Up Vector (for orbit camera):
 ```lua
-camera:SetTarget(x, y, z)
-camera:GetTarget()
-camera:SetUp(x, y, z)
-camera:GetUp()
+camera:setTarget(x, y, z)
+camera:getTarget()
+camera:setUp(x, y, z)
+camera:getUp()
 ```
 
 Rotation:
 ```lua
-camera:RotateYaw(angleSpeed)
-camera:RotatePitch(angleSpeed)
-camera:SwitchToFPSMode()
+camera:rotateYaw(angleSpeed)
+camera:rotatePitch(angleSpeed)
+camera:switchToFPSMode()
 ```
 
 Zoom (Stick Length - for orbiting camera):
 ```lua
-camera:GetStickLength()      -- Distance from target
-camera:SetStickLength(length)
-camera:GetStickDirection()   -- Direction of stick as Vector3; The same as Camera direction
+camera:getStickLength()      -- Distance from target
+camera:setStickLength(length)
+camera:getStickDirection()   -- Direction of stick as Vector3; The same as Camera direction
 ```
 
 View Dimensions:
 ```lua
-camera:GetViewWidth()
-camera:GetViewHeight()
-camera:SetNearZ(distance)
-camera:GetNearZ()
-camera:SetFarZ(distance)
-camera:GetFarZ()
-camera:SetReferenceLen(length)
-camera:GetReferenceLen()
+camera:getViewWidth()
+camera:getViewHeight()
+camera:setNearZ(distance)
+camera:getNearZ()
+camera:setFarZ(distance)
+camera:getFarZ()
+camera:setReferenceLen(length)
+camera:getReferenceLen()
 ```
 
 **Example (Kinematic Camera):**
@@ -229,7 +243,8 @@ camera:GetReferenceLen()
 function onLookAround(deltaX, deltaY, wheelDelta)
     if not player then return end
     
-    local camera = player:GetCamera()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
     local deltaTime = camera.deltaTime
     local sensitivity = 1.0
     
@@ -237,16 +252,16 @@ function onLookAround(deltaX, deltaY, wheelDelta)
     local yawDelta = deltaX * sensitivity * deltaTime
     local pitchDelta = deltaY * sensitivity * deltaTime
 
-    local transform = player:GetTransform()
+    local transform = player:getTransform()
     transform.rotation.y = transform.rotation.y + yawDelta
     
     -- Zoom with mouse wheel
     if wheelDelta ~= 0 then
-        local currentLen = camera:GetStickLength()
+        local currentLen = camera:getStickLength()
         local zoomAmount = wheelDelta * deltaTime
         local newLen = currentLen - zoomAmount
         if newLen >= 0.0 and newLen <= 100.0 then
-            camera:SetStickLength(newLen)
+            camera:setStickLength(newLen)
         end
     end
 end
@@ -260,33 +275,33 @@ Direct access to physics engine (Jolt Physics). Apply forces, impulses, torques,
 
 **Force & Impulse Methods:**
 ```lua
-physics:AddForce(vector3)           -- Apply constant force
-physics:AddImpulse(vector3)         -- Apply instantaneous impulse
-physics:AddTorque(vector3)          -- Apply rotational torque
-physics:AddAngularImpulse(vector3)  -- Apply instantaneous angular impulse
+physics:addForce(vector3)           -- Apply constant force
+physics:addImpulse(vector3)         -- Apply instantaneous impulse
+physics:addTorque(vector3)          -- Apply rotational torque
+physics:addAngularImpulse(vector3)  -- Apply instantaneous angular impulse
 ```
 
 **Query Methods:**
 ```lua
-physics:GetAccumulatedForce()    -- Returns Vector3
-physics:GetAccumulatedTorque()   -- Returns Vector3
-physics:GetLinearVelocity()      -- Returns Vector3
-physics:GetAngularVelocity()     -- Returns Vector3
-physics:GetPointVelocity(point)  -- Returns Vector3 (velocity at specific point)
-physics:GetPosition()            -- Returns Vector3
-physics:GetRotation()            -- Returns Quaternion
+physics:getAccumulatedForce()    -- Returns Vector3
+physics:getAccumulatedTorque()   -- Returns Vector3
+physics:getLinearVelocity()      -- Returns Vector3
+physics:getAngularVelocity()     -- Returns Vector3
+physics:getPointVelocity(point)  -- Returns Vector3 (velocity at specific point)
+physics:getPosition()            -- Returns Vector3
+physics:getRotation()            -- Returns Quaternion
 ```
 
 **Velocity Control:**
 ```lua
-physics:SetLinearVelocity(vector3)  -- Direct velocity override
-physics:SetAngularVelocity(vector3) -- Direct angular velocity override
+physics:setLinearVelocity(vector3)  -- Direct velocity override
+physics:setAngularVelocity(vector3) -- Direct angular velocity override
 ```
 
 **Reset Methods:**
 ```lua
-physics:ResetForce()  -- Clear accumulated force
-physics:ResetTorque() -- Clear accumulated torque
+physics:resetForce()  -- Clear accumulated force
+physics:resetTorque() -- Clear accumulated torque
 ```
 
 **Example (Dynamic Movement):**
@@ -296,8 +311,9 @@ local moveForce = 1000.0
 function onMoveForward(action)
     if not player then return end
     
-    local camera = player:GetCamera()
-    local physics = player:GetPhysics()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    local physics = player:getPhysics()
     
     if action == "down" then
         print("Moving forward...")
@@ -306,15 +322,15 @@ function onMoveForward(action)
             camera.forward.y * moveForce,
             camera.forward.z * moveForce
         )
-        physics:AddImpulse(forward)
+        physics:addImpulse(forward)
     end
 end
 
 function onJump(action)
     if action == "down" then
-        local physics = player:GetPhysics()
+        local physics = player:getPhysics()
         local up = Vector3(0, moveForce, 0)
-        physics:AddImpulse(up)
+        physics:addImpulse(up)
     end
 end
 ```
@@ -334,8 +350,9 @@ local moveSpeed = 0.1
 function onMoveForward(action)
     if not player then return end
     
-    local transform = player:GetTransform()
-    local camera = player:GetCamera()
+    local transform = player:getTransform()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
     
     if action == "down" then
         print("Moving forward...")
@@ -349,8 +366,9 @@ end
 function onMoveBackward(action)
     if not player then return end
     
-    local transform = player:GetTransform()
-    local camera = player:GetCamera()
+    local transform = player:getTransform()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
     
     if action == "down" then
         print("Moving backward...")
@@ -364,8 +382,9 @@ end
 function onStrafeLeft(action)
     if not player then return end
     
-    local transform = player:GetTransform()
-    local camera = player:GetCamera()
+    local transform = player:getTransform()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
     
     if action == "down" then
         print("Strafing left...")
@@ -379,8 +398,9 @@ end
 function onStrafeRight(action)
     if not player then return end
     
-    local transform = player:GetTransform()
-    local camera = player:GetCamera()
+    local transform = player:getTransform()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
     
     if action == "down" then
         print("Strafing right...")
@@ -396,7 +416,7 @@ function onJump(action)
     
     if action == "down" then
         print("Jump!")
-        local transform = player:GetTransform()
+        local transform = player:getTransform()
         transform.position.y = transform.position.y + 0.5
     end
 end
@@ -406,7 +426,7 @@ function onDown(action)
     
     if action == "down" then
         print("Go Down!")
-        local transform = player:GetTransform()
+        local transform = player:getTransform()
         transform.position.y = transform.position.y - 0.5
     end
 end
@@ -425,8 +445,9 @@ local moveForce = 1000.0
 function onMoveForward(action)
     if not player then return end
     
-    local camera = player:GetCamera()
-    local physics = player:GetPhysics()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    local physics = player:getPhysics()
     
     if action == "down" then
         print("Moving forward...")
@@ -435,15 +456,16 @@ function onMoveForward(action)
             camera.forward.y * moveForce,
             camera.forward.z * moveForce
         )
-        physics:AddImpulse(forward)
+        physics:addImpulse(forward)
     end    
 end
 
 function onMoveBackward(action)
     if not player then return end
         
-    local camera = player:GetCamera()
-    local physics = player:GetPhysics()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    local physics = player:getPhysics()
     
     if action == "down" then
         print("Moving backward...")
@@ -452,15 +474,16 @@ function onMoveBackward(action)
             camera.forward.y * -moveForce,
             camera.forward.z * -moveForce
         )
-        physics:AddImpulse(forward)
+        physics:addImpulse(forward)
     end    
 end
 
 function onStrafeLeft(action)
     if not player then return end
      
-    local camera = player:GetCamera()
-    local physics = player:GetPhysics()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    local physics = player:getPhysics()
     
     if action == "down" then
         print("Moving left...")
@@ -469,15 +492,16 @@ function onStrafeLeft(action)
             camera.right.y * -moveForce,
             camera.right.z * -moveForce
         )
-        physics:AddImpulse(left)
+        physics:addImpulse(left)
     end    
 end
 
 function onStrafeRight(action)
     if not player then return end
          
-    local camera = player:GetCamera()
-    local physics = player:GetPhysics()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    local physics = player:getPhysics()
     
     if action == "down" then
         print("Moving right...")
@@ -486,7 +510,7 @@ function onStrafeRight(action)
             camera.right.y * moveForce,
             camera.right.z * moveForce
         )
-        physics:AddImpulse(right)
+        physics:addImpulse(right)
     end   
 end
 
@@ -499,8 +523,9 @@ function onJump(action)
         return
     end
          
-    local camera = player:GetCamera()
-    local physics = player:GetPhysics()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    local physics = player:getPhysics()
 
     if action == "down" then
         local currentTime = os.clock()
@@ -510,7 +535,7 @@ function onJump(action)
         if currentTime - lastJumpTime > jumpCooldown then
             lastJumpTime = currentTime
             local up = Vector3.new(0, moveForce * 10, 0)
-            physics:AddImpulse(up)
+            physics:addImpulse(up)
             print("Jump!")
             return
         end
@@ -520,36 +545,36 @@ end
 function onDown(action)
     if not player then return end
          
-    local physics = player:GetPhysics()
+    local physics = player:getPhysics()
     
     if action == "down" then
         print("Down!")
         local down = Vector3(0, -moveForce, 0)
-        physics:AddImpulse(down)
+        physics:addImpulse(down)
     end   
 end
 
 function onTorque(action)
     if not player then return end
          
-    local physics = player:GetPhysics()
+    local physics = player:getPhysics()
     
     if action == "down" then
         print("Torque!")
         local torque = Vector3(0, moveForce, 0)
-        physics:AddTorque(torque)
+        physics:addTorque(torque)
     end   
 end
 
 function onAngularImpulse(action)
     if not player then return end
          
-    local physics = player:GetPhysics()
+    local physics = player:getPhysics()
     
     if action == "down" then
         print("AngularImpulse!")
         local angularImpulse = Vector3(0, moveForce, 0)
-        physics:AddAngularImpulse(angularImpulse)
+        physics:addAngularImpulse(angularImpulse)
     end   
 end
 ```
@@ -563,7 +588,8 @@ end
 function onLookAround(deltaX, deltaY, wheelDelta)
     if not player then return end
     
-    local camera = player:GetCamera()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
     local deltaTime = camera.deltaTime
     local sensitivity = 1.0
     
@@ -575,13 +601,13 @@ function onLookAround(deltaX, deltaY, wheelDelta)
     
     -- Handle mouse wheel zoom (for stick-based/orbit camera)
     if wheelDelta ~= 0 then
-        local currentLen = camera:GetStickLength()
+        local currentLen = camera:getStickLength()
         local zoomAmount = wheelDelta * deltaTime
         local newLen = currentLen - zoomAmount
         
         -- Clamp zoom distance
         if newLen >= 0.0 and newLen <= 100.0 then
-            camera:SetStickLength(newLen)
+            camera:setStickLength(newLen)
         end
     end
 end
@@ -601,8 +627,9 @@ function onJump(action)
         return
     end
          
-    local camera = player:GetCamera()
-    local physics = player:GetPhysics()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    local physics = player:getPhysics()
 
     if action == "down" then
         local currentTime = os.clock()
@@ -631,7 +658,7 @@ function onCrouch(action)
     
     isCrouching = not isCrouching
     
-    local transform = player:GetTransform()
+    local transform = player:getTransform()
     if isCrouching then
         transform.scale.y = 0.5
         print("Crouching")
@@ -704,14 +731,14 @@ physics:AddImpulse(impulse)
 ### Velocity Queries
 
 ```lua
-local physics = player:GetPhysics()
+local physics = player:getPhysics()
 
 -- Get current velocities
-local linearVel = physics:GetLinearVelocity()
-local angularVel = physics:GetAngularVelocity()
+local linearVel = physics:getLinearVelocity()
+local angularVel = physics:getAngularVelocity()
 
--- Get velocity at specific world point
-local velAtPoint = physics:GetPointVelocity(Vector3(0, 1, 0))
+-- get velocity at specific world point
+local velAtPoint = physics:getPointVelocity(Vector3(0, 1, 0))
 
 -- Calculate speed
 local speed = linearVel:Length()
@@ -726,8 +753,8 @@ local speed = linearVel:Length()
 Use the `print()` function for debugging:
 
 ```lua
-print("Player name: " .. player:GetName())
-print("Position: " .. player:GetTransform().position.x)
+print("Player name: " .. player:getName())
+print("Position: " .. player:getTransform().position.x)
 print("Action triggered")
 ```
 
@@ -757,8 +784,8 @@ All output goes to the engine console.
    function onMoveForward(action)
        if not player then return end
        
-       local transform = player:GetTransform()
-       local camera = player:GetCamera()
+       local transform = player:getTransform()
+       local camera = player:getCamera()
        -- Reuse components in function
    end
    ```
@@ -799,7 +826,7 @@ All output goes to the engine console.
 
 **Camera not rotating**
 - Check mouse callback `onLookAround` is bound
-- Verify camera:GetStickLength() > 0 for orbit camera
+- Verify camera:getStickLength() > 0 for orbit camera
 
 **Physics not responding**
 - Ensure physics body exists and is dynamic
@@ -819,8 +846,9 @@ function onMoveForward(action)
     if not player then return end
     if action ~= "down" then return end
     
-    local transform = player:GetTransform()
-    local camera = player:GetCamera()
+    local transform = player:getTransform()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
     transform.position.x = transform.position.x + camera.forward.x * moveSpeed
     transform.position.y = transform.position.y + camera.forward.y * moveSpeed
     transform.position.z = transform.position.z + camera.forward.z * moveSpeed
@@ -829,7 +857,8 @@ end
 function onLookAround(deltaX, deltaY, wheelDelta)
     if not player then return end
     
-    local camera = player:GetCamera()
+    local cameraComponent = player:getCameraComponent()
+    local camera = cameraComponent:getCamera()
     local deltaTime = camera.deltaTime
     
 	-- This behaviour is handled inside C++ engine
@@ -838,7 +867,7 @@ function onLookAround(deltaX, deltaY, wheelDelta)
     -- camera:RotatePitch(deltaY * mouseSensitivity * deltaTime)
     
     if wheelDelta ~= 0 then
-        local newLen = camera:GetStickLength() - wheelDelta * deltaTime
+        local newLen = camera:getStickLength() - wheelDelta * deltaTime
         if newLen >= 0.0 and newLen <= 100.0 then
             camera:SetStickLength(newLen)
         end

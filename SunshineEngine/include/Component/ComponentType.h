@@ -10,7 +10,8 @@ namespace SE {
 		PHYSICS,
 		PERCEPTION,
 		BEHAVIOR,
-		MESH
+		MESH,
+		CAMERA,
 	};
 }
 
@@ -23,4 +24,5 @@ NLOHMANN_JSON_SERIALIZE_ENUM(SE::ComponentType, {
 	{SE::ComponentType::PERCEPTION,   "PERCEPTION"},
 	{SE::ComponentType::BEHAVIOR,   "BEHAVIOR"},
 	{SE::ComponentType::MESH,   "MESH"},
+	{SE::ComponentType::CAMERA,   "CAMERA"},
 })

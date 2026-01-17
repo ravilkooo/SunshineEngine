@@ -6,6 +6,7 @@
 
 #include <Component/TransformComponent.h>
 #include <Component/MeshComponent.h>
+#include <Component/CameraComponent.h>
 
 #include <Utils/AssetPath.h>
 #include <Utils/StringUtils.h>
@@ -51,6 +52,8 @@ PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, 
 		json _empty;
 		SettingsFromJson(_empty, camera);
 	}
+
+	AddComponent<CameraComponent>(m_playerCamera);
 }
 
 void PlayerObject::SetUpCamera(SE_G::DeferredRenderer* renderSystem)
