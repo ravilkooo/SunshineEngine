@@ -94,7 +94,14 @@ void LuaComponent::LoadScript() {
 	//InitLuaFile();
 
 	lua = eastl::make_unique<sol::state>();
-	lua->open_libraries(sol::lib::base);
+	lua->open_libraries(
+		sol::lib::base,
+		sol::lib::package,
+		sol::lib::math,
+		sol::lib::string,
+		sol::lib::table,
+		sol::lib::os
+	);
 
 	registerComponents();
 

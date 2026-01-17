@@ -2,6 +2,7 @@
 #include <PlayerObject/PlayerObject.h>
 #include <Component/TransformComponent.h>
 #include <Component/PhysicsComponent.h>
+#include <Component/CameraComponent.h>
 #include <Graphics/Utils/Camera.h>
 
 #include <iostream>
@@ -171,7 +172,11 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"x", &DXSM::Vector3::x,
 		"y", &DXSM::Vector3::y,
 		"z", &DXSM::Vector3::z,
-		//"Normalize", &DXSM::Vector3::Normalize,
+		"Normalize",
+		[](DXSM::Vector3* self) {
+			return self->Normalize();
+		}
+		/*&DXSM::Vector3::Normalize*/,
 		"Length", &DXSM::Vector3::Length
 	);
 
@@ -186,41 +191,41 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		// delta time
 		"deltaTime", sol::readonly(&SE_G::Camera::m_deltaTime),
 		// Position methods
-		"SetPosition", &SE_G::Camera::SetPosition,
-		"GetPosition", &SE_G::Camera::GetPosition,
+		"setPosition", &SE_G::Camera::SetPosition,
+		"getPosition", &SE_G::Camera::GetPosition,
 		// Target methods
-		"SetTarget", &SE_G::Camera::SetTarget,
-		"GetTarget", &SE_G::Camera::GetTarget,
+		"setTarget", &SE_G::Camera::SetTarget,
+		"getTarget", &SE_G::Camera::GetTarget,
 		// Up vector methods
-		"SetUp", &SE_G::Camera::SetUp,
-		"GetUp", &SE_G::Camera::GetUp,
+		"setUp", &SE_G::Camera::SetUp,
+		"getUp", &SE_G::Camera::GetUp,
 		// Near/Far Z methods
-		"SetNearZ", &SE_G::Camera::SetNearZ,
-		"GetNearZ", &SE_G::Camera::GetNearZ,
-		"SetFarZ", &SE_G::Camera::SetFarZ,
-		"GetFarZ", &SE_G::Camera::GetFarZ,
+		"setNearZ", &SE_G::Camera::SetNearZ,
+		"getNearZ", &SE_G::Camera::GetNearZ,
+		"setFarZ", &SE_G::Camera::SetFarZ,
+		"getFarZ", &SE_G::Camera::GetFarZ,
 		// Reference length
-		"SetReferenceLen", &SE_G::Camera::SetReferenceLen,
-		"GetReferenceLen", &SE_G::Camera::GetReferenceLen,
+		"setReferenceLen", &SE_G::Camera::SetReferenceLen,
+		"getReferenceLen", &SE_G::Camera::GetReferenceLen,
 		// View dimensions
-		"GetViewWidth", &SE_G::Camera::GetViewWidth,
-		"GetViewHeight", &SE_G::Camera::GetViewHeight,
+		"getViewWidth", &SE_G::Camera::GetViewWidth,
+		"getViewHeight", &SE_G::Camera::GetViewHeight,
 		// Movement methods
-		"MoveForward", &SE_G::Camera::MoveForward,
-		"MoveBackward", &SE_G::Camera::MoveBackward,
-		"MoveLeft", &SE_G::Camera::MoveLeft,
-		"MoveRight", &SE_G::Camera::MoveRight,
-		"MoveUp", &SE_G::Camera::MoveUp,
-		"MoveDown", &SE_G::Camera::MoveDown,
+		"moveForward", &SE_G::Camera::MoveForward,
+		"moveBackward", &SE_G::Camera::MoveBackward,
+		"moveLeft", &SE_G::Camera::MoveLeft,
+		"moveRight", &SE_G::Camera::MoveRight,
+		"moveUp", &SE_G::Camera::MoveUp,
+		"moveDown", &SE_G::Camera::MoveDown,
 		// Rotation methods
-		"RotateYaw", &SE_G::Camera::RotateYaw,
-		"RotatePitch", &SE_G::Camera::RotatePitch,
+		"rotateYaw", &SE_G::Camera::RotateYaw,
+		"rotatePitch", &SE_G::Camera::RotatePitch,
 		// Stick Properties
-		"GetStickDirection", &SE_G::Camera::GetStickDirection,
-		"GetStickLength", &SE_G::Camera::GetStickLength,
-		"SetStickLength", &SE_G::Camera::SetStickLength,
+		"getStickDirection", &SE_G::Camera::GetStickDirection,
+		"getStickLength", &SE_G::Camera::GetStickLength,
+		"setStickLength", &SE_G::Camera::SetStickLength,
 		// Camera mode
-		"SwitchToFPSMode", &SE_G::Camera::SwitchToFPSMode
+		"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode
 		/*
 		// Update methods
 		"Update", sol::overload(
@@ -238,39 +243,48 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"scale", &TransformComponent::m_scaleFactor
 	);
 
+	// Register CameraComponent
+	m_luaState->new_usertype<CameraComponent>("CameraComponent",
+		sol::no_constructor,
+		"getCamera", [](CameraComponent* self) { return self->GetCamera(); }
+	);
+
 	// Register PhysicsComponent
 	m_luaState->new_usertype<PhysicsComponent>("PhysicsComponent",
 		sol::no_constructor,
-		"AddForce", &PhysicsComponent::AddForce,
-		"AddImpulse", &PhysicsComponent::AddImpulse,
-		"AddTorque", &PhysicsComponent::AddTorque,
-		"AddAngularImpulse", &PhysicsComponent::AddAngularImpulse,
-		"GetAccumulatedForce", &PhysicsComponent::GetAccumulatedForce,
-		"GetAccumulatedTorque", &PhysicsComponent::GetAccumulatedTorque,
-		"GetAngularVelocity", &PhysicsComponent::GetAngularVelocity,
-		"GetLinearVelocity", &PhysicsComponent::GetLinearVelocity,
-		"GetPointVelocity", &PhysicsComponent::GetPointVelocity,
-		"GetPosition", &PhysicsComponent::GetPosition,
-		"GetRotation", &PhysicsComponent::GetRotation,
-		"ResetForce", &PhysicsComponent::ResetForce,
-		"ResetTorque", &PhysicsComponent::ResetTorque,
-		"SetAngularVelocity", &PhysicsComponent::SetAngularVelocity,
-		"SetLinearVelocity", &PhysicsComponent::SetLinearVelocity
+		"addForce", &PhysicsComponent::AddForce,
+		"addImpulse", &PhysicsComponent::AddImpulse,
+		"addTorque", &PhysicsComponent::AddTorque,
+		"addAngularImpulse", &PhysicsComponent::AddAngularImpulse,
+		"getAccumulatedForce", &PhysicsComponent::GetAccumulatedForce,
+		"getAccumulatedTorque", &PhysicsComponent::GetAccumulatedTorque,
+		"getAngularVelocity", &PhysicsComponent::GetAngularVelocity,
+		"getLinearVelocity", &PhysicsComponent::GetLinearVelocity,
+		"getPointVelocity", &PhysicsComponent::GetPointVelocity,
+		"getPosition", &PhysicsComponent::GetPosition,
+		"getRotation", &PhysicsComponent::GetRotation,
+		"resetForce", &PhysicsComponent::ResetForce,
+		"resetTorque", &PhysicsComponent::ResetTorque,
+		"setAngularVelocity", &PhysicsComponent::SetAngularVelocity,
+		"setLinearVelocity", &PhysicsComponent::SetLinearVelocity
 	);
 
 	// Register PlayerObject
 	m_luaState->new_usertype<PlayerObject>("PlayerObject",
 		sol::no_constructor,
-		"GetTransform", [](PlayerObject* player) {
+		"getTransform", [](PlayerObject* player) {
 			return player->GetComponent<TransformComponent>().get();
 		},
-		"GetPhysics", [](PlayerObject* player) {
+		"getPhysics", [](PlayerObject* player) {
 			return player->GetComponent<PhysicsComponent>().get();
 		},
-		"GetCamera", [](PlayerObject* player) {
+		"getCamera", [](PlayerObject* player) {
 			return player->m_playerCamera.get();
 		},
-		"GetName", [](PlayerObject* player) {
+		"getCameraComponent", [](PlayerObject* player) {
+			return player->GetComponent<CameraComponent>().get();
+		},
+		"getName", [](PlayerObject* player) {
 			return player->m_name.c_str();
 		}
 	);

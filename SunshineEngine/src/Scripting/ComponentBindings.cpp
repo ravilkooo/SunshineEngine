@@ -1,6 +1,7 @@
 #include <Scripting/ComponentBindings.h>
 
 #include <GameObject/GameObject.h>
+#include <Graphics/Utils/Camera.h>
 #include <Scripting/AutoBindings.h>
 #include <Utils/DebugUtils.h>
 #include <SimpleMath.h>
@@ -22,9 +23,63 @@ namespace ScriptingBindings
             "z", &DXSM::Vector3::z
         );
 
+		// Register Camera type
+		lua.new_usertype<SE_G::Camera>("Camera",
+			sol::no_constructor,
+			// Properties (read-only)
+			"forward", sol::readonly(&SE_G::Camera::forward),
+			"up", sol::readonly(&SE_G::Camera::up),
+			"right", sol::readonly(&SE_G::Camera::right),
+			"position", sol::readonly(&SE_G::Camera::position),
+			// delta time
+			"deltaTime", sol::readonly(&SE_G::Camera::m_deltaTime),
+			// Position methods
+			"setPosition", &SE_G::Camera::SetPosition,
+			"getPosition", &SE_G::Camera::GetPosition,
+			// Target methods
+			"setTarget", &SE_G::Camera::SetTarget,
+			"getTarget", &SE_G::Camera::GetTarget,
+			// Up vector methods
+			"setUp", &SE_G::Camera::SetUp,
+			"getUp", &SE_G::Camera::GetUp,
+			// Near/Far Z methods
+			"setNearZ", &SE_G::Camera::SetNearZ,
+			"getNearZ", &SE_G::Camera::GetNearZ,
+			"setFarZ", &SE_G::Camera::SetFarZ,
+			"getFarZ", &SE_G::Camera::GetFarZ,
+			// Reference length
+			"setReferenceLen", &SE_G::Camera::SetReferenceLen,
+			"getReferenceLen", &SE_G::Camera::GetReferenceLen,
+			// View dimensions
+			"getViewWidth", &SE_G::Camera::GetViewWidth,
+			"getViewHeight", &SE_G::Camera::GetViewHeight,
+			// Movement methods
+			"moveForward", &SE_G::Camera::MoveForward,
+			"moveBackward", &SE_G::Camera::MoveBackward,
+			"moveLeft", &SE_G::Camera::MoveLeft,
+			"moveRight", &SE_G::Camera::MoveRight,
+			"moveUp", &SE_G::Camera::MoveUp,
+			"moveDown", &SE_G::Camera::MoveDown,
+			// Rotation methods
+			"rotateYaw", &SE_G::Camera::RotateYaw,
+			"rotatePitch", &SE_G::Camera::RotatePitch,
+			// Stick Properties
+			"getStickDirection", &SE_G::Camera::GetStickDirection,
+			"getStickLength", &SE_G::Camera::GetStickLength,
+			"setStickLength", &SE_G::Camera::SetStickLength,
+			// Camera mode
+			"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode
+
+			// // Update methods
+			// "Update", sol::overload(
+			// 	static_cast<void (SE_G::Camera::*)()>(&SE_G::Camera::Update),
+			// 	static_cast<void (SE_G::Camera::*)(const DXSM::Vector3)>(&SE_G::Camera::Update)
+			// )
+		);
+
         // Base GameObject type; component binders will append getters
         lua.new_usertype<GameObject>("GameObject");
-
+		
         // Execute all component binders registered via LUA_REGISTER_COMPONENT
         AutoBindings::RegisterAll(lua);
 

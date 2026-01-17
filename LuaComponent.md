@@ -9,9 +9,10 @@ Complete guide to using Lua scripts to manage game object components through the
 1. [Introduction](#introduction)
 2. [TransformComponent](#transformcomponent)
 3. [PhysicsComponent](#physicscomponent)
-4. [PerceptionComponent](#perceptioncomponent)
-5. [PerceptionSystem](#perceptionsystem)
-6. [Usage Examples](#usage-examples)
+4. [CameraComponent](#cameracomponent)
+5. [PerceptionComponent](#perceptioncomponent)
+6. [PerceptionSystem](#perceptionsystem)
+7. [Usage Examples](#usage-examples)
 
 ---
 
@@ -92,7 +93,7 @@ The physics component provides access to the Jolt Physics engine. It allows you 
 ### Getting the Component
 
 ```lua
-local physics = getPhysics(gameObject)
+local physics = GetPhysics(gameObject)
 ```
 
 **Note:** PhysicsComponent must be previously added to the game object in the editor or through code.
@@ -101,45 +102,45 @@ local physics = getPhysics(gameObject)
 
 #### Force and Impulse
 
-##### `AddForce(force)`
+##### `addForce(force)`
 
 Applies a continuous force to the physics body.
 
 ```lua
-physics:AddForce({x = 100.0, y = 0.0, z = 0.0})
+physics:addForce({x = 100.0, y = 0.0, z = 0.0})
 ```
 
 **Parameters:**
 - `force` (Vector3): Force vector to apply
 
-##### `AddImpulse(impulse)`
+##### `addImpulse(impulse)`
 
 Applies an instantaneous impulse to the physics body.
 
 ```lua
-physics:AddImpulse({x = 500.0, y = 1000.0, z = 0.0})
+physics:addImpulse({x = 500.0, y = 1000.0, z = 0.0})
 ```
 
 **Parameters:**
 - `impulse` (Vector3): Impulse vector to apply
 
-##### `AddTorque(torque)`
+##### `addTorque(torque)`
 
 Applies a continuous rotational torque to the physics body.
 
 ```lua
-physics:AddTorque({x = 0.0, y = 50.0, z = 0.0})
+physics:addTorque({x = 0.0, y = 50.0, z = 0.0})
 ```
 
 **Parameters:**
 - `torque` (Vector3): Torque vector to apply
 
-##### `AddAngularImpulse(angularImpulse)`
+##### `addAngularImpulse(angularImpulse)`
 
 Applies an instantaneous angular impulse to the physics body.
 
 ```lua
-physics:AddAngularImpulse({x = 10.0, y = 20.0, z = 0.0})
+physics:addAngularImpulse({x = 10.0, y = 20.0, z = 0.0})
 ```
 
 **Parameters:**
@@ -149,55 +150,55 @@ physics:AddAngularImpulse({x = 10.0, y = 20.0, z = 0.0})
 
 #### Query Methods
 
-##### `GetAccumulatedForce()`
+##### `getAccumulatedForce()`
 
 Gets the accumulated force on the physics body.
 
 ```lua
-local force = physics:GetAccumulatedForce()
+local force = physics:getAccumulatedForce()
 print("Accumulated force:", force.x, force.y, force.z)
 ```
 
 **Returns:** Vector3
 
-##### `GetAccumulatedTorque()`
+##### `getAccumulatedTorque()`
 
 Gets the accumulated torque on the physics body.
 
 ```lua
-local torque = physics:GetAccumulatedTorque()
+local torque = physics:getAccumulatedTorque()
 ```
 
 **Returns:** Vector3
 
-##### `GetLinearVelocity()`
+##### `getLinearVelocity()`
 
 Gets the current linear velocity of the physics body.
 
 ```lua
-local velocity = physics:GetLinearVelocity()
+local velocity = physics:getLinearVelocity()
 local speed = math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z)
 print("Speed:", speed)
 ```
 
 **Returns:** Vector3
 
-##### `GetAngularVelocity()`
+##### `getAngularVelocity()`
 
 Gets the current angular velocity of the physics body.
 
 ```lua
-local angularVel = physics:GetAngularVelocity()
+local angularVel = physics:getAngularVelocity()
 ```
 
 **Returns:** Vector3
 
-##### `GetPointVelocity(point)`
+##### `getPointVelocity(point)`
 
 Gets the velocity at a specific point on the physics body.
 
 ```lua
-local pointVel = physics:GetPointVelocity({x = 0.0, y = 1.0, z = 0.0})
+local pointVel = physics:getPointVelocity({x = 0.0, y = 1.0, z = 0.0})
 ```
 
 **Parameters:**
@@ -205,23 +206,23 @@ local pointVel = physics:GetPointVelocity({x = 0.0, y = 1.0, z = 0.0})
 
 **Returns:** Vector3
 
-##### `GetPosition()`
+##### `getPosition()`
 
 Gets the current position of the physics body.
 
 ```lua
-local pos = physics:GetPosition()
+local pos = physics:getPosition()
 print("Position:", pos.x, pos.y, pos.z)
 ```
 
 **Returns:** Vector3
 
-##### `GetRotation()`
+##### `getRotation()`
 
 Gets the current rotation of the physics body as a quaternion.
 
 ```lua
-local rot = physics:GetRotation()
+local rot = physics:getRotation()
 print("Rotation quaternion:", rot)
 ```
 
@@ -231,47 +232,409 @@ print("Rotation quaternion:", rot)
 
 #### Reset Methods
 
-##### `ResetForce()`
+##### `resetForce()`
 
 Clears all accumulated forces on the physics body.
 
 ```lua
-physics:ResetForce()
+physics:resetForce()
 ```
 
-##### `ResetTorque()`
+##### `resetTorque()`
 
 Clears all accumulated torques on the physics body.
 
 ```lua
-physics:ResetTorque()
+physics:resetTorque()
 ```
 
 ---
 
 #### Velocity Control
 
-##### `SetLinearVelocity(velocity)`
+##### `setLinearVelocity(velocity)`
 
 Directly sets the linear velocity of the physics body.
 
 ```lua
-physics:SetLinearVelocity({x = 10.0, y = 0.0, z = 5.0})
+physics:setLinearVelocity({x = 10.0, y = 0.0, z = 5.0})
 ```
 
 **Parameters:**
 - `velocity` (Vector3): Target velocity
 
-##### `SetAngularVelocity(angularVelocity)`
+##### `setAngularVelocity(angularVelocity)`
 
 Directly sets the angular velocity of the physics body.
 
 ```lua
-physics:SetAngularVelocity({x = 0.0, y = 90.0, z = 0.0})
+physics:setAngularVelocity({x = 0.0, y = 90.0, z = 0.0})
 ```
 
 **Parameters:**
 - `angularVelocity` (Vector3): Target angular velocity
+
+---
+
+## CameraComponent
+
+> **Warning**
+Only PlayerObject has CameraComponent!
+
+The camera component provides control over the camera's view, position, rotation, and various camera modes. It manages the player's perspective with support for first-person, orbital, and follow camera modes.
+
+### Getting the Component
+
+```lua
+local cameraComponent = self.owner:getCameraComponent()
+local camera = cameraComponent:getCamera()
+```
+
+---
+
+## Camera
+
+The Camera object handles view frustum, direction vectors, and stick-based camera control for orbiting and third-person perspectives.
+
+### Getting the Camera
+
+```lua
+local camera = cameraComponent:getCamera()
+```
+
+### Read-Only Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `forward` | Vector3 | Camera forward direction vector |
+| `up` | Vector3 | Camera up direction vector |
+| `right` | Vector3 | Camera right direction vector |
+| `position` | Vector3 | Camera world position |
+| `deltaTime` | float | Delta time for current frame |
+
+### Methods
+
+#### Position Methods
+
+##### `setPosition(position)`
+
+Sets the camera position in world space.
+
+```lua
+camera:setPosition({x = 0.0, y = 5.0, z = -10.0})
+```
+
+**Parameters:**
+- `position` (Vector3): Target position
+
+##### `getPosition()`
+
+Gets the current camera position.
+
+```lua
+local pos = camera:getPosition()
+print("Position:", pos.x, pos.y, pos.z)
+```
+
+**Returns:** Vector3
+
+#### Movement Methods
+
+##### `moveForward(moveSpeed)`
+
+Moves the camera forward relative to its forward direction.
+
+```lua
+camera:moveForward(5.0)
+```
+
+**Parameters:**
+- `moveSpeed` (float): Speed of movement
+
+##### `moveBackward(moveSpeed)`
+
+Moves the camera backward relative to its forward direction.
+
+```lua
+camera:moveBackward(5.0)
+```
+
+**Parameters:**
+- `moveSpeed` (float): Speed of movement
+
+##### `moveLeft(moveSpeed)`
+
+Moves the camera left relative to its right direction.
+
+```lua
+camera:moveLeft(5.0)
+```
+
+**Parameters:**
+- `moveSpeed` (float): Speed of movement
+
+##### `moveRight(moveSpeed)`
+
+Moves the camera right relative to its right direction.
+
+```lua
+camera:moveRight(5.0)
+```
+
+**Parameters:**
+- `moveSpeed` (float): Speed of movement
+
+##### `moveUp(moveSpeed)`
+
+Moves the camera up in world space.
+
+```lua
+camera:moveUp(5.0)
+```
+
+**Parameters:**
+- `moveSpeed` (float): Speed of movement
+
+##### `moveDown(moveSpeed)`
+
+Moves the camera down in world space.
+
+```lua
+camera:moveDown(5.0)
+```
+
+**Parameters:**
+- `moveSpeed` (float): Speed of movement
+
+#### Target & Up Vector Methods (for Orbital Camera)
+
+##### `setTarget(target)`
+
+Sets the target point the camera looks at (for orbital mode).
+
+```lua
+camera:setTarget({x = 0.0, y = 1.0, z = 0.0})
+```
+
+**Parameters:**
+- `target` (Vector3): Target position to look at
+
+##### `getTarget()`
+
+Gets the current camera target.
+
+```lua
+local target = camera:getTarget()
+```
+
+**Returns:** Vector3
+
+##### `setUp(up)`
+
+Sets the camera's up direction vector.
+
+```lua
+camera:setUp({x = 0.0, y = 1.0, z = 0.0})
+```
+
+**Parameters:**
+- `up` (Vector3): Up direction vector
+
+##### `getUp()`
+
+Gets the current camera up direction.
+
+```lua
+local up = camera:getUp()
+```
+
+**Returns:** Vector3
+
+#### Rotation Methods
+
+##### `rotateYaw(angleSpeed)`
+
+Rotates the camera around the up axis (horizontal rotation).
+
+```lua
+camera:rotateYaw(45.0)  -- 45 degrees
+```
+
+**Parameters:**
+- `angleSpeed` (float): Rotation angle speed in degrees
+
+##### `rotatePitch(angleSpeed)`
+
+Rotates the camera around the right axis (vertical rotation).
+
+```lua
+camera:rotatePitch(30.0)  -- 30 degrees
+```
+
+**Parameters:**
+- `angleSpeed` (float): Rotation angle speed in degrees
+
+##### `switchToFPSMode()`
+
+Switches the camera to first-person mode.
+
+```lua
+camera:switchToFPSMode()
+```
+
+#### Stick Length Methods (for Orbiting Camera)
+
+The stick represents the distance and direction from the camera's target (used in orbital and third-person camera modes).
+
+##### `getStickLength()`
+
+Gets the distance from the camera to its target.
+
+```lua
+local distance = camera:getStickLength()
+print("Distance to target:", distance)
+```
+
+**Returns:** float
+
+##### `setStickLength(length)`
+
+Sets the distance from the camera to its target (zoom).
+
+```lua
+camera:setStickLength(15.0)  -- 15 units from target
+```
+
+**Parameters:**
+- `length` (float): Distance in world units (clamped to 0-100)
+
+##### `getStickDirection()`
+
+Gets the direction vector from target to camera (same as camera direction).
+
+```lua
+local direction = camera:getStickDirection()
+```
+
+**Returns:** Vector3
+
+#### View Dimensions Methods
+
+##### `getViewWidth()`
+
+Gets the width of the view.
+
+```lua
+local width = camera:getViewWidth()
+```
+
+**Returns:** float
+
+##### `GetViewHeight()`
+
+Gets the height of the view.
+
+```lua
+local height = camera:getViewHeight()
+```
+
+**Returns:** float
+
+#### Near/Far Z Plane Methods
+
+##### `setNearZ(distance)`
+
+Sets the near clipping plane distance.
+
+```lua
+camera:setNearZ(0.1)
+```
+
+**Parameters:**
+- `distance` (float): Distance from camera to near plane
+
+##### `getNearZ()`
+
+Gets the near clipping plane distance.
+
+```lua
+local nearZ = camera:getNearZ()
+```
+
+**Returns:** float
+
+##### `setFarZ(distance)`
+
+Sets the far clipping plane distance.
+
+```lua
+camera:setFarZ(1000.0)
+```
+
+**Parameters:**
+- `distance` (float): Distance from camera to far plane
+
+##### `getFarZ()`
+
+Gets the far clipping plane distance.
+
+```lua
+local farZ = camera:getFarZ()
+```
+
+**Returns:** float
+
+#### Reference Length Methods
+
+##### `setReferenceLen(length)`
+
+Sets the reference length for camera calculations.
+
+```lua
+camera:setReferenceLen(10.0)
+```
+
+**Parameters:**
+- `length` (float): Reference length value
+
+##### `getReferenceLen()`
+
+Gets the current reference length.
+
+```lua
+local refLen = camera:getReferenceLen()
+```
+
+**Returns:** float
+
+### Usage Examples
+
+#### Orbital Camera Control
+
+```lua
+-- Set up orbital camera
+local camera = cameraComponent:getCamera()
+camera:setTarget({x = 0.0, y = 1.0, z = 0.0})  -- Look at player center
+camera:setStickLength(10.0)  -- 10 units away
+
+-- Orbit around target with mouse movement
+camera:rotateYaw(45.0)   -- Rotate horizontally
+camera:rotatePitch(-20.0)  -- Rotate vertically
+```
+
+#### Dynamic Camera Distance
+
+```lua
+function behavior:update(dt)
+    local camera = self.owner:getCameraComponent():getCamera()
+    local currentTime = os.clock()
+    
+    -- Smoothly change zoom distance based on time
+    camera:setStickLength(10.0 + 3.0 * math.sin(currentTime))
+    
+    return "success"
+end
+```
 
 ---
 

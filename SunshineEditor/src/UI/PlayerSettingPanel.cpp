@@ -75,24 +75,14 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
         //ImGui::ColorEdit3("Camera Rotation",
         //	&(m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll.x), ImGuiColorEditFlags_Float);
 
+        /*
         DXSM::Vector3 viewPitchYawRoll = m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll * (180.0f / DirectX::XM_PI);
         if (PropertyPanel::DrawVector3Control("Camera Rotation", viewPitchYawRoll, 0.0f))
         {
             m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll = viewPitchYawRoll * (DirectX::XM_PI / 180.0f);
         }
-
-        /*
-        float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
-        float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
-        if ()
-        {
-            lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
-        }
-        if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
-        {
-            lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
-        }
         */
+
         ImGui::TreePop();
     }
     else
