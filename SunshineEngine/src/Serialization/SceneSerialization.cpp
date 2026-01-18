@@ -605,13 +605,12 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
 
 // ----------------- Scene -----------------
 
-eastl::shared_ptr<Scene> Scene::FromJson(
+void Scene::FromJson(
     SE_G::DeferredRenderer* renderSystem,
     PhysicsSystem* physicsSystem,
     eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
-    auto scene = eastl::make_shared<Scene>();
 
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
@@ -675,8 +674,8 @@ eastl::shared_ptr<Scene> Scene::FromJson(
             {
                 go = eastl::make_unique<PlayerObject>(objJ, renderSystem, camera);
                 auto playerObj = static_cast<PlayerObject*>(go.get());
-                playerObj->AssignSceneToCamera(scene.get());
-                scene->m_playerObjectUUID = playerObj->m_UUID;
+                playerObj->AssignSceneToCamera(&GetInstance());
+                GetInstance().m_playerObjectUUID = playerObj->m_UUID;
                 break;
             }
             case GameObjectGroup::ParticleEmitter:
@@ -713,16 +712,17 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
                 }
 
-                auto objUUID = scene->AddGameObject(eastl::move(go));
+                auto objUUID = GetInstance().AddGameObject(eastl::move(go));
                 if (objGroup == GameObjectGroup::Player)
                 {
-                    scene->m_playerObject = static_cast<PlayerObject*>(scene->GetGameObjectByUUID(objUUID));
+                    GetInstance().m_playerObject = static_cast<PlayerObject*>(
+                        GetInstance().GetGameObjectByUUID(objUUID)
+                        );
                 }
             }
         }
     }
-    scene->RestoreParents();
-    return scene;
+    GetInstance().RestoreParents();
 }
 
 // ----------------- Scene_Info -----------------

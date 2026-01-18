@@ -5,6 +5,7 @@
 #include <Scripting/AutoBindings.h>
 #include <Utils/DebugUtils.h>
 #include <SimpleMath.h>
+#include <Scene.h>
 #include <AI/Perception/PerceptionSystem.h>
 #include "AI/Behavior/MemoryBoard.h"
 #include "AI/Behavior/BehaviorController.h"

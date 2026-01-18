@@ -17,13 +17,18 @@ class PlayerObject;
 class Scene
 {
 public:
-    Scene();
-    ~Scene();
+    static Scene& GetInstance()
+    {
+        static Scene instance;
+        return instance;
+    }
 
     Scene(const Scene&) = delete;
     Scene& operator=(const Scene&) = delete;
-    Scene(Scene&&) noexcept = default;
-    Scene& operator=(Scene&&) noexcept = default;
+    Scene(Scene&&) = delete;
+    Scene& operator=(Scene&&) = delete;
+
+    ~Scene();
 
     void ClearScene();
 
@@ -37,7 +42,7 @@ public:
     // Владеет объектами. Нужен чтобы быстро находить по UUID
     std::unordered_map<SE::UUID, eastl::unique_ptr<GameObject>> uuidToObjectMap;
 
-    static eastl::shared_ptr<Scene> FromJson(
+    static void FromJson(
         SE_G::DeferredRenderer* renderSystem,
         PhysicsSystem* m_physicsSystem,
         eastl::shared_ptr<SE_G::Camera> camera, const json& j);
@@ -49,6 +54,7 @@ public:
     PlayerObject* m_playerObject = nullptr;
 
 private:
+    Scene();
 };
 
 class Scene_Info {

@@ -82,7 +82,7 @@ public:
     UINT m_screenHeight = 800u;
 
     GameTimer m_timer;
-    eastl::shared_ptr<Scene> m_scene;
+    //eastl::shared_ptr<Scene> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
     eastl::unique_ptr<PhysicsSystem> m_physicsSystem;
 

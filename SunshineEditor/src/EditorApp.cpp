@@ -430,6 +430,7 @@ void EditorApp::StopGame() {
 	m_currentGame->m_particleSystem->DisableAllEmitters();
 	m_currentGame->m_particleSystem;
 	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
+	m_currentGame->ClearScene();
 	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
 

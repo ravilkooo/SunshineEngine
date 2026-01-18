@@ -130,6 +130,7 @@ public:
     virtual void Update(float deltaTime) {};
 
     ParentNode<GameObject> m_parent;
+    eastl::vector<SE::UUID> m_children;
     void SetParent(ParentNode<GameObject> parent)
     {
         GameObject* currNode = parent.ptr;
@@ -149,6 +150,7 @@ public:
             currNode = currNode->m_parent.ptr;
         }
         m_parent = parent;
+        m_children.push_back(parent.uuid);
 
         if (m_parent.ptr && m_parent.attached)
         {

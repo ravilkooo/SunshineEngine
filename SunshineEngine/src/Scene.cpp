@@ -23,6 +23,9 @@ void Scene::ClearScene() {
         uuidToObjectMap.erase(it);
     }
     gameObjects.clear();
+
+    m_playerObjectUUID = SE::UUID(0u);
+    m_playerObject = nullptr;
 }
 
 SE::UUID Scene::AddGameObject(eastl::unique_ptr<GameObject> gameObject)
@@ -51,21 +54,53 @@ eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
     if (it == uuidToObjectMap.end())
         return nullptr;
 
-    eastl::unique_ptr<GameObject> out = std::move(it->second);
-    uuidToObjectMap.erase(it);
-
-    for (size_t i = 0; i < gameObjects.size(); ++i)
+    // Collect all children recursively
+    eastl::vector<SE::UUID> toRemove;
+    eastl::vector<SE::UUID> stack;
+    stack.push_back(uuid);
+    
+    while (!stack.empty())
     {
-        if (gameObjects[i] == uuid)
+        SE::UUID current = stack.back();
+        stack.pop_back();
+        toRemove.push_back(current);
+        
+        // Find object and add its children to stack
+        auto objIt = uuidToObjectMap.find(current);
+        if (objIt != uuidToObjectMap.end() && objIt->second)
         {
-            // not keeping order
-            eastl::swap(gameObjects[i], gameObjects.back());
-            gameObjects.pop_back();
-            // keeping order
-            //gameObjects.erase(gameObjects.begin() + i);
-            break;
+            for (SE::UUID childUUID : objIt->second->m_children)
+            {
+                stack.push_back(childUUID);
+            }
         }
     }
+    
+    // Store root object to return
+    eastl::unique_ptr<GameObject> out = std::move(uuidToObjectMap[uuid]);
+    
+    // Remove all collected objects (including root)
+    for (SE::UUID removeUUID : toRemove)
+    {
+        // Remove from map
+        auto mapIt = uuidToObjectMap.find(removeUUID);
+        if (mapIt != uuidToObjectMap.end())
+        {
+            uuidToObjectMap.erase(mapIt);
+        }
+        
+        // Remove from gameObjects vector
+        for (size_t i = 0; i < gameObjects.size(); ++i)
+        {
+            if (gameObjects[i] == removeUUID)
+            {
+                eastl::swap(gameObjects[i], gameObjects.back());
+                gameObjects.pop_back();
+                break;
+            }
+        }
+    }
+    
     return out;
 }
 
@@ -140,6 +175,8 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::RemoveGameObjectByUUID(SE::UUID u
     if (it == uuidToObjectMap.end())
         return nullptr;
 
+    // Collect all children recursively (Note: GameObject_Info doesn't have m_children, relies on SceneGraph)
+    // For Scene_Info, we just remove the single object since hierarchy is managed by SceneGraph
     eastl::unique_ptr<GameObject_Info> out = std::move(it->second);
     uuidToObjectMap.erase(it);
 
