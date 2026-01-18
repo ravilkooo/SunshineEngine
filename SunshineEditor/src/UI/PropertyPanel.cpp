@@ -8,6 +8,7 @@
 #include <Graphics/Lighting/LightData.h>
 #include <Graphics/Renderer/Technique/PointLightTechnique.h>
 #include <Graphics/Renderer/Technique/SkyBoxTechnique.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
 
 #include <GameObject/GameObject.h>
 #include <GameObject/Lighting/LightObject.h>
@@ -56,7 +57,10 @@ void PropertyPanel::OnImGuiRender()
         return;
     }
     
-    DrawGameObjectHeader(obj);
+    if (!DrawGameObjectHeader(obj))
+    {
+        return;
+    }
     ImGui::Separator();
     
     DrawParentnes(obj);
@@ -68,7 +72,7 @@ void PropertyPanel::OnImGuiRender()
     DrawComponentAddPopup(obj);
 }
 
-void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
+bool PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
 {
     ImGui::Text("GameObject");
     ImGui::SameLine();
@@ -83,6 +87,34 @@ void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
     }
     
     ImGui::TextDisabled("UUID: %llu", obj->m_UUID.m_UUID);
+    
+    // Remove GameObject button
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 120);
+    if (ImGui::Button("Remove Object", ImVec2(110, 0)))
+    {
+        if (m_WorldEditor && m_WorldEditor->m_scene)
+        {
+            SE::UUID objUUID = obj->m_UUID;
+            
+            // Remove from scene hierarchy
+            if (m_WorldEditor->m_scene->m_sceneGraph)
+            {
+                m_WorldEditor->m_scene->m_sceneGraph->EraseSubtree(objUUID);
+            }
+            
+            // Remove from scene
+            m_WorldEditor->m_scene->RemoveGameObjectByUUID(objUUID);
+            
+            // Clear selection
+            m_WorldEditor->m_hierarchySelection.picked.clear();
+            m_WorldEditor->m_hierarchySelection.last_clicked = SE::UUID(0u);
+            m_WorldEditor->m_selectionPass->m_selectedObjectUUID = SE::UUID(0u);
+            m_SelectedUUID = SE::UUID(0u);
+            return false;
+        }
+    }
+    return true;
 }
 
 void PropertyPanel::DrawParentnes(GameObject_Info* obj)
