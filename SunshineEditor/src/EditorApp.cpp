@@ -102,19 +102,19 @@ void EditorApp::RunApp()
 {
 	SE::Project::SetWorldEditor(m_worldEditor.get());
 
-	float physicsUpdateFPS = 120.0f;
-	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
-	float accumulator = 0.0f;
-	float accumulatorLimit = 4.0f * physicsUpdateMs;
+	// Fixed timestep physics update
+	physicsUpdateFPS = 120.0f;
+	physicsUpdateMs = 1.0f / physicsUpdateFPS;
+	accumulator = 0.0f;
+	accumulatorLimit = 4.0f * physicsUpdateMs;
+
+	// FPS statitistic
+	frameCount = 0;
+	FPSstatisticTimer = 0;
 
 	MSG msg = {};
 	bool isExitRequested = false;
-
-	// FPS statitistic
-	unsigned int frameCount = 0;
-	float FPSstatisticTimer = 0;
-
-
+	
 	while (!isExitRequested) {
 		// Handle the windows messages.
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -377,9 +377,7 @@ void EditorApp::RunGame()
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
-	m_currentGame->SetParticleSystem(m_worldEditor->m_renderer->m_particleSystem);
-	m_currentGame->m_particleSystem->Enable();
-	m_currentGame->m_particleSystem->EnableAllEmitters();
+	// m_currentGame->SetParticleSystem(m_worldEditor->m_renderer->m_particleSystem);
 	
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
@@ -411,6 +409,18 @@ void EditorApp::RunGame()
 
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
+
+	m_deltaTime = 0.0f;
+
+	accumulator = 0.0f;
+	accumulatorLimit = 4.0f * physicsUpdateMs;
+
+	// FPS statitistic
+	frameCount = 0;
+	FPSstatisticTimer = 0;
+
+	m_currentGame->m_particleSystem->Enable();
+	m_currentGame->m_particleSystem->EnableAllEmitters();
 
 	m_currentGame->m_timer.Reset();
 }
@@ -444,6 +454,15 @@ void EditorApp::StopGame() {
 	// There should be loading scene to world editor (deserializing)
 	// m_currentGame->UnloadScene(...);
 	// m_worldEditor->LoadScene(...);
+
+	m_deltaTime = 0.0f;
+
+	accumulator = 0.0f;
+	accumulatorLimit = 4.0f * physicsUpdateMs;
+
+	// FPS statitistic
+	frameCount = 0;
+	FPSstatisticTimer = 0;
 
 	m_worldEditor->m_timer.Reset();
 }

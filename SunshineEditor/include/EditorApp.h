@@ -95,6 +95,16 @@ public:
 
     float m_deltaTime = 0.0f;
 
+	// Fixed timestep physics update
+    float physicsUpdateFPS = 120.0f;
+    float physicsUpdateMs = 1.0f / 120.0f;
+    float accumulator = 0.0f;
+    float accumulatorLimit = 4.0f / 120.0f;
+
+    // FPS statitistic
+    unsigned int frameCount = 0;
+    float FPSstatisticTimer = 0;
+
     sol::state m_lua;
 
     enum class RuntimeMode {
