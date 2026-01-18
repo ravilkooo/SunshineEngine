@@ -2,6 +2,8 @@
 #include <fstream>   // std::ofstream
 #include <PlayerObject/PlayerObject.h>
 
+#include <Scene.h>
+
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
 
@@ -18,6 +20,11 @@ Game::Game()
 Game::~Game()
 {
 	// ������������ ��������
+}
+
+void Game::ClearScene()
+{
+	Scene::GetInstance().ClearScene();
 }
 
 void Game::SetupRendering(
@@ -84,8 +91,8 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	}
 
 	SetupPhysics();
-	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
-	m_playerObject = m_scene->m_playerObject;
+	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
+	m_playerObject = Scene::GetInstance().m_playerObject;
 	/*
 	if (!loadedScene) {
 		LOG_EDITOR_ERROR("Scene load error\n");
@@ -96,10 +103,10 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	// For Volodya
 	/*
-	auto m_uuid0 = m_scene->gameObjects[0];
-	auto m_gobj0 = m_scene->GetGameObjectByUUID(m_uuid0);
-	auto m_uuid1 = m_scene->gameObjects[1];
-	auto m_gobj1 = m_scene->GetGameObjectByUUID(m_uuid1);
+	auto m_uuid0 = Scene::GetInstance().gameObjects[0];
+	auto m_gobj0 = Scene::GetInstance().GetGameObjectByUUID(m_uuid0);
+	auto m_uuid1 = Scene::GetInstance().gameObjects[1];
+	auto m_gobj1 = Scene::GetInstance().GetGameObjectByUUID(m_uuid1);
 
 	TracedBody* tb0 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
 
@@ -134,60 +141,58 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 bool Game::LoadGAIScene()
 {
-	auto scene = eastl::make_shared<Scene>();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
 bool Game::LoadDefaultScene()
 {
-	auto scene = eastl::make_shared<Scene>();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
 bool Game::LoadParentScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
 bool Game::LoadLuaScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
 bool Game::LoadResourcesScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
@@ -264,11 +269,11 @@ void Game::Run()
 
 void Game::Update(float deltaTime) {
 
-	 m_luaManager.Update(m_scene.get(), deltaTime);
+	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	 m_physicsSystem->Step(deltaTime);
 
-	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
+	 m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance());
 
 	 if (m_particleSystem)
 		 m_particleSystem->Update(deltaTime);

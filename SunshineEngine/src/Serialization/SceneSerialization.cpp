@@ -446,6 +446,9 @@ json GameObject_Info::ToJson() const {
     json j;
     j["m_name"] = m_name.c_str();
     j["m_UUID"] = (uint64_t)m_UUID;
+	SE::UUIDhilo uuidhilo = m_UUID.GetHilo();
+	j["m_UUID_hi"] = (uint32_t)uuidhilo.hi; // for debugging
+    j["m_UUID_lo"] = (uint32_t)uuidhilo.lo; // for debugging
     j["m_group"] = m_group;
     j["m_parent"] = m_parent.ToJson();
     
@@ -605,13 +608,12 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
 
 // ----------------- Scene -----------------
 
-eastl::shared_ptr<Scene> Scene::FromJson(
+void Scene::FromJson(
     SE_G::DeferredRenderer* renderSystem,
     PhysicsSystem* physicsSystem,
     eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
-    auto scene = eastl::make_shared<Scene>();
 
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
@@ -675,8 +677,8 @@ eastl::shared_ptr<Scene> Scene::FromJson(
             {
                 go = eastl::make_unique<PlayerObject>(objJ, renderSystem, camera);
                 auto playerObj = static_cast<PlayerObject*>(go.get());
-                playerObj->AssignSceneToCamera(scene.get());
-                scene->m_playerObjectUUID = playerObj->m_UUID;
+                playerObj->AssignSceneToCamera(&GetInstance());
+                GetInstance().m_playerObjectUUID = playerObj->m_UUID;
                 break;
             }
             case GameObjectGroup::ParticleEmitter:
@@ -713,16 +715,17 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
                 }
 
-                auto objUUID = scene->AddGameObject(eastl::move(go));
+                auto objUUID = GetInstance().AddGameObject(eastl::move(go));
                 if (objGroup == GameObjectGroup::Player)
                 {
-                    scene->m_playerObject = static_cast<PlayerObject*>(scene->GetGameObjectByUUID(objUUID));
+                    GetInstance().m_playerObject = static_cast<PlayerObject*>(
+                        GetInstance().GetGameObjectByUUID(objUUID)
+                        );
                 }
             }
         }
     }
-    scene->RestoreParents();
-    return scene;
+    GetInstance().RestoreParents();
 }
 
 // ----------------- Scene_Info -----------------

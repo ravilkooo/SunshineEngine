@@ -30,7 +30,7 @@ public:
     RenderComponent() = default;
     RenderComponent(SE::UUID uuid, SE_G::DeferredRenderer* renderSystem)
         : m_renderSystem(renderSystem), m_objectUUID(uuid) {}
-    ~RenderComponent() = default;
+    ~RenderComponent();
 
     RenderComponent(const RenderComponent&) = delete;
     RenderComponent& operator=(const RenderComponent&) = delete;

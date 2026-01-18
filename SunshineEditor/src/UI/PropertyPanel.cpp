@@ -140,6 +140,11 @@ bool PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
             return false;
         }
     }
+
+    auto uuidhilo = obj->m_UUID.GetHilo();
+    ImGui::TextDisabled("UUID (hi,lo): (%lu, %lu)", uuidhilo.hi, uuidhilo.lo);
+	// ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "UUID (hi,lo): (%lu, %lu)", uuidhilo.hi, uuidhilo.lo);
+
     return true;
 }
 

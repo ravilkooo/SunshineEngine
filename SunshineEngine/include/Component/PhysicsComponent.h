@@ -74,6 +74,10 @@ public:
     // Set velocities
     void SetAngularVelocity(const DXSM::Vector3& inAngularVelocity);
     void SetLinearVelocity(const DXSM::Vector3& inLinearVelocity);
+
+    // Enable/disable physics body (removes from simulation but keeps data)
+    void SetActive(bool active);
+    bool IsActive() const;
     
     // Setters for configuration before adding body
     void SetObjecUUID(SE::UUID objectUUID);
@@ -197,5 +201,7 @@ public:
     FM("resetForce", [](PhysicsComponent* self){ self->ResetForce(); }), \
     FM("resetTorque", [](PhysicsComponent* self){ self->ResetTorque(); }), \
     FM("setAngularVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetAngularVelocity(v); }), \
-    FM("setLinearVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetLinearVelocity(v); })
+    FM("setLinearVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetLinearVelocity(v); }), \
+    FM("setActive", [](PhysicsComponent* self, bool active){ self->SetActive(active); }), \
+    FM("isActive", [](PhysicsComponent* self){ return self->IsActive(); })
 #endif

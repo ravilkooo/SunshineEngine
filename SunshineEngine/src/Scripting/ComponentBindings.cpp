@@ -1,10 +1,14 @@
 #include <Scripting/ComponentBindings.h>
-
-#include <GameObject/GameObject.h>
-#include <Graphics/Utils/Camera.h>
 #include <Scripting/AutoBindings.h>
-#include <Utils/DebugUtils.h>
+
 #include <SimpleMath.h>
+
+#include <Graphics/Utils/Camera.h>
+#include <GameObject/GameObject.h>
+#include <Scene.h>
+#include <Utils/UUID.h>
+#include <Utils/DebugUtils.h>
+
 #include <AI/Perception/PerceptionSystem.h>
 #include "AI/Behavior/MemoryBoard.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -15,6 +19,17 @@ namespace ScriptingBindings
 {
     void RegisterAll(sol::state& lua)
     {
+        // Register UUIDhilo struct for safe 32-bit access
+        lua.new_usertype<SE::UUIDhilo>("UUID",
+            sol::constructors<SE::UUIDhilo()>(),
+            "hi", &SE::UUIDhilo::hi,
+            "lo", &SE::UUIDhilo::lo,
+            "toString", [](SE::UUIDhilo* self) { return SE::UUID::FromHilo(*self).ToString(); },
+			"isEqual", [](SE::UUIDhilo* self, SE::UUIDhilo other) {
+				return self->hi == other.hi && self->lo == other.lo;
+			}
+        );
+
         // Math/value types
         lua.new_usertype<DXSM::Vector3>("Vector3",
             sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float)>(),
@@ -78,8 +93,21 @@ namespace ScriptingBindings
 		);
 
         // Base GameObject type; component binders will append getters
-        lua.new_usertype<GameObject>("GameObject");
+        lua.new_usertype<GameObject>("GameObject",
+			sol::no_constructor,
+			"getUUID", [](GameObject* self) { return self->m_UUID.GetHilo(); }
+			);
 		
+		// Remove object from scene
+		lua.set_function("removeGameObjectByUUID", [](SE::UUIDhilo uuidhilo) {
+			Scene::GetInstance().RemoveGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+			});
+
+		// GetObject by UUID
+		lua.set_function("getGameObjectByUUID", [](SE::UUIDhilo uuidhilo) -> GameObject* {
+			return Scene::GetInstance().GetGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+			});
+
         // Execute all component binders registered via LUA_REGISTER_COMPONENT
         AutoBindings::RegisterAll(lua);
 

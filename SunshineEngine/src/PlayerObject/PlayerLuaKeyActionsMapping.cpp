@@ -166,6 +166,16 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 {
 	if (!m_luaState) return;
 
+	m_luaState->new_usertype<SE::UUIDhilo>("UUID",
+		sol::constructors<SE::UUIDhilo()>(),
+		"hi", &SE::UUIDhilo::hi,
+		"lo", &SE::UUIDhilo::lo,
+		"toString", [](SE::UUIDhilo* self) { return SE::UUID(*self).ToString(); },
+		"isEqual", [](SE::UUIDhilo* self, SE::UUIDhilo other) {
+			return self->hi == other.hi && self->lo == other.lo;
+		}
+	);
+
 	// Register Vector3 type
 	m_luaState->new_usertype<DXSM::Vector3>("Vector3",
 		sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float)>(),
@@ -238,9 +248,9 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 	// Register TransformComponent
 	m_luaState->new_usertype<TransformComponent>("TransformComponent",
 		sol::no_constructor,
-		"position", &TransformComponent::m_position,
-		"rotation", &TransformComponent::m_rotation,
-		"scale", &TransformComponent::m_scaleFactor
+		"m_position", &TransformComponent::m_position,
+		"m_rotation", &TransformComponent::m_rotation,
+		"m_scale", &TransformComponent::m_scaleFactor
 	);
 
 	// Register CameraComponent
@@ -286,8 +296,38 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		},
 		"getName", [](PlayerObject* player) {
 			return player->m_name.c_str();
+		},
+		"getUUID", [](PlayerObject* self) {
+			return self->m_UUID.GetHilo();
 		}
 	);
+
+	// Base GameObject type; component binders will append getters
+	m_luaState->new_usertype<GameObject>("GameObject",
+		sol::no_constructor,
+		"getTransform", [](GameObject* player) {
+			return player->GetComponent<TransformComponent>().get();
+		},
+		"getPhysics", [](GameObject* player) {
+			return player->GetComponent<PhysicsComponent>().get();
+		},
+		"getName", [](GameObject* player) {
+			return player->m_name.c_str();
+		},
+		"getUUID", [](GameObject* self) {
+			return self->m_UUID.GetHilo();
+		}
+	);
+
+	// Remove object from scene
+	m_luaState->set_function("removeGameObjectByUUID", [](SE::UUIDhilo uuidhilo) {
+		Scene::GetInstance().RemoveGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+		});
+
+	// GetObject by UUID
+	m_luaState->set_function("getGameObjectByUUID", [](SE::UUIDhilo uuidhilo) -> GameObject* {
+		return Scene::GetInstance().GetGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+		});
 
 	// Helper functions
 	(*m_luaState)["print"] = [](const std::string& msg) {

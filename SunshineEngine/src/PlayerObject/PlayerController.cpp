@@ -11,6 +11,9 @@ void PlayerController::HandleKeyDown(Keys key)
 	// Feed input to InputManager for proper edge detection
 	m_inputManager.ProcessKeyDown(key);
 
+	// Update input state for this frame - computes edge events
+	m_inputManager.Update();
+
 	// Try Lua callback for key press (edge event)
 	if (m_useLuaCallbacks && m_player) {
 		// Only call Lua on the press event (not every frame while held)
@@ -29,6 +32,9 @@ void PlayerController::HandleKeyUp(Keys key)
 {
 	// Feed input to InputManager for proper edge detection
 	m_inputManager.ProcessKeyUp(key);
+
+	// Update input state for this frame - computes edge events
+	m_inputManager.Update();
 
 	// Try Lua callback for key release (edge event)
 	if (m_useLuaCallbacks && m_player) {
@@ -75,7 +81,7 @@ void PlayerController::UpdatePlayer(float deltaTime)
 	*/
 
 	// Update input state for this frame - computes edge events
-	m_inputManager.Update();
+	// m_inputManager.Update();
 
 	ExecuteAllOnKeyDown();
 

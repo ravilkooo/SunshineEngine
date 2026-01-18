@@ -37,6 +37,8 @@
                 }
             },
             "m_UUID": 10349756182875634575,
+            "m_UUID_hi": 2409740393,
+            "m_UUID_lo": 3090447247,
             "m_group": "Lighting",
             "m_lightData": {
                 "Power": 0.6000000238418579,
@@ -127,6 +129,8 @@
                 }
             },
             "m_UUID": 15551142850770219886,
+            "m_UUID_hi": 3620782599,
+            "m_UUID_lo": 2139337582,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_parent": null,
@@ -212,6 +216,8 @@
                 }
             },
             "m_UUID": 1179623425869587445,
+            "m_UUID_hi": 274652481,
+            "m_UUID_lo": 2209326069,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": null,
@@ -299,6 +305,8 @@
                 }
             },
             "m_UUID": 13836700115024532676,
+            "m_UUID_hi": 3221607793,
+            "m_UUID_lo": 3550794948,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -389,6 +397,8 @@
                 }
             },
             "m_UUID": 5252445742742597294,
+            "m_UUID_hi": 1222930323,
+            "m_UUID_lo": 170880686,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": null,
@@ -476,6 +486,8 @@
                 }
             },
             "m_UUID": 16981128559790429414,
+            "m_UUID_hi": 3953727092,
+            "m_UUID_lo": 2341246182,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -566,6 +578,8 @@
                 }
             },
             "m_UUID": 2639839029316881779,
+            "m_UUID_hi": 614635420,
+            "m_UUID_lo": 1453657459,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -661,6 +675,8 @@
                 }
             },
             "m_UUID": 646582510600955799,
+            "m_UUID_hi": 150544222,
+            "m_UUID_lo": 509192087,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -715,6 +731,8 @@
                 }
             },
             "m_UUID": 15350749837127902739,
+            "m_UUID_hi": 3574124965,
+            "m_UUID_lo": 635758099,
             "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
@@ -766,6 +784,8 @@
                 }
             },
             "m_UUID": 6433801847370492395,
+            "m_UUID_hi": 1497986225,
+            "m_UUID_lo": 1136994795,
             "m_group": "Lighting",
             "m_lightData": {
                 "Diffuse": {
@@ -833,6 +853,8 @@
                 }
             },
             "m_UUID": 4259055904536338598,
+            "m_UUID_hi": 991638727,
+            "m_UUID_lo": 2624266406,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
@@ -941,6 +963,8 @@
                 }
             },
             "m_UUID": 2729350038267267073,
+            "m_UUID_hi": 635476326,
+            "m_UUID_lo": 715032577,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_parent": null,
@@ -1027,6 +1051,8 @@
                 }
             },
             "m_UUID": 2232906597439411555,
+            "m_UUID_hi": 519889080,
+            "m_UUID_lo": 1291883875,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -1117,6 +1143,8 @@
                 }
             },
             "m_UUID": 701588890976834624,
+            "m_UUID_hi": 163351393,
+            "m_UUID_lo": 285791296,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1161,6 +1189,8 @@
                 }
             },
             "m_UUID": 13780240543166426970,
+            "m_UUID_hi": 3208462275,
+            "m_UUID_lo": 1591668570,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
@@ -1274,6 +1304,8 @@
                 }
             },
             "m_UUID": 1087253342462268591,
+            "m_UUID_hi": 253145895,
+            "m_UUID_lo": 2320618671,
             "m_group": "Player",
             "m_name": "PlayerObject",
             "m_parent": null,
@@ -1329,6 +1361,10 @@
                     {
                         "functionName": "onJump",
                         "key": 51
+                    },
+                    {
+                        "functionName": "onInteract",
+                        "key": 52
                     }
                 ],
                 "luaScript": {
@@ -1416,6 +1452,8 @@
                 }
             },
             "m_UUID": 3619104566789212522,
+            "m_UUID_hi": 842638445,
+            "m_UUID_lo": 3161917802,
             "m_group": "Shapes",
             "m_name": "Geosphere",
             "m_parent": null,
@@ -1528,6 +1566,8 @@
                 }
             },
             "m_UUID": 18132964941149930345,
+            "m_UUID_hi": 4221909898,
+            "m_UUID_lo": 2581234537,
             "m_group": "ParticleEmitter",
             "m_name": "ParticleEmitter",
             "m_parent": null
@@ -1631,6 +1671,8 @@
                 }
             },
             "m_UUID": 3591371132865286047,
+            "m_UUID_hi": 836181252,
+            "m_UUID_lo": 1996951455,
             "m_group": "ParticleEmitter",
             "m_name": "ParticleEmitter2",
             "m_parent": null
