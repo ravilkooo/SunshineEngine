@@ -6,6 +6,9 @@
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitter.h>
 
+#include "AI/Perception/PerceptionSystem.h"
+#include "AI/Behavior/BehaviorController.h"
+
 Game::Game()
 {
 	// Initialize();
@@ -276,6 +279,10 @@ void Game::Update(float deltaTime) {
 
 	 // For Volodya
 	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
+
+	 // AI
+	 PerceptionSystem::Get().CheckSights();
+	 BehaviorStorage::Get().Update(deltaTime);
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
