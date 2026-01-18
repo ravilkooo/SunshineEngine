@@ -105,6 +105,14 @@ namespace SE_G {
 			}
 		}
 	}
+
+	void RenderGroup::RemoveAllTechniques(SE::UUID uuid)
+	{
+		for (auto& pass : m_passes)
+		{
+			pass.second->RemoveTechnique(uuid);
+		}
+	}
 	
 	void RenderGroup::ClearAllTechniques()
 	{

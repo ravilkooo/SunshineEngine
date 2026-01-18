@@ -4,23 +4,27 @@
 #include <EASTL/hash_map.h>
 #include <sstream>
 
-struct UUIDhilo
-{
-    uint32_t hi;
-    uint32_t lo;
-};
 
 
 namespace SE
 {
+    struct UUIDhilo
+    {
+        uint32_t hi;
+        uint32_t lo;
+    };
+
     class UUID
     {
     public:
         UUID();
         explicit UUID(uint64_t uuid);
+        explicit UUID(const UUIDhilo& hilo);
         UUID(const UUID&) = default;
 
-        UUIDhilo GetHilo();
+        UUIDhilo GetHilo() const;
+
+        static UUID FromHilo(const UUIDhilo& hilo);
 
         operator uint64_t() const;
 

@@ -5,6 +5,11 @@
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
+RenderComponent::~RenderComponent() {
+	m_renderSystem->RemoveAllTechniques(m_objectUUID);
+}
+
+
 SE_G::RenderTechnique* RenderComponent::AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> renderTech)
 {
 	return m_renderSystem->AddTechnique(m_objectUUID, eastl::move(renderTech));

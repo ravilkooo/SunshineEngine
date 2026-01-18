@@ -34,8 +34,10 @@ public:
 
     SE::UUID AddGameObject(eastl::unique_ptr<GameObject> gameObject);
     GameObject* GetGameObjectByUUID(SE::UUID uuid) const;
+    GameObject* GetGameObjectByUUIDhilo(SE::UUIDhilo uuidhilo) const;
     //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
     eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(SE::UUID uuid);
+    eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(SE::UUIDhilo uuidhilo);
 
     // Чтобы быстро и последовательно итероваться
     eastl::vector<SE::UUID> gameObjects;

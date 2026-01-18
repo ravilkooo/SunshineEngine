@@ -150,7 +150,10 @@ public:
             currNode = currNode->m_parent.ptr;
         }
         m_parent = parent;
-        m_children.push_back(parent.uuid);
+        if (m_parent.uuid != SE::UUID(0u) && m_parent.ptr)
+        {
+            m_parent.ptr->m_children.push_back(this->m_UUID);
+        }
 
         if (m_parent.ptr && m_parent.attached)
         {

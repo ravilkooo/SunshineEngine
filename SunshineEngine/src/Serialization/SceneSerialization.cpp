@@ -446,6 +446,9 @@ json GameObject_Info::ToJson() const {
     json j;
     j["m_name"] = m_name.c_str();
     j["m_UUID"] = (uint64_t)m_UUID;
+	SE::UUIDhilo uuidhilo = m_UUID.GetHilo();
+	j["m_UUID_hi"] = (uint32_t)uuidhilo.hi; // for debugging
+    j["m_UUID_lo"] = (uint32_t)uuidhilo.lo; // for debugging
     j["m_group"] = m_group;
     j["m_parent"] = m_parent.ToJson();
     

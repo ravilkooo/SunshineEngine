@@ -17,12 +17,22 @@ namespace SE {
     {
     }
 
-    UUIDhilo UUID::GetHilo()
+    UUID::UUID(const UUIDhilo& hilo)
+        : m_UUID(((uint64_t)hilo.hi << 32) | hilo.lo)
+    {
+    }
+
+    UUIDhilo UUID::GetHilo() const
     {
         return UUIDhilo{
             (uint32_t)(m_UUID >> 32),
             (uint32_t)(m_UUID & 0xFFFFFFFF)
         };
+    }
+
+    UUID UUID::FromHilo(const UUIDhilo& hilo)
+    {
+        return UUID(((uint64_t)hilo.hi << 32) | hilo.lo);
     }
 
     UUID::operator uint64_t() const { return m_UUID; }

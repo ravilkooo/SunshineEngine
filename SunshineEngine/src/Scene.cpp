@@ -48,6 +48,11 @@ GameObject* Scene::GetGameObjectByUUID(SE::UUID uuid) const
     return (it != uuidToObjectMap.end()) ? it->second.get() : nullptr;
 }
 
+GameObject* Scene::GetGameObjectByUUIDhilo(SE::UUIDhilo uuidhilo) const
+{
+	return GetGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+}
+
 eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
 {
     auto it = uuidToObjectMap.find(uuid);
@@ -102,6 +107,11 @@ eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
     }
     
     return out;
+}
+
+eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUIDhilo uuidhilo)
+{
+	return RemoveGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
 }
 
 void Scene::RestoreParents()

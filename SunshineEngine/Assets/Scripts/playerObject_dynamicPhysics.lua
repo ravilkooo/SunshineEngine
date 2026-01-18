@@ -14,6 +14,20 @@ function behavior:update(dt)
 
     camera:setStickLength(20 + 3 * math.sin(currentTime))
     -- print("Behavior update", self.id)
+    
+    -- local uuid = self.owner:getUUID()
+    -- print("Owner UUID: " .. uuid.hi .. " " .. uuid.lo)
+    local customUUID = UUID.new()
+    customUUID.hi = 163351393
+    customUUID.lo = 285791296
+    local customObject = getGameObjectByUUID(customUUID)
+    if customObject then
+        -- local customPhysics = customObject:getPhysics()
+        -- customPhysics:addForce(Vector3.new(0, 100.0 * math.sin(currentTime), 0))
+        local customTransform = customObject:getTransform()
+        -- print("Transform: " .. customTransform.m_position.x .. ", " .. customTransform.m_position.y .. ", " .. customTransform.m_position.z)
+    end
+    
     return "success"
 end
 

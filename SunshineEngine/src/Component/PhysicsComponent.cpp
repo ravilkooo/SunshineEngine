@@ -18,7 +18,7 @@ PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
 
 PhysicsComponent::~PhysicsComponent()
 {
-
+	m_physicsSystem->RemoveBody(this);
 }
 
 void PhysicsComponent::AddForce(const DXSM::Vector3& inForce)
@@ -198,6 +198,44 @@ void PhysicsComponent::SetLinearVelocity(const DXSM::Vector3& inLinearVelocity)
     JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
     JPH::Vec3 v(inLinearVelocity.x, inLinearVelocity.y, inLinearVelocity.z);
     bodyInterface.SetLinearVelocity(m_joltBodyId, v);
+}
+
+void PhysicsComponent::SetActive(bool active)
+{
+    if (!m_physicsSystem)
+        return;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+    
+    if (active)
+    {
+        // Add body back to simulation if not already added
+        if (!bodyInterface.IsAdded(m_joltBodyId))
+        {
+            bodyInterface.AddBody(m_joltBodyId, JPH::EActivation::Activate);
+        }
+        else
+        {
+            bodyInterface.ActivateBody(m_joltBodyId);
+        }
+    }
+    else
+    {
+        // Remove from simulation but keep the body data
+        if (bodyInterface.IsAdded(m_joltBodyId))
+        {
+            bodyInterface.RemoveBody(m_joltBodyId);
+        }
+    }
+}
+
+bool PhysicsComponent::IsActive() const
+{
+    if (!m_physicsSystem)
+        return false;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+    return bodyInterface.IsAdded(m_joltBodyId);
 }
 
 void PhysicsComponent::SetObjecUUID(SE::UUID objectUUID) {
