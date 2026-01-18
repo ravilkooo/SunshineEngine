@@ -70,7 +70,7 @@ namespace SE
             uint32_t padding[3];
         };
 
-        uint32_t m_maxParticles = 4 * 1024;
+        uint32_t m_maxParticles = 256u;
 
         bool m_enabled = false;
         float m_deaultEmissionRate = 0.0f;
