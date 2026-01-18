@@ -8,6 +8,7 @@
 #include <Graphics/Lighting/LightData.h>
 #include <Graphics/Renderer/Technique/PointLightTechnique.h>
 #include <Graphics/Renderer/Technique/SkyBoxTechnique.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
 
 #include <GameObject/GameObject.h>
 #include <GameObject/Lighting/LightObject.h>
@@ -56,7 +57,10 @@ void PropertyPanel::OnImGuiRender()
         return;
     }
     
-    DrawGameObjectHeader(obj);
+    if (!DrawGameObjectHeader(obj))
+    {
+        return;
+    }
     ImGui::Separator();
     
     DrawParentnes(obj);
@@ -68,7 +72,7 @@ void PropertyPanel::OnImGuiRender()
     DrawComponentAddPopup(obj);
 }
 
-void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
+bool PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
 {
     ImGui::Text("GameObject");
     ImGui::SameLine();
@@ -83,6 +87,60 @@ void PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
     }
     
     ImGui::TextDisabled("UUID: %llu", obj->m_UUID.m_UUID);
+    
+    // Remove GameObject button
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 120);
+    if (ImGui::Button("Remove Object", ImVec2(110, 0)))
+    {
+        if (m_WorldEditor && m_WorldEditor->m_scene && m_WorldEditor->m_scene->m_sceneGraph)
+        {
+            SE::UUID objUUID = obj->m_UUID;
+            
+            // Collect all UUIDs in the subtree (including root)
+            eastl::vector<SE::UUID> toRemove;
+            eastl::vector<SE::UUID> stack;
+            stack.push_back(objUUID);
+            
+            while (!stack.empty())
+            {
+                SE::UUID current = stack.back();
+                stack.pop_back();
+                toRemove.push_back(current);
+                
+                // Find node in scene graph
+                auto it = m_WorldEditor->m_scene->m_sceneGraph->m_byObjUUID.find(current);
+                if (it != m_WorldEditor->m_scene->m_sceneGraph->m_byObjUUID.end())
+                {
+                    int nodeIdx = it->second;
+                    const auto& node = m_WorldEditor->m_scene->m_sceneGraph->m_nodes[nodeIdx];
+                    
+                    // Add all children to stack
+                    for (SE::UUID childUUID : node.children)
+                    {
+                        stack.push_back(childUUID);
+                    }
+                }
+            }
+            
+            // Remove from scene hierarchy first
+            m_WorldEditor->m_scene->m_sceneGraph->EraseSubtree(objUUID);
+            
+            // Remove all collected objects from scene
+            for (SE::UUID uuid : toRemove)
+            {
+                m_WorldEditor->m_scene->RemoveGameObjectByUUID(uuid);
+            }
+            
+            // Clear selection
+            m_WorldEditor->m_hierarchySelection.picked.clear();
+            m_WorldEditor->m_hierarchySelection.last_clicked = SE::UUID(0u);
+            m_WorldEditor->m_selectionPass->m_selectedObjectUUID = SE::UUID(0u);
+            m_SelectedUUID = SE::UUID(0u);
+            return false;
+        }
+    }
+    return true;
 }
 
 void PropertyPanel::DrawParentnes(GameObject_Info* obj)

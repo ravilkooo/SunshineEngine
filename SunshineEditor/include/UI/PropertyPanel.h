@@ -55,7 +55,7 @@ private:
     eastl::shared_ptr<WorldEditor> m_WorldEditor;
     SE::UUID m_SelectedUUID = SE::UUID(0u);
     
-    void DrawGameObjectHeader(GameObject_Info* obj);
+    bool DrawGameObjectHeader(GameObject_Info* obj);
 
     void DrawParentnes(GameObject_Info* obj);
 
