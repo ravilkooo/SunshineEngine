@@ -21,7 +21,7 @@
 #include <Component/LuaComponent.h>
 
 #include <ParticleSystem/ParticleSystem.h>
-#include <ParticleSystem/ParticleEmitter.h>
+// #include <ParticleSystem/ParticleEmitter.h>
 
 #include <ResourceManager/ResourceLoaderFactory.h>
 

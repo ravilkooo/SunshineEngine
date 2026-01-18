@@ -3,11 +3,12 @@
 
 #include <EASTL/shared_ptr.h>
 #include <SimpleMath.h>
+
+#include <GameObject/GameObject.h>
 #include <Graphics/Lighting/LightData.h>
 
 #include <Utils/UUID.h>
-
-#include <ParticleSystem/ParticleEmitter.h>
+#include <Utils/AssetPath.h>
 
 class GameObject_Info;
 class BoxShapeObject_Info;
@@ -19,6 +20,13 @@ class TransformComponent;
 class RenderComponent;
 class LuaComponent;
 class WorldEditor;
+
+namespace SE_G {
+    namespace Bind {
+        class Texture;
+    }
+    class Mesh;
+}
 
 class PropertyPanel
 {
@@ -64,7 +72,7 @@ private:
     void DrawComponentAddPopup(GameObject_Info* obj);
 
     void DrawEmitterDetails(
-        SE::ParticleEmitter_Info* emitterObj
+        GameObject_Info* obj
         /*
         SE::ParticleData::EmitterPointConstantBuffer* emitterPointBuffer,
         SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer
@@ -97,8 +105,10 @@ private:
                        const char* format = "%u", float columnWidth = 100.0f);
 
     eastl::shared_ptr<SE_G::Bind::Texture> DrawTextureSettings(
-        eastl::shared_ptr<SE_G::Bind::Texture> texture);
+        eastl::shared_ptr<SE_G::Bind::Texture> texture,
+        eastl::string widgetGroup);
 
     eastl::shared_ptr<SE_G::Mesh> DrawMeshSettings(
-        eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group);
+        eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group,
+        eastl::string widgetGroup);
 };

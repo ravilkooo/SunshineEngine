@@ -1,162 +1,106 @@
-#include <ParticleSystem/ParticleEmitter.h>
+#include <ParticleSystem/ParticleEmitterComponent.h>
 #include <ParticleSystem/ParticleSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/GraphicsResources/Texture.h>
-#include <Utils/AssetPath.h>
 
-#include <Graphics/Renderer/Technique/IconTechnique.h>
-#include <Graphics/Renderer/Technique/EmitterTechnique.h>
+#include <Component/TransformComponent.h>
+
+#include <Utils/AssetPath.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 
+ParticleEmitterComponent::ParticleEmitterComponent()
+{
+}
+
+ParticleEmitterComponent::ParticleEmitterComponent(
+    SE::UUID objectUUID, TransformComponent* tc,
+    SE::ParticleSystem* particleSystem,
+    SE::ParticleData::EmitterPointConstantBuffer emitterDesc,
+    SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc
+)
+{
+    m_particleData = eastl::make_shared<SE::ParticleData>(particleSystem, emitterDesc, simulatorDesc);
+    m_particleData->m_transformComp = tc;
+    particleSystem->AddEmitter(objectUUID, m_particleData);
+
+    // m_name = "ParticleEmitterComponent";
+}
+
+ParticleEmitterComponent::~ParticleEmitterComponent()
+{
+
+}
+
+void ParticleEmitterComponent::FromJson(const json& j,
+    SE::UUID objectUUID, TransformComponent* tc,
+    SE::ParticleSystem* particleSystem)
+{
+    // obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+    // obj->m_name = j["m_name"].get<std::string>().c_str();
+
+    if (j.contains("emitterData"))
+    {
+        m_particleData = SE::ParticleData::FromJson(j["emitterData"], particleSystem);
+    }
+    else
+    {
+        json je;
+        m_particleData = SE::ParticleData::FromJson(je, particleSystem);
+    }
+
+    m_particleData->EnableEmission();
+    m_particleData->m_transformComp = tc;
+    particleSystem->AddEmitter(objectUUID, m_particleData);
+}
+
+ParticleEmitterComponent_Info::ParticleEmitterComponent_Info()
+{
+}
+
+ParticleEmitterComponent_Info::ParticleEmitterComponent_Info(
+    SE::UUID objectUUID, TransformComponent* tc,
+    SE::ParticleSystem* particleSystem,
+    SE::ParticleData::EmitterPointConstantBuffer emitterDesc,
+    SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc
+)
+{
+    m_particleData = eastl::make_shared<SE::ParticleData>(particleSystem, emitterDesc, simulatorDesc);
+    m_particleData->m_transformComp = tc;
+    particleSystem->AddEmitter(objectUUID, m_particleData);
+}
+
+ParticleEmitterComponent_Info::~ParticleEmitterComponent_Info()
+{
+
+}
+
+json ParticleEmitterComponent_Info::ToJson() const {
+    json j;
+    j["emitterData"] = m_particleData->ToJson();
+    return j;
+}
+
+void ParticleEmitterComponent_Info::FromJson(const json& j,
+    SE::UUID objectUUID, TransformComponent* tc,
+    SE::ParticleSystem* particleSystem)
+{
+    if (j.contains("emitterData"))
+    {
+        m_particleData = SE::ParticleData::FromJson(j["emitterData"], particleSystem);
+    }
+    else
+    {
+        json je;
+        m_particleData = SE::ParticleData::FromJson(je, particleSystem);
+    }
+
+    m_particleData->m_transformComp = tc;
+    particleSystem->AddEmitter(objectUUID, m_particleData);
+}
+
 namespace SE
 {
-    ParticleEmitter::ParticleEmitter()
-    {
-    }
-
-    ParticleEmitter::ParticleEmitter(
-        ParticleSystem* particleSystem,
-        ParticleData::EmitterPointConstantBuffer emitterDesc,
-        ParticleData::SimulateParticlesConstantBuffer simulatorDesc
-    )
-        : GameObject()
-    {
-        auto tc = AddComponent<TransformComponent>(particleSystem->m_renderer->GetDevice());
-
-        m_particleData = eastl::make_shared<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
-        m_particleData->m_transformComp = tc.get();
-        particleSystem->AddEmitter(m_UUID, m_particleData);
-
-        m_name = "ParticleEmitter";
-    }
-
-    ParticleEmitter::~ParticleEmitter()
-    {
-
-    }
-
-    eastl::unique_ptr<ParticleEmitter> ParticleEmitter::FromJson(const json& j, ParticleSystem* particleSystem)
-    {
-        eastl::unique_ptr<ParticleEmitter> obj = eastl::make_unique<ParticleEmitter>();
-
-        obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-        obj->m_name = j["m_name"].get<std::string>().c_str();
-
-        if (j.contains("emitterData"))
-        {
-            obj->m_particleData = SE::ParticleData::FromJson(j["emitterData"], particleSystem);
-        }
-        else
-        {
-            json je;
-            obj->m_particleData = SE::ParticleData::FromJson(je, particleSystem);
-        }
-
-        auto tc = obj->AddComponent<TransformComponent>(particleSystem->m_renderer->GetDevice());
-        if (j["components"].contains("Transform")) {
-            tc->FromJson(j["components"]["Transform"]);
-        }
-
-        obj->m_particleData->EnableEmission();
-        obj->m_particleData->m_transformComp = tc.get();
-        particleSystem->AddEmitter(obj->m_UUID, obj->m_particleData);
-
-        return obj;
-    }
-
-    ParticleEmitter_Info::ParticleEmitter_Info()
-    {
-    }
-
-    ParticleEmitter_Info::ParticleEmitter_Info(
-        ParticleSystem* particleSystem,
-        ParticleData::EmitterPointConstantBuffer emitterDesc,
-        ParticleData::SimulateParticlesConstantBuffer simulatorDesc
-    )
-        : GameObject_Info()
-    {
-        m_group = GameObjectGroup::ParticleEmitter;
-        m_name = "ParticleEmitter";
-
-        auto tc_info = AddComponent<TransformComponent_Info>(particleSystem->m_renderer->GetDevice());
-        auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, particleSystem->m_renderer);
-
-        // IconPass
-        auto iconTech = eastl::make_unique<SE_G::IconTechnique>(
-            particleSystem->m_renderer->GetDevice(),
-            tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
-            SE_G::IconData{ 5u, 0u, 1u, 1u, m_UUID.GetHilo() });
-
-        rc_info->AddTechnique(eastl::move(iconTech));
-
-        m_particleData = eastl::make_shared<ParticleData>(particleSystem, emitterDesc, simulatorDesc);
-        m_particleData->m_transformComp = tc_info->m_assignedComponent.get();
-        particleSystem->AddEmitter(m_UUID, m_particleData);
-
-        auto emitTech = eastl::make_unique<SE_G::EmitterTechnique>(
-            particleSystem->m_renderer->GetDevice(),
-            tc_info->m_assignedComponent.get(), eastl::string("EmitterDebugPass"),
-            m_particleData.get());
-        rc_info->AddTechnique(eastl::move(emitTech));
-    }
-
-    ParticleEmitter_Info::~ParticleEmitter_Info()
-    {
-
-    }
-
-    json ParticleEmitter_Info::ToJson() const {
-        json j = GameObject_Info::ToJson();
-        j["emitterData"] = m_particleData->ToJson();
-        return j;
-    }
-
-    eastl::unique_ptr<ParticleEmitter_Info> ParticleEmitter_Info::FromJson(const json& j, ParticleSystem* particleSystem)
-    {
-        eastl::unique_ptr<ParticleEmitter_Info> obj = eastl::make_unique<ParticleEmitter_Info>();
-
-        obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-        obj->m_name = j["m_name"].get<std::string>().c_str();
-        obj->m_group = GameObjectGroup::ParticleEmitter;
-
-        if (j.contains("emitterData"))
-        {
-            obj->m_particleData = SE::ParticleData::FromJson(j["emitterData"], particleSystem);
-        }
-        else
-        {
-            json je;
-            obj->m_particleData = SE::ParticleData::FromJson(je, particleSystem);
-        }
-
-        // TransformComponent
-        auto tc_info = obj->AddComponent<TransformComponent_Info>(particleSystem->m_renderer->GetDevice());
-        if (j["components"].contains("Transform")) {
-            tc_info->FromJson(j["components"]["Transform"], particleSystem->m_renderer->GetDevice());
-        }
-        auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, particleSystem->m_renderer);
-
-        // IconPass
-        auto iconTech = eastl::make_unique<SE_G::IconTechnique>(
-            particleSystem->m_renderer->GetDevice(),
-            tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
-            SE_G::IconData{ 5u, 0u, 1u, 1u, obj->m_UUID.GetHilo() });
-
-        rc_info->AddTechnique(eastl::move(iconTech));
-
-        obj->m_particleData->m_transformComp = tc_info->m_assignedComponent.get();
-        particleSystem->AddEmitter(obj->m_UUID, obj->m_particleData);
-
-        auto emitTech = eastl::make_unique<SE_G::EmitterTechnique>(
-            particleSystem->m_renderer->GetDevice(),
-            tc_info->m_assignedComponent.get(), eastl::string("EmitterDebugPass"),
-            obj->m_particleData.get());
-        rc_info->AddTechnique(eastl::move(emitTech));
-
-        return obj;
-    }
-
     ParticleData::ParticleData()
     { }
 
@@ -169,6 +113,29 @@ namespace SE
         m_simulateParticlesConstantBufferData = simulatorDesc;
 
         InitGraphicsResources();
+
+        auto& rm = ResourceManagerFacade::Instance();
+        AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
+        ResourceHandle texHandle = rm.LoadByPath(texPath);
+        SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+        if (texRes)
+        {
+            auto particleTex = eastl::shared_ptr<SE_G::Bind::Texture>(
+                texRes,
+                [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+            SetTexture(particleTex);
+        }
+        else
+        {
+            auto particleTex = eastl::make_shared<SE_G::Bind::Texture>(
+                particleSystem->m_renderer->GetDevice(),
+                texPath, 0u,
+                SE_G::Bind::PipelineStage::PIXEL_SHADER);
+            SetTexture(particleTex);
+        }
+
+        SetEmissionRate(40);
     }
 
     void ParticleData::InitGraphicsResources()

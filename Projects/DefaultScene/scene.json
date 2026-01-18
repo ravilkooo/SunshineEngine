@@ -1474,6 +1474,70 @@
         },
         {
             "components": {
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 10.0,
+                        "Emitter": {
+                            "alphaEnd": 1.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "latitudeMax": -1.0995573997497559,
+                            "latitudeMin": -1.5707963705062866,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 100,
+                            "particleSizeEnd": 0.5,
+                            "particleSizeStart": 0.20000000298023224,
+                            "particlesBaseSpeed": 8.0,
+                            "particlesLifeSpan": 3.0,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                10.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 0,
+                            "relativePath": "Textures/DefaultTexture.dds"
+                        }
+                    }
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -1508,68 +1572,6 @@
                     ]
                 }
             },
-            "emitterData": {
-                "EmissionRate": 10.0,
-                "Emitter": {
-                    "alphaEnd": 1.0,
-                    "alphaStart": 1.0,
-                    "colorEnd": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "colorStart": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "latitudeMax": -1.0995573997497559,
-                    "latitudeMin": -1.5707963705062866,
-                    "longitudeMax": 6.2831854820251465,
-                    "longitudeMin": 0.0,
-                    "maxSpawn": 100,
-                    "particleSizeEnd": 0.5,
-                    "particleSizeStart": 0.20000000298023224,
-                    "particlesBaseSpeed": 8.0,
-                    "particlesLifeSpan": 3.0,
-                    "particlesMass": 1.0,
-                    "position": [
-                        15.0,
-                        0.0,
-                        0.0
-                    ],
-                    "rotMatrix": [
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ]
-                },
-                "MaxParticles": 256,
-                "Simulate": {
-                    "force": [
-                        0.0,
-                        10.0,
-                        0.0
-                    ]
-                },
-                "Texture": {
-                    "assetSource": 0,
-                    "relativePath": "Textures/DefaultTexture.dds"
-                }
-            },
             "m_UUID": 10055640163896243162,
             "m_UUID_hi": 2341261171,
             "m_UUID_lo": 3056579546,
@@ -1579,6 +1581,70 @@
         },
         {
             "components": {
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 10.0,
+                        "Emitter": {
+                            "alphaEnd": 1.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "latitudeMax": 0.3141592741012573,
+                            "latitudeMin": -0.3141592741012573,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 100,
+                            "particleSizeEnd": 0.5,
+                            "particleSizeStart": 0.20000000298023224,
+                            "particlesBaseSpeed": 8.0,
+                            "particlesLifeSpan": 1.0,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                -5.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 0,
+                            "relativePath": "Textures/DefaultTexture.dds"
+                        }
+                    }
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -1613,68 +1679,6 @@
                     ]
                 }
             },
-            "emitterData": {
-                "EmissionRate": 10.0,
-                "Emitter": {
-                    "alphaEnd": 1.0,
-                    "alphaStart": 1.0,
-                    "colorEnd": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "colorStart": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "latitudeMax": 0.3141592741012573,
-                    "latitudeMin": -0.3141592741012573,
-                    "longitudeMax": 6.2831854820251465,
-                    "longitudeMin": 0.0,
-                    "maxSpawn": 100,
-                    "particleSizeEnd": 0.5,
-                    "particleSizeStart": 0.20000000298023224,
-                    "particlesBaseSpeed": 8.0,
-                    "particlesLifeSpan": 1.0,
-                    "particlesMass": 1.0,
-                    "position": [
-                        15.0,
-                        0.0,
-                        0.0
-                    ],
-                    "rotMatrix": [
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ]
-                },
-                "MaxParticles": 256,
-                "Simulate": {
-                    "force": [
-                        0.0,
-                        -5.0,
-                        0.0
-                    ]
-                },
-                "Texture": {
-                    "assetSource": 0,
-                    "relativePath": "Textures/DefaultTexture.dds"
-                }
-            },
             "m_UUID": 2222185986879794610,
             "m_UUID_hi": 517392993,
             "m_UUID_lo": 2765237682,
@@ -1684,6 +1688,70 @@
         },
         {
             "components": {
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 10.0,
+                        "Emitter": {
+                            "alphaEnd": 1.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "latitudeMax": 1.5707963705062866,
+                            "latitudeMin": 1.2217304706573486,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 100,
+                            "particleSizeEnd": 0.5,
+                            "particleSizeStart": 0.20000000298023224,
+                            "particlesBaseSpeed": 8.0,
+                            "particlesLifeSpan": 3.0,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                -5.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 0,
+                            "relativePath": "Textures/DefaultTexture.dds"
+                        }
+                    }
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -1718,68 +1786,6 @@
                     ]
                 }
             },
-            "emitterData": {
-                "EmissionRate": 10.0,
-                "Emitter": {
-                    "alphaEnd": 1.0,
-                    "alphaStart": 1.0,
-                    "colorEnd": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "colorStart": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "latitudeMax": 1.5707963705062866,
-                    "latitudeMin": 1.2217304706573486,
-                    "longitudeMax": 6.2831854820251465,
-                    "longitudeMin": 0.0,
-                    "maxSpawn": 100,
-                    "particleSizeEnd": 0.5,
-                    "particleSizeStart": 0.20000000298023224,
-                    "particlesBaseSpeed": 8.0,
-                    "particlesLifeSpan": 3.0,
-                    "particlesMass": 1.0,
-                    "position": [
-                        15.0,
-                        0.0,
-                        0.0
-                    ],
-                    "rotMatrix": [
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ]
-                },
-                "MaxParticles": 256,
-                "Simulate": {
-                    "force": [
-                        0.0,
-                        -5.0,
-                        0.0
-                    ]
-                },
-                "Texture": {
-                    "assetSource": 0,
-                    "relativePath": "Textures/DefaultTexture.dds"
-                }
-            },
             "m_UUID": 13364823039728117378,
             "m_UUID_hi": 3111740350,
             "m_UUID_lo": 2834523778,
@@ -1789,6 +1795,106 @@
         },
         {
             "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:250,0,250,255.dds"
+                    }
+                },
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 20.0,
+                        "Emitter": {
+                            "alphaEnd": 1.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "latitudeMax": 0.3141592741012573,
+                            "latitudeMin": -0.3141592741012573,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 0,
+                            "particleSizeEnd": 0.5,
+                            "particleSizeStart": 0.20000000298023224,
+                            "particlesBaseSpeed": 8.0,
+                            "particlesLifeSpan": 1.0,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 1,
+                            "relativePath": "Textures/primogem.dds"
+                        }
+                    }
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.2000000476837158
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_collisionLayer": "MOVING",
+                    "m_motion": "Dynamic"
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -1807,7 +1913,7 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
+                        -3.5762786865234375e-07,
                         3.423429250717163,
                         0.0
                     ],
@@ -1821,68 +1927,6 @@
                         1.0,
                         1.0
                     ]
-                }
-            },
-            "emitterData": {
-                "EmissionRate": 20.0,
-                "Emitter": {
-                    "alphaEnd": 1.0,
-                    "alphaStart": 1.0,
-                    "colorEnd": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "colorStart": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "latitudeMax": 0.3141592741012573,
-                    "latitudeMin": -0.3141592741012573,
-                    "longitudeMax": 6.2831854820251465,
-                    "longitudeMin": 0.0,
-                    "maxSpawn": 100,
-                    "particleSizeEnd": 0.5,
-                    "particleSizeStart": 0.20000000298023224,
-                    "particlesBaseSpeed": 8.0,
-                    "particlesLifeSpan": 1.0,
-                    "particlesMass": 1.0,
-                    "position": [
-                        15.0,
-                        0.0,
-                        0.0
-                    ],
-                    "rotMatrix": [
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ]
-                },
-                "MaxParticles": 256,
-                "Simulate": {
-                    "force": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ]
-                },
-                "Texture": {
-                    "assetSource": 1,
-                    "relativePath": "Textures/primogem.dds"
                 }
             },
             "m_UUID": 10670304525947875631,
