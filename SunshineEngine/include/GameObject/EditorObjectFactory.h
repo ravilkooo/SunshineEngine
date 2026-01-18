@@ -20,7 +20,6 @@ using json = nlohmann::json;
 namespace SE
 {
 	class ParticleSystem;
-	class ParticleEmitter_Info;
 }
 
 namespace SE_G {
@@ -30,8 +29,12 @@ namespace SE_G {
 class EditorObjectFactory
 {
 public:
-	static eastl::unique_ptr<SE::ParticleEmitter_Info> CreateParticleEmitter(
+	static eastl::unique_ptr<GameObject_Info> CreateParticleEmitter(
 		SE::ParticleSystem* particleSystem);
+
+	static eastl::unique_ptr<GameObject_Info> CreateParticleEmitter(
+		SE::ParticleSystem* particleSystem,
+		const json& j);
 
 	static eastl::unique_ptr<GameObject_Info> CreateCustomMesh(
 		SE_G::DeferredRenderer* renderSystem,

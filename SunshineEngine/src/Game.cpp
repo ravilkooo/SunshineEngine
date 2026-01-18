@@ -5,7 +5,7 @@
 #include <Scene.h>
 
 #include <ParticleSystem/ParticleSystem.h>
-#include <ParticleSystem/ParticleEmitter.h>
+//#include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>

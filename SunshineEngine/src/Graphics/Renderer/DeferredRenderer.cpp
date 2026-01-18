@@ -2,7 +2,6 @@
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 
 #include <ParticleSystem/ParticleSystem.h>
-#include <ParticleSystem/ParticleEmitter.h>
 
 #include <iostream>
 

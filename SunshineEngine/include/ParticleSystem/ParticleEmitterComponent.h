@@ -2,14 +2,18 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <SimpleMath.h>
+#include <EASTL/shared_ptr.h>
 
-#include <GameObject/GameObject.h>
+#include <Utils/UUID.h>
+#include <Component/Component.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
+
+class TransformComponent;
 
 namespace SE_G
 {
@@ -149,6 +153,8 @@ namespace SE
 
         void SetEmissionRate(float emissionRate);
 
+        bool IsEnabled() { return m_enabled; }
+
         void EnableEmission();
         void DisableEmission();
 
@@ -163,47 +169,82 @@ namespace SE
         static eastl::shared_ptr<ParticleData> FromJson(const json& j, ParticleSystem* particleSystem);
         json ToJson() const;
     };
-
-    class ParticleEmitter :
-        public GameObject
-        //public GameObject
-    {
-    public:
-        eastl::shared_ptr<ParticleData> m_particleData;
-
-        ParticleEmitter();
-
-        ParticleEmitter(
-            ParticleSystem* particleSystem,
-            ParticleData::EmitterPointConstantBuffer emitterDesc,
-            ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
-
-        ~ParticleEmitter();
-
-        static eastl::unique_ptr<ParticleEmitter> FromJson(
-            const json& j, ParticleSystem* particleSystem);
-    };
-
-    class ParticleEmitter_Info :
-        public GameObject_Info
-        //public GameObject
-    {
-    public:
-        eastl::shared_ptr<ParticleData> m_particleData;
-
-        ParticleEmitter_Info();
-
-        ParticleEmitter_Info(
-            ParticleSystem* particleSystem,
-            ParticleData::EmitterPointConstantBuffer emitterDesc,
-            ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
-
-        ~ParticleEmitter_Info();
-
-        virtual json ToJson() const override;
-
-        static eastl::unique_ptr<ParticleEmitter_Info> FromJson(
-            const json& j, ParticleSystem* particleSystem);
-    };
-
 }
+
+class ParticleEmitterComponent :
+    public Component
+{
+public:
+    eastl::shared_ptr<SE::ParticleData> m_particleData;
+
+    ParticleEmitterComponent();
+
+    ParticleEmitterComponent(
+        SE::UUID objectUUID, TransformComponent* tc,
+        SE::ParticleSystem* particleSystem,
+        SE::ParticleData::EmitterPointConstantBuffer emitterDesc,
+        SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
+
+    ~ParticleEmitterComponent();
+
+    void FromJson(
+        const json& j,
+        SE::UUID objectUUID, TransformComponent* tc,
+        SE::ParticleSystem* particleSystem);
+
+    const std::type_info& getType() const override {
+        return typeid(ParticleEmitterComponent);
+    }
+    static const SE::ComponentType s_componentType = SE::ComponentType::PARTICLE_EMITTER;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+};
+
+class ParticleEmitterComponent_Info :
+    public Component_Info
+    //public GameObject
+{
+public:
+    eastl::shared_ptr<SE::ParticleData> m_particleData;
+
+    ParticleEmitterComponent_Info();
+
+    ParticleEmitterComponent_Info(
+        SE::UUID objectUUID, TransformComponent* tc,
+        SE::ParticleSystem* particleSystem,
+        SE::ParticleData::EmitterPointConstantBuffer emitterDesc,
+        SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
+
+    ~ParticleEmitterComponent_Info();
+
+    json ToJson() const override;
+
+    void FromJson(
+        const json& j,
+        SE::UUID objectUUID, TransformComponent* tc,
+        SE::ParticleSystem* particleSystem);
+
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+    static const SE::ComponentType s_componentType = SE::ComponentType::PARTICLE_EMITTER;
+    const std::type_info& getType() const override {
+        return typeid(ParticleEmitterComponent_Info);
+    }
+
+    bool IsAssigned() override { return false; }
+};
+
+// Macro listing methods of ParticleEmitterComponent to expose in Lua bindings
+#ifndef PARTICLE_EMITTER_COMPONENT_LUA_METHODS_APPLY
+#define PARTICLE_EMITTER_COMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("setEmissionRate", [](ParticleEmitterComponent* self, float emissionRate){ return self->m_particleData->SetEmissionRate(emissionRate); }), \
+    FM("isEnabled", [](ParticleEmitterComponent* self){ return self->m_particleData->IsEnabled(); }), \
+    FM("enableEmission", [](ParticleEmitterComponent* self){ return self->m_particleData->EnableEmission(); }), \
+    FM("disableEmission", [](ParticleEmitterComponent* self){ return self->m_particleData->DisableEmission(); }), \
+    FM("incrementEmissionRate", [](ParticleEmitterComponent* self, float deltaEmissionRate){ return self->m_particleData->IncrementEmissionRate(deltaEmissionRate); }), \
+    FM("decrementEmissionRate", [](ParticleEmitterComponent* self, float deltaEmissionRate){ return self->m_particleData->DecrementEmissionRate(deltaEmissionRate); }), \
+    FM("setEmitPosition", [](ParticleEmitterComponent* self, DXSM::Vector3 newPosition){ return self->m_particleData->SetEmitPosition(newPosition); }), \
+    FM("setEmitDir", [](ParticleEmitterComponent* self, DXSM::Vector3 newEmitDir){ return self->m_particleData->SetEmitDir(newEmitDir); })
+#endif

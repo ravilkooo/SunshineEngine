@@ -20,10 +20,8 @@ function behavior:update(dt)
         lastJumpTime = currentTime
         local up = Vector3.new(0, self.speedY * 10, 0)
         physics:addImpulse(up)
-        print("Jump!")
-        return "success"
+        -- print("Jump!")
     end
-
 
     -- physics:addForce(Vector3.new(0,self.speedY,0))
     -- print("Behavior update", self.id)

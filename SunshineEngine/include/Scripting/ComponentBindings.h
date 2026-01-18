@@ -7,6 +7,7 @@ class TransformComponent;
 class RenderComponent;
 class PhysicsComponent;
 class PerceptionComponent;
+class ParticleEmitterComponent;
 class CameraComponent;
 
 namespace ScriptingBindings {
@@ -21,9 +22,10 @@ namespace ScriptingBindings {
 // Macro list of GameObject getters to expose in Lua
 #ifndef GAMEOBJECT_LUA_GETTERS_APPLY
 #define GAMEOBJECT_LUA_GETTERS_APPLY(F) \
-    F(TransformComponent, "GetTransform") , \
-    F(RenderComponent, "GetRender") , \
-    F(PhysicsComponent, "GetPhysics") , \
-    F(PerceptionComponent, "GetPerception"), \
-    F(CameraComponent, "GetCameraComponent")
+    F(TransformComponent, "getTransform") , \
+    F(RenderComponent, "getRender") , \
+    F(PhysicsComponent, "getPhysics") , \
+    F(PerceptionComponent, "getPerception"), \
+    F(ParticleEmitterComponent, "getParticleEmitter"), \
+    F(CameraComponent, "getCameraComponent")
 #endif
