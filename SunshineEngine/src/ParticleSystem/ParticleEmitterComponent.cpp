@@ -7,6 +7,9 @@
 
 #include <Utils/AssetPath.h>
 
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
+
 #include <ResourceManager/ResourceManagerFacade.h>
 
 ParticleEmitterComponent::ParticleEmitterComponent()
@@ -782,3 +785,13 @@ namespace SE
         return j;
     }
 }
+
+#define PEC_ADD_METHOD(k, fn) k, fn
+
+LUA_REGISTER_COMPONENT(
+    ParticleEmitterComponent,
+    "ParticleEmitterComponent",
+    /* no fields */,
+    PARTICLE_EMITTER_COMPONENT_LUA_METHODS_APPLY(PEC_ADD_METHOD),
+    "getParticleEmitter")
+#undef PEC_ADD_METHOD

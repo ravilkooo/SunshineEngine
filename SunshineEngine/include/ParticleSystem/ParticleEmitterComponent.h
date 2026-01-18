@@ -153,6 +153,8 @@ namespace SE
 
         void SetEmissionRate(float emissionRate);
 
+        bool IsEnabled() { return m_enabled; }
+
         void EnableEmission();
         void DisableEmission();
 
@@ -233,3 +235,16 @@ public:
 
     bool IsAssigned() override { return false; }
 };
+
+// Macro listing methods of ParticleEmitterComponent to expose in Lua bindings
+#ifndef PARTICLE_EMITTER_COMPONENT_LUA_METHODS_APPLY
+#define PARTICLE_EMITTER_COMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("setEmissionRate", [](ParticleEmitterComponent* self, float emissionRate){ return self->m_particleData->SetEmissionRate(emissionRate); }), \
+    FM("isEnabled", [](ParticleEmitterComponent* self){ return self->m_particleData->IsEnabled(); }), \
+    FM("enableEmission", [](ParticleEmitterComponent* self){ return self->m_particleData->EnableEmission(); }), \
+    FM("disableEmission", [](ParticleEmitterComponent* self){ return self->m_particleData->DisableEmission(); }), \
+    FM("incrementEmissionRate", [](ParticleEmitterComponent* self, float deltaEmissionRate){ return self->m_particleData->IncrementEmissionRate(deltaEmissionRate); }), \
+    FM("decrementEmissionRate", [](ParticleEmitterComponent* self, float deltaEmissionRate){ return self->m_particleData->DecrementEmissionRate(deltaEmissionRate); }), \
+    FM("setEmitPosition", [](ParticleEmitterComponent* self, DXSM::Vector3 newPosition){ return self->m_particleData->SetEmitPosition(newPosition); }), \
+    FM("setEmitDir", [](ParticleEmitterComponent* self, DXSM::Vector3 newEmitDir){ return self->m_particleData->SetEmitDir(newEmitDir); })
+#endif
