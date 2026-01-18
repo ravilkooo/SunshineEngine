@@ -1,3 +1,5 @@
+#include <Graphics/Renderer/RenderingSystem.h>
+
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
 #include <Graphics/Bindable/Rasterizer.h>
 #include <Graphics/Bindable/Sampler.h>
@@ -164,6 +166,7 @@ namespace SE_G {
 
 	void ShadowMapPass::StartFrame()
 	{
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"ShadowMap Pass");
 	}
 
 	void ShadowMapPass::Pass()
@@ -233,6 +236,8 @@ namespace SE_G {
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
 		context->OMSetRenderTargets(1, nullRTVs, *nullDSVs);
+
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
 	SE_G::Camera* ShadowMapPass::GetFrustumCamera()

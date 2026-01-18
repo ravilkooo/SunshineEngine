@@ -1,4 +1,9 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
+
+#include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/ParticleEmitter.h>
+
 #include <iostream>
 
 namespace SE_G {
@@ -26,6 +31,19 @@ namespace SE_G {
 		m_GBuffer = eastl::make_shared<GBuffer>(m_device, screenWidth, screenHeight);
 		m_mainCamera = eastl::make_shared<Camera>(m_device, screenWidth * 1.0f / screenHeight);
 		m_mainCamera->SetPosition({ 0, 0, -10 });
+	}
+
+	void DeferredRenderer::InitParticleSystem()
+	{
+		m_particleSystem = eastl::make_shared<SE::ParticleSystem>(
+			this, GetMainCamera());
+	}
+
+	void DeferredRenderer::SetParticleSystem(eastl::shared_ptr<SE::ParticleSystem> ps)
+	{
+		m_particleSystem = ps;
+		m_particleSystem->SetRenderer(this);
+		m_particleSystem->SetCamera(this->GetMainCamera());
 	}
 
 	void DeferredRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)
@@ -74,19 +92,5 @@ namespace SE_G {
 				pass->EndFrame();
 			}
 		}
-
-		/*
-		for (auto& pass : m_passes) {
-			if (!pass->IsEnabled())
-				continue;
-
-			m_context->ClearState();
-
-			pass->StartFrame();
-			pass->Pass();
-			pass->EndFrame();
-		}
-		*/
 	}
-
 }

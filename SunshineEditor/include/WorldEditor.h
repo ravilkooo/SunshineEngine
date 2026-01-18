@@ -5,30 +5,35 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
-#include <Graphics/Renderer/RenderingSystem.h>
-#include <Graphics/Renderer/DeferredRenderer.h>
+#include <Scene.h>
 
-#include <GameObject/GameObject.h>
+#include <Utils/UUID.h>
+
 #include <GameTimer.h>
 
-#include <Graphics/Renderer/Pass/GPass.h>
-#include <Graphics/Renderer/Pass/LightPass.h>
-#include <Graphics/Renderer/Pass/SelectionPass.h>
-#include <Graphics/Renderer/Pass/IconPass.h>
-#include <Graphics/Renderer/Pass/ColliderPass.h>
-
-#include <GameObject/EditorObjectFactory.h>
 #include <Scripting/LuaManager.h>
 
-#include <PlayerObject/PlayerObject.h>
-
-#include <Physics/PhysicsSystem.h>
 #include <LogManager.h>
 
+#include <Windows/InputManager.h>
+#include <Windows/InputDevice.h>
+
+namespace SE
+{
+    class ParticleSystem;
+}
 
 namespace SE_G
 {
     class RenderingSystem;
+    class DeferredRenderer;
+
+    class GPass;
+    class LightPass;
+    class SelectionPass;
+    class IconPass;
+    class ColliderPass;
+    class EmitterDebugPass;
 };
 
 struct Selection {
@@ -59,7 +64,6 @@ public:
         ~PixelUUIDHandler();
 
         void Init(ID3D11Device* device);
-
         SE::UUID GetUUID(ID3D11DeviceContext* context,
             ID3D11ShaderResourceView* UUIDTextureView,
             UINT mouseClickX, UINT mouseClickY);
@@ -77,16 +81,17 @@ public:
         UINT screenHeight = 600u);
     void SetUpPlayerObject();
 
+    void InitResourceLoaders(ID3D11Device* device);
+
     // Start/Pause worldEditor and it's rendering
     void Start();
     void Pause();
 
     void Update(float deltaTime);
     //void SyncronizeTransforms();
-    void Render();
     void CloseProject();
     void ClearScene();
-    
+
     void CreateDefaultScene();
     void CreateParentScene();
     void CreateGAIScene();
@@ -115,9 +120,6 @@ public:
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
     LuaManager m_luaManager;
 
-    // Change to (Index + generation handle (robust for inserts/erases))
-    // eastl::shared_ptr<GameObject> m_acticeGameObject;
-
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
@@ -126,6 +128,7 @@ public:
     SE_G::SelectionPass* m_selectionPass;
     SE_G::IconPass* m_iconPass;
     SE_G::ColliderPass* m_colliderPass;
+    SE_G::EmitterDebugPass* m_emitterPass;
 
     float m_deltaTime = 0.0f;
 
@@ -134,6 +137,22 @@ public:
 
     // PlayerObject
     SE::UUID m_playerObject = SE::UUID(0u);
+
+    SE::ParticleSystem* m_particleSystem;
+
+    // Robust input system for editor camera
+    InputManager m_editorInputManager;
+    // Input handling
+    void HandleKeyDown(Keys key);
+    void HandleKeyUp(Keys key);
+    void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
+
+    bool IsRightMousePressed = false;
+    float CameraSpeed = 20.0f;
+    float const MaxCameraSpeed = 100.0f;
+    float const MinCameraSpeed = 10.0f;
+    float const CameraSpeedStep = 10.0f;
+    float const CameraRotateSpeed = 0.5f;
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

@@ -8,8 +8,6 @@
 #include "Scene.h"
 #include <Graphics/Bindable/Bindable.h>
 #include <GameObject/GameObject.h>
-#include <Component/RenderComponent.h>
-#include <Component/TransformComponent.h>
 
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 
@@ -22,12 +20,13 @@ namespace SE_G {
 
 	public:
 		enum class PassType : UINT {
-			GPass = 0u,
-			Shadow = 1u,
-			Light = 2u,
-			Collider = 3u,
-			Icon = 4u,
-			Selection = 5u,
+			GPass,
+			Shadow,
+			Light,
+			Collider,
+			Emitter,
+			Icon,
+			Selection,
 			Count
 		};
 

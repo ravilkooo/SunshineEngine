@@ -23,8 +23,9 @@ namespace SE_G {
 		public:
 			TransformCBuffer(ID3D11Device* device, TransformComponent* parent, UINT slot = 0u);
 			~TransformCBuffer();
+			void Update(ID3D11DeviceContext* context) noexcept;
 			void Bind(ID3D11DeviceContext* context) noexcept override;
-		private:
+		// private:
 			// static
 			eastl::unique_ptr<VertexConstantBuffer<Transforms>> pVcbuf;
 			TransformComponent* pParent = nullptr;

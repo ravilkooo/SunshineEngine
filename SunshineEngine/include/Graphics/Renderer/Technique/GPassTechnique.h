@@ -13,7 +13,7 @@ namespace SE_G {
         public RenderTechnique
     {
     public:
-        eastl::unique_ptr<Bind::PixelConstantBuffer<UUIDhilo>> m_uuidBuffer;
+        eastl::unique_ptr<Bind::PixelConstantBuffer<SE::UUIDhilo>> m_uuidBuffer;
 
         GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             SE::UUID uuid);

@@ -1,12 +1,33 @@
-#include "WorldEditor.h"
-#include <Graphics/Renderer/RenderingSystem.h>
+#include <WorldEditor.h>
 
-#include <Component/LuaComponent.h>
-#include <Component/PhysicsComponent.h>
 #include <fstream>   // std::ofstream
+#include <EASTL/unique_ptr.h>
+
+#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
+#include <Graphics/Renderer/Pass/IconPass.h>
+#include <Graphics/Renderer/Pass/ColliderPass.h>
+#include <Graphics/Renderer/Pass/EmitterDebugPass.h>
+
+#include <GameObject/GameObject.h>
+#include <GameObject/EditorObjectFactory.h>
+
+#include <PlayerObject/PlayerObject.h>
+
+#include <Component/PhysicsComponent.h>
+#include <Component/LuaComponent.h>
+
+#include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/ParticleEmitter.h>
+
+#include <ResourceManager/ResourceLoaderFactory.h>
 
 WorldEditor::WorldEditor()
 {
+	m_timer = GameTimer();
 }
 
 WorldEditor::~WorldEditor()
@@ -122,6 +143,8 @@ void WorldEditor::SetupRendering(
 		renderSystem->GetDeviceContext(),
 		m_screenWidth, m_screenHeight
 	);
+	this->m_renderer->InitParticleSystem();
+	this->m_particleSystem = this->m_renderer->m_particleSystem.get();
 
 	{
 		m_gPass = static_cast<SE_G::GPass*>(
@@ -136,10 +159,19 @@ void WorldEditor::SetupRendering(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
+
+		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 	}
 	{
 		m_colliderPass = static_cast<SE_G::ColliderPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::ColliderPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+	}
+	{
+		m_emitterPass = static_cast<SE_G::EmitterDebugPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::EmitterDebugPass>(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
@@ -159,6 +191,7 @@ void WorldEditor::SetupRendering(
 			);
 		m_selectionPass->m_iconPass = m_iconPass;
 	}
+	m_particleSystem->Enable();
 
 	m_pixelUUIDHandler = new PixelUUIDHandler();
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
@@ -306,7 +339,7 @@ void WorldEditor::CreateParentScene()
 			collSettings.data.asCapsule = { 1.0f, 0.2f };
 
 			pc_info->m_colliderData->SetColliderSettings(collSettings);
-			
+
 			obj->SetParent({ floorId, m_scene->GetGameObjectByUUID(floorId), false });
 		}
 
@@ -519,18 +552,97 @@ void WorldEditor::CreateResourcesScene()
 	m_selectionPass->m_scene = m_scene.get();
 }
 
+void WorldEditor::HandleKeyDown(Keys key)
+{
+	// In editor mode, use editor input manager
+	m_editorInputManager.ProcessKeyDown(key);
+
+	// Handle special editor keys
+	if (key == Keys::RightButton) {
+		IsRightMousePressed = true;
+	}
+}
+void WorldEditor::HandleKeyUp(Keys key)
+{
+	// In editor mode, use editor input manager
+	m_editorInputManager.ProcessKeyUp(key);
+
+	// Handle special editor keys
+	if (key == Keys::RightButton) {
+		IsRightMousePressed = false;
+	}
+}
+
+void WorldEditor::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
+{
+	if (IsRightMousePressed)
+	{
+		m_renderer->m_mainCamera->RotateYaw(args.Offset.x * CameraRotateSpeed);
+		m_renderer->m_mainCamera->RotatePitch(-args.Offset.y * CameraRotateSpeed);
+	}
+
+	if (args.WheelDelta != 0.0f)
+	{
+		CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
+
+		if (CameraSpeed < MinCameraSpeed)
+			CameraSpeed = MinCameraSpeed;
+		else if (CameraSpeed > MaxCameraSpeed)
+			CameraSpeed = MaxCameraSpeed;
+	}
+}
+
 void WorldEditor::Start() {
 	m_renderer->Enable();
+	static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject))->m_miniViewRenderer->Enable();
+	m_particleSystem->Enable();
 }
 
 void WorldEditor::Pause() {
 	m_renderer->Disable();
+	static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject))->m_miniViewRenderer->Disable();
+	m_particleSystem->Disable();
 }
 
-void WorldEditor::Update(float deltaTime) {
+void WorldEditor::Update(float deltaTime)
+{
+	if (m_particleSystem)
+		m_particleSystem->Update(deltaTime);
 
+	if (IsRightMousePressed)
+	{
+		// Use InputManager for camera movement (supports held keys)
+		if (m_editorInputManager.IsKeyDown(Keys::W) || m_editorInputManager.IsKeyDown(Keys::S)) {
+			float forward = (m_editorInputManager.IsKeyDown(Keys::W) ? 1.0f : 0.0f)
+				- (m_editorInputManager.IsKeyDown(Keys::S) ? 1.0f : 0.0f);
+			m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed);
+		}
+
+		if (m_editorInputManager.IsKeyDown(Keys::D) || m_editorInputManager.IsKeyDown(Keys::A)) {
+			float right = (m_editorInputManager.IsKeyDown(Keys::D) ? 1.0f : 0.0f)
+				- (m_editorInputManager.IsKeyDown(Keys::A) ? 1.0f : 0.0f);
+			m_renderer->m_mainCamera->MoveRight(right * CameraSpeed);
+		}
+
+		if (m_editorInputManager.IsKeyDown(Keys::E) || m_editorInputManager.IsKeyDown(Keys::Q)) {
+			float up = (m_editorInputManager.IsKeyDown(Keys::E) ? 1.0f : 0.0f)
+				- (m_editorInputManager.IsKeyDown(Keys::Q) ? 1.0f : 0.0f);
+			m_renderer->m_mainCamera->MoveUp(up * CameraSpeed);
+		}
+	}
 	//m_luaManager.Update(m_scene, deltaTime);
 	//m_physicsSystem->Step(deltaTime);
+
+	m_renderer->GetMainCamera()->Update(deltaTime);
+
+	if (m_scene && (m_scene->m_playerObject != SE::UUID(0u)))
+	{
+		static_cast<PlayerObject_Info*>(
+			m_scene->GetGameObjectByUUID(m_scene->m_playerObject))->m_playerCamera->Update(deltaTime);
+	}
+	//scene->m_playerObject
+
+	//m_playerObject->m_playerCamera->Update(deltaTime);
 }
 
 /*
@@ -538,10 +650,6 @@ void WorldEditor::SyncronizeTransforms() {
 	m_physicsSystem->SyncronizeTransforms(&m_scene);
 }
 */
-
-void WorldEditor::Render() {
-	
-}
 
 void WorldEditor::CloseProject()
 {
@@ -621,32 +729,74 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	LOG_EDITOR_INFO("Scene loaded");
 
 	m_selectionPass->m_scene = m_scene.get();
-	
-	if (m_scene->m_playerObject == SE::UUID(0u))
-	{
-		auto go = eastl::make_unique<PlayerObject_Info>();
-
-		go->AddTransformComponent(m_renderer->GetDevice());
-		go->AddRenderComponent(m_renderer.get());
-		go->AddMeshComponent();
-		go->AddPhysicsComponent();
-
-		json _empty;
-		go->SettingsFromJson(_empty, m_renderer.get());
-		go->AssignSceneToCamera(m_scene.get());
-		
-		m_playerObject = m_scene->AddGameObject(eastl::move(go));
-		m_scene->m_playerObject = m_playerObject;
-	}
-	else
-	{
-		m_playerObject = m_scene->m_playerObject;
-	}
-
+  
 	// PlayerObject
-	auto pObj = static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject));
+	{
+		if (m_scene->m_playerObject == SE::UUID(0u))
+		{
+			auto go = eastl::make_unique<PlayerObject_Info>();
 
-	m_renderingSystem->AddRenderGroup(pObj->m_miniViewRenderer.get());
+			go->AddTransformComponent(m_renderer->GetDevice());
+			go->AddRenderComponent(m_renderer.get());
+			go->AddMeshComponent();
+			go->AddPhysicsComponent();
+
+			json _empty;
+			go->SettingsFromJson(_empty, m_renderer.get());
+			go->AssignSceneToCamera(m_scene.get());
+
+			m_playerObject = m_scene->AddGameObject(eastl::move(go));
+			m_scene->m_playerObject = m_playerObject;
+		}
+		else
+		{
+			m_playerObject = m_scene->m_playerObject;
+		}
+
+		auto pObj = static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject));
+
+		m_renderingSystem->AddRenderGroup(pObj->m_miniViewRenderer.get());
+	}
+
+	// TestEmitter
+	{
+		/*
+		SE::ParticleData::EmitterPointConstantBuffer emitterDesc;
+		SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc;
+
+		// Bubble Particles
+		emitterDesc =
+		{
+			DXSM::Matrix::Identity,
+			{ 15, 0, 0 }, 3,
+			{ 1, 1, 1 }, 8,
+			{ 1, 1, 1 }, 1,
+			
+			0.2, 0.5, 0, DX::XM_2PI,
+
+			-DX::XM_PI / 10, DX::XM_PI / 10, 100u, 0
+		};
+		simulatorDesc = {
+			{ 0, -5, 0 }, 0
+		};
+
+		auto go = eastl::make_unique<SE::ParticleEmitter_Info>(
+			m_particleSystem.get(),
+			emitterDesc,
+			simulatorDesc);
+
+		AssetPath bubble(L"Textures/bubble24bpp.dds");
+
+		auto bubbleTex = eastl::make_unique<SE_G::Bind::Texture>(m_renderer->GetDevice(), bubble, 0u);
+
+		go->m_particleData->SetTexture(eastl::move(bubbleTex));
+		go->m_particleData->SetEmissionRate(40);
+		*/
+		/*
+		auto go = EditorObjectFactory::CreateParticleEmitter(m_particleSystem);
+		auto bubbleUUID = m_scene->AddGameObject(eastl::move(go));
+		*/
+	}
 
 	return true;
 }
@@ -677,5 +827,3 @@ void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::
 	// trComp->m_position = DXSM::Vector3(worldPos);
 }
 */
-
-

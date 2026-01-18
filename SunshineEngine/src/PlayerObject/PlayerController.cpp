@@ -8,76 +8,103 @@ void PlayerController::SetPlayerObject(PlayerObject* player)
 
 void PlayerController::HandleKeyDown(Keys key)
 {
-	// InputDevice::instance->IsKeyDown(key);
-	/*
-	m_moveDir = DXSM::Vector3::Zero;
-	auto forward = m_player->m_playerCamera->forward;
-	auto up = m_player->m_playerCamera->up;
-	DXSM::Vector3 right = forward.Cross(up);
-	*/
-	switch (key)
-	{
-	case Keys::W:
-	case Keys::S:
-	case Keys::D:
-	case Keys::A:
-	{
-		m_isKeyPressed[key] = true;
-		break;
+	// Feed input to InputManager for proper edge detection
+	m_inputManager.ProcessKeyDown(key);
+
+	// Update input state for this frame - computes edge events
+	m_inputManager.Update();
+
+	// Try Lua callback for key press (edge event)
+	if (m_useLuaCallbacks && m_player) {
+		// Only call Lua on the press event (not every frame while held)
+		if (m_inputManager.IsKeyPressed(key))
+		{
+			m_player->m_luaActionMapping.ExecuteKeyAction(key, "pressed");
+		}
+		else if (m_inputManager.IsKeyDown(key))
+		{
+			m_player->m_luaActionMapping.ExecuteKeyAction(key, "down");
+		}
 	}
-	}
-	/*
-	m_moveDir.Normalize();
-	m_moveDir = DXSM::Vector3::Transform(m_moveDir, m_player->m_playerCamera->rotateCamToForward);
-	*/
 }
 
 void PlayerController::HandleKeyUp(Keys key)
 {
-	switch (key)
-	{
-	case Keys::W:
-	case Keys::S:
-	case Keys::D:
-	case Keys::A:
-	{
-		m_isKeyPressed[key] = false;
-		break;
+	// Feed input to InputManager for proper edge detection
+	m_inputManager.ProcessKeyUp(key);
+
+	// Update input state for this frame - computes edge events
+	m_inputManager.Update();
+
+	// Try Lua callback for key release (edge event)
+	if (m_useLuaCallbacks && m_player) {
+		// Only call Lua on the release event
+		if (m_inputManager.IsKeyReleased(key)) {
+			m_player->m_luaActionMapping.ExecuteKeyAction(key, "up");
+		}
 	}
-	}
-	/*
-	m_moveDir.Normalize();
-	m_moveDir = DXSM::Vector3::Transform(m_moveDir, m_player->m_playerCamera->rotateCamToForward);
-	*/
 }
 
 void PlayerController::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
-	m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
-	m_stickPitchMoveDir = args.Offset.y * m_stickYawPitchSpeed;
+	SUNSHINE_ROOT_DIR;
+	if (!m_player->m_fixedCamera)
+	{
+		m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
+		m_stickPitchMoveDir = -args.Offset.y * m_stickYawPitchSpeed;
+		
+		m_player->m_playerCamera->RotateStickYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
+	}
+	m_player->m_luaActionMapping.ExecuteMouseMoveAction(args);
+}
+
+void PlayerController::ExecuteAllOnKeyDown()
+{
+	if (m_useLuaCallbacks && m_player) {
+		for (auto key : m_inputManager.m_currentKeys)
+		{
+			m_player->m_luaActionMapping.ExecuteKeyAction(key, "down");
+		}
+	}
 }
 
 void PlayerController::UpdatePlayer(float deltaTime)
 {
-	m_player->m_playerCamera->RotateStickYawPitch(deltaTime * m_stickYawMoveDir, deltaTime * m_stickPitchMoveDir);
+	/*
+	auto pc = m_player->GetComponent<PhysicsComponent>();
+	if (pc)
+	{
+		// Sync kinematic physics body with TransformComponent
+		pc->AddForce(DXSM::Vector3(0, 0, 0.5f * deltaTime));
+		pc->AddImpulse(DXSM::Vector3(0, 0.5f * deltaTime, 0));
+	}
+	*/
 
-	if (m_isKeyPressed[Keys::W] ||
-		m_isKeyPressed[Keys::A] ||
-		m_isKeyPressed[Keys::S] ||
-		m_isKeyPressed[Keys::D])
+	// Update input state for this frame - computes edge events
+	// m_inputManager.Update();
+
+	ExecuteAllOnKeyDown();
+
+	/*
+	// Handle movement using InputManager (supports key held)
+	if (m_inputManager.IsKeyDown(Keys::W) ||
+		m_inputManager.IsKeyDown(Keys::A) ||
+		m_inputManager.IsKeyDown(Keys::S) ||
+		m_inputManager.IsKeyDown(Keys::D))
 	{
 		m_moveDir =
 		{
-			(m_isKeyPressed[Keys::D] - m_isKeyPressed[Keys::A]) * 1.0f,
+			(m_inputManager.IsKeyDown(Keys::D) - m_inputManager.IsKeyDown(Keys::A)) * 1.0f,
 			0.0f,
-			(m_isKeyPressed[Keys::W] - m_isKeyPressed[Keys::S]) * 1.0f
+			(m_inputManager.IsKeyDown(Keys::W) - m_inputManager.IsKeyDown(Keys::S)) * 1.0f
 		};
 		m_moveDir.Normalize();
 		m_moveDir = DXSM::Vector3::Transform(m_moveDir, m_player->m_playerCamera->rotateCamToForward);
 		m_player->GetComponent<TransformComponent>()->m_position += m_moveDir * m_moveSpeed;
 	}
+	m_moveDir = DXSM::Vector3::Zero;
+	*/
 
 	m_stickYawMoveDir = 0.0f;
 	m_stickPitchMoveDir = 0.0f;
-	m_moveDir = DXSM::Vector3::Zero;
 }

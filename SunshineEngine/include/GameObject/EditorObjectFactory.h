@@ -17,6 +17,12 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+namespace SE
+{
+	class ParticleSystem;
+	class ParticleEmitter_Info;
+}
+
 namespace SE_G {
 	class DeferredRenderer;
 }
@@ -24,6 +30,9 @@ namespace SE_G {
 class EditorObjectFactory
 {
 public:
+	static eastl::unique_ptr<SE::ParticleEmitter_Info> CreateParticleEmitter(
+		SE::ParticleSystem* particleSystem);
+
 	static eastl::unique_ptr<GameObject_Info> CreateCustomMesh(
 		SE_G::DeferredRenderer* renderSystem,
 		AssetPath meshPath);
@@ -57,7 +66,7 @@ public:
 	static eastl::unique_ptr<SkyBox_Info> CreateSkyBox(
 		SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,
-		AssetPath assetPath = AssetPath(L"DefaultSkybox.dds", AssetPath::AssetSource::Engine),
+		AssetPath assetPath = AssetPath(eastl::wstring(L"Textures/DefaultSkybox.dds"), AssetPath::AssetSource::Engine),
 		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f }
 	);
 

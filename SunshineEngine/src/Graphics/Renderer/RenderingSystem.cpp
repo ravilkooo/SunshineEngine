@@ -2,6 +2,14 @@
 #include <iostream>
 
 namespace SE_G {
+	Microsoft::WRL::ComPtr<ID3DUserDefinedAnnotation> RenderingSystem::gAnn;
+
+	void RenderingSystem::InitAnnotations(ID3D11DeviceContext* ctx)
+	{
+		ctx->QueryInterface(__uuidof(ID3DUserDefinedAnnotation),
+			reinterpret_cast<void**>(SE_G::RenderingSystem::gAnn.GetAddressOf()));
+	}
+
 	RenderingSystem::RenderingSystem()
 	{
 	}
@@ -75,6 +83,7 @@ namespace SE_G {
 		if (FAILED(hr))
 			throw std::runtime_error("Failed to get back buffer");
 
+		SE_G::RenderingSystem::InitAnnotations(m_context.Get());
 	}
 
 	void RenderingSystem::Render()

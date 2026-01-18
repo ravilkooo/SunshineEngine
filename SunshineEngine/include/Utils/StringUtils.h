@@ -109,6 +109,10 @@ inline eastl::wstring MakeEngineAssetPath_Wstring(const wchar_t* sub) {
     return JoinWchar_Wstring(ENGINE_ASSETS_DIR, sub);
 }
 
+inline eastl::wstring MakeProjectAssetPath_Wstring(const wchar_t* sub) {
+    return JoinWchar_Wstring(PROJECT_DIR, sub);
+}
+
 inline eastl::string MakeEngineAssetPath_String(const char* sub) {
     // Convert ENGINE_ASSETS_DIR to UTF-8 string and join
     eastl::string dirUtf8 = WcharToChar(ENGINE_ASSETS_DIR);

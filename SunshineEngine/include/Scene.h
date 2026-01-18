@@ -9,6 +9,7 @@
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
 class PhysicsSystem;
 class SceneGraph;
 class PlayerObject;
@@ -16,27 +17,34 @@ class PlayerObject;
 class Scene
 {
 public:
-    Scene();
-    ~Scene();
+    static Scene& GetInstance()
+    {
+        static Scene instance;
+        return instance;
+    }
 
     Scene(const Scene&) = delete;
     Scene& operator=(const Scene&) = delete;
-    Scene(Scene&&) noexcept = default;
-    Scene& operator=(Scene&&) noexcept = default;
+    Scene(Scene&&) = delete;
+    Scene& operator=(Scene&&) = delete;
+
+    ~Scene();
 
     void ClearScene();
 
     SE::UUID AddGameObject(eastl::unique_ptr<GameObject> gameObject);
     GameObject* GetGameObjectByUUID(SE::UUID uuid) const;
+    GameObject* GetGameObjectByUUIDhilo(SE::UUIDhilo uuidhilo) const;
     //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
     eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(SE::UUID uuid);
+    eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(SE::UUIDhilo uuidhilo);
 
     // Чтобы быстро и последовательно итероваться
     eastl::vector<SE::UUID> gameObjects;
     // Владеет объектами. Нужен чтобы быстро находить по UUID
     std::unordered_map<SE::UUID, eastl::unique_ptr<GameObject>> uuidToObjectMap;
 
-    static eastl::shared_ptr<Scene> FromJson(
+    static void FromJson(
         SE_G::DeferredRenderer* renderSystem,
         PhysicsSystem* m_physicsSystem,
         eastl::shared_ptr<SE_G::Camera> camera, const json& j);
@@ -48,6 +56,7 @@ public:
     PlayerObject* m_playerObject = nullptr;
 
 private:
+    Scene();
 };
 
 class Scene_Info {

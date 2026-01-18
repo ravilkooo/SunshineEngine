@@ -10,7 +10,11 @@
 #include <ResourceManager/MemoryManager/ResourceMemoryManager.h>
 #include <ResourceManager/IResource.h>
 #include "ResourceLoader/CompositeResourceLoader.h"
+
+#include "MemoryManager/StackMemoryManager.h"
+
 #include <Utils/DebugUtils.h>
+#include <Utils/AssetPath.h>
 
 // Simple, convenient facade over the engine ResourceManager stack.
 // Responsibilities:
@@ -19,6 +23,7 @@
 // - Load via appropriate IResourceLoader
 // - Track refs in registry
 // - Provide typed accessors
+
 class ResourceManagerFacade {
 public:
     static ResourceManagerFacade& Instance() {
@@ -26,8 +31,10 @@ public:
         return inst;
     }
 
+    static void Initialize(size_t maxMemorySize);
+
     // Load by file path (auto-detects loader by extension). Increments refcount on reuse.
-    ResourceHandle LoadByPath(const eastl::string& path);
+    ResourceHandle LoadByPath(const AssetPath& path);
 
     // Raw typed getter (non-owning). Returns nullptr if not found.
     template <typename T>
@@ -53,6 +60,8 @@ public:
 
     size_t GetTotalMemoryUsage() const;
 
+
+
 private:
     ResourceManagerFacade() = default;
     ~ResourceManagerFacade() = default;
@@ -62,5 +71,5 @@ private:
 
 private:
     ResourceRegistry m_registry;
-    HeapMemoryManager* m_memoryManager; // default heap-backed
+    eastl::unique_ptr<StackMemoryManager> m_memoryManager;
 };

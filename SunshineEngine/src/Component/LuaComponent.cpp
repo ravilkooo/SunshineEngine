@@ -12,6 +12,7 @@
 #include "Utils/FileSystemWrapper.h"
 #include "Scripting/ComponentBindings.h"
 #include <GameObject/GameObject.h>
+#include <Utils/StringHelper.h>
 
 void LuaComponent_Info::ScanLuaFiles(const eastl::string& dirPath) {
 	luaFiles.clear();
@@ -35,7 +36,8 @@ void LuaComponent_Info::ScanLuaFiles(const eastl::string& dirPath) {
 
 void LuaComponent_Info::InitLuaFile()
 {
-	eastl::wstring wpath = MakeEngineAssetPath_Wstring(L"Scripts");
+	eastl::wstring wpath = AssetPath::s_projectPath + L"Assets/Scripts";
+
 	eastl::string assetsPath = wstringToString(wpath);
 	ScanLuaFiles(assetsPath);
 	if (!luaFiles.empty()) {
@@ -92,7 +94,14 @@ void LuaComponent::LoadScript() {
 	//InitLuaFile();
 
 	lua = eastl::make_unique<sol::state>();
-	lua->open_libraries(sol::lib::base);
+	lua->open_libraries(
+		sol::lib::base,
+		sol::lib::package,
+		sol::lib::math,
+		sol::lib::string,
+		sol::lib::table,
+		sol::lib::os
+	);
 
 	registerComponents();
 

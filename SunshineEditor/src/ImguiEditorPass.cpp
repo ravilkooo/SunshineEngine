@@ -1,3 +1,7 @@
+#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/Pass/SelectionPass.h>
+#include <Graphics/Renderer/GBuffer.h>
+
 #include <EASTL/string.h>
 #include <EASTL/priority_queue.h>
 
@@ -8,9 +12,13 @@
 #include <WorldEditor.h>
 #include <SceneHierarchy.h>
 
+#include <PlayerObject/PlayerObject.h>
+
 #include <Component/LuaComponent.h>
+
 #include <Utils/DebugUtils.h>
 #include <Utils/StringUtils.h>
+
 #include <UI/FontStyles.h>
 #include "UI/PropertyPanel.h"
 
@@ -89,6 +97,8 @@ void ImguiEditorPass::SetVieportGBuffer(
 
 void ImguiEditorPass::StartFrame()
 {
+	if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"ImguiEditor Pass");
+
 	context->OMSetRenderTargets(1u, m_renderTargetView.GetAddressOf(), m_pDSV.Get());
 	float color[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	context->ClearRenderTargetView(m_renderTargetView.Get(), color);
@@ -320,6 +330,8 @@ void ImguiEditorPass::EndFrame()
 	context->PSSetShaderResources(0, 1, nullSRVs);
 	ID3D11RenderTargetView* nullRTVs[] = { nullptr };
 	context->OMSetRenderTargets(1, nullRTVs, nullptr);
+
+	if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 }
 
 void ImguiEditorPass::RenderGameWorld()
@@ -438,79 +450,12 @@ void ImguiEditorPass::ShowGameObjectProperties()
 
 void ImguiEditorPass::ShowPlayerProperties()
 {
-	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
-		ImGuiTreeNodeFlags_Framed |
-		ImGuiTreeNodeFlags_SpanAvailWidth;
-	EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-	if (ImGui::TreeNodeEx("Camera Settings", flags))
-	{
-		EditorUI::FontStyles::Pop();
-
-		ImVec2 avail = ImGui::GetContentRegionAvail();
-		avail.y = avail.x * 360.0f / 640.0f;
-
-		auto pObj = static_cast<PlayerObject_Info*>(
-			m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(m_editorApp->m_worldEditor->m_playerObject));
-
-		ImGui::Image((ImTextureID)pObj->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
-
-		EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
-		ImGui::Text("Stick Params");
-		EditorUI::FontStyles::Pop();
-
-		float stickLength = pObj->m_playerCamera->m_stickParams.stickLength;
-		if (ImGui::DragFloat("Stick length", &stickLength, 0.1f, 0.1f, 90.0f, "%.1f m"))
-		{
-			pObj->m_playerCamera->m_stickParams.stickLength = stickLength;
-		}
-
-		float stickYaw = pObj->m_playerCamera->m_stickParams.stickYaw;
-		stickYaw *= 360.0f / DirectX::XM_2PI;
-		if (ImGui::DragFloat("Stick yaw", &stickYaw, 0.1f, -90.0f, 90.0f, "%.1f"))
-		{
-			pObj->m_playerCamera->m_stickParams.stickYaw =
-				DirectX::XM_2PI / 360.0f * stickYaw;
-		}
-
-		float stickPitch = pObj->m_playerCamera->m_stickParams.stickPitch;
-		stickPitch *= 360.0f / DirectX::XM_2PI;
-		if (ImGui::DragFloat("Stick pitch", &stickPitch, 0.1f, -80.0f, 80.0f, "%.1f"))
-		{
-			pObj->m_playerCamera->m_stickParams.stickPitch =
-				DirectX::XM_2PI / 360.0f * stickPitch;
-		}
-
-		// ImGui::ColorEdit3("Camera Offset",
-		// 	&(pObj->m_playerCamera->m_stickParams.offset.x), ImGuiColorEditFlags_Float);
-		PropertyPanel::DrawVector3Control("Camera Offset",
-			pObj->m_playerCamera->m_stickParams.offset, 0.0f);
-
-		//ImGui::ColorEdit3("Camera Rotation",
-		//	&(pObj->m_playerCamera->m_stickParams.viewPitchYawRoll.x), ImGuiColorEditFlags_Float);
-
-		DXSM::Vector3 viewPitchYawRoll = pObj->m_playerCamera->m_stickParams.viewPitchYawRoll * (180.0f / DirectX::XM_PI);
-		if (PropertyPanel::DrawVector3Control("Camera Rotation", viewPitchYawRoll, 0.0f))
-		{
-			pObj->m_playerCamera->m_stickParams.viewPitchYawRoll = viewPitchYawRoll * (DirectX::XM_PI / 180.0f);
-		}
-
-		/*
-		float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
-		float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
-		if ()
-		{
-			lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
-		}
-		if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
-		{
-			lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
-		}
-		*/
-		ImGui::TreePop();
-	}
-	else
-		EditorUI::FontStyles::Pop();
-
+	m_PlayerSettingPanel.SetPlayerObject(
+		static_cast<PlayerObject_Info*>(
+			m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(m_editorApp->m_worldEditor->m_playerObject)
+		)
+	);
+	m_PlayerSettingPanel.OnImGuiRender();
 }
 
 void ImguiEditorPass::ShowBottomPanel()
@@ -640,21 +585,27 @@ void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Textur
 	m_windowViewport.MaxDepth = 1.0f;
 }
 
-void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
+void ImguiEditorPass::DrawNode(SE::UUID nodeUUID, Selection& sel) {
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
 		| ImGuiTreeNodeFlags_SpanFullWidth
 		| ImGuiTreeNodeFlags_DefaultOpen
 		| ImGuiTreeNodeFlags_DrawLinesToNodes;
-	const bool is_leaf = node->children.empty();
+
+	auto node = m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_nodes[
+		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_byObjUUID[nodeUUID]
+	];
+	auto obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(nodeUUID);
+
+	const bool is_leaf = node.children.empty();
 	if (is_leaf)
 		flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-	if (sel.Contains(node->objUUID))
+	if (sel.Contains(nodeUUID))
 		flags |= ImGuiTreeNodeFlags_Selected;
 
-	ImGui::PushID(node); // stable id (or use UUID string)
+	ImGui::PushID(obj); // stable id (or use UUID string)
 	//bool open = ImGui::TreeNodeEx((void*)node, flags, "%s", node->objUUID.ToString().c_str());
-	bool open = ImGui::TreeNodeEx((void*)node, flags, "%s",
-		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_uuidToObjectMap[node->objUUID]->m_name);
+	bool open = ImGui::TreeNodeEx((void*)obj, flags, "%s",
+		m_editorApp->m_worldEditor->m_scene->m_sceneGraph->m_uuidToObjectMap[nodeUUID]->m_name);
 
 	// Selection handling: click label to select; arrow toggles open.
 	if (ImGui::IsItemClicked()) {
@@ -663,12 +614,15 @@ void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
 		if (ImGui::GetIO().KeyCtrl) sel.Toggle(node->objUUID);
 		else 
 		*/
-		sel.SetSingle(node->objUUID);
-		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = node->objUUID;
+		sel.SetSingle(nodeUUID);
+		m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = nodeUUID;
 	}
 
+	ImGui::SameLine();
+	ImGui::TextDisabled("(%s)", nodeUUID.ToString().c_str());
+
 	if (!is_leaf && open) {
-		for (auto* child : node->children)
+		for (auto child : node.children)
 			DrawNode(child, sel);
 		ImGui::TreePop();
 	}
@@ -676,6 +630,6 @@ void ImguiEditorPass::DrawNode(SceneNode* node, Selection& sel) {
 }
 
 void ImguiEditorPass::DrawSceneGraph(SceneGraph* g, Selection& sel) {
-	for (auto* root : g->m_roots)
+	for (auto root : g->m_roots)
 		DrawNode(root, sel);
 }

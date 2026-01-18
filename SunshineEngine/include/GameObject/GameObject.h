@@ -130,6 +130,7 @@ public:
     virtual void Update(float deltaTime) {};
 
     ParentNode<GameObject> m_parent;
+    eastl::vector<SE::UUID> m_children;
     void SetParent(ParentNode<GameObject> parent)
     {
         GameObject* currNode = parent.ptr;
@@ -149,6 +150,10 @@ public:
             currNode = currNode->m_parent.ptr;
         }
         m_parent = parent;
+        if (m_parent.uuid != SE::UUID(0u) && m_parent.ptr)
+        {
+            m_parent.ptr->m_children.push_back(this->m_UUID);
+        }
 
         if (m_parent.ptr && m_parent.attached)
         {
@@ -248,7 +253,7 @@ protected:
 };
 
 enum class GameObjectGroup {
-    Lighting, Shapes, CustomMesh, Player, Other
+    Lighting, Shapes, CustomMesh, Player, ParticleEmitter, Other
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(GameObjectGroup, {
@@ -256,6 +261,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(GameObjectGroup, {
     {GameObjectGroup::Shapes, "Shapes"},
     {GameObjectGroup::CustomMesh, "CustomMesh"},
     {GameObjectGroup::Player, "Player"},
+    {GameObjectGroup::ParticleEmitter, "ParticleEmitter"},
     {GameObjectGroup::Other, "Other"},
     })
 

@@ -74,7 +74,7 @@ namespace SE_G {
         void SetReferenceLen(float referenceLen);
         float GetReferenceLen();
 
-        void Update();
+        void Update(float deltaTime);
         void Update(const DXSM::Vector3 targetPoistion);
         void Update(const DXSM::Matrix targetTransform);
         void Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
@@ -130,6 +130,7 @@ namespace SE_G {
         DXSM::Vector3 target;
         DXSM::Vector3 up;
         DXSM::Vector3 forward;
+        DXSM::Vector3 right;
 
         DXSM::Matrix rotateCamToForward;
 
@@ -144,8 +145,15 @@ namespace SE_G {
 
             DXSM::Vector3 offset = DXSM::Vector3::Zero;
         } m_stickParams;
-        void RotateStickYawPitch(float deltaYaw, float deltaPitch);
+        DXSM::Vector3 stickDirection;
+        
+        DXSM::Vector3 GetStickDirection();
+        float GetStickLength() { return m_stickParams.stickLength; };
+        void SetStickLength(float newLen) { m_stickParams.stickLength = fmin(fmax(0.0f, newLen), 100.0f); };
 
+        void RotateStickYawPitch(float yawSpeed, float pitchSpeed);
+
+        float m_deltaTime = 1.0f;
     private:
         void SetFOV(float fov);
         void SetAspectRatio(float aspectRatio);
@@ -201,5 +209,6 @@ namespace SE_G {
         bool m_playerPointerInited = false;
 
         SE::UUID m_playerUUID = SE::UUID(0u);
+
     };
 }

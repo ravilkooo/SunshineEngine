@@ -48,7 +48,7 @@ namespace SE_G {
             m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         }
         else if (!LoadModel(vertices, indices, meshPath, attrFlags)) {
-            m_meshPath = AssetPath(L"Box_repeat");
+            m_meshPath = AssetPath(eastl::wstring(L"Box_repeat"));
             FillUnwrappedBoxMesh_repeat(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
@@ -678,7 +678,7 @@ namespace SE_G {
 
         FillUnwrappedBoxMesh(vertices, indices, size);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        mesh->m_meshPath = AssetPath(L"Box");
+        mesh->m_meshPath = AssetPath(eastl::wstring(L"Box"));
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -696,7 +696,7 @@ namespace SE_G {
         FillUnwrappedBoxMesh_repeat(vertices, indices, size);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        mesh->m_meshPath = AssetPath(L"Box_repeat");
+        mesh->m_meshPath = AssetPath(eastl::wstring(L"Box_repeat"));
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -715,7 +715,7 @@ namespace SE_G {
         FillSphereMesh(vertices, indices, size, sliceCount, stackCount);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         
-        mesh->m_meshPath = AssetPath(L"Sphere");
+        mesh->m_meshPath = AssetPath(eastl::wstring(L"Sphere"));
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -733,7 +733,7 @@ namespace SE_G {
         FillGeosphereMesh(vertices, indices, size, numSubdivisions);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        mesh->m_meshPath = AssetPath(L"Geosphere");
+        mesh->m_meshPath = AssetPath(eastl::wstring(L"Geosphere"));
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
@@ -749,7 +749,7 @@ namespace SE_G {
         FillScreenAlignedQuad(vertices, indices);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-        mesh->m_meshPath = AssetPath(L"ScreenAlignedQuad");
+        mesh->m_meshPath = AssetPath(eastl::wstring(L"ScreenAlignedQuad"));
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);

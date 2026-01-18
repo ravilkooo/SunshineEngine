@@ -9,51 +9,56 @@
 #include <assimp/scene.h>
 #include <assimp/material.h>
 #include <assimp/postprocess.h>
+#include <ResourceManager/MemoryManager/StackMemoryManager.h>
 
 
-IResource* CompositeResourceLoader::Load(const eastl::string& path,
+IResource* CompositeResourceLoader::Load(const AssetPath& path,
     ResourceRegistry* pRegistry,
-    ResourceMemoryManager* pMemMgr)
+    StackMemoryManager* pMemMgr)
 {
     // Track loading paths to detect circular dependencies
     static thread_local eastl::unordered_set<eastl::string> loadingPaths;
     
+    auto fullPath = WStringToUtf8(path.GetFullPath());
+
     // Check for circular dependency
-    if (loadingPaths.find(path) != loadingPaths.end()) {
-        printSunshineErrorMessage(("Circular dependency detected while loading: {}", path.c_str()));
+    if (loadingPaths.find(fullPath) != loadingPaths.end()) {
+        printSunshineErrorMessage(("Circular dependency detected while loading: {}", fullPath.c_str()));
         return nullptr;
     }
     
     // Mark this path as being loaded
-    loadingPaths.insert(path);
+    loadingPaths.insert(fullPath);
     
     // 1. Resolve and load all dependencies
-    eastl::vector<eastl::string> deps = ResolveDependencies(path);
+    eastl::vector<AssetPath> deps = ResolveDependencies(path);
     eastl::vector<ResourceGUID> loadedDependencies;
 
     for (const auto& depPath : deps)
     {
         // Skip empty paths
-        if (depPath.empty()) {
-            printSunshineErrorMessage(("Empty dependency path found while loading: {}", path.c_str()));
+        if (depPath.m_assetRelativePath.empty()) {
+            printSunshineErrorMessage(("Empty dependency path found while loading: {}", fullPath.c_str()));
             continue;
         }
 
-        ResourceGUID depGUID = ComputeGUID(depPath);
+        auto depFullPath = WStringToUtf8(depPath.GetFullPath());
+
+        ResourceGUID depGUID = ComputeGUID(depFullPath);
         IResource* pDepResource = pRegistry->Get(depGUID);
 
         if (!pDepResource)
         {
-            IResourceLoader* pDepLoader = ResourceLoaderFactory::GetLoaderForFile(depPath);
+            IResourceLoader* pDepLoader = ResourceLoaderFactory::GetLoaderForFile(depFullPath);
             if (!pDepLoader) {
-                printSunshineErrorMessage(("No loader found for dependency: {}", depPath.c_str()));
+                printSunshineErrorMessage(("No loader found for dependency: {}", depFullPath.c_str()));
                 continue;
             }
 
             // Recursively load the dependency
             pDepResource = pDepLoader->Load(depPath, pRegistry, pMemMgr);
             if (!pDepResource) {
-                printSunshineErrorMessage(("Failed to load dependency: {}", depPath.c_str()));
+                printSunshineErrorMessage(("Failed to load dependency: {}", depFullPath.c_str()));
                 continue;
             }
 
@@ -62,7 +67,7 @@ IResource* CompositeResourceLoader::Load(const eastl::string& path,
                 ResourceHandle depHandle;
                 depHandle.guid = depGUID;
                 depHandle.version = 1;
-                pRegistry->Register(depHandle, pDepResource, depPath);
+                pRegistry->Register(depHandle, pDepResource, depFullPath);
             }
         }
         
@@ -72,8 +77,8 @@ IResource* CompositeResourceLoader::Load(const eastl::string& path,
     // 2. Create the main resource (Model in this case)
     Model* pModel = new (std::nothrow) Model();
     if (!pModel) {
-        printSunshineErrorMessage(("Failed to allocate memory for model: {}", path.c_str()));
-        loadingPaths.erase(path);
+        printSunshineErrorMessage(("Failed to allocate memory for model: {}", fullPath.c_str()));
+        loadingPaths.erase(fullPath);
         return nullptr;
     }
 
@@ -92,7 +97,7 @@ IResource* CompositeResourceLoader::Load(const eastl::string& path,
     }
 
     // Clean up and return
-    loadingPaths.erase(path);
+    loadingPaths.erase(fullPath);
     return pModel;
 }
 
@@ -113,16 +118,18 @@ SunshineResource::ResourceType DetermineResourceType(const eastl::string& path)
     return SunshineResource::ResourceType::COUNT;
 }
 
-eastl::vector<eastl::string> CompositeResourceLoader::ResolveDependencies(const eastl::string& path)
+eastl::vector<AssetPath> CompositeResourceLoader::ResolveDependencies(const AssetPath& path)
 {
-    eastl::vector<eastl::string> dependencies;
+    eastl::vector<AssetPath> dependencies;
+
+    auto fullPath = WStringToUtf8(path.GetFullPath());
 
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path.c_str(),
+    const aiScene* scene = importer.ReadFile(fullPath.c_str(),
         aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 
     if (!scene) {
-        printSunshineErrorMessage(("Failed to load model with Assimp: {}", path.c_str()));
+        printSunshineErrorMessage(("Failed to load model with Assimp: {}", fullPath.c_str()));
         return dependencies;
     }
 
@@ -139,7 +146,8 @@ eastl::vector<eastl::string> CompositeResourceLoader::ResolveDependencies(const 
             {
                 aiString texPath;
                 if (material->GetTexture((aiTextureType)texType, t, &texPath) == AI_SUCCESS) {
-                    dependencies.push_back(texPath.C_Str());
+                    AssetPath ap(Utf8ToWString(texPath.C_Str()), AssetPath::AssetSource::Absolute);
+                    dependencies.push_back(ap);
                 }
             }
         }

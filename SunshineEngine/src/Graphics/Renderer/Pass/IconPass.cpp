@@ -1,6 +1,14 @@
+#include <Graphics/Bindable/Bindable.h>
+#include <Graphics/Bindable/Sampler.h>
+#include <Graphics/Bindable/DepthStencilState.h>
+
+#include <Graphics/GraphicsResources/GeometryShader.h>
+#include <Graphics/GraphicsResources/PixelShader.h>
+#include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
-#include <Graphics/GraphicsResources/GeometryShader.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
@@ -59,7 +67,7 @@ namespace SE_G {
 
 		m_iconSprites = eastl::make_unique<Bind::Texture>(
 			device,
-			AssetPath(L"EditorIcons.dds", AssetPath::AssetSource::Engine), 0u,
+			AssetPath(L"Textures/EditorIcons.dds", AssetPath::AssetSource::Engine), 0u,
 			Bind::PipelineStage::PIXEL_SHADER
 		);
 
@@ -98,6 +106,8 @@ namespace SE_G {
 
 	void IconPass::StartFrame()
 	{
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Icon Pass");
+
 		context->OMSetRenderTargets(2, m_bufferRTVs, m_GBuffer->pDepthDSV.Get());
 
 		context->RSSetViewports(1, &m_viewport);
@@ -136,6 +146,8 @@ namespace SE_G {
 		}
 		*/
 		for (auto& tech : m_techniques) {
+
+
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
 		}
@@ -146,6 +158,8 @@ namespace SE_G {
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr, nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
 		context->OMSetRenderTargets(2, nullRTVs, *nullDSVs);
+
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
 	void IconPass::OnResize(UINT resizeWidth, UINT resizeHeight)

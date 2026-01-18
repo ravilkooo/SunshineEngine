@@ -37,4 +37,5 @@ private:
     void AddPointLight();
     void AddSpotLight();
     void AddCustomMesh();
+    void AddParticleEmitter();
 };

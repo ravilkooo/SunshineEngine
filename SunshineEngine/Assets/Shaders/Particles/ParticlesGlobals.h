@@ -3,8 +3,12 @@ struct Particle
 {
     float4 position;
     float4 velocity;
-    float4 colorStart;
-    float4 colorEnd;
+
+    float3 colorStart;
+    float alphaStart;
+
+    float3 colorEnd;
+    float alphaEnd;
 
     float sizeStart;
     float sizeEnd;

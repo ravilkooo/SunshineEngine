@@ -19,8 +19,12 @@
 
 #include <PlayerObject/PlayerObject.h>
 
+#include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/ParticleEmitter.h>
+
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Utils/Camera.h>
+#include <Graphics/GraphicsResources/Texture.h>
 
 #include <Serialization/GraphicsSerialization.h>
 
@@ -32,6 +36,8 @@
 #include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
 
 #include <Physics/PhysicsSystem.h>
+
+#include <ResourceManager/ResourceManagerFacade.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -194,20 +200,42 @@ void MeshData::FromJson(const json& j, ID3D11Device* device)
     }
 
     // Texture
+    AssetPath texPath;
     if (j.contains("Texture"))
     {
-        AssetPath texPath;
         texPath.FromJson(j["Texture"]);
-
-        m_texture = eastl::make_shared<SE_G::Bind::Texture>(
-            device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
     }
     else {
+        texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
+    }
+    /*
+    m_texture = eastl::make_shared<SE_G::Bind::Texture>(
+        device,
+        texPath, 0u,
+        SE_G::Bind::PipelineStage::PIXEL_SHADER);
+    */
+    auto& rm = ResourceManagerFacade::Instance();
+    ResourceHandle texHandle = rm.LoadByPath(texPath);
+    SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+    if (texRes)
+    {
+        m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+            texRes,
+            [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+        //mc_info->SetTexture(texture);
+    }
+    else
+    {
         m_texture = eastl::make_shared<SE_G::Bind::Texture>(
             device,
-            AssetPath(L"DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
+            AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine),
+            0u,
             SE_G::Bind::PipelineStage::PIXEL_SHADER);
+        //mc_info->SetTexture(texture);
     }
+
+
 
     // Sampler
     if (j.contains("Sampler")) {
@@ -418,6 +446,9 @@ json GameObject_Info::ToJson() const {
     json j;
     j["m_name"] = m_name.c_str();
     j["m_UUID"] = (uint64_t)m_UUID;
+	SE::UUIDhilo uuidhilo = m_UUID.GetHilo();
+	j["m_UUID_hi"] = (uint32_t)uuidhilo.hi; // for debugging
+    j["m_UUID_lo"] = (uint32_t)uuidhilo.lo; // for debugging
     j["m_group"] = m_group;
     j["m_parent"] = m_parent.ToJson();
     
@@ -577,13 +608,12 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
 
 // ----------------- Scene -----------------
 
-eastl::shared_ptr<Scene> Scene::FromJson(
+void Scene::FromJson(
     SE_G::DeferredRenderer* renderSystem,
     PhysicsSystem* physicsSystem,
     eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
-    auto scene = eastl::make_shared<Scene>();
 
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
@@ -645,19 +675,16 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                 break;
             case GameObjectGroup::Player:
             {
-                go = eastl::make_unique<PlayerObject>(objJ, renderSystem);
+                go = eastl::make_unique<PlayerObject>(objJ, renderSystem, camera);
                 auto playerObj = static_cast<PlayerObject*>(go.get());
-                if (objJ.contains("settings"))
-                {
-                    playerObj->SettingsFromJson(objJ["settings"], camera);
-                }
-                else
-                {
-                    json _empty;
-                    playerObj->SettingsFromJson(_empty, camera);
-                }
-                playerObj->AssignSceneToCamera(scene.get());
-                scene->m_playerObjectUUID = playerObj->m_UUID;
+                playerObj->AssignSceneToCamera(&GetInstance());
+                GetInstance().m_playerObjectUUID = playerObj->m_UUID;
+                break;
+            }
+            case GameObjectGroup::ParticleEmitter:
+            {
+                go = SE::ParticleEmitter::FromJson(objJ, renderSystem->m_particleSystem.get());
+
                 break;
             }
             case GameObjectGroup::Other:
@@ -688,25 +715,31 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
                 }
 
-                auto objUUID = scene->AddGameObject(eastl::move(go));
+                auto objUUID = GetInstance().AddGameObject(eastl::move(go));
                 if (objGroup == GameObjectGroup::Player)
                 {
-                    scene->m_playerObject = static_cast<PlayerObject*>(scene->GetGameObjectByUUID(objUUID));
+                    GetInstance().m_playerObject = static_cast<PlayerObject*>(
+                        GetInstance().GetGameObjectByUUID(objUUID)
+                        );
                 }
             }
         }
     }
-    scene->RestoreParents();
-    return scene;
+    GetInstance().RestoreParents();
 }
 
 // ----------------- Scene_Info -----------------
 json Scene_Info::ToJson() const {
     json j;
     j["gameObjects"] = json::array();
-    for (auto& uuid : gameObjects) {
+    for (auto& uuid : gameObjects)
+    {
         auto it = uuidToObjectMap.find(uuid);
-        if (it != uuidToObjectMap.end() && it->second) {
+        if (it != uuidToObjectMap.end() && it->second)
+        {
+            // if (it->second->m_group == GameObjectGroup::ParticleEmitter)
+            //     continue;
+
             j["gameObjects"].push_back(it->second->ToJson());
         }
     }
@@ -786,17 +819,14 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
             {
                 go = eastl::make_unique<PlayerObject_Info>(objJ, renderSystem);
                 auto playerObj = static_cast<PlayerObject_Info*>(go.get());
-                if (objJ.contains("settings"))
-                {
-                    playerObj->SettingsFromJson(objJ["settings"], renderSystem);
-                }
-                else
-                {
-                    json _empty;
-                    playerObj->SettingsFromJson(_empty, renderSystem);
-                }
                 playerObj->AssignSceneToCamera(scene.get());
                 scene->m_playerObject = playerObj->m_UUID;
+                break;
+            }
+            case GameObjectGroup::ParticleEmitter:
+            {
+                go = SE::ParticleEmitter_Info::FromJson(objJ, renderSystem->m_particleSystem.get());
+                    
                 break;
             }
             case GameObjectGroup::Other:

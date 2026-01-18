@@ -234,6 +234,23 @@ namespace SE
         }
     }
 
+	eastl::string Project::createScriptsDirectory() const
+	{
+		try
+		{
+			eastl::wstring fullPath = JoinWchar_Wstring(GetFullPath().c_str(), L"Scripts/");
+			std::filesystem::create_directories(fullPath.c_str());
+			if (std::filesystem::exists(fullPath.c_str()))
+				return "";
+			else
+				return "Failed to create directory: " + WStringToUtf8(fullPath);
+		}
+		catch (const std::exception& e)
+		{
+			return "Failed to create directory: " + eastl::string(e.what());
+		}
+	}
+
     eastl::string Project::renameDirectory(const eastl::wstring& newPath) const
     {
         try
@@ -275,10 +292,15 @@ namespace SE
 	    	if (subPath.back() != L'/' && subPath.back() != L'\\')
 	    		subPath.push_back(L'/');
 	    	
-	    	eastl::wstring sceneFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"scene.json");
 	    	eastl::wstring templateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/DefaultScene.json");
+	    	eastl::wstring sceneFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"scene.json");
 	    	std::filesystem::copy(templateFile.c_str(), sceneFile.c_str());
 	    	//std::rename("from.txt", "to.txt")
+			
+			project.createScriptsDirectory();
+			eastl::wstring playerScriptTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/player_controller.lua");
+			eastl::wstring playerScriptFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Scripts/player_controller.lua");
+			std::filesystem::copy(playerScriptTemplateFile.c_str(), playerScriptFile.c_str());
     		
 	        return "";
 	    }

@@ -92,7 +92,7 @@ SkyBox_Info::SkyBox_Info(
 		eastl::make_unique<SE_G::SkyBoxTechnique>(
 			device, tc_info->m_assignedComponent.get(), "LightPass",
 			camera, m_lightData, assetPath);
-	rc_info->AddTechnique(eastl::move(lightTech));
+	m_lightTech = static_cast<SE_G::SkyBoxTechnique*>(rc_info->AddTechnique(eastl::move(lightTech)));
 
 	// IconPass
 	auto iconTech = eastl::make_unique<SE_G::IconTechnique>(
@@ -128,11 +128,24 @@ SkyBox_Info::SkyBox_Info(
 		eastl::make_unique<SE_G::SkyBoxTechnique>(
 			device, tc_info->m_assignedComponent.get(), "LightPass",
 			camera, m_lightData); // , texturePath);
-	rc_info->AddTechnique(eastl::move(lightTech));
+	m_lightTech = static_cast<SE_G::SkyBoxTechnique*>(rc_info->AddTechnique(eastl::move(lightTech)));
 
 	// IconPass
 	auto iconTech = eastl::make_unique<SE_G::IconTechnique>(
 		device, tc_info->m_assignedComponent.get(), eastl::string("IconPass"),
 		SE_G::IconData{ 0u, 0u, 1u, 1u, m_UUID.GetHilo() });
 	rc_info->AddTechnique(eastl::move(iconTech));
+}
+
+void SkyBox_Info::SetTexture(eastl::shared_ptr<SE_G::Bind::Texture> tex)
+{
+	m_lightTech->m_texture = tex;
+}
+
+void SkyBox_Info::SetTexture(SE_G::DeferredRenderer* renderSystem, AssetPath assetPath)
+{
+	auto device = renderSystem->GetDevice();
+	auto tex = eastl::make_shared<SE_G::Bind::Texture>(device, assetPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+
+	m_lightTech->m_texture = tex;
 }

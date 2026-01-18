@@ -1,7 +1,9 @@
 #pragma once
 
 #include <d3d11.h>
-#include <wrl.h>    
+#include <d3d11_1.h>
+#include <wrl.h>
+#include <wrl/client.h>
 #include <directxmath.h>
 
 #include <EASTL/shared_ptr.h>
@@ -15,6 +17,11 @@ namespace SE_G {
 	class RenderingSystem
 	{
 	public:
+		// temp
+		static Microsoft::WRL::ComPtr<ID3DUserDefinedAnnotation> gAnn;
+
+		static void InitAnnotations(ID3D11DeviceContext* ctx);
+
 		RenderingSystem();
 		~RenderingSystem();
 		RenderingSystem(HWND hWnd, UINT screenWidth, UINT screenHeight);

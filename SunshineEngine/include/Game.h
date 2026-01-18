@@ -9,9 +9,6 @@
 
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
-#include <Graphics/Renderer/Pass/GPass.h>
-#include <Graphics/Renderer/Pass/LightPass.h>
-#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 #include <GameObject/GameObjectFactory.h>
 #include <GameObject/GameObject.h>
@@ -22,17 +19,28 @@
 
 #include <Physics/PhysicsSystem.h>
 
-#include <TracingSystem/TracingSystem.h>
+#include <Windows/InputDevice.h>
 #include <Audio/AudioSystem.h>
 
-#include <Utils/ILogManager.h>
 #include <Scripting/LuaManager.h>
-
-#include <PlayerObject/PlayerObject.h>
+#include <Utils/ILogManager.h>
 
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
 
+class PlayerObject;
+
+namespace SE
+{
+    class ParticleSystem;
+}
+
+namespace SE_G
+{
+    class ShadowMapPass;
+    class GPass;
+    class LightPass;
+}
 
 class SUNSHINE_ENGINE_API Game
 {
@@ -44,6 +52,7 @@ public:
         eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
+    void SetParticleSystem(eastl::shared_ptr<SE::ParticleSystem> ps);
 
     void SetupPhysics();
 
@@ -55,7 +64,6 @@ public:
     void Stop();
 
     virtual void Update(float deltaTime);
-    void Render();
     void ClearScene();
 
     bool LoadScene(const wchar_t* scenePath);
@@ -68,16 +76,18 @@ public:
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 
+    // Input handling
+    void HandleKeyDown(Keys key);
+    void HandleKeyUp(Keys key);
+    void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
+
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
     GameTimer m_timer;
-    eastl::shared_ptr<Scene> m_scene;
+    //eastl::shared_ptr<Scene> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
     eastl::unique_ptr<PhysicsSystem> m_physicsSystem;
-    
-    // For Volodya
-    //eastl::unique_ptr<TracingSystem> m_tracingSystem;
 
     LuaManager m_luaManager;
 
@@ -92,6 +102,8 @@ public:
 
     // PlayerObject
     PlayerObject* m_playerObject;
+
+    SE::ParticleSystem* m_particleSystem;
 
     // GAI
     void CreateGAIScene();

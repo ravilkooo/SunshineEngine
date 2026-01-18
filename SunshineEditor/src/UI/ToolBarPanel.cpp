@@ -3,6 +3,9 @@
 #include <ostream>
 #include <Utils/StringUtils.h>
 #include <EditorApp.h>
+#include <GameObject/EditorObjectFactory.h>
+#include <ParticleSystem/ParticleEmitter.h>
+#include <SceneHierarchy.h>
 
 #include "Utils/FileDialogManager.h"
 
@@ -159,6 +162,11 @@ void ToolbarPanel::ShowAddMenu()
     {
         AddCustomMesh();
     }
+
+    if (ImGui::MenuItem("Particle Emitter"))
+    {
+        AddParticleEmitter();
+    }
 }
 
 void ToolbarPanel::AddBoxShape()
@@ -169,7 +177,8 @@ void ToolbarPanel::AddBoxShape()
         
         if (boxObject)
         {
-            m_scene->AddGameObject(std::move(boxObject));
+            auto uuid = m_scene->AddGameObject(std::move(boxObject));
+			m_scene->m_sceneGraph->Add(uuid);
         }
     }
 }
@@ -182,7 +191,8 @@ void ToolbarPanel::AddSphereShape()
         
         if (sphereObject)
         {
-            m_scene->AddGameObject(std::move(sphereObject));
+            auto uuid = m_scene->AddGameObject(std::move(sphereObject));
+            m_scene->m_sceneGraph->Add(uuid);
         }
     }
 }
@@ -195,7 +205,8 @@ void ToolbarPanel::AddGeosphereShape()
         
         if (geosphereObject)
         {
-            m_scene->AddGameObject(std::move(geosphereObject));
+            auto uuid = m_scene->AddGameObject(std::move(geosphereObject));
+            m_scene->m_sceneGraph->Add(uuid);
         }
     }
 }
@@ -210,7 +221,8 @@ void ToolbarPanel::AddSkyBox()
             
             if (skyboxObject)
             {
-                m_scene->AddGameObject(std::move(skyboxObject));
+                auto uuid = m_scene->AddGameObject(std::move(skyboxObject));
+                m_scene->m_sceneGraph->Add(uuid);
             }
         }
     }
@@ -226,7 +238,8 @@ void ToolbarPanel::AddAmbientLight()
             
             if (ambientLightObject)
             {
-                m_scene->AddGameObject(std::move(ambientLightObject));
+                auto uuid = m_scene->AddGameObject(std::move(ambientLightObject));
+                m_scene->m_sceneGraph->Add(uuid);
             }
         }
     }
@@ -238,11 +251,18 @@ void ToolbarPanel::AddDirectionalLight()
     {
         if (m_camera)
         {
-            auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer, m_camera);
+            auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer, m_camera,
+                {
+                    DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+                    DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+                    DXSM::Vector3::Zero, 0,
+                    DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
+                });
             
             if (directionalLightObject)
             {
-                m_scene->AddGameObject(std::move(directionalLightObject));
+                auto uuid = m_scene->AddGameObject(std::move(directionalLightObject));
+                m_scene->m_sceneGraph->Add(uuid);
             }
         }
     }
@@ -254,11 +274,18 @@ void ToolbarPanel::AddPointLight()
     {
         if (m_camera)
         {
-            auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer, m_camera);
+            auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer, m_camera,
+                {
+                    DXSM::Vector3::One, 1.0f,
+                    DXSM::Vector3::One, 1.0f,
+                    DXSM::Vector3::Zero, 20,
+                    DXSM::Vector3::One, 0
+                });
             
             if (pointLightObject)
             {
-                m_scene->AddGameObject(std::move(pointLightObject));
+                auto uuid = m_scene->AddGameObject(std::move(pointLightObject));
+                m_scene->m_sceneGraph->Add(uuid);
             }
         }
     }
@@ -270,11 +297,19 @@ void ToolbarPanel::AddSpotLight()
     {
         if (m_camera)
         {
-            auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer, m_camera);
+            auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer, m_camera,
+                {
+                    DXSM::Vector3::One, 1.0f,
+                    DXSM::Vector3::One, 1.0f,
+                    DXSM::Vector3::Zero, 20,
+                    DXSM::Vector2(0, -DX::XM_PIDIV4), 10, 0,
+                    DXSM::Vector3::One, 0
+                });
             
             if (spotLightObject)
             {
-                m_scene->AddGameObject(std::move(spotLightObject));
+                auto uuid = m_scene->AddGameObject(std::move(spotLightObject));
+                m_scene->m_sceneGraph->Add(uuid);
             }
         }
     }
@@ -309,7 +344,28 @@ void ToolbarPanel::AddCustomMesh()
             
         if (customMeshObject)
         {
-            m_scene->AddGameObject(std::move(customMeshObject));
+            auto uuid = m_scene->AddGameObject(std::move(customMeshObject));
+            m_scene->m_sceneGraph->Add(uuid);
+        }
+    }
+    else
+    {
+        LOG_EDITOR_ERROR("Cannot add Custom Mesh: Renderer or Scene not initialized");
+    }
+}
+
+
+void ToolbarPanel::AddParticleEmitter()
+{
+    if (m_renderer && m_scene)
+    {
+        auto particleEmitter = EditorObjectFactory::CreateParticleEmitter(
+            m_renderer->m_particleSystem.get());
+
+        if (particleEmitter)
+        {
+            auto uuid = m_scene->AddGameObject(std::move(particleEmitter));
+            m_scene->m_sceneGraph->Add(uuid);
         }
     }
     else

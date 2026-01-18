@@ -1,4 +1,7 @@
+#include <Graphics/Renderer/RenderingSystem.h>
+
 #include "Graphics/Renderer/Pass/GPass.h"
+
 
 namespace SE_G {
 	GPass::GPass(ID3D11Device* device, ID3D11DeviceContext* context,
@@ -38,6 +41,8 @@ namespace SE_G {
 
 	void GPass::StartFrame()
 	{
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"GPass");
+
 		context->OMSetRenderTargets(5, gBufferRTVs, pGBuffer->pDepthDSV.Get());
 		float colorBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		float colorNone[] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -88,6 +93,8 @@ namespace SE_G {
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
 		context->OMSetRenderTargets(5, nullRTVs, *nullDSVs);
+
+		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
 	// GBuffer should be resized before this method

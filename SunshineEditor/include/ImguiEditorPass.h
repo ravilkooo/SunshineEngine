@@ -12,23 +12,28 @@
 
 // SunshineLibs
 #include <Graphics/Renderer/Pass/RenderPass.h>
-#include <Graphics/Renderer/GBuffer.h>
 
-#include "UI/ContentBrowserPanel.h"
-#include "UI/MainMenuBarPanel.h"
-#include "UI/ToolbarPanel.h"
-#include "UI/BottomBarPanel.h"
-#include "UI/LogPanel.h"
-#include "UI/PropertyPanel.h"
-#include "UI/ProjectSelector.h"
-#include "UI/Gizmo.h"
-#include "Audio/AudioEditor.h"
+#include <UI/ContentBrowserPanel.h>
+#include <UI/MainMenuBarPanel.h>
+#include <UI/ToolbarPanel.h>
+#include <UI/BottomBarPanel.h>
+#include <UI/LogPanel.h>
+#include <UI/PropertyPanel.h>
+#include <UI/ProjectSelector.h>
+#include <UI/Gizmo.h>
+#include <UI/PlayerSettingPanel.h>
+#include <Audio/AudioEditor.h>
 
 class EditorApp;
 class WorldEditor;
 struct Selection;
 struct SceneNode;
 class SceneGraph;
+
+namespace SE_G
+{
+    class GBuffer;
+}
 
 class ImguiEditorPass :
     public SE_G::RenderPass
@@ -82,6 +87,8 @@ public:
     LogPanel m_GameLogPanel = LogPanel{"Game Output Log", LogManager::LogTarget::Game};
     BottomBarPanel m_BottomPanel;
     PropertyPanel m_PropertyPanel;
+	PlayerSettingPanel m_PlayerSettingPanel;
+
     SE::ProjectSelector m_ProjectSelector;
     bool m_ProjectSelected = false;
 
@@ -110,7 +117,7 @@ public:
     } m_mouseClickCoords = { 0u, 0u };
 
     void ShowSceneHierarchy();
-    void DrawNode(SceneNode* node, Selection& sel);
+    void DrawNode(SE::UUID nodeUUID, Selection& sel);
     void DrawSceneGraph(SceneGraph* g, Selection& sel);
 private:
     //int selectedIdx = -1;

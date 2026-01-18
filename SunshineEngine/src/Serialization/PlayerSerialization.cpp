@@ -7,9 +7,6 @@ using json = nlohmann::json;
 
 void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera)
 {
-	m_playerCamera = camera;
-	m_playerCamera->SetFollowPlayer(m_UUID);
-
 	if (j.contains("camera"))
 	{
 		if (j["camera"].contains("stickLength")) {
@@ -31,6 +28,16 @@ void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camer
 			m_playerCamera->m_stickParams.offset.y = j["camera"]["offset"][1].get<float>();
 			m_playerCamera->m_stickParams.offset.z = j["camera"]["offset"][2].get<float>();
 		}
+	}
+
+	// Load Lua script
+	if (j.contains("luaScript") && j.contains("keyFunctionMappings"))
+	{
+		SetupLuaActionMapping(j);
+	}
+	else
+	{
+		SetDefaultLuaActionMapping();
 	}
 }
 
@@ -59,6 +66,17 @@ json PlayerObject_Info::SettingsToJson() const
 		m_playerCamera->m_stickParams.offset.y,
 		m_playerCamera->m_stickParams.offset.z
 	};
+
+	// Serialize Lua script path
+	j["luaScript"] = m_luaScriptPath.ToJson();
+
+	// Serialize key-function mappings
+	j["keyFunctionMappings"] = json::array();
+	for (const auto& pair : m_keyFunctionMapping) {
+		j["keyFunctionMappings"].push_back(pair.ToJson());
+	}
+
+	j["mouseFunctionMapping"] = m_mouseActionsHandlingFunction.c_str();
 
 	return j;
 }
@@ -89,5 +107,22 @@ void PlayerObject_Info::SettingsFromJson(const json& j, SE_G::DeferredRenderer* 
 			m_playerCamera->m_stickParams.offset.y = j["camera"]["offset"][1].get<float>();
 			m_playerCamera->m_stickParams.offset.z = j["camera"]["offset"][2].get<float>();
 		}
+	}
+	
+	// Load Lua script
+	if (j.contains("luaScript")) {
+		m_luaScriptPath.FromJson(j["luaScript"]);
+	}
+
+	// Load key-function mappings
+	if (j.contains("keyFunctionMappings")) {
+		m_keyFunctionMapping.clear();
+		for (const auto& pairJson : j["keyFunctionMappings"]) {
+			m_keyFunctionMapping.push_back(KeyFunctionPair::FromJson(pairJson));
+		}
+	}
+
+	if (j.contains("mouseFunctionMapping")) {
+		m_mouseActionsHandlingFunction = j["mouseFunctionMapping"].get<std::string>().c_str();
 	}
 }

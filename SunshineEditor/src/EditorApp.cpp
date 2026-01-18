@@ -4,6 +4,17 @@
 #include <filesystem>
 #include <Utils/AssetPath.h>
 
+#include <ParticleSystem/ParticleSystem.h>
+#include <ResourceManager/ResourceManagerFacade.h>
+#include <ResourceManager/ResourceLoader/TextureLoader.h>
+
+#include <Graphics/Renderer/Pass/RenderPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+
+#include <ImguiEditorPass.h>
+
+#include <Project.h>
+
 EditorApp::EditorApp()
 {
 
@@ -17,7 +28,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_winWidth = winWidth;
 	m_winHeight = winHeight;
 
-	m_timer = GameTimer();
+	// m_timer = GameTimer();
 
 	m_displayWindow = DisplayWindow(this, m_applicationName, m_hInstance,
 		m_winWidth, m_winHeight, DisplayWindow::WndProcImGui);
@@ -29,11 +40,11 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_editorAudioSystem = std::make_unique<AudioSystem>();
 	// m_audioEditor = eastl::make_unique<AudioEditor>(nullptr);
 	m_audioEditor = eastl::make_unique<AudioEditor>(m_editorAudioSystem.get());
-
+	//delete these?????????
 	eastl::wstring configPathW = JoinWchar_Wstring(EDITOR_ASSETS_DIR, L"Config/audio_tracks.json");
 	std::wstring stdPathW(configPathW.c_str());
 	std::string configPathStr(stdPathW.begin(), stdPathW.end());
-
+	// these helpers!
 	m_audioEditor->LoadFromJson(configPathStr);
 	
 	UINT worldEditorWidth = winWidth / 2;
@@ -42,7 +53,8 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	// Init WorldEditor with all it's passes
 	m_worldEditor = eastl::make_shared<WorldEditor>();
 	m_worldEditor->SetupRendering(m_renderingSystem, worldEditorWidth, worldEditorHeight);
-	
+	InitResourceLoaders(m_renderingSystem->GetDevice());
+
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
 	sol_ImGui::Init(m_lua);
@@ -128,11 +140,26 @@ void EditorApp::RunApp()
 			continue;
 		}
 
+		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
+		{
+			m_worldEditor->m_timer.Tick();
+			m_deltaTime = m_worldEditor->m_timer.GetDeltaTime();
 
-		m_timer.Tick();
-		m_deltaTime = m_timer.GetDeltaTime();
-		accumulator += m_deltaTime;
-		accumulator = eastl::min(4.0f * physicsUpdateMs, accumulator);
+			accumulator += m_deltaTime;
+			accumulator = eastl::min(accumulatorLimit, accumulator);
+		}
+		else if (m_runtimeMode == RuntimeMode::GAME_MODE && !m_gamePaused)
+		{
+			m_currentGame->m_timer.Tick();
+			m_deltaTime = m_currentGame->m_timer.GetDeltaTime();
+
+			accumulator += m_deltaTime;
+			accumulator = eastl::min(accumulatorLimit, accumulator);
+		}
+		else
+		{
+			accumulator = 0.0f;
+		}
 
 		// FPS statistic
 		FPSstatisticTimer += m_deltaTime;
@@ -166,17 +193,22 @@ void EditorApp::RunApp()
 		}
 
 
-		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
+		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
+		{
 			while (accumulator >= physicsUpdateMs) {
 				// UpdateGame(physicsUpdateMs);
 				UpdateEditor(physicsUpdateMs);
 				accumulator -= physicsUpdateMs;
 			}
 		}
-		else {
-			while (accumulator >= physicsUpdateMs) {
-				UpdateGame(physicsUpdateMs);
-				accumulator -= physicsUpdateMs;
+		else
+		{
+			if (!m_gamePaused)
+			{
+				while (accumulator >= physicsUpdateMs) {
+					UpdateGame(physicsUpdateMs);
+					accumulator -= physicsUpdateMs;
+				}
 			}
 		}
 		
@@ -208,32 +240,31 @@ void EditorApp::RunApp()
 	SE::SaveProjects(imguiEditorPass->m_ProjectSelector.m_projectsList);
 }
 
+void EditorApp::InitResourceLoaders(ID3D11Device* device)
+{
+	ResourceManagerFacade::Instance().Initialize(256 * 1024 * 1024);
+
+	auto texLoader = eastl::make_unique<TextureLoader>(device);
+	ResourceLoaderFactory::RegisterLoader(SunshineResource::ResourceType::TEXTURE,
+		eastl::move(texLoader));
+
+	AssetPath ap(
+		SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnhandledTextureColor),
+		AssetPath::AssetSource::Engine);
+	ResourceManagerFacade::Instance().LoadByPath(ap);
+
+	ap = AssetPath(
+		SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
+		AssetPath::AssetSource::Engine);
+	ResourceManagerFacade::Instance().LoadByPath(ap);
+}
+
 void EditorApp::UpdateGame(float deltaTime)
 {
-	if (!imguiEditorPass->IsFocusedGameViewport)
-	{
-		for (int i = 0; i < 6; ++i)
-			MovingPressed[i] = false;
-
-		IsRightMousePressed = false;
-	}
-	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
-	{
-		if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
-			- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
-			m_currentGame->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
-		}
-		if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
-			- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
-			m_currentGame->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
-		}
-		if (float up = (MovingPressed[(int)MoveKey::E] ? 1.0f : 0.0f)
-			- (MovingPressed[(int)MoveKey::Q] ? 1.0f : 0.0f); up != 0.0f) {
-			m_currentGame->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
-		}
-	}
-	if (!m_gamePaused)
-		m_currentGame->Update(deltaTime);
+	if (m_gamePaused)
+		return;
+	//m_currentGame->m_playerObject->m_playerController.m_inputManager.Update();
+	m_currentGame->Update(deltaTime);
 }
 
 void EditorApp::UpdateEditor(float deltaTime) 
@@ -244,37 +275,19 @@ void EditorApp::UpdateEditor(float deltaTime)
 	
 	if (!imguiEditorPass->IsFocusedGameViewport)
 	{
-		for (int i = 0; i < 6; ++i)
-			MovingPressed[i] = false;
-
-		IsRightMousePressed = false;
-		return;
+		// Reset input state when not focused
+		m_worldEditor->m_editorInputManager.Reset();
+		m_worldEditor->IsRightMousePressed = false;
 	}
-
-	if (!IsRightMousePressed)
-	{
-		m_worldEditor->Update(deltaTime);
-		return;
+	else {
+		// Update input manager for edge detection
+		m_worldEditor->m_editorInputManager.Update();
 	}
-
-	if (float forward = (MovingPressed[(int)MoveKey::W] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::S] ? 1.0f : 0.0f); forward != 0.0f) {
-		m_worldEditor->m_renderer->m_mainCamera->MoveForward(forward * CameraSpeed * deltaTime);
-	}
-	if (float right = (MovingPressed[(int)MoveKey::D] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::A] ? 1.0f : 0.0f); right != 0.0f) {
-		m_worldEditor->m_renderer->m_mainCamera->MoveRight(right * CameraSpeed * deltaTime);
-	}
-	if (float up = (MovingPressed[(int)MoveKey::E] ? 1.0f : 0.0f)
-		- (MovingPressed[(int)MoveKey::Q] ? 1.0f : 0.0f); up != 0.0f) {
-		m_worldEditor->m_renderer->m_mainCamera->MoveUp(up * CameraSpeed * deltaTime);
-	}
-
 	m_worldEditor->Update(deltaTime);
 }
 
 void EditorApp::Render() {
-
+	SUNSHINE_ROOT_DIR;
 	// Passes
 	m_renderingSystem->Render();
 
@@ -324,60 +337,13 @@ void EditorApp::HandleKeyDown(Keys key)
 	if (!imguiEditorPass->IsFocusedGameViewport)
 		return;
 
-	if (m_runtimeMode == RuntimeMode::GAME_MODE) {
-		/*
-		switch (key)
-		{
-		case Keys::W: MovingPressed[(int)MoveKey::W] = true;
-			break;
-		case Keys::S: MovingPressed[(int)MoveKey::S] = true;
-			break;
-		case Keys::D: MovingPressed[(int)MoveKey::D] = true;
-			break;
-		case Keys::A: MovingPressed[(int)MoveKey::A] = true;
-			break;
-		case Keys::E: MovingPressed[(int)MoveKey::E] = true;
-			break;
-		case Keys::Q: MovingPressed[(int)MoveKey::Q] = true;
-			break;
-
-		case Keys::RightButton: IsRightMousePressed = true;
-			break;
-		case Keys::LeftButton:
-			if (imguiEditorPass->IsHoveredGameViewport)
-			{
-
-			}
-			break;
-		}
-		*/
-		m_currentGame->m_playerObject->m_playerController.HandleKeyDown(key);
+	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
+	{
+		m_worldEditor->HandleKeyDown(key);
 	}
-	else if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
-		switch (key)
-		{
-		case Keys::W: MovingPressed[(int)MoveKey::W] = true;
-			break;
-		case Keys::S: MovingPressed[(int)MoveKey::S] = true;
-			break;
-		case Keys::D: MovingPressed[(int)MoveKey::D] = true;
-			break;
-		case Keys::A: MovingPressed[(int)MoveKey::A] = true;
-			break;
-		case Keys::E: MovingPressed[(int)MoveKey::E] = true;
-			break;
-		case Keys::Q: MovingPressed[(int)MoveKey::Q] = true;
-			break;
-
-		case Keys::RightButton: IsRightMousePressed = true;
-			break;
-		case Keys::LeftButton:
-			if (imguiEditorPass->IsHoveredGameViewport)
-			{
-
-			}
-			break;
-		}
+	else if(m_runtimeMode == RuntimeMode::GAME_MODE)
+	{
+		m_currentGame->HandleKeyDown(key);
 	}
 }
 
@@ -386,48 +352,13 @@ void EditorApp::HandleKeyUp(Keys key)
 	if (!imguiEditorPass->IsFocusedGameViewport)
 		return;
 
-	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE) {
-		switch (key)
-		{
-		case Keys::W: MovingPressed[(int)MoveKey::W] = false;
-			break;
-		case Keys::S: MovingPressed[(int)MoveKey::S] = false;
-			break;
-		case Keys::D: MovingPressed[(int)MoveKey::D] = false;
-			break;
-		case Keys::A: MovingPressed[(int)MoveKey::A] = false;
-			break;
-		case Keys::E: MovingPressed[(int)MoveKey::E] = false;
-			break;
-		case Keys::Q: MovingPressed[(int)MoveKey::Q] = false;
-			break;
-
-		case Keys::RightButton: IsRightMousePressed = false;
-			break;
-		}
+	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
+	{
+		m_worldEditor->HandleKeyUp(key);
 	}
-	else if (m_runtimeMode == RuntimeMode::GAME_MODE) {
-		/*
-		switch (key)
-		{
-		case Keys::W: MovingPressed[(int)MoveKey::W] = false;
-			break;
-		case Keys::S: MovingPressed[(int)MoveKey::S] = false;
-			break;
-		case Keys::D: MovingPressed[(int)MoveKey::D] = false;
-			break;
-		case Keys::A: MovingPressed[(int)MoveKey::A] = false;
-			break;
-		case Keys::E: MovingPressed[(int)MoveKey::E] = false;
-			break;
-		case Keys::Q: MovingPressed[(int)MoveKey::Q] = false;
-			break;
-
-		case Keys::RightButton: IsRightMousePressed = false;
-			break;
-		}
-		*/
-		m_currentGame->m_playerObject->m_playerController.HandleKeyUp(key);
+	else if (m_runtimeMode == RuntimeMode::GAME_MODE)
+	{
+		m_currentGame->HandleKeyUp(key);
 	}
 }
 
@@ -438,73 +369,38 @@ void EditorApp::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 
 	if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
 	{
-		if (IsRightMousePressed)
-		{
-			float deltaTime = m_timer.GetDeltaTime();
-
-			m_worldEditor->m_renderer->m_mainCamera->RotateYaw(deltaTime * args.Offset.x * CameraRotateSpeed);
-			m_worldEditor->m_renderer->m_mainCamera->RotatePitch(-deltaTime * args.Offset.y * CameraRotateSpeed);
-		}
-
-		if (args.WheelDelta != 0.0f)
-		{
-			float deltaTime = m_timer.GetDeltaTime();
-
-			CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
-
-			if (CameraSpeed < MinCameraSpeed)
-				CameraSpeed = MinCameraSpeed;
-			else if (CameraSpeed > MaxCameraSpeed)
-				CameraSpeed = MaxCameraSpeed;
-		}
+		m_worldEditor->HandleMouseMove(args);
 	}
 
 	if (m_runtimeMode == RuntimeMode::GAME_MODE)
 	{
-		/*
-		if (IsRightMousePressed)
-		{
-			float deltaTime = m_timer.GetDeltaTime();
-
-			m_currentGame->m_renderer->m_mainCamera->RotateYaw(deltaTime * args.Offset.x * CameraRotateSpeed);
-			m_currentGame->m_renderer->m_mainCamera->RotatePitch(-deltaTime * args.Offset.y * CameraRotateSpeed);
-		}
-
-		if (args.WheelDelta != 0.0f)
-		{
-			float deltaTime = m_timer.GetDeltaTime();
-
-			CameraSpeed += ((args.WheelDelta > 0) - (args.WheelDelta < 0)) * CameraSpeedStep;
-
-			if (CameraSpeed < MinCameraSpeed)
-				CameraSpeed = MinCameraSpeed;
-			else if (CameraSpeed > MaxCameraSpeed)
-				CameraSpeed = MaxCameraSpeed;
-		}
-		*/
-		m_currentGame->m_playerObject->m_playerController.HandleMouseMove(args);
+		m_currentGame->HandleMouseMove(args);
 	}
 }
 
-void EditorApp::RunGame() {
+void EditorApp::RunGame()
+{
 	m_runtimeMode = RuntimeMode::GAME_MODE;
 
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
 		m_openedProject->Save();
 	}
-	
+	m_worldEditor->m_particleSystem->DisableAllEmitters();
 	m_worldEditor->Pause();
 
 	// Init WorldEditor with all it's passes
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
+	m_currentGame->SetParticleSystem(m_worldEditor->m_renderer->m_particleSystem);
+	m_currentGame->m_particleSystem->Enable();
+	m_currentGame->m_particleSystem->EnableAllEmitters();
 
 	if (m_audioEditor && m_currentGame) {
 		m_audioEditor->SetAudioSystem(m_currentGame->m_audioSystem);
 	}
-	
+
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
 		eastl::wstring scenePath = m_openedProject->GetScenePath();
@@ -540,6 +436,8 @@ void EditorApp::RunGame() {
 	
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
+
+	m_currentGame->m_timer.Reset();
 }
 
 void EditorApp::PauseGame() {
@@ -548,14 +446,19 @@ void EditorApp::PauseGame() {
 
 void EditorApp::ContinueGame() {
 	m_gamePaused = false;
+
+	m_currentGame->m_timer.Reset();
 }
 
 void EditorApp::StopGame() {
 	m_currentGame->Stop();
+	m_currentGame->m_particleSystem->DisableAllEmitters();
+	m_currentGame->m_particleSystem;
 	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
 	if (m_audioEditor) {
 		m_audioEditor->SetAudioSystem(m_editorAudioSystem.get());
 	}
+	m_currentGame->ClearScene();
 	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
 
@@ -563,10 +466,14 @@ void EditorApp::StopGame() {
 	imguiEditorPass->SetVieportGBuffer(
 		m_worldEditor->m_renderer->m_GBuffer.get());
 
+	m_worldEditor->m_renderer->m_particleSystem->SetRenderer(m_worldEditor->m_renderer.get());
+	m_worldEditor->m_lightPass->m_particleSystem = m_worldEditor->m_renderer->m_particleSystem.get();
 	m_worldEditor->Start();
 	// There should be loading scene to world editor (deserializing)
 	// m_currentGame->UnloadScene(...);
 	// m_worldEditor->LoadScene(...);
+
+	m_worldEditor->m_timer.Reset();
 }
 
 void EditorApp::SaveProject()

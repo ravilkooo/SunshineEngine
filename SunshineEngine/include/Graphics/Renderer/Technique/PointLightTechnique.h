@@ -2,12 +2,12 @@
 #include "LightTechnique.h"
 #include "Graphics/Lighting/LightData.h"
 
-#include <Component/TransformComponent.h>
-
 #include <SimpleMath.h>
 
 namespace DXSM = DirectX::SimpleMath;
 namespace DX = DirectX;
+
+class TransformComponent;
 
 namespace SE_G {
     class PointLightTechnique :

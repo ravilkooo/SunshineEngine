@@ -20,14 +20,14 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
-                        0.0,
-                        0.0
+                        12.337416648864746,
+                        0.7354838848114014,
+                        14.042142868041992
                     ],
                     "m_rotation": [
                         0.0,
                         0.0,
-                        0.0
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -37,13 +37,15 @@
                 }
             },
             "m_UUID": 10349756182875634575,
+            "m_UUID_hi": 2409740393,
+            "m_UUID_lo": 3090447247,
             "m_group": "Lighting",
             "m_lightData": {
-                "Power": 0.0,
+                "Power": 0.6000000238418579,
                 "Tint": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
+                    "x": 0.17246757447719574,
+                    "y": 0.20098036527633667,
+                    "z": 0.16058725118637085
                 }
             },
             "m_name": "SkyBox",
@@ -59,8 +61,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "DefaultSkybox.dds"
+                        "assetSource": 1,
+                        "relativePath": "Textures/carpet.dds"
                     }
                 },
                 "Physics": {
@@ -110,14 +112,14 @@
                         1.0
                     ],
                     "m_position": [
-                        -0.20000000298023224,
-                        0.0,
-                        0.0
+                        8.4399995803833,
+                        -1.8700000047683716,
+                        -3.9200000762939453
                     ],
                     "m_rotation": [
-                        0.0,
-                        0.0,
-                        0.0
+                        -1.1623892784118652,
+                        -0.9285151958465576,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -127,6 +129,8 @@
                 }
             },
             "m_UUID": 15551142850770219886,
+            "m_UUID_hi": 3620782599,
+            "m_UUID_lo": 2139337582,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_parent": null,
@@ -149,7 +153,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "football.dds"
+                        "relativePath": "Textures/football.dds"
                     }
                 },
                 "Physics": {
@@ -195,14 +199,14 @@
                         1.0
                     ],
                     "m_position": [
-                        2.799999952316284,
-                        0.0,
-                        0.0
+                        4.9206953048706055,
+                        -3.975027084350586,
+                        -1.203254222869873
                     ],
                     "m_rotation": [
-                        0.0,
-                        -0.0,
-                        -0.0
+                        -0.008438218384981155,
+                        -0.008924972265958786,
+                        7.531134906457737e-05
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -212,12 +216,11 @@
                 }
             },
             "m_UUID": 1179623425869587445,
+            "m_UUID_hi": 274652481,
+            "m_UUID_lo": 2209326069,
             "m_group": "Shapes",
             "m_name": "Sphere",
-            "m_parent": {
-                "attached": false,
-                "uuid": 15551142850770219886
-            },
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -239,7 +242,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
-                        "relativePath": "DefaultSphereTexture.dds"
+                        "relativePath": "Textures/DefaultSphereTexture.dds"
                     }
                 },
                 "Physics": {
@@ -286,12 +289,12 @@
                     ],
                     "m_position": [
                         2.700000047683716,
-                        2.5,
-                        2.4000000953674316
+                        -1.2014492750167847,
+                        10.365477561950684
                     ],
                     "m_rotation": [
                         0.0,
-                        -0.0,
+                        0.0,
                         -0.0
                     ],
                     "m_scaleFactor": [
@@ -302,6 +305,8 @@
                 }
             },
             "m_UUID": 13836700115024532676,
+            "m_UUID_hi": 3221607793,
+            "m_UUID_lo": 3550794948,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -329,7 +334,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
-                        "relativePath": "DefaultSphereTexture.dds"
+                        "relativePath": "Textures/DefaultSphereTexture.dds"
                     }
                 },
                 "Physics": {
@@ -376,8 +381,8 @@
                     ],
                     "m_position": [
                         -1.700000286102295,
-                        2.598076105117798,
-                        0.0
+                        -2.046409845352173,
+                        -3.9318759441375732
                     ],
                     "m_rotation": [
                         0.0,
@@ -392,12 +397,11 @@
                 }
             },
             "m_UUID": 5252445742742597294,
+            "m_UUID_hi": 1222930323,
+            "m_UUID_lo": 170880686,
             "m_group": "Shapes",
             "m_name": "Sphere",
-            "m_parent": {
-                "attached": false,
-                "uuid": 15551142850770219886
-            },
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -419,7 +423,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "pixeleye.dds"
+                        "relativePath": "Textures/pixeleye.dds"
                     }
                 },
                 "Physics": {
@@ -465,13 +469,13 @@
                         1.0
                     ],
                     "m_position": [
-                        -3.200000047683716,
-                        -2.6226831550957286e-07,
-                        0.0
+                        -2.4312281608581543,
+                        -1.903242588043213,
+                        3.6355702877044678
                     ],
                     "m_rotation": [
                         0.0,
-                        -0.0,
+                        3.1415927410125732,
                         -0.0
                     ],
                     "m_scaleFactor": [
@@ -482,6 +486,8 @@
                 }
             },
             "m_UUID": 16981128559790429414,
+            "m_UUID_hi": 3953727092,
+            "m_UUID_lo": 2341246182,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -509,7 +515,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "basketball.dds"
+                        "relativePath": "Textures/basketballskin.dds"
                     }
                 },
                 "Physics": {
@@ -555,14 +561,14 @@
                         1.0
                     ],
                     "m_position": [
-                        -3.052388906478882,
-                        -2.598076343536377,
-                        0.0
+                        -0.6790460348129272,
+                        -3.3411929607391357,
+                        -1.7198560237884521
                     ],
                     "m_rotation": [
                         0.0,
-                        -0.0,
-                        -0.0
+                        -0.39618974924087524,
+                        -0.9791271090507507
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -572,6 +578,8 @@
                 }
             },
             "m_UUID": 2639839029316881779,
+            "m_UUID_hi": 614635420,
+            "m_UUID_lo": 1453657459,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -584,8 +592,8 @@
                     "y": 1.0,
                     "z": 1.0
                 },
-                "SliceCount": 10,
-                "StackCount": 10
+                "SliceCount": 22,
+                "StackCount": 16
             },
             "m_type": "Sphere"
         },
@@ -604,7 +612,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "eye.dds"
+                        "relativePath": "Textures/eye.dds"
                     }
                 },
                 "Physics": {
@@ -656,8 +664,8 @@
                     ],
                     "m_rotation": [
                         0.0,
-                        -0.0,
-                        -0.0
+                        -0.8290314078330994,
+                        -0.9738937020301819
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -667,6 +675,8 @@
                 }
             },
             "m_UUID": 646582510600955799,
+            "m_UUID_hi": 150544222,
+            "m_UUID_lo": 509192087,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -704,14 +714,14 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
-                        0.0,
-                        0.0
+                        1.6642787456512451,
+                        -3.35492205619812,
+                        3.054506778717041
                     ],
                     "m_rotation": [
                         0.0,
                         0.0,
-                        0.0
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -721,12 +731,14 @@
                 }
             },
             "m_UUID": 15350749837127902739,
+            "m_UUID_hi": 3574124965,
+            "m_UUID_lo": 635758099,
             "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
-                    "x": 0.5,
-                    "y": 0.5,
-                    "z": 0.5
+                    "x": 0.6127451062202454,
+                    "y": 0.6127451062202454,
+                    "z": 0.6127451062202454
                 },
                 "AmbientPad": 1.0
             },
@@ -755,14 +767,14 @@
                         1.0
                     ],
                     "m_position": [
-                        -4.5,
-                        0.0,
-                        0.0
+                        6.807260513305664,
+                        -0.8388142585754395,
+                        -5.068036079406738
                     ],
                     "m_rotation": [
                         0.0,
                         0.0,
-                        0.0
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -772,6 +784,8 @@
                 }
             },
             "m_UUID": 6433801847370492395,
+            "m_UUID_hi": 1497986225,
+            "m_UUID_lo": 1136994795,
             "m_group": "Lighting",
             "m_lightData": {
                 "Diffuse": {
@@ -781,13 +795,13 @@
                 },
                 "DiffusePad": 1.0,
                 "Direction": {
-                    "x": 0.8464847207069397,
-                    "y": -0.7504915595054626
+                    "x": 2.2340214252471924,
+                    "y": -0.9686577916145325
                 },
                 "Position": {
-                    "x": -4.5,
-                    "y": 0.0,
-                    "z": 0.0
+                    "x": 6.807260513305664,
+                    "y": -0.8388142585754395,
+                    "z": -5.068036079406738
                 },
                 "Specular": {
                     "x": 0.4901960790157318,
@@ -822,14 +836,14 @@
                         1.0
                     ],
                     "m_position": [
-                        -1.899999976158142,
-                        0.0,
-                        0.0
+                        1.902719497680664,
+                        -1.6404362916946411,
+                        -3.466524124145508
                     ],
                     "m_rotation": [
                         0.0,
                         0.0,
-                        0.0
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -839,29 +853,31 @@
                 }
             },
             "m_UUID": 4259055904536338598,
+            "m_UUID_hi": 991638727,
+            "m_UUID_lo": 2624266406,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
-                    "x": 0.0,
-                    "y": 0.0,
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
                     "z": 0.10000000149011612
                 },
                 "Diffuse": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
+                    "x": 0.9460784196853638,
+                    "y": 0.18223191797733307,
+                    "z": 0.018550556153059006
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": -1.899999976158142,
-                    "y": 0.0,
-                    "z": 0.0
+                    "x": 1.902719497680664,
+                    "y": -1.6404362916946411,
+                    "z": -3.466524124145508
                 },
-                "Range": 51.59644317626953,
+                "Range": 16.5,
                 "Specular": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
+                    "x": 0.9460784196853638,
+                    "y": 0.10202808678150177,
+                    "z": 0.10202808678150177
                 },
                 "SpecularPad": 1.0,
                 "pad": 0.0
@@ -879,8 +895,8 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 1,
-                        "relativePath": "carpet.dds"
+                        "assetSource": 0,
+                        "relativePath": "Textures/PawBgBlue.dds"
                     }
                 },
                 "Physics": {
@@ -888,7 +904,7 @@
                         "settings": {
                             "box": {
                                 "size": [
-                                    100.0,
+                                    98.0999984741211,
                                     0.10000000149011612,
                                     100.0
                                 ]
@@ -947,6 +963,8 @@
                 }
             },
             "m_UUID": 2729350038267267073,
+            "m_UUID_hi": 635476326,
+            "m_UUID_lo": 715032577,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_parent": null,
@@ -969,7 +987,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
-                        "relativePath": "DefaultSphereTexture.dds"
+                        "relativePath": "Textures/DefaultSphereTexture.dds"
                     }
                 },
                 "Physics": {
@@ -1033,6 +1051,8 @@
                 }
             },
             "m_UUID": 2232906597439411555,
+            "m_UUID_hi": 519889080,
+            "m_UUID_lo": 1291883875,
             "m_group": "Shapes",
             "m_name": "Sphere",
             "m_parent": {
@@ -1055,12 +1075,12 @@
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 1,
-                        "relativePath": "plane.obj"
+                        "relativePath": "Meshes/horse.obj"
                     },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "plane_Diffuse.dds"
+                        "relativePath": "Textures/horse_Diffuse.dds"
                     }
                 },
                 "Physics": {
@@ -1106,23 +1126,25 @@
                         1.0
                     ],
                     "m_position": [
-                        4.900000095367432,
-                        2.0,
-                        -2.0
+                        2.1278231143951416,
+                        -2.5661678314208984,
+                        -5.695718288421631
                     ],
                     "m_rotation": [
-                        0.0,
-                        -0.0,
-                        -0.0
+                        1.2699504781110704e-09,
+                        -0.8255407214164734,
+                        4.0153999236736126e-08
                     ],
                     "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        20.0,
+                        20.0,
+                        20.0
                     ]
                 }
             },
-            "m_UUID": 5671762299653499202,
+            "m_UUID": 701588890976834624,
+            "m_UUID_hi": 163351393,
+            "m_UUID_lo": 285791296,
             "m_group": "CustomMesh",
             "m_name": "CustomObject",
             "m_parent": {
@@ -1150,14 +1172,14 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
-                        0.0,
-                        0.0
+                        1.536346673965454,
+                        -2.833113670349121,
+                        1.4966399669647217
                     ],
                     "m_rotation": [
                         0.0,
                         0.0,
-                        0.0
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -1167,11 +1189,13 @@
                 }
             },
             "m_UUID": 13780240543166426970,
+            "m_UUID_hi": 3208462275,
+            "m_UUID_lo": 1591668570,
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
-                    "x": 1.0,
-                    "y": 1.0,
+                    "x": 0.0,
+                    "y": 0.0,
                     "z": 1.0
                 },
                 "Diffuse": {
@@ -1181,9 +1205,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
+                    "x": 1.536346673965454,
+                    "y": -2.833113670349121,
+                    "z": 1.4966399669647217
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -1200,15 +1224,20 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/playerObject_dynamicPhysics.lua",
+                    "selectedLuaFile": 5
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 1,
-                        "relativePath": "horse.obj"
+                        "relativePath": "Meshes/plane.obj"
                     },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "horse_Diffuse.dds"
+                        "relativePath": "Textures/plane_Diffuse.dds"
                     }
                 },
                 "Physics": {
@@ -1216,9 +1245,9 @@
                         "settings": {
                             "box": {
                                 "size": [
-                                    1.0,
-                                    1.0,
-                                    1.0
+                                    2.799999952316284,
+                                    0.4000000059604645,
+                                    3.0999999046325684
                                 ]
                             }
                         },
@@ -1238,7 +1267,7 @@
                     },
                     "m_activation": "Activate",
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Kinematic"
+                    "m_motion": "Dynamic"
                 },
                 "Render": null,
                 "Transform": {
@@ -1258,46 +1287,100 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
-                        0.0,
-                        -4.5
+                        6.729291915893555,
+                        -2.875474214553833,
+                        -7.510225772857666
                     ],
                     "m_rotation": [
-                        0.0,
-                        -3.050835609436035,
-                        0.0
+                        5.802353597594845e-10,
+                        -1.5707963705062866,
+                        -9.279170853915275e-07
                     ],
                     "m_scaleFactor": [
-                        20.0,
-                        20.0,
-                        20.0
+                        2.999999761581421,
+                        3.0,
+                        3.0
                     ]
                 }
             },
             "m_UUID": 1087253342462268591,
+            "m_UUID_hi": 253145895,
+            "m_UUID_lo": 2320618671,
             "m_group": "Player",
             "m_name": "PlayerObject",
             "m_parent": null,
             "settings": {
                 "camera": {
                     "offset": [
-                        0.30000001192092896,
-                        0.0,
-                        0.0
+                        3.299999952316284,
+                        3.0,
+                        -12.699999809265137
                     ],
-                    "stickLength": 14.399999618530273,
-                    "stickPitch": 0.5215044021606445,
+                    "stickLength": 19.399999618530273,
+                    "stickPitch": -0.6841690540313721,
                     "stickYaw": 0.0,
                     "viewPitchYawRoll": [
-                        -0.5057964324951172,
+                        0.0,
                         0.0,
                         0.0
                     ]
-                }
+                },
+                "keyFunctionMappings": [
+                    {
+                        "functionName": "onJump",
+                        "key": 69
+                    },
+                    {
+                        "functionName": "onDown",
+                        "key": 81
+                    },
+                    {
+                        "functionName": "onMoveForward",
+                        "key": 87
+                    },
+                    {
+                        "functionName": "onStrafeLeft",
+                        "key": 65
+                    },
+                    {
+                        "functionName": "onMoveBackward",
+                        "key": 83
+                    },
+                    {
+                        "functionName": "onStrafeRight",
+                        "key": 68
+                    },
+                    {
+                        "functionName": "onTorque",
+                        "key": 49
+                    },
+                    {
+                        "functionName": "onAngularImpulse",
+                        "key": 50
+                    },
+                    {
+                        "functionName": "onJump",
+                        "key": 51
+                    },
+                    {
+                        "functionName": "onInteract",
+                        "key": 52
+                    }
+                ],
+                "luaScript": {
+                    "assetSource": 1,
+                    "relativePath": "Scripts/player_controller_dynamic.lua"
+                },
+                "mouseFunctionMapping": "onLookAround"
             }
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/offsetPosition_dynamicPhysics.lua",
+                    "selectedLuaFile": 4
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -1306,7 +1389,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "eye.dds"
+                        "relativePath": "Textures/eye.dds"
                     }
                 },
                 "Physics": {
@@ -1357,9 +1440,166 @@
                         0.0
                     ],
                     "m_rotation": [
+                        -0.0,
+                        -0.12708641588687897,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        0.9999998807907104,
+                        1.0,
+                        0.9999998807907104
+                    ]
+                }
+            },
+            "m_UUID": 3619104566789212522,
+            "m_UUID_hi": 842638445,
+            "m_UUID_lo": 3161917802,
+            "m_group": "Shapes",
+            "m_name": "Geosphere",
+            "m_parent": null,
+            "m_shapeData": {
+                "NumSubdivisions": 3,
+                "Size": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            },
+            "m_type": "Geosphere"
+        },
+        {
+            "components": {
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
                         0.0,
                         0.0,
                         0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        7.001391887664795,
+                        -3.2035484313964844,
+                        10.120645523071289
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        -3.451276819887994e-09,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        0.9999999403953552,
+                        1.0,
+                        0.9999999403953552
+                    ]
+                }
+            },
+            "emitterData": {
+                "EmissionRate": 10.0,
+                "Emitter": {
+                    "alphaEnd": 0.0,
+                    "alphaStart": 1.0,
+                    "colorEnd": [
+                        0.936274528503418,
+                        0.5387358069419861,
+                        0.5002643465995789
+                    ],
+                    "colorStart": [
+                        0.4215686321258545,
+                        0.48961931467056274,
+                        1.0
+                    ],
+                    "latitudeMax": 1.5707963705062866,
+                    "latitudeMin": -0.7853981852531433,
+                    "longitudeMax": 1.5707963705062866,
+                    "longitudeMin": 0.0,
+                    "maxSpawn": 0,
+                    "particleSizeEnd": 0.800000011920929,
+                    "particleSizeStart": 0.4000000059604645,
+                    "particlesBaseSpeed": 6.0,
+                    "particlesLifeSpan": 1.0,
+                    "particlesMass": 1.0,
+                    "position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "rotMatrix": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                },
+                "MaxParticles": 1024,
+                "Simulate": {
+                    "force": [
+                        0.0,
+                        -10.0,
+                        0.0
+                    ]
+                },
+                "Texture": {
+                    "assetSource": 0,
+                    "relativePath": "Textures/primogem.dds"
+                }
+            },
+            "m_UUID": 18132964941149930345,
+            "m_UUID_hi": 4221909898,
+            "m_UUID_lo": 2581234537,
+            "m_group": "ParticleEmitter",
+            "m_name": "ParticleEmitter",
+            "m_parent": null
+        },
+        {
+            "components": {
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -10.13733196258545,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -1368,19 +1608,74 @@
                     ]
                 }
             },
-            "m_UUID": 3619104566789212522,
-            "m_group": "Shapes",
-            "m_name": "Geosphere",
-            "m_parent": null,
-            "m_shapeData": {
-                "NumSubdivisions": 5,
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
+            "emitterData": {
+                "EmissionRate": 10.0,
+                "Emitter": {
+                    "alphaEnd": 1.0,
+                    "alphaStart": 1.0,
+                    "colorEnd": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "colorStart": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "latitudeMax": 0.3141592741012573,
+                    "latitudeMin": -0.3141592741012573,
+                    "longitudeMax": 6.2831854820251465,
+                    "longitudeMin": 0.0,
+                    "maxSpawn": 0,
+                    "particleSizeEnd": 0.5,
+                    "particleSizeStart": 0.20000000298023224,
+                    "particlesBaseSpeed": 8.0,
+                    "particlesLifeSpan": 3.0,
+                    "particlesMass": 1.0,
+                    "position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "rotMatrix": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                },
+                "MaxParticles": 4096,
+                "Simulate": {
+                    "force": [
+                        0.0,
+                        -5.0,
+                        0.0
+                    ]
+                },
+                "Texture": {
+                    "assetSource": 0,
+                    "relativePath": "Textures/DefaultTexture.dds"
                 }
             },
-            "m_type": "Geosphere"
+            "m_UUID": 3591371132865286047,
+            "m_UUID_hi": 836181252,
+            "m_UUID_lo": 1996951455,
+            "m_group": "ParticleEmitter",
+            "m_name": "ParticleEmitter2",
+            "m_parent": null
         }
     ]
 }

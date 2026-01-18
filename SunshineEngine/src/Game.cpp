@@ -1,16 +1,30 @@
 #include "Game.h"
 #include <fstream>   // std::ofstream
-#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 #include <PlayerObject/PlayerObject.h>
+
+#include <Scene.h>
+
+#include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/ParticleEmitter.h>
+
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 Game::Game()
 {
-	//Initialize();
+	// Initialize();
+	m_timer = GameTimer();
 }
 
 Game::~Game()
 {
-	// Освобождение ресурсов
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+}
+
+void Game::ClearScene()
+{
+	Scene::GetInstance().ClearScene();
 }
 
 void Game::SetupRendering(
@@ -25,7 +39,11 @@ void Game::SetupRendering(
 		"GameDeferred", renderSystem->GetDevice(),
 		renderSystem->GetDeviceContext(),
 		m_screenWidth, m_screenHeight);
-
+	/*
+	this->m_renderer->InitParticleSystem();
+	this->m_particleSystem = this->m_renderer->m_particleSystem.get();
+	*/
+	
 	{
 		m_gPass = static_cast<SE_G::GPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::GPass>(
@@ -39,14 +57,21 @@ void Game::SetupRendering(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
+
+		//m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 	}
+}
+
+void Game::SetParticleSystem(eastl::shared_ptr <SE::ParticleSystem> ps)
+{
+	this->m_renderer->SetParticleSystem(ps);
+	this->m_particleSystem = m_renderer->m_particleSystem.get();
+	this->m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 }
 
 void Game::SetupPhysics()
 {
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
-	// For Volodya
-	//m_tracingSystem = eastl::make_unique<TracingSystem>();
 }
 
 bool Game::LoadScene(const wchar_t* scenePath)
@@ -58,7 +83,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	}
 	json j;
 	try {
-		file >> j; // прочитать json из файла
+		file >> j; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ json пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	}
 	catch (const std::exception& e) {
 		//LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()));
@@ -66,8 +91,8 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	}
 
 	SetupPhysics();
-	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
-	m_playerObject = m_scene->m_playerObject;
+	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
+	m_playerObject = Scene::GetInstance().m_playerObject;
 	/*
 	if (!loadedScene) {
 		LOG_EDITOR_ERROR("Scene load error\n");
@@ -78,10 +103,10 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	// For Volodya
 	/*
-	auto m_uuid0 = m_scene->gameObjects[0];
-	auto m_gobj0 = m_scene->GetGameObjectByUUID(m_uuid0);
-	auto m_uuid1 = m_scene->gameObjects[1];
-	auto m_gobj1 = m_scene->GetGameObjectByUUID(m_uuid1);
+	auto m_uuid0 = Scene::GetInstance().gameObjects[0];
+	auto m_gobj0 = Scene::GetInstance().GetGameObjectByUUID(m_uuid0);
+	auto m_uuid1 = Scene::GetInstance().gameObjects[1];
+	auto m_gobj1 = Scene::GetInstance().GetGameObjectByUUID(m_uuid1);
 
 	TracedBody* tb0 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
 
@@ -121,12 +146,11 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 bool Game::LoadGAIScene()
 {
-	auto scene = eastl::make_shared<Scene>();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	
 	if (!m_audioSystem) {
@@ -138,12 +162,11 @@ bool Game::LoadGAIScene()
 
 bool Game::LoadDefaultScene()
 {
-	auto scene = eastl::make_shared<Scene>();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	
 	if (!m_audioSystem) {
@@ -155,12 +178,12 @@ bool Game::LoadDefaultScene()
 
 bool Game::LoadParentScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	
 	if (!m_audioSystem) {
@@ -172,12 +195,12 @@ bool Game::LoadParentScene()
 
 bool Game::LoadLuaScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	
 	if (!m_audioSystem) {
@@ -189,12 +212,12 @@ bool Game::LoadLuaScene()
 
 bool Game::LoadResourcesScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	
 	if (!m_audioSystem) {
@@ -216,10 +239,12 @@ void Game::SetUpAudio()
 
 void Game::Start() {
 	m_renderer->Enable();
+	m_particleSystem->Enable();
 }
 
 void Game::Stop() {
 	m_renderer->Disable();
+	m_particleSystem->Disable();
 }
 
 void Game::Run()
@@ -283,20 +308,18 @@ void Game::Run()
 
 void Game::Update(float deltaTime) {
 
-	 m_luaManager.Update(m_scene.get(), deltaTime);
-	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	 m_physicsSystem->Step(deltaTime);
 
-	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
-	 
-	 // For Volodya
-	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
-}
+	 m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance());
 
-void Game::Render()
-{
-	// m_renderer->RenderScene(m_scene);
+	 if (m_particleSystem)
+		 m_particleSystem->Update(deltaTime);
+
+	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+
+	 m_renderer->GetMainCamera()->Update(deltaTime);
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
@@ -320,4 +343,20 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_screenHeight = resizeHeight;
 
 	m_renderer->OnResize(resizeWidth, resizeHeight);
+}
+
+
+void Game::HandleKeyDown(Keys key)
+{
+	m_playerObject->m_playerController.HandleKeyDown(key);
+}
+
+void Game::HandleKeyUp(Keys key)
+{
+	m_playerObject->m_playerController.HandleKeyUp(key);
+}
+
+void Game::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
+{
+	m_playerObject->m_playerController.HandleMouseMove(args);
 }

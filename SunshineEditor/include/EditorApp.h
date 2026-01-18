@@ -25,21 +25,19 @@
 #include <GameTimer.h>
 #include <Game.h>
 
-#include <Project.h>
 #include <WorldEditor.h>
-#include <ImguiEditorPass.h>
-#include <Audio/AudioEditor.h>
 
-enum class MoveKey
+#include <UI/ProjectSelector.h>
+//#include <Audio/AudioEditor.h>
+
+
+class ImguiEditorPass;
+
+namespace SE
 {
-    W,
-    S, 
-    D, 
-    A,
-    E, 
-    Q 
-};
+    class Project;
 
+}
 struct Ray
 {
     DX::XMVECTOR Origin;
@@ -72,6 +70,8 @@ public:
 
     void RunApp();
 
+    void InitResourceLoaders(ID3D11Device* device);
+
     void RunGame();
     void StopGame();
 
@@ -90,10 +90,10 @@ public:
     eastl::shared_ptr<SE_G::RenderingSystem> m_renderingSystem;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;
-    SE::Project* m_openedProject;
+    SE::Project* m_openedProject = nullptr;
     eastl::unique_ptr<Game> m_currentGame;
 
-    GameTimer m_timer;
+    //GameTimer m_timer;
 
     float m_deltaTime = 0.0f;
 
@@ -106,32 +106,19 @@ public:
     bool m_gamePaused = false;
 
 private:
-    // Camera movings
     void HandleKeyDown(Keys key);
     void HandleKeyUp(Keys key);
-
     void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
-
-    bool MovingPressed[6] = { false };
-
-    float CameraSpeed = 20.0f;
-    float const MaxCameraSpeed = 100.0f;
-    float const MinCameraSpeed = 10.0f;
-    float const CameraSpeedStep = 10.0f;
-
-    bool IsRightMousePressed = false;
-
-    float const CameraRotateSpeed = 0.5f;
 
     bool is_layout_initialized = false;
 
     eastl::unique_ptr<SE_G::RenderGroup> m_imguiRenderGroup;
-    ImguiEditorPass* imguiEditorPass;
+    ImguiEditorPass* imguiEditorPass = nullptr;
     bool m_initialized = false;
 
     bool m_projectSelected = false;
-    eastl::unique_ptr<AudioEditor> m_audioEditor;
-    std::unique_ptr<AudioSystem> m_editorAudioSystem;
+    //eastl::unique_ptr<AudioEditor> m_audioEditor;
+    //std::unique_ptr<AudioSystem> m_editorAudioSystem;
 
 private:
     // Only for testing
