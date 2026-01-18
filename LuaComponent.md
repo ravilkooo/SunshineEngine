@@ -1314,3 +1314,43 @@ local vec = {
 ---
 
 *Documentation is current for engine version with Lua bindings via sol2*
+
+---
+
+## GameObject & Scene Helpers
+
+The engine exposes a small set of helpers for working with game objects and their UUIDs from Lua.
+
+### `GameObject:getUUID()`
+
+- **Returns:** `UUID` (an `SE::UUIDhilo` wrapper with numeric fields `hi` and `lo`)
+- Use `id:toString()` to get a human-readable UUID string.
+- The `UUID` is a 32-bit split representation (`hi` / `lo`) to avoid precision loss in Lua numbers.
+
+Example:
+
+```lua
+local id = gameObject:getUUID()
+print("UUID hi=", id.hi, "lo=", id.lo)
+print("UUID string:", id:toString())
+```
+
+### Scene helpers
+
+- `removeGameObjectByUUID(uuid)` — remove a game object (and its children) from the active scene. Accepts a `UUID` (hi/lo) value.
+- `getGameObjectByUUID(uuid)` — returns the `GameObject` instance for the given `UUID`, or `nil` if not found.
+
+Examples:
+
+```lua
+-- Remove an object by UUID
+local id = gameObject:getUUID()
+removeGameObjectByUUID(id)
+
+-- Find an object by UUID and access its transform
+local other = getGameObjectByUUID(id)
+if other then
+    local t = other:getTransform()
+    print("Found object position:", t.m_position.x, t.m_position.y, t.m_position.z)
+end
+```
