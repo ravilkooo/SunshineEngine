@@ -26,7 +26,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 if (MSVC)
     # Match VS default: Unicode build, no min/max macro pollution
     add_compile_definitions(UNICODE _UNICODE NOMINMAX)
-    #add_compile_options(/MP)
+    add_compile_options(/MP)
 endif()
 
 # Engine (DLL)
