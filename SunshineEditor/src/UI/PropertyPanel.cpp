@@ -93,18 +93,44 @@ bool PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
     ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 120);
     if (ImGui::Button("Remove Object", ImVec2(110, 0)))
     {
-        if (m_WorldEditor && m_WorldEditor->m_scene)
+        if (m_WorldEditor && m_WorldEditor->m_scene && m_WorldEditor->m_scene->m_sceneGraph)
         {
             SE::UUID objUUID = obj->m_UUID;
             
-            // Remove from scene hierarchy
-            if (m_WorldEditor->m_scene->m_sceneGraph)
+            // Collect all UUIDs in the subtree (including root)
+            eastl::vector<SE::UUID> toRemove;
+            eastl::vector<SE::UUID> stack;
+            stack.push_back(objUUID);
+            
+            while (!stack.empty())
             {
-                m_WorldEditor->m_scene->m_sceneGraph->EraseSubtree(objUUID);
+                SE::UUID current = stack.back();
+                stack.pop_back();
+                toRemove.push_back(current);
+                
+                // Find node in scene graph
+                auto it = m_WorldEditor->m_scene->m_sceneGraph->m_byObjUUID.find(current);
+                if (it != m_WorldEditor->m_scene->m_sceneGraph->m_byObjUUID.end())
+                {
+                    int nodeIdx = it->second;
+                    const auto& node = m_WorldEditor->m_scene->m_sceneGraph->m_nodes[nodeIdx];
+                    
+                    // Add all children to stack
+                    for (SE::UUID childUUID : node.children)
+                    {
+                        stack.push_back(childUUID);
+                    }
+                }
             }
             
-            // Remove from scene
-            m_WorldEditor->m_scene->RemoveGameObjectByUUID(objUUID);
+            // Remove from scene hierarchy first
+            m_WorldEditor->m_scene->m_sceneGraph->EraseSubtree(objUUID);
+            
+            // Remove all collected objects from scene
+            for (SE::UUID uuid : toRemove)
+            {
+                m_WorldEditor->m_scene->RemoveGameObjectByUUID(uuid);
+            }
             
             // Clear selection
             m_WorldEditor->m_hierarchySelection.picked.clear();
