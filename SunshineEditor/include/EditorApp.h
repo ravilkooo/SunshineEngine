@@ -28,7 +28,7 @@
 #include <WorldEditor.h>
 
 #include <UI/ProjectSelector.h>
-//#include <Audio/AudioEditor.h>
+#include <Audio/AudioEditor.h>
 
 
 class ImguiEditorPass;
@@ -127,8 +127,8 @@ private:
     bool m_initialized = false;
 
     bool m_projectSelected = false;
-    //eastl::unique_ptr<AudioEditor> m_audioEditor;
-    //std::unique_ptr<AudioSystem> m_editorAudioSystem;
+    eastl::unique_ptr<AudioEditor> m_audioEditor;
+    std::unique_ptr<AudioSystem> m_editorAudioSystem;
 
 private:
     // Only for testing
