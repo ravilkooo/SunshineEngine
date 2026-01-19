@@ -1356,7 +1356,7 @@
                         "key": 68
                     },
                     {
-                        "functionName": "onTorque",
+                        "functionName": "onAngularImpulse_inv",
                         "key": 49
                     },
                     {
@@ -1365,7 +1365,7 @@
                     },
                     {
                         "functionName": "onJump",
-                        "key": 51
+                        "key": 32
                     },
                     {
                         "functionName": "onInteract",
