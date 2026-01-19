@@ -827,13 +827,59 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
             return;
         }
 
+
+        /*
         uint32_t luaScriptIndex = luaInfo->selectedLuaFile;
         if (DrawUIntControl("Lua Script Index", luaScriptIndex, 10, 1.0f))
         {
             luaInfo->selectedLuaFile = luaScriptIndex;
             luaInfo->InitLuaFile();
             ImGui::Text(luaInfo->scriptPath.c_str());
-        }        
+        }
+        */
+        
+        LuaComponent_Info::ScanLuaFiles();
+        eastl::vector<eastl::string> comboItems;
+        comboItems.reserve(LuaComponent_Info::luaFiles.size() + 1);
+
+        // First entry = None
+        comboItems.push_back(eastl::string("None"));
+
+        int currentIndex = 0; // default to None
+        for (int i = 0; i < (int)LuaComponent_Info::luaFiles.size(); ++i) {
+            AssetPath scriptPath = LuaComponent_Info::luaFiles[i];
+            char buf[512];
+            if (scriptPath.m_assetRelativePath != L"")
+                snprintf(buf, sizeof(buf), WStringToUtf8(scriptPath.m_assetRelativePath).c_str());
+            else
+                snprintf(buf, sizeof(buf), "Unknown");
+            comboItems.push_back(eastl::string(buf));
+
+            if (scriptPath == luaInfo->scriptPath) currentIndex = i + 1; // +1 because of None at 0
+        }
+
+        ImGui::Text("Lua script:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(-FLT_MIN);
+
+        const char* preview = comboItems.size() > 0 ? comboItems[currentIndex].c_str() : "None";
+        if (ImGui::BeginCombo("##LuaCombo", preview)) {
+            for (int i = 0; i < (int)comboItems.size(); ++i) {
+                bool selected = (i == currentIndex);
+                if (ImGui::Selectable(comboItems[i].c_str(), selected)) {
+                    if (i == 0) {
+                        luaInfo->scriptPath.m_assetRelativePath = L"";
+                    }
+                    else {
+                        luaInfo->scriptPath = LuaComponent_Info::luaFiles[i - 1];
+                    }
+                    currentIndex = i;
+                }
+                if (selected) ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();

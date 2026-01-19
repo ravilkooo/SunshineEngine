@@ -409,21 +409,22 @@ void PhysicsComponent::FromJson(const json& j) {
 json LuaComponent_Info::ToJson() const {
     json j;
     j = nlohmann::json{
-        {"scriptPath", std::string{scriptPath.c_str()}},
-        {"selectedLuaFile", selectedLuaFile},
+        {"scriptPath", scriptPath.ToJson() },
+        // {"selectedLuaFile", selectedLuaFile},
         {"scriptLoaded", scriptLoaded}
     };
     return j;
 }
 
 void LuaComponent_Info::FromJson(const json& j) {
-    if (j.contains("scriptPath") && j["scriptPath"].is_string()) {
-        std::string stdPath = j.at("scriptPath").get<std::string>();
-        scriptPath = eastl::string(stdPath.c_str());
+    if (j.contains("scriptPath")) {
+		scriptPath.FromJson(j["scriptPath"]);
+        // std::string stdPath = j.at("scriptPath").get<std::string>();
+        // scriptPath = eastl::string(stdPath.c_str());
     }
-    if (j.contains("selectedLuaFile") && j["selectedLuaFile"].is_number()) {
-        selectedLuaFile = j.at("selectedLuaFile").get<int>();
-    }
+    // if (j.contains("selectedLuaFile") && j["selectedLuaFile"].is_number()) {
+    //     selectedLuaFile = j.at("selectedLuaFile").get<int>();
+    // }
     if (j.contains("scriptLoaded") && j["scriptLoaded"].is_boolean()) {
         scriptLoaded = j.at("scriptLoaded").get<bool>();
     }
@@ -434,7 +435,7 @@ void LuaComponent::FromJson(const json& j, GameObject* obj) {
     LuaComponent_Info info;
     info.FromJson(j);
 
-    if (!info.scriptPath.empty()) {
+    if (!info.scriptPath.m_assetRelativePath.empty()) {
         Init(obj, info.scriptPath);
     }
 }

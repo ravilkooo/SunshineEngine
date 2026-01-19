@@ -234,6 +234,13 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/jumpUp_dynamicPhysics.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -417,8 +424,10 @@
             "components": {
                 "Lua": {
                     "scriptLoaded": true,
-                    "scriptPath": "D:/Studyspace/Sunshine/Projects/DefaultScene/Scripts/jumpUp_dynamicPhysics.lua",
-                    "selectedLuaFile": 0
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/jumpUp_dynamicPhysics.lua"
+                    }
                 },
                 "Mesh": {
                     "Mesh": {
@@ -606,8 +615,10 @@
             "components": {
                 "Lua": {
                     "scriptLoaded": true,
-                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/MonoBehavior.lua",
-                    "selectedLuaFile": 2
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/MonoBehavior.lua"
+                    }
                 },
                 "Mesh": {
                     "Mesh": {
@@ -1235,8 +1246,10 @@
             "components": {
                 "Lua": {
                     "scriptLoaded": true,
-                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/playerObject_dynamicPhysics.lua",
-                    "selectedLuaFile": 5
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/playerObject_dynamicPhysics.lua"
+                    }
                 },
                 "Mesh": {
                     "Mesh": {
@@ -1387,8 +1400,10 @@
             "components": {
                 "Lua": {
                     "scriptLoaded": true,
-                    "scriptPath": "D:/Studyspace/Sunshine/SunshineEngine/Assets/Scripts/offsetPosition_dynamicPhysics.lua",
-                    "selectedLuaFile": 4
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/offsetPosition_dynamicPhysics.lua"
+                    }
                 },
                 "Mesh": {
                     "Mesh": {
@@ -1801,8 +1816,10 @@
             "components": {
                 "Lua": {
                     "scriptLoaded": true,
-                    "scriptPath": "D:/Studyspace/Sunshine/Projects/DefaultScene/Scripts/emitter.lua",
-                    "selectedLuaFile": 0
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/emitter.lua"
+                    }
                 },
                 "Mesh": {
                     "Mesh": {
@@ -1924,7 +1941,7 @@
                     "m_position": [
                         -6.287438736762851e-05,
                         1.6411066055297852,
-                        0.0011339187622070313
+                        0.15632057189941406
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1944,6 +1961,79 @@
             "m_group": "ParticleEmitter",
             "m_name": "ParticleEmitter",
             "m_parent": null
+        },
+        {
+            "components": {
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        6.287438736762851e-05,
+                        1.3430403470993042,
+                        2.1386988162994385
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 16716278908812768401,
+            "m_UUID_hi": 3892061977,
+            "m_UUID_lo": 3592664209,
+            "m_group": "Lighting",
+            "m_lightData": {
+                "Att": {
+                    "x": 0.10000000149011612,
+                    "y": 0.10000000149011612,
+                    "z": 0.10000000149011612
+                },
+                "Diffuse": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "DiffusePad": 1.0,
+                "Position": {
+                    "x": 6.287438736762851e-05,
+                    "y": 1.3430403470993042,
+                    "z": 2.1386988162994385
+                },
+                "Range": 20.0,
+                "Specular": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SpecularPad": 1.0,
+                "pad": 0.0
+            },
+            "m_name": "PointLight",
+            "m_parent": {
+                "attached": true,
+                "uuid": 10670304525947875631
+            },
+            "m_type": "PointLight"
         }
     ]
 }
