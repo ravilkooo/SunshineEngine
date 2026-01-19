@@ -251,6 +251,7 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
         
         DrawVector3Control("Scale", transform->m_scaleFactor, 1.0f);
         
+        /*
         if (ImGui::TreeNode("Local Transform"))
         {
             DrawVector3Control("Local Position", transform->m_localPosition, 0.0f);
@@ -265,6 +266,7 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
             
             ImGui::TreePop();
         }
+        */
         
         ImGui::TreePop();
     }
@@ -1289,6 +1291,23 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     if (!assigned) {
         ImGui::TextDisabled("(mesh component not initialized)");
         return;
+    }
+
+    if (ImGui::TreeNode("Mesh Transform"))
+    {
+        auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+
+        DrawVector3Control("Mesh Offset", transform->m_localPosition, 0.0f);
+
+        DXSM::Vector3 localRotDeg = transform->m_localRotation * (180.0f / DirectX::XM_PI);
+        if (DrawVector3Control("Mesh Rotation", localRotDeg, 0.0f))
+        {
+            transform->m_localRotation = localRotDeg * (DirectX::XM_PI / 180.0f);
+        }
+
+        DrawVector3Control("Mesh Scale", transform->m_localScaleFactor, 1.0f);
+
+        ImGui::TreePop();
     }
 
     auto meshPtr = assigned->GetMesh();

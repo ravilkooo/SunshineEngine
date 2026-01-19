@@ -162,6 +162,8 @@ namespace SE_G {
 
 			m_camera->BindBuffer(context.Get());
 
+			transformComponent->EnableMeshTransformMode();
+
 			transformComponent->BindToGraphicsPipeline(
 				GetDeviceContext()
 			);
@@ -226,6 +228,7 @@ namespace SE_G {
 
 				transformComponent->m_localScaleFactor = actualLocalScaleFactor;
 			}
+			transformComponent->DisableMeshTransformMode();
 		}
 
 		context->OMSetDepthStencilState(nullptr, 0);

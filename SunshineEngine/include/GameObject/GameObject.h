@@ -184,7 +184,7 @@ public:
         auto tc = GetComponent<TransformComponent>();
         auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix().Invert(); // *XMMatrixInverse(nullptr, Matrix::CreateScale(1 / ball->radius) * ball->worldMat);
+        DXSM::Matrix newTransform = tc_parent->GetWorldMatrix().Invert(); // *XMMatrixInverse(nullptr, Matrix::CreateScale(1 / ball->radius) * ball->worldMat);
 
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
@@ -464,7 +464,7 @@ public:
         auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
         auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix().Invert(); // *XMMatrixInverse(nullptr, Matrix::CreateScale(1 / ball->radius) * ball->worldMat);
+        DXSM::Matrix newTransform = tc_parent->GetWorldMatrix().Invert(); // *XMMatrixInverse(nullptr, Matrix::CreateScale(1 / ball->radius) * ball->worldMat);
 
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
