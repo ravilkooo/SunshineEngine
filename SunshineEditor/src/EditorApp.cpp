@@ -40,12 +40,12 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_editorAudioSystem = std::make_unique<AudioSystem>();
 	// m_audioEditor = eastl::make_unique<AudioEditor>(nullptr);
 	m_audioEditor = eastl::make_unique<AudioEditor>(m_editorAudioSystem.get());
-	//delete these?????????
 	eastl::wstring configPathW = JoinWchar_Wstring(EDITOR_ASSETS_DIR, L"Config/audio_tracks.json");
 	std::wstring stdPathW(configPathW.c_str());
 	std::string configPathStr(stdPathW.begin(), stdPathW.end());
-	// these helpers!
 	m_audioEditor->LoadFromJson(configPathStr);
+	
+	UINT worldEditorWidth = winWidth / 2;
 	
 	UINT worldEditorWidth = winWidth / 2;
 	UINT worldEditorHeight = winHeight / 2;
@@ -88,8 +88,6 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	imguiEditorPass->SetVieportGBuffer(
 		m_worldEditor->m_renderer->m_GBuffer.get());
 
-	imguiEditorPass->SetAudioEditor(m_audioEditor.get());
-
 	m_initialized = true;
 
 	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
@@ -114,19 +112,19 @@ void EditorApp::RunApp()
 {
 	SE::Project::SetWorldEditor(m_worldEditor.get());
 
-	float physicsUpdateFPS = 120.0f;
-	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
-	float accumulator = 0.0f;
-	float accumulatorLimit = 4.0f * physicsUpdateMs;
+	// Fixed timestep physics update
+	physicsUpdateFPS = 120.0f;
+	physicsUpdateMs = 1.0f / physicsUpdateFPS;
+	accumulator = 0.0f;
+	accumulatorLimit = 4.0f * physicsUpdateMs;
+
+	// FPS statitistic
+	frameCount = 0;
+	FPSstatisticTimer = 0;
 
 	MSG msg = {};
 	bool isExitRequested = false;
-
-	// FPS statitistic
-	unsigned int frameCount = 0;
-	float FPSstatisticTimer = 0;
-
-
+	
 	while (!isExitRequested) {
 		// Handle the windows messages.
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -272,7 +270,7 @@ void EditorApp::UpdateEditor(float deltaTime)
 	if (m_audioEditor) {
 		m_audioEditor->Update(deltaTime, EDITOR_ASSETS_DIR);
 	}
-	
+
 	if (!imguiEditorPass->IsFocusedGameViewport)
 	{
 		// Reset input state when not focused
@@ -393,14 +391,14 @@ void EditorApp::RunGame()
 	m_currentGame = eastl::make_unique<Game>();
 	m_currentGame->SetupRendering(m_renderingSystem,
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
-	m_currentGame->SetParticleSystem(m_worldEditor->m_renderer->m_particleSystem);
-	m_currentGame->m_particleSystem->Enable();
+	// m_currentGame->SetParticleSystem(m_worldEditor->m_renderer->m_particleSystem);
+	
 	m_currentGame->m_particleSystem->EnableAllEmitters();
 
 	if (m_audioEditor && m_currentGame) {
 		m_audioEditor->SetAudioSystem(m_currentGame->m_audioSystem);
 	}
-
+	
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
 		eastl::wstring scenePath = m_openedProject->GetScenePath();
@@ -430,12 +428,23 @@ void EditorApp::RunGame()
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
 
 	if (m_audioEditor && m_currentGame) {
-		if (m_currentGame->m_audioSystem)
 			m_audioEditor->SetAudioSystem(m_currentGame->m_audioSystem);
 	}
 	
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
+
+	m_deltaTime = 0.0f;
+
+	accumulator = 0.0f;
+	accumulatorLimit = 4.0f * physicsUpdateMs;
+
+	// FPS statitistic
+	frameCount = 0;
+	FPSstatisticTimer = 0;
+
+	m_currentGame->m_particleSystem->Enable();
+	m_currentGame->m_particleSystem->EnableAllEmitters();
 
 	m_currentGame->m_timer.Reset();
 }
@@ -460,6 +469,8 @@ void EditorApp::StopGame() {
 	}
 	m_currentGame->ClearScene();
 	m_currentGame.reset(NULL);
+	m_currentGame->ClearScene();
+	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
 
 	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
@@ -472,6 +483,15 @@ void EditorApp::StopGame() {
 	// There should be loading scene to world editor (deserializing)
 	// m_currentGame->UnloadScene(...);
 	// m_worldEditor->LoadScene(...);
+
+	m_deltaTime = 0.0f;
+
+	accumulator = 0.0f;
+	accumulatorLimit = 4.0f * physicsUpdateMs;
+
+	// FPS statitistic
+	frameCount = 0;
+	FPSstatisticTimer = 0;
 
 	m_worldEditor->m_timer.Reset();
 }

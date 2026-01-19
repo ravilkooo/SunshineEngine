@@ -2,7 +2,7 @@
 #include <Graphics/Renderer/Pass/EmitterDebugPass.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
 
-#include <ParticleSystem/ParticleEmitter.h>
+#include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Utils/StringUtils.h>
 

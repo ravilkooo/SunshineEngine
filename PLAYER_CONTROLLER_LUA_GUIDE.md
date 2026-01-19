@@ -337,6 +337,69 @@ end
 
 ---
 
+---
+
+## UUID & Scene Helpers
+
+The engine exposes a `UUID` usertype (implemented as `SE::UUIDhilo`) for safe 32-bit access from Lua. This represents a 64-bit UUID split into two 32-bit integers to avoid precision loss in Lua numbers.
+
+### `UUID` (`SE::UUIDhilo`)
+
+- Fields: `hi` (uint32), `lo` (uint32)
+- Methods: `toString()` — returns the full UUID as a string
+- Comparison: `isEqual(other)` — compares `hi` and `lo` fields
+
+Example:
+
+```lua
+local id = UUID() -- constructor
+id.hi = 12345
+id.lo = 67890
+print(id:toString())
+```
+
+### `PlayerObject` and `GameObject` UUID access
+
+Both `PlayerObject` and `GameObject` expose a `getUUID()` method which returns the `UUID` (`SE::UUIDhilo`) representing the object's identifier. `PlayerObject` also exposes `getName()`.
+
+Example:
+
+```lua
+local pid = player:getUUID()
+print("Player UUID:", pid:toString())
+print("Player name:", player:getName())
+```
+
+For any `GameObject` (base type) the following getters are available (component getters shown here as examples):
+
+```lua
+local t = gameObject:getTransform()   -- returns TransformComponent
+local p = gameObject:getPhysics()     -- returns PhysicsComponent (if present)
+local name = gameObject:getName()      -- object name (string)
+local id = gameObject:getUUID()        -- returns UUID (hi/lo)
+```
+
+### Scene helpers
+
+- `removeGameObjectByUUID(uuid)` — remove a game object (and its children) from the active scene; accepts a `UUID` (hi/lo) value.
+- `getGameObjectByUUID(uuid)` — returns the `GameObject` instance for the given `UUID`, or `nil` if not found.
+
+Examples:
+
+```lua
+-- Remove an object by UUID
+local id = someObject:getUUID()
+removeGameObjectByUUID(id)
+
+-- Find an object by UUID and access its transform
+local other = getGameObjectByUUID(id)
+if other then
+    local t = other:getTransform()
+    print("Found object position:", t.position.x, t.position.y, t.position.z)
+end
+```
+
+
 ## Common Patterns
 
 ### Static Movement (Kinematic)

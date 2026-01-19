@@ -20,7 +20,7 @@
 #include <PlayerObject/PlayerObject.h>
 
 #include <ParticleSystem/ParticleSystem.h>
-#include <ParticleSystem/ParticleEmitter.h>
+#include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Utils/Camera.h>
@@ -493,7 +493,8 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::RENDER:    key = "Render"; break;
             case SE::ComponentType::PHYSICS:   key = "Physics"; break;
             case SE::ComponentType::LUA:       key = "Lua"; break;
-            case SE::ComponentType::MESH:       key = "Mesh"; break;
+            case SE::ComponentType::MESH:      key = "Mesh"; break;
+            case SE::ComponentType::PARTICLE_EMITTER:      key = "ParticleEmitter"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -683,7 +684,8 @@ void Scene::FromJson(
             }
             case GameObjectGroup::ParticleEmitter:
             {
-                go = SE::ParticleEmitter::FromJson(objJ, renderSystem->m_particleSystem.get());
+                go = GameObjectFactory::CreateParticleEmitter(
+                    renderSystem->m_particleSystem.get(), objJ);
 
                 break;
             }
@@ -825,7 +827,8 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
             }
             case GameObjectGroup::ParticleEmitter:
             {
-                go = SE::ParticleEmitter_Info::FromJson(objJ, renderSystem->m_particleSystem.get());
+                go = EditorObjectFactory::CreateParticleEmitter(
+                    renderSystem->m_particleSystem.get(), objJ);
                     
                 break;
             }

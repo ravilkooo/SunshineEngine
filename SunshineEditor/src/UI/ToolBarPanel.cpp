@@ -4,7 +4,6 @@
 #include <Utils/StringUtils.h>
 #include <EditorApp.h>
 #include <GameObject/EditorObjectFactory.h>
-#include <ParticleSystem/ParticleEmitter.h>
 #include <SceneHierarchy.h>
 
 #include "Utils/FileDialogManager.h"

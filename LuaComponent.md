@@ -638,6 +638,273 @@ end
 
 ---
 
+## ParticleEmitterComponent
+
+The particle emitter component manages particle systems for visual effects. It allows you to control emission rates, enable/disable emission, set particle spawn positions and directions, and manage the overall behavior of particle systems.
+
+### Getting the Component
+
+```lua
+local emitter = self.owner:getParticleEmitter()
+```
+
+**Note:** ParticleEmitterComponent must be previously added to the game object in the editor or through code.
+
+### Methods
+
+#### Emission Control
+
+##### `setEmissionRate(emissionRate)`
+
+Sets the rate at which particles are emitted.
+
+```lua
+emitter:setEmissionRate(100.0)  -- Emit 100 particles per unit time
+```
+
+**Parameters:**
+- `emissionRate` (float): Particles per unit time
+
+##### `enableEmission()`
+
+Enables particle emission.
+
+```lua
+emitter:enableEmission()
+```
+
+##### `disableEmission()`
+
+Disables particle emission. Previously emitted particles continue to live and update.
+
+```lua
+emitter:disableEmission()
+```
+
+##### `isEnabled()`
+
+Checks if the emitter is currently emitting particles.
+
+```lua
+local isEmitting = emitter:isEnabled()
+if isEmitting then
+    print("Particles are being emitted")
+end
+```
+
+**Returns:** boolean - `true` if emission is active, `false` otherwise
+
+#### Emission Rate Adjustment
+
+##### `incrementEmissionRate(deltaEmissionRate)`
+
+Increases the emission rate by the specified amount.
+
+```lua
+emitter:incrementEmissionRate(50.0)  -- Increase rate by 50
+```
+
+**Parameters:**
+- `deltaEmissionRate` (float): Amount to increase
+
+##### `decrementEmissionRate(deltaEmissionRate)`
+
+Decreases the emission rate by the specified amount.
+
+```lua
+emitter:decrementEmissionRate(25.0)  -- Decrease rate by 25
+```
+
+**Parameters:**
+- `deltaEmissionRate` (float): Amount to decrease
+
+#### Position and Direction Control
+
+##### `setEmitPosition(offset)`
+
+Sets the position offset from which particles are emitted.
+
+```lua
+emitter:setEmitPosition({x = 10.0, y = 5.0, z = -5.0})
+```
+
+**Parameters:**
+- `offset` (Vector3): World space emission position offset
+
+##### `setEmitDir(direction)`
+
+Sets the direction vector for particle emission.
+
+```lua
+-- Emit particles upward
+emitter:setEmitDir({x = 0.0, y = 1.0, z = 0.0})
+
+-- Emit particles in a diagonal direction
+emitter:setEmitDir({x = 1.0, y = 0.5, z = 1.0})
+```
+
+**Parameters:**
+- `direction` (Vector3): Emission direction vector (should be normalized)
+
+### Usage Examples
+
+#### Basic Particle Emission
+
+```lua
+behavior = {}
+
+function behavior:start()
+    local emitter = self.owner:getParticleEmitter()
+    if emitter then
+        emitter:setEmissionRate(50.0)
+        emitter:enableEmission()
+    end
+end
+
+function behavior:update(dt)
+    return "success"
+end
+
+function behavior:destroy()
+    print("Destroyed", self.id)
+end
+
+return behavior
+```
+
+#### Dynamic Emission Control with Cooldown
+
+```lua
+behavior = {}
+
+function behavior:start()
+    self.lastEmitTime = 0
+    self.emitCooldown = 2.0  -- Emit for 2 seconds, then stop
+    self.isEmitting = true
+end
+
+function behavior:update(dt)
+    local emitter = self.owner:getParticleEmitter()
+    if not emitter then
+        return "success"
+    end
+
+    local currentTime = os.clock()
+    
+    -- Toggle emission on a timer
+    if currentTime - self.lastEmitTime > self.emitCooldown then
+        self.lastEmitTime = currentTime
+        
+        if self.isEmitting then
+            emitter:disableEmission()
+            self.isEmitting = false
+        else
+            emitter:enableEmission()
+            self.isEmitting = true
+        end
+    end
+    
+    return "success"
+end
+
+function behavior:destroy()
+    print("Destroyed", self.id)
+end
+
+return behavior
+```
+
+#### Rotating Particle Emission Direction
+
+```lua
+behavior = {}
+
+function behavior:start()
+    self.rotationSpeed = 5.0  -- Radians per second
+end
+
+function behavior:update(dt)
+    local emitter = self.owner:getParticleEmitter()
+    if not emitter then
+        return "success"
+    end
+
+    local currentTime = os.clock()
+    
+    -- Rotate emission direction over time
+    local newDir = Vector3.new(
+        math.sin(currentTime * self.rotationSpeed),
+        math.cos(currentTime * self.rotationSpeed),
+        0.0
+    )
+    
+    emitter:setEmitDir(newDir)
+    
+    return "success"
+end
+
+function behavior:destroy()
+    print("Destroyed", self.id)
+end
+
+return behavior
+```
+
+
+#### Velocity-Based Emission Rate
+
+```lua
+behavior = {}
+
+function behavior:start()
+    self.baseEmissionRate = 50.0
+    self.maxEmissionRate = 200.0
+end
+
+function behavior:update(dt)
+    local emitter = self.owner:getParticleEmitter()
+    local physics = self.owner:getPhysics()
+    
+    if emitter and physics then
+        -- Get current velocity
+        local velocity = physics:getLinearVelocity()
+        
+        -- Calculate speed
+        local speed = math.sqrt(
+            velocity.x * velocity.x + 
+            velocity.y * velocity.y + 
+            velocity.z * velocity.z
+        )
+        
+        -- Scale emission rate with speed
+        local emissionRate = self.baseEmissionRate + (speed * 0.5)
+        emissionRate = math.min(emissionRate, self.maxEmissionRate)
+        
+        emitter:setEmissionRate(emissionRate)
+        
+        -- Set direction based on velocity
+        if speed > 0.1 then
+            local dir = Vector3.new(
+                velocity.x / speed,
+                velocity.y / speed,
+                velocity.z / speed
+            )
+            emitter:setEmitDir(dir)
+        end
+    end
+    
+    return "success"
+end
+
+function behavior:destroy()
+    print("Destroyed", self.id)
+end
+
+return behavior
+```
+
+---
+
 ## PerceptionComponent
 
 The perception component manages the sight and hearing of a game object. It allows you to configure object detection parameters and receive callbacks when perception events occur.
@@ -1314,3 +1581,43 @@ local vec = {
 ---
 
 *Documentation is current for engine version with Lua bindings via sol2*
+
+---
+
+## GameObject & Scene Helpers
+
+The engine exposes a small set of helpers for working with game objects and their UUIDs from Lua.
+
+### `GameObject:getUUID()`
+
+- **Returns:** `UUID` (an `SE::UUIDhilo` wrapper with numeric fields `hi` and `lo`)
+- Use `id:toString()` to get a human-readable UUID string.
+- The `UUID` is a 32-bit split representation (`hi` / `lo`) to avoid precision loss in Lua numbers.
+
+Example:
+
+```lua
+local id = gameObject:getUUID()
+print("UUID hi=", id.hi, "lo=", id.lo)
+print("UUID string:", id:toString())
+```
+
+### Scene helpers
+
+- `removeGameObjectByUUID(uuid)` — remove a game object (and its children) from the active scene. Accepts a `UUID` (hi/lo) value.
+- `getGameObjectByUUID(uuid)` — returns the `GameObject` instance for the given `UUID`, or `nil` if not found.
+
+Examples:
+
+```lua
+-- Remove an object by UUID
+local id = gameObject:getUUID()
+removeGameObjectByUUID(id)
+
+-- Find an object by UUID and access its transform
+local other = getGameObjectByUUID(id)
+if other then
+    local t = other:getTransform()
+    print("Found object position:", t.m_position.x, t.m_position.y, t.m_position.z)
+end
+```

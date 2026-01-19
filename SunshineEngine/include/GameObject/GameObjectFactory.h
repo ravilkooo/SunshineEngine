@@ -14,21 +14,32 @@
 using json = nlohmann::json;
 
 class GameObject;
-
-namespace SE_G {
-	class DeferredRenderer;
-	class Mesh;
-}
-
 class AmbientLight;
 class DirectionalLight;
 class PointLight;
 class SpotLight;
 class SkyBox;
 
+namespace SE
+{
+	class ParticleSystem;
+}
+
+namespace SE_G {
+	class DeferredRenderer;
+	class Mesh;
+}
+
 class GameObjectFactory
 {
 public:
+	static eastl::unique_ptr<GameObject> CreateParticleEmitter(
+		SE::ParticleSystem* particleSystem);
+
+	static eastl::unique_ptr<GameObject> CreateParticleEmitter(
+		SE::ParticleSystem* particleSystem,
+		const json& j);
+
 	static eastl::unique_ptr<GameObject> CreateCustomMesh(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);

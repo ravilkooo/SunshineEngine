@@ -19,7 +19,7 @@
 
 #include <PlayerObject/PlayerObject.h>
 
-#include <ParticleSystem/ParticleEmitter.h>
+#include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Component/TransformComponent.h>
 #include <Component/RenderComponent.h>
@@ -361,13 +361,15 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         }
         else if (obj->m_group == GameObjectGroup::ParticleEmitter)
         {
-            auto emitterObj = static_cast<SE::ParticleEmitter_Info*>(obj);
-            DrawEmitterDetails(emitterObj);
+            // auto emitterObj = static_cast<SE::ParticleData*>(obj);
+            // DrawEmitterDetails(emitterObj);
         }
 
         DrawMeshComponent(obj);
         DrawPhysicsComponent(obj);
         DrawLuaComponent(obj);
+        DrawEmitterDetails(obj);
+
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();
@@ -479,7 +481,7 @@ void PropertyPanel::DrawSkyBoxDetails(SkyBox_Info* skyBoxObj)
 
         auto tex = skyBoxObj->m_lightTech->m_texture;
 
-        auto newTexture = DrawTextureSettings(tex);
+        auto newTexture = DrawTextureSettings(tex, "SkyBox");
         if (newTexture)
         {
             newTexture->SetSlot(4u);
@@ -1459,7 +1461,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     }
 
     auto meshPtr = assigned->GetMesh();
-    auto newMesh = DrawMeshSettings(meshPtr, obj->m_group);
+    auto newMesh = DrawMeshSettings(meshPtr, obj->m_group, "Mesh");
     if (newMesh)
     {
         assigned->SetMesh(newMesh);
@@ -1469,7 +1471,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     // Texture
     auto tex = assigned->GetTexture();
 
-    auto newTexture = DrawTextureSettings(tex);
+    auto newTexture = DrawTextureSettings(tex, "Mesh");
     if (newTexture)
     {
         newTexture->SetSlot(0u);
@@ -1500,20 +1502,26 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 }
 
 void PropertyPanel::DrawEmitterDetails(
-    SE::ParticleEmitter_Info* emitterObj
+    GameObject_Info* obj
     /*
     SE::ParticleData::EmitterPointConstantBuffer* emitterPointBuffer,
     SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer
     */
     )
 {
-    if (emitterObj)
+    if (!obj->HasComponent<ParticleEmitterComponent_Info>())
+        return;
+
+    auto emitterInfo = obj->GetComponent<ParticleEmitterComponent_Info>();
+
+    if (obj)
     {
+        ImGui::Separator();
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Particle Emitter");
         EditorUI::FontStyles::Pop();
 
-        auto emitterData = emitterObj->m_particleData.get();
+        auto emitterData = emitterInfo->m_particleData.get();
         auto emitterPointBuffer = &emitterData->m_emitterConstantBufferData;
         auto simulateParticlesBuffer = &emitterData->m_simulateParticlesConstantBufferData;
 
@@ -1612,13 +1620,13 @@ void PropertyPanel::DrawEmitterDetails(
         ImGui::Separator();
         // Texture
         
-        auto tex = emitterObj->m_particleData->m_texture;
+        auto tex = emitterInfo->m_particleData->m_texture;
 
-        auto newTexture = DrawTextureSettings(tex);
+        auto newTexture = DrawTextureSettings(tex, "Emitter");
         if (newTexture)
         {
             newTexture->SetSlot(0u);
-            emitterObj->m_particleData->SetTexture(newTexture);
+            emitterInfo->m_particleData->SetTexture(newTexture);
         }
 
         ImGui::Separator();
@@ -1626,7 +1634,8 @@ void PropertyPanel::DrawEmitterDetails(
 }
 
 eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
-    eastl::shared_ptr<SE_G::Bind::Texture> texture)
+    eastl::shared_ptr<SE_G::Bind::Texture> texture,
+    eastl::string widgetGroup)
 {
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
     ImGui::Text("Texture settings");
@@ -1653,7 +1662,9 @@ eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
     }
 
     // Editing button
-    if (ImGui::SmallButton(s_meshEditor.m_editTexture ? "Close Texture Editor" : "Edit Texture")) {
+    if (ImGui::SmallButton(s_meshEditor.m_editTexture ?
+        (eastl::string("Close Texture Editor##") + widgetGroup).c_str() : (eastl::string("Edit Texture##") + widgetGroup).c_str()))
+    {
         s_meshEditor.m_editTexture = !s_meshEditor.m_editTexture;
         s_meshEditor.m_texError.clear();
         // �����������: ��� �������� ��������� ���� �������� ����������
@@ -1674,9 +1685,14 @@ eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
         ImGui::InputText("Texture asset path", s_meshEditor.m_texPathBuf, sizeof(s_meshEditor.m_texPathBuf));
 
         const char* srcItems = "Engine\0Project\0";
-        ImGui::Combo("Texture Source", (int*)&s_meshEditor.m_texAssetSource, srcItems);
+        ImGui::Combo(
+            (eastl::string("Texture Source##") + widgetGroup).c_str(),
+            (int*)&s_meshEditor.m_texAssetSource, srcItems);
 
-        if (ImGui::Button("Load Texture")) {
+        if (ImGui::Button(
+            (eastl::string("Load Texture##") + widgetGroup).c_str()
+        ))
+        {
             s_meshEditor.m_texError.clear();
 
             AssetPath::AssetSource src = s_meshEditor.m_texAssetSource;
@@ -1723,7 +1739,8 @@ eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
 }
 
 eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
-    eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group)
+    eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group,
+    eastl::string widgetGroup)
 {
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
     ImGui::Text("Mesh settings");
@@ -1752,7 +1769,9 @@ eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
     if (!(group == GameObjectGroup::Shapes))
     {
         // Editing button
-        if (ImGui::SmallButton(s_meshEditor.m_editMesh ? "Close Mesh Editor" : "Edit Mesh")) {
+        if (ImGui::SmallButton(s_meshEditor.m_editMesh ?
+            (eastl::string("Close Mesh Editor##") + widgetGroup).c_str() : (eastl::string("Edit Mesh##") + widgetGroup).c_str()))
+        {
             s_meshEditor.m_editMesh = !s_meshEditor.m_editMesh;
             s_meshEditor.m_meshError.clear();
             // �����������: ��� �������� ��������� ���� �������� ����������
@@ -1773,7 +1792,9 @@ eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
             ImGui::InputText("Mesh asset path", s_meshEditor.m_meshPathBuf, sizeof(s_meshEditor.m_meshPathBuf));
 
             const char* srcItems = "Engine\0Project\0";
-            ImGui::Combo("Mesh Source", (int*)&s_meshEditor.m_meshAssetSource, srcItems);
+            ImGui::Combo(
+                (eastl::string("Mesh Source##") + widgetGroup).c_str(),
+                (int*)&s_meshEditor.m_meshAssetSource, srcItems);
 
             if (ImGui::Button("Load Mesh")) {
                 s_meshEditor.m_meshError.clear();
@@ -1802,7 +1823,7 @@ eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
     else
     {
         ImGui::BeginDisabled();
-        ImGui::Button("Edit Mesh");
+        ImGui::Button((eastl::string("Edit Mesh##") + widgetGroup).c_str());
         ImGui::SetItemTooltip("Mesh editor disabled for shapes");
         ImGui::EndDisabled();
     }
