@@ -237,7 +237,7 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
                               ImGuiTreeNodeFlags_SpanAvailWidth;
     
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
-    if (ImGui::TreeNodeEx("Transform", flags))
+    if (ImGui::TreeNodeEx("Object Transform", flags))
     {
         EditorUI::FontStyles::Pop();
 
@@ -1251,8 +1251,12 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
         }
 
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen;
+
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         if (ImGui::TreeNodeEx("Mesh Transform", flags))
         {
+            EditorUI::FontStyles::Pop();
             auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
             DrawVector3Control("Mesh Offset", transform->m_localPosition, 0.0f);
@@ -1267,6 +1271,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 
             ImGui::TreePop();
         }
+        else EditorUI::FontStyles::Pop();
 
         auto meshPtr = assigned->GetMesh();
         auto newMesh = DrawMeshSettings(meshPtr, obj->m_group, "Mesh");
