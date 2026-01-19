@@ -3,6 +3,7 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <Component/TransformComponent.h>
+#include <Component/MeshComponent.h>
 
 #include "WorldEditor.h"
 
@@ -36,25 +37,37 @@ void Gizmo::Update()
     if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
         return;
     
-    if (ImGui::IsKeyPressed(ImGuiKey_W))
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantCaptureKeyboard)
     {
-        m_currentOperation = ImGuizmo::TRANSLATE;
-        m_currentMode = ImGuizmo::WORLD; 
+        if (ImGui::IsKeyPressed(ImGuiKey_W))
+        {
+            m_currentOperation = ImGuizmo::TRANSLATE;
+            m_currentMode = ImGuizmo::WORLD;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_E))
+        {
+            m_currentOperation = ImGuizmo::ROTATE;
+            m_currentMode = ImGuizmo::LOCAL;
+        }
+
+        if (ImGui::IsKeyPressed(ImGuiKey_R))
+        {
+            m_currentOperation = ImGuizmo::SCALE;
+            m_currentMode = ImGuizmo::LOCAL;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_T) && (m_currentOperation != ImGuizmo::SCALE))
+        {
+            m_currentMode = (m_currentMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_G))
+        {
+            if (m_selectedObject->HasComponent<MeshComponent_Info>())
+            {
+			    m_isMeshSettings = !m_isMeshSettings;
+            }
+        }
     }
-    if (ImGui::IsKeyPressed(ImGuiKey_E))
-    {
-        m_currentOperation = ImGuizmo::ROTATE;
-        m_currentMode = ImGuizmo::LOCAL; 
-    }
-    
-    if (ImGui::IsKeyPressed(ImGuiKey_R))
-    {
-        m_currentOperation = ImGuizmo::SCALE;
-        m_currentMode = ImGuizmo::LOCAL;
-    }
-    // if (ImGui::IsKeyPressed(ImGuiKey_T))
-    //     m_currentMode = (m_currentMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
-    
 }
 
 void Gizmo::Draw()
@@ -118,21 +131,56 @@ void Gizmo::Draw()
 
     ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, 20.0f);
     
-    bool changed = ImGuizmo::Manipulate(
-                        view,
-                        projection,
-                        m_currentOperation,
-                        m_currentMode,
-                        m_objectMatrix,
-                        nullptr,
-                        snapValues
-                    );
-    
-    ImGui::PopStyleVar();
-    
-    if (changed)
+
+    if (m_isMeshSettings)
     {
-        ApplyTransform(m_objectMatrix);
+        //DXSM::Matrix m_fullMatrix = DXSM::Matrix::Identity;
+        DXSM::Matrix worldMatrix = transformComp->m_assignedComponent->GetWorldMatrix_noLocal();
+        DXSM::Matrix localMatrix;
+        memcpy(&localMatrix, m_objectMatrix, sizeof(float) * 16);
+        DXSM::Matrix fullMatrix = localMatrix * worldMatrix;
+
+        memcpy(m_objectMatrix, &fullMatrix, sizeof(float) * 16);
+
+        bool changed = ImGuizmo::Manipulate(
+            view,
+            projection,
+            m_currentOperation,
+            m_currentMode,
+            m_objectMatrix,
+            nullptr,
+            snapValues
+		);
+
+        memcpy(&fullMatrix, m_objectMatrix, sizeof(float) * 16);
+        localMatrix = fullMatrix * worldMatrix.Invert();
+        memcpy(m_objectMatrix, &localMatrix, sizeof(float) * 16);
+
+        ImGui::PopStyleVar();
+
+        if (changed)
+        {
+            ApplyTransform(m_objectMatrix);
+        }
+    }
+    else {
+
+        bool changed = ImGuizmo::Manipulate(
+            view,
+            projection,
+            m_currentOperation,
+            m_currentMode,
+            m_objectMatrix,
+            nullptr,
+            snapValues
+        );
+
+        ImGui::PopStyleVar();
+
+        if (changed)
+        {
+            ApplyTransform(m_objectMatrix);
+        }
     }
 }
 
@@ -145,23 +193,92 @@ void Gizmo::UpdateObjectMatrix()
 
     auto& comp = *transformInfo->m_assignedComponent;
 
-    if (!m_hasRotationCache)
+    if (m_isMeshSettings)
     {
-        m_gizmoRotation = ConvertEulerToQuaternion(comp.m_rotation);
-        m_hasRotationCache = true;
+        if (!m_hasRotationCache)
+        {
+            m_gizmoRotation = ConvertEulerToQuaternion(comp.m_localRotation);
+            m_hasRotationCache = true;
+        }
+
+        DXSM::Matrix worldMatrix =
+            DXSM::Matrix::CreateScale(comp.m_localScaleFactor) *
+            DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
+            DXSM::Matrix::CreateTranslation(comp.m_localPosition);
+
+        memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
     }
+    else
+    {
+        if (!m_hasRotationCache)
+        {
+            m_gizmoRotation = ConvertEulerToQuaternion(comp.m_rotation);
+            m_hasRotationCache = true;
+        }
 
-    DXSM::Matrix worldMatrix =
-        DXSM::Matrix::CreateScale(comp.m_scaleFactor) *
-        DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
-        DXSM::Matrix::CreateTranslation(comp.m_position);
+        DXSM::Matrix worldMatrix =
+            DXSM::Matrix::CreateScale(comp.m_scaleFactor) *
+            DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
+            DXSM::Matrix::CreateTranslation(comp.m_position);
 
-    memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
-
+        memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
+    }
 }
 
 void Gizmo::DrawGizmoControls()
-{   
+{
+	float worldLocal_padding = 5.0f;
+
+    ImVec2 worldLocal_windowPos = ImVec2(
+        m_viewportPos.x + m_viewportSize.x * 0.5f,
+        m_viewportPos.y
+    );
+
+    ImGui::SetNextWindowPos(worldLocal_windowPos, ImGuiCond_Always, ImVec2(0.5f, 0.0f));
+    ImGuiWindowFlags worldLocal_window_flags =
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_AlwaysAutoResize |
+        ImGuiWindowFlags_NoSavedSettings |
+        ImGuiWindowFlags_NoFocusOnAppearing;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(worldLocal_padding, worldLocal_padding - 1.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(worldLocal_padding * 0.5f, worldLocal_padding * 0.5f));
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+
+    ImGui::Begin("WorldLocal Controls", nullptr, worldLocal_window_flags);
+
+    if (m_currentOperation != ImGuizmo::SCALE)
+    {
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.4f, 0.8f));
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+        {
+            ImGui::Spacing();
+            if (ImGui::RadioButton("World (T)", m_currentMode == ImGuizmo::WORLD))
+                m_currentMode = ImGuizmo::WORLD;
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Local (T)", m_currentMode == ImGuizmo::LOCAL))
+                m_currentMode = ImGuizmo::LOCAL;
+        }
+
+        ImGui::PopStyleColor(1);
+    }
+
+    ImGui::End();
+
+    ImGui::PopStyleColor(2);
+    ImGui::PopStyleVar(2);
+
+
+
+
+
     float padding = 5.0f;
     
     ImVec2 windowPos = ImVec2(
@@ -180,11 +297,29 @@ void Gizmo::DrawGizmoControls()
     
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding - 1.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(padding * 0.5f, padding * 0.5f));
-    
+
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.8f));
     ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
 
     ImGui::Begin("Gizmo Controls", nullptr, window_flags);
+
+    if (m_selectedObject->HasComponent<MeshComponent_Info>())
+    {
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+        {
+            ImGui::Spacing();
+            if (ImGui::RadioButton("Object Transform (G)", !m_isMeshSettings))
+                m_isMeshSettings = false;
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Mesh Transform (G)", m_isMeshSettings))
+                m_isMeshSettings = true;
+        }
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+    }
 
     static bool showAdvancedSettings = false;
     
@@ -206,31 +341,42 @@ void Gizmo::DrawGizmoControls()
     ImGui::SameLine();
     
     if (ImGui::RadioButton("Translate (W)", m_currentOperation == ImGuizmo::TRANSLATE))
+    {
         m_currentOperation = ImGuizmo::TRANSLATE;
+        m_currentMode = ImGuizmo::WORLD;
+    }
     ImGui::SameLine();
     if (ImGui::RadioButton("Rotate (E)", m_currentOperation == ImGuizmo::ROTATE))
+    {
         m_currentOperation = ImGuizmo::ROTATE;
+        m_currentMode = ImGuizmo::LOCAL;
+    }
     ImGui::SameLine();
     if (ImGui::RadioButton("Scale (R)", m_currentOperation == ImGuizmo::SCALE))
+    {
         m_currentOperation = ImGuizmo::SCALE;
+        m_currentMode = ImGuizmo::LOCAL;
+    }
 
     if (showAdvancedSettings)
     {
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
-        
-        // if (m_currentOperation == ImGuizmo::SCALE)
-        // {
-        //     ImGui::Spacing();
-        //     if (ImGui::RadioButton("World (T)", m_currentMode == ImGuizmo::WORLD))
-        //         m_currentMode = ImGuizmo::WORLD;
-        //     ImGui::SameLine();
-        //     if (ImGui::RadioButton("Local (T)", m_currentMode == ImGuizmo::LOCAL))
-        //         m_currentMode = ImGuizmo::LOCAL;
-        // }
-        //
-        // ImGui::Spacing();
+
+        /*
+        //if (m_currentOperation == ImGuizmo::SCALE)
+        {
+            ImGui::Spacing();
+            if (ImGui::RadioButton("World (T)", m_currentMode == ImGuizmo::WORLD))
+                m_currentMode = ImGuizmo::WORLD;
+            ImGui::SameLine();
+            if (ImGui::RadioButton("Local (T)", m_currentMode == ImGuizmo::LOCAL))
+                m_currentMode = ImGuizmo::LOCAL;
+        }
+        */
+
+        ImGui::Spacing();
         ImGui::Checkbox("Use Snap", &m_useSnap);
         if (m_useSnap)
         {
@@ -258,15 +404,13 @@ void Gizmo::DrawGizmoControls()
 DXSM::Quaternion Gizmo::ConvertEulerToQuaternion(const DXSM::Vector3& euler) const
 {
     return DXSM::Quaternion::CreateFromRotationMatrix(
-        DXSM::Matrix::CreateRotationY(DX::XMConvertToRadians(euler.y)) *
-        DXSM::Matrix::CreateRotationX(DX::XMConvertToRadians(euler.x)) *
-        DXSM::Matrix::CreateRotationZ(DX::XMConvertToRadians(euler.z))
+        DXSM::Matrix::CreateFromYawPitchRoll(euler.y, euler.x, euler.z)
     );
 }
 
 DXSM::Vector3 Gizmo::ConvertQuaternionToEuler(const DXSM::Quaternion& quat) const
 {
-    
+    return quat.ToEuler();
     float x = quat.x, y = quat.y, z = quat.z, w = quat.w;
     
     float sinp = 2.0f * (w * x - y * z);
@@ -297,8 +441,7 @@ void Gizmo::ApplyTransform(float* matrix)
 
 void Gizmo::ExtractTransformFromMatrix(const float* matrix)
 {
-    auto transformInfo = m_selectedObject
-        ->GetComponent<TransformComponent_Info>();
+    auto transformInfo = m_selectedObject->GetComponent<TransformComponent_Info>();
 
     if (!transformInfo || !transformInfo->m_assignedComponent)
         return;
@@ -311,19 +454,39 @@ void Gizmo::ExtractTransformFromMatrix(const float* matrix)
     DX::XMVECTOR scale, rotation, translation;
     DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&m));
 
-    DX::XMStoreFloat3(&comp.m_position, translation);
-    DX::XMStoreFloat3(&comp.m_scaleFactor, scale);
-
-    if (m_currentOperation != ImGuizmo::SCALE)
+    if (m_isMeshSettings)
     {
-        DX::XMStoreFloat4(&m_gizmoRotation, rotation);
-        m_hasRotationCache = true;
-        
-        comp.m_rotation = ConvertQuaternionToEuler(m_gizmoRotation);
+        DX::XMStoreFloat3(&comp.m_localPosition, translation);
+        DX::XMStoreFloat3(&comp.m_localScaleFactor, scale);
+
+        if (m_currentOperation != ImGuizmo::SCALE)
+        {
+            DX::XMStoreFloat4(&m_gizmoRotation, rotation);
+            m_hasRotationCache = true;
+
+            comp.m_localRotation = ConvertQuaternionToEuler(m_gizmoRotation);
+        }
+        else
+        {
+            m_hasRotationCache = false;
+        }
     }
     else
     {
-        m_hasRotationCache = false;
+        DX::XMStoreFloat3(&comp.m_position, translation);
+        DX::XMStoreFloat3(&comp.m_scaleFactor, scale);
+
+        if (m_currentOperation != ImGuizmo::SCALE)
+        {
+            DX::XMStoreFloat4(&m_gizmoRotation, rotation);
+            m_hasRotationCache = true;
+
+            comp.m_rotation = ConvertQuaternionToEuler(m_gizmoRotation);
+        }
+        else
+        {
+            m_hasRotationCache = false;
+        }
     }
 }
 
@@ -334,6 +497,9 @@ void Gizmo::SetSelectedObject(GameObject_Info* obj)
 
     m_selectedObject = obj;
     m_hasRotationCache = false;
+	m_isMeshSettings = false;
+    m_currentOperation = ImGuizmo::TRANSLATE;
+    m_currentMode = ImGuizmo::WORLD;
 
     if (obj)
         UpdateObjectMatrix();

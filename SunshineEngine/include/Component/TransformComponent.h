@@ -85,8 +85,14 @@ public:
     void SetParentTransform(TransformComponent* parentTransform);
     TransformComponent* GetParentTransform();
 
+	void EnableMeshTransformMode();
+	void DisableMeshTransformMode();
+	bool IsMeshTransformMode();
+
 private:
     TransformComponent* m_parentTransform = nullptr;
+
+	bool m_meshTransformMode = false;
 };
 
 class TransformComponent_Info : public Component_Info

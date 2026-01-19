@@ -297,7 +297,8 @@ void ImguiEditorPass::Pass()
 	
 	RenderGameWorld();
 	
-	if (isEditorMode && selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
+	if (isEditorMode && selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u)
+		&& m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID != SE::UUID(0u))
 	{
 		m_Gizmo.Draw();
 	}

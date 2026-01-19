@@ -111,4 +111,32 @@ private:
     eastl::shared_ptr<SE_G::Mesh> DrawMeshSettings(
         eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group,
         eastl::string widgetGroup);
+
+	template <typename T>
+    bool DrawComponentRemoveButton(GameObject_Info* obj)
+    {
+        // Button width
+        const char* labelRemove = "Remove component";
+        ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
+        ImVec2 padding = ImGui::GetStyle().FramePadding;
+        float labelWidth = textSize.x + padding.x * 2.0f;
+
+        // free space on this line
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        avail.x = avail.x - textSize.x;
+
+        if (avail.x > labelWidth) {
+            // put on the same line
+            float oldX = ImGui::GetCursorPosX();
+            // ImGui::SameLine();
+            ImGui::SetCursorPosX(oldX + avail.x);
+        }
+        // else dont call SameLine, Button will be under line
+
+        if (ImGui::SmallButton(labelRemove)) {
+            obj->RemoveComponent<T>();
+            return true;
+        }
+        return false;
+    }
 };

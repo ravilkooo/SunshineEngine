@@ -251,6 +251,7 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
         
         DrawVector3Control("Scale", transform->m_scaleFactor, 1.0f);
         
+        /*
         if (ImGui::TreeNode("Local Transform"))
         {
             DrawVector3Control("Local Position", transform->m_localPosition, 0.0f);
@@ -265,6 +266,7 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
             
             ImGui::TreePop();
         }
+        */
         
         ImGui::TreePop();
     }
@@ -375,12 +377,20 @@ void PropertyPanel::DrawAmbientLightDetails(SE_G::AmbientLightData* lightData)
 {
     if (lightData)
     {
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+            ImGuiTreeNodeFlags_Framed |
+            ImGuiTreeNodeFlags_SpanAvailWidth;
 
+        ImGui::Separator();
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        ImGui::Text("Ambient Light");
-        EditorUI::FontStyles::Pop();
+        if (ImGui::TreeNodeEx("Ambient Light", flags))
+        {
+            EditorUI::FontStyles::Pop();
+            ImGui::ColorEdit3("Light Color", &lightData->Ambient.x, ImGuiColorEditFlags_Float);
+            ImGui::TreePop();
+        }
+		else EditorUI::FontStyles::Pop();
 
-        ImGui::ColorEdit3("Light Color", &lightData->Ambient.x, ImGuiColorEditFlags_Float);
     }
 }
 
@@ -388,23 +398,32 @@ void PropertyPanel::DrawDirectionalLightDetails(SE_G::DirectionalLightData* ligh
 {
     if (lightData)
     {
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+            ImGuiTreeNodeFlags_Framed |
+            ImGuiTreeNodeFlags_SpanAvailWidth;
+
+        ImGui::Separator();
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        ImGui::Text("Directional Light");
-        EditorUI::FontStyles::Pop();
-        
-        ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
-        ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
-        
-        float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
-        float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
-        if (ImGui::DragFloat("Azimut", &azimut, 0.5f, 0.0f, 360.0f, "%.1f m"))
+        if (ImGui::TreeNodeEx("Directional Light", flags))
         {
-            lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
+            EditorUI::FontStyles::Pop();
+
+            ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
+            ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
+
+            float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
+            float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
+            if (ImGui::DragFloat("Azimut", &azimut, 0.5f, 0.0f, 360.0f, "%.1f m"))
+            {
+                lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
+            }
+            if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
+            {
+                lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
+            }
+            ImGui::TreePop();
         }
-        if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
-        {
-            lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
-        }
+		else EditorUI::FontStyles::Pop();
 
     }
 }
@@ -413,19 +432,27 @@ void PropertyPanel::DrawPointLightDetails(SE_G::PointLightData* lightData)
 {
     if (lightData)
     {
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        ImGui::Text("Point Light");
-        EditorUI::FontStyles::Pop();
-        
-        ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
-        ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Range", &lightData->Range, 0.5f, 0.0f, 100.0f, "%.1f m");
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+            ImGuiTreeNodeFlags_Framed |
+            ImGuiTreeNodeFlags_SpanAvailWidth;
 
-        ImGui::Text("Attenuation");
-        ImGui::DragFloat("1", &lightData->Att.x, 0.5f, 0.0f, 100.0f, "%.1f m");
-        ImGui::DragFloat("1/x", &lightData->Att.y, 0.5f, 0.0f, 100.0f, "%.1f m");
-        ImGui::DragFloat("1/x2", &lightData->Att.z, 0.5f, 0.0f, 100.0f, "%.1f m");
-        //
+        ImGui::Separator();
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        if (ImGui::TreeNodeEx("Point Light", flags))
+        {
+            EditorUI::FontStyles::Pop();
+
+            ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
+            ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
+            ImGui::DragFloat("Range", &lightData->Range, 0.5f, 0.0f, 100.0f, "%.1f m");
+
+            ImGui::Text("Attenuation");
+            ImGui::DragFloat("1", &lightData->Att.x, 0.5f, 0.0f, 100.0f, "%.1f m");
+            ImGui::DragFloat("1/x", &lightData->Att.y, 0.5f, 0.0f, 100.0f, "%.1f m");
+            ImGui::DragFloat("1/x2", &lightData->Att.z, 0.5f, 0.0f, 100.0f, "%.1f m");
+            ImGui::TreePop();
+        }
+		else EditorUI::FontStyles::Pop();
     }
 }
 
@@ -433,31 +460,40 @@ void PropertyPanel::DrawSpotLightDetails(SE_G::SpotLightData* lightData)
 {
     if (lightData)
     {
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+            ImGuiTreeNodeFlags_Framed |
+            ImGuiTreeNodeFlags_SpanAvailWidth;
+
+        ImGui::Separator();
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        ImGui::Text("Spot Light");
-        EditorUI::FontStyles::Pop();
-
-        ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
-        ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Range", &lightData->Range, 0.5f, 0.0f, 100.0f, "%.1f m");
-        ImGui::DragFloat("Spot", &lightData->Spot, 0.1f, 0.0f, 100.0f, "%.1f m");
-
-        ImGui::Text("Attenuation");
-        ImGui::DragFloat("1", &lightData->Att.x, 0.5f, 0.0f, 100.0f, "%.1f m");
-        ImGui::DragFloat("1/x", &lightData->Att.y, 0.5f, 0.0f, 100.0f, "%.1f m");
-        ImGui::DragFloat("1/x2", &lightData->Att.z, 0.5f, 0.0f, 100.0f, "%.1f m");
-        /*
-        float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
-        float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
-        if (ImGui::DragFloat("Azimut", &azimut, 0.5f, 0.0f, 360.0f, "%.1f m"))
+        if (ImGui::TreeNodeEx("Spot Light", flags))
         {
-            lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
+            EditorUI::FontStyles::Pop();
+
+            ImGui::ColorEdit3("Diffuse Color", &lightData->Diffuse.x, ImGuiColorEditFlags_Float);
+            ImGui::ColorEdit3("Specular Color", &lightData->Specular.x, ImGuiColorEditFlags_Float);
+            ImGui::DragFloat("Range", &lightData->Range, 0.5f, 0.0f, 100.0f, "%.1f m");
+            ImGui::DragFloat("Spot", &lightData->Spot, 0.1f, 0.0f, 100.0f, "%.1f m");
+
+            ImGui::Text("Attenuation");
+            ImGui::DragFloat("1", &lightData->Att.x, 0.5f, 0.0f, 100.0f, "%.1f m");
+            ImGui::DragFloat("1/x", &lightData->Att.y, 0.5f, 0.0f, 100.0f, "%.1f m");
+            ImGui::DragFloat("1/x2", &lightData->Att.z, 0.5f, 0.0f, 100.0f, "%.1f m");
+            /*
+            float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
+            float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
+            if (ImGui::DragFloat("Azimut", &azimut, 0.5f, 0.0f, 360.0f, "%.1f m"))
+            {
+                lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
+            }
+            if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
+            {
+                lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
+            }
+            */
+            ImGui::TreePop();
         }
-        if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
-        {
-            lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
-        }
-        */
+		else EditorUI::FontStyles::Pop();
     }
 }
 
@@ -465,126 +501,148 @@ void PropertyPanel::DrawSkyBoxDetails(SkyBox_Info* skyBoxObj)
 {
     if (skyBoxObj)
     {
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+            ImGuiTreeNodeFlags_Framed |
+            ImGuiTreeNodeFlags_SpanAvailWidth;
+
+        ImGui::Separator();
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        ImGui::Text("Skybox");
-        EditorUI::FontStyles::Pop();
-        
-        ImGui::ColorEdit3("Sky Tint", &skyBoxObj->m_lightData.get()->Tint.x, ImGuiColorEditFlags_Float);
-        ImGui::DragFloat("Intensity", &skyBoxObj->m_lightData.get()->Power, 0.1f, 0.0f, 10.0f, "%.1f");
-
-        ImGui::Separator();
-        // Texture
-
-        auto tex = skyBoxObj->m_lightTech->m_texture;
-
-        auto newTexture = DrawTextureSettings(tex, "SkyBox");
-        if (newTexture)
+        if (ImGui::TreeNodeEx("Skybox", flags))
         {
-            newTexture->SetSlot(4u);
-            skyBoxObj->SetTexture(newTexture);
-        }
+            EditorUI::FontStyles::Pop();
 
-        ImGui::Separator();
+            ImGui::ColorEdit3("Sky Tint", &skyBoxObj->m_lightData.get()->Tint.x, ImGuiColorEditFlags_Float);
+            ImGui::DragFloat("Intensity", &skyBoxObj->m_lightData.get()->Power, 0.1f, 0.0f, 10.0f, "%.1f");
+
+            ImGui::Separator();
+            // Texture
+
+            auto tex = skyBoxObj->m_lightTech->m_texture;
+
+            auto newTexture = DrawTextureSettings(tex, "SkyBox");
+            if (newTexture)
+            {
+                newTexture->SetSlot(4u);
+                skyBoxObj->SetTexture(newTexture);
+            }
+            ImGui::Separator();
+            ImGui::TreePop();
+        }
+		else EditorUI::FontStyles::Pop();
     }
 }
 
 void PropertyPanel::DrawBoxShapeDetails(BoxShapeObject_Info* obj)
 {
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-    ImGui::Text("Box Shape");
-    EditorUI::FontStyles::Pop();
-    
-    DXSM::Vector3 currentSize = obj->GetSize();
-    
-    if (DrawVector3Control("Size", currentSize, 1.0f))
+    if (ImGui::TreeNodeEx("Box Shape", flags))
     {
-        obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
+        EditorUI::FontStyles::Pop();
+
+        DXSM::Vector3 currentSize = obj->GetSize();
+
+        if (DrawVector3Control("Size", currentSize, 1.0f))
+        {
+            obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
+        }
+        ImGui::TreePop();
     }
+	else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawSphereShapeDetails(SphereShapeObject_Info* obj)
 {
-    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-    ImGui::Text("Sphere Shape");
-    EditorUI::FontStyles::Pop();
-    
-    DXSM::Vector3 currentSize = obj->GetSize();
-    uint32_t currentSliceCount = obj->GetSliceCount();
-    uint32_t currentStackCount = obj->GetStackCount();
-    
-     if (DrawVector3Control("Size", currentSize, 1.0f))
-     {
-         obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
-     }
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
 
-    uint32_t min_slice = 3, max_slice = 64;
-    if (DrawUIntControl("Slice Count", currentSliceCount, 10, 1.0f, min_slice, max_slice))
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Sphere Shape", flags))
     {
-        obj->SetSliceCount(m_WorldEditor->m_renderer.get(), currentSliceCount);
+        EditorUI::FontStyles::Pop();
+
+        DXSM::Vector3 currentSize = obj->GetSize();
+        uint32_t currentSliceCount = obj->GetSliceCount();
+        uint32_t currentStackCount = obj->GetStackCount();
+
+        if (DrawVector3Control("Size", currentSize, 1.0f))
+        {
+            obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
+        }
+
+        uint32_t min_slice = 3, max_slice = 64;
+        if (DrawUIntControl("Slice Count", currentSliceCount, 10, 1.0f, min_slice, max_slice))
+        {
+            obj->SetSliceCount(m_WorldEditor->m_renderer.get(), currentSliceCount);
+        }
+
+        uint32_t min_stack = 3, max_stack = 64;
+        if (DrawUIntControl("Stack Count", currentStackCount, 10, 1.0f, min_stack, max_stack))
+        {
+            obj->SetStackCount(m_WorldEditor->m_renderer.get(), currentStackCount);
+        }
+        ImGui::TreePop();
     }
-    
-    uint32_t min_stack = 3, max_stack = 64;
-    if (DrawUIntControl("Stack Count", currentStackCount, 10, 1.0f, min_stack, max_stack))
-    {
-        obj->SetStackCount(m_WorldEditor->m_renderer.get(), currentStackCount);
-    }
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj)
 {
-    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);    
-    ImGui::Text("Geosphere Shape");
-    EditorUI::FontStyles::Pop();
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
 
-    DXSM::Vector3 currentSize = obj->GetSize();
-    uint32_t currentNumSubdiv = obj->GetNumSubdivisions();
-    
-    if (DrawVector3Control("Size", currentSize, 1.0f))
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Geosphere Shape", flags))
     {
-        obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
-    }
+        EditorUI::FontStyles::Pop();
 
-    uint32_t min_numsubdiv = 0, max_numsubdiv = 5;
-    if (DrawUIntControl("Subdivisions number", currentNumSubdiv, 6, 1.0f, min_numsubdiv, max_numsubdiv))
-    {
-        obj->SetNumSubdivisions(m_WorldEditor->m_renderer.get(), currentNumSubdiv);
+        DXSM::Vector3 currentSize = obj->GetSize();
+        uint32_t currentNumSubdiv = obj->GetNumSubdivisions();
+
+        if (DrawVector3Control("Size", currentSize, 1.0f))
+        {
+            obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
+        }
+
+        uint32_t min_numsubdiv = 0, max_numsubdiv = 5;
+        if (DrawUIntControl("Subdivisions number", currentNumSubdiv, 6, 1.0f, min_numsubdiv, max_numsubdiv))
+        {
+            obj->SetNumSubdivisions(m_WorldEditor->m_renderer.get(), currentNumSubdiv);
+        }
+        ImGui::TreePop();
     }
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
 {
     if (!obj->HasComponent<PhysicsComponent_Info>()) 
         return;
-    if (auto physicsInfo = obj->GetComponent<PhysicsComponent_Info>())
-    {   
-        ImGui::Separator();
+    auto physicsInfo = obj->GetComponent<PhysicsComponent_Info>();
 
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        ImGui::Text("Physics Settings");
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Physics Settings", flags))
+    {
         EditorUI::FontStyles::Pop();
         
-        // Button width
-        const char* labelRemove = "Remove Physics component";
-        ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
-        ImVec2 padding = ImGui::GetStyle().FramePadding;
-        float labelWidth = textSize.x + padding.x * 2.0f;
-
-        // free space on this line
-        ImVec2 avail = ImGui::GetContentRegionAvail();
-        avail.x = avail.x - textSize.x;
-
-        if (avail.x > labelWidth) {
-            // put on the same line
-            float oldX = ImGui::GetCursorPosX();
-            ImGui::SameLine();
-            ImGui::SetCursorPosX(oldX + avail.x);
-        }
-        // else dont call SameLine, Button will be under line
-
-        if (ImGui::SmallButton(labelRemove)) {
-            obj->RemoveComponent<PhysicsComponent_Info>();
+        if (DrawComponentRemoveButton<PhysicsComponent_Info>(obj))
+        {
+            ImGui::TreePop();
             return;
-        }
+		}
 
         auto currentMotion = physicsInfo->GetMotion();
         if (ImGui::Combo("Motion Type", (int*)&currentMotion, "Static\0Kinematic\0Dynamic\0"))
@@ -741,7 +799,9 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
                 colliderData->SetColliderSettings(settings);
             }
         }
+        ImGui::TreePop();
     }
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
@@ -749,41 +809,21 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
     if (!obj->HasComponent<LuaComponent_Info>()) 
         return;
 
-    auto luaComp = obj->GetComponent<LuaComponent_Info>();
+    auto luaInfo = obj->GetComponent<LuaComponent_Info>();
     
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
                               ImGuiTreeNodeFlags_Framed |
                               ImGuiTreeNodeFlags_SpanAvailWidth;
 
-
-    if (auto luaInfo = obj->GetComponent<LuaComponent_Info>())
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Lua Settings", flags))
     {
-        ImGui::Separator();
-
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        ImGui::Text("Lua Settings");
         EditorUI::FontStyles::Pop();
 
-        // Button width
-        const char* labelRemove = "Remove";
-        ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
-        ImVec2 padding = ImGui::GetStyle().FramePadding;
-        float labelWidth = textSize.x + padding.x * 2.0f;
-
-        // free space on this line
-        ImVec2 avail = ImGui::GetContentRegionAvail();
-        avail.x = avail.x - textSize.x;
-
-        if (avail.x > labelWidth) {
-            // put on the same line
-            float oldX = ImGui::GetCursorPosX();
-            ImGui::SameLine();
-            ImGui::SetCursorPosX(oldX + avail.x);
-        }
-        // else dont call SameLine, Button will be under line
-
-        if (ImGui::SmallButton(labelRemove)) {
-            obj->RemoveComponent<LuaComponent_Info>();
+        if (DrawComponentRemoveButton<LuaComponent_Info>(obj))
+        {
+            ImGui::TreePop();
             return;
         }
 
@@ -794,86 +834,10 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
             luaInfo->InitLuaFile();
             ImGui::Text(luaInfo->scriptPath.c_str());
         }        
-
-    }
-    /*
-    if (ImGui::TreeNodeEx("Lua Script", flags))
-    {
-        ImGui::Text("Script Selection");
-        ImGui::Separator();
-        
-        if (!luaComp->luaFiles.empty())
-        {
-            ImGui::Text("Script File:");
-            ImGui::SameLine();
-    
-            float comboWidth = ImGui::GetContentRegionAvail().x * 0.6f; 
-            ImGui::SetNextItemWidth(comboWidth);
-            
-            if (ImGui::BeginCombo("##Script File", 
-                luaComp->luaFiles[luaComp->selectedLuaFile].c_str()))
-            {
-                for (int i = 0; i < luaComp->luaFiles.size(); ++i)
-                {
-                    bool isSelected = (i == luaComp->selectedLuaFile);
-                    if (ImGui::Selectable(luaComp->luaFiles[i].c_str(), isSelected))
-                    {
-                        luaComp->selectedLuaFile = i;
-                    }
-                    if (isSelected)
-                        ImGui::SetItemDefaultFocus();
-                }
-                ImGui::EndCombo();
-            }
-        }
-        else
-        {
-            ImGui::TextDisabled("No Lua files found");
-        }
-        
-        ImGui::Spacing();
-        ImGui::Text("Script Control");
-        ImGui::Separator();
-        
-        eastl::string currentScriptPath = luaComp->assetsPath + "/" + luaComp->luaFiles[luaComp->selectedLuaFile];
-        bool isCurrentFileLoaded = luaComp->scriptLoaded && (luaComp->scriptPath == currentScriptPath);
-        
-        ImGui::BeginGroup();
-        ImGui::Text("Status:");
-        ImGui::SameLine();
-        ImGui::TextColored(isCurrentFileLoaded ? 
-          ImVec4(0, 1, 0, 1) : ImVec4(1, 0.5f, 0, 1), 
-          isCurrentFileLoaded ? "Loaded" : "Not Loaded");
-        ImGui::EndGroup();
-
-        ImGui::BeginGroup();
-        if (isCurrentFileLoaded)
-        {
-            if (ImGui::Button("Reload", ImVec2(120, 0)))
-            {
-                luaComp->Cleanup();
-                luaComp->LoadScript();
-            }
-        }
-        else
-        {
-            if (ImGui::Button("Load Script", ImVec2(120, 0))) 
-            {
-                luaComp->LoadScript();
-            }
-        }
-        
-        ImGui::EndGroup();
-
-        if (isCurrentFileLoaded)
-        {
-            ImGui::Spacing();
-            DrawLuaFunctions(luaComp.get());
-        }
-        
         ImGui::TreePop();
     }
-    */
+    else EditorUI::FontStyles::Pop();
+    
 }
 
 void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
@@ -1249,87 +1213,104 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
     
     auto meshInfo = obj->GetComponent<MeshComponent_Info>();
 
-    ImGui::Separator();
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
 
+    ImGui::Separator();
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-    ImGui::Text("Mesh");
-    EditorUI::FontStyles::Pop();
-
-    if (!(obj->m_group == GameObjectGroup::Shapes))
+    if (ImGui::TreeNodeEx("Mesh", flags))
     {
-        // Button width calculation similar to other components
-        const char* labelRemove = "Remove Mesh component";
-        ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
-        ImVec2 padding = ImGui::GetStyle().FramePadding;
-        float labelWidth = textSize.x + padding.x * 2.0f;
+        EditorUI::FontStyles::Pop();
 
-        ImVec2 avail = ImGui::GetContentRegionAvail();
-        avail.x = avail.x - textSize.x;
+        if (!(obj->m_group == GameObjectGroup::Shapes))
+        {
+            if (DrawComponentRemoveButton<MeshComponent_Info>(obj))
+            {
+                ImGui::TreePop();
 
-        if (avail.x > labelWidth) {
-            // put on the same line
-            float oldX = ImGui::GetCursorPosX();
-            ImGui::SameLine();
-            ImGui::SetCursorPosX(oldX + avail.x);
+                auto tcInfo = obj->GetComponent<TransformComponent_Info>();
+				tcInfo->m_assignedComponent->m_localPosition = DXSM::Vector3::Zero;
+				tcInfo->m_assignedComponent->m_localRotation = DXSM::Vector3::Zero;
+				tcInfo->m_assignedComponent->m_localScaleFactor = DXSM::Vector3::One;
+
+                return;
+            }
         }
 
-        if (ImGui::SmallButton(labelRemove)) {
-            obj->RemoveComponent<MeshComponent_Info>();
-            return; // component removed, nothing to draw
+        // Draw mesh info
+        if (!meshInfo->IsAssigned()) {
+            ImGui::TextDisabled("No mesh assigned");
+            return;
         }
-    }
 
-    // Draw mesh info
-    if (!meshInfo->IsAssigned()) {
-        ImGui::TextDisabled("No mesh assigned");
-        return;
-    }
-
-    auto assigned = meshInfo->m_assignedComponent.get();
-    if (!assigned) {
-        ImGui::TextDisabled("(mesh component not initialized)");
-        return;
-    }
-
-    auto meshPtr = assigned->GetMesh();
-    auto newMesh = DrawMeshSettings(meshPtr, obj->m_group, "Mesh");
-    if (newMesh)
-    {
-        assigned->SetMesh(newMesh);
-    }
-
-    ImGui::Separator();
-    // Texture
-    auto tex = assigned->GetTexture();
-
-    auto newTexture = DrawTextureSettings(tex, "Mesh");
-    if (newTexture)
-    {
-        newTexture->SetSlot(0u);
-        assigned->SetTexture(newTexture);
-    }
-    ImGui::Separator();
-
-    // Sampler
-    auto sampler = assigned->GetTextureSamplerPreset();
-
-    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
-    ImGui::Text("Sampler settings");
-    EditorUI::FontStyles::Pop();
-
-    if (sampler) {
-        auto preset = sampler->GetPreset();
-        const char* presetName = "Unknown";
-        switch (preset) {
-        case SE_G::Bind::SamplerPreset::Wrap: presetName = "Wrap"; break;
-        case SE_G::Bind::SamplerPreset::Mirror: presetName = "Mirror"; break;
-        case SE_G::Bind::SamplerPreset::Clamp: presetName = "Clamp"; break;
-        case SE_G::Bind::SamplerPreset::Border: presetName = "Border"; break;
+        auto assigned = meshInfo->m_assignedComponent.get();
+        if (!assigned) {
+            ImGui::TextDisabled("(mesh component not initialized)");
+            return;
         }
-        ImGui::Text("Sampler: %s", presetName);
-    } else {
-        ImGui::TextDisabled("Sampler: (none)");
+
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen;
+        if (ImGui::TreeNodeEx("Mesh Transform", flags))
+        {
+            auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+
+            DrawVector3Control("Mesh Offset", transform->m_localPosition, 0.0f);
+
+            DXSM::Vector3 localRotDeg = transform->m_localRotation * (180.0f / DirectX::XM_PI);
+            if (DrawVector3Control("Mesh Rotation", localRotDeg, 0.0f))
+            {
+                transform->m_localRotation = localRotDeg * (DirectX::XM_PI / 180.0f);
+            }
+
+            DrawVector3Control("Mesh Scale", transform->m_localScaleFactor, 1.0f);
+
+            ImGui::TreePop();
+        }
+
+        auto meshPtr = assigned->GetMesh();
+        auto newMesh = DrawMeshSettings(meshPtr, obj->m_group, "Mesh");
+        if (newMesh)
+        {
+            assigned->SetMesh(newMesh);
+        }
+
+        ImGui::Separator();
+        // Texture
+        auto tex = assigned->GetTexture();
+
+        auto newTexture = DrawTextureSettings(tex, "Mesh");
+        if (newTexture)
+        {
+            newTexture->SetSlot(0u);
+            assigned->SetTexture(newTexture);
+        }
+        ImGui::Separator();
+
+        // Sampler
+        auto sampler = assigned->GetTextureSamplerPreset();
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("Sampler settings");
+        EditorUI::FontStyles::Pop();
+
+        if (sampler) {
+            auto preset = sampler->GetPreset();
+            const char* presetName = "Unknown";
+            switch (preset) {
+            case SE_G::Bind::SamplerPreset::Wrap: presetName = "Wrap"; break;
+            case SE_G::Bind::SamplerPreset::Mirror: presetName = "Mirror"; break;
+            case SE_G::Bind::SamplerPreset::Clamp: presetName = "Clamp"; break;
+            case SE_G::Bind::SamplerPreset::Border: presetName = "Border"; break;
+            }
+            ImGui::Text("Sampler: %s", presetName);
+        }
+        else {
+            ImGui::TextDisabled("Sampler: (none)");
+        }
+        ImGui::TreePop();
     }
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawEmitterDetails(
@@ -1340,16 +1321,21 @@ void PropertyPanel::DrawEmitterDetails(
     */
     )
 {
+    if (!obj)
+        return;
     if (!obj->HasComponent<ParticleEmitterComponent_Info>())
         return;
 
     auto emitterInfo = obj->GetComponent<ParticleEmitterComponent_Info>();
 
-    if (obj)
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+		ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Particle Emitter", flags))
     {
-        ImGui::Separator();
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-        ImGui::Text("Particle Emitter");
         EditorUI::FontStyles::Pop();
 
         auto emitterData = emitterInfo->m_particleData.get();
@@ -1461,7 +1447,9 @@ void PropertyPanel::DrawEmitterDetails(
         }
 
         ImGui::Separator();
+        ImGui::TreePop();
     }
+    else EditorUI::FontStyles::Pop();
 }
 
 eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(

@@ -32,7 +32,7 @@ namespace SE_G {
 			const auto wMatInvTranspose = (A.Invert()).Transpose();
 
 			const Transforms tf = {
-					wMat, wMatInvTranspose,
+				wMat, wMatInvTranspose,
 			};
 			pVcbuf->Update(context, tf);
 		}
