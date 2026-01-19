@@ -1,5 +1,5 @@
 #include <ParticleSystem/ParticleSystem.h>
-#include <ParticleSystem/ParticleEmitter.h>
+#include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
