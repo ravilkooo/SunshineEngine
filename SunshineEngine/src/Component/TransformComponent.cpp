@@ -56,7 +56,13 @@ DXSM::Matrix TransformComponent::GetScaleMatrix() const
 
 DXSM::Matrix TransformComponent::GetWorldMatrix_noLocal() const
 {
-    return GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
+    DXSM::Matrix wt = GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
+
+    if (m_parentTransform)
+    {
+        wt = wt * m_parentTransform->GetWorldMatrix_noLocal();
+    }
+    return wt;
 }
 
 DXSM::Matrix TransformComponent::GetWorldMatrix() const
@@ -70,7 +76,7 @@ DXSM::Matrix TransformComponent::GetWorldMatrix() const
 
     if (m_parentTransform)
     {
-        wt = wt * m_parentTransform->GetWorldMatrix();
+        wt = wt * m_parentTransform->GetWorldMatrix_noLocal();
     }
     return wt;
 }

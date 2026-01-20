@@ -89,8 +89,8 @@ public:
 	void DisableMeshTransformMode();
 	bool IsMeshTransformMode();
 
-private:
     TransformComponent* m_parentTransform = nullptr;
+private:
 
 	bool m_meshTransformMode = false;
 };

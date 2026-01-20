@@ -214,6 +214,9 @@ namespace SE_G {
 			m_shadowMapRasterizer->Bind(GetDeviceContext());
 
 			for (auto& tech : m_gPass->m_techniques) {
+				if (tech.second->GetTechniqueTag() == "GPass")
+					tech.second->m_assignedTransform->EnableMeshTransformMode();
+
 				tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 				// tech.second->BindAll(GetDeviceContext());
 
@@ -224,6 +227,9 @@ namespace SE_G {
 				}
 
 				tech.second->DrawTechnique(GetDeviceContext());
+
+				if (tech.second->GetTechniqueTag() == "GPass")
+					tech.second->m_assignedTransform->DisableMeshTransformMode();
 			}
 
 		}

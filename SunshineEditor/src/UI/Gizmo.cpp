@@ -59,12 +59,14 @@ void Gizmo::Update()
         if (ImGui::IsKeyPressed(ImGuiKey_T) && (m_currentOperation != ImGuizmo::SCALE))
         {
             m_currentMode = (m_currentMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+            m_hasRotationCache = false;
         }
         if (ImGui::IsKeyPressed(ImGuiKey_G))
         {
             if (m_selectedObject->HasComponent<MeshComponent_Info>())
             {
 			    m_isMeshSettings = !m_isMeshSettings;
+                m_hasRotationCache = false;
             }
         }
     }
@@ -132,9 +134,8 @@ void Gizmo::Draw()
     ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize, 20.0f);
     
 
-    if (m_isMeshSettings)
+    if (transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
     {
-        //DXSM::Matrix m_fullMatrix = DXSM::Matrix::Identity;
         DXSM::Matrix worldMatrix = transformComp->m_assignedComponent->GetWorldMatrix_noLocal();
         DXSM::Matrix localMatrix;
         memcpy(&localMatrix, m_objectMatrix, sizeof(float) * 16);
@@ -163,7 +164,68 @@ void Gizmo::Draw()
             ApplyTransform(m_objectMatrix);
         }
     }
-    else {
+    else if (transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings)
+    {
+        DXSM::Matrix parentMatrix = transformComp->m_assignedComponent->GetParentTransform()->GetWorldMatrix_noLocal();
+        DXSM::Matrix worldMatrix;
+        memcpy(&worldMatrix, m_objectMatrix, sizeof(float) * 16);
+        DXSM::Matrix fullMatrix = worldMatrix * parentMatrix;
+
+        memcpy(m_objectMatrix, &fullMatrix, sizeof(float) * 16);
+
+        bool changed = ImGuizmo::Manipulate(
+            view,
+            projection,
+            m_currentOperation,
+            m_currentMode,
+            m_objectMatrix,
+            nullptr,
+            snapValues
+        );
+
+        memcpy(&fullMatrix, m_objectMatrix, sizeof(float) * 16);
+        worldMatrix = fullMatrix * parentMatrix.Invert();
+        memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
+
+        ImGui::PopStyleVar();
+
+        if (changed)
+        {
+            ApplyTransform(m_objectMatrix);
+        }
+    }
+    else if (!transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
+    {
+        //DXSM::Matrix m_fullMatrix = DXSM::Matrix::Identity;
+        DXSM::Matrix worldMatrix = transformComp->m_assignedComponent->GetWorldMatrix_noLocal();
+        DXSM::Matrix localMatrix;
+        memcpy(&localMatrix, m_objectMatrix, sizeof(float) * 16);
+        DXSM::Matrix fullMatrix = localMatrix * worldMatrix;
+
+        memcpy(m_objectMatrix, &fullMatrix, sizeof(float) * 16);
+
+        bool changed = ImGuizmo::Manipulate(
+            view,
+            projection,
+            m_currentOperation,
+            m_currentMode,
+            m_objectMatrix,
+            nullptr,
+            snapValues
+        );
+
+        memcpy(&fullMatrix, m_objectMatrix, sizeof(float) * 16);
+        localMatrix = fullMatrix * worldMatrix.Invert();
+        memcpy(m_objectMatrix, &localMatrix, sizeof(float) * 16);
+
+        ImGui::PopStyleVar();
+
+        if (changed)
+        {
+            ApplyTransform(m_objectMatrix);
+        }
+    }
+    else if (!transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings) {
 
         bool changed = ImGuizmo::Manipulate(
             view,
@@ -186,14 +248,14 @@ void Gizmo::Draw()
 
 void Gizmo::UpdateObjectMatrix()
 {
-    auto transformInfo = m_selectedObject
+    auto transformComp = m_selectedObject
         ->GetComponent<TransformComponent_Info>();
-    if (!transformInfo || !transformInfo->m_assignedComponent)
+    if (!transformComp || !transformComp->m_assignedComponent)
         return;
 
-    auto& comp = *transformInfo->m_assignedComponent;
+    auto& comp = *transformComp->m_assignedComponent;
 
-    if (m_isMeshSettings)
+    if (!transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
     {
         if (!m_hasRotationCache)
         {
@@ -208,7 +270,37 @@ void Gizmo::UpdateObjectMatrix()
 
         memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
     }
-    else
+    else if (!transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings)
+    {
+        if (!m_hasRotationCache)
+        {
+            m_gizmoRotation = ConvertEulerToQuaternion(comp.m_rotation);
+            m_hasRotationCache = true;
+        }
+
+        DXSM::Matrix worldMatrix =
+            DXSM::Matrix::CreateScale(comp.m_scaleFactor) *
+            DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
+            DXSM::Matrix::CreateTranslation(comp.m_position);
+
+        memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
+    }
+    else if (transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
+    {
+        if (!m_hasRotationCache)
+        {
+            m_gizmoRotation = ConvertEulerToQuaternion(comp.m_localRotation);
+            m_hasRotationCache = true;
+        }
+
+        DXSM::Matrix worldMatrix =
+            DXSM::Matrix::CreateScale(comp.m_localScaleFactor) *
+            DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
+            DXSM::Matrix::CreateTranslation(comp.m_localPosition);
+
+        memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
+    }
+    else if (transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings)
     {
         if (!m_hasRotationCache)
         {
@@ -253,6 +345,8 @@ void Gizmo::DrawGizmoControls()
 
     if (m_currentOperation != ImGuizmo::SCALE)
     {
+        m_hasRotationCache = false;
+
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.4f, 0.8f));
 
         ImGui::Spacing();
@@ -305,6 +399,7 @@ void Gizmo::DrawGizmoControls()
 
     if (m_selectedObject->HasComponent<MeshComponent_Info>())
     {
+        m_hasRotationCache = false;
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
@@ -403,9 +498,7 @@ void Gizmo::DrawGizmoControls()
 
 DXSM::Quaternion Gizmo::ConvertEulerToQuaternion(const DXSM::Vector3& euler) const
 {
-    return DXSM::Quaternion::CreateFromRotationMatrix(
-        DXSM::Matrix::CreateFromYawPitchRoll(euler.y, euler.x, euler.z)
-    );
+	return DXSM::Quaternion::CreateFromYawPitchRoll(euler.y, euler.x, euler.z);
 }
 
 DXSM::Vector3 Gizmo::ConvertQuaternionToEuler(const DXSM::Quaternion& quat) const
@@ -441,12 +534,10 @@ void Gizmo::ApplyTransform(float* matrix)
 
 void Gizmo::ExtractTransformFromMatrix(const float* matrix)
 {
-    auto transformInfo = m_selectedObject->GetComponent<TransformComponent_Info>();
+    auto transformComp = m_selectedObject->GetComponent<TransformComponent_Info>();
 
-    if (!transformInfo || !transformInfo->m_assignedComponent)
+    if (!transformComp || !transformComp->m_assignedComponent)
         return;
-
-    auto& comp = *transformInfo->m_assignedComponent;
 
     DXSM::Matrix m;
     memcpy(&m, matrix, sizeof(float) * 16);
@@ -454,8 +545,9 @@ void Gizmo::ExtractTransformFromMatrix(const float* matrix)
     DX::XMVECTOR scale, rotation, translation;
     DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&m));
 
-    if (m_isMeshSettings)
+    if (!transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
     {
+        auto& comp = *transformComp->m_assignedComponent;
         DX::XMStoreFloat3(&comp.m_localPosition, translation);
         DX::XMStoreFloat3(&comp.m_localScaleFactor, scale);
 
@@ -471,8 +563,11 @@ void Gizmo::ExtractTransformFromMatrix(const float* matrix)
             m_hasRotationCache = false;
         }
     }
-    else
+    else if (!transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings)
     {
+        auto& comp = *transformComp->m_assignedComponent;
+
+
         DX::XMStoreFloat3(&comp.m_position, translation);
         DX::XMStoreFloat3(&comp.m_scaleFactor, scale);
 
@@ -488,6 +583,43 @@ void Gizmo::ExtractTransformFromMatrix(const float* matrix)
             m_hasRotationCache = false;
         }
     }
+    else if (transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
+    {
+        auto& comp = *transformComp->m_assignedComponent;
+        DX::XMStoreFloat3(&comp.m_localPosition, translation);
+        DX::XMStoreFloat3(&comp.m_localScaleFactor, scale);
+
+        if (m_currentOperation != ImGuizmo::SCALE)
+        {
+            DX::XMStoreFloat4(&m_gizmoRotation, rotation);
+            m_hasRotationCache = true;
+
+            comp.m_localRotation = ConvertQuaternionToEuler(m_gizmoRotation);
+        }
+        else
+        {
+            m_hasRotationCache = false;
+        }
+    }
+    else if (transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings)
+    {
+        auto& comp = *transformComp->m_assignedComponent;
+        DX::XMStoreFloat3(&comp.m_position, translation);
+        DX::XMStoreFloat3(&comp.m_scaleFactor, scale);
+
+        if (m_currentOperation != ImGuizmo::SCALE)
+        {
+            DX::XMStoreFloat4(&m_gizmoRotation, rotation);
+            m_hasRotationCache = true;
+
+            comp.m_rotation = ConvertQuaternionToEuler(m_gizmoRotation);
+        }
+        else
+        {
+            m_hasRotationCache = false;
+        }
+    }
+
 }
 
 void Gizmo::SetSelectedObject(GameObject_Info* obj)
