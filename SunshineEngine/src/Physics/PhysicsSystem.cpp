@@ -246,11 +246,20 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             if (!tc)
                 continue;
 
+            auto wMat = tc->GetWorldMatrix_noLocal();
+
+            DX::XMVECTOR scale, rotation, translation;
+            DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
+
+            DXSM::Vector3 _pos;
+            DXSM::Quaternion _quat;
+
+            DX::XMStoreFloat3(&_pos, translation);
+            DX::XMStoreFloat4(&_quat, rotation);
+
             // Push TransformComponent data into the kinematic body
-            const JPH::RVec3 targetPos(tc->m_position.x, tc->m_position.y, tc->m_position.z);
-            const DXSM::Quaternion dxQuat = DXSM::Quaternion::CreateFromYawPitchRoll(
-                tc->m_rotation.y, tc->m_rotation.x, tc->m_rotation.z);
-            const JPH::Quat targetRot(dxQuat.x, dxQuat.y, dxQuat.z, dxQuat.w);
+            const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
+            const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
             m_bodyInterface->SetPositionAndRotation(
                 bodyEntry.m_joltBodyId,

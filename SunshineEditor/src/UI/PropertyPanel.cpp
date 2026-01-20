@@ -214,13 +214,16 @@ void PropertyPanel::DrawParentnes(GameObject_Info* obj)
     }
 
     // Attached checkbox (preserve behavior)
-    ImGui::SetNextItemWidth(-FLT_MIN);
-    bool attached = obj->m_parent.attached;
-    ImGui::Checkbox("Attached to parent: ", &attached); ImGui::SameLine();
-    if (attached != obj->m_parent.attached)
+    if (obj->m_parent.uuid != SE::UUID(0u) && obj->m_parent.ptr)
     {
-        if (attached) obj->AttachToParent();
-        else obj->DetachFromParent();
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        bool attached = obj->m_parent.attached;
+        ImGui::Checkbox("Attached to parent: ", &attached); ImGui::SameLine();
+        if (attached != obj->m_parent.attached)
+        {
+            if (attached) obj->AttachToParent();
+            else obj->DetachFromParent();
+        }
     }
 
 }

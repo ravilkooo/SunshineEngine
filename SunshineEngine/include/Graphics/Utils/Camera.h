@@ -106,6 +106,7 @@ namespace SE_G {
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis, float referenceLen);
 
         void SwitchProjection();
+        bool IsPerspectiveCamera();
 
         struct FrustumPlanes {
             DX::XMVECTOR Left;

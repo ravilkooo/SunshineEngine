@@ -1,7 +1,10 @@
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 #include <Graphics/GraphicsResources/Mesh.h>
-#include <Utils/StringUtils.h>
+
 #include <Component/TransformComponent.h>
+
+#include <Utils/StringUtils.h>
+#include <Utils/MathUtils.h>
 
 namespace SE_G {
     PointLightTechnique::PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
@@ -21,11 +24,36 @@ namespace SE_G {
 
     void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
     {
+        DXSM::Vector3 old_localScaleFactor = m_assignedTransform->m_localScaleFactor;
+        DXSM::Vector3 old_localRotation = m_assignedTransform->m_localRotation;
+        DXSM::Vector3 old_localPosition = m_assignedTransform->m_localPosition;
+
+        m_assignedTransform->EnableMeshTransformMode();
+        DXSM::Matrix fullTransform = m_assignedTransform->GetWorldMatrix_noLocal();
+        DXSM::Vector3 scale;
+        DXSM::Vector3 rotate;
+        DXSM::Vector3 translation;
+        DecomposeTransform(fullTransform, scale, rotate, translation);
+
+        m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
+        m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
+        m_assignedTransform->m_localScaleFactor = DXSM::Vector3(
+            1.0f / scale.x,
+            1.0f / scale.y,
+            1.0f / scale.z
+        );
+        m_assignedTransform->BindToGraphicsPipeline(context.Get());
+
         // to-do: update only when changed
-        m_lightData->Position = m_assignedTransform->m_position;
+		m_lightData->Position = DXSM::Vector3(fullTransform._41, fullTransform._42, fullTransform._43);
         m_lightDataBuffer->Update(context.Get(), *m_lightData);
         BindAll(context);
         DrawTechnique(context);
+
+        m_assignedTransform->DisableMeshTransformMode();
+        m_assignedTransform->m_localPosition = old_localPosition;
+        m_assignedTransform->m_localRotation = old_localRotation;
+        m_assignedTransform->m_localScaleFactor = old_localScaleFactor;
     }
 
     void PointLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
