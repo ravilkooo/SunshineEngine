@@ -1,0 +1,38 @@
+behavior = {}
+
+function behavior:start()
+    self.sensitivity = 50.0
+    -- print("Behavior started", self.id)
+end
+
+function behavior:update(dt)
+    local physics = self.owner:getPhysics()
+    local cameraComponent = self.owner:getCameraComponent()
+    local camera = cameraComponent:getCamera()
+    
+    local currentTime = os.clock()
+
+    camera:setStickLength(20 + 3 * math.sin(currentTime))
+    -- print("Behavior update", self.id)
+    
+    -- local uuid = self.owner:getUUID()
+    -- print("Owner UUID: " .. uuid.hi .. " " .. uuid.lo)
+    local customUUID = UUID.new()
+    customUUID.hi = 163351393
+    customUUID.lo = 285791296
+    local customObject = getGameObjectByUUID(customUUID)
+    if customObject then
+        -- local customPhysics = customObject:getPhysics()
+        -- customPhysics:addForce(Vector3.new(0, 100.0 * math.sin(currentTime), 0))
+        local customTransform = customObject:getTransform()
+        -- print("Transform: " .. customTransform.m_position.x .. ", " .. customTransform.m_position.y .. ", " .. customTransform.m_position.z)
+    end
+    
+    return "success"
+end
+
+function behavior:destroy()
+    print("Destroyed", self.id)
+end
+
+return behavior
