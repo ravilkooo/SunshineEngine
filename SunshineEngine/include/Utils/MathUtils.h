@@ -11,6 +11,18 @@ inline void DecomposeTransform(
 	DXSM::Vector3& rotation,
 	DXSM::Vector3& translation)
 {
+	DX::XMVECTOR _scale, _rotation, _translation;
+	DX::XMMatrixDecompose(&_scale, &_rotation, &_translation, DX::XMLoadFloat4x4(&fullTransform));
+
+	DX::XMStoreFloat3(&translation, _translation);
+	DX::XMStoreFloat3(&scale, _scale);
+
+	DXSM::Quaternion _quat;
+	DX::XMStoreFloat4(&_quat, _rotation);
+	
+	rotation = _quat.ToEuler();
+	return;
+
 	translation = DXSM::Vector3(fullTransform._41, fullTransform._42, fullTransform._43);
 	scale = DXSM::Vector3::One;
 	scale.x = DXSM::Vector3(fullTransform._11, fullTransform._12, fullTransform._13).Length();

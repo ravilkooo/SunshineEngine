@@ -14,6 +14,11 @@ PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
 {
     SetObjecUUID(objectUUID);
     InitTransforms(tc);
+
+    if (tc->m_parentTransform)
+    {
+        m_motionType = JPH::EMotionType::Kinematic;
+    }
 }
 
 PhysicsComponent::~PhysicsComponent()
@@ -258,10 +263,20 @@ void PhysicsComponent::SetShape(JPH::ShapeRefC shapePtr) { m_shape = shapePtr; }
 void PhysicsComponent::InitTransforms(TransformComponent* tc)
 {
     transformComp = tc;
-    
-    m_position.Set(tc->m_position.x, tc->m_position.y, tc->m_position.z);
-    auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(tc->m_rotation.y, tc->m_rotation.x, tc->m_rotation.z);
-    m_orientation.Set(quat.x, quat.y, quat.z, quat.w);
+
+    auto wMat = tc->GetWorldMatrix_noLocal();
+
+    DX::XMVECTOR scale, rotation, translation;
+    DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
+
+	DXSM::Vector3 _pos;
+	DXSM::Quaternion _quat;
+
+    DX::XMStoreFloat3(&_pos, translation);
+    DX::XMStoreFloat4(&_quat, rotation);
+
+    m_position.Set(_pos.x, _pos.y, _pos.z);
+    m_orientation.Set(_quat.x, _quat.y, _quat.z, _quat.w);
 }
 
 JPH::Body* PhysicsComponent::GetBody() const { return m_joltBody; }
@@ -274,8 +289,6 @@ PhysicsComponent_Info::PhysicsComponent_Info(
     : m_rc_info(rc_info)
 {
     m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Box);
-    SE::PhysicsMotionType m_motion = SE::PhysicsMotionType::Static;
-    SE::PhysicsActivation m_activation = SE::PhysicsActivation::DontActivate;
 
     // Init collider
     auto device = rc_info->m_assignedComponent.get()->GetDevice();
@@ -286,7 +299,14 @@ PhysicsComponent_Info::PhysicsComponent_Info(
     rc_info->AddTechnique(eastl::move(colliderTech));
 
     SetCollisionLayer("MOVING");
-    SetMotion(SE::PhysicsMotionType::Dynamic);
+    if (tc_info->m_assignedComponent->m_parentTransform)
+    {
+        SetMotion(SE::PhysicsMotionType::Kinematic);
+    }
+    else
+    {
+        SetMotion(SE::PhysicsMotionType::Dynamic);
+    }
     SetActivation(SE::PhysicsActivation::Activate);
     SetShape(SE::ColliderShapeType::Box);
     SE::ColliderSettings collSettings{};

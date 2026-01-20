@@ -14,3 +14,8 @@ void printSunshineMessage(eastl::string message)
 {
 	printf("%s\n", message.c_str());
 }
+
+void printSunshineMessage(eastl::wstring message)
+{
+	wprintf(L"%ls\n", message.c_str());
+}

@@ -230,7 +230,7 @@ namespace SE_G {
                     m_playerTransform = pObj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
                 }
             }
-            DXSM::Matrix targetTransform = m_playerTransform->GetWorldMatrix();;
+            DXSM::Matrix targetTransform = m_playerTransform->GetWorldMatrix_noLocal();
 
             DXSM::Vector3 targetPos;
             targetPos.x = targetTransform._41;
@@ -391,7 +391,7 @@ namespace SE_G {
         }
         if (!isPerspective)
         {
-            orthZ = eastl::max(orthZ + speed * m_deltaTime, nearZ * 1.1f);
+            // orthZ = eastl::max(orthZ + speed * m_deltaTime, nearZ * 1.1f);
         }
     }
 
@@ -673,4 +673,9 @@ namespace SE_G {
     {
         return stickDirection;
     }
+
+    bool Camera::IsPerspectiveCamera()
+    {
+        return isPerspective;
+	}
 }

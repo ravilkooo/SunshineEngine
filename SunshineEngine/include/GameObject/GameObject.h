@@ -77,12 +77,15 @@ public:
         }
         if ((typeid(T) == typeid(PhysicsComponent)) && (m_parent.attached == true))
         {
+            /*
             auto currObj = this;
             while (currObj)
             {
-                this->DetachFromParent();
-                currObj = this->m_parent.ptr;
+				auto nextObj = currObj->m_parent.ptr;
+                currObj->DetachFromParent();
+                currObj = nextObj;
             }
+            */
         }
         auto component = eastl::make_shared<T>(eastl::forward<Args>(args)...);
         impl->components.emplace_back(component);
@@ -165,13 +168,13 @@ public:
             }
             if (HasComponent<PhysicsComponent>())
             {
-                RemoveComponent<PhysicsComponent>();
+                // RemoveComponent<PhysicsComponent>();
                 // To-do: remove phys from every child
                 
                 // OR
                 
                 // To-do: make extended attached mode
-                //GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
+                GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
             }
         }
     }
@@ -184,7 +187,7 @@ public:
         auto tc = GetComponent<TransformComponent>();
         auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix().Invert(); // *XMMatrixInverse(nullptr, Matrix::CreateScale(1 / ball->radius) * ball->worldMat);
+        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix_noLocal().Invert();
 
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
@@ -201,13 +204,13 @@ public:
 
         if (HasComponent<PhysicsComponent>())
         {
-            RemoveComponent<PhysicsComponent>();
+            // RemoveComponent<PhysicsComponent>();
 
             // To-do: remove phys from every child
 
             // OR
             // To-do: make extended attached mode
-            //GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
+            GetComponent<PhysicsComponent>()->SetMotionType(JPH::EMotionType::Kinematic);
         }
 
         m_parent.attached = true;
@@ -223,7 +226,7 @@ public:
         auto tc = GetComponent<TransformComponent>();
         auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix();
+        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal();
 
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
@@ -364,13 +367,13 @@ public:
 
             if (HasComponent<PhysicsComponent_Info>())
             {
-                RemoveComponent< PhysicsComponent_Info>();
+                // RemoveComponent< PhysicsComponent_Info>();
 
                 // To-do: remove phys from every child
 
                 // OR
                 // To-do: make extended attached mode
-                //GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
+                GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
             }
         }
     }
@@ -458,13 +461,13 @@ public:
 
     void AttachToParent()
     {
-        if (!HasComponent<TransformComponent_Info>() || !m_parent.ptr->HasComponent<TransformComponent_Info>())
+        if (!HasComponent<TransformComponent_Info>() || !m_parent.ptr || !m_parent.ptr->HasComponent<TransformComponent_Info>())
             return;
 
         auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
         auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix().Invert(); // *XMMatrixInverse(nullptr, Matrix::CreateScale(1 / ball->radius) * ball->worldMat);
+        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix_noLocal().Invert();
 
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
@@ -480,12 +483,12 @@ public:
 
         if (HasComponent<PhysicsComponent_Info>())
         {
-            RemoveComponent<PhysicsComponent_Info>();
+            // RemoveComponent<PhysicsComponent_Info>();
             // To-do
             // Remove PhysComp from every GrandChild
             // OR
             // To-do: make extended attached mode
-            //GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
+            GetComponent<PhysicsComponent_Info>()->SetMotion(SE::PhysicsMotionType::Kinematic);
         }
 
         m_parent.attached = true;
@@ -496,7 +499,7 @@ public:
         auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
         auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix();
+        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal();
 
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
@@ -525,12 +528,15 @@ public:
         SE::ComponentType type = T::s_componentType;
         if (type == SE::ComponentType::PHYSICS && m_parent.attached == true)
         {
+            /*
             auto currObj = this;
             while (currObj)
             {
-                this->DetachFromParent();
-                currObj = this->m_parent.ptr;
+				auto nextObj = currObj->m_parent.ptr;
+                currObj->DetachFromParent();
+                currObj = nextObj;
             }
+            */
         }
         //SE::ComponentType type = T::StaticComponentType();
         // Check if already has this type
