@@ -697,6 +697,10 @@ void Scene::FromJson(
             }
 
             if (go) {
+                if (objJ.contains("m_name"))
+                {
+                    go->m_name = objJ["m_name"].get<std::string>().c_str();
+                }
                 // Other components (Physics, Lua)
                 
                 if (objJ["components"].contains("Physics")) {
@@ -841,6 +845,10 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
 
 
             if (go) {
+                if (objJ.contains("m_name"))
+                {
+                    go->m_name = objJ["m_name"].get<std::string>().c_str();
+                }
 
                 if (objJ["components"].contains("Physics")
                     && objJ["m_group"] != GameObjectGroup::Player)

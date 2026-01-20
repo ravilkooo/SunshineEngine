@@ -48,7 +48,7 @@
                     "z": 0.16058725118637085
                 }
             },
-            "m_name": "SkyBox",
+            "m_name": "Floor",
             "m_parent": null,
             "m_type": "SkyBox"
         },
@@ -132,7 +132,7 @@
             "m_UUID_hi": 3620782599,
             "m_UUID_lo": 2139337582,
             "m_group": "Shapes",
-            "m_name": "Box",
+            "m_name": "Carpet",
             "m_parent": null,
             "m_shapeData": {
                 "Size": {
@@ -322,7 +322,7 @@
             "m_UUID_hi": 3221607793,
             "m_UUID_lo": 3550794948,
             "m_group": "Shapes",
-            "m_name": "Sphere",
+            "m_name": "DefaultSphere",
             "m_parent": {
                 "attached": false,
                 "uuid": 15551142850770219886
@@ -396,17 +396,17 @@
                     "m_position": [
                         -2.2605843544006348,
                         -3.2329354286193848,
-                        -7.584725856781006
+                        -7.750267505645752
                     ],
                     "m_rotation": [
-                        0.18271680176258087,
-                        -1.576676368713379,
-                        -2.2545151710510254
+                        0.18271684646606445,
+                        -1.5766760110855103,
+                        -2.2545149326324463
                     ],
                     "m_scaleFactor": [
-                        1.2926521301269531,
-                        0.7546654343605042,
-                        0.5675925016403198
+                        1.2926520109176636,
+                        0.7546652555465698,
+                        0.5675923824310303
                     ]
                 }
             },
@@ -414,7 +414,7 @@
             "m_UUID_hi": 1222930323,
             "m_UUID_lo": 170880686,
             "m_group": "Shapes",
-            "m_name": "Sphere",
+            "m_name": "Oval",
             "m_parent": null,
             "m_shapeData": {
                 "Size": {
@@ -503,7 +503,7 @@
             "m_UUID_hi": 3953727092,
             "m_UUID_lo": 2341246182,
             "m_group": "Shapes",
-            "m_name": "Sphere",
+            "m_name": "BlackEye",
             "m_parent": {
                 "attached": true,
                 "uuid": 1087253342462268591
@@ -595,7 +595,7 @@
             "m_UUID_hi": 614635420,
             "m_UUID_lo": 1453657459,
             "m_group": "Shapes",
-            "m_name": "Sphere",
+            "m_name": "BasketBall",
             "m_parent": {
                 "attached": false,
                 "uuid": 15551142850770219886
@@ -694,7 +694,7 @@
             "m_UUID_hi": 150544222,
             "m_UUID_lo": 509192087,
             "m_group": "Shapes",
-            "m_name": "Sphere",
+            "m_name": "EyeBall",
             "m_parent": {
                 "attached": false,
                 "uuid": 15551142850770219886
@@ -982,7 +982,7 @@
             "m_UUID_hi": 635476326,
             "m_UUID_lo": 715032577,
             "m_group": "Shapes",
-            "m_name": "Box",
+            "m_name": "ParticleEmitter_Pink",
             "m_parent": null,
             "m_shapeData": {
                 "Size": {
@@ -1166,7 +1166,7 @@
             "m_UUID_hi": 163351393,
             "m_UUID_lo": 285791296,
             "m_group": "CustomMesh",
-            "m_name": "CustomObject",
+            "m_name": "Horse",
             "m_parent": null
         },
         {
@@ -1189,9 +1189,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -0.0318298414349556,
-                        -2.8524720668792725,
-                        -9.732568740844727
+                        2.9282891750335693,
+                        -0.860666036605835,
+                        -9.19705867767334
                     ],
                     "m_rotation": [
                         -0.5441939830780029,
@@ -1222,9 +1222,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 2.9282891750335693,
-                    "y": -0.860666036605835,
-                    "z": -9.19705867767334
+                    "x": 3.348266124725342,
+                    "y": -4.766558647155762,
+                    "z": -10.611934661865234
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -1479,7 +1479,7 @@
             "m_UUID_hi": 842638445,
             "m_UUID_lo": 3161917802,
             "m_group": "Shapes",
-            "m_name": "Geosphere",
+            "m_name": "GeosphereEye",
             "m_parent": null,
             "m_shapeData": {
                 "NumSubdivisions": 3,
@@ -1702,7 +1702,7 @@
             "m_UUID_hi": 517392993,
             "m_UUID_lo": 2765237682,
             "m_group": "ParticleEmitter",
-            "m_name": "ParticleEmitter",
+            "m_name": "ParticleEmitter_eq",
             "m_parent": null
         },
         {
@@ -1845,7 +1845,7 @@
             "m_UUID_hi": 3111740350,
             "m_UUID_lo": 2834523778,
             "m_group": "ParticleEmitter",
-            "m_name": "ParticleEmitter",
+            "m_name": "ParticleEmitter_cube",
             "m_parent": null
         },
         {
@@ -1995,7 +1995,7 @@
             "m_UUID_hi": 2484373870,
             "m_UUID_lo": 3260920111,
             "m_group": "ParticleEmitter",
-            "m_name": "ParticleEmitter",
+            "m_name": "ParticleEmitter_Pink",
             "m_parent": null
         },
         {
@@ -2018,9 +2018,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -1.4698660373687744,
-                        -2.389655351638794,
-                        2.790318012237549
+                        -2.3949806690216064,
+                        -3.8539986610412598,
+                        8.686555862426758
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2051,9 +2051,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": -2.3949806690216064,
-                    "y": -3.8539986610412598,
-                    "z": 8.686555862426758
+                    "x": -3.3200953006744385,
+                    "y": -5.318342208862305,
+                    "z": 14.582794189453125
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -2091,9 +2091,9 @@
                         1.0
                     ],
                     "m_position": [
-                        105.82701873779297,
-                        -41.70350646972656,
-                        150.48646545410156
+                        111.2479019165039,
+                        -43.55178451538086,
+                        160.16165161132813
                     ],
                     "m_rotation": [
                         -3.382860924716624e-08,
@@ -2124,9 +2124,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 111.2479019165039,
-                    "y": -43.55178451538086,
-                    "z": 160.16165161132813
+                    "x": 116.58221435546875,
+                    "y": -45.31794738769531,
+                    "z": 169.90008544921875
                 },
                 "Range": 20.0,
                 "Specular": {
