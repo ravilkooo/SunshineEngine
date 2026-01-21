@@ -1,15 +1,8 @@
 #pragma once
 
-//#include <EASTL/string.h>
-//#include <EASTL/hash_map.h>
-//#include <EASTL/vector.h>
-//#include <EASTL/shared_ptr.h>
-//#include <EASTL/optional.h>
-//#include <EASTL/utility.h>
-//#include <EASTL/functional.h>
-
 // Engine
 #include "MemoryBoard.h"
+#include "AI/Behavior/BehaviorStorage.h"
 #include <Utils/UUID.h>
 #include <Component/Component.h>
 
@@ -46,6 +39,7 @@ enum class EStateResult
 
 
 using AbortFunc = std::function<void(const std::string& ToState)>;
+
 
 
 class Action
@@ -217,11 +211,13 @@ private:
 
 class BehaviorController : public Component
 {
-    friend class Game;
+    friend class BehaviorStorage;
     friend class EventTransition;
 
 public:
-    BehaviorController(const SE::UUID& InGOID) : GOID(InGOID) { };
+    explicit BehaviorController(const SE::UUID& InGOID) : GOID(InGOID) { BehaviorStorage::Get().AddBehavior(this); };
+
+    ~BehaviorController() { BehaviorStorage::Get().RemoveBehavior(this); }
 
     // --- MemoryBoard ---
     void SetMemoryBoard(std::shared_ptr<MemoryBoard>& InMemoryBoard);

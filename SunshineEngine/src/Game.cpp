@@ -11,6 +11,9 @@
 #include <Graphics/Renderer/Pass/LightPass.h>
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
+#include "AI/Perception/PerceptionSystem.h"
+#include "AI/Behavior/BehaviorController.h"
+
 Game::Game()
 {
 	// Initialize();
@@ -278,6 +281,10 @@ void Game::Update(float deltaTime) {
 		 m_particleSystem->Update(deltaTime);
 
 	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+
+	 // AI
+	 PerceptionSystem::Get().CheckSights();
+	 BehaviorStorage::Get().Update(deltaTime);
 
 	 m_renderer->GetMainCamera()->Update(deltaTime);
 }
