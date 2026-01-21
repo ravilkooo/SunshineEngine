@@ -1,10 +1,15 @@
 #include "Game.h"
 #include <fstream>   // std::ofstream
-#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 #include <PlayerObject/PlayerObject.h>
 
+#include <Scene.h>
+
 #include <ParticleSystem/ParticleSystem.h>
-#include <ParticleSystem/ParticleEmitter.h>
+//#include <ParticleSystem/ParticleEmitterComponent.h>
+
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Pass/LightPass.h>
+#include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 #include "AI/Perception/PerceptionSystem.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -20,6 +25,11 @@ Game::~Game()
 	// ������������ ��������
 }
 
+void Game::ClearScene()
+{
+	Scene::GetInstance().ClearScene();
+}
+
 void Game::SetupRendering(
 	eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
 	UINT screenWidth,
@@ -32,10 +42,9 @@ void Game::SetupRendering(
 		"GameDeferred", renderSystem->GetDevice(),
 		renderSystem->GetDeviceContext(),
 		m_screenWidth, m_screenHeight);
-	/*
+	
 	this->m_renderer->InitParticleSystem();
 	this->m_particleSystem = this->m_renderer->m_particleSystem.get();
-	*/
 	
 	{
 		m_gPass = static_cast<SE_G::GPass*>(
@@ -51,7 +60,7 @@ void Game::SetupRendering(
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
 
-		//m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
+		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 	}
 }
 
@@ -65,8 +74,6 @@ void Game::SetParticleSystem(eastl::shared_ptr <SE::ParticleSystem> ps)
 void Game::SetupPhysics()
 {
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
-	// For Volodya
-	//m_tracingSystem = eastl::make_unique<TracingSystem>();
 }
 
 bool Game::LoadScene(const wchar_t* scenePath)
@@ -86,8 +93,8 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	}
 
 	SetupPhysics();
-	m_scene = Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
-	m_playerObject = m_scene->m_playerObject;
+	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
+	m_playerObject = Scene::GetInstance().m_playerObject;
 	/*
 	if (!loadedScene) {
 		LOG_EDITOR_ERROR("Scene load error\n");
@@ -98,10 +105,10 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	// For Volodya
 	/*
-	auto m_uuid0 = m_scene->gameObjects[0];
-	auto m_gobj0 = m_scene->GetGameObjectByUUID(m_uuid0);
-	auto m_uuid1 = m_scene->gameObjects[1];
-	auto m_gobj1 = m_scene->GetGameObjectByUUID(m_uuid1);
+	auto m_uuid0 = Scene::GetInstance().gameObjects[0];
+	auto m_gobj0 = Scene::GetInstance().GetGameObjectByUUID(m_uuid0);
+	auto m_uuid1 = Scene::GetInstance().gameObjects[1];
+	auto m_gobj1 = Scene::GetInstance().GetGameObjectByUUID(m_uuid1);
 
 	TracedBody* tb0 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
 
@@ -136,60 +143,58 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 bool Game::LoadGAIScene()
 {
-	auto scene = eastl::make_shared<Scene>();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
 bool Game::LoadDefaultScene()
 {
-	auto scene = eastl::make_shared<Scene>();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
 bool Game::LoadParentScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
 bool Game::LoadLuaScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
 
 bool Game::LoadResourcesScene()
 {
-	auto scene = eastl::make_shared<Scene>();
+	
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
-	scene->RestoreParents();
+	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	return true;
 }
@@ -266,23 +271,22 @@ void Game::Run()
 
 void Game::Update(float deltaTime) {
 
-	 m_luaManager.Update(m_scene.get(), deltaTime);
+	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	 m_physicsSystem->Step(deltaTime);
 
-	 m_physicsSystem->SyncronizeTransforms(m_scene.get());
+	 m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance());
 
 	 if (m_particleSystem)
 		 m_particleSystem->Update(deltaTime);
 
 	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
-	 // For Volodya
-	 //m_tracingSystem->SyncronizeTransforms(m_scene.get());
-
 	 // AI
 	 PerceptionSystem::Get().CheckSights();
 	 BehaviorStorage::Get().Update(deltaTime);
+
+	 m_renderer->GetMainCamera()->Update(deltaTime);
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {

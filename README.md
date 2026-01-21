@@ -126,6 +126,15 @@ Simple 3D Game Engine
 
 Make simple games with our Sunshine Engine!
 
+Link to wiki:
+https://github.com/ravilkooo/SunshineEngine/wiki
+
+Link to videoguide:
+[YouTube]([https://youtu.be/PQfZMqGmwHU](https://youtube.com/playlist?list=PLYaUtvngCOWkHuXNp-mbLQ_tkmgm7sHEm&si=J-wMjmR6qrSwSEhl))
+
+[VK]([https://vk.com/video359543554_456240406](https://vkvideo.ru/playlist/359543554_2))
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 

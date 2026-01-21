@@ -286,6 +286,9 @@ public:
     
     void CreateAndAddBody(PhysicsComponent* physComp);
 
+    // Remove and destroy a specific physics body
+    void RemoveBody(PhysicsComponent* physComp);
+
     // Add objects before this step
     void FinalizeScene();
 

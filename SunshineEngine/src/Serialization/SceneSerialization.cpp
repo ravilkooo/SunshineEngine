@@ -20,10 +20,11 @@
 #include <PlayerObject/PlayerObject.h>
 
 #include <ParticleSystem/ParticleSystem.h>
-#include <ParticleSystem/ParticleEmitter.h>
+#include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Utils/Camera.h>
+#include <Graphics/GraphicsResources/Texture.h>
 
 #include <Serialization/GraphicsSerialization.h>
 
@@ -408,21 +409,22 @@ void PhysicsComponent::FromJson(const json& j) {
 json LuaComponent_Info::ToJson() const {
     json j;
     j = nlohmann::json{
-        {"scriptPath", std::string{scriptPath.c_str()}},
-        {"selectedLuaFile", selectedLuaFile},
+        {"scriptPath", scriptPath.ToJson() },
+        // {"selectedLuaFile", selectedLuaFile},
         {"scriptLoaded", scriptLoaded}
     };
     return j;
 }
 
 void LuaComponent_Info::FromJson(const json& j) {
-    if (j.contains("scriptPath") && j["scriptPath"].is_string()) {
-        std::string stdPath = j.at("scriptPath").get<std::string>();
-        scriptPath = eastl::string(stdPath.c_str());
+    if (j.contains("scriptPath")) {
+		scriptPath.FromJson(j["scriptPath"]);
+        // std::string stdPath = j.at("scriptPath").get<std::string>();
+        // scriptPath = eastl::string(stdPath.c_str());
     }
-    if (j.contains("selectedLuaFile") && j["selectedLuaFile"].is_number()) {
-        selectedLuaFile = j.at("selectedLuaFile").get<int>();
-    }
+    // if (j.contains("selectedLuaFile") && j["selectedLuaFile"].is_number()) {
+    //     selectedLuaFile = j.at("selectedLuaFile").get<int>();
+    // }
     if (j.contains("scriptLoaded") && j["scriptLoaded"].is_boolean()) {
         scriptLoaded = j.at("scriptLoaded").get<bool>();
     }
@@ -433,7 +435,7 @@ void LuaComponent::FromJson(const json& j, GameObject* obj) {
     LuaComponent_Info info;
     info.FromJson(j);
 
-    if (!info.scriptPath.empty()) {
+    if (!info.scriptPath.m_assetRelativePath.empty()) {
         Init(obj, info.scriptPath);
     }
 }
@@ -445,6 +447,9 @@ json GameObject_Info::ToJson() const {
     json j;
     j["m_name"] = m_name.c_str();
     j["m_UUID"] = (uint64_t)m_UUID;
+	SE::UUIDhilo uuidhilo = m_UUID.GetHilo();
+	j["m_UUID_hi"] = (uint32_t)uuidhilo.hi; // for debugging
+    j["m_UUID_lo"] = (uint32_t)uuidhilo.lo; // for debugging
     j["m_group"] = m_group;
     j["m_parent"] = m_parent.ToJson();
     
@@ -489,7 +494,8 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::RENDER:    key = "Render"; break;
             case SE::ComponentType::PHYSICS:   key = "Physics"; break;
             case SE::ComponentType::LUA:       key = "Lua"; break;
-            case SE::ComponentType::MESH:       key = "Mesh"; break;
+            case SE::ComponentType::MESH:      key = "Mesh"; break;
+            case SE::ComponentType::PARTICLE_EMITTER:      key = "ParticleEmitter"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -604,13 +610,12 @@ eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
 
 // ----------------- Scene -----------------
 
-eastl::shared_ptr<Scene> Scene::FromJson(
+void Scene::FromJson(
     SE_G::DeferredRenderer* renderSystem,
     PhysicsSystem* physicsSystem,
     eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
-    auto scene = eastl::make_shared<Scene>();
 
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
@@ -674,13 +679,14 @@ eastl::shared_ptr<Scene> Scene::FromJson(
             {
                 go = eastl::make_unique<PlayerObject>(objJ, renderSystem, camera);
                 auto playerObj = static_cast<PlayerObject*>(go.get());
-                playerObj->AssignSceneToCamera(scene.get());
-                scene->m_playerObjectUUID = playerObj->m_UUID;
+                playerObj->AssignSceneToCamera(&GetInstance());
+                GetInstance().m_playerObjectUUID = playerObj->m_UUID;
                 break;
             }
             case GameObjectGroup::ParticleEmitter:
             {
-                go = SE::ParticleEmitter::FromJson(objJ, renderSystem->m_particleSystem.get());
+                go = GameObjectFactory::CreateParticleEmitter(
+                    renderSystem->m_particleSystem.get(), objJ);
 
                 break;
             }
@@ -691,6 +697,10 @@ eastl::shared_ptr<Scene> Scene::FromJson(
             }
 
             if (go) {
+                if (objJ.contains("m_name"))
+                {
+                    go->m_name = objJ["m_name"].get<std::string>().c_str();
+                }
                 // Other components (Physics, Lua)
                 
                 if (objJ["components"].contains("Physics")) {
@@ -712,16 +722,17 @@ eastl::shared_ptr<Scene> Scene::FromJson(
                     go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
                 }
 
-                auto objUUID = scene->AddGameObject(eastl::move(go));
+                auto objUUID = GetInstance().AddGameObject(eastl::move(go));
                 if (objGroup == GameObjectGroup::Player)
                 {
-                    scene->m_playerObject = static_cast<PlayerObject*>(scene->GetGameObjectByUUID(objUUID));
+                    GetInstance().m_playerObject = static_cast<PlayerObject*>(
+                        GetInstance().GetGameObjectByUUID(objUUID)
+                        );
                 }
             }
         }
     }
-    scene->RestoreParents();
-    return scene;
+    GetInstance().RestoreParents();
 }
 
 // ----------------- Scene_Info -----------------
@@ -821,7 +832,8 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
             }
             case GameObjectGroup::ParticleEmitter:
             {
-                go = SE::ParticleEmitter_Info::FromJson(objJ, renderSystem->m_particleSystem.get());
+                go = EditorObjectFactory::CreateParticleEmitter(
+                    renderSystem->m_particleSystem.get(), objJ);
                     
                 break;
             }
@@ -833,6 +845,10 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
 
 
             if (go) {
+                if (objJ.contains("m_name"))
+                {
+                    go->m_name = objJ["m_name"].get<std::string>().c_str();
+                }
 
                 if (objJ["components"].contains("Physics")
                     && objJ["m_group"] != GameObjectGroup::Player)

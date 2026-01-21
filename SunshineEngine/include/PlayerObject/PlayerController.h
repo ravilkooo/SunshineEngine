@@ -1,12 +1,12 @@
 #pragma once
 
-#include <Windows/Keys.h>
-#include <Windows/InputDevice.h>
-#include <Windows/InputManager.h>
-
 #include <SimpleMath.h> 
 
 #include <EASTL/unordered_map.h>
+
+#include <Windows/Keys.h>
+#include <Windows/InputDevice.h>
+#include <Windows/InputManager.h>
 
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;

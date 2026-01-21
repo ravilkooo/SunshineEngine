@@ -16,7 +16,7 @@ namespace SE_G {
         UINT vIdx = 0u;
         UINT uStepSize = 1u;
         UINT vStepSize = 1u;
-        UUIDhilo uuidHilo;
+        SE::UUIDhilo uuidHilo;
     };
 
     struct IconVertex {

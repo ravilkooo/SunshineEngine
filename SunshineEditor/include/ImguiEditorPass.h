@@ -12,7 +12,6 @@
 
 // SunshineLibs
 #include <Graphics/Renderer/Pass/RenderPass.h>
-#include <Graphics/Renderer/GBuffer.h>
 
 #include <UI/ContentBrowserPanel.h>
 #include <UI/MainMenuBarPanel.h>
@@ -29,6 +28,11 @@ class WorldEditor;
 struct Selection;
 struct SceneNode;
 class SceneGraph;
+
+namespace SE_G
+{
+    class GBuffer;
+}
 
 class ImguiEditorPass :
     public SE_G::RenderPass
@@ -109,7 +113,7 @@ public:
     } m_mouseClickCoords = { 0u, 0u };
 
     void ShowSceneHierarchy();
-    void DrawNode(SceneNode* node, Selection& sel);
+    void DrawNode(SE::UUID nodeUUID, Selection& sel);
     void DrawSceneGraph(SceneGraph* g, Selection& sel);
 private:
     //int selectedIdx = -1;

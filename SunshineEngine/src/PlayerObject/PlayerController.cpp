@@ -8,21 +8,11 @@ void PlayerController::SetPlayerObject(PlayerObject* player)
 
 void PlayerController::HandleKeyDown(Keys key)
 {
-	/*
-	// Try Lua callback first if enabled
-	if (m_useLuaCallbacks && m_player) {
-		bool handled = m_player->m_luaActionMapping.ExecuteKeyAction(key, "down");
-		if (handled) {
-			// Lua handled the input, update key state
-			m_isKeyPressed[key] = true;
-			return;
-		}
-	}
-	return;
-	*/
-
 	// Feed input to InputManager for proper edge detection
 	m_inputManager.ProcessKeyDown(key);
+
+	// Update input state for this frame - computes edge events
+	m_inputManager.Update();
 
 	// Try Lua callback for key press (edge event)
 	if (m_useLuaCallbacks && m_player) {
@@ -40,21 +30,11 @@ void PlayerController::HandleKeyDown(Keys key)
 
 void PlayerController::HandleKeyUp(Keys key)
 {
-	/*
-	// Try Lua callback first if enabled
-	if (m_useLuaCallbacks && m_player) {
-		bool handled = m_player->m_luaActionMapping.ExecuteKeyAction(key, "up");
-		if (handled) {
-			// Lua handled the input, update key state
-			m_isKeyPressed[key] = false;
-			return;
-		}
-	}
-	return;
-	*/
-
 	// Feed input to InputManager for proper edge detection
 	m_inputManager.ProcessKeyUp(key);
+
+	// Update input state for this frame - computes edge events
+	m_inputManager.Update();
 
 	// Try Lua callback for key release (edge event)
 	if (m_useLuaCallbacks && m_player) {
@@ -67,8 +47,15 @@ void PlayerController::HandleKeyUp(Keys key)
 
 void PlayerController::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
-	m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
-	m_stickPitchMoveDir = args.Offset.y * m_stickYawPitchSpeed;
+	SUNSHINE_ROOT_DIR;
+	if (!m_player->m_fixedCamera)
+	{
+		m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
+		m_stickPitchMoveDir = -args.Offset.y * m_stickYawPitchSpeed;
+		
+		m_player->m_playerCamera->RotateStickYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
+	}
+	m_player->m_luaActionMapping.ExecuteMouseMoveAction(args);
 }
 
 void PlayerController::ExecuteAllOnKeyDown()
@@ -83,13 +70,22 @@ void PlayerController::ExecuteAllOnKeyDown()
 
 void PlayerController::UpdatePlayer(float deltaTime)
 {
-	// Update input state for this frame - computes edge events
-	m_inputManager.Update();
+	/*
+	auto pc = m_player->GetComponent<PhysicsComponent>();
+	if (pc)
+	{
+		// Sync kinematic physics body with TransformComponent
+		pc->AddForce(DXSM::Vector3(0, 0, 0.5f * deltaTime));
+		pc->AddImpulse(DXSM::Vector3(0, 0.5f * deltaTime, 0));
+	}
+	*/
 
-	// Handle camera rotation
-	m_player->m_playerCamera->RotateStickYawPitch(deltaTime * m_stickYawMoveDir, deltaTime * m_stickPitchMoveDir);
+	// Update input state for this frame - computes edge events
+	// m_inputManager.Update();
+
 	ExecuteAllOnKeyDown();
 
+	/*
 	// Handle movement using InputManager (supports key held)
 	if (m_inputManager.IsKeyDown(Keys::W) ||
 		m_inputManager.IsKeyDown(Keys::A) ||
@@ -106,8 +102,9 @@ void PlayerController::UpdatePlayer(float deltaTime)
 		m_moveDir = DXSM::Vector3::Transform(m_moveDir, m_player->m_playerCamera->rotateCamToForward);
 		m_player->GetComponent<TransformComponent>()->m_position += m_moveDir * m_moveSpeed;
 	}
+	m_moveDir = DXSM::Vector3::Zero;
+	*/
 
 	m_stickYawMoveDir = 0.0f;
 	m_stickPitchMoveDir = 0.0f;
-	m_moveDir = DXSM::Vector3::Zero;
 }

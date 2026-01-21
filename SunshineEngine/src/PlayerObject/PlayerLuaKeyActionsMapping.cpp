@@ -1,6 +1,8 @@
 #include <PlayerObject/PlayerLuaKeyActionsMapping.h>
 #include <PlayerObject/PlayerObject.h>
 #include <Component/TransformComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/CameraComponent.h>
 #include <Graphics/Utils/Camera.h>
 
 #include <iostream>
@@ -25,7 +27,8 @@ bool PlayerLuaKeyActionsMapping::Initialize(const AssetPath& scriptPath)
 		sol::lib::package,
 		sol::lib::math,
 		sol::lib::string,
-		sol::lib::table
+		sol::lib::table,
+		sol::lib::os
 	);
 
 	// Register C++ bindings
@@ -72,8 +75,7 @@ void PlayerLuaKeyActionsMapping::BindKeyByString(const eastl::string& keyName, c
 	}
 }
 
-
-void PlayerLuaKeyActionsMapping::InitBindingFromJson(const json& j)
+void PlayerLuaKeyActionsMapping::InitKeyBindingFromJson(const json& j)
 {
 	// Load key-function mappings
 	for (const auto& pairJson : j) {
@@ -82,9 +84,46 @@ void PlayerLuaKeyActionsMapping::InitBindingFromJson(const json& j)
 	}
 }
 
+void PlayerLuaKeyActionsMapping::InitMouseActionHandler(const eastl::string& functionName)
+{
+	m_mouseActionsHandlingFunction = functionName;
+}
+
 void PlayerLuaKeyActionsMapping::UnbindKey(Keys key)
 {
 	m_keyActionMapping.erase(key);
+}
+
+bool PlayerLuaKeyActionsMapping::ExecuteMouseMoveAction(InputDevice::MouseMoveEventArgs mouseArgs)
+{
+	// If no Lua state or no handler name configured, abort
+	if (!m_luaState) return false;
+	if (m_mouseActionsHandlingFunction.empty()) return false;
+
+	// try
+	{
+		sol::protected_function func = (*m_luaState)[m_mouseActionsHandlingFunction.c_str()];
+		if (!func.valid()) {
+			LogError("Lua mouse move handler not found: " + m_mouseActionsHandlingFunction);
+			return false;
+		}
+
+		// Pass mouse delta (dx, dy) and wheel delta to Lua. Signature: function(dx, dy, wheelDelta)
+		auto result = func(mouseArgs.Offset.x, mouseArgs.Offset.y, mouseArgs.WheelDelta);
+		if (!result.valid()) {
+			sol::error err = result;
+			LogError("Lua execution error in mouse handler: " + eastl::string(err.what()));
+			return false;
+		}
+
+		return true;
+	}
+	/*
+	catch (const sol::error& e) {
+		LogError("Lua exception in mouse handler: " + eastl::string(e.what()));
+		return false;
+	}
+	*/
 }
 
 void PlayerLuaKeyActionsMapping::SetPlayerObject(PlayerObject* player)
@@ -127,46 +166,168 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 {
 	if (!m_luaState) return;
 
+	m_luaState->new_usertype<SE::UUIDhilo>("UUID",
+		sol::constructors<SE::UUIDhilo()>(),
+		"hi", &SE::UUIDhilo::hi,
+		"lo", &SE::UUIDhilo::lo,
+		"toString", [](SE::UUIDhilo* self) { return SE::UUID(*self).ToString(); },
+		"isEqual", [](SE::UUIDhilo* self, SE::UUIDhilo other) {
+			return self->hi == other.hi && self->lo == other.lo;
+		}
+	);
+
 	// Register Vector3 type
 	m_luaState->new_usertype<DXSM::Vector3>("Vector3",
 		sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float)>(),
 		"x", &DXSM::Vector3::x,
 		"y", &DXSM::Vector3::y,
 		"z", &DXSM::Vector3::z,
-		//"Normalize", &DXSM::Vector3::Normalize,
+		"Normalize",
+		[](DXSM::Vector3* self) {
+			return self->Normalize();
+		}
+		/*&DXSM::Vector3::Normalize*/,
 		"Length", &DXSM::Vector3::Length
 	);
 
 	// Register Camera type
 	m_luaState->new_usertype<SE_G::Camera>("Camera",
 		sol::no_constructor,
+		// Properties (read-only)
 		"forward", sol::readonly(&SE_G::Camera::forward),
 		"up", sol::readonly(&SE_G::Camera::up),
 		"right", sol::readonly(&SE_G::Camera::right),
-		"position", sol::readonly(&SE_G::Camera::position)
+		"position", sol::readonly(&SE_G::Camera::position),
+		// delta time
+		"deltaTime", sol::readonly(&SE_G::Camera::m_deltaTime),
+		// Position methods
+		"setPosition", &SE_G::Camera::SetPosition,
+		"getPosition", &SE_G::Camera::GetPosition,
+		// Target methods
+		"setTarget", &SE_G::Camera::SetTarget,
+		"getTarget", &SE_G::Camera::GetTarget,
+		// Up vector methods
+		"setUp", &SE_G::Camera::SetUp,
+		"getUp", &SE_G::Camera::GetUp,
+		// Near/Far Z methods
+		"setNearZ", &SE_G::Camera::SetNearZ,
+		"getNearZ", &SE_G::Camera::GetNearZ,
+		"setFarZ", &SE_G::Camera::SetFarZ,
+		"getFarZ", &SE_G::Camera::GetFarZ,
+		// Reference length
+		"setReferenceLen", &SE_G::Camera::SetReferenceLen,
+		"getReferenceLen", &SE_G::Camera::GetReferenceLen,
+		// View dimensions
+		"getViewWidth", &SE_G::Camera::GetViewWidth,
+		"getViewHeight", &SE_G::Camera::GetViewHeight,
+		// Movement methods
+		"moveForward", &SE_G::Camera::MoveForward,
+		"moveBackward", &SE_G::Camera::MoveBackward,
+		"moveLeft", &SE_G::Camera::MoveLeft,
+		"moveRight", &SE_G::Camera::MoveRight,
+		"moveUp", &SE_G::Camera::MoveUp,
+		"moveDown", &SE_G::Camera::MoveDown,
+		// Rotation methods
+		"rotateYaw", &SE_G::Camera::RotateYaw,
+		"rotatePitch", &SE_G::Camera::RotatePitch,
+		// Stick Properties
+		"getStickDirection", &SE_G::Camera::GetStickDirection,
+		"getStickLength", &SE_G::Camera::GetStickLength,
+		"setStickLength", &SE_G::Camera::SetStickLength,
+		// Camera mode
+		"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode
+		/*
+		// Update methods
+		"Update", sol::overload(
+			static_cast<void (SE_G::Camera::*)()>(&SE_G::Camera::Update),
+			static_cast<void (SE_G::Camera::*)(const DXSM::Vector3)>(&SE_G::Camera::Update)
+		)
+		*/
 	);
 
 	// Register TransformComponent
 	m_luaState->new_usertype<TransformComponent>("TransformComponent",
 		sol::no_constructor,
-		"position", &TransformComponent::m_position,
-		"rotation", &TransformComponent::m_rotation,
-		"scale", &TransformComponent::m_scaleFactor
+		"m_position", &TransformComponent::m_position,
+		"m_rotation", &TransformComponent::m_rotation,
+		"m_scale", &TransformComponent::m_scaleFactor
+	);
+
+	// Register CameraComponent
+	m_luaState->new_usertype<CameraComponent>("CameraComponent",
+		sol::no_constructor,
+		"getCamera", [](CameraComponent* self) { return self->GetCamera(); }
+	);
+
+	// Register PhysicsComponent
+	m_luaState->new_usertype<PhysicsComponent>("PhysicsComponent",
+		sol::no_constructor,
+		"addForce", &PhysicsComponent::AddForce,
+		"addImpulse", &PhysicsComponent::AddImpulse,
+		"addTorque", &PhysicsComponent::AddTorque,
+		"addAngularImpulse", &PhysicsComponent::AddAngularImpulse,
+		"getAccumulatedForce", &PhysicsComponent::GetAccumulatedForce,
+		"getAccumulatedTorque", &PhysicsComponent::GetAccumulatedTorque,
+		"getAngularVelocity", &PhysicsComponent::GetAngularVelocity,
+		"getLinearVelocity", &PhysicsComponent::GetLinearVelocity,
+		"getPointVelocity", &PhysicsComponent::GetPointVelocity,
+		"getPosition", &PhysicsComponent::GetPosition,
+		"getRotation", &PhysicsComponent::GetRotation,
+		"resetForce", &PhysicsComponent::ResetForce,
+		"resetTorque", &PhysicsComponent::ResetTorque,
+		"setAngularVelocity", &PhysicsComponent::SetAngularVelocity,
+		"setLinearVelocity", &PhysicsComponent::SetLinearVelocity
 	);
 
 	// Register PlayerObject
 	m_luaState->new_usertype<PlayerObject>("PlayerObject",
 		sol::no_constructor,
-		"GetTransform", [](PlayerObject* player) {
+		"getTransform", [](PlayerObject* player) {
 			return player->GetComponent<TransformComponent>().get();
 		},
-		"GetCamera", [](PlayerObject* player) {
+		"getPhysics", [](PlayerObject* player) {
+			return player->GetComponent<PhysicsComponent>().get();
+		},
+		"getCamera", [](PlayerObject* player) {
 			return player->m_playerCamera.get();
 		},
-		"GetName", [](PlayerObject* player) {
+		"getCameraComponent", [](PlayerObject* player) {
+			return player->GetComponent<CameraComponent>().get();
+		},
+		"getName", [](PlayerObject* player) {
 			return player->m_name.c_str();
+		},
+		"getUUID", [](PlayerObject* self) {
+			return self->m_UUID.GetHilo();
 		}
 	);
+
+	// Base GameObject type; component binders will append getters
+	m_luaState->new_usertype<GameObject>("GameObject",
+		sol::no_constructor,
+		"getTransform", [](GameObject* player) {
+			return player->GetComponent<TransformComponent>().get();
+		},
+		"getPhysics", [](GameObject* player) {
+			return player->GetComponent<PhysicsComponent>().get();
+		},
+		"getName", [](GameObject* player) {
+			return player->m_name.c_str();
+		},
+		"getUUID", [](GameObject* self) {
+			return self->m_UUID.GetHilo();
+		}
+	);
+
+	// Remove object from scene
+	m_luaState->set_function("removeGameObjectByUUID", [](SE::UUIDhilo uuidhilo) {
+		Scene::GetInstance().RemoveGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+		});
+
+	// GetObject by UUID
+	m_luaState->set_function("getGameObjectByUUID", [](SE::UUIDhilo uuidhilo) -> GameObject* {
+		return Scene::GetInstance().GetGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+		});
 
 	// Helper functions
 	(*m_luaState)["print"] = [](const std::string& msg) {

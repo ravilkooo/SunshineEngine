@@ -3,12 +3,16 @@
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 #include <Component/MeshComponent.h>
+#include <ParticleSystem/ParticleEmitterComponent.h>
+
 #include <GameObject/Lighting/AmbientLight.h>
 #include <GameObject/Lighting/DirectionalLight.h>
 #include <GameObject/Lighting/PointLight.h>
 #include <GameObject/Lighting/SpotLight.h>
 #include <GameObject/Lighting/SkyBox.h>
 #include <GameObject/Shapes/ShapeData.h>
+
+#include <ParticleSystem/ParticleSystem.h>
 
 #include <Graphics/GraphicsResources/Mesh.h>
 
@@ -25,6 +29,109 @@
 #include <Serialization/ShapeSerialization.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
+
+
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateParticleEmitter(
+	SE::ParticleSystem* particleSystem)
+{
+	auto device = particleSystem->m_renderer->GetDevice();
+	auto obj = eastl::make_unique<GameObject>();
+
+	// TransformComponent
+	auto tc = obj->AddComponent<TransformComponent>(device);
+
+	// RenderComponent
+	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, particleSystem->m_renderer);
+
+	// ParticleEmitterComponent
+	SE::ParticleData::EmitterPointConstantBuffer emitterDesc;
+	SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc;
+
+	emitterDesc =
+	{
+		DXSM::Matrix::Identity,
+		{ 0, 0, 0 }, 3.0f,
+		{ 1, 1, 1 }, 1.0f,
+		{ 1, 1, 1 }, 1.0f,
+
+		8, 1, 0.2, 0.5,
+
+		0, DX::XM_2PI, -DX::XM_PIDIV2, DX::XM_PIDIV2,
+
+		100u, { 0, 0, 0 },
+	};
+	simulatorDesc = {
+		{ 0, 0, 0 }, 0
+	};
+
+	auto pec = obj->AddComponent<ParticleEmitterComponent>(
+		obj->m_UUID, tc.get(),
+		particleSystem,
+		emitterDesc,
+		simulatorDesc);
+
+	return obj;
+}
+
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateParticleEmitter(
+	SE::ParticleSystem* particleSystem,
+	const json& j)
+{
+	auto device = particleSystem->m_renderer->GetDevice();
+	auto obj = eastl::make_unique<GameObject>();
+	obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+
+	// TransformComponent
+	auto tc = obj->AddComponent<TransformComponent>(device);
+	if (j["components"].contains("Transform")) {
+		tc->FromJson(j["components"]["Transform"]);
+	}
+
+	// RenderComponent
+	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, particleSystem->m_renderer);
+
+	// ParticleEmitterComponent
+	if (j["components"].contains("ParticleEmitter"))
+	{
+		auto pec = obj->AddComponent<ParticleEmitterComponent>();
+		pec->FromJson(j["components"]["ParticleEmitter"],
+			obj->m_UUID, tc.get(),
+			particleSystem);
+	}
+	else
+	{
+		SE::ParticleData::EmitterPointConstantBuffer emitterDesc;
+		SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc;
+		emitterDesc =
+		{
+			DXSM::Matrix::Identity,
+			{ 0, 0, 0 }, 3.0f,
+			{ 1, 1, 1 }, 1.0f,
+			{ 1, 1, 1 }, 1.0f,
+			8, 1, 0.2, 0.5,
+			0, DX::XM_2PI, -DX::XM_PIDIV2, DX::XM_PIDIV2,
+			100u, { 0, 0, 0 },
+		};
+		simulatorDesc = {
+			{ 0, 0, 0 }, 0
+		};
+		auto pec = obj->AddComponent<ParticleEmitterComponent>(
+			obj->m_UUID, tc.get(),
+			particleSystem,
+			emitterDesc,
+			simulatorDesc);
+	}
+
+	// MeshComponent
+	if (j["components"].contains("Mesh"))
+	{
+		auto mc = obj->AddComponent<MeshComponent>();
+		mc->FromJson(j["components"]["Mesh"], device, rc.get(), tc.get(), obj->m_UUID);
+	}
+
+	return obj;
+}
+
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
 	SE_G::DeferredRenderer* renderSystem,

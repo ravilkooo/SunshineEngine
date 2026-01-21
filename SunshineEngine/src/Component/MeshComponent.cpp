@@ -71,6 +71,17 @@ MeshComponent::MeshComponent(RenderComponent* rc, TransformComponent* tc,
 
 MeshComponent::~MeshComponent()
 {
+    /*
+    if (m_gBufferTech)
+    {
+        if (m_gBufferTech->m_assignedTransform)
+        {
+            m_gBufferTech->m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
+            m_gBufferTech->m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
+            m_gBufferTech->m_assignedTransform->m_localScaleFactor = DXSM::Vector3::One;
+        }
+    }
+    */
 }
 
 MeshComponent::MeshComponent(MeshComponent&& other) noexcept
@@ -124,6 +135,14 @@ MeshComponent_Info::MeshComponent_Info(
 
 MeshComponent_Info::~MeshComponent_Info()
 {
+    /*
+    if (m_assignedComponent->m_gBufferTech && m_assignedComponent->m_gBufferTech->m_assignedTransform)
+    {
+        m_assignedComponent->m_gBufferTech->m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
+        m_assignedComponent->m_gBufferTech->m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
+        m_assignedComponent->m_gBufferTech->m_assignedTransform->m_localScaleFactor = DXSM::Vector3::One;
+    }
+    */
     m_rc_info->RemoveTechnique("GPass");
 }
 

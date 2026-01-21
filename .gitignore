@@ -73,6 +73,8 @@ Editor/lib/
 
 Projects/*
 !Projects/.gitignore
+!Projects/DefaultScene/
+!Projects/DefaultScene/**
 
 # ---- Precompiled headers (VS/MSVC) ----
 *.pch

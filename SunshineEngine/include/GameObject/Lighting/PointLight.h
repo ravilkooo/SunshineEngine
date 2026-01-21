@@ -7,17 +7,10 @@
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
 
-#include <Graphics/Utils/ShapeGenerator.h>
-//#include <DirectXCollision.h>
-
-#include "Graphics/Utils/Camera.h"
-
 #include <GameObject/GameObject.h>
 #include <GameObject/Lighting/LightObject.h>
 #include <Graphics/Lighting/LightData.h>
 
-#include <Serialization/LightDataSerialization.h>
-#include <Serialization/DXSMSerialization.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 

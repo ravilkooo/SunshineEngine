@@ -75,24 +75,14 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
         //ImGui::ColorEdit3("Camera Rotation",
         //	&(m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll.x), ImGuiColorEditFlags_Float);
 
+        /*
         DXSM::Vector3 viewPitchYawRoll = m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll * (180.0f / DirectX::XM_PI);
         if (PropertyPanel::DrawVector3Control("Camera Rotation", viewPitchYawRoll, 0.0f))
         {
             m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll = viewPitchYawRoll * (DirectX::XM_PI / 180.0f);
         }
-
-        /*
-        float azimut = lightData->Direction.x * (360.0f / DirectX::XM_2PI);
-        float height = lightData->Direction.y * (360.0f / DirectX::XM_2PI);
-        if ()
-        {
-            lightData->Direction.x = azimut * DirectX::XM_2PI / 360.0f;
-        }
-        if (ImGui::DragFloat("Height", &height, 0.5f, -90.0f, 90.0f, "%.1f m"))
-        {
-            lightData->Direction.y = height * DirectX::XM_2PI / 360.0f;
-        }
         */
+
         ImGui::TreePop();
     }
     else
@@ -175,6 +165,78 @@ void PlayerSettingPanel::DrawPlayerControllerDetails()
                 ImGui::CloseCurrentPopup();
             }
 
+            ImGui::EndPopup();
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        // ===== MOUSE ACTIONS CONFIGURATION =====
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("Mouse Actions");
+        EditorUI::FontStyles::Pop();
+
+        ImGui::Text("Mouse Handler Function:");
+        ImGui::SameLine();
+
+        static char mouseHandlerBuffer[256] = "";
+        // Initialize buffer with current value
+        static bool mouseBufferInitialized = false;
+        if (!mouseBufferInitialized && m_playerObject) {
+            eastl::string currentHandler = m_playerObject->m_luaActionMapping.GetMouseActionsHandlingFunction();
+            if (!currentHandler.empty()) {
+                strncpy_s(mouseHandlerBuffer, currentHandler.c_str(), sizeof(mouseHandlerBuffer) - 1);
+            }
+            else {
+                strncpy_s(mouseHandlerBuffer, "onLookAround", sizeof(mouseHandlerBuffer) - 1);
+            }
+            mouseBufferInitialized = true;
+        }
+
+        float total = ImGui::GetContentRegionAvail().x;
+        ImGui::SetNextItemWidth(total * 0.7f);
+        ImGui::InputText("##MouseHandler", mouseHandlerBuffer, IM_ARRAYSIZE(mouseHandlerBuffer));
+        ImGui::SameLine();
+
+        if (ImGui::Button("Set##MouseHandler", ImVec2(0, 0))) {
+            if (mouseHandlerBuffer[0] != '\0' && m_playerObject) {
+                // Validate function exists in Lua
+                sol::state* luaState = m_playerObject->m_luaActionMapping.GetLuaState();
+                if (luaState) {
+                    sol::function func = (*luaState)[mouseHandlerBuffer];
+                    if (func.valid()) {
+                        m_playerObject->m_luaActionMapping.SetMouseActionsHandlingFunction(
+                            eastl::string(mouseHandlerBuffer));
+                        ImGui::OpenPopup("MouseHandlerSetPopup");
+                    }
+                    else {
+                        ImGui::OpenPopup("MouseHandlerErrorPopup");
+                    }
+                }
+            }
+        }
+
+        ImGui::TextDisabled("(function signature: function(deltaX, deltaY, wheelDelta))");
+
+        // Success message
+        if (ImGui::BeginPopupModal("MouseHandlerSetPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "Mouse handler set successfully!");
+            ImGui::Text("Function: %s", mouseHandlerBuffer);
+            if (ImGui::Button("OK##MouseHandlerSet", ImVec2(100, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        // Error message
+        if (ImGui::BeginPopupModal("MouseHandlerErrorPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "Error: Function not found!");
+            ImGui::Text("Function '%s' not found in Lua script.", mouseHandlerBuffer);
+            ImGui::TextDisabled("Make sure the function is defined in your Lua script.");
+            if (ImGui::Button("OK##MouseHandlerError", ImVec2(100, 0))) {
+                ImGui::CloseCurrentPopup();
+            }
             ImGui::EndPopup();
         }
 

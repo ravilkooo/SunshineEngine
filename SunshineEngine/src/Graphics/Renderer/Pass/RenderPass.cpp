@@ -1,5 +1,8 @@
 #include "Graphics/Renderer/Pass/RenderPass.h"
 
+#include <Component/RenderComponent.h>
+#include <Component/TransformComponent.h>
+
 namespace SE_G {
 	RenderPass::RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context)
 		: techniqueTag(techniqueTag), device(device), context(context)

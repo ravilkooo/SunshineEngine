@@ -24,6 +24,15 @@ eastl::wstring AssetPath::GetFullPath() const
 	}
 }
 
+bool AssetPath::operator==(const AssetPath& other) const noexcept
+{
+	return this->m_assetSource == other.m_assetSource && this->m_assetRelativePath == other.m_assetRelativePath;
+}
+bool AssetPath::operator!=(const AssetPath& other) const noexcept
+{
+	return !(*this == other);
+}
+
 json AssetPath::ToJson() const
 {
 	json j;

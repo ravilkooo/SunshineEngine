@@ -129,9 +129,43 @@ void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
     physComp->m_joltBody = bodyInterface.CreateBody(settings);
     physComp->m_joltBodyId = physComp->m_joltBody->GetID();
     physComp->m_joltBody->SetUserData(physComp->m_objectUUID.m_UUID);
+	physComp->m_physicsSystem = this;
 
     m_bodyEntries.push_back({ physComp->m_joltBodyId });
     m_bodyInterface->AddBody(physComp->m_joltBodyId, physComp->m_activation);
+}
+
+void PhysicsSystem::RemoveBody(PhysicsComponent* physComp)
+{
+    if (!physComp || !m_bodyInterface)
+        return;
+
+    JPH::BodyID bodyId = physComp->m_joltBodyId;
+
+    // Remove from body entries
+    auto it = eastl::find_if(m_bodyEntries.begin(), m_bodyEntries.end(),
+        [bodyId](const PhysicsBodyEntry& entry) {
+            return entry.m_joltBodyId == bodyId;
+        });
+
+    if (it != m_bodyEntries.end())
+    {
+        m_bodyEntries.erase(it);
+    }
+
+    // Remove from physics world
+    if (m_bodyInterface->IsAdded(bodyId))
+    {
+        m_bodyInterface->RemoveBody(bodyId);
+    }
+
+    // Destroy the body
+    m_bodyInterface->DestroyBody(bodyId);
+
+    // Clear component references
+    physComp->m_joltBody = nullptr;
+    physComp->m_joltBodyId = JPH::BodyID();
+    physComp->m_physicsSystem = nullptr;
 }
 
 // Add objects before this step
@@ -178,6 +212,11 @@ void PhysicsSystem::FinalizeScene() {
 void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
     for (auto bodyEntry : m_bodyEntries) {
 
+        SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
+        auto objPtr = scene->GetGameObjectByUUID(objectUUID);
+        if (!objPtr)
+			continue;
+
         if (m_bodyInterface->GetMotionType(bodyEntry.m_joltBodyId) == JPH::EMotionType::Dynamic)
         {
             //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(bodyEntry.m_joltBodyId);
@@ -185,10 +224,8 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
             JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);
 
-            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
 
-            auto tc = scene->GetGameObjectByUUID(
-                objectUUID)->GetComponent<TransformComponent>();
+            auto tc = objPtr->GetComponent<TransformComponent>();
 
             tc->m_position =
                 DXSM::Vector3(position.mF32
@@ -209,11 +246,20 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             if (!tc)
                 continue;
 
+            auto wMat = tc->GetWorldMatrix_noLocal();
+
+            DX::XMVECTOR scale, rotation, translation;
+            DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
+
+            DXSM::Vector3 _pos;
+            DXSM::Quaternion _quat;
+
+            DX::XMStoreFloat3(&_pos, translation);
+            DX::XMStoreFloat4(&_quat, rotation);
+
             // Push TransformComponent data into the kinematic body
-            const JPH::RVec3 targetPos(tc->m_position.x, tc->m_position.y, tc->m_position.z);
-            const DXSM::Quaternion dxQuat = DXSM::Quaternion::CreateFromYawPitchRoll(
-                tc->m_rotation.y, tc->m_rotation.x, tc->m_rotation.z);
-            const JPH::Quat targetRot(dxQuat.x, dxQuat.y, dxQuat.z, dxQuat.w);
+            const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
+            const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
             m_bodyInterface->SetPositionAndRotation(
                 bodyEntry.m_joltBodyId,

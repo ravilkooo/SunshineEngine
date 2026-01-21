@@ -4,6 +4,9 @@
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
 #include <Graphics/GraphicsResources/GeometryShader.h>
+#include <Graphics/GraphicsResources/PixelShader.h>
+#include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/Bindable/Sampler.h>
 
 #include <Utils/StringUtils.h>
 
@@ -159,6 +162,8 @@ namespace SE_G {
 
 			m_camera->BindBuffer(context.Get());
 
+			transformComponent->EnableMeshTransformMode();
+
 			transformComponent->BindToGraphicsPipeline(
 				GetDeviceContext()
 			);
@@ -223,6 +228,7 @@ namespace SE_G {
 
 				transformComponent->m_localScaleFactor = actualLocalScaleFactor;
 			}
+			transformComponent->DisableMeshTransformMode();
 		}
 
 		context->OMSetDepthStencilState(nullptr, 0);

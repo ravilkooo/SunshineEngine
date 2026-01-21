@@ -9,11 +9,8 @@
 #include <directxmath.h>
 
 #include <Graphics/Renderer/RenderGroup.h>
-#include <Graphics/Renderer/Technique/RenderTechnique.h>
 #include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Utils/Camera.h>
-
-//#include <Scene.h>
 
 namespace SE
 {

@@ -50,7 +50,7 @@ namespace SE_G {
 
 		m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 
-		m_uuidBuffer = eastl::make_unique<Bind::PixelConstantBuffer<UUIDhilo>>(
+		m_uuidBuffer = eastl::make_unique<Bind::PixelConstantBuffer<SE::UUIDhilo>>(
 			device,
 			uuid.GetHilo(),
 			0u
@@ -100,7 +100,9 @@ namespace SE_G {
 
 	GPassTechnique::~GPassTechnique()
 	{
-		
+		m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
+		m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
+		m_assignedTransform->m_localScaleFactor = DXSM::Vector3::One;
 	}
 
 GPassTechnique::GPassTechnique(GPassTechnique&& other) noexcept

@@ -5,6 +5,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Root paths
 set(SE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(SE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(PROJECTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Projects")
 
 # Tell CMake to reconfigure if files change
 set_property(GLOBAL PROPERTY CMAKE_CONFIGURE_DEPENDS
@@ -92,6 +93,7 @@ target_link_libraries(SunshineEngine PUBLIC Jolt)
 # -------------- Assets --------------
 
 target_compile_definitions(SunshineEngine PUBLIC ENGINE_ASSETS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Assets/")
+target_compile_definitions(SunshineEngine PUBLIC PROJECT_DIR=L"${PROJECTS_DIR}/")
 
 # Collect all HLSL shader files
 file(GLOB_RECURSE SHADERS "Assets/Shaders/*.hlsl")

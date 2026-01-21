@@ -26,7 +26,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 if (MSVC)
     # Match VS default: Unicode build, no min/max macro pollution
     add_compile_definitions(UNICODE _UNICODE NOMINMAX)
-    #add_compile_options(/MP)
+    add_compile_options(/MP)
 endif()
 
 # Engine (DLL)
@@ -39,3 +39,6 @@ add_subdirectory(ThirdParty)
 
 # Projects path
 target_compile_definitions(SunshineEditor PUBLIC PROJECTS_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/Projects/")
+
+# Engine root path
+target_compile_definitions(SunshineEngine PUBLIC SUNSHINE_ROOT_DIR=L"${CMAKE_CURRENT_SOURCE_DIR}/")

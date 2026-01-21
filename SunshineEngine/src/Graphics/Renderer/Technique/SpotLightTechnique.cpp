@@ -1,5 +1,8 @@
 #include "Graphics/Renderer/Technique/SpotLightTechnique.h"
 #include <Graphics/GraphicsResources/Mesh.h>
+
+#include <Component/TransformComponent.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
@@ -27,7 +30,8 @@ namespace SE_G {
     void SpotLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
     {
         // to-do: update only when changed
-        m_lightData->Position = m_assignedTransform->m_position;
+        auto wMat = m_assignedTransform->GetWorldMatrix();
+        m_lightData->Position = DXSM::Vector3(wMat._41, wMat._42, wMat._43);
 
         DXSM::Matrix rot = m_assignedTransform->GetRotationMatrix();
         DXSM::Vector3 dir = DXSM::Vector3::Transform(DXSM::Vector3::Down, rot);

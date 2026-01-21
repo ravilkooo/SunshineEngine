@@ -17,7 +17,6 @@
 // SunshineLibs
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/RenderGroup.h>
-#include <Graphics/Renderer/Pass/RenderPass.h>
 
 #include <Windows/WindowsApp.h>
 
@@ -25,10 +24,18 @@
 #include <GameTimer.h>
 #include <Game.h>
 
-#include <Project.h>
 #include <WorldEditor.h>
-#include <ImguiEditorPass.h>
 
+#include <UI/ProjectSelector.h>
+
+
+class ImguiEditorPass;
+
+namespace SE
+{
+    class Project;
+
+}
 struct Ray
 {
     DX::XMVECTOR Origin;
@@ -87,6 +94,16 @@ public:
     //GameTimer m_timer;
 
     float m_deltaTime = 0.0f;
+
+	// Fixed timestep physics update
+    float physicsUpdateFPS = 120.0f;
+    float physicsUpdateMs = 1.0f / 120.0f;
+    float accumulator = 0.0f;
+    float accumulatorLimit = 4.0f / 120.0f;
+
+    // FPS statitistic
+    unsigned int frameCount = 0;
+    float FPSstatisticTimer = 0;
 
     sol::state m_lua;
 

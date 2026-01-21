@@ -1,9 +1,21 @@
 #include <PlayerObject/PlayerObject.h>
 
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/Utils/Camera.h>
+
+#include <Component/TransformComponent.h>
+#include <Component/MeshComponent.h>
+#include <Component/CameraComponent.h>
 
 #include <Utils/AssetPath.h>
 #include <Utils/StringUtils.h>
+
+
+PlayerObject::PlayerObject() : GameObject()
+{
+	m_name = "PlayerObject";
+};
 
 PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, eastl::shared_ptr<SE_G::Camera> camera)
 {
@@ -40,6 +52,20 @@ PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, 
 		json _empty;
 		SettingsFromJson(_empty, camera);
 	}
+
+	AddComponent<CameraComponent>(m_playerCamera);
+}
+
+void PlayerObject::SetUpCamera(SE_G::DeferredRenderer* renderSystem)
+{
+	m_playerCamera = eastl::make_shared<SE_G::Camera>(
+		renderSystem->GetDevice(), renderSystem->m_screenWidth / renderSystem->m_screenHeight);
+	m_playerCamera->SetFollowPlayer(m_UUID);
+}
+
+void PlayerObject::AssignSceneToCamera(Scene* scene)
+{
+	m_playerCamera->AssignScene(scene);
 }
 
 void PlayerObject::SetDefaultLuaActionMapping()
@@ -66,7 +92,8 @@ void PlayerObject::SetupLuaActionMapping(const json& j)
 	m_luaActionMapping.SetPlayerObject(this);
 
 	// Bind keys
-	m_luaActionMapping.InitBindingFromJson(j["keyFunctionMappings"]);
+	m_luaActionMapping.InitKeyBindingFromJson(j["keyFunctionMappings"]);
+	m_luaActionMapping.InitMouseActionHandler(j["mouseFunctionMapping"].get<std::string>().c_str());
 
 	// Enable Lua mode
 	m_playerController.SetLuaCallbackMode(true);
@@ -145,4 +172,160 @@ PlayerObject_Info::PlayerObject_Info(const json& j, SE_G::DeferredRenderer* rend
 		json _empty;
 		SettingsFromJson(_empty, renderSystem);
 	}
+}
+
+void PlayerObject_Info::SetLuaScriptPath(const AssetPath& scriptPath)
+{
+	m_luaScriptPath = scriptPath;
+}
+
+const AssetPath& PlayerObject_Info::GetLuaScriptPath() const
+{
+	return m_luaScriptPath;
+}
+
+bool PlayerObject_Info::HasLuaScript() const
+{
+	return !m_luaScriptPath.GetFullPath().empty();
+}
+
+
+void PlayerObject_Info::AddKeyFunctionPair(Keys key, const eastl::string& functionName)
+{
+	if (key != Keys::None && !functionName.empty()) {
+		m_keyFunctionMapping.push_back(KeyFunctionPair(key, functionName));
+	}
+}
+
+void PlayerObject_Info::AddKeyFunctionPair(const KeyFunctionPair& pair)
+{
+	if (pair.IsValid()) {
+		m_keyFunctionMapping.push_back(pair);
+	}
+}
+
+bool PlayerObject_Info::RemoveKeyFunctionPair(size_t index)
+{
+	if (index < m_keyFunctionMapping.size()) {
+		m_keyFunctionMapping.erase(m_keyFunctionMapping.begin() + index);
+		return true;
+	}
+	return false;
+}
+
+bool PlayerObject_Info::EditKeyFunctionPair(size_t index, Keys newKey, const eastl::string& newFunctionName)
+{
+	if (index < m_keyFunctionMapping.size()) {
+		if (newKey != Keys::None && !newFunctionName.empty()) {
+			m_keyFunctionMapping[index].key = newKey;
+			m_keyFunctionMapping[index].functionName = newFunctionName;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool PlayerObject_Info::EditKeyFunctionPairKey(size_t index, Keys newKey)
+{
+	if (index < m_keyFunctionMapping.size() && newKey != Keys::None) {
+		m_keyFunctionMapping[index].key = newKey;
+		return true;
+	}
+	return false;
+}
+
+bool PlayerObject_Info::EditKeyFunctionPairFunction(size_t index, const eastl::string& newFunctionName)
+{
+	if (index < m_keyFunctionMapping.size() && !newFunctionName.empty()) {
+		m_keyFunctionMapping[index].functionName = newFunctionName;
+		return true;
+	}
+	return false;
+}
+
+const KeyFunctionPair* PlayerObject_Info::GetKeyFunctionPair(size_t index) const
+{
+	if (index < m_keyFunctionMapping.size()) {
+		return &m_keyFunctionMapping[index];
+	}
+	return nullptr;
+}
+
+const eastl::vector<KeyFunctionPair>& PlayerObject_Info::GetAllKeyFunctionPairs() const
+{
+	return m_keyFunctionMapping;
+}
+
+size_t PlayerObject_Info::GetKeyFunctionPairCount() const
+{
+	return m_keyFunctionMapping.size();
+}
+
+void PlayerObject_Info::ClearKeyFunctionPairs()
+{
+	m_keyFunctionMapping.clear();
+}
+
+int PlayerObject_Info::FindPairIndexByKey(Keys key) const
+{
+	for (size_t i = 0; i < m_keyFunctionMapping.size(); ++i) {
+		if (m_keyFunctionMapping[i].key == key) {
+			return static_cast<int>(i);
+		}
+	}
+	return -1;
+}
+
+void PlayerObject_Info::AddRenderComponent(SE_G::DeferredRenderer* renderSystem)
+{
+	m_renderComp = this->AddComponent<RenderComponent_Info>(this->m_UUID, renderSystem).get();
+};
+
+void PlayerObject_Info::AddTransformComponent(ID3D11Device* device)
+{
+	m_transformComp = this->AddComponent<TransformComponent_Info>(device).get();
+};
+
+void PlayerObject_Info::AddMeshComponent()
+{
+	auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
+		m_renderComp->GetDevice(),
+		DXSM::Vector3(1.0f, 1.0f, 1.0f)
+	);
+	m_meshComp = this->AddComponent<MeshComponent_Info>(
+		m_renderComp, m_transformComp, this->m_UUID, meshPtr).get();
+};
+
+void PlayerObject_Info::AddPhysicsComponent()
+{
+	m_physComp = this->AddComponent<PhysicsComponent_Info>(
+		m_renderComp, m_transformComp).get();
+
+	m_physComp->SetMotion(SE::PhysicsMotionType::Kinematic);
+};
+
+void PlayerObject_Info::InitMiniViewport(SE_G::DeferredRenderer* defRenderer)
+{
+	m_miniViewRenderer = eastl::make_shared<SE_G::MiniViewRenderer>(
+		"PlayerViewport", defRenderer->GetDevice(), defRenderer->GetDeviceContext());
+	m_miniViewRenderer->SetParentRenderer(defRenderer);
+	m_miniViewRenderer->Disable();
+}
+
+void PlayerObject_Info::AssignSceneToCamera(Scene_Info* scene)
+{
+	m_playerCamera->AssignScene(scene);
+}
+
+void PlayerObject_Info::SetUpCamera()
+{
+	m_playerCamera = eastl::make_shared<SE_G::Camera>(
+		m_miniViewRenderer->GetDevice(), 640.0f / 360.0f);
+	m_playerCamera->SetFollowPlayer(m_UUID);
+	m_miniViewRenderer->SetMainCamera(m_playerCamera);
+}
+
+void PlayerObject_Info::RenderViewport()
+{
+	m_miniViewRenderer->Pass();
 }

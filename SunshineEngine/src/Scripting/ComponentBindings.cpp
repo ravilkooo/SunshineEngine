@@ -1,9 +1,14 @@
 #include <Scripting/ComponentBindings.h>
-
-#include <GameObject/GameObject.h>
 #include <Scripting/AutoBindings.h>
-#include <Utils/DebugUtils.h>
+
 #include <SimpleMath.h>
+
+#include <Graphics/Utils/Camera.h>
+#include <GameObject/GameObject.h>
+#include <Scene.h>
+#include <Utils/UUID.h>
+#include <Utils/DebugUtils.h>
+
 #include <AI/Perception/PerceptionSystem.h>
 #include "AI/Behavior/MemoryBoard.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -14,15 +19,94 @@ namespace ScriptingBindings
 {
     void RegisterAll(sol::state& lua)
     {
+        // Register UUIDhilo struct for safe 32-bit access
+        lua.new_usertype<SE::UUIDhilo>("UUID",
+            sol::constructors<SE::UUIDhilo()>(),
+            "hi", &SE::UUIDhilo::hi,
+            "lo", &SE::UUIDhilo::lo,
+            "toString", [](SE::UUIDhilo* self) { return SE::UUID::FromHilo(*self).ToString(); },
+			"isEqual", [](SE::UUIDhilo* self, SE::UUIDhilo other) {
+				return self->hi == other.hi && self->lo == other.lo;
+			}
+        );
+
         // Math/value types
         lua.new_usertype<DXSM::Vector3>("Vector3",
+            sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float)>(),
             "x", &DXSM::Vector3::x,
             "y", &DXSM::Vector3::y,
             "z", &DXSM::Vector3::z
         );
 
+		// Register Camera type
+		lua.new_usertype<SE_G::Camera>("Camera",
+			sol::no_constructor,
+			// Properties (read-only)
+			"forward", sol::readonly(&SE_G::Camera::forward),
+			"up", sol::readonly(&SE_G::Camera::up),
+			"right", sol::readonly(&SE_G::Camera::right),
+			"position", sol::readonly(&SE_G::Camera::position),
+			// delta time
+			"deltaTime", sol::readonly(&SE_G::Camera::m_deltaTime),
+			// Position methods
+			"setPosition", &SE_G::Camera::SetPosition,
+			"getPosition", &SE_G::Camera::GetPosition,
+			// Target methods
+			"setTarget", &SE_G::Camera::SetTarget,
+			"getTarget", &SE_G::Camera::GetTarget,
+			// Up vector methods
+			"setUp", &SE_G::Camera::SetUp,
+			"getUp", &SE_G::Camera::GetUp,
+			// Near/Far Z methods
+			"setNearZ", &SE_G::Camera::SetNearZ,
+			"getNearZ", &SE_G::Camera::GetNearZ,
+			"setFarZ", &SE_G::Camera::SetFarZ,
+			"getFarZ", &SE_G::Camera::GetFarZ,
+			// Reference length
+			"setReferenceLen", &SE_G::Camera::SetReferenceLen,
+			"getReferenceLen", &SE_G::Camera::GetReferenceLen,
+			// View dimensions
+			"getViewWidth", &SE_G::Camera::GetViewWidth,
+			"getViewHeight", &SE_G::Camera::GetViewHeight,
+			// Movement methods
+			"moveForward", &SE_G::Camera::MoveForward,
+			"moveBackward", &SE_G::Camera::MoveBackward,
+			"moveLeft", &SE_G::Camera::MoveLeft,
+			"moveRight", &SE_G::Camera::MoveRight,
+			"moveUp", &SE_G::Camera::MoveUp,
+			"moveDown", &SE_G::Camera::MoveDown,
+			// Rotation methods
+			"rotateYaw", &SE_G::Camera::RotateYaw,
+			"rotatePitch", &SE_G::Camera::RotatePitch,
+			// Stick Properties
+			"getStickDirection", &SE_G::Camera::GetStickDirection,
+			"getStickLength", &SE_G::Camera::GetStickLength,
+			"setStickLength", &SE_G::Camera::SetStickLength,
+			// Camera mode
+			"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode
+
+			// // Update methods
+			// "Update", sol::overload(
+			// 	static_cast<void (SE_G::Camera::*)()>(&SE_G::Camera::Update),
+			// 	static_cast<void (SE_G::Camera::*)(const DXSM::Vector3)>(&SE_G::Camera::Update)
+			// )
+		);
+
         // Base GameObject type; component binders will append getters
-        lua.new_usertype<GameObject>("GameObject");
+        lua.new_usertype<GameObject>("GameObject",
+			sol::no_constructor,
+			"getUUID", [](GameObject* self) { return self->m_UUID.GetHilo(); }
+			);
+		
+		// Remove object from scene
+		lua.set_function("removeGameObjectByUUID", [](SE::UUIDhilo uuidhilo) {
+			Scene::GetInstance().RemoveGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+			});
+
+		// GetObject by UUID
+		lua.set_function("getGameObjectByUUID", [](SE::UUIDhilo uuidhilo) -> GameObject* {
+			return Scene::GetInstance().GetGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+			});
 
         // Execute all component binders registered via LUA_REGISTER_COMPONENT
         AutoBindings::RegisterAll(lua);

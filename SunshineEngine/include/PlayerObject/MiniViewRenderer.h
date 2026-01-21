@@ -7,7 +7,6 @@
 #include <wrl.h>
 #include <directxmath.h>
 
-#include <Graphics/Renderer/RenderGroup.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 

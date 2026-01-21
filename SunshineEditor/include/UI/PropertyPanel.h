@@ -3,11 +3,12 @@
 
 #include <EASTL/shared_ptr.h>
 #include <SimpleMath.h>
+
+#include <GameObject/GameObject.h>
 #include <Graphics/Lighting/LightData.h>
 
 #include <Utils/UUID.h>
-
-#include <ParticleSystem/ParticleEmitter.h>
+#include <Utils/AssetPath.h>
 
 class GameObject_Info;
 class BoxShapeObject_Info;
@@ -19,6 +20,13 @@ class TransformComponent;
 class RenderComponent;
 class LuaComponent;
 class WorldEditor;
+
+namespace SE_G {
+    namespace Bind {
+        class Texture;
+    }
+    class Mesh;
+}
 
 class PropertyPanel
 {
@@ -55,7 +63,7 @@ private:
     eastl::shared_ptr<WorldEditor> m_WorldEditor;
     SE::UUID m_SelectedUUID = SE::UUID(0u);
     
-    void DrawGameObjectHeader(GameObject_Info* obj);
+    bool DrawGameObjectHeader(GameObject_Info* obj);
 
     void DrawParentnes(GameObject_Info* obj);
 
@@ -64,7 +72,7 @@ private:
     void DrawComponentAddPopup(GameObject_Info* obj);
 
     void DrawEmitterDetails(
-        SE::ParticleEmitter_Info* emitterObj
+        GameObject_Info* obj
         /*
         SE::ParticleData::EmitterPointConstantBuffer* emitterPointBuffer,
         SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer
@@ -97,8 +105,38 @@ private:
                        const char* format = "%u", float columnWidth = 100.0f);
 
     eastl::shared_ptr<SE_G::Bind::Texture> DrawTextureSettings(
-        eastl::shared_ptr<SE_G::Bind::Texture> texture);
+        eastl::shared_ptr<SE_G::Bind::Texture> texture,
+        eastl::string widgetGroup);
 
     eastl::shared_ptr<SE_G::Mesh> DrawMeshSettings(
-        eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group);
+        eastl::shared_ptr<SE_G::Mesh> meshPtr, GameObjectGroup group,
+        eastl::string widgetGroup);
+
+	template <typename T>
+    bool DrawComponentRemoveButton(GameObject_Info* obj)
+    {
+        // Button width
+        const char* labelRemove = "Remove component";
+        ImVec2 textSize = ImGui::CalcTextSize(labelRemove);
+        ImVec2 padding = ImGui::GetStyle().FramePadding;
+        float labelWidth = textSize.x + padding.x * 2.0f;
+
+        // free space on this line
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        avail.x = avail.x - textSize.x;
+
+        if (avail.x > labelWidth) {
+            // put on the same line
+            float oldX = ImGui::GetCursorPosX();
+            // ImGui::SameLine();
+            ImGui::SetCursorPosX(oldX + avail.x);
+        }
+        // else dont call SameLine, Button will be under line
+
+        if (ImGui::SmallButton(labelRemove)) {
+            obj->RemoveComponent<T>();
+            return true;
+        }
+        return false;
+    }
 };
