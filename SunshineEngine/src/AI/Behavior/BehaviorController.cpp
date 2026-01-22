@@ -808,6 +808,39 @@ void BehaviorController::ChangeState(const SE::UUID& GOID, std::shared_ptr<Memor
 	}
 }
 
+void BehaviorController::FromJson(const json& j)
+{
+	if (j.contains("IsEnabled") && j["IsEnabled"].is_boolean())
+	{
+		IsEnabled = j.at("IsEnabled").get<bool>();
+	}
+}
+
+
+
+// ------------------------------------------------------------------------------------------------------
+// ---------------------------------- JSON
+// ------------------------------------------------------------------------------------------------------
+
+json BehaviorController_Info::ToJson() const
+{
+	json j;
+
+	j = nlohmann::json
+	{
+		{"IsEnabled",           IsEnabled},
+	};
+
+	return j;
+}
+
+void BehaviorController_Info::FromJson(const json& j)
+{
+	if (j.contains("IsEnabled") && j["IsEnabled"].is_boolean())
+	{
+		IsEnabled = j.at("IsEnabled").get<bool>();
+	}
+}
 
 
 // ------------------------------------------------------------------------------------------------------
@@ -858,5 +891,5 @@ LUA_REGISTER_COMPONENT(
 	"BehaviorController",
 	/* no fields */,
 	BEHAVIORCONTROLLER_LUA_METHODS_APPLY(ADD_METHOD),
-	"getBehaviorController"
+	"getBehavior"
 )

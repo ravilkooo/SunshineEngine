@@ -1,5 +1,8 @@
 #pragma once
 
+// Eastl
+#include <EASTL/unique_ptr.h>
+
 // Ñ++
 #include <unordered_map>
 
@@ -11,6 +14,9 @@
 // Lua
 #include <sol/sol.hpp>
 
+// Json
+#include <nlohmann/json.hpp>
+
 
 class PerceptionSystem;
 
@@ -18,14 +24,18 @@ class PerceptionSystem;
 namespace DXSM = DirectX::SimpleMath;
 
 
+using json = nlohmann::json;
+
+
 // Perception component attached to a GameObject
 // Handles sight, hearing, and damage events
 class PerceptionComponent : public Component
 {
     friend class PerceptionSystem;
+    friend class PerceptionComponent_Info;
 
 public:
-    explicit PerceptionComponent(SE::UUID GOID): OwnerID(GOID) {}
+    explicit PerceptionComponent(SE::UUID GOID) : OwnerID(GOID) {}
 
     ~PerceptionComponent();
 
@@ -33,20 +43,21 @@ public:
 
 
     // --- SIGHT ---
-    void SetCanSee(bool NewCondition) { CanSee = NewCondition;  }
+    void SetCanSee(bool NewCondition) { CanSee = NewCondition; }
     bool SetSight(float NewSightRadius, float NewLoseRadius, float NewFieldOfView, DXSM::Vector3 NewEyesOffset, bool NewCanSeeThroughObjects);
 
     bool SetSightRadius(float NewSightRadius);
     bool SetLoseRadius(float NewLoseRadius);
     bool SetFieldOfView(float NewFieldOfView);
-    void SetEyesOffset(DXSM::Vector3 NewEyesOffset)            { EyesOffset = NewEyesOffset; };
+    void SetEyesOffset(DXSM::Vector3 NewEyesOffset) { EyesOffset = NewEyesOffset; };
     void SetCanSeeThroughObjects(bool NewCanSeeThroughObjects) { CanSeeThroughObjects = NewCanSeeThroughObjects; };
 
-    float GetSightRadius()           { return SightRadius; };
-    float GetLoseRadius()            { return LoseRadius; };
-    float GetFieldOfView()           { return FieldOfView; };
-    DXSM::Vector3 GetEyesOffset()    { return EyesOffset; };
-    bool GetCanSeeThroughObjects()   { return CanSeeThroughObjects; };
+    bool GetCanSee() { return CanSee; }
+    float GetSightRadius() { return SightRadius; };
+    float GetLoseRadius() { return LoseRadius; };
+    float GetFieldOfView() { return FieldOfView; };
+    DXSM::Vector3 GetEyesOffset() { return EyesOffset; };
+    bool GetCanSeeThroughObjects() { return CanSeeThroughObjects; };
     //
 
     // --- HEARING ---
@@ -57,29 +68,30 @@ public:
     bool SetThreshold(float NewThreshold);
     bool SetSensitivity(float NewSensitivity);
 
+    bool GetCanHear() { return CanHear; }
     float GetHearingRadius() { return HearingRadius; };
-    float GetThreshold()     { return Threshold; };
-    float GetSensitivity()   { return Sensitivity; };
+    float GetThreshold() { return Threshold; };
+    float GetSensitivity() { return Sensitivity; };
     //
 
     // --- SIGHT LISTENERS ---
     uint64_t AddSightCallback(const sol::function& Callback);
     void RemoveSightCallback(uint64_t Id) { SightCallbacks.erase(Id); };
-    void ClearSightCallbacks()            { SightCallbacks.clear(); };
+    void ClearSightCallbacks() { SightCallbacks.clear(); };
     //
 
     // --- HEARING LISTENERS ---
     uint64_t AddHearingCallback(const sol::function& Callback);
     void RemoveHearingCallback(uint64_t Id) { HearingCallbacks.erase(Id); };
-    void ClearHearingCallbacks()            { HearingCallbacks.clear(); };
+    void ClearHearingCallbacks() { HearingCallbacks.clear(); };
     //
 
     // --- DAMAGE LISTENERS ---
     uint64_t AddDamageCallback(const sol::function& Callback);
     void RemoveDamageCallback(uint64_t Id) { DamageCallbacks.erase(Id); };
-    void ClearDamageCallbacks()            { DamageCallbacks.clear(); };
+    void ClearDamageCallbacks() { DamageCallbacks.clear(); };
     //
-  
+
     // --- EVENTS ---
     // Trigger a noise event to be broadcast globally
     bool MakeNoise(float Loudness);
@@ -87,6 +99,12 @@ public:
     // Notify listeners that damage was received
     void DealDamage(PerceptionComponent* Instigator, float DamageAmount);
     //
+
+    const std::type_info& getType() const override { return typeid(PerceptionComponent); }
+    static const SE::ComponentType s_componentType = SE::ComponentType::PERCEPTION;
+    const SE::ComponentType ComponentType() const override { return s_componentType; }
+
+    void FromJson(const json& j) override;
 
 private:
     //
@@ -146,16 +164,36 @@ private:
 class PerceptionComponent_Info : public Component_Info
 {
 public:
-    PerceptionComponent_Info() { };
+    explicit PerceptionComponent_Info() { };
 
     static const SE::ComponentType s_componentType = SE::ComponentType::PERCEPTION;
 
     const SE::ComponentType ComponentType() const override { return s_componentType; }
-    const std::type_info& getType() const override         { return typeid(PerceptionComponent_Info); }
-    bool IsAssigned() override                             { return true; }
+    const std::type_info& getType() const override { return typeid(PerceptionComponent_Info); }
+    bool IsAssigned() override { return true; }
+
+    void SetSightRadius(float NewSightRadius);
+    void SetLoseRadius(float NewLoseRadius);
+    void SetFieldOfView(float NewFieldOfView);
+
+    void SetHearingRadius(float NewHearingRadius);
+    void SetThreshold(float NewThreshold);
+    void SetSensitivity(float NewSensitivity);
+
+    json ToJson() const override;
+    void FromJson(const json& j) override;
 
 
-    PerceptionComponent* Component;
+    bool CanSee = false;
+    DXSM::Vector3 EyesOffset = DXSM::Vector3::Zero;
+    float SightRadius = 0.0f;
+    float LoseRadius = 0.0f;
+    float FieldOfView = 90.0f;
+    bool CanSeeThroughObjects = false;
+    bool CanHear = false;
+    float HearingRadius = 0.0f;
+    float Threshold = 0.0f;
+    float Sensitivity = 1.0f;
 };
 
 
@@ -173,28 +211,37 @@ public:
     FM("setFieldOfView",            &PerceptionComponent::SetFieldOfView) , \
     FM("setEyesOffset",             &PerceptionComponent::SetEyesOffset) , \
     FM("setCanSeeThroughObjects",   &PerceptionComponent::SetCanSeeThroughObjects) , \
-    FM("setCanHear",                &PerceptionComponent::SetCanHear) , \
+    \
+    FM("getCanSee",                 &PerceptionComponent::GetCanSee) , \
     FM("getSightRadius",            &PerceptionComponent::GetSightRadius) , \
     FM("getLoseRadius",             &PerceptionComponent::GetLoseRadius) , \
     FM("getFieldOfView",            &PerceptionComponent::GetFieldOfView) , \
     FM("getEyesOffset",             &PerceptionComponent::GetEyesOffset) , \
     FM("getCanSeeThroughObjects",   &PerceptionComponent::GetCanSeeThroughObjects) , \
+    \
+    FM("setCanHear",                &PerceptionComponent::SetCanHear) , \
     FM("setHearing",                &PerceptionComponent::SetHearing) , \
     FM("setHearingRadius",          &PerceptionComponent::SetHearingRadius) , \
     FM("setThreshold",              &PerceptionComponent::SetThreshold) , \
     FM("setSensitivity",            &PerceptionComponent::SetSensitivity) , \
+    \
+    FM("getCanHear",                &PerceptionComponent::GetCanHear) , \
     FM("getHearingRadius",          &PerceptionComponent::GetHearingRadius) , \
     FM("getThreshold",              &PerceptionComponent::GetThreshold) , \
     FM("getSensitivity",            &PerceptionComponent::GetSensitivity) , \
+    \
     FM("addSightCallback",          &PerceptionComponent::AddSightCallback) , \
     FM("removeSightCallback",       &PerceptionComponent::RemoveSightCallback) , \
     FM("clearSightCallbacks",       &PerceptionComponent::ClearSightCallbacks) , \
+    \
     FM("addHearingCallback",        &PerceptionComponent::AddHearingCallback) , \
     FM("removeHearingCallback",     &PerceptionComponent::RemoveHearingCallback) , \
     FM("clearHearingCallbacks",     &PerceptionComponent::ClearHearingCallbacks) , \
+    \
     FM("addDamageCallback",         &PerceptionComponent::AddDamageCallback) , \
     FM("removeDamageCallback",      &PerceptionComponent::RemoveDamageCallback) , \
     FM("clearDamageCallbacks",      &PerceptionComponent::ClearDamageCallbacks) , \
+    \
     FM("makeNoise",                 &PerceptionComponent::MakeNoise), \
     FM("dealDamage",                &PerceptionComponent::DealDamage)
 #endif

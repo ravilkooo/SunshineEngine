@@ -19,6 +19,9 @@
 #include <Component/MeshComponent.h>
 #include <Component/LuaComponent.h>
 
+#include "AI/Perception/PerceptionComponent.h"
+#include "AI/Behavior/BehaviorController.h"
+
 #include <GameObject/ParentNode.h>
 
 //#include <Graphics/Renderer/DeferredRenderer.h>
@@ -417,18 +420,16 @@ public:
                 break;
 
             case SE::ComponentType::PERCEPTION:
-
-                // To-do:
-                // Add  #include <Component/PerceptionComponent.h>
-                // Add PerceptionComponent with default values
+            {
+                auto percc_info = AddComponent<PerceptionComponent_Info>();
+            }
 
                 break;
 
             case SE::ComponentType::BEHAVIOR:
-
-                // To-do:
-                // Add  #include <Component/BehaviourController.h>
-                // Add BehaviourController with default values
+            {
+                auto bc_info = AddComponent<BehaviorController_Info>();
+            }
 
                 break;
                 
