@@ -125,6 +125,10 @@ void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
     JPH::BodyCreationSettings settings(physComp->m_shape, physComp->m_position, physComp->m_orientation, physComp->m_motionType, physComp->m_objectLayer);
     settings.mObjectLayer = physComp->m_objectLayer;
     settings.mAllowSleeping = (physComp->m_activation != JPH::EActivation::DontActivate);
+    settings.mFriction = physComp->m_friction;
+    settings.mLinearDamping = physComp->m_linearDamping;
+    settings.mAngularDamping = physComp->m_angularDamping;
+    settings.mRestitution = physComp->m_restitution;
 
     physComp->m_joltBody = bodyInterface.CreateBody(settings);
     physComp->m_joltBodyId = physComp->m_joltBody->GetID();
