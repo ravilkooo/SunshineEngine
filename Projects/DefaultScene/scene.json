@@ -91,8 +91,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -185,8 +189,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -281,8 +289,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -373,8 +385,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -462,8 +478,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Kinematic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Kinematic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -580,8 +600,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 1.0,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.8500000238418579
                 },
                 "Render": null,
                 "Transform": {
@@ -679,8 +703,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Kinematic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Kinematic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -967,8 +995,12 @@
                         }
                     },
                     "m_activation": "DontActivate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "NON_MOVING",
-                    "m_motion": "Static"
+                    "m_friction": 0.9900000095367432,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Static",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1055,8 +1087,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 1.7400000095367432,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1151,8 +1187,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1215,9 +1255,9 @@
                         1.0
                     ],
                     "m_position": [
-                        10.833785057067871,
-                        -7.962581634521484,
-                        -21.101341247558594
+                        3.348266124725342,
+                        -4.766558647155762,
+                        -10.611934661865234
                     ],
                     "m_rotation": [
                         -0.5441939830780029,
@@ -1330,8 +1370,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1480,8 +1524,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1846,8 +1894,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1996,8 +2048,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
