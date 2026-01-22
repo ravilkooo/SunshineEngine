@@ -108,7 +108,7 @@ bool PhysicsSystem::Trace(const JPH::RVec3& begin,
         return false;
 
     const JPH::Body& body = lock.GetBody();
-    *out_id = *reinterpret_cast<const SE::UUID*>(body.GetUserData());
+    *out_id = SE::UUID(body.GetUserData());
     return true;
 }
 //////////////////////////////////////////

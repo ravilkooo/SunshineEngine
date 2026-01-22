@@ -23,7 +23,7 @@ PerceptionComponent::~PerceptionComponent()
 {
 	if (TeamId != UINT32_MAX)
 	{
-		PerceptionSystem::Get().RemoveFromTeam(TeamId, this);
+		PerceptionSystem::Get().RemoveFromTeam(this);
 	}
 }
 
@@ -228,16 +228,14 @@ void PerceptionComponent::ChangeInSight(SE::UUID GOID, bool NewCondition)
 {
 	if (NewCondition)
 	{
-		GOCanSee.push_back(GOID);
+		if (std::find(GOCanSee.begin(), GOCanSee.end(), GOID) == GOCanSee.end())
+		{
+			GOCanSee.push_back(GOID);
+		}
 	}
 	else
 	{
-		auto it = eastl::find(GOCanSee.begin(), GOCanSee.end(), GOID);
-
-		if (it != GOCanSee.end())
-		{
-			GOCanSee.erase(it);
-		}
+		GOCanSee.erase(std::remove(GOCanSee.begin(), GOCanSee.end(), GOID), GOCanSee.end());
 	}
 
 	for (auto& Pair : SightCallbacks)
@@ -289,6 +287,7 @@ void PerceptionComponent::FromJson(const json& j)
 	if (j.contains("EyesOffset")) EyesOffset = j.at("EyesOffset");
 	if (j.contains("SightRadius")) SightRadius = j.at("SightRadius").get<float>();
 	if (j.contains("LoseRadius")) LoseRadius = j.at("LoseRadius").get<float>();
+	if (j.contains("CanSeeThroughObjects")) CanSeeThroughObjects = j.at("CanSeeThroughObjects").get<bool>();
 	if (j.contains("FieldOfView")) FieldOfView = j.at("FieldOfView").get<float>();
 	if (j.contains("CanHear")) CanHear = j.at("CanHear").get<bool>();
 	if (j.contains("HearingRadius")) HearingRadius = j.at("HearingRadius").get<float>();
@@ -385,6 +384,7 @@ json PerceptionComponent_Info::ToJson() const
 		{"SightRadius",      SightRadius},
 		{"LoseRadius",       LoseRadius},
 		{"FieldOfView",      FieldOfView},
+		{"CanSeeThroughObjects",      CanSeeThroughObjects},
 		{"CanHear",          CanHear},
 		{"HearingRadius",    HearingRadius},
 		{"Threshold",        Threshold},
@@ -401,6 +401,7 @@ void PerceptionComponent_Info::FromJson(const json& j)
 	if (j.contains("SightRadius")) SightRadius = j.at("SightRadius").get<float>();
 	if (j.contains("LoseRadius")) LoseRadius = j.at("LoseRadius").get<float>();
 	if (j.contains("FieldOfView")) FieldOfView = j.at("FieldOfView").get<float>();
+	if (j.contains("CanSeeThroughObjects")) CanSeeThroughObjects = j.at("CanSeeThroughObjects").get<bool>();
 	if (j.contains("CanHear")) CanHear = j.at("CanHear").get<bool>();
 	if (j.contains("HearingRadius")) HearingRadius = j.at("HearingRadius").get<float>();
 	if (j.contains("Threshold")) Threshold = j.at("Threshold").get<float>();

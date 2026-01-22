@@ -2,7 +2,14 @@ behavior = {}
 
 function behavior:start()
     self.sensitivity = 50.0
-    -- print("Behavior started", self.id)
+    
+    -- Perception
+    local teamB = 2
+
+    local ps = getPerceptionSystem()
+    local perception = self.owner:getPerception()
+
+    ps:addToTeam(teamB, perception)
 end
 
 function behavior:update(dt)

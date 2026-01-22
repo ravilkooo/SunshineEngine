@@ -1423,11 +1423,7 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
 
         ImGui::Checkbox("Can See", &percInfo->CanSee);
 
-        DXSM::Vector3 EyesOffset = percInfo->EyesOffset;
-        if (DrawVector3Control("Eyes Offset", EyesOffset, 0.0f));
-        {
-            percInfo->EyesOffset = EyesOffset;
-        }
+        ImGui::Checkbox("Can See Through Objects", &percInfo->CanSeeThroughObjects);
 
         float SightRadius = percInfo->SightRadius;
         if (ImGui::InputFloat("Sight Radius", &SightRadius))
@@ -1446,6 +1442,14 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
         {
             percInfo->SetFieldOfView(FieldOfView);
         }
+
+        DXSM::Vector3 EyesOffset = percInfo->EyesOffset;
+        if (DrawVector3Control("Eyes Offset", EyesOffset, 0.0f));
+        {
+            percInfo->EyesOffset = EyesOffset;
+        }
+
+        ImGui::Separator();
 
         ImGui::Checkbox("Can Hear", &percInfo->CanHear);
 

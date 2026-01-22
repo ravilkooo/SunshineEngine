@@ -94,7 +94,7 @@ public:
             return false;
 
         const JPH::Body& body = lock.GetBody();
-        SE::UUID id = *reinterpret_cast<const SE::UUID*>(body.GetUserData());
+        SE::UUID id = SE::UUID(body.GetUserData());
 
         return m_ignore.find(id) == m_ignore.end();
     }
