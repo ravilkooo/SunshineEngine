@@ -28,6 +28,8 @@ Game::~Game()
 void Game::ClearScene()
 {
 	Scene::GetInstance().ClearScene();
+	PerceptionSystem::Get().Clear();
+	BehaviorStorage::Get().Clear();
 }
 
 void Game::SetupRendering(
@@ -283,8 +285,8 @@ void Game::Update(float deltaTime) {
 	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
 	 // AI
-	 PerceptionSystem::Get().CheckSights();
-	 BehaviorStorage::Get().Update(deltaTime);
+	 PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
+	 //BehaviorStorage::Get().Update(deltaTime);
 
 	 m_renderer->GetMainCamera()->Update(deltaTime);
 }

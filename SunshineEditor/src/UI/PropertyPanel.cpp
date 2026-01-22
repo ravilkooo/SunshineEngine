@@ -368,6 +368,8 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
 
         DrawMeshComponent(obj);
         DrawPhysicsComponent(obj);
+        DrawPerceptionComponent(obj);
+        DrawBehaviorController(obj);
         DrawLuaComponent(obj);
         DrawEmitterDetails(obj);
 
@@ -1045,6 +1047,8 @@ void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
 
 void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
 {
+    bool HasAllComponents = true;
+
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
     
     if (ImGui::Button("Add Component", ImVec2(-1, 30)))
@@ -1059,28 +1063,55 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
 
         if (!obj->HasComponent<PhysicsComponent_Info>())
         {
+            HasAllComponents = false;
+
             if (ImGui::MenuItem("Physics Component", nullptr, false, true))
             {
                 obj->AddDefaultComponent(SE::ComponentType::PHYSICS);
             }
         }
+
         if (!obj->HasComponent<MeshComponent_Info>())
         {
+            HasAllComponents = false;
+
             if (ImGui::MenuItem("Mesh Component", nullptr, false, true))
             {
                 obj->AddDefaultComponent(SE::ComponentType::MESH);
             }
         }
 
+        if (!obj->HasComponent<PerceptionComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Perception Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::PERCEPTION);
+            }
+        }
+
+        if (!obj->HasComponent<BehaviorController_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Behavior Controller", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::BEHAVIOR);
+            }
+        }
         
         if (!obj->HasComponent<LuaComponent_Info>())
         {
+            HasAllComponents = false;
+
             if (ImGui::MenuItem("Lua Script", nullptr, false, true))
             {
                 obj->AddDefaultComponent(SE::ComponentType::LUA);
             }
         }
-        else
+        
+        if (HasAllComponents)
         {
             ImGui::TextDisabled("All available components added");
         }
@@ -1416,6 +1447,114 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
         else {
             ImGui::TextDisabled("Sampler: (none)");
         }
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<PerceptionComponent_Info>())
+        return;
+
+    auto percInfo = obj->GetComponent<PerceptionComponent_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Perception Component Settings", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        if (DrawComponentRemoveButton<PerceptionComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
+
+        ImGui::Checkbox("Can See", &percInfo->CanSee);
+
+        ImGui::Checkbox("Can See Through Objects", &percInfo->CanSeeThroughObjects);
+
+        float SightRadius = percInfo->SightRadius;
+        if (ImGui::InputFloat("Sight Radius", &SightRadius))
+        {
+            percInfo->SetSightRadius(SightRadius);
+        }
+
+        float LoseRadius = percInfo->LoseRadius;
+        if (ImGui::InputFloat("Lose Radius", &LoseRadius))
+        {
+            percInfo->SetLoseRadius(LoseRadius);
+        }
+
+        float FieldOfView = percInfo->FieldOfView;
+        if (ImGui::InputFloat("Field Of View", &FieldOfView))
+        {
+            percInfo->SetFieldOfView(FieldOfView);
+        }
+
+        DXSM::Vector3 EyesOffset = percInfo->EyesOffset;
+        if (DrawVector3Control("Eyes Offset", EyesOffset, 0.0f));
+        {
+            percInfo->EyesOffset = EyesOffset;
+        }
+
+        ImGui::Separator();
+
+        ImGui::Checkbox("Can Hear", &percInfo->CanHear);
+
+        float HearingRadius = percInfo->HearingRadius;
+        if (ImGui::InputFloat("Hearing Radius", &HearingRadius))
+        {
+            percInfo->SetHearingRadius(HearingRadius);
+        }
+
+        float Threshold = percInfo->Threshold;
+        if (ImGui::InputFloat("Threshold", &Threshold))
+        {
+            percInfo->SetThreshold(Threshold);
+        }
+
+        float Sensitivity = percInfo->Sensitivity;
+        if (ImGui::InputFloat("Sensitivity", &Sensitivity))
+        {
+            percInfo->SetSensitivity(Sensitivity);
+        }
+
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawBehaviorController(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<BehaviorController_Info>())
+        return;
+
+    auto behaviorInfo = obj->GetComponent<BehaviorController_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Behavior Controller Settings", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        if (DrawComponentRemoveButton<BehaviorController_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
+
+        ImGui::Checkbox("Is Enabled", &behaviorInfo->IsEnabled);
+
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();

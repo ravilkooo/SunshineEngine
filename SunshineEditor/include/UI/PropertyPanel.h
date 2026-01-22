@@ -93,6 +93,9 @@ private:
     void DrawPhysicsComponent(GameObject_Info* obj);
     void DrawMeshComponent(GameObject_Info* obj);
 
+    void DrawPerceptionComponent(GameObject_Info* obj);
+    void DrawBehaviorController(GameObject_Info* obj);
+
     void DrawLuaComponent(GameObject_Info* obj);
     void DrawLuaFunctions(LuaComponent* luaComp);
     

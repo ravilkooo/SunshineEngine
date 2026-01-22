@@ -7,6 +7,7 @@ class TransformComponent;
 class RenderComponent;
 class PhysicsComponent;
 class PerceptionComponent;
+class BehaviorController;
 class ParticleEmitterComponent;
 class CameraComponent;
 
@@ -25,6 +26,7 @@ namespace ScriptingBindings {
     F(TransformComponent, "getTransform") , \
     F(RenderComponent, "getRender") , \
     F(PhysicsComponent, "getPhysics") , \
+    F(BehaviorController, "getBehavior") , \
     F(PerceptionComponent, "getPerception"), \
     F(ParticleEmitterComponent, "getParticleEmitter"), \
     F(CameraComponent, "getCameraComponent")

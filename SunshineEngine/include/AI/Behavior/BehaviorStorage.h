@@ -27,6 +27,8 @@ private:
 
     void Update(float DeltaTime);
 
+    void Clear() { BCs.clear(); }
+
 
     std::vector<BehaviorController*> BCs;
 };

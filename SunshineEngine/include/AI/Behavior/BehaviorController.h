@@ -6,6 +6,9 @@
 #include <Utils/UUID.h>
 #include <Component/Component.h>
 
+// Eastl
+#include <EASTL/unique_ptr.h>
+
 // C++
 #include <vector>
 #include <memory>
@@ -14,13 +17,19 @@
 // Lua
 #include <sol/sol.hpp>
 
+// Json
+#include <nlohmann/json.hpp>
+
+
+using json = nlohmann::json;
+
 
 enum class EActionCondition
 {
-    Running,
-    Succeeded,
-    Failed,
-    Aborted
+    Running,   // 0
+    Succeeded, // 1
+    Failed,    // 2
+    Aborted    // 3
 };
 
 enum class EActionResult
@@ -49,13 +58,13 @@ class Action
 public:
     explicit Action(const std::string& InName) : Name(InName) {}
 
-    const std::string& GetName() const       { return Name; }
+    const std::string& GetName() const { return Name; }
     void SetName(const std::string& NewName) { Name = NewName; }
 
-    void SetOnStart(const sol::function& Func)     { OnActionStart = Func; }
-    void SetOnUpdate(const sol::function& Func)    { OnActionUpdate = Func; };
-    void SetOnAbort(const sol::function& Func)     { OnActionAbort = Func; };
-    void SetOnComplete(const sol::function& Func)  { OnActionComplete = Func; };
+    void SetOnStart(const sol::function& Func) { OnActionStart = Func; }
+    void SetOnUpdate(const sol::function& Func) { OnActionUpdate = Func; };
+    void SetOnAbort(const sol::function& Func) { OnActionAbort = Func; };
+    void SetOnComplete(const sol::function& Func) { OnActionComplete = Func; };
 
 private:
     EActionCondition Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
@@ -95,10 +104,10 @@ public:
 
     void SetEvaluateUtility(const sol::function& Func) { EvaluateUtility = Func; }
 
-    void SetOnStart(const sol::function& Func)         { OnPatternStart = Func; }
-    void SetOnUpdate(const sol::function& Func)        { OnPatternUpdate = Func; }
-    void SetOnAbort(const sol::function& Func)         { OnPatternAbort = Func; }
-    void SetOnComplete(const sol::function& Func)      { OnPatternComplete = Func; }
+    void SetOnStart(const sol::function& Func) { OnPatternStart = Func; }
+    void SetOnUpdate(const sol::function& Func) { OnPatternUpdate = Func; }
+    void SetOnAbort(const sol::function& Func) { OnPatternAbort = Func; }
+    void SetOnComplete(const sol::function& Func) { OnPatternComplete = Func; }
 
 private:
     EActionCondition Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
@@ -126,7 +135,7 @@ private:
 class ConditionTransition
 {
 public:
-    explicit ConditionTransition(const std::string& InToState, sol::function InCheck) : ToState(InToState), Check(InCheck) { }
+    explicit ConditionTransition(const std::string& InToState, sol::function InCheck) : ToState(InToState), Check(InCheck) {}
 
 
     sol::function Check = nullptr;
@@ -177,10 +186,10 @@ public:
         return t;
     }
 
-    void SetOnEnter(const sol::function& Func)  { OnStateEnter = Func; }
+    void SetOnEnter(const sol::function& Func) { OnStateEnter = Func; }
     void SetOnUpdate(const sol::function& Func) { OnStateUpdate = Func; }
-    void SetOnAbort(const sol::function& Func)  { OnStateAbort = Func; }
-    void SetOnExit(const sol::function& Func)   { OnStateExit = Func; }
+    void SetOnAbort(const sol::function& Func) { OnStateAbort = Func; }
+    void SetOnExit(const sol::function& Func) { OnStateExit = Func; }
 
 private:
     void AddConditionTransition(const std::string& InToState, sol::function InCheck);
@@ -213,6 +222,7 @@ class BehaviorController : public Component
 {
     friend class BehaviorStorage;
     friend class EventTransition;
+    friend class BehaviorController_Info;
 
 public:
     explicit BehaviorController(const SE::UUID& InGOID) : GOID(InGOID) { BehaviorStorage::Get().AddBehavior(this); };
@@ -263,6 +273,14 @@ public:
     //
 
     void SetIsEnabled(bool NewCondition) { IsEnabled = NewCondition; }
+    bool GetIsEnabled() { return IsEnabled; }
+
+    const std::type_info& getType() const override { return typeid(BehaviorController); }
+
+    static const SE::ComponentType s_componentType = SE::ComponentType::BEHAVIOR;
+    const SE::ComponentType ComponentType() const override { return s_componentType; }
+
+    void FromJson(const json& j) override;
 
 private:
     void Update(float DeltaTime);
@@ -289,7 +307,7 @@ private:
 class BehaviorController_Info : public Component_Info
 {
 public:
-    BehaviorController_Info() {};
+    explicit BehaviorController_Info() { }
 
     static const SE::ComponentType s_componentType = SE::ComponentType::BEHAVIOR;
 
@@ -297,8 +315,10 @@ public:
     const std::type_info& getType() const override { return typeid(BehaviorController_Info); }
     bool IsAssigned() override { return true; }
 
+    json ToJson() const override;
+    void FromJson(const json& j) override;
 
-    BehaviorController* Controller;
+    bool IsEnabled = false;
 };
 
 

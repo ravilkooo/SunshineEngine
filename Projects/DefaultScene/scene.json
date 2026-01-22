@@ -48,7 +48,7 @@
                     "z": 0.16058725118637085
                 }
             },
-            "m_name": "Floor",
+            "m_name": "NameMine",
             "m_parent": null,
             "m_type": "SkyBox"
         },
@@ -541,6 +541,16 @@
         },
         {
             "components": {
+                "Behavior": {
+                    "IsEnabled": false
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/Perception_Test.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -551,6 +561,22 @@
                         "assetSource": 1,
                         "relativePath": "Textures/basketballskin.dds"
                     }
+                },
+                "Perception": {
+                    "CanHear": true,
+                    "CanSee": true,
+                    "CanSeeThroughObjects": false,
+                    "EyesOffset": {
+                        "x": 0.0,
+                        "y": 2.0,
+                        "z": 0.0
+                    },
+                    "FieldOfView": 90.0,
+                    "HearingRadius": 0.0,
+                    "LoseRadius": 1.0,
+                    "Sensitivity": 1.0,
+                    "SightRadius": 1.0,
+                    "Threshold": 0.0
                 },
                 "Physics": {
                     "collider": {
@@ -599,18 +625,18 @@
                         1.0
                     ],
                     "m_position": [
-                        -6.531379222869873,
-                        -3.341193675994873,
-                        -0.822404146194458
+                        -31.49148178100586,
+                        -3.0,
+                        -39.77454376220703
                     ],
                     "m_rotation": [
-                        -0.00011816051846835762,
+                        -0.00011816053302027285,
                         -0.006913804914802313,
-                        -0.017088990658521652
+                        -0.017088988795876503
                     ],
                     "m_scaleFactor": [
-                        0.9999999403953552,
-                        0.9999999403953552,
+                        0.9999998211860657,
+                        0.9999998211860657,
                         1.0
                     ]
                 }
@@ -641,7 +667,7 @@
                     "scriptLoaded": true,
                     "scriptPath": {
                         "assetSource": 1,
-                        "relativePath": "Scripts/MonoBehavior.lua"
+                        "relativePath": ""
                     }
                 },
                 "Mesh": {
@@ -1014,7 +1040,7 @@
             "m_UUID_hi": 635476326,
             "m_UUID_lo": 715032577,
             "m_group": "Shapes",
-            "m_name": "ParticleEmitter_Pink",
+            "m_name": "Floor",
             "m_parent": null,
             "m_shapeData": {
                 "Size": {
@@ -1262,9 +1288,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 3.891561508178711,
-                    "y": -3.203521490097046,
-                    "z": -13.236812591552734
+                    "x": 10.879127502441406,
+                    "y": -7.999898910522461,
+                    "z": -21.177906036376953
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -1301,6 +1327,22 @@
                         "assetSource": 1,
                         "relativePath": "Textures/plane_Diffuse.dds"
                     }
+                },
+                "Perception": {
+                    "CanHear": false,
+                    "CanSee": false,
+                    "CanSeeThroughObjects": false,
+                    "EyesOffset": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "FieldOfView": 90.0,
+                    "HearingRadius": 0.0,
+                    "LoseRadius": 0.0,
+                    "Sensitivity": 1.0,
+                    "SightRadius": 0.0,
+                    "Threshold": 0.0
                 },
                 "Physics": {
                     "collider": {
@@ -2051,7 +2093,7 @@
             "m_UUID_hi": 2484373870,
             "m_UUID_lo": 3260920111,
             "m_group": "ParticleEmitter",
-            "m_name": "ParticleEmitter_Pink",
+            "m_name": "ParticleEmitter_Pink2",
             "m_parent": null
         },
         {
@@ -2074,9 +2116,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -3.3200953006744385,
-                        -5.318342208862305,
-                        14.582794189453125
+                        -24.59772491455078,
+                        -38.99824523925781,
+                        150.1962890625
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2107,9 +2149,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": -4.245209693908691,
-                    "y": -6.782685279846191,
-                    "z": 20.479032516479492
+                    "x": -25.522838592529297,
+                    "y": -40.462589263916016,
+                    "z": 156.092529296875
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -2147,9 +2189,9 @@
                         1.0
                     ],
                     "m_position": [
-                        116.58221435546875,
-                        -45.31794738769531,
-                        169.90008544921875
+                        214.2603302001953,
+                        -62.23186492919922,
+                        407.8521728515625
                     ],
                     "m_rotation": [
                         -3.382860924716624e-08,
@@ -2180,9 +2222,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 121.82941436767578,
-                    "y": -47.00147247314453,
-                    "z": 179.70028686523438
+                    "x": 217.38002014160156,
+                    "y": -61.89956283569336,
+                    "z": 418.64886474609375
                 },
                 "Range": 20.0,
                 "Specular": {

@@ -21,13 +21,13 @@ bool PerceptionSystem::RegisterTeam(uint32_t Id)
 {
     if (Id == UINT32_MAX)
     {
-        std::cerr << "[Warning] PerceptionSystem::RegisterTeam: Team ID is UINT32_MAX.\n";
+        //std::cerr << "[Warning] PerceptionSystem::RegisterTeam: Team ID is UINT32_MAX.\n";
         return false;
     }
 
     if (Teams.find(Id) != Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::RegisterTeam: Team ID " << Id << " already exists.\n";
+        //std::cerr << "[Warning] PerceptionSystem::RegisterTeam: Team ID " << Id << " already exists.\n";
         return false;
     }  
 
@@ -76,114 +76,102 @@ bool PerceptionSystem::UnregisterTeam(uint32_t Id)
 // ---------------------------------- TARGETS AND SOURCES
 // ------------------------------------------------------------------------------------------------------
 
-bool PerceptionSystem::AddSightTargetTeamIDsInTeam(uint32_t TeamId, std::vector<uint32_t>& InSightTargetTeamIDs)
+bool PerceptionSystem::AddSightTargetTeamIDsInTeam(uint32_t TeamId, uint32_t InSightTargetTeamID)
 {
     auto It = Teams.find(TeamId);
 
     if (It == Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::AddSightTargetTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
+        //std::cerr << "[Warning] PerceptionSystem::AddSightTargetTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
         return false;
     }
 
     auto& Targets = It->second.SightTargetTeamIDs;
 
-    for (uint32_t TargetId : InSightTargetTeamIDs)
+    auto itTarg = std::find(Targets.begin(), Targets.end(), InSightTargetTeamID);
+
+    if (itTarg != Targets.end())
     {
-        auto itTarg = std::find(Targets.begin(), Targets.end(), TargetId);
-
-        if (itTarg != Targets.end())
-        {
-            std::cerr << "[Warning] PerceptionSystem::AddSightTargetTeamIDsInTeam: Team " << TeamId << " already contains SightTargetTeamID = " << TargetId << ".\n";
-            continue;
-        }
-
-        Targets.push_back(TargetId);
+        //std::cerr << "[Warning] PerceptionSystem::AddSightTargetTeamIDsInTeam: Team " << TeamId << " already contains SightTargetTeamID = " << InSightTargetTeamID << ".\n";
+        return false;
     }
+
+    Targets.push_back(InSightTargetTeamID);
 
     return true;
 }
 
-bool PerceptionSystem::AddHearingSourceTeamIDsInTeam(uint32_t TeamId, std::vector<uint32_t>& InHearingSourceTeamIDs)
+bool PerceptionSystem::AddHearingSourceTeamIDsInTeam(uint32_t TeamId, uint32_t InHearingSourceTeamID)
 {
     auto it = Teams.find(TeamId);
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::AddSightTargetTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
+        //std::cerr << "[Warning] PerceptionSystem::AddSightTargetTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
         return false;
     }
 
     auto& Sources = it->second.HearingSourceTeamIDs;
 
-    for (uint32_t SourceId : InHearingSourceTeamIDs)
+    auto itSrc = std::find(Sources.begin(), Sources.end(), InHearingSourceTeamID);
+
+    if (itSrc != Sources.end())
     {
-        auto itSrc = std::find(Sources.begin(), Sources.end(), SourceId);
-
-        if (itSrc != Sources.end())
-        {
-            std::cerr << "[Warning] PerceptionSystem::AddSightTargetTeamIDsInTeam: Team " << TeamId << " already contains HearingSourceTeamID = " << SourceId << ".\n";
-            continue;
-        }
-
-        Sources.push_back(SourceId);
+        //std::cerr << "[Warning] PerceptionSystem::AddSightTargetTeamIDsInTeam: Team " << TeamId << " already contains HearingSourceTeamID = " << InHearingSourceTeamID << ".\n";
+        return false;
     }
+
+    Sources.push_back(InHearingSourceTeamID);
 
     return true;
 }
 
-bool PerceptionSystem::RemoveSightTargetTeamIDsInTeam(uint32_t TeamId, std::vector<uint32_t>& InSightTargetTeamIDs)
+bool PerceptionSystem::RemoveSightTargetTeamIDsInTeam(uint32_t TeamId, uint32_t InSightTargetTeamID)
 {
     auto it = Teams.find(TeamId);
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::RemoveSightTargetTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
+        //std::cerr << "[Warning] PerceptionSystem::RemoveSightTargetTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
         return false;
     }
 
     auto& Targets = it->second.SightTargetTeamIDs;
 
-    for (uint32_t TargetId : InSightTargetTeamIDs)
+    auto itTarg = std::find(Targets.begin(), Targets.end(), InSightTargetTeamID);
+
+    if (itTarg == Targets.end())
     {
-        auto itTarg = std::find(Targets.begin(), Targets.end(), TargetId);
-
-        if (itTarg == Targets.end())
-        {
-            std::cerr << "[Warning] PerceptionSystem::RemoveSightTargetTeamIDsInTeam: Team " << TeamId << " does not contain SightTargetTeamID = " << TargetId << ".\n";
-            continue;
-        }
-
-        Targets.erase(itTarg);
+        //std::cerr << "[Warning] PerceptionSystem::RemoveSightTargetTeamIDsInTeam: Team " << TeamId << " does not contain SightTargetTeamID = " << InSightTargetTeamID << ".\n";
+        return false;
     }
+
+    Targets.erase(itTarg);
 
     return true;
 }
 
-bool PerceptionSystem::RemoveHearingSourceTeamIDsInTeam(uint32_t TeamId, std::vector<uint32_t>& InHearingSourceTeamIDs)
+bool PerceptionSystem::RemoveHearingSourceTeamIDsInTeam(uint32_t TeamId, uint32_t InHearingSourceTeamID)
 {
     auto it = Teams.find(TeamId);
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::RemoveHearingSourceTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
+        //std::cerr << "[Warning] PerceptionSystem::RemoveHearingSourceTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
         return false;
     }
 
     auto& Sources = it->second.HearingSourceTeamIDs;
 
-    for (uint32_t SourceId : InHearingSourceTeamIDs)
+    auto itSrc = std::find(Sources.begin(), Sources.end(), InHearingSourceTeamID);
+
+    if (itSrc == Sources.end())
     {
-        auto itSrc = std::find(Sources.begin(), Sources.end(), SourceId);
-
-        if (itSrc == Sources.end())
-        {
-            std::cerr << "[Warning] PerceptionSystem::RemoveHearingSourceTeamIDsInTeam: Team " << TeamId << " does not contain SightTargetTeamID = " << SourceId << ".\n";
-            continue;
-        }
-
-        Sources.erase(itSrc);
+        //std::cerr << "[Warning] PerceptionSystem::RemoveHearingSourceTeamIDsInTeam: Team " << TeamId << " does not contain SightTargetTeamID = " << InHearingSourceTeamID << ".\n";
+        return false;
     }
+
+    Sources.erase(itSrc);
 
     return true;
 }
@@ -194,7 +182,7 @@ bool PerceptionSystem::ClearSightTargetTeamIDsInTeam(uint32_t TeamId)
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::ClearSightTargetTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
+        //std::cerr << "[Warning] PerceptionSystem::ClearSightTargetTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
         return false;
     }
 
@@ -209,7 +197,7 @@ bool PerceptionSystem::ClearHearingSourceTeamIDsInTeam(uint32_t TeamId)
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::ClearHearingSourceTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
+        //std::cerr << "[Warning] PerceptionSystem::ClearHearingSourceTeamIDsInTeam: Team ID " << TeamId << " not found.\n";
         return false;
     }
 
@@ -228,19 +216,19 @@ bool PerceptionSystem::AddToTeam(uint32_t TeamId, PerceptionComponent* PC)
 {
     if (!PC)
     {
-        std::cerr << "[Warning] PerceptionSystem::AddToTeam: PerceptionComponent is null.\n";
+        //std::cerr << "[Warning] PerceptionSystem::AddToTeam: PerceptionComponent is null.\n";
         return false;
     }
 
     if (TeamId == UINT32_MAX)
     {
-        std::cerr << "[Warning] PerceptionSystem::AddToTeam: Team ID is UINT32_MAX.\n";
+        //std::cerr << "[Warning] PerceptionSystem::AddToTeam: Team ID is UINT32_MAX.\n";
         return false;
     }
 
     if (PC->TeamId != UINT32_MAX)
     {
-        std::cerr << "[Warning] PerceptionSystem::AddToTeam: PerceptionComponent already in another team with id " << PC->TeamId << ".\n";
+        //std::cerr << "[Warning] PerceptionSystem::AddToTeam: PerceptionComponent already in another team with id " << PC->TeamId << ".\n";
         return false;
     }
 
@@ -248,7 +236,7 @@ bool PerceptionSystem::AddToTeam(uint32_t TeamId, PerceptionComponent* PC)
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::AddToTeam: Team ID " << TeamId << " not found.\n";
+        //std::cerr << "[Warning] PerceptionSystem::AddToTeam: Team ID " << TeamId << " not found.\n";
         return false;
     }
 
@@ -272,35 +260,27 @@ bool PerceptionSystem::AddToTeam(uint32_t TeamId, PerceptionComponent* PC)
     }
     else
     {
-        std::cerr << "[Warning] PerceptionSystem::AddToTeam: PerceptionComponent already in team.\n";
+        //std::cerr << "[Warning] PerceptionSystem::AddToTeam: PerceptionComponent already in team.\n";
     }
 
     return true;
 }
 
-bool PerceptionSystem::RemoveFromTeam(uint32_t TeamId, PerceptionComponent* PC)
+bool PerceptionSystem::RemoveFromTeam(PerceptionComponent* PC)
 {
     if (!PC)
     {
-        std::cerr << "[Warning] PerceptionSystem::RemoveFromTeam: PerceptionComponent is null.\n";
+        //std::cerr << "[Warning] PerceptionSystem::RemoveFromTeam: PerceptionComponent is null.\n";
         return false;
     }
 
-    if (TeamId == UINT32_MAX)
+    if (PC->TeamId == UINT32_MAX)
     {
-        std::cerr << "[Warning] PerceptionSystem::RemoveFromTeam: Team ID is UINT32_MAX.\n";
+        //std::cerr << "[Warning] PerceptionSystem::RemoveFromTeam: Team ID is UINT32_MAX.\n";
         return false;
     }
 
-    auto it = Teams.find(TeamId);
-
-    if (it == Teams.end())
-    {
-        std::cerr << "[Warning] PerceptionSystem::RemoveFromTeam: Team ID " << TeamId << " not found.\n";
-        return false;
-    }
-
-    TeamSctruct& Team = it->second;
+    TeamSctruct& Team = Teams.find(PC->TeamId)->second;
 
     for (auto itP = Team.Perceivers.begin(); itP != Team.Perceivers.end(); ++itP)
     {
@@ -318,7 +298,35 @@ bool PerceptionSystem::RemoveFromTeam(uint32_t TeamId, PerceptionComponent* PC)
 
 bool PerceptionSystem::ClearTeam(uint32_t TeamId)
 {
-    return false;
+    if (TeamId == UINT32_MAX)
+    {
+        //std::cerr << "[Warning] PerceptionSystem::ClearTeam: Team ID is UINT32_MAX.\n";
+        return false;
+    }
+
+    auto it = Teams.find(TeamId);
+
+    if (it == Teams.end())
+    {
+        //std::cerr << "[Warning] PerceptionSystem::ClearTeam: Team ID " << TeamId << " not found.\n";
+        return false;
+    }
+
+    TeamSctruct& Team = it->second;
+
+    for (PerceptionComponent* PC : Team.Perceivers)
+    {
+        if (PC)
+        {
+            PC->TeamId = UINT32_MAX;
+        }
+    }
+
+    Team.Perceivers.clear();
+    Team.SightTargetTeamIDs.clear();
+    Team.HearingSourceTeamIDs.clear();
+
+    return true;
 }
 
 
@@ -327,7 +335,7 @@ bool PerceptionSystem::ClearTeam(uint32_t TeamId)
 // ---------------------------------- RUNTIME
 // ------------------------------------------------------------------------------------------------------
 
-void PerceptionSystem::CheckSights()
+void PerceptionSystem::CheckSights(PhysicsSystem* PS)
 {
     for (auto& [TeamId, Team] : Teams)
     {
@@ -338,7 +346,7 @@ void PerceptionSystem::CheckSights()
                 continue;
             }
 
-            auto ViewerGO = SceneSP->GetGameObjectByUUID(ViewerPC->GetOwnerID());
+            auto ViewerGO = Scene::GetInstance().GetGameObjectByUUID(ViewerPC->GetOwnerID());
 
             if (!ViewerGO || !ViewerGO->HasComponent<TransformComponent>())
             {
@@ -350,7 +358,7 @@ void PerceptionSystem::CheckSights()
             DXSM::Vector3 ViewerPos = ViewerTC->m_position + ViewerPC->EyesOffset;
 
             DXSM::Vector3 z_plus = DXSM::Vector3(0.0f, 0.0f, 1.0f);
-            const auto wMat = ViewerTC->GetWorldMatrix();
+            const auto wMat = ViewerTC->GetWorldMatrix_noLocal();
             DXSM::Matrix A = wMat;
             A._41 = 0; A._42 = 0; A._43 = 0; A._44 = 1;
             const auto wMatInvTranspose = (A.Invert()).Transpose();
@@ -374,7 +382,7 @@ void PerceptionSystem::CheckSights()
                         continue;
                     }
 
-                    auto TargetGO = SceneSP->GetGameObjectByUUID(TargetPC->GetOwnerID());
+                    auto TargetGO = Scene::GetInstance().GetGameObjectByUUID(TargetPC->GetOwnerID());
 
                     if (!TargetGO || !TargetGO->HasComponent<TransformComponent>())
                     {
@@ -393,53 +401,67 @@ void PerceptionSystem::CheckSights()
                     bool WasVisible = std::find(ViewerPC->GOCanSee.begin(), ViewerPC->GOCanSee.end(), 
                         TargetPC->GetOwnerID()) != ViewerPC->GOCanSee.end();
 
-                    if (WasVisible)
-                    {
-                        if (Dist > ViewerPC->LoseRadius)
-                        {
-                            ViewerPC->ChangeInSight(TargetPC->OwnerID, false);
-
-                            continue;
-                        }
-
-                        if (acosf(ViewerForward.Dot(DirNorm)) * 57.2958f > ViewerPC->FieldOfView * 0.5f)
-                        {
-                            ViewerPC->ChangeInSight(TargetPC->OwnerID, false);
-
-                            continue;
-                        }
-                    }                 
-
-                    bool HitTarget = false;
-
                     if (ViewerPC->CanSeeThroughObjects)
                     {
-                        HitTarget = true;
-                    }
-                    else
-                    {
-                        eastl::vector<SE::UUID> Ignore;
-                        Ignore.reserve(2);
-                        Ignore.push_back(ViewerPC->OwnerID);
-                        Ignore.push_back(TargetPC->OwnerID);
-
-                        HitTarget = !PhysicsSystemSP->Trace(JPH::RVec3(ViewerPos.x, ViewerPos.y, ViewerPos.z), 
-                            JPH::Vec3(DirNorm.x, DirNorm.y, DirNorm.z),
-                            Dist, 0, Ignore, nullptr );
-                    }
-
-                    if (HitTarget)
-                    {
-                        if (!WasVisible)
+                        if (WasVisible)
                         {
-                            ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
-                        }                  
+                            if (Dist > ViewerPC->LoseRadius || acosf(ViewerForward.Dot(DirNorm)) * 57.2958f > ViewerPC->FieldOfView * 0.5f)
+                            {
+                                ViewerPC->ChangeInSight(TargetPC->OwnerID, false);
+                            }
+                        }
+                        else
+                        {
+                            if (Dist <= ViewerPC->SightRadius && acosf(ViewerForward.Dot(DirNorm)) * 57.2958f <= ViewerPC->FieldOfView * 0.5f)
+                            {
+                                ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
+                            }
+                        }
                     }
                     else
                     {
                         if (WasVisible)
                         {
-                            ViewerPC->ChangeInSight(TargetPC->OwnerID, false);
+                            if (Dist > ViewerPC->LoseRadius || acosf(ViewerForward.Dot(DirNorm)) * 57.2958f > ViewerPC->FieldOfView * 0.5f)
+                            {
+                                ViewerPC->ChangeInSight(TargetPC->OwnerID, false);
+
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            if (Dist > ViewerPC->SightRadius || acosf(ViewerForward.Dot(DirNorm)) * 57.2958f > ViewerPC->FieldOfView * 0.5f)
+                            {
+                                continue;
+                            }
+                        }
+
+                        eastl::vector<SE::UUID> Ignore;
+                        Ignore.reserve(2);
+                        Ignore.push_back(ViewerPC->OwnerID);
+                        Ignore.push_back(TargetPC->OwnerID);
+
+                        SE::UUID HitUUID;
+
+                        bool HitSMTH = PS->Trace(JPH::RVec3(ViewerPos.x, ViewerPos.y, ViewerPos.z),
+                            JPH::Vec3(DirNorm.x, DirNorm.y, DirNorm.z),
+                            Dist, 0, Ignore, &HitUUID);
+
+                        if (!HitUUID)
+                        {
+                            if (!WasVisible)
+                            {
+                                ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
+                            }
+                        }
+                        else
+                        {
+                            if (WasVisible)
+                            {
+                                ViewerPC->ChangeInSight(TargetPC->OwnerID, false);
+                            }
+
                         }
                     }
                 }
@@ -468,7 +490,7 @@ bool PerceptionSystem::ReportNoise(PerceptionComponent* SourcePC, float Loudness
         return false;
     }
 
-    auto SourceObj = SceneSP->GetGameObjectByUUID(SourcePC->GetOwnerID());
+    auto SourceObj = Scene::GetInstance().GetGameObjectByUUID(SourcePC->GetOwnerID());
 
     if (!SourceObj->HasComponent<TransformComponent>())
     {
@@ -502,7 +524,7 @@ bool PerceptionSystem::ReportNoise(PerceptionComponent* SourcePC, float Loudness
                 continue;
             }
 
-            auto Obj = SceneSP->GetGameObjectByUUID(SourcePC->GetOwnerID());
+            auto Obj = Scene::GetInstance().GetGameObjectByUUID(SourcePC->GetOwnerID());
 
             if (!Obj->HasComponent<TransformComponent>())
             {

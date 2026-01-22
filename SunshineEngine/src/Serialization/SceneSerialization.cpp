@@ -506,8 +506,10 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::RENDER:    key = "Render"; break;
             case SE::ComponentType::PHYSICS:   key = "Physics"; break;
             case SE::ComponentType::LUA:       key = "Lua"; break;
-            case SE::ComponentType::MESH:      key = "Mesh"; break;
-            case SE::ComponentType::PARTICLE_EMITTER:      key = "ParticleEmitter"; break;
+            case SE::ComponentType::MESH:                key = "Mesh"; break;
+            case SE::ComponentType::PERCEPTION:          key = "Perception"; break;
+            case SE::ComponentType::BEHAVIOR:            key = "Behavior"; break;
+            case SE::ComponentType::PARTICLE_EMITTER:    key = "ParticleEmitter"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -628,7 +630,6 @@ void Scene::FromJson(
     eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
-
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
             GameObjectGroup objGroup = objJ["m_group"];
@@ -721,6 +722,16 @@ void Scene::FromJson(
                     c->FromJson(objJ["components"]["Physics"]);
                     physicsSystem->CreateAndAddBody(c.get());
                     //physicsSystem->CreateAndBody(c);
+                }
+
+                if (objJ["components"].contains("Perception")) {
+                    auto c = go->AddComponent<PerceptionComponent>(go->m_UUID);
+                    c->FromJson(objJ["components"]["Perception"]);
+                }
+
+                if (objJ["components"].contains("Behavior")) {
+                    auto c = go->AddComponent<BehaviorController>(go->m_UUID);
+                    c->FromJson(objJ["components"]["Behavior"]);
                 }
 
                 if (objJ["components"].contains("Lua")) {
@@ -870,6 +881,16 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                         go->GetComponent<TransformComponent_Info>().get());
                     c->FromJson(objJ["components"]["Physics"]);
                     //physicsSystem->CreateAndBody(c);
+                }
+
+                if (objJ["components"].contains("Perception")) {
+                    auto c = go->AddComponent<PerceptionComponent_Info>();
+                    c->FromJson(objJ["components"]["Perception"]);
+                }
+
+                if (objJ["components"].contains("Behavior")) {
+                    auto c = go->AddComponent<BehaviorController_Info>();
+                    c->FromJson(objJ["components"]["Behavior"]);
                 }
 
                 if (objJ["components"].contains("Lua")) {
