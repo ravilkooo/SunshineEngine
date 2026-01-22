@@ -260,6 +260,42 @@ void PhysicsComponent::SetActivation(JPH::EActivation activation) { activation =
 
 void PhysicsComponent::SetShape(JPH::ShapeRefC shapePtr) { m_shape = shapePtr; }
 
+void PhysicsComponent::SetFriction(float inFriction)
+{
+    if (!m_physicsSystem)
+        return;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+    return bodyInterface.SetFriction(m_joltBodyId, inFriction);
+}
+
+float PhysicsComponent::GetFriction()
+{
+    if (!m_physicsSystem)
+        return 0.2f;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+    return bodyInterface.GetFriction(m_joltBodyId);
+}
+
+void PhysicsComponent::SetRestitution(float inRestitution)
+{
+    if (!m_physicsSystem)
+        return;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+    return bodyInterface.SetRestitution(m_joltBodyId, inRestitution);
+}
+
+float PhysicsComponent::GetRestitution()
+{
+    if (!m_physicsSystem)
+        return 0.0f;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+    return bodyInterface.GetRestitution(m_joltBodyId);
+}
+
 void PhysicsComponent::InitTransforms(TransformComponent* tc)
 {
     transformComp = tc;

@@ -88,6 +88,18 @@ public:
     void SetActivation(JPH::EActivation activation);
     void SetShape(JPH::ShapeRefC shapePtr);
 
+    // Friction
+    void SetFriction(float inFriction);
+    float GetFriction();
+
+    // Restitution
+    void SetRestitution(float inRestitution);
+    float GetRestitution();
+
+    // GravityFactor
+    void SetGravityFactor(float inGravityFactor);
+    float GetGravityFactor();
+
     void InitTransforms(TransformComponent* tc);
 
     JPH::Body* GetBody() const;
@@ -111,6 +123,14 @@ private:
     JPH::EActivation m_activation = JPH::EActivation::Activate;
     JPH::ObjectLayer m_objectLayer = SE::Layers::NON_MOVING; // default layer
     JPH::ShapeRefC m_shape = nullptr;
+
+    // Friction and damping
+    float m_friction = 0.2f;
+    float m_linearDamping = 0.05f;
+    float m_angularDamping = 0.05f;
+
+    // Restitution
+    float m_restitution = 0.0f;
 
     SE::ColliderTransforms m_transformsData;
     /*
@@ -180,8 +200,15 @@ public:
     SE::PhysicsMotionType m_motion = SE::PhysicsMotionType::Static;
     SE::PhysicsActivation m_activation = SE::PhysicsActivation::DontActivate;
 
-    SE::CollisionLayer m_collisionLayer = {};
+    // Friction and damping
+    float m_friction = 0.2f;
+    float m_linearDamping = 0.05f;
+    float m_angularDamping = 0.05f;
+    
+    // Restitution
+    float m_restitution = 0.0f;
 
+    SE::CollisionLayer m_collisionLayer = {};
 };
 
 // Macro listing methods of PhysicsComponent to expose in Lua bindings

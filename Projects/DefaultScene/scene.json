@@ -91,8 +91,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -185,8 +189,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -281,8 +289,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -373,8 +385,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -462,8 +478,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Kinematic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Kinematic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -554,8 +574,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 1.0,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.8500000238418579
                 },
                 "Render": null,
                 "Transform": {
@@ -653,8 +677,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Kinematic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Kinematic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -941,8 +969,12 @@
                         }
                     },
                     "m_activation": "DontActivate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "NON_MOVING",
-                    "m_motion": "Static"
+                    "m_friction": 0.9900000095367432,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Static",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1029,8 +1061,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 1.7400000095367432,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1125,8 +1161,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1189,9 +1229,9 @@
                         1.0
                     ],
                     "m_position": [
-                        2.9282891750335693,
-                        -0.860666036605835,
-                        -9.19705867767334
+                        3.348266124725342,
+                        -4.766558647155762,
+                        -10.611934661865234
                     ],
                     "m_rotation": [
                         -0.5441939830780029,
@@ -1222,9 +1262,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 3.348266124725342,
-                    "y": -4.766558647155762,
-                    "z": -10.611934661865234
+                    "x": 3.891561508178711,
+                    "y": -3.203521490097046,
+                    "z": -13.236812591552734
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -1288,8 +1328,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1438,8 +1482,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1804,8 +1852,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1954,8 +2006,12 @@
                         }
                     },
                     "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
-                    "m_motion": "Dynamic"
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -2018,9 +2074,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -2.3949806690216064,
-                        -3.8539986610412598,
-                        8.686555862426758
+                        -3.3200953006744385,
+                        -5.318342208862305,
+                        14.582794189453125
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2051,9 +2107,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": -3.3200953006744385,
-                    "y": -5.318342208862305,
-                    "z": 14.582794189453125
+                    "x": -4.245209693908691,
+                    "y": -6.782685279846191,
+                    "z": 20.479032516479492
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -2091,9 +2147,9 @@
                         1.0
                     ],
                     "m_position": [
-                        111.2479019165039,
-                        -43.55178451538086,
-                        160.16165161132813
+                        116.58221435546875,
+                        -45.31794738769531,
+                        169.90008544921875
                     ],
                     "m_rotation": [
                         -3.382860924716624e-08,
@@ -2124,9 +2180,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 116.58221435546875,
-                    "y": -45.31794738769531,
-                    "z": 169.90008544921875
+                    "x": 121.82941436767578,
+                    "y": -47.00147247314453,
+                    "z": 179.70028686523438
                 },
                 "Range": 20.0,
                 "Specular": {
