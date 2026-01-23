@@ -112,10 +112,11 @@ Simple 3D Game Engine
    cmake .. -G "Visual Studio 17 2022" -A x64
    ```
 3. Open project `Sunshine.sln`
-4. Copy fmodL.dll file to build: from `$RepoFolder$\ThirdParty\FMOD\api\lib\x64` to `$RepoFolder$\build\bin\Debug`
-5. Build `ALL_BUILD` (see in *CMakePredefinedTargets*)
-6. '*Set as Startup Project*' on `SunshineEditor` (VS 2022)
-7. Run Editor
+4. Build `ALL_BUILD` (see in *CMakePredefinedTargets*)
+5. Copy fmodL.dll file to build: from `$RepoFolder$\ThirdParty\FMOD\api\lib\x64` to `$RepoFolder$\build\bin\Debug`
+6. Copy fmod.dll file to build: from `$RepoFolder$\ThirdParty\FMOD\api\lib\x64` to `$RepoFolder$\build\bin\Release`
+7. '*Set as Startup Project*' on `SunshineEditor` (VS 2022)
+8. Run Editor in *Debug* or *Release* configuration
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
