@@ -40,7 +40,7 @@ bool PerceptionSystem::UnregisterTeam(uint32_t Id)
 {
     if (Id == UINT32_MAX)
     {
-        std::cerr << "[Warning] PerceptionSystem::UnregisterTeam: Team ID is UINT32_MAX.\n";
+        //std::cerr << "[Warning] PerceptionSystem::UnregisterTeam: Team ID is UINT32_MAX.\n";
         return false;
     }
 
@@ -48,10 +48,10 @@ bool PerceptionSystem::UnregisterTeam(uint32_t Id)
 
     if (it == Teams.end())
     {
-        std::cerr << "[Warning] PerceptionSystem::UnregisterTeam: Team ID " << Id << " not found.\n";
+        //std::cerr << "[Warning] PerceptionSystem::UnregisterTeam: Team ID " << Id << " not found.\n";
         return false;
     }
-    
+
     TeamSctruct& Team = it->second;
 
     for (PerceptionComponent* PC : Team.Perceivers)
@@ -63,6 +63,10 @@ bool PerceptionSystem::UnregisterTeam(uint32_t Id)
 
         PC->TeamId = UINT32_MAX;
     }
+
+    Team.Perceivers.clear();
+    Team.SightTargetTeamIDs.clear();
+    Team.HearingSourceTeamIDs.clear();
 
     Teams.erase(it);
 

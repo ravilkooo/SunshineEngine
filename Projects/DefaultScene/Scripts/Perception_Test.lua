@@ -161,6 +161,16 @@ local function TestPerceptionSystem(self)
     testEqual("AddHearingSourceTeamIDsInTeam after clear", true, ps:addHearingSourceTeamIDsInTeam(teamA, teamB))
     testEqual("AddToTeam after clear", true, ps:addToTeam(teamA, perception))
 
+    -- =========================
+    -- UNREGISTER
+    -- =========================
+
+    testEqual("UnregisterTeam A", true, ps:unregisterTeam(teamA))
+    testEqual("UnregisterTeam duplicate", false, ps:unregisterTeam(teamA))
+    testEqual("UnregisterTeam not existing team", false, ps:unregisterTeam(999))
+
+    testEqual("RegisterTeam again A", true, ps:registerTeam(teamA))
+
     print("=== PerceptionSystem test end ===")
 end
 
