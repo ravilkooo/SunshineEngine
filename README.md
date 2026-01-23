@@ -68,7 +68,7 @@
 ## About The Project
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
-![2026-01-23_14-16](https://github.com/user-attachments/assets/25a3720c-b4a3-4fce-8ace-df7b799dc76b)
+![2026-01-23_14-35](https://github.com/user-attachments/assets/bf6cb502-2bc3-48a5-a56a-103341e29493)
 
 Sunshine Engine is a **3D game engine** built with **C++ and DirectX 11**. Here's a quick breakdown:
 
