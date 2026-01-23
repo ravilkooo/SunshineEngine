@@ -1516,7 +1516,7 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
         float HearingRadius = percInfo->HearingRadius;
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Hearing Radius");
         ImGui::SameLine();
-        if (ImGui::InputFloat("##Hearing Radius", &LoseRadius))
+        if (ImGui::InputFloat("##Hearing Radius", &HearingRadius))
         {
             percInfo->SetHearingRadius(HearingRadius);
         }
