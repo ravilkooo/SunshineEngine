@@ -310,7 +310,7 @@ private:
     void ClearAllBodies();
 
     eastl::unique_ptr<BPLayerInterfaceImpl> m_bpInterface; // { 2, 2 };
-    eastl::unique_ptr<ObjectVsBroadPhaseLayerFilterImpl> m_objectVsBpFilter; // ; // { 2 };
+    eastl::unique_ptr<ObjectVsBroadPhaseLayerFilterImpl> m_objectVsBpFilter; // { 2 };
     eastl::unique_ptr<ObjectLayerPairFilterImpl> m_objectPairFilter; // { 2 };
 
     eastl::unique_ptr<JPH::JobSystemThreadPool> m_jobSystem;

@@ -34,6 +34,7 @@ namespace SE_G
     class IconPass;
     class ColliderPass;
     class EmitterDebugPass;
+    class PerceptionDebugPass;
 };
 
 struct Selection {
@@ -123,12 +124,13 @@ public:
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
-    SE_G::GPass* m_gPass;
-    SE_G::LightPass* m_lightPass;
-    SE_G::SelectionPass* m_selectionPass;
-    SE_G::IconPass* m_iconPass;
-    SE_G::ColliderPass* m_colliderPass;
-    SE_G::EmitterDebugPass* m_emitterPass;
+    SE_G::GPass* m_gPass = nullptr;
+    SE_G::LightPass* m_lightPass = nullptr;
+    SE_G::SelectionPass* m_selectionPass = nullptr;
+    SE_G::IconPass* m_iconPass = nullptr;
+    SE_G::ColliderPass* m_colliderPass = nullptr;
+    SE_G::EmitterDebugPass* m_emitterPass = nullptr;
+    SE_G::PerceptionDebugPass* m_perceptionPass = nullptr;
 
     float m_deltaTime = 0.0f;
 

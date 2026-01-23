@@ -100,9 +100,12 @@ namespace SE_G {
 
 	GPassTechnique::~GPassTechnique()
 	{
-		m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
-		m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
-		m_assignedTransform->m_localScaleFactor = DXSM::Vector3::One;
+		if (m_assignedTransform)
+		{
+			m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
+			m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
+			m_assignedTransform->m_localScaleFactor = DXSM::Vector3::One;
+		}
 	}
 
 GPassTechnique::GPassTechnique(GPassTechnique&& other) noexcept
