@@ -661,6 +661,7 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
             physicsInfo->SetActivation(currentActivation);
         }
 
+        /*
         auto currentLayer = physicsInfo->GetCollisionLayer();
         int layerIndex = currentLayer == "MOVING"? 1 : 0;
         const char* layerItems = "Non Moving\0Moving\0";
@@ -669,6 +670,7 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
         {
             physicsInfo->SetCollisionLayer(layerIndex == 0 ? "NON_MOVING" : "MOVING");
         }
+        */
         
         if (auto colliderData = physicsInfo->m_colliderData) {
             ImGui::Separator();

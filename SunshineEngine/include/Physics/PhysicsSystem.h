@@ -184,10 +184,12 @@ public:
         JPH::ObjectLayer inObject1,
         JPH::ObjectLayer inObject2) const override
     {
+        return true;
+
         switch (inObject1)
         {
-        case SE::Layers::NON_MOVING:
-            return inObject2 == SE::Layers::MOVING; // Non moving only collides with moving
+        // case SE::Layers::NON_MOVING:
+        //     return inObject2 == SE::Layers::MOVING; // Non moving only collides with moving
         case SE::Layers::MOVING:
             return true; // Moving collides with everything
         default:
@@ -205,7 +207,7 @@ public:
     BPLayerInterfaceImpl()
     {
         // Create a mapping table from object to broad phase layer
-        mObjectToBroadPhase[SE::Layers::NON_MOVING] = SE::BroadPhaseLayers::NON_MOVING;
+        // mObjectToBroadPhase[SE::Layers::NON_MOVING] = SE::BroadPhaseLayers::NON_MOVING;
         mObjectToBroadPhase[SE::Layers::MOVING] = SE::BroadPhaseLayers::MOVING;
     }
 
@@ -225,7 +227,7 @@ public:
     {
         switch ((JPH::BroadPhaseLayer::Type)inLayer)
         {
-        case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
+        // case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
         case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::MOVING:		return "MOVING";
         default:													JPH_ASSERT(false); return "INVALID";
         }
@@ -244,10 +246,12 @@ public:
         JPH::ObjectLayer inLayer1,
         JPH::BroadPhaseLayer inLayer2) const override
     {
+        return true;
+
         switch (inLayer1)
         {
-        case SE::Layers::NON_MOVING:
-            return inLayer2 == SE::BroadPhaseLayers::MOVING;
+        // case SE::Layers::NON_MOVING:
+        //     return inLayer2 == SE::BroadPhaseLayers::MOVING;
         case SE::Layers::MOVING:
             return true;
         default:

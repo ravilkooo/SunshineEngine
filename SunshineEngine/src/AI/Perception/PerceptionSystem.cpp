@@ -397,6 +397,10 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
 
                     DXSM::Vector3 DirNorm = Dir;
                     DirNorm.Normalize();
+                    
+					// printf("ViewFwd: %.2f, %.2f, %.2f\t Direction: %.2f, %.2f, %.2f\n",
+                    //     ViewerForward.x, ViewerForward.y, ViewerForward.z,
+                    //     Dir.x, Dir.y, Dir.z);
 
                     bool WasVisible = std::find(ViewerPC->GOCanSee.begin(), ViewerPC->GOCanSee.end(), 
                         TargetPC->GetOwnerID()) != ViewerPC->GOCanSee.end();
@@ -440,28 +444,46 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
                         eastl::vector<SE::UUID> Ignore;
                         Ignore.reserve(2);
                         Ignore.push_back(ViewerPC->OwnerID);
-                        Ignore.push_back(TargetPC->OwnerID);
+                        // Ignore.push_back(TargetPC->OwnerID);
 
-                        SE::UUID HitUUID;
+                        SE::UUID HitUUID = SE::UUID(0u);
 
                         bool HitSMTH = PS->Trace(JPH::RVec3(ViewerPos.x, ViewerPos.y, ViewerPos.z),
                             JPH::Vec3(DirNorm.x, DirNorm.y, DirNorm.z),
                             Dist, 0, Ignore, &HitUUID);
 
-                        if (!HitUUID)
+						// printf("\tHitSMTH: (%d); Hit UUID: (%s)\n", HitSMTH, HitUUID.ToString().c_str());
+
+                        if (!HitSMTH)
                         {
                             if (!WasVisible)
                             {
                                 ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
                             }
-                        }
+						}
                         else
                         {
-                            if (WasVisible)
+                            if (HitUUID == SE::UUID(0u))
                             {
-                                ViewerPC->ChangeInSight(TargetPC->OwnerID, false);
+                                if (!WasVisible)
+                                {
+                                    ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
+                                }
                             }
-
+                            else if (HitUUID == TargetPC->OwnerID)
+                            {
+                                if (!WasVisible)
+                                {
+                                    ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
+                                }
+                            }
+							else
+                            {
+                                if (WasVisible)
+                                {
+                                    ViewerPC->ChangeInSight(TargetPC->OwnerID, false);
+                                }
+                            }
                         }
                     }
                 }

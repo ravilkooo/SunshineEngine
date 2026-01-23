@@ -81,7 +81,7 @@ bool PhysicsSystem::Trace(const JPH::RVec3& begin,
     // Build ignore set
     eastl::unordered_set<SE::UUID> ignore_set(ignore.begin(), ignore.end());
 
-    JPH::RRayCast ray(begin, begin + JPH::RVec3(dir * length));
+    JPH::RRayCast ray(begin, JPH::RVec3(dir * length));
 
     JPH::RayCastResult   result;
     
@@ -97,19 +97,32 @@ bool PhysicsSystem::Trace(const JPH::RVec3& begin,
         layer_filter,
         body_filter);
 
-    if (!hit || !out_id)
-        return hit;
-
-    // Retrieve SE::UUID from hit body
-    JPH::BodyID body_id = result.mBodyID;
-
-    JPH::BodyLockRead lock(m_physicsSystem->GetBodyLockInterface(), body_id);
-    if (!lock.Succeeded())
+    if (!hit)
+    {
         return false;
+    }
 
-    const JPH::Body& body = lock.GetBody();
-    *out_id = SE::UUID(body.GetUserData());
-    return true;
+    if (out_id)
+    {
+        // Retrieve SE::UUID from hit body
+        JPH::BodyID body_id = result.mBodyID;
+
+        JPH::BodyLockRead lock(m_physicsSystem->GetBodyLockInterface(), body_id);
+        if (!lock.Succeeded())
+        {
+            *out_id = SE::UUID(0u);
+            return false;
+        }
+
+        const JPH::Body& body = lock.GetBody();
+        *out_id = SE::UUID(body.GetUserData());
+
+        auto n = body.GetWorldSpaceSurfaceNormal(result.mSubShapeID2, ray.GetPointOnRay(result.mFraction));
+        // printf("\t\tHit normal: %.2f, %.2f, %.2f\n", n.GetX(), n.GetY(), n.GetZ());
+
+        return true;
+    }
+	return true;
 }
 //////////////////////////////////////////
 //////////////////////////////////////////

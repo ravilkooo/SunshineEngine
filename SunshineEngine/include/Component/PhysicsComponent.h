@@ -121,7 +121,7 @@ private:
     JPH::Quat m_orientation = JPH::Quat::sIdentity();
     JPH::EMotionType m_motionType = JPH::EMotionType::Static;
     JPH::EActivation m_activation = JPH::EActivation::Activate;
-    JPH::ObjectLayer m_objectLayer = SE::Layers::NON_MOVING; // default layer
+    JPH::ObjectLayer m_objectLayer = SE::Layers::MOVING; // default layer
     JPH::ShapeRefC m_shape = nullptr;
 
     // Friction and damping
@@ -208,7 +208,7 @@ public:
     // Restitution
     float m_restitution = 0.0f;
 
-    SE::CollisionLayer m_collisionLayer = {};
+    SE::CollisionLayer m_collisionLayer = "MOVING";
 };
 
 // Macro listing methods of PhysicsComponent to expose in Lua bindings

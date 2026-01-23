@@ -178,7 +178,7 @@ function TestPerceptionComponentWithPerceptionSystem(self)
     ps:clearTeam(teamB)
 
     perception:setCanSee(true)
-    perception:setSight(10, 20, 90, Vector3.new(0.0, 0.0, 0.0), false)
+    perception:setSight(15, 20, 90, Vector3.new(0.0, 0.0, 0.0), false)
 
     perception:setCanHear(true)
     perception:setHearing(1000, 0, 1)
@@ -231,9 +231,29 @@ function TestPerceptionComponentWithPerceptionSystem(self)
 end
 
 function behavior:start()
+    local perception = self.owner:getPerception()
+    
+    local canSee = perception:getCanSee()
+    local canSeeThroughObjects = perception:getCanSeeThroughObjects()
+    local sightRadius = perception:getSightRadius()
+    local loseRadius = perception:getLoseRadius()
+    local fov = perception:getFieldOfView()
+    local eyesOffset = perception:getEyesOffset()
+
+    local canHear = perception:getCanHear()
+    local hearingRadius = perception:getHearingRadius()
+    local threshold = perception:getThreshold()
+    local sensitivity = perception:getSensitivity()
+
     TestPerceptionComponent(self)
     TestPerceptionSystem(self)
     TestPerceptionComponentWithPerceptionSystem(self)
+
+    perception:setCanSee(canSee)
+    perception:setCanSeeThroughObjects(canSeeThroughObjects)
+    perception:setSight(sightRadius, loseRadius, fov, eyesOffset, canSeeThroughObjects)
+    perception:setCanHear(canHear)
+    perception:setHearing(hearingRadius, threshold, sensitivity)
 end
 
 local first = true
