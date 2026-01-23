@@ -2,6 +2,7 @@
 
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
+#include <Graphics/Renderer/Pass/PerceptionDebugPass.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
 #include <Graphics/GraphicsResources/GeometryShader.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
@@ -123,7 +124,14 @@ namespace SE_G {
 	void SelectionPass::Pass()
 	{
 		if (m_selectedObjectUUID == SE::UUID(0u))
+		{
+			if (m_perceptionPass)
+			{
+				m_perceptionPass->SetGameObject(nullptr);
+			}
+
 			return;
+		}
 
 		/*
 		m_screenInfoPCB->Update(GetDeviceContext(), { DXSM::Vector2(
@@ -134,6 +142,10 @@ namespace SE_G {
 		BindAllPerFrame();
 
 		GameObject_Info* gameObject_info = m_scene->GetGameObjectByUUID(m_selectedObjectUUID);
+		if (m_perceptionPass)
+		{
+			m_perceptionPass->SetGameObject(gameObject_info);
+		}
 
 		if (gameObject_info->HasComponent<RenderComponent_Info>() &&
 			gameObject_info->HasComponent<TransformComponent_Info>()) {
@@ -257,4 +269,8 @@ namespace SE_G {
 		m_viewport.MinDepth = 0;
 		m_viewport.MaxDepth = 1.0f;
 	}
+	
+	void SelectionPass::SetPerceptionDebugPass(PerceptionDebugPass* perceptionPass) {
+		m_perceptionPass = perceptionPass;
+	};
 }

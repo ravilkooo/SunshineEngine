@@ -1,9 +1,13 @@
-﻿#include <Graphics/Renderer/RenderingSystem.h>
+﻿#include <Graphics/Renderer/Pass/PerceptionDebugPass.h>
 
-#include <Graphics/Renderer/Pass/PerceptionDebugPass.h>
+#include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
-
+#include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/Bindable/Sampler.h>
+#include <GameObject/GameObject.h>
+
+#include <AI/Perception/PerceptionComponent.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
@@ -16,20 +20,6 @@ namespace SE_G {
 	{
 		eastl::vector<SE_G::PerceptionVertex> vertices;
 		eastl::vector<UINT> indices;
-
-		vertices.reserve(0u);
-		indices.reserve(0u);
-
-		vertices.push_back(SE_G::PerceptionVertex{ {0.0f, 0.0f, 0.0f} });
-		vertices.push_back(SE_G::PerceptionVertex{ {1.0f, 0.0f, 0.0f} });
-
-		indices.push_back(0u);
-		indices.push_back(1u);
-
-		m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(
-			device, vertices.data(), vertices.size(), sizeof(SE_G::PerceptionVertex));
-		m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(
-			device, indices.data(), indices.size());
 		
 		m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
@@ -77,7 +67,27 @@ namespace SE_G {
 		AddPerFrameBind(m_GBufferSampler.get());
 
 		m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/PerceptionDebugPass/PerceptionShaderPS.hlsl").c_str());
+			MakeEngineAssetPath_Wstring(L"Shaders/PerceptionDebugPass/PerceptionPassPS.hlsl").c_str());
+
+		// UINT numInputElements = 2;
+		UINT numInputElements = 1;
+		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			// { "TEXCOORD", 0, DXGI_FORMAT_R32_UINT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+
+		m_vertexShader = eastl::make_unique<Bind::VertexShader>(device,
+			MakeEngineAssetPath_Wstring(L"Shaders/PerceptionDebugPass/PerceptionPassVS.hlsl").c_str(),
+			numInputElements,
+			IALayoutInputElements);
+
+		m_settingsCB = eastl::make_unique<Bind::VertexConstantBuffer<PerceptionSettings>>(
+			device,
+			m_perceptionData,
+			2u);
+
+		InitVertexBuffer(device);
 	}
 
 	PerceptionDebugPass::~PerceptionDebugPass() {
@@ -98,25 +108,71 @@ namespace SE_G {
 
 	void PerceptionDebugPass::Pass()
 	{
-		BindAllPerFrame();
-
-		// VertexBuffer with all default shapes
-		m_topology->Bind(context.Get());
-		m_depthStencilState->Bind(context.Get());
-		m_pixelShader->Bind(context.Get());
-
-		// Default shapes
-		m_vertexBuffer->Bind(context.Get());
-		m_indexBuffer->Bind(context.Get());
-		for (auto& tech : m_techniques)
+		if (m_gameObject && m_gameObject->HasComponent<PerceptionComponent_Info>()) 
 		{
-			DXSM::Vector3 old_scaleFactor = tech.second->m_assignedTransform->m_scaleFactor;
-			tech.second->m_assignedTransform->m_scaleFactor = DXSM::Vector3::One;
+			PerceptionComponent_Info* perceptionComp = m_gameObject->GetComponent<PerceptionComponent_Info>().get();
 
-			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-			tech.second->Pass(GetDeviceContext());
+			m_perceptionData.EyesOffset = perceptionComp->EyesOffset;
+			m_perceptionData.SightRadius = perceptionComp->SightRadius;
+			m_perceptionData.LoseRadius = perceptionComp->LoseRadius;
+			m_perceptionData.FieldOfView = perceptionComp->FieldOfView;
+			m_perceptionData.HearingRadius = perceptionComp->HearingRadius;
 
-			tech.second->m_assignedTransform->m_scaleFactor = old_scaleFactor;
+			auto tc = m_gameObject->GetComponent<TransformComponent_Info>();
+			DXSM::Vector3 old_localScaleFactor = tc->m_assignedComponent->m_localScaleFactor;
+			DXSM::Vector3 old_localRotation = tc->m_assignedComponent->m_localRotation;
+			DXSM::Vector3 old_localPosition = tc->m_assignedComponent->m_localPosition;
+
+			tc->m_assignedComponent->EnableMeshTransformMode();
+			DXSM::Matrix fullTransform = tc->m_assignedComponent->GetWorldMatrix_noLocal();
+			DXSM::Vector3 scale;
+			DXSM::Vector3 rotate;
+			DXSM::Vector3 translation;
+			DecomposeTransform(fullTransform, scale, rotate, translation);
+			tc->m_assignedComponent->m_localPosition = DXSM::Vector3::Zero;
+			tc->m_assignedComponent->m_localRotation = DXSM::Vector3::Zero;
+			tc->m_assignedComponent->m_localScaleFactor = DXSM::Vector3(
+				1.0f / scale.x,
+				1.0f / scale.y,
+				1.0f / scale.z
+			);
+
+            const auto wMat = tc->m_assignedComponent->GetWorldMatrix_noLocal();
+            DXSM::Matrix A = wMat;
+            A._41 = 0; A._42 = 0; A._43 = 0; A._44 = 1;
+            m_perceptionData.wMatNoLocalInvTranspose = (A.Invert()).Transpose();
+
+			m_settingsCB->Update(context.Get(), m_perceptionData);
+			m_settingsCB->Bind(context.Get());
+
+			BindAllPerFrame();
+
+			// VertexBuffer with all default shapes
+			m_topology->Bind(context.Get());
+			m_depthStencilState->Bind(context.Get());
+			m_pixelShader->Bind(context.Get());
+			m_vertexShader->Bind(context.Get());
+
+			// Default shapes
+			m_vertexBuffer->Bind(context.Get());
+			m_indexBuffer->Bind(context.Get());
+
+
+			tc->m_assignedComponent->BindToGraphicsPipeline(context.Get());
+			// tc->Pass(GetDeviceContext());
+
+			context->DrawIndexedInstanced(
+				2 * segments + 4,
+				3,
+				0u,
+				0u,
+				0u
+			);
+
+			tc->m_assignedComponent->DisableMeshTransformMode();
+			tc->m_assignedComponent->m_localScaleFactor = old_localScaleFactor;
+			tc->m_assignedComponent->m_localRotation = old_localRotation;
+			tc->m_assignedComponent->m_localPosition = old_localPosition;
 		}
 	}
 
@@ -146,4 +202,51 @@ namespace SE_G {
 		m_viewport.MinDepth = 0;
 		m_viewport.MaxDepth = 1.0f;
 	}
+
+	void PerceptionDebugPass::InitVertexBuffer(ID3D11Device* device)
+	{
+
+		eastl::vector<SE_G::PerceptionVertex> vertices;
+		vertices.reserve(segments + 1u); // center + perimeter
+		eastl::vector<UINT> indices;
+
+		UINT vertexOffset = 0u;
+		UINT indexOffset = 0u;
+
+		vertices.push_back({DXSM::Vector3::Zero}); // center
+
+		// 'segments + 1' vertices
+		// 'segments' number of segments between vertices
+		for (UINT i = 0u; i < segments + 1; ++i)
+		{
+			// float a = step * float(i);
+			// float c = cosf(a);
+			// float s = sinf(a);
+			float c = 0.0f;
+			float s = 1.0f;
+
+			SE_G::PerceptionVertex v{};
+			
+			v.position = { 
+				DXSM::Vector3(c, 0.0f, s)
+			}; // XZ
+			vertices.push_back(v);
+		}
+
+		// indices: connect i -> i+1, last -> first
+		for (UINT i = 0u; i < vertices.size(); ++i)
+		{
+			UINT aIdx = UINT(i);
+			UINT bIdx = UINT((i + 1u) % vertices.size());
+			indices.push_back(aIdx);
+			indices.push_back(bIdx);
+		}
+
+		m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(
+			device, vertices.data(), vertices.size(), sizeof(SE_G::PerceptionVertex));
+		m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(
+			device, indices.data(), indices.size());
+	}
+
+	void PerceptionDebugPass::SetGameObject(GameObject_Info* gameObject) { m_gameObject = gameObject; }
 }
