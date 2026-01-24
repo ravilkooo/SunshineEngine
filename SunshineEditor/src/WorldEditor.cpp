@@ -171,6 +171,13 @@ void WorldEditor::SetupRendering(
 			);
 	}
 	{
+		m_triggerPass = static_cast<SE_G::TriggerPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::TriggerPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+	}
+	{
 		m_emitterPass = static_cast<SE_G::EmitterDebugPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::EmitterDebugPass>(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),

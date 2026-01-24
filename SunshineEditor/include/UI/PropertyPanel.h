@@ -91,6 +91,9 @@ private:
     void DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj);
 
     void DrawPhysicsComponent(GameObject_Info* obj);
+    void DrawTriggerComponent(GameObject_Info* obj);
+    void DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> colliderData);
+
     void DrawMeshComponent(GameObject_Info* obj);
 
     void DrawPerceptionComponent(GameObject_Info* obj);

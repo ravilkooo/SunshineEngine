@@ -26,6 +26,7 @@
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>
 #include <Component/LuaComponent.h>
+#include <Component/TriggerComponent.h>
 
 #include <SceneHierarchy.h>
 
@@ -362,16 +363,15 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         }
         else if (obj->m_group == GameObjectGroup::ParticleEmitter)
         {
-            // auto emitterObj = static_cast<SE::ParticleData*>(obj);
-            // DrawEmitterDetails(emitterObj);
+            DrawEmitterDetails(obj);
         }
 
         DrawMeshComponent(obj);
         DrawPhysicsComponent(obj);
+        DrawTriggerComponent(obj);
         DrawPerceptionComponent(obj);
         DrawBehaviorController(obj);
         DrawLuaComponent(obj);
-        DrawEmitterDetails(obj);
 
         ImGui::TreePop();
     }
@@ -661,7 +661,6 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
             physicsInfo->SetActivation(currentActivation);
         }
 
-        /*
         auto currentLayer = physicsInfo->GetCollisionLayer();
         int layerIndex = currentLayer == "MOVING"? 1 : 0;
         const char* layerItems = "Non Moving\0Moving\0";
@@ -670,147 +669,14 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
         {
             physicsInfo->SetCollisionLayer(layerIndex == 0 ? "NON_MOVING" : "MOVING");
         }
-        */
+        ImGui::Separator();
         
-        if (auto colliderData = physicsInfo->m_colliderData) {
-            ImGui::Separator();
 
-            EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
-            if (ImGui::TreeNodeEx("Collider Settings", flags))
-            {
-                EditorUI::FontStyles::Pop();
-
-                auto currentShape = colliderData->GetShapeType();
-                const char* shapeItems =
-                    "Sphere\0Box\0Capsule\0TaperedCapsule\0";
-                if (ImGui::Combo("Shape Type", (int*)&currentShape, shapeItems))
-                {
-                    colliderData->SetShapeType(currentShape);
-                }
-
-                /*
-                auto transformData = colliderData->GetTransformData();
-                bool transformChanged = false;
-                ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
-                                  ImGuiTreeNodeFlags_Framed |
-                                  ImGuiTreeNodeFlags_SpanAvailWidth;
-                if (ImGui::TreeNodeEx("Collider Transform", flags))
-                {
-                    if (DrawVector3Control("Offset", transformData.m_offset, 0.0f))
-                        transformChanged = true;
-
-                    DXSM::Vector3 rotationDeg = transformData.m_rotation * (180.0f / DirectX::XM_PI);
-                    if (DrawVector3Control("Rotation", rotationDeg, 0.0f))
-                    {
-                        transformData.m_rotation = rotationDeg * (DirectX::XM_PI / 180.0f);
-                        transformChanged = true;
-                    }
-
-                    ImGui::TreePop();
-                }
-                if (transformChanged)
-                {
-                    colliderData->SetTransformData(transformData);
-                }
-                */
-
-                auto settings = colliderData->GetColliderSettings();
-                bool settingsChanged = false;
-
-                switch (colliderData->GetShapeType())
-                {
-                case SE::ColliderShapeType::Box:
-                    if (DrawVector3Control("Box Size", settings.data.asBox.m_size, 1.0f))
-                        settingsChanged = true;
-                    break;
-
-                case SE::ColliderShapeType::Sphere:
-                    if (DrawFloatControl("Radius", settings.data.asSphere.m_radius, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
-                        settingsChanged = true;
-                    break;
-
-                case SE::ColliderShapeType::Capsule:
-                    if (DrawFloatControl("Height", settings.data.asCapsule.m_height, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
-                        settingsChanged = true;
-                    if (DrawFloatControl("Radius", settings.data.asCapsule.m_radius, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
-                        settingsChanged = true;
-                    break;
-
-                case SE::ColliderShapeType::TaperedCapsule:
-                    if (DrawFloatControl("Height", settings.data.asTaperedCapsule.m_height, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
-                        settingsChanged = true;
-                    if (DrawFloatControl("Top Radius", settings.data.asTaperedCapsule.m_topRadius, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
-                        settingsChanged = true;
-                    if (DrawFloatControl("Bottom Radius", settings.data.asTaperedCapsule.m_bottomRadius, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
-                        settingsChanged = true;
-                    break;
-
-                case SE::ColliderShapeType::Mesh:
-                    ImGui::Text("Using mesh");
-                    break;
-
-                case SE::ColliderShapeType::Cylinder:
-                    ImGui::Text("Using cylinder");
-                    break;
-
-                case SE::ColliderShapeType::TaperedCylinder:
-                    ImGui::Text("Using tapered cylinder");
-                    break;
-
-                case SE::ColliderShapeType::Plane:
-                    ImGui::Text("Using plane");
-                    break;
-
-                case SE::ColliderShapeType::Triangle:
-                    ImGui::Text("Using triangle");
-                    break;
-
-                case SE::ColliderShapeType::Empty:
-                    ImGui::Text("Using empty");
-                    break;
-
-                case SE::ColliderShapeType::ConvexHull:
-                    ImGui::Text("Using convex hull");
-                    break;
-
-                case SE::ColliderShapeType::HeightField:
-                    ImGui::Text("Using height field");
-                    break;
-
-                case SE::ColliderShapeType::SoftBody:
-                    ImGui::Text("Using soft body");
-                    break;
-
-                case SE::ColliderShapeType::StaticCompound:
-                    ImGui::Text("Using static compound");
-                    break;
-
-                case SE::ColliderShapeType::MutableCompound:
-                    ImGui::Text("Using mutable compound");
-                    break;
-
-                case SE::ColliderShapeType::Scaled:
-                    ImGui::Text("Using scaled");
-                    break;
-
-                case SE::ColliderShapeType::RotatedTranslated:
-                    ImGui::Text("Using rotated translated");
-                    break;
-
-                case SE::ColliderShapeType::OffsetCenterOfMass:
-                    ImGui::TextDisabled("Using offset center of mass");
-                    break;
-                }
-
-                if (settingsChanged)
-                {
-                    colliderData->SetColliderSettings(settings);
-                }
-
-                ImGui::TreePop();
-            }
-            else EditorUI::FontStyles::Pop();
+        if (auto colliderData = physicsInfo->m_colliderData)
+        {
+            DrawColliderSettings(colliderData);
         }
+
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         if (ImGui::TreeNodeEx("Additional Forces", flags))
@@ -859,6 +725,38 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
             ImGui::TreePop();
         }
         else EditorUI::FontStyles::Pop();
+
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawTriggerComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<TriggerComponent_Info>())
+        return;
+    auto triggerInfo = obj->GetComponent<TriggerComponent_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Trigger Settings", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        if (DrawComponentRemoveButton<TriggerComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
+
+        if (auto colliderData = triggerInfo->m_colliderData)
+        {
+            DrawColliderSettings(colliderData);
+        }
 
         ImGui::TreePop();
     }
@@ -1063,6 +961,16 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
         ImGui::Text("Add Component");
         ImGui::Separator();
 
+        if (!obj->HasComponent<MeshComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Mesh Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::MESH);
+            }
+        }
+
         if (!obj->HasComponent<PhysicsComponent_Info>())
         {
             HasAllComponents = false;
@@ -1073,13 +981,13 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             }
         }
 
-        if (!obj->HasComponent<MeshComponent_Info>())
+        if (!obj->HasComponent<TriggerComponent_Info>())
         {
             HasAllComponents = false;
 
-            if (ImGui::MenuItem("Mesh Component", nullptr, false, true))
+            if (ImGui::MenuItem("Trigger Component", nullptr, false, true))
             {
-                obj->AddDefaultComponent(SE::ComponentType::MESH);
+                obj->AddDefaultComponent(SE::ComponentType::TRIGGER);
             }
         }
 
@@ -1903,4 +1811,124 @@ eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
     }
 
     return newMesh;
+}
+
+void PropertyPanel::DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> colliderData)
+{
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+    if (ImGui::TreeNodeEx("Collider Settings", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        auto currentShape = colliderData->GetShapeType();
+        const char* shapeItems =
+            "Sphere\0Box\0Capsule\0TaperedCapsule\0";
+        if (ImGui::Combo("Shape Type", (int*)&currentShape, shapeItems))
+        {
+            colliderData->SetShapeType(currentShape);
+        }
+
+        auto settings = colliderData->GetColliderSettings();
+        bool settingsChanged = false;
+
+        switch (colliderData->GetShapeType())
+        {
+        case SE::ColliderShapeType::Box:
+            if (DrawVector3Control("Box Size", settings.data.asBox.m_size, 1.0f))
+                settingsChanged = true;
+            break;
+
+        case SE::ColliderShapeType::Sphere:
+            if (DrawFloatControl("Radius", settings.data.asSphere.m_radius, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
+                settingsChanged = true;
+            break;
+
+        case SE::ColliderShapeType::Capsule:
+            if (DrawFloatControl("Height", settings.data.asCapsule.m_height, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
+                settingsChanged = true;
+            if (DrawFloatControl("Radius", settings.data.asCapsule.m_radius, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
+                settingsChanged = true;
+            break;
+
+        case SE::ColliderShapeType::TaperedCapsule:
+            if (DrawFloatControl("Height", settings.data.asTaperedCapsule.m_height, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
+                settingsChanged = true;
+            if (DrawFloatControl("Top Radius", settings.data.asTaperedCapsule.m_topRadius, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
+                settingsChanged = true;
+            if (DrawFloatControl("Bottom Radius", settings.data.asTaperedCapsule.m_bottomRadius, 1.0f, 0.1f, 0.01f, 100.0f, "%.2f"))
+                settingsChanged = true;
+            break;
+
+        case SE::ColliderShapeType::Mesh:
+            ImGui::Text("Using mesh");
+            break;
+
+        case SE::ColliderShapeType::Cylinder:
+            ImGui::Text("Using cylinder");
+            break;
+
+        case SE::ColliderShapeType::TaperedCylinder:
+            ImGui::Text("Using tapered cylinder");
+            break;
+
+        case SE::ColliderShapeType::Plane:
+            ImGui::Text("Using plane");
+            break;
+
+        case SE::ColliderShapeType::Triangle:
+            ImGui::Text("Using triangle");
+            break;
+
+        case SE::ColliderShapeType::Empty:
+            ImGui::Text("Using empty");
+            break;
+
+        case SE::ColliderShapeType::ConvexHull:
+            ImGui::Text("Using convex hull");
+            break;
+
+        case SE::ColliderShapeType::HeightField:
+            ImGui::Text("Using height field");
+            break;
+
+        case SE::ColliderShapeType::SoftBody:
+            ImGui::Text("Using soft body");
+            break;
+
+        case SE::ColliderShapeType::StaticCompound:
+            ImGui::Text("Using static compound");
+            break;
+
+        case SE::ColliderShapeType::MutableCompound:
+            ImGui::Text("Using mutable compound");
+            break;
+
+        case SE::ColliderShapeType::Scaled:
+            ImGui::Text("Using scaled");
+            break;
+
+        case SE::ColliderShapeType::RotatedTranslated:
+            ImGui::Text("Using rotated translated");
+            break;
+
+        case SE::ColliderShapeType::OffsetCenterOfMass:
+            ImGui::TextDisabled("Using offset center of mass");
+            break;
+        }
+
+        if (settingsChanged)
+        {
+            colliderData->SetColliderSettings(settings);
+        }
+
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+
+
+    ImGui::Separator();
 }

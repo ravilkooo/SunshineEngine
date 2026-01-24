@@ -11,8 +11,8 @@
 
 #include <Physics/PhysicsEnums.h>
 
-
-namespace DXSM = DirectX::SimpleMath;
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 namespace SE {
     typedef eastl::string CollisionLayer;
@@ -20,16 +20,18 @@ namespace SE {
 
     namespace Layers
     {
-        // static constexpr JPH::ObjectLayer NON_MOVING = 0;
-        static constexpr JPH::ObjectLayer MOVING = 0;
-        static constexpr JPH::ObjectLayer NUM_LAYERS = 1;
+        static constexpr JPH::ObjectLayer NON_MOVING = 0;
+        static constexpr JPH::ObjectLayer MOVING = 1;
+        static constexpr JPH::ObjectLayer TRIGGER = 2;
+        static constexpr JPH::ObjectLayer NUM_LAYERS = 3;
     };
 
     namespace BroadPhaseLayers
     {
-        //static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
-        static constexpr JPH::BroadPhaseLayer MOVING(0);
-        static constexpr UINT NUM_LAYERS(1);
+        static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
+        static constexpr JPH::BroadPhaseLayer MOVING(1);
+        static constexpr JPH::BroadPhaseLayer TRIGGER(2);
+        static constexpr UINT NUM_LAYERS(3);
     };
 
     struct ColliderVertex {
@@ -85,6 +87,12 @@ namespace SE {
 
     struct ColliderSettings
     {
+        DXSM::Vector3 colliderColor = DXSM::Vector3(
+            0.0313725f,
+            0.0745098f,
+            0.7764706f
+        );
+        float padding = 1.0f;
         union {
             RowParams asRowParams; // For setting maximum size
 

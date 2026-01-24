@@ -1,6 +1,7 @@
 struct PS_IN
 {
     float4 pos : SV_POSITION;
+    float4 col : COLOR;
 };
 
 struct PSOutput
@@ -12,6 +13,7 @@ PSOutput PSMain(PS_IN input)
 {
     PSOutput output;
     // HEX color #0859C6
-    output.Color = float4(0.03137f, 0.34902f, 0.77647f, 1.0f);
+    // output.Color = float4(0.03137f, 0.34902f, 0.77647f, 1.0f);
+    output.Color = input.col;
     return output;
 }

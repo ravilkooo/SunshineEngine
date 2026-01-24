@@ -16,6 +16,7 @@
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 #include <Component/PhysicsComponent.h>
+#include <Component/TriggerComponent.h>
 #include <Component/MeshComponent.h>
 #include <Component/LuaComponent.h>
 
@@ -415,6 +416,18 @@ public:
                 auto rc_info = GetComponent<RenderComponent_Info>();
 
                 auto pc_info = AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
+
+            }
+                break;
+
+            case SE::ComponentType::TRIGGER:
+
+                // Add PhysicsComponent with default values
+            {
+                auto tc_info = GetComponent<TransformComponent_Info>();
+                auto rc_info = GetComponent<RenderComponent_Info>();
+
+                auto trigc_info = AddComponent<TriggerComponent_Info>(rc_info.get(), tc_info.get());
 
             }
                 break;

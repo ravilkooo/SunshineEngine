@@ -24,6 +24,7 @@ namespace SE_G {
 			Shadow,
 			Light,
 			Collider,
+			Trigger,
 			Emitter,
 			Icon,
 			Selection,

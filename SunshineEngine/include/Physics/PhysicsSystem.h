@@ -37,10 +37,11 @@
 #include <Physics/CollisionLayerVsGroupTable.h>
 #include <Physics/TriggerContactListener.h>
 
-#include <Component/PhysicsComponent.h>
 
 #include <Utils/UUID.h>
 
+class PhysicsComponent;
+class TriggerComponent;
 
 class PhysicsSystem_Info {
 public:
@@ -187,14 +188,23 @@ public:
         JPH::ObjectLayer inObject1,
         JPH::ObjectLayer inObject2) const override
     {
-        return true;
-
         switch (inObject1)
         {
-        // case SE::Layers::NON_MOVING:
-        //     return inObject2 == SE::Layers::MOVING; // Non moving only collides with moving
+        case SE::Layers::NON_MOVING:
+            // Non-moving only collides with moving
+            return inObject2 == SE::Layers::MOVING;
+
         case SE::Layers::MOVING:
-            return true; // Moving collides with everything
+            // Moving collides with non-moving and triggers
+            return inObject2 == SE::Layers::NON_MOVING || 
+                   inObject2 == SE::Layers::MOVING ||
+                   inObject2 == SE::Layers::TRIGGER;
+
+        case SE::Layers::TRIGGER:
+            // Triggers ONLY collide with MOVING bodies
+            // (not with static non-moving objects or other triggers)
+            return inObject2 == SE::Layers::MOVING;
+
         default:
             JPH_ASSERT(false);
             return false;
@@ -210,8 +220,9 @@ public:
     BPLayerInterfaceImpl()
     {
         // Create a mapping table from object to broad phase layer
-        // mObjectToBroadPhase[SE::Layers::NON_MOVING] = SE::BroadPhaseLayers::NON_MOVING;
+        mObjectToBroadPhase[SE::Layers::NON_MOVING] = SE::BroadPhaseLayers::NON_MOVING;
         mObjectToBroadPhase[SE::Layers::MOVING] = SE::BroadPhaseLayers::MOVING;
+        mObjectToBroadPhase[SE::Layers::TRIGGER] = SE::BroadPhaseLayers::TRIGGER;
     }
 
     virtual UINT GetNumBroadPhaseLayers() const override
@@ -230,9 +241,10 @@ public:
     {
         switch ((JPH::BroadPhaseLayer::Type)inLayer)
         {
-        // case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::NON_MOVING:	return "NON_MOVING";
-        case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::MOVING:		return "MOVING";
-        default:													JPH_ASSERT(false); return "INVALID";
+        case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::NON_MOVING:  return "NON_MOVING";
+        case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::MOVING:      return "MOVING";
+        case (JPH::BroadPhaseLayer::Type)SE::BroadPhaseLayers::TRIGGER:     return "TRIGGER";
+        default:                                                             JPH_ASSERT(false); return "INVALID";
         }
     }
 #endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
@@ -249,14 +261,19 @@ public:
         JPH::ObjectLayer inLayer1,
         JPH::BroadPhaseLayer inLayer2) const override
     {
-        return true;
-
         switch (inLayer1)
         {
-        // case SE::Layers::NON_MOVING:
-        //     return inLayer2 == SE::BroadPhaseLayers::MOVING;
+        case SE::Layers::NON_MOVING:
+            return inLayer2 == SE::BroadPhaseLayers::MOVING;
+
         case SE::Layers::MOVING:
-            return true;
+            return inLayer2 == SE::BroadPhaseLayers::NON_MOVING || 
+                   inLayer2 == SE::BroadPhaseLayers::MOVING ||
+                   inLayer2 == SE::BroadPhaseLayers::TRIGGER;
+
+        case SE::Layers::TRIGGER:
+            return inLayer2 == SE::BroadPhaseLayers::MOVING;
+
         default:
             JPH_ASSERT(false);
             return false;
@@ -284,10 +301,9 @@ public:
     ~PhysicsSystem();
 
     // begin: world-space start; dir: normalized; layerKey: your editor layer key
-    bool Trace(const JPH::RVec3& begin,
+    bool PerceptionTrace(const JPH::RVec3& begin,
         const JPH::Vec3& dir,
         float length,
-        JPH::ObjectLayer layer,
         const eastl::vector<SE::UUID>& ignore,
         SE::UUID* out_id);
     
@@ -308,14 +324,11 @@ public:
 
     bool IsValid() { return m_isValid; }
 
-    // Create a trigger box
-    JPH::BodyID CreateTriggerBox(
-        const JPH::RVec3& position,
-        const JPH::Vec3& halfExtents,
-        SE::UUID triggerUUID);
+    // Create a trigger
+    void CreateAndAddTrigger(TriggerComponent* triggerComp);
 
-    // Remove trigger
-    void RemoveTrigger(JPH::BodyID triggerID);
+    // Remove and destroy a specific physics body
+    void RemoveTrigger(TriggerComponent* triggerComp);
 
     // Check trigger overlaps each frame
     void UpdateTriggerOverlaps();

@@ -34,14 +34,11 @@ void TriggerContactListener::HandleTriggerContact(
     const JPH::Body& body2,
     bool entered)
 {
-    if (!m_scene)
-        return;
-
     SE::UUID uuid1 = SE::UUID((std::uint64_t)body1.GetUserData());
     SE::UUID uuid2 = SE::UUID((std::uint64_t)body2.GetUserData());
 
-    auto go1 = m_scene->GetGameObjectByUUID(uuid1);
-    auto go2 = m_scene->GetGameObjectByUUID(uuid2);
+    auto go1 = Scene::GetInstance().GetGameObjectByUUID(uuid1);
+    auto go2 = Scene::GetInstance().GetGameObjectByUUID(uuid2);
 
     if (!go1 || !go2)
         return;

@@ -1,13 +1,15 @@
 #include <Physics/PhysicsSystem.h>
 #include <Scene.h>
 #include <Component/TransformComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/TriggerComponent.h>
 
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
 
 PhysicsSystem::PhysicsSystem() :
     m_bodyEntries(eastl::vector<PhysicsBodyEntry>()),
-    m_triggerContactListener(nullptr)
+    m_triggerContactListener()
 {
     JPH::RegisterDefaultAllocator();
     //JPH::Trace = [](const char* fmt, ...) {}; // hook your logger
@@ -71,10 +73,23 @@ PhysicsSystem::~PhysicsSystem()
 // FOR TRACING ONLY (GAI)
 //////////////////////////////////////////
 
-bool PhysicsSystem::Trace(const JPH::RVec3& begin,
+class PerceptionBroadPhaseLayerFilter : public JPH::BroadPhaseLayerFilter
+{
+public:
+    PerceptionBroadPhaseLayerFilter()
+    {
+    }
+
+    virtual bool ShouldCollide(JPH::BroadPhaseLayer inLayer) const override
+    {
+        // Ignore 'transparent' triggers
+        return inLayer != SE::BroadPhaseLayers::TRIGGER;
+    }
+};
+
+bool PhysicsSystem::PerceptionTrace(const JPH::RVec3& begin,
     const JPH::Vec3& dir,
     float length,
-    JPH::ObjectLayer layer,
     const eastl::vector<SE::UUID>& ignore,
     SE::UUID* out_id)
 {
@@ -85,18 +100,20 @@ bool PhysicsSystem::Trace(const JPH::RVec3& begin,
     eastl::unordered_set<SE::UUID> ignore_set(ignore.begin(), ignore.end());
 
     JPH::RRayCast ray(begin, JPH::RVec3(dir * length));
-
     JPH::RayCastResult   result;
     
     // Cast againts all layers
     EmptyFilter layer_filter = EmptyFilter();
     IgnoreUUIDBodyFilter body_filter(ignore_set, m_physicsSystem->GetBodyLockInterface());
+    
+    // Create filter for specific broad-phase layer
+    PerceptionBroadPhaseLayerFilter bpFilter;
 
     auto& nq = m_physicsSystem->GetNarrowPhaseQuery(); // locking version for thread safety
 
     bool hit = nq.CastRay(ray,
         result,
-        JPH::BroadPhaseLayerFilter(), // accept all BP layers or plug your own
+        bpFilter,
         layer_filter,
         body_filter);
 
@@ -302,6 +319,8 @@ void PhysicsSystem::Step(float dt) {
         dt, /*collisionSteps*/1,
         // /*integrationSubSteps*/ 1,
         m_tempAllocator.get(), m_jobSystem.get());
+
+    UpdateTriggerOverlaps();
 }
 
 void PhysicsSystem::ClearAllBodies()
@@ -338,57 +357,6 @@ JPH::PhysicsSystem& PhysicsSystem::GetWorld() { return *m_physicsSystem; }
 
 JPH::BodyInterface& PhysicsSystem::Bodies() { return *m_bodyInterface; }
 
-JPH::BodyID PhysicsSystem::CreateTriggerBox(
-    const JPH::RVec3& position,
-    const JPH::Vec3& halfExtents,
-    SE::UUID triggerUUID)
-{
-    JPH::BoxShapeSettings boxSettings(halfExtents);
-    auto shapeResult = boxSettings.Create();
-
-    if (shapeResult.HasError())
-    {
-        std::cerr << "[PhysicsSystem::CreateTriggerBox] Shape creation failed: "
-            << shapeResult.GetError().c_str() << std::endl;
-        return JPH::BodyID();
-    }
-
-    JPH::BodyCreationSettings settings(
-        shapeResult.Get(),
-        position,
-        JPH::Quat::sIdentity(),
-        JPH::EMotionType::Static,  // Triggers are typically static
-        0x1);  // Trigger layer
-
-    settings.mIsSensor = true;  // KEY: Mark as sensor/trigger
-
-    JPH::BodyID triggerID = m_bodyInterface->CreateAndAddBody(
-        settings,
-        JPH::EActivation::DontActivate);
-
-    m_bodyInterface->SetUserData(triggerID, (uint64_t)triggerUUID.m_UUID);
-
-    m_activeTriggers.push_back(triggerID);
-
-    return triggerID;
-}
-
-void PhysicsSystem::RemoveTrigger(JPH::BodyID triggerID)
-{
-    auto it = eastl::find(m_activeTriggers.begin(), m_activeTriggers.end(), triggerID);
-    if (it != m_activeTriggers.end())
-    {
-        m_activeTriggers.erase(it);
-    }
-
-    if (m_bodyInterface->IsAdded(triggerID))
-    {
-        m_bodyInterface->RemoveBody(triggerID);
-    }
-
-    m_bodyInterface->DestroyBody(triggerID);
-}
-
 void PhysicsSystem::UpdateTriggerOverlaps()
 {
     if (!m_physicsSystem)
@@ -412,4 +380,63 @@ void PhysicsSystem::UpdateTriggerOverlaps()
         // Use OverlapSweep to find all bodies overlapping this trigger
         // This is simplified - full implementation would track previous overlaps
     }
+}
+
+void PhysicsSystem::CreateAndAddTrigger(TriggerComponent* triggerComp) {
+
+    JPH::BodyInterface& bodyInterface = Bodies();
+
+    if (!triggerComp->m_shape) {
+        // handle error: shape not set
+        return;
+    }
+    JPH::BodyCreationSettings settings(triggerComp->m_shape,
+        triggerComp->m_position, triggerComp->m_orientation,
+        triggerComp->s_triggerMotionType, triggerComp->s_triggerObjectLayer);
+    settings.mObjectLayer = triggerComp->s_triggerObjectLayer;
+    settings.mAllowSleeping = (triggerComp->s_triggerActivation != JPH::EActivation::DontActivate);
+    settings.mIsSensor = true;
+
+    triggerComp->m_joltBody = bodyInterface.CreateBody(settings);
+    triggerComp->m_joltBodyId = triggerComp->m_joltBody->GetID();
+    triggerComp->m_joltBody->SetUserData(triggerComp->m_objectUUID.m_UUID);
+    triggerComp->m_physicsSystem = this;
+
+    //m_bodyEntries.push_back({ triggerComp->m_joltBodyId });
+    m_bodyInterface->AddBody(triggerComp->m_joltBodyId, triggerComp->s_triggerActivation);
+
+    m_activeTriggers.push_back(triggerComp->m_joltBodyId);
+}
+
+void PhysicsSystem::RemoveTrigger(TriggerComponent* triggerComp)
+{
+    if (!triggerComp || !m_bodyInterface)
+        return;
+
+    JPH::BodyID bodyId = triggerComp->m_joltBodyId;
+
+    // Remove from body entries
+    auto it = eastl::find_if(m_activeTriggers.begin(), m_activeTriggers.end(),
+        [bodyId](const PhysicsBodyEntry& entry) {
+            return entry.m_joltBodyId == bodyId;
+        });
+
+    if (it != m_activeTriggers.end())
+    {
+        m_activeTriggers.erase(it);
+    }
+
+    // Remove from physics world
+    if (m_bodyInterface->IsAdded(bodyId))
+    {
+        m_bodyInterface->RemoveBody(bodyId);
+    }
+
+    // Destroy the body
+    m_bodyInterface->DestroyBody(bodyId);
+
+    // Clear component references
+    triggerComp->m_joltBody = nullptr;
+    triggerComp->m_joltBodyId = JPH::BodyID();
+    triggerComp->m_physicsSystem = nullptr;
 }

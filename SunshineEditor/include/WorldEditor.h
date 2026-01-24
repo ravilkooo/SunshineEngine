@@ -33,6 +33,7 @@ namespace SE_G
     class SelectionPass;
     class IconPass;
     class ColliderPass;
+    class TriggerPass;
     class EmitterDebugPass;
     class PerceptionDebugPass;
 };
@@ -129,6 +130,7 @@ public:
     SE_G::SelectionPass* m_selectionPass = nullptr;
     SE_G::IconPass* m_iconPass = nullptr;
     SE_G::ColliderPass* m_colliderPass = nullptr;
+    SE_G::TriggerPass* m_triggerPass = nullptr;
     SE_G::EmitterDebugPass* m_emitterPass = nullptr;
     SE_G::PerceptionDebugPass* m_perceptionPass = nullptr;
 
