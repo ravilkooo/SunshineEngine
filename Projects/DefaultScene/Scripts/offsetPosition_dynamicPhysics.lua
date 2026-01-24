@@ -10,6 +10,12 @@ function behavior:update(dt)
     local physics = self.owner:getPhysics()
     physics:addForce(Vector3.new(self.speedMyX,0,0))
     -- print("Behavior update", self.id)
+
+    local transform = self.owner:getTransform()
+    if (transform.m_position.x > 20) then
+        removeGameObjectByUUID(self.owner:getUUID())
+    end
+
     return "success"
 end
 
