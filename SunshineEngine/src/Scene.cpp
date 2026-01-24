@@ -1,6 +1,23 @@
 #include <Scene.h>
 #include <SceneHierarchy.h>
 
+void DeletionQueue::QueueForDestruction(SE::UUID uuid) {
+    queue[tail] = uuid;
+    tail = (tail + 1) % queue.size();
+    ++count;
+}
+
+void DeletionQueue::Flush() {
+    for (size_t i = 0; i < count; ++i) {
+        size_t idx = (head + i) % queue.size();
+        Scene::GetInstance().RemoveGameObjectByUUID(queue[idx]);
+    }
+    head = tail;
+    count = 0;
+}
+
+bool DeletionQueue::IsEmpty() const { return count == 0; }
+
 Scene::Scene()
 {
 }
@@ -26,6 +43,8 @@ void Scene::ClearScene() {
 
     m_playerObjectUUID = SE::UUID(0u);
     m_playerObject = nullptr;
+
+    m_objectDestructionQueue.Flush();
 }
 
 SE::UUID Scene::AddGameObject(eastl::unique_ptr<GameObject> gameObject)
@@ -112,6 +131,21 @@ eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
 eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUIDhilo uuidhilo)
 {
 	return RemoveGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+}
+
+void Scene::QueueGameObjectForDestruction(SE::UUID uuid)
+{
+    m_objectDestructionQueue.QueueForDestruction(uuid);
+}
+
+void Scene::QueueGameObjectForDestruction(SE::UUIDhilo uuidhilo)
+{
+    QueueGameObjectForDestruction(SE::UUID::FromHilo(uuidhilo));
+}
+
+void Scene::FlushDestructionQueue()
+{
+    m_objectDestructionQueue.Flush();
 }
 
 void Scene::RestoreParents()
