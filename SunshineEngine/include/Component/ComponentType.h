@@ -9,6 +9,7 @@ namespace SE {
 		LUA,
 		PHYSICS,
 		PERCEPTION,
+		TRIGGER,
 		BEHAVIOR,
 		MESH,
 		CAMERA,

@@ -6,7 +6,8 @@
 #include <Jolt/Physics/Collision/CastResult.h>
 
 PhysicsSystem::PhysicsSystem() :
-    m_bodyEntries(eastl::vector<PhysicsBodyEntry>())
+    m_bodyEntries(eastl::vector<PhysicsBodyEntry>()),
+    m_triggerContactListener(nullptr)
 {
     JPH::RegisterDefaultAllocator();
     //JPH::Trace = [](const char* fmt, ...) {}; // hook your logger
@@ -42,9 +43,11 @@ PhysicsSystem::PhysicsSystem() :
         maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
         *m_bpInterface, *m_objectVsBpFilter, *m_objectPairFilter);
     m_physicsSystem->SetBodyActivationListener(&m_bodyActivationListener);
-    m_physicsSystem->SetContactListener(&m_contactListener);
+    // m_physicsSystem->SetContactListener(&m_contactListener);
     m_physicsSystem->SetGravity(JPH::Vec3(0, -9.81f, 0));
     m_bodyInterface = &m_physicsSystem->GetBodyInterface();
+
+    m_physicsSystem->SetContactListener(&m_triggerContactListener);
 }
 
 PhysicsSystem::~PhysicsSystem()
@@ -335,3 +338,78 @@ JPH::PhysicsSystem& PhysicsSystem::GetWorld() { return *m_physicsSystem; }
 
 JPH::BodyInterface& PhysicsSystem::Bodies() { return *m_bodyInterface; }
 
+JPH::BodyID PhysicsSystem::CreateTriggerBox(
+    const JPH::RVec3& position,
+    const JPH::Vec3& halfExtents,
+    SE::UUID triggerUUID)
+{
+    JPH::BoxShapeSettings boxSettings(halfExtents);
+    auto shapeResult = boxSettings.Create();
+
+    if (shapeResult.HasError())
+    {
+        std::cerr << "[PhysicsSystem::CreateTriggerBox] Shape creation failed: "
+            << shapeResult.GetError().c_str() << std::endl;
+        return JPH::BodyID();
+    }
+
+    JPH::BodyCreationSettings settings(
+        shapeResult.Get(),
+        position,
+        JPH::Quat::sIdentity(),
+        JPH::EMotionType::Static,  // Triggers are typically static
+        0x1);  // Trigger layer
+
+    settings.mIsSensor = true;  // KEY: Mark as sensor/trigger
+
+    JPH::BodyID triggerID = m_bodyInterface->CreateAndAddBody(
+        settings,
+        JPH::EActivation::DontActivate);
+
+    m_bodyInterface->SetUserData(triggerID, (uint64_t)triggerUUID.m_UUID);
+
+    m_activeTriggers.push_back(triggerID);
+
+    return triggerID;
+}
+
+void PhysicsSystem::RemoveTrigger(JPH::BodyID triggerID)
+{
+    auto it = eastl::find(m_activeTriggers.begin(), m_activeTriggers.end(), triggerID);
+    if (it != m_activeTriggers.end())
+    {
+        m_activeTriggers.erase(it);
+    }
+
+    if (m_bodyInterface->IsAdded(triggerID))
+    {
+        m_bodyInterface->RemoveBody(triggerID);
+    }
+
+    m_bodyInterface->DestroyBody(triggerID);
+}
+
+void PhysicsSystem::UpdateTriggerOverlaps()
+{
+    if (!m_physicsSystem)
+        return;
+
+    auto& bodyInterface = m_bodyInterface;
+    auto& nq = m_physicsSystem->GetNarrowPhaseQuery();
+
+    for (JPH::BodyID triggerId : m_activeTriggers)
+    {
+        if (!bodyInterface->IsAdded(triggerId))
+            continue;
+
+        JPH::BodyLockRead triggerLock(m_physicsSystem->GetBodyLockInterface(), triggerId);
+        if (!triggerLock.Succeeded())
+            continue;
+
+        const JPH::Body& triggerBody = triggerLock.GetBody();
+        SE::UUID triggerUUID = SE::UUID((uint64_t)triggerBody.GetUserData());
+
+        // Use OverlapSweep to find all bodies overlapping this trigger
+        // This is simplified - full implementation would track previous overlaps
+    }
+}

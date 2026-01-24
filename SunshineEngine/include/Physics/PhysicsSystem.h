@@ -35,7 +35,10 @@
 #include <Physics/CollisionUtils.h>
 #include <Physics/CollisionLayerVsLayerTable.h>
 #include <Physics/CollisionLayerVsGroupTable.h>
+#include <Physics/TriggerContactListener.h>
+
 #include <Component/PhysicsComponent.h>
+
 #include <Utils/UUID.h>
 
 
@@ -305,6 +308,18 @@ public:
 
     bool IsValid() { return m_isValid; }
 
+    // Create a trigger box
+    JPH::BodyID CreateTriggerBox(
+        const JPH::RVec3& position,
+        const JPH::Vec3& halfExtents,
+        SE::UUID triggerUUID);
+
+    // Remove trigger
+    void RemoveTrigger(JPH::BodyID triggerID);
+
+    // Check trigger overlaps each frame
+    void UpdateTriggerOverlaps();
+
 private:
 
     void ClearAllBodies();
@@ -318,9 +333,12 @@ private:
     eastl::unique_ptr<JPH::PhysicsSystem> m_physicsSystem;
     JPH::BodyInterface* m_bodyInterface = nullptr;
     MyBodyActivationListener m_bodyActivationListener;
-    MyContactListener m_contactListener;
+    // MyContactListener m_contactListener;
 
     eastl::vector<PhysicsBodyEntry> m_bodyEntries;
+
+    TriggerContactListener m_triggerContactListener;
+    eastl::vector<JPH::BodyID> m_activeTriggers;
 
     bool m_isValid = false;
     // TO-DO
