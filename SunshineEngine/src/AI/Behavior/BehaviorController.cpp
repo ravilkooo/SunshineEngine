@@ -541,6 +541,13 @@ sol::table BehaviorController::GetAllStates(sol::this_state L) const
 
 void BehaviorController::Trigger(const std::string& ToState)
 {
+	auto it = States.find(ToState);
+
+	if (it == States.end())
+	{
+		return;
+	}
+
 	if (ToState != CurrentStateName)
 		Abort(ToState);
 }
