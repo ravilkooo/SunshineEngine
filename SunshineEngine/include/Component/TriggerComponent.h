@@ -90,7 +90,7 @@ private:
 
     // Configuration properties before creating body
     static const JPH::EMotionType s_triggerMotionType = JPH::EMotionType::Kinematic;
-    static const JPH::EActivation s_triggerActivation = JPH::EActivation::DontActivate;
+    static const JPH::EActivation s_triggerActivation = JPH::EActivation::Activate;
     static const JPH::ObjectLayer s_triggerObjectLayer = SE::Layers::TRIGGER;
 
 };

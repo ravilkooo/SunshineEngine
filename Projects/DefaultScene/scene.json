@@ -2421,7 +2421,7 @@
             "m_UUID_hi": 3086971655,
             "m_UUID_lo": 2539245991,
             "m_group": "Shapes",
-            "m_name": "Box",
+            "m_name": "Platform",
             "m_parent": null,
             "m_shapeData": {
                 "Size": {
@@ -2471,7 +2471,7 @@
                     ],
                     "m_position": [
                         0.0,
-                        2.450327157974243,
+                        1.740161418914795,
                         0.0
                     ],
                     "m_rotation": [

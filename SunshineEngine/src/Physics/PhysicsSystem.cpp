@@ -311,6 +311,63 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
                 JPH::EActivation::Activate);
         }
     }
+
+    for (auto triggerJoltId : m_activeTriggers) {
+
+        SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(triggerJoltId));
+        auto objPtr = scene->GetGameObjectByUUID(objectUUID);
+        if (!objPtr)
+            continue;
+
+        if (m_bodyInterface->GetMotionType(triggerJoltId) == JPH::EMotionType::Dynamic)
+        {
+            //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(triggerJoltId);
+
+            JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(triggerJoltId);
+            JPH::Quat quatRot = m_bodyInterface->GetRotation(triggerJoltId);
+
+
+            auto tc = objPtr->GetComponent<TransformComponent>();
+
+            tc->m_position =
+                DXSM::Vector3(position.mF32
+                );
+            tc->m_rotation =
+                DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
+                );
+        }
+        else if (m_bodyInterface->GetMotionType(triggerJoltId) == JPH::EMotionType::Kinematic)
+        {
+            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(triggerJoltId));
+
+            auto gameObject = scene->GetGameObjectByUUID(objectUUID);
+            if (!gameObject)
+                continue;
+
+            auto tc = gameObject->GetComponent<TransformComponent>();
+            if (!tc)
+                continue;
+            /*
+            auto wMat = tc->GetWorldMatrix_noLocal();
+
+            DX::XMVECTOR scale, rotation, translation;
+            DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
+            */
+
+            DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
+            DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
+
+            // Push TransformComponent data into the kinematic body
+            const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
+            const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
+
+            m_bodyInterface->SetPositionAndRotation(
+                triggerJoltId,
+                targetPos,
+                targetRot,
+                JPH::EActivation::Activate);
+        }
+    }
 }
 
 void PhysicsSystem::Step(float dt) {
