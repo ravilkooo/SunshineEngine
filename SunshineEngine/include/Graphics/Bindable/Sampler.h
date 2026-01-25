@@ -29,6 +29,8 @@ namespace SE_G {
 				SamplerPreset preset, UINT slot = 0u,
 				PipelineStage pipelineStage = PipelineStage::PIXEL_SHADER);
 
+			Sampler();
+
 			~Sampler();
 			
 			void Release();
