@@ -255,6 +255,8 @@ void Game::ClearCachedAbsoluteTransforms()
 
 void Game::Update(float deltaTime) {
 
+	Scene::GetInstance().FlushDestructionQueue();
+
 	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	 m_physicsSystem->Step(deltaTime);
@@ -268,7 +270,7 @@ void Game::Update(float deltaTime) {
 
 	 // AI
 	 PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
-	 //BehaviorStorage::Get().Update(deltaTime);
+	 BehaviorStorage::Get().Update(deltaTime);
 
 	 ClearCachedAbsoluteTransforms();
 

@@ -541,14 +541,11 @@
         },
         {
             "components": {
-                "Behavior": {
-                    "IsEnabled": false
-                },
                 "Lua": {
                     "scriptLoaded": true,
                     "scriptPath": {
                         "assetSource": 1,
-                        "relativePath": "Scripts/Perception_Test.lua"
+                        "relativePath": ""
                     }
                 },
                 "Mesh": {
@@ -663,6 +660,9 @@
         },
         {
             "components": {
+                "Behavior": {
+                    "IsEnabled": true
+                },
                 "Lua": {
                     "scriptLoaded": true,
                     "scriptPath": {
@@ -728,14 +728,14 @@
                         1.0
                     ],
                     "m_position": [
-                        2.658480644226074,
+                        -8.947046279907227,
                         -1.3660533428192139,
-                        -17.529869079589844
+                        -28.032611846923828
                     ],
                     "m_rotation": [
+                        -0.0,
                         0.0,
-                        0.0,
-                        0.0
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -2073,7 +2073,7 @@
                         1.0
                     ],
                     "m_position": [
-                        -0.925114631652832,
+                        -0.7914609909057617,
                         -1.4643433094024658,
                         5.896237850189209
                     ],

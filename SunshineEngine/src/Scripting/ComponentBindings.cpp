@@ -119,22 +119,6 @@ namespace ScriptingBindings
         lua.set_function("getPerceptionSystem", []() -> PerceptionSystem& {
             return PerceptionSystem::Get();
             });
-
-        lua.set_function("createMemoryBoard", []() {
-            return std::make_unique<MemoryBoard>();
-            });
-
-        lua.set_function("createAction", [](const std::string& name) {
-            return std::make_unique<Action>(name);
-            });
-
-        lua.set_function("createPattern", []() {
-            return std::make_unique<Pattern>();
-            });
-
-        lua.set_function("createState", []() {
-            return std::make_unique<State>();
-            });
     }
 
 } // namespace ScriptingBindings

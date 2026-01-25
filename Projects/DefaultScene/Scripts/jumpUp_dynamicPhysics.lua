@@ -6,7 +6,7 @@ function behavior:start()
     -- print("Behavior started", self.id)
 end
 
-local lastJumpTime = 0
+local lastJumpTime = 4
 local jumpCooldown = 2
 
 function behavior:update(dt)
@@ -16,7 +16,7 @@ function behavior:update(dt)
 
     -- print("currentTime: " .. currentTime .. ", lastJumpTime: " .. lastJumpTime .. ", cooldown: " .. jumpCooldown)
 
-    if (currentTime - lastJumpTime > jumpCooldown) and (math.abs(physics:getLinearVelocity().y) < 0.0001) then
+    if (currentTime - lastJumpTime > jumpCooldown) and (math.abs(physics:getLinearVelocity().y) <= 0.0001) then
         lastJumpTime = currentTime
         local up = Vector3.new(0, self.speedY * 50, 0)
         physics:addImpulse(up)
