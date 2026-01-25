@@ -100,7 +100,7 @@ namespace ScriptingBindings
 		
 		// Remove object from scene
 		lua.set_function("removeGameObjectByUUID", [](SE::UUIDhilo uuidhilo) {
-			Scene::GetInstance().RemoveGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+			Scene::GetInstance().QueueGameObjectForDestruction(SE::UUID::FromHilo(uuidhilo));
 			});
 
 		// GetObject by UUID

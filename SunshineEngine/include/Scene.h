@@ -23,6 +23,8 @@ class DeletionQueue {
     size_t count = 0;
 
 public:
+    DeletionQueue();
+
     void QueueForDestruction(SE::UUID uuid);
 
     void Flush();
