@@ -1,6 +1,12 @@
 #include <Scene.h>
 #include <SceneHierarchy.h>
 
+DeletionQueue::DeletionQueue()
+    : queue(), head(0), tail(0), count(0)
+{
+    queue.resize(DELETION_QUEUE_CAPACITY, SE::UUID(0u));
+}
+
 void DeletionQueue::QueueForDestruction(SE::UUID uuid) {
     queue[tail] = uuid;
     tail = (tail + 1) % queue.size();

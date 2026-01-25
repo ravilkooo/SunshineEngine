@@ -189,7 +189,7 @@ void LuaComponent::LoadParamsFromLua() {
 void LuaComponent::InitializeBehavior()
 {
 	if (!scriptLoaded) {
-		printSunshineErrorMessage("InitializeBehavior: scriptLoaded is false!");
+		wprintf(L"%ls: InitializeBehavior: scriptLoaded is false!", scriptPath.GetFullPath().c_str());
 		return;
 	}
 

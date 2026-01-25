@@ -54,6 +54,13 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/triggerRemove.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -116,20 +123,42 @@
                         1.0
                     ],
                     "m_position": [
-                        8.4399995803833,
-                        -1.8700000047683716,
-                        -1.411884069442749
+                        7.4140472412109375,
+                        -1.8699992895126343,
+                        -15.995661735534668
                     ],
                     "m_rotation": [
-                        -1.1623893976211548,
-                        -0.9285153150558472,
-                        7.504088728182978e-08
+                        -1.1623892784118652,
+                        -0.9285149574279785,
+                        7.504088017640242e-08
                     ],
                     "m_scaleFactor": [
                         1.0,
-                        1.0,
-                        0.9999999403953552
+                        0.9999999403953552,
+                        0.9999998211860657
                     ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.2799999713897705
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    }
                 }
             },
             "m_UUID": 15551142850770219886,
@@ -319,7 +348,7 @@
                         10.365477561950684
                     ],
                     "m_rotation": [
-                        0.0,
+                        -0.0,
                         0.0,
                         -0.0
                     ],
@@ -335,10 +364,7 @@
             "m_UUID_lo": 3550794948,
             "m_group": "Shapes",
             "m_name": "DefaultSphere",
-            "m_parent": {
-                "attached": false,
-                "uuid": 15551142850770219886
-            },
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -541,13 +567,6 @@
         },
         {
             "components": {
-                "Lua": {
-                    "scriptLoaded": true,
-                    "scriptPath": {
-                        "assetSource": 1,
-                        "relativePath": ""
-                    }
-                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -628,7 +647,7 @@
                     ],
                     "m_rotation": [
                         -0.0,
-                        0.5707226991653442,
+                        0.570722758769989,
                         -0.0
                     ],
                     "m_scaleFactor": [
@@ -643,10 +662,7 @@
             "m_UUID_lo": 1453657459,
             "m_group": "Shapes",
             "m_name": "BasketBall",
-            "m_parent": {
-                "attached": false,
-                "uuid": 15551142850770219886
-            },
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -749,10 +765,7 @@
             "m_UUID_lo": 509192087,
             "m_group": "Shapes",
             "m_name": "EyeBall",
-            "m_parent": {
-                "attached": false,
-                "uuid": 15551142850770219886
-            },
+            "m_parent": null,
             "m_shapeData": {
                 "Size": {
                     "x": 1.0,
@@ -2149,7 +2162,7 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": -0.925114631652832,
+                    "x": -0.7914609909057617,
                     "y": -1.4643433094024658,
                     "z": 5.896237850189209
                 },
