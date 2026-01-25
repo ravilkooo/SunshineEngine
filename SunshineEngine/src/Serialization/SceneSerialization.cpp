@@ -760,6 +760,8 @@ void Scene::FromJson(
         }
     }
     GetInstance().RestoreParents();
+
+    GetInstance().FlushDestructionQueue();
 }
 
 // ----------------- Scene_Info -----------------

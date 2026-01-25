@@ -7,6 +7,9 @@
 void LuaManager::Update(Scene* scene, float deltaTime) {
     for (SE::UUID objUUID : scene->gameObjects) {
         auto obj = scene->GetGameObjectByUUID(objUUID);
+        if (!obj)
+            continue;
+
         if (obj->HasComponent<LuaComponent>()) {
             obj->GetComponent<LuaComponent>()->LuaUpdate(deltaTime);
         }

@@ -17,6 +17,7 @@ namespace SE_G {
     }
 
     class IconPass;
+    class PerceptionDebugPass;
 
     class SelectionPass :
         public RenderPass
@@ -35,6 +36,7 @@ namespace SE_G {
         void OnResize(UINT resizeWidth, UINT resizeHeight) override;
             //eastl::shared_ptr<GBuffer> pGBuffer);
 
+        void SetPerceptionDebugPass(PerceptionDebugPass* perceptionPass);
 
         UINT m_screenWidth = 800u;
         UINT m_screenHeight = 800u;
@@ -59,7 +61,7 @@ namespace SE_G {
 
         Scene_Info* m_scene;
 
-
+		PerceptionDebugPass* m_perceptionPass = nullptr;
         /*
         struct ScreenInfoPCB {
             DXSM::Vector2 screenSize;

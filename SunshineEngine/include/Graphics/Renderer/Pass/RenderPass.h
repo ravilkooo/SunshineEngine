@@ -27,6 +27,7 @@ namespace SE_G {
 			Emitter,
 			Icon,
 			Selection,
+			Perception,
 			Count
 		};
 
@@ -67,7 +68,7 @@ namespace SE_G {
 		Microsoft::WRL::ComPtr<ID3D11Device> device;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 
-		// Владеет объектами. Нужен чтобы быстро находить по UUID
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ UUID
 		eastl::unordered_map<SE::UUID, eastl::unique_ptr<SE_G::RenderTechnique>> m_techniques;
 
 

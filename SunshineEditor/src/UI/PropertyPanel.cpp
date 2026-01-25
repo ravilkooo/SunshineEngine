@@ -1482,13 +1482,17 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
         ImGui::Checkbox("Can See Through Objects", &percInfo->CanSeeThroughObjects);
 
         float SightRadius = percInfo->SightRadius;
-        if (ImGui::InputFloat("Sight Radius", &SightRadius))
+        ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Sight Radius");
+        ImGui::SameLine();
+        if (ImGui::InputFloat("##SightRadius", &SightRadius))
         {
             percInfo->SetSightRadius(SightRadius);
         }
 
         float LoseRadius = percInfo->LoseRadius;
-        if (ImGui::InputFloat("Lose Radius", &LoseRadius))
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Lose Radius");
+        ImGui::SameLine();
+        if (ImGui::InputFloat("##Lose Radius", &LoseRadius))
         {
             percInfo->SetLoseRadius(LoseRadius);
         }
@@ -1510,7 +1514,9 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
         ImGui::Checkbox("Can Hear", &percInfo->CanHear);
 
         float HearingRadius = percInfo->HearingRadius;
-        if (ImGui::InputFloat("Hearing Radius", &HearingRadius))
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Hearing Radius");
+        ImGui::SameLine();
+        if (ImGui::InputFloat("##Hearing Radius", &HearingRadius))
         {
             percInfo->SetHearingRadius(HearingRadius);
         }

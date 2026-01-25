@@ -273,6 +273,8 @@ void Game::Run()
 
 void Game::Update(float deltaTime) {
 
+	Scene::GetInstance().FlushDestructionQueue();
+
 	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	 m_physicsSystem->Step(deltaTime);
