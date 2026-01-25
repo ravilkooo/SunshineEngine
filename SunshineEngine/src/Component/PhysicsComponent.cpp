@@ -12,8 +12,9 @@
 
 PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
 {
+    transformComp = tc;
+
     SetObjecUUID(objectUUID);
-    InitTransforms(tc);
 
     if (tc->m_parentTransform)
     {
@@ -296,23 +297,17 @@ float PhysicsComponent::GetRestitution()
     return bodyInterface.GetRestitution(m_joltBodyId);
 }
 
-void PhysicsComponent::InitTransforms(TransformComponent* tc)
+void PhysicsComponent::InitTransforms()
 {
-    transformComp = tc;
+    transformComp->CalcAbsoluteTransform();
 
-    auto wMat = tc->GetWorldMatrix_noLocal();
-
-    DX::XMVECTOR scale, rotation, translation;
-    DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
-
-	DXSM::Vector3 _pos;
-	DXSM::Quaternion _quat;
-
-    DX::XMStoreFloat3(&_pos, translation);
-    DX::XMStoreFloat4(&_quat, rotation);
-
-    m_position.Set(_pos.x, _pos.y, _pos.z);
-    m_orientation.Set(_quat.x, _quat.y, _quat.z, _quat.w);
+    m_position.Set(transformComp->m_cachedAbsoluteWorldPosition.x,
+        transformComp->m_cachedAbsoluteWorldPosition.y,
+        transformComp->m_cachedAbsoluteWorldPosition.z);
+    m_orientation.Set(transformComp->m_cachedAbsoluteWorldRotation_quat.x,
+        transformComp->m_cachedAbsoluteWorldRotation_quat.y,
+        transformComp->m_cachedAbsoluteWorldRotation_quat.z,
+        transformComp->m_cachedAbsoluteWorldRotation_quat.w);
 }
 
 JPH::Body* PhysicsComponent::GetBody() const { return m_joltBody; }

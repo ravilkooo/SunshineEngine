@@ -91,7 +91,7 @@ function onJump(action)
 
         if currentTime - lastJumpTime > jumpCooldown then
             lastJumpTime = currentTime
-            local up = Vector3.new(0, moveForce * 10, 0)
+            local up = Vector3.new(0, moveForce * 30, 0)
             physics:addImpulse(up)
             -- print("Jump!")
             return

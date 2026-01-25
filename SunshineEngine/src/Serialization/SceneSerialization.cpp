@@ -1,3 +1,4 @@
+#include <Jolt/Jolt.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/string.h>
 
@@ -28,12 +29,6 @@
 
 #include <Serialization/GraphicsSerialization.h>
 
-#include <Jolt/Jolt.h>
-#include <Jolt/Physics/Collision/Shape/Shape.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Collision/Shape/CapSuleShape.h>
-#include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
 
 #include <Physics/PhysicsSystem.h>
 
@@ -367,56 +362,7 @@ void PhysicsComponent::FromJson(const json& j) {
 
     // Deserialize shape from collider data
     if (info.m_colliderData) {
-        const SE::ColliderData& colliderData = *info.m_colliderData;
-        JPH::ShapeSettings::ShapeResult shapeResult;
-
-        switch (colliderData.m_shapeType) {
-            case SE::ColliderShapeType::Box: {
-                JPH::BoxShapeSettings boxSettings(
-                    JPH::Vec3(
-                        colliderData.m_settings.data.asBox.m_size.x * 0.5f,
-                        colliderData.m_settings.data.asBox.m_size.y * 0.5f,
-                        colliderData.m_settings.data.asBox.m_size.z * 0.5f
-                    )
-                );
-                shapeResult = boxSettings.Create();
-                break;
-            }
-            case SE::ColliderShapeType::Sphere: {
-                JPH::SphereShapeSettings sphereSettings(colliderData.m_settings.data.asSphere.m_radius);
-                shapeResult = sphereSettings.Create();
-                break;
-            }
-            case SE::ColliderShapeType::Capsule: {
-                JPH::CapsuleShapeSettings capsuleSettings(
-                    colliderData.m_settings.data.asCapsule.m_height * 0.5f,
-                    colliderData.m_settings.data.asCapsule.m_radius
-                );
-                shapeResult = capsuleSettings.Create();
-                break;
-            }
-            case SE::ColliderShapeType::TaperedCapsule: {
-                JPH::TaperedCapsuleShapeSettings taperedCapsuleSettings(
-                    colliderData.m_settings.data.asTaperedCapsule.m_height * 0.5f,
-                    colliderData.m_settings.data.asTaperedCapsule.m_topRadius,
-                    colliderData.m_settings.data.asTaperedCapsule.m_bottomRadius
-                );
-                shapeResult = taperedCapsuleSettings.Create();
-                break;
-            }
-            default:
-                // Fallback to box if shape type is not recognized
-                JPH::BoxShapeSettings defaultBoxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
-                shapeResult = defaultBoxSettings.Create();
-                break;
-        }
-
-        m_transformsData.m_offset = info.m_colliderData->GetTransformData().m_offset;
-        m_transformsData.m_rotation = info.m_colliderData->GetTransformData().m_rotation;
-
-        if (shapeResult.IsValid()) {
-            m_shape = shapeResult.Get();
-        }
+        m_colliderData = *info.m_colliderData;  
     }
 
     m_friction = j.contains("m_friction") ? j["m_friction"].get<float>() : 0.2f;
@@ -514,6 +460,7 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::TRANSFORM: key = "Transform"; break;
             case SE::ComponentType::RENDER:    key = "Render"; break;
             case SE::ComponentType::PHYSICS:   key = "Physics"; break;
+            case SE::ComponentType::TRIGGER:   key = "Trigger"; break;
             case SE::ComponentType::LUA:       key = "Lua"; break;
             case SE::ComponentType::MESH:                key = "Mesh"; break;
             case SE::ComponentType::PERCEPTION:          key = "Perception"; break;
@@ -729,8 +676,13 @@ void Scene::FromJson(
                     auto c = go->AddComponent<PhysicsComponent>(
                         go->m_UUID, go->GetComponent<TransformComponent>().get());
                     c->FromJson(objJ["components"]["Physics"]);
-                    physicsSystem->CreateAndAddBody(c.get());
                     //physicsSystem->CreateAndBody(c);
+                }
+
+                if (objJ["components"].contains("Trigger")) {
+                    auto c = go->AddComponent<TriggerComponent>(
+                        go->m_UUID, go->GetComponent<TransformComponent>().get());
+                    c->FromJson(objJ["components"]["Trigger"]);
                 }
 
                 if (objJ["components"].contains("Perception")) {
@@ -895,6 +847,13 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 if (objJ["components"].contains("Perception")) {
                     auto c = go->AddComponent<PerceptionComponent_Info>();
                     c->FromJson(objJ["components"]["Perception"]);
+                }
+
+                if (objJ["components"].contains("Trigger")) {
+                    auto c = go->AddComponent<TriggerComponent_Info>(
+                        go->GetComponent<RenderComponent_Info>().get(),
+                        go->GetComponent<TransformComponent_Info>().get());
+                    c->FromJson(objJ["components"]["Trigger"]);
                 }
 
                 if (objJ["components"].contains("Behavior")) {

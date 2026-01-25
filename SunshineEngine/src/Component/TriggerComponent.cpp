@@ -26,13 +26,15 @@ TriggerComponent::TriggerComponent()
 TriggerComponent::TriggerComponent(SE::UUID objectUUID, TransformComponent* tc)
     : m_luaCallback(sol::nil)
 {
+    transformComp = tc;
+
     SetObjecUUID(objectUUID);
-    InitTransforms(tc);
 }
 
 TriggerComponent::~TriggerComponent()
 {
-    m_physicsSystem->RemoveTrigger(this);
+    if (m_physicsSystem)
+        m_physicsSystem->RemoveTrigger(this);
 }
 
 void TriggerComponent::SetLuaCallback(sol::function callback)
@@ -53,7 +55,7 @@ void TriggerComponent::OnEnter(SE::UUID otherUUID)
     {
         try
         {
-            m_luaCallback("enter", otherUUID.m_UUID);
+            m_luaCallback("enter", otherUUID.GetHilo());
         }
         catch (const std::exception& e)
         {
@@ -76,7 +78,7 @@ void TriggerComponent::OnExit(SE::UUID otherUUID)
     {
         try
         {
-            m_luaCallback("exit", otherUUID.m_UUID);
+            m_luaCallback("exit", otherUUID.GetHilo());
         }
         catch (const std::exception& e)
         {
@@ -95,23 +97,17 @@ void TriggerComponent::SetShape(JPH::ShapeRefC shapePtr)
     m_shape = shapePtr;
 }
 
-void TriggerComponent::InitTransforms(TransformComponent* tc)
+void TriggerComponent::InitTransforms()
 {
-    transformComp = tc;
+    transformComp->CalcAbsoluteTransform();
 
-    auto wMat = tc->GetWorldMatrix_noLocal();
-
-    DX::XMVECTOR scale, rotation, translation;
-    DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
-
-    DXSM::Vector3 _pos;
-    DXSM::Quaternion _quat;
-
-    DX::XMStoreFloat3(&_pos, translation);
-    DX::XMStoreFloat4(&_quat, rotation);
-
-    m_position.Set(_pos.x, _pos.y, _pos.z);
-    m_orientation.Set(_quat.x, _quat.y, _quat.z, _quat.w);
+    m_position.Set(transformComp->m_cachedAbsoluteWorldPosition.x,
+        transformComp->m_cachedAbsoluteWorldPosition.y,
+        transformComp->m_cachedAbsoluteWorldPosition.z);
+    m_orientation.Set(transformComp->m_cachedAbsoluteWorldRotation_quat.x,
+        transformComp->m_cachedAbsoluteWorldRotation_quat.y,
+        transformComp->m_cachedAbsoluteWorldRotation_quat.z,
+        transformComp->m_cachedAbsoluteWorldRotation_quat.w);
 }
 
 JPH::Body* TriggerComponent::GetBody() const
@@ -126,62 +122,14 @@ JPH::BodyID TriggerComponent::GetBodyID() const
 
 void TriggerComponent::FromJson(const json& j)
 {
-    SE::ColliderData colliderData;
     // Collider/shape data
     if (j.contains("collider") && j["collider"].is_object()) {
-        colliderData.FromJson(j["collider"]);
+        m_colliderData.FromJson(j["collider"]);
     }
     else
     {
-        colliderData = SE::ColliderData(SE::ColliderShapeType::Box);
+        m_colliderData = SE::ColliderData(SE::ColliderShapeType::Box);
     }
-
-    JPH::ShapeSettings::ShapeResult shapeResult;
-    switch (colliderData.m_shapeType) {
-    case SE::ColliderShapeType::Box: {
-        JPH::BoxShapeSettings boxSettings(
-            JPH::Vec3(
-                colliderData.m_settings.data.asBox.m_size.x * 0.5f,
-                colliderData.m_settings.data.asBox.m_size.y * 0.5f,
-                colliderData.m_settings.data.asBox.m_size.z * 0.5f
-            )
-        );
-        shapeResult = boxSettings.Create();
-        break;
-    }
-    case SE::ColliderShapeType::Sphere: {
-        JPH::SphereShapeSettings sphereSettings(colliderData.m_settings.data.asSphere.m_radius);
-        shapeResult = sphereSettings.Create();
-        break;
-    }
-    case SE::ColliderShapeType::Capsule: {
-        JPH::CapsuleShapeSettings capsuleSettings(
-            colliderData.m_settings.data.asCapsule.m_height * 0.5f,
-            colliderData.m_settings.data.asCapsule.m_radius
-        );
-        shapeResult = capsuleSettings.Create();
-        break;
-    }
-    case SE::ColliderShapeType::TaperedCapsule: {
-        JPH::TaperedCapsuleShapeSettings taperedCapsuleSettings(
-            colliderData.m_settings.data.asTaperedCapsule.m_height * 0.5f,
-            colliderData.m_settings.data.asTaperedCapsule.m_topRadius,
-            colliderData.m_settings.data.asTaperedCapsule.m_bottomRadius
-        );
-        shapeResult = taperedCapsuleSettings.Create();
-        break;
-    }
-    default:
-        // Fallback to box if shape type is not recognized
-        JPH::BoxShapeSettings defaultBoxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
-        shapeResult = defaultBoxSettings.Create();
-        break;
-    }
-
-    if (shapeResult.IsValid()) {
-        m_shape = shapeResult.Get();
-    }
-
 }
 
 TriggerComponent_Info::TriggerComponent_Info(
@@ -251,3 +199,13 @@ void TriggerComponent_Info::FromJson(const json& j)
         0.0f
     );
 }
+
+#define TRIGGER_ADD_METHOD(k, fn) k, fn
+
+LUA_REGISTER_COMPONENT(
+    TriggerComponent,
+    "TriggerComponent",
+    /* no fields */,
+    TRIGGER_LUA_METHODS_APPLY(TRIGGER_ADD_METHOD),
+    "getTrigger")
+#undef TRIGGER_ADD_METHOD

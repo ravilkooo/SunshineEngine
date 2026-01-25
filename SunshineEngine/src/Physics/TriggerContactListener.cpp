@@ -20,13 +20,65 @@ void TriggerContactListener::OnContactAdded(
     JPH::ContactSettings& ioSettings)
 {
     HandleTriggerContact(inBody1, inBody2, true);  // Enter
+
+    const bool b1Trigger = inBody1.IsSensor();
+    const bool b2Trigger = inBody2.IsSensor();
+
+    if (!b1Trigger && !b2Trigger)
+        return;
+
+    if (b1Trigger && b2Trigger)
+        return;
+
+    const JPH::Body& triggerBody = b1Trigger ? inBody1 : inBody2;
+    const JPH::Body& otherBody = b1Trigger ? inBody2 : inBody1;
+
+    TriggerExitEvent ev;
+    ev.Trigger = SE::UUID((uint64_t)triggerBody.GetUserData());
+    ev.Other = SE::UUID((uint64_t)otherBody.GetUserData());
+
+    TriggerOverlapKey key;
+    key.TriggerBody = triggerBody.GetID();
+    key.OtherBody = otherBody.GetID();
+
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_activeOverlaps[key] = ev;
+    }
 }
 
 void TriggerContactListener::OnContactRemoved(
     const JPH::SubShapeIDPair& inSubShapePair)
 {
-    // Note: We don't have body references here, so exit handling
-    // is done via OverlapQuery in PhysicsSystem::Step()
+    const JPH::BodyID a = inSubShapePair.GetBody1ID();
+    const JPH::BodyID b = inSubShapePair.GetBody2ID();
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    // пробуем оба направления (мы не знаем кто trigger)
+    TriggerOverlapKey key1{ a, b };
+    TriggerOverlapKey key2{ b, a };
+
+    auto it = m_activeOverlaps.find(key1);
+    if (it == m_activeOverlaps.end())
+        it = m_activeOverlaps.find(key2);
+
+    if (it == m_activeOverlaps.end())
+        return;
+
+    // кидаем exit-событие
+    m_exitQueue.push_back(it->second);
+
+    // удаляем активное пересечение
+    m_activeOverlaps.erase(it);
+}
+
+void TriggerContactListener::FetchExitEvents(eastl::vector<TriggerExitEvent>& outEvents)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    outEvents.insert(outEvents.end(), m_exitQueue.begin(), m_exitQueue.end());
+    m_exitQueue.clear();
 }
 
 void TriggerContactListener::HandleTriggerContact(

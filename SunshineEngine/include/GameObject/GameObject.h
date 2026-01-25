@@ -114,7 +114,7 @@ public:
             }
         }
         // log << "Component not found";
-        printf("Component not found");
+        // printf("Component not found");
         return nullptr;
     }
 
@@ -129,7 +129,7 @@ public:
             }
         }
         // log << "Component not found";
-        printf("Component not found");
+        // printf("Component not found");
         //return nullptr;
     }
 
@@ -183,23 +183,26 @@ public:
         }
     }
 
-    void AttachToParent()
+    void AttachToParent(bool alreadyLocalTransform = false)
     {
         if (!HasComponent<TransformComponent>() || !m_parent.ptr->HasComponent<TransformComponent>())
             return;
 
-        auto tc = GetComponent<TransformComponent>();
-        auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
+        if (!alreadyLocalTransform)
+        {
+            auto tc = GetComponent<TransformComponent>();
+            auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix_noLocal().Invert();
+            DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix_noLocal().Invert();
 
-        DXSM::Vector3 scale;
-        DXSM::Vector3 rotate;
-        DXSM::Vector3 translation;
-        DecomposeTransform(newTransform, scale, rotate, translation);
-        tc->m_scaleFactor = scale;
-        tc->m_position = translation;
-        tc->m_rotation = rotate;
+            DXSM::Vector3 scale;
+            DXSM::Vector3 rotate;
+            DXSM::Vector3 translation;
+            DecomposeTransform(newTransform, scale, rotate, translation);
+            tc->m_scaleFactor = scale;
+            tc->m_position = translation;
+            tc->m_rotation = rotate;
+        }
 
 
         GetComponent<TransformComponent>()->SetParentTransform(
@@ -473,23 +476,26 @@ public:
     }
 
 
-    void AttachToParent()
+    void AttachToParent(bool alreadyLocalTransform = false)
     {
         if (!HasComponent<TransformComponent_Info>() || !m_parent.ptr || !m_parent.ptr->HasComponent<TransformComponent_Info>())
             return;
 
-        auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
-        auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+        if (!alreadyLocalTransform)
+        {
+            auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
+            auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix_noLocal().Invert();
+            DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix_noLocal().Invert();
 
-        DXSM::Vector3 scale;
-        DXSM::Vector3 rotate;
-        DXSM::Vector3 translation;
-        DecomposeTransform(newTransform, scale, rotate, translation);
-        tc->m_scaleFactor = scale;
-        tc->m_position = translation;
-        tc->m_rotation = rotate;
+            DXSM::Vector3 scale;
+            DXSM::Vector3 rotate;
+            DXSM::Vector3 translation;
+            DecomposeTransform(newTransform, scale, rotate, translation);
+            tc->m_scaleFactor = scale;
+            tc->m_position = translation;
+            tc->m_rotation = rotate;
+        }
 
         GetComponent<TransformComponent_Info>()->SetParentTransform(
             m_parent.ptr->GetComponent<TransformComponent_Info>().get()

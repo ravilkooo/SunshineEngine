@@ -148,13 +148,21 @@ bool PhysicsSystem::PerceptionTrace(const JPH::RVec3& begin,
 //////////////////////////////////////////
 
 void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
+    physComp->InitTransforms();
 
-    JPH::BodyInterface& bodyInterface = Bodies();
+    JPH::ShapeSettings::ShapeResult shapeResult = physComp->m_colliderData.CreateShape();
 
+    if (shapeResult.IsValid()) {
+        physComp->m_shape = shapeResult.Get();
+    }
+    
     if (!physComp->m_shape) {
         // handle error: shape not set
         return;
     }
+
+    JPH::BodyInterface& bodyInterface = Bodies();
+
     JPH::BodyCreationSettings settings(physComp->m_shape, physComp->m_position, physComp->m_orientation, physComp->m_motionType, physComp->m_objectLayer);
     settings.mObjectLayer = physComp->m_objectLayer;
     settings.mAllowSleeping = (physComp->m_activation != JPH::EActivation::DontActivate);
@@ -282,17 +290,15 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             auto tc = gameObject->GetComponent<TransformComponent>();
             if (!tc)
                 continue;
-
+            /*
             auto wMat = tc->GetWorldMatrix_noLocal();
 
             DX::XMVECTOR scale, rotation, translation;
             DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
+            */
 
-            DXSM::Vector3 _pos;
-            DXSM::Quaternion _quat;
-
-            DX::XMStoreFloat3(&_pos, translation);
-            DX::XMStoreFloat4(&_quat, rotation);
+            DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
+            DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
 
             // Push TransformComponent data into the kinematic body
             const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
@@ -332,6 +338,14 @@ void PhysicsSystem::ClearAllBodies()
     }
     m_bodyEntries.clear();
 
+    // eastl::vector<JPH::BodyID> m_activeTriggers;
+    for (auto body : m_activeTriggers)
+    {
+        m_bodyInterface->RemoveBody(body);
+        m_bodyInterface->DestroyBody(body);
+    }
+    m_activeTriggers.clear();
+
     /*
     for (body in physicsScene)
     {
@@ -359,37 +373,39 @@ JPH::BodyInterface& PhysicsSystem::Bodies() { return *m_bodyInterface; }
 
 void PhysicsSystem::UpdateTriggerOverlaps()
 {
-    if (!m_physicsSystem)
-        return;
+    eastl::vector<TriggerExitEvent> exitEvents;
+    m_triggerContactListener.FetchExitEvents(exitEvents);
 
-    auto& bodyInterface = m_bodyInterface;
-    auto& nq = m_physicsSystem->GetNarrowPhaseQuery();
-
-    for (JPH::BodyID triggerId : m_activeTriggers)
+    for (const TriggerExitEvent& e : exitEvents)
     {
-        if (!bodyInterface->IsAdded(triggerId))
+        auto triggerGO = Scene::GetInstance().GetGameObjectByUUID(e.Trigger);
+        if (!triggerGO)
             continue;
 
-        JPH::BodyLockRead triggerLock(m_physicsSystem->GetBodyLockInterface(), triggerId);
-        if (!triggerLock.Succeeded())
+        auto triggerComp = triggerGO->GetComponent<TriggerComponent>();
+        if (!triggerComp)
             continue;
 
-        const JPH::Body& triggerBody = triggerLock.GetBody();
-        SE::UUID triggerUUID = SE::UUID((uint64_t)triggerBody.GetUserData());
-
-        // Use OverlapSweep to find all bodies overlapping this trigger
-        // This is simplified - full implementation would track previous overlaps
+        triggerComp->OnExit(e.Other);
     }
 }
 
 void PhysicsSystem::CreateAndAddTrigger(TriggerComponent* triggerComp) {
+    triggerComp->InitTransforms();
 
-    JPH::BodyInterface& bodyInterface = Bodies();
+    JPH::ShapeSettings::ShapeResult shapeResult = triggerComp->m_colliderData.CreateShape();
+
+    if (shapeResult.IsValid()) {
+        triggerComp->m_shape = shapeResult.Get();
+    }
 
     if (!triggerComp->m_shape) {
         // handle error: shape not set
         return;
     }
+
+    JPH::BodyInterface& bodyInterface = Bodies();
+
     JPH::BodyCreationSettings settings(triggerComp->m_shape,
         triggerComp->m_position, triggerComp->m_orientation,
         triggerComp->s_triggerMotionType, triggerComp->s_triggerObjectLayer);
@@ -420,7 +436,6 @@ void PhysicsSystem::RemoveTrigger(TriggerComponent* triggerComp)
         [bodyId](const PhysicsBodyEntry& entry) {
             return entry.m_joltBodyId == bodyId;
         });
-
     if (it != m_activeTriggers.end())
     {
         m_activeTriggers.erase(it);

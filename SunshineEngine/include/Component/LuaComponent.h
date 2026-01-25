@@ -18,6 +18,7 @@ struct ParamEntry {
 class LuaComponent : public Component
 {
     friend class LuaComponent_Info;
+    friend class LuaManager;
 public:
     LuaComponent();
     ~LuaComponent();

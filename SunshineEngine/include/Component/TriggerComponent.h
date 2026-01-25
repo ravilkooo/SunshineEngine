@@ -53,12 +53,17 @@ public:
     {
         return m_insideObjects;
     }
+
+    auto GetInsideObjects_Lua()
+    {
+        return eastl::ref(m_insideObjects);
+    }
     
     // Setters for configuration before adding body
     void SetObjecUUID(SE::UUID objectUUID);
     void SetShape(JPH::ShapeRefC shapePtr);
 
-    void InitTransforms(TransformComponent* tc);
+    void InitTransforms();
 
     JPH::Body* GetBody() const;
     JPH::BodyID GetBodyID() const;
@@ -73,6 +78,7 @@ private:
     PhysicsSystem* m_physicsSystem;
 
     TransformComponent* transformComp;
+    SE::ColliderData m_colliderData;    
 
     SE::UUID m_objectUUID;
     JPH::Body* m_joltBody;
@@ -125,3 +131,9 @@ public:
     // All colliders settings
     eastl::shared_ptr<SE::ColliderData> m_colliderData;
 };
+
+#ifndef TRIGGER_LUA_METHODS_APPLY
+#define TRIGGER_LUA_METHODS_APPLY(FM) \
+    FM("setLuaCallback",        &TriggerComponent::SetLuaCallback), \
+    FM("getInsideObjects",      &TriggerComponent::GetInsideObjects_Lua)
+#endif
