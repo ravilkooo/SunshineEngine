@@ -288,7 +288,7 @@ void Game::Update(float deltaTime) {
 
 	 // AI
 	 PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
-	 //BehaviorStorage::Get().Update(deltaTime);
+	 BehaviorStorage::Get().Update(deltaTime);
 
 	 m_renderer->GetMainCamera()->Update(deltaTime);
 }

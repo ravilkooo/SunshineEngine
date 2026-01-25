@@ -22,6 +22,7 @@ namespace DXSM = DirectX::SimpleMath;
 // subscribing to changes, and accessing values from various subsystems.
 class MemoryBoard
 {
+    friend class BehaviorController;
 
 public:
     MemoryBoard() {}
@@ -51,7 +52,7 @@ public:
     bool SetBool(const std::string& Key, bool Value)                    { return SetTypedValue<bool>(Key, Value); }
     bool SetString(const std::string& Key, const std::string& Value)    { return SetTypedValue<std::string>(Key, Value); }
     bool SetVector3(const std::string& Key, const DXSM::Vector3& Value) { return SetTypedValue<DXSM::Vector3>(Key, Value); }
-    bool SetUUID(const std::string& Key, const SE::UUID& Value)         { return SetTypedValue<SE::UUID>(Key, Value); }
+    bool SetUUID(const std::string& Key, const SE::UUID Value)          { return SetTypedValue<SE::UUID>(Key, Value); }
     //
 
     // --- GETTERS ---
@@ -61,15 +62,6 @@ public:
     bool GetString(const std::string& Key, std::string& OutValue) const    { return GetTypedValue<std::string>(Key, OutValue); }
     bool GetVector3(const std::string& Key, DXSM::Vector3& OutValue) const { return GetTypedValue<DXSM::Vector3>(Key, OutValue); }
     bool GetUUID(const std::string& Key, SE::UUID& OutValue) const         { return GetTypedValue<SE::UUID>(Key, OutValue); }
-    //
-
-    // --- LUA-FRIENDLY GETTERS ---
-    sol::object Lua_GetInt(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetFloat(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetBool(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetString(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetVector3(const std::string& Key, sol::this_state L) const;
-    sol::object Lua_GetUUID(const std::string& Key, sol::this_state L) const;
     //
 
     // --- GENERAL OPERATIONS ---
@@ -105,7 +97,7 @@ private:
 
         if (!Holder)
         {
-            std::cerr << "[Warning] MemoryBoard::Set: Type mismatch in key: " << Key.c_str() << "\n";
+            //std::cerr << "[Warning] MemoryBoard::Set: Type mismatch in key: " << Key.c_str() << "\n";
             return false;
         }
 
@@ -136,7 +128,7 @@ private:
 
         if (it == Data.end())
         {
-            std::cerr << "[Warning] MemoryBoard::Get: key does not exist: " << Key.c_str() << "\n";
+            //std::cerr << "[Warning] MemoryBoard::Get: key does not exist: " << Key.c_str() << "\n";
             return false;
         }
 
@@ -144,7 +136,7 @@ private:
 
         if (!Holder)
         {
-            std::cerr << "[Warning] MemoryBoard::Get: Type mismatch for key: " << Key.c_str() << "\n";
+            //std::cerr << "[Warning] MemoryBoard::Get: Type mismatch for key: " << Key.c_str() << "\n";
             return false;
         }
 
@@ -159,26 +151,3 @@ private:
     std::unordered_map<std::string, std::vector<CallbackWrapper>> Callbacks;
     uint64_t NextCallbackId = 0u;
 };
-
-
-#ifndef MEMORYBOARD_LUA_METHODS_APPLY
-#define MEMORYBOARD_LUA_METHODS_APPLY(FM) \
-    FM("setInt",         &MemoryBoard::SetInt) , \
-    FM("setFloat",       &MemoryBoard::SetFloat) , \
-    FM("setBool",        &MemoryBoard::SetBool) , \
-    FM("setString",      &MemoryBoard::SetString) , \
-    FM("setVector3",     &MemoryBoard::SetVector3) , \
-    FM("setUUID",        &MemoryBoard::SetUUID) , \
-    FM("getInt",         &MemoryBoard::Lua_GetInt) , \
-    FM("getFloat",       &MemoryBoard::Lua_GetFloat) , \
-    FM("getBool",        &MemoryBoard::Lua_GetBool) , \
-    FM("getString",      &MemoryBoard::Lua_GetString) , \
-    FM("getVector3",     &MemoryBoard::Lua_GetVector3) , \
-    FM("getUUID",        &MemoryBoard::Lua_GetUUID) , \
-    FM("hasKey",         &MemoryBoard::HasKey) , \
-    FM("removeKey",      &MemoryBoard::RemoveKey) , \
-    FM("clear",          &MemoryBoard::Clear) , \
-    FM("addCallback",    &MemoryBoard::AddCallback) , \
-    FM("removeCallback", &MemoryBoard::RemoveCallback) , \
-    FM("clearCallbacks", &MemoryBoard::ClearCallbacks)
-#endif
