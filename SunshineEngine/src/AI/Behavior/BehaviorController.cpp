@@ -298,75 +298,6 @@ void Pattern::Reset()
 
 
 // ------------------------------------------------------------------------------------------------------
-// ---------------------------------- EventTransition
-// ------------------------------------------------------------------------------------------------------
-
-EventTransition::EventTransition(const std::string& InToState, sol::function InCheck, BehaviorController* FSM) : ToState(InToState), Check(InCheck)
-{
-	Abort =
-		[FSM](const std::string& ToState)
-		{
-			if (FSM)
-			{
-				FSM->Abort(ToState);
-			}
-		};
-}
-
-void EventTransition::Trigger(const SE::UUID& GOID, BehaviorController* BC)
-{
-	if (Check)
-	{
-		bool Result = false;
-
-		sol::protected_function_result CallResult = Check(GOID.GetHilo(), BC);
-
-		if (!CallResult.valid())
-		{
-			sol::error Err = CallResult;
-			//std::cerr << "[Warning] EventTransition::Trigger error: " << Err.what() << "\n";
-		}
-		else if (CallResult.return_count() == 0)
-		{
-			//std::cerr << "[Warning] EventTransition::Trigger returned nothing\n";
-		}
-		else
-		{
-			sol::object Ret = CallResult.get<sol::object>();
-
-			if (Ret.is<bool>())
-			{
-				Result = Ret.as<bool>();
-			}
-			else
-			{
-				//std::cerr << "[Warning] EventTransition::Trigger returned non-bool value\n";
-			}
-		}
-
-		if (Result)
-		{
-			Abort(ToState);
-		}
-	}
-}
-
-void EventTransition::ChangeToState(const std::string& InToState, BehaviorController* FSM)
-{
-	ToState = InToState;
-
-	Abort = [FSM](const std::string& ToState)
-		{
-			if (FSM)
-			{
-				FSM->Abort(ToState);
-			}
-		};
-}
-
-
-
-// ------------------------------------------------------------------------------------------------------
 // ---------------------------------- State
 // ------------------------------------------------------------------------------------------------------
 
@@ -442,29 +373,6 @@ bool State::ConditionTransition_Remove(const std::string& ToState)
 		if ((*it)->ToState == ToState)
 		{
 			ConditionTransitions.erase(it);
-			return true;
-		}
-	}
-
-	return false;
-}
-//
-
-// --- Event Conditions ---
-void State::EventTransition_Add(const std::string& InToState, sol::function InCheck, BehaviorController* FSM)
-{
-	auto Transition = std::make_shared<EventTransition>(InToState, InCheck, FSM);
-
-	EventTransitions.push_back(Transition);
-}
-
-bool State::RemoveEventTransition(const std::string& ToState)
-{
-	for (auto it = EventTransitions.begin(); it != EventTransitions.end(); ++it)
-	{
-		if ((*it)->ToState == ToState)
-		{
-			EventTransitions.erase(it);
 			return true;
 		}
 	}
@@ -629,6 +537,12 @@ sol::table BehaviorController::GetAllStates(sol::this_state L) const
 	}
 
 	return t;
+}
+
+void BehaviorController::Trigger(const std::string& ToState)
+{
+	if (ToState != CurrentStateName)
+		Abort(ToState);
 }
 
 void BehaviorController::FromJson(const json& j)
@@ -953,117 +867,6 @@ bool BehaviorController::ConditionTransition_Remove(const std::string& FromState
 	else
 	{
 		//std::cerr << "[Warning] BehaviorController::RemoveConditionTransition: tried to remove non-existing transition from " << FromState.c_str() << " to " << ToState.c_str() << "\n";
-		return false;
-	}
-}
-//
-
-// --- Event Conditions ---
-bool BehaviorController::EventTransition_Add(const std::string& FromState, const std::string& ToState, sol::function InCheck)
-{
-	auto From = State_Get(FromState);
-	auto To = State_Get(ToState);
-
-	if (!From || !To)
-	{
-		return false;
-	}
-
-	for (auto& ET : From->EventTransitions)
-	{
-		if (ET->ToState == ToState)
-		{
-			//std::cerr << "[Warning] BehaviorController::AddEventTransition: transition already exists: " << FromState.c_str() << " -> " << ToState.c_str() << "\n";
-			return false;
-		}
-	}
-
-	From->EventTransition_Add(ToState, InCheck, this);
-
-	return true;
-}
-
-bool BehaviorController::EventTransition_Has(const std::string& FromState, const std::string& ToState)
-{
-	auto From = State_Get(FromState);
-	auto To = State_Get(ToState);
-
-	if (!From || !To)
-	{
-		return false;
-	}
-
-	for (auto& ET : From->EventTransitions)
-	{
-		if (ET->ToState == ToState)
-		{
-			return true;
-		}
-	}
-
-	return true;
-}
-
-bool BehaviorController::EventTransition_ChangeToState(const std::string& FromState, const std::string& OldToState, const std::string& NewToState)
-{
-	auto From = State_Get(FromState);
-
-	if (!From || !State_Get(NewToState))
-	{
-		return false;
-	}
-
-	for (auto& T : From->EventTransitions)
-	{
-		if (T->ToState == OldToState)
-		{
-			T->ToState = NewToState;
-			return true;
-		}
-	}
-
-	//std::cerr << "[Warning] BehaviorController::ChangeToStateInEventTransition: No condition transition found in state " << FromState.c_str() << " from ToState " << OldToState.c_str() << "\n";
-	return false;
-}
-
-bool BehaviorController::EventTransition_ChangeCheckFunc(const std::string& FromState, const std::string& ToState, sol::function InCheck)
-{
-	auto From = State_Get(FromState);
-
-	if (!From)
-	{
-		return false;
-	}
-
-	for (auto& T : From->EventTransitions)
-	{
-		if (T->ToState == ToState)
-		{
-			T->Check = InCheck;
-			return true;
-		}
-	}
-
-	//std::cerr << "[Warning]";
-	return false;
-}
-
-bool BehaviorController::EventTransition_Remove(const std::string& FromState, const std::string& ToState)
-{
-	auto From = State_Get(FromState);
-
-	if (!From)
-	{
-		return false;
-	}
-
-	if (From->RemoveEventTransition(ToState))
-	{
-		return true;
-	}
-	else
-	{
-		//std::cerr << "[Warning] BehaviorController::RemoveEventTransition: tried to remove non-existing transition from " << FromState.c_str() << " to " << ToState.c_str() << "\n";
 		return false;
 	}
 }

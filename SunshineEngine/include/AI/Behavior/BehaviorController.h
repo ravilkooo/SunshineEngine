@@ -134,24 +134,6 @@ public:
 };
 
 
-class EventTransition
-{
-public:
-    explicit EventTransition(const std::string& InToState, sol::function InCheck, BehaviorController* FSM);
-
-    void Trigger(const SE::UUID& GOID, BehaviorController* BC);
-
-    void ChangeToState(const std::string& InToState, BehaviorController* FSM);
-
-
-    sol::function Check;
-
-    AbortFunc Abort = nullptr;
-
-    std::string ToState;
-};
-
-
 class State
 {
     friend class BehaviorController;
@@ -172,11 +154,6 @@ private:
     bool ConditionTransition_Remove(const std::string& ToState);
     //
     
-    // --- Event Conditions ---
-    void EventTransition_Add(const std::string& InToState, sol::function InCheck, BehaviorController* FSM);
-    bool RemoveEventTransition(const std::string& ToState);
-    //
-    
     // --- In game ---
     bool Update(const SE::UUID& GOID, BehaviorController* BC, float DeltaTime);
     std::shared_ptr<ConditionTransition> CheckConditionTransitions(const SE::UUID& GOID, BehaviorController* BC);
@@ -184,7 +161,6 @@ private:
 
 
     std::vector<std::shared_ptr<ConditionTransition>> ConditionTransitions;
-    std::vector<std::shared_ptr<EventTransition>> EventTransitions;
 
     std::unordered_map<std::string, std::shared_ptr<Pattern>> Patterns;
     std::shared_ptr<Pattern> CurrentPattern = nullptr;
@@ -201,7 +177,6 @@ private:
 class BehaviorController : public Component
 {
     friend class BehaviorStorage;
-    friend class EventTransition;
 
 public:
     // --- General ---
@@ -220,7 +195,8 @@ public:
     void SetIsEnabled(bool NewCondition) { IsEnabled = NewCondition; }
     bool GetIsEnabled() { return IsEnabled; }
     sol::table GetAllStates(sol::this_state L) const;
-    void Clear();
+
+    void Trigger(const std::string& ToState);
 
     void FromJson(const json& j) override;
 
@@ -274,14 +250,6 @@ public:
     bool ConditionTransition_ChangeToState(const std::string& FromState, const std::string& OldToState, const std::string& NewToState);
     bool ConditionTransition_ChangeCheckFunc(const std::string& FromState, const std::string& ToState, sol::function InCheck);
     bool ConditionTransition_Remove(const std::string& FromState, const std::string& ToState);
-    //
-
-    // --- Event Conditions ---
-    bool EventTransition_Add(const std::string& FromState, const std::string& ToState, sol::function InCheck);
-    bool EventTransition_Has(const std::string& FromState, const std::string& ToState);
-    bool EventTransition_ChangeToState(const std::string& FromState, const std::string& OldToState, const std::string& NewToState);
-    bool EventTransition_ChangeCheckFunc(const std::string& FromState, const std::string& ToState, sol::function InCheck);
-    bool EventTransition_Remove(const std::string& FromState, const std::string& ToState);
     //
 
     // --- Patterns ---
@@ -356,6 +324,7 @@ public:
     FM("setIsEnabled",                   &BehaviorController::SetIsEnabled), \
     FM("getIsEnabled",                   &BehaviorController::GetIsEnabled), \
     FM("getAllStates",                   &BehaviorController::GetAllStates), \
+    FM("trigger",                        &BehaviorController::Trigger), \
     \
     FM("MB_setInt",                      &BehaviorController::MemoryBoard_SetInt), \
     FM("MB_setFloat",                    &BehaviorController::MemoryBoard_SetFloat), \
@@ -389,17 +358,13 @@ public:
     FM("S_setOnAbort",                   &BehaviorController::State_SetOnAbort), \
     FM("S_setOnExit",                    &BehaviorController::State_SetOnExit), \
     \
+    FM("ET_Trigger",                     &BehaviorController::State_SetOnExit), \
+    \
     FM("CT_add",                         &BehaviorController::ConditionTransition_Add) , \
     FM("CT_has",                         &BehaviorController::ConditionTransition_Has) , \
     FM("CT_changeToState",               &BehaviorController::ConditionTransition_ChangeToState) , \
     FM("CT_changeCheckFunc",             &BehaviorController::ConditionTransition_ChangeCheckFunc), \
     FM("CT_remove",                      &BehaviorController::ConditionTransition_Remove) , \
-    \
-    FM("ET_add",                         &BehaviorController::EventTransition_Add), \
-    FM("ET_has",                         &BehaviorController::EventTransition_Has), \
-    FM("ET_changeToState",               &BehaviorController::EventTransition_ChangeToState), \
-    FM("ET_changeCheckFunc",             &BehaviorController::EventTransition_ChangeCheckFunc), \
-    FM("ET_remove",                      &BehaviorController::EventTransition_Remove), \
     \
     FM("P_add",                          &BehaviorController::Pattern_Add), \
     FM("P_remove",                       &BehaviorController::Pattern_Remove), \
