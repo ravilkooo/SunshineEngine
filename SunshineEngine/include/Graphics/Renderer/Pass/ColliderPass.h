@@ -72,4 +72,12 @@ namespace SE_G {
         eastl::unique_ptr<Bind::PixelConstantBuffer<SpritesheetInfoPCB>> m_spritesheetInfoPCB;
         */
     };
+
+    class TriggerPass : public ColliderPass
+    {
+    public:
+        TriggerPass(ID3D11Device* device, ID3D11DeviceContext* context,
+            eastl::shared_ptr<GBuffer> pGBuffer,
+            eastl::shared_ptr<Camera> camera);
+    };
 }

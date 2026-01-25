@@ -6,13 +6,18 @@
 #include <EASTL/string.h>
 
 #include <Jolt/Jolt.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/Collision/Shape/BoxShape.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/CapSuleShape.h>
+#include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 
 #include <Physics/PhysicsEnums.h>
 
-
-namespace DXSM = DirectX::SimpleMath;
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 namespace SE {
     typedef eastl::string CollisionLayer;
@@ -20,16 +25,18 @@ namespace SE {
 
     namespace Layers
     {
-        // static constexpr JPH::ObjectLayer NON_MOVING = 0;
-        static constexpr JPH::ObjectLayer MOVING = 0;
-        static constexpr JPH::ObjectLayer NUM_LAYERS = 1;
+        static constexpr JPH::ObjectLayer NON_MOVING = 0;
+        static constexpr JPH::ObjectLayer MOVING = 1;
+        static constexpr JPH::ObjectLayer TRIGGER = 2;
+        static constexpr JPH::ObjectLayer NUM_LAYERS = 3;
     };
 
     namespace BroadPhaseLayers
     {
-        //static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
-        static constexpr JPH::BroadPhaseLayer MOVING(0);
-        static constexpr UINT NUM_LAYERS(1);
+        static constexpr JPH::BroadPhaseLayer NON_MOVING(0);
+        static constexpr JPH::BroadPhaseLayer MOVING(1);
+        static constexpr JPH::BroadPhaseLayer TRIGGER(2);
+        static constexpr UINT NUM_LAYERS(3);
     };
 
     struct ColliderVertex {
@@ -85,6 +92,12 @@ namespace SE {
 
     struct ColliderSettings
     {
+        DXSM::Vector3 colliderColor = DXSM::Vector3(
+            0.0313725f,
+            0.0745098f,
+            0.7764706f
+        );
+        float padding = 1.0f;
         union {
             RowParams asRowParams; // For setting maximum size
 
@@ -247,6 +260,53 @@ namespace SE {
         {
             m_settings = settings;
         }
+
+        JPH::ShapeSettings::ShapeResult CreateShape()
+        {
+            JPH::ShapeSettings::ShapeResult shapeResult;
+            switch (m_shapeType) {
+            case SE::ColliderShapeType::Box: {
+                JPH::BoxShapeSettings boxSettings(
+                    JPH::Vec3(
+                        m_settings.data.asBox.m_size.x * 0.5f,
+                        m_settings.data.asBox.m_size.y * 0.5f,
+                        m_settings.data.asBox.m_size.z * 0.5f
+                    )
+                );
+                shapeResult = boxSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::Sphere: {
+                JPH::SphereShapeSettings sphereSettings(m_settings.data.asSphere.m_radius);
+                shapeResult = sphereSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::Capsule: {
+                JPH::CapsuleShapeSettings capsuleSettings(
+                    m_settings.data.asCapsule.m_height * 0.5f,
+                    m_settings.data.asCapsule.m_radius
+                );
+                shapeResult = capsuleSettings.Create();
+                break;
+            }
+            case SE::ColliderShapeType::TaperedCapsule: {
+                JPH::TaperedCapsuleShapeSettings taperedCapsuleSettings(
+                    m_settings.data.asTaperedCapsule.m_height * 0.5f,
+                    m_settings.data.asTaperedCapsule.m_topRadius,
+                    m_settings.data.asTaperedCapsule.m_bottomRadius
+                );
+                shapeResult = taperedCapsuleSettings.Create();
+                break;
+            }
+            default:
+                // Fallback to box if shape type is not recognized
+                JPH::BoxShapeSettings defaultBoxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
+                shapeResult = defaultBoxSettings.Create();
+                break;
+            }
+            return shapeResult;
+        }
+
 
         // Serialize this ColliderData to JSON
         nlohmann::json ToJson() const

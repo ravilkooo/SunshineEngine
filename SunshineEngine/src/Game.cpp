@@ -76,6 +76,18 @@ void Game::SetParticleSystem(eastl::shared_ptr <SE::ParticleSystem> ps)
 void Game::SetupPhysics()
 {
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
+
+	for (auto& it : Scene::GetInstance().uuidToObjectMap)
+	{
+		auto pc = it.second->GetComponent<PhysicsComponent>();
+		if (pc)
+			m_physicsSystem->CreateAndAddBody(pc.get());
+
+		auto trigc = it.second->GetComponent<TriggerComponent>();
+		if (trigc)
+			m_physicsSystem->CreateAndAddTrigger(trigc.get());
+	}
+	m_physicsSystem->FinalizeScene();
 }
 
 bool Game::LoadScene(const wchar_t* scenePath)
@@ -94,52 +106,10 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		return false;
 	}
 
-	SetupPhysics();
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	m_playerObject = Scene::GetInstance().m_playerObject;
-	/*
-	if (!loadedScene) {
-		LOG_EDITOR_ERROR("Scene load error\n");
-		return false;
-	}
-	*/
-	//LOG_EDITOR_INFO("Scene loaded");
-
-	// For Volodya
-	/*
-	auto m_uuid0 = Scene::GetInstance().gameObjects[0];
-	auto m_gobj0 = Scene::GetInstance().GetGameObjectByUUID(m_uuid0);
-	auto m_uuid1 = Scene::GetInstance().gameObjects[1];
-	auto m_gobj1 = Scene::GetInstance().GetGameObjectByUUID(m_uuid1);
-
-	TracedBody* tb0 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
-
-	tb0->m_objectLayer = 0u;
-	tb0->m_motionType = JPH::EMotionType::Dynamic;
-	tb0->m_activation = JPH::EActivation::Activate;
-	JPH::ShapeSettings::ShapeResult shapeResult;
-	JPH::BoxShapeSettings boxSettings(
-		JPH::Vec3(
-			0.5f,
-			0.5f,
-			0.5f
-		)
-	);
-	shapeResult = boxSettings.Create();
-	tb0->m_shape = shapeResult.Get();
-	m_tracingSystem->CreateAndAddBody(tb0);
-
-	TracedBody* tb1 = new TracedBody(m_uuid0, m_gobj0->GetComponent<TransformComponent>().get());
-	tb1->m_objectLayer = 0u;
-	tb1->m_motionType = JPH::EMotionType::Dynamic;
-	tb1->m_activation = JPH::EActivation::Activate;
-	tb1->m_shape = shapeResult.Get();
-	m_tracingSystem->CreateAndAddBody(tb1);
-
-	m_tracingSystem->FinalizeScene();
-	*/
-
-	m_physicsSystem->FinalizeScene();
+	SetupPhysics();
+	m_luaManager.InitializeBehavior();
 	return true;
 }
 
@@ -271,6 +241,18 @@ void Game::Run()
 	*/
 }
 
+void Game::ClearCachedAbsoluteTransforms()
+{
+	for (auto& it : Scene::GetInstance().uuidToObjectMap)
+	{
+		auto tc = it.second->GetComponent<TransformComponent>();
+		if (tc)
+		{
+			tc->m_isAbsoluteTransformCached = false;
+		}
+	}
+}
+
 void Game::Update(float deltaTime) {
 
 	Scene::GetInstance().FlushDestructionQueue();
@@ -289,6 +271,8 @@ void Game::Update(float deltaTime) {
 	 // AI
 	 PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
 	 BehaviorStorage::Get().Update(deltaTime);
+
+	 ClearCachedAbsoluteTransforms();
 
 	 m_renderer->GetMainCamera()->Update(deltaTime);
 }

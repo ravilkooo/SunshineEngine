@@ -100,7 +100,7 @@ public:
     void SetGravityFactor(float inGravityFactor);
     float GetGravityFactor();
 
-    void InitTransforms(TransformComponent* tc);
+    void InitTransforms();
 
     JPH::Body* GetBody() const;
     JPH::BodyID GetBodyID() const;
@@ -133,6 +133,7 @@ private:
     float m_restitution = 0.0f;
 
     SE::ColliderTransforms m_transformsData;
+    SE::ColliderData m_colliderData;
     /*
     ColliderTransformCB m_transformMat;
     */

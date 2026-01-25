@@ -9,6 +9,7 @@
 
 #include <Physics/PhysicsEnums.h>
 #include <Physics/CollisionUtils.h>
+#include <Graphics/Utils/Color.h>
 
 namespace SE_G {
 

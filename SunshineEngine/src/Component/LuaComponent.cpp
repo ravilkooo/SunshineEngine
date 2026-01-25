@@ -126,7 +126,7 @@ void LuaComponent::LoadScript() {
 
 	scriptLoaded = true;
 
-	InitializeBehavior();
+	// InitializeBehavior();
 
 	//scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
 	//printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));

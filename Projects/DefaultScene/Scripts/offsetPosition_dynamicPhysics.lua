@@ -8,7 +8,7 @@ end
 
 function behavior:update(dt)
     local physics = self.owner:getPhysics()
-    physics:addForce(Vector3.new(self.speedMyX,0,0))
+    physics:addImpulse(Vector3.new(self.speedMyX,0,0))
     -- print("Behavior update", self.id)
 
     local transform = self.owner:getTransform()

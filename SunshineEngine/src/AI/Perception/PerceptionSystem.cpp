@@ -452,9 +452,9 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
 
                         SE::UUID HitUUID = SE::UUID(0u);
 
-                        bool HitSMTH = PS->Trace(JPH::RVec3(ViewerPos.x, ViewerPos.y, ViewerPos.z),
+                        bool HitSMTH = PS->PerceptionTrace(JPH::RVec3(ViewerPos.x, ViewerPos.y, ViewerPos.z),
                             JPH::Vec3(DirNorm.x, DirNorm.y, DirNorm.z),
-                            Dist, 0, Ignore, &HitUUID);
+                            Dist, Ignore, &HitUUID);
 
 						// printf("\tHitSMTH: (%d); Hit UUID: (%s)\n", HitSMTH, HitUUID.ToString().c_str());
 

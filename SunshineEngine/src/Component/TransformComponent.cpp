@@ -65,6 +65,41 @@ DXSM::Matrix TransformComponent::GetWorldMatrix_noLocal() const
     return wt;
 }
 
+void TransformComponent::CalcAbsoluteTransform()
+{
+    if (!m_isAbsoluteTransformCached)
+    {
+        auto wMat = GetWorldMatrix_noLocal();
+
+        DX::XMVECTOR scale, rotation, translation;
+        DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
+
+        DX::XMStoreFloat3(&m_cachedAbsoluteWorldPosition, translation);
+        DX::XMStoreFloat4(&m_cachedAbsoluteWorldRotation_quat, rotation);
+
+        m_cachedAbsoluteWorldRotation = m_cachedAbsoluteWorldRotation_quat.ToEuler();
+        m_isAbsoluteTransformCached = true;
+    }
+}
+
+DXSM::Vector3 TransformComponent::GetAbsoluteWorldPosition()
+{
+    CalcAbsoluteTransform();
+    return m_cachedAbsoluteWorldPosition;
+}
+
+DXSM::Quaternion TransformComponent::GetAbsoluteWorldRotation_quat()
+{
+    CalcAbsoluteTransform();
+    return m_cachedAbsoluteWorldRotation_quat;
+}
+
+DXSM::Vector3 TransformComponent::GetAbsoluteWorldRotation()
+{
+    CalcAbsoluteTransform();
+    return m_cachedAbsoluteWorldRotation;
+}
+
 DXSM::Matrix TransformComponent::GetWorldMatrix() const
 {
     DXSM::Matrix wt = GetScaleMatrix() * GetRotationMatrix() * GetTransalationMatrix();
@@ -136,6 +171,10 @@ void TransformComponent_Info::SetParentTransform(TransformComponent_Info* parent
 
 #define TC_ADD_FIELD(name) #name, &TransformComponent::name
 #define TC_FIELD_PAIRS TRANSFORMCOMPONENT_LUA_FIELDS_APPLY(TC_ADD_FIELD)
-#define TC_METHOD_PAIRS
+
+#define TC_ADD_METHOD_WITH_LEAD(k, fn) , k, fn
+#define TC_METHOD_PAIRS TRANSFORMCOMPONENT_LUA_METHODS_APPLY(TC_ADD_METHOD_WITH_LEAD)
+
 LUA_REGISTER_COMPONENT(TransformComponent, "TransformComponent", TC_FIELD_PAIRS, TC_METHOD_PAIRS, "getTransform")
 #undef TC_ADD_FIELD
+#undef  TC_ADD_METHOD_WITH_LEAD

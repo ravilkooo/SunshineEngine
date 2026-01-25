@@ -379,5 +379,12 @@ namespace SE_G {
 		s_staticDataInitializated = true;
 	}
 
-
+	TriggerPass::TriggerPass(ID3D11Device* device, ID3D11DeviceContext* context,
+		eastl::shared_ptr<GBuffer> pGBuffer,
+		eastl::shared_ptr<Camera> camera)
+		: ColliderPass(device, context, pGBuffer, camera)
+	{
+		techniqueTag = "TriggerPass";
+		m_passType = PassType::Trigger;
+	}
 }
