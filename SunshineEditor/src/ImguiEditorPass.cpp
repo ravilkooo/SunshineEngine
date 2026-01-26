@@ -298,7 +298,8 @@ void ImguiEditorPass::Pass()
 	
 	RenderGameWorld();
 	
-	if (isEditorMode && selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
+	if (isEditorMode && selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u)
+		&& m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID != SE::UUID(0u))
 	{
 		m_Gizmo.Draw();
 	}
@@ -340,6 +341,59 @@ void ImguiEditorPass::RenderGameWorld()
 	ImGui::Image((ImTextureID)m_viewportGBuffer->pLightSRV.Get(), avail);
 	// ����� ����� ���������� ���� ������� ����������, ���� ��������
 	//ImGui::Text("Game World Render Here");
+
+	if (m_editorApp->m_worldEditor && m_editorApp->m_worldEditor->m_renderer->m_mainCamera)
+	{
+		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		auto m_viewportPos = ImVec2(windowPos.x + vMin.x, windowPos.y + vMin.y);
+		auto m_viewportSize = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y);
+
+		float cameraMode_padding = 5.0f;
+
+		ImVec2 cameraMode_windowPos = ImVec2(
+			m_viewportPos.x, m_viewportPos.y
+		);
+
+		ImGui::SetNextWindowPos(cameraMode_windowPos, ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+		ImGuiWindowFlags cameraMode_window_flags =
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_AlwaysAutoResize |
+			ImGuiWindowFlags_NoSavedSettings |
+			ImGuiWindowFlags_NoFocusOnAppearing;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(cameraMode_padding, cameraMode_padding - 1.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(cameraMode_padding * 0.5f, cameraMode_padding * 0.5f));
+
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.8f));
+		ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.3f, 0.3f, 0.3f, 0.5f));
+
+		ImGui::Begin("CameraMode Controls", nullptr, cameraMode_window_flags);
+
+		ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.4f, 0.8f));
+
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+		{
+			ImGui::Spacing();
+			if (ImGui::RadioButton("Perspective", m_editorApp->m_worldEditor->m_renderer->m_mainCamera->IsPerspectiveCamera()))
+				m_editorApp->m_worldEditor->m_renderer->m_mainCamera->SwitchProjection();
+			ImGui::SameLine();
+			if (ImGui::RadioButton("Orhtographic", !m_editorApp->m_worldEditor->m_renderer->m_mainCamera->IsPerspectiveCamera()))
+				m_editorApp->m_worldEditor->m_renderer->m_mainCamera->SwitchProjection();
+		}
+
+		ImGui::PopStyleColor(1);
+
+		ImGui::End();
+
+		ImGui::PopStyleColor(2);
+		ImGui::PopStyleVar(2);
+	}
 }
 
 void ImguiEditorPass::ShowSceneHierarchy()

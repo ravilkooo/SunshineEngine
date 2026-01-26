@@ -14,36 +14,47 @@
 #include <GameObject/GameObject.h>
 #include <Utils/StringHelper.h>
 
-void LuaComponent_Info::ScanLuaFiles(const eastl::string& dirPath) {
+eastl::vector<AssetPath> LuaComponent_Info::luaFiles;
+
+void LuaComponent_Info::ScanLuaFiles()
+{
 	luaFiles.clear();
 	std::error_code ec;
+
+	AssetPath scriptDirPath(L"Scripts/", AssetPath::AssetSource::Project);
+	AssetPath currentScript(L"Scripts/", AssetPath::AssetSource::Project);
 	//for (eastlfs::directory_iterator it(dirPath); it != eastlfs::directory_iterator(""); ++it) {
 	eastlfs::directory_iterator end;
-	for (eastlfs::directory_iterator it(dirPath, ec); it != end; ++it) {
+	for (eastlfs::directory_iterator it(WStringToUtf8(scriptDirPath.GetFullPath()), ec); it != end; ++it)
+	{
 		auto& entry = it.entry();
-		if (eastlfs::is_regular_file(entry)) {
+		if (eastlfs::is_regular_file(entry))
+		{
 			eastl::string filename = eastlfs::filename(entry);
+			currentScript.m_assetRelativePath = L"Scripts/" + Utf8ToWString(filename);
+
 			if (filename.size() > 4 && EASTLStringEqualsChar(filename.substr(filename.size() - 4), ".lua"))
-				luaFiles.push_back(filename);
+				luaFiles.push_back(currentScript);
 		}
 	}
 	if (ec)
 	{
-		// handle failure
+		wprintf(L"Lua dir not found: %ls\n", scriptDirPath.GetFullPath().c_str());
 	}
+	
+	/*
+	std::error_code ec;
+	if (!std::filesystem::exists(scriptPath.GetFullPath().c_str()))
+	{
+		wprintf(L"Lua file not found: %ls\n", scriptPath.GetFullPath().c_str());
+	}
+	*/
 }
-
 
 void LuaComponent_Info::InitLuaFile()
 {
-	eastl::wstring wpath = AssetPath::s_projectPath + L"Assets/Scripts";
-
-	eastl::string assetsPath = wstringToString(wpath);
-	ScanLuaFiles(assetsPath);
-	if (!luaFiles.empty()) {
-		scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
-	}
-	printSunshineMessage(scriptPath.c_str());
+	ScanLuaFiles();
+	printSunshineMessage(scriptPath.GetFullPath());
 }
 
 LuaComponent::LuaComponent()
@@ -54,7 +65,7 @@ LuaComponent::~LuaComponent() {
 	//Cleanup();
 }
 
-void LuaComponent::Init(GameObject* obj, const eastl::string& inScriptPath) {
+void LuaComponent::Init(GameObject* obj, AssetPath inScriptPath) {
 
 	this->obj = obj;
 	scriptPath = inScriptPath;
@@ -105,7 +116,7 @@ void LuaComponent::LoadScript() {
 
 	registerComponents();
 
-	auto result = lua->script_file(scriptPath.c_str());
+	auto result = lua->script_file(WStringToUtf8(scriptPath.GetFullPath()).c_str());
 	if (!result.valid()) 
 	{
 		sol::error err = result;
@@ -115,7 +126,7 @@ void LuaComponent::LoadScript() {
 
 	scriptLoaded = true;
 
-	InitializeBehavior();
+	// InitializeBehavior();
 
 	//scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
 	//printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
@@ -123,14 +134,6 @@ void LuaComponent::LoadScript() {
 	foundFunction = false;
 	params.clear();
 	lastResult.clear();
-}
-
-void LuaComponent::SetFunctionName(const eastl::string& name) {
-	//functionName = name;
-}
-
-eastl::string LuaComponent::GetFunctionName() const {
-	return functionName;
 }
 
 void LuaComponent::LuaUpdate(float deltaTime)
@@ -186,7 +189,7 @@ void LuaComponent::LoadParamsFromLua() {
 void LuaComponent::InitializeBehavior()
 {
 	if (!scriptLoaded) {
-		printSunshineErrorMessage("InitializeBehavior: scriptLoaded is false!");
+		wprintf(L"%ls: InitializeBehavior: scriptLoaded is false!", scriptPath.GetFullPath().c_str());
 		return;
 	}
 
@@ -279,9 +282,9 @@ eastl::vector<eastl::string> LuaComponent::GetAvailableFunctions() const
 {
 	eastl::vector<eastl::string> functions;
     
-	if (scriptPath.empty()) return functions;
+	if (scriptPath.m_assetRelativePath.empty()) return functions;
         
-	std::ifstream file(scriptPath.c_str());
+	std::ifstream file(scriptPath.GetFullPath().c_str());
 	if (!file.is_open()) return functions;
 
 	std::string stdLine;

@@ -11,6 +11,9 @@
 #include <Graphics/Renderer/Pass/LightPass.h>
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
+#include "AI/Perception/PerceptionSystem.h"
+#include "AI/Behavior/BehaviorController.h"
+
 Game::Game()
 {
 	// Initialize();
@@ -25,6 +28,8 @@ Game::~Game()
 void Game::ClearScene()
 {
 	Scene::GetInstance().ClearScene();
+	PerceptionSystem::Get().Clear();
+	BehaviorStorage::Get().Clear();
 }
 
 void Game::SetupRendering(
@@ -71,6 +76,20 @@ void Game::SetParticleSystem(eastl::shared_ptr <SE::ParticleSystem> ps)
 void Game::SetupPhysics()
 {
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
+
+	for (auto& it : Scene::GetInstance().uuidToObjectMap)
+	{
+		auto pc = it.second->GetComponent<PhysicsComponent>();
+		if (pc)
+			m_physicsSystem->CreateAndAddBody(pc.get());
+
+		auto trigc = it.second->GetComponent<TriggerComponent>();
+		if (trigc)
+			m_physicsSystem->CreateAndAddTrigger(trigc.get());
+	}
+	m_physicsSystem->FinalizeScene();
+
+	Scene::GetInstance().m_physicsSystem = m_physicsSystem.get();
 }
 
 bool Game::LoadScene(const wchar_t* scenePath)
@@ -92,6 +111,8 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	SetupPhysics();
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	m_playerObject = Scene::GetInstance().m_playerObject;
+	SetupPhysics();
+	m_luaManager.InitializeBehavior();
 	/*
 	if (!loadedScene) {
 		LOG_EDITOR_ERROR("Scene load error\n");
@@ -305,11 +326,28 @@ void Game::Run()
 	*/
 }
 
+void Game::ClearCachedAbsoluteTransforms()
+{
+	for (auto& it : Scene::GetInstance().uuidToObjectMap)
+	{
+		auto tc = it.second->GetComponent<TransformComponent>();
+		if (tc)
+		{
+			tc->m_isAbsoluteTransformCached = false;
+		}
+	}
+}
+
 void Game::Update(float deltaTime) {
 
+	Scene::GetInstance().FlushDestructionQueue();
+
+
+	 m_physicsSystem->FlushCommands();
 	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	 m_physicsSystem->Step(deltaTime);
+	 m_physicsSystem->FlushCommands();
 
 	 m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance());
 
@@ -317,6 +355,12 @@ void Game::Update(float deltaTime) {
 		 m_particleSystem->Update(deltaTime);
 
 	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+
+	 // AI
+	 PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
+	 BehaviorStorage::Get().Update(deltaTime);
+
+	 ClearCachedAbsoluteTransforms();
 
 	 m_renderer->GetMainCamera()->Update(deltaTime);
 }

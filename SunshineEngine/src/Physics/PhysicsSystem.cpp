@@ -1,12 +1,15 @@
 #include <Physics/PhysicsSystem.h>
 #include <Scene.h>
 #include <Component/TransformComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/TriggerComponent.h>
 
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
 
 PhysicsSystem::PhysicsSystem() :
-    m_bodyEntries(eastl::vector<PhysicsBodyEntry>())
+    m_bodyEntries(eastl::vector<PhysicsBodyEntry>()),
+    m_triggerContactListener()
 {
     JPH::RegisterDefaultAllocator();
     //JPH::Trace = [](const char* fmt, ...) {}; // hook your logger
@@ -42,9 +45,11 @@ PhysicsSystem::PhysicsSystem() :
         maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
         *m_bpInterface, *m_objectVsBpFilter, *m_objectPairFilter);
     m_physicsSystem->SetBodyActivationListener(&m_bodyActivationListener);
-    m_physicsSystem->SetContactListener(&m_contactListener);
+    // m_physicsSystem->SetContactListener(&m_contactListener);
     m_physicsSystem->SetGravity(JPH::Vec3(0, -9.81f, 0));
     m_bodyInterface = &m_physicsSystem->GetBodyInterface();
+
+    m_physicsSystem->SetContactListener(&m_triggerContactListener);
 }
 
 PhysicsSystem::~PhysicsSystem()
@@ -68,10 +73,23 @@ PhysicsSystem::~PhysicsSystem()
 // FOR TRACING ONLY (GAI)
 //////////////////////////////////////////
 
-bool PhysicsSystem::Trace(const JPH::RVec3& begin,
+class PerceptionBroadPhaseLayerFilter : public JPH::BroadPhaseLayerFilter
+{
+public:
+    PerceptionBroadPhaseLayerFilter()
+    {
+    }
+
+    virtual bool ShouldCollide(JPH::BroadPhaseLayer inLayer) const override
+    {
+        // Ignore 'transparent' triggers
+        return inLayer != SE::BroadPhaseLayers::TRIGGER;
+    }
+};
+
+bool PhysicsSystem::PerceptionTrace(const JPH::RVec3& begin,
     const JPH::Vec3& dir,
     float length,
-    JPH::ObjectLayer layer,
     const eastl::vector<SE::UUID>& ignore,
     SE::UUID* out_id)
 {
@@ -81,50 +99,77 @@ bool PhysicsSystem::Trace(const JPH::RVec3& begin,
     // Build ignore set
     eastl::unordered_set<SE::UUID> ignore_set(ignore.begin(), ignore.end());
 
-    JPH::RRayCast ray(begin, begin + JPH::RVec3(dir * length));
-
+    JPH::RRayCast ray(begin, JPH::RVec3(dir * length));
     JPH::RayCastResult   result;
     
     // Cast againts all layers
     EmptyFilter layer_filter = EmptyFilter();
     IgnoreUUIDBodyFilter body_filter(ignore_set, m_physicsSystem->GetBodyLockInterface());
+    
+    // Create filter for specific broad-phase layer
+    PerceptionBroadPhaseLayerFilter bpFilter;
 
     auto& nq = m_physicsSystem->GetNarrowPhaseQuery(); // locking version for thread safety
 
     bool hit = nq.CastRay(ray,
         result,
-        JPH::BroadPhaseLayerFilter(), // accept all BP layers or plug your own
+        bpFilter,
         layer_filter,
         body_filter);
 
-    if (!hit || !out_id)
-        return hit;
-
-    // Retrieve SE::UUID from hit body
-    JPH::BodyID body_id = result.mBodyID;
-
-    JPH::BodyLockRead lock(m_physicsSystem->GetBodyLockInterface(), body_id);
-    if (!lock.Succeeded())
+    if (!hit)
+    {
         return false;
+    }
 
-    const JPH::Body& body = lock.GetBody();
-    *out_id = *reinterpret_cast<const SE::UUID*>(body.GetUserData());
-    return true;
+    if (out_id)
+    {
+        // Retrieve SE::UUID from hit body
+        JPH::BodyID body_id = result.mBodyID;
+
+        JPH::BodyLockRead lock(m_physicsSystem->GetBodyLockInterface(), body_id);
+        if (!lock.Succeeded())
+        {
+            *out_id = SE::UUID(0u);
+            return false;
+        }
+
+        const JPH::Body& body = lock.GetBody();
+        *out_id = SE::UUID(body.GetUserData());
+
+        auto n = body.GetWorldSpaceSurfaceNormal(result.mSubShapeID2, ray.GetPointOnRay(result.mFraction));
+        // printf("\t\tHit normal: %.2f, %.2f, %.2f\n", n.GetX(), n.GetY(), n.GetZ());
+
+        return true;
+    }
+	return true;
 }
 //////////////////////////////////////////
 //////////////////////////////////////////
 
 void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
+    physComp->InitTransforms();
 
-    JPH::BodyInterface& bodyInterface = Bodies();
+    JPH::ShapeSettings::ShapeResult shapeResult = physComp->m_colliderData.CreateShape();
 
+    if (shapeResult.IsValid()) {
+        physComp->m_shape = shapeResult.Get();
+    }
+    
     if (!physComp->m_shape) {
         // handle error: shape not set
         return;
     }
+
+    JPH::BodyInterface& bodyInterface = Bodies();
+
     JPH::BodyCreationSettings settings(physComp->m_shape, physComp->m_position, physComp->m_orientation, physComp->m_motionType, physComp->m_objectLayer);
     settings.mObjectLayer = physComp->m_objectLayer;
     settings.mAllowSleeping = (physComp->m_activation != JPH::EActivation::DontActivate);
+    settings.mFriction = physComp->m_friction;
+    settings.mLinearDamping = physComp->m_linearDamping;
+    settings.mAngularDamping = physComp->m_angularDamping;
+    settings.mRestitution = physComp->m_restitution;
 
     physComp->m_joltBody = bodyInterface.CreateBody(settings);
     physComp->m_joltBodyId = physComp->m_joltBody->GetID();
@@ -245,15 +290,79 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             auto tc = gameObject->GetComponent<TransformComponent>();
             if (!tc)
                 continue;
+            /*
+            auto wMat = tc->GetWorldMatrix_noLocal();
+
+            DX::XMVECTOR scale, rotation, translation;
+            DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
+            */
+
+            DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
+            DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
 
             // Push TransformComponent data into the kinematic body
-            const JPH::RVec3 targetPos(tc->m_position.x, tc->m_position.y, tc->m_position.z);
-            const DXSM::Quaternion dxQuat = DXSM::Quaternion::CreateFromYawPitchRoll(
-                tc->m_rotation.y, tc->m_rotation.x, tc->m_rotation.z);
-            const JPH::Quat targetRot(dxQuat.x, dxQuat.y, dxQuat.z, dxQuat.w);
+            const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
+            const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
             m_bodyInterface->SetPositionAndRotation(
                 bodyEntry.m_joltBodyId,
+                targetPos,
+                targetRot,
+                JPH::EActivation::Activate);
+        }
+    }
+
+    for (auto triggerJoltId : m_activeTriggers) {
+
+        SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(triggerJoltId));
+        auto objPtr = scene->GetGameObjectByUUID(objectUUID);
+        if (!objPtr)
+            continue;
+
+        if (m_bodyInterface->GetMotionType(triggerJoltId) == JPH::EMotionType::Dynamic)
+        {
+            //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(triggerJoltId);
+
+            JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(triggerJoltId);
+            JPH::Quat quatRot = m_bodyInterface->GetRotation(triggerJoltId);
+
+
+            auto tc = objPtr->GetComponent<TransformComponent>();
+
+            tc->m_position =
+                DXSM::Vector3(position.mF32
+                );
+            tc->m_rotation =
+                DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
+                );
+        }
+        else if (m_bodyInterface->GetMotionType(triggerJoltId) == JPH::EMotionType::Kinematic)
+        {
+            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(triggerJoltId));
+
+            auto gameObject = scene->GetGameObjectByUUID(objectUUID);
+            if (!gameObject)
+                continue;
+
+            auto tc = gameObject->GetComponent<TransformComponent>();
+            if (!tc)
+                continue;
+            /*
+            auto wMat = tc->GetWorldMatrix_noLocal();
+
+            DX::XMVECTOR scale, rotation, translation;
+            DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
+            */
+
+            DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
+            DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
+
+            // Push TransformComponent data into the kinematic body
+            const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
+            const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
+
+            m_bodyInterface->SetPositionAndRotation(
+                triggerJoltId,
                 targetPos,
                 targetRot,
                 JPH::EActivation::Activate);
@@ -268,11 +377,16 @@ void PhysicsSystem::Step(float dt) {
     JPH::Vec3 velocity = bodyInterface->GetLinearVelocity(sphere_id);
     //std::cout << " :: Position = (" << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "), Velocity = (" << velocity.GetX() << ", " << velocity.GetY() << ", " << velocity.GetZ() << ")" << std::endl;
     */
+    // FlushCommands();
 
     m_physicsSystem->Update(
         dt, /*collisionSteps*/1,
         // /*integrationSubSteps*/ 1,
         m_tempAllocator.get(), m_jobSystem.get());
+
+    UpdateTriggerOverlaps();
+
+    // FlushCommands();
 }
 
 void PhysicsSystem::ClearAllBodies()
@@ -283,6 +397,14 @@ void PhysicsSystem::ClearAllBodies()
         m_bodyInterface->DestroyBody(body.m_joltBodyId);
     }
     m_bodyEntries.clear();
+
+    // eastl::vector<JPH::BodyID> m_activeTriggers;
+    for (auto body : m_activeTriggers)
+    {
+        m_bodyInterface->RemoveBody(body);
+        m_bodyInterface->DestroyBody(body);
+    }
+    m_activeTriggers.clear();
 
     /*
     for (body in physicsScene)
@@ -309,3 +431,119 @@ JPH::PhysicsSystem& PhysicsSystem::GetWorld() { return *m_physicsSystem; }
 
 JPH::BodyInterface& PhysicsSystem::Bodies() { return *m_bodyInterface; }
 
+void PhysicsSystem::UpdateTriggerOverlaps()
+{
+    eastl::vector<TriggerExitEvent> exitEvents;
+    m_triggerContactListener.FetchExitEvents(exitEvents);
+
+    for (const TriggerExitEvent& e : exitEvents)
+    {
+        auto triggerGO = Scene::GetInstance().GetGameObjectByUUID(e.Trigger);
+        if (!triggerGO)
+            continue;
+
+        auto triggerComp = triggerGO->GetComponent<TriggerComponent>();
+        if (!triggerComp)
+            continue;
+
+        triggerComp->OnExit(e.Other);
+    }
+}
+
+void PhysicsSystem::CreateAndAddTrigger(TriggerComponent* triggerComp) {
+    triggerComp->InitTransforms();
+
+    JPH::ShapeSettings::ShapeResult shapeResult = triggerComp->m_colliderData.CreateShape();
+
+    if (shapeResult.IsValid()) {
+        triggerComp->m_shape = shapeResult.Get();
+    }
+
+    if (!triggerComp->m_shape) {
+        // handle error: shape not set
+        return;
+    }
+
+    JPH::BodyInterface& bodyInterface = Bodies();
+
+    JPH::BodyCreationSettings settings(triggerComp->m_shape,
+        triggerComp->m_position, triggerComp->m_orientation,
+        triggerComp->s_triggerMotionType, triggerComp->s_triggerObjectLayer);
+    settings.mObjectLayer = triggerComp->s_triggerObjectLayer;
+    settings.mAllowSleeping = (triggerComp->s_triggerActivation != JPH::EActivation::DontActivate);
+    settings.mIsSensor = true;
+
+    triggerComp->m_joltBody = bodyInterface.CreateBody(settings);
+    triggerComp->m_joltBodyId = triggerComp->m_joltBody->GetID();
+    triggerComp->m_joltBody->SetUserData(triggerComp->m_objectUUID.m_UUID);
+    triggerComp->m_physicsSystem = this;
+
+    //m_bodyEntries.push_back({ triggerComp->m_joltBodyId });
+    m_bodyInterface->AddBody(triggerComp->m_joltBodyId, triggerComp->s_triggerActivation);
+
+    m_activeTriggers.push_back(triggerComp->m_joltBodyId);
+}
+
+void PhysicsSystem::RemoveTrigger(TriggerComponent* triggerComp)
+{
+    if (!triggerComp || !m_bodyInterface)
+        return;
+
+    JPH::BodyID bodyId = triggerComp->m_joltBodyId;
+
+    // Remove from body entries
+    auto it = eastl::find_if(m_activeTriggers.begin(), m_activeTriggers.end(),
+        [bodyId](const PhysicsBodyEntry& entry) {
+            return entry.m_joltBodyId == bodyId;
+        });
+    if (it != m_activeTriggers.end())
+    {
+        m_activeTriggers.erase(it);
+    }
+
+    // Remove from physics world
+    if (m_bodyInterface->IsAdded(bodyId))
+    {
+        m_bodyInterface->RemoveBody(bodyId);
+    }
+
+    // Destroy the body
+    m_bodyInterface->DestroyBody(bodyId);
+
+    // Clear component references
+    triggerComp->m_joltBody = nullptr;
+    triggerComp->m_joltBodyId = JPH::BodyID();
+    triggerComp->m_physicsSystem = nullptr;
+}
+
+
+void PhysicsSystem::SetGravity(DXSM::Vector3 inGravity)
+{
+    EnqueueCommand([this, inGravity]()
+        {
+            m_physicsSystem->SetGravity(JPH::Vec3(inGravity.x, inGravity.y, inGravity.z));
+        });
+}
+
+DXSM::Vector3 PhysicsSystem::GetGravity()
+{
+    auto currGrav = m_physicsSystem->GetGravity();
+    return DXSM::Vector3(currGrav.GetX(), currGrav.GetY(), currGrav.GetZ());
+}
+
+void PhysicsSystem::EnqueueCommand(std::function<void()> fn)
+{
+    std::lock_guard<std::mutex> l(m_cmdMutex);
+    m_cmds.push_back(std::move(fn));
+}
+
+void PhysicsSystem::FlushCommands()
+{
+    std::vector<std::function<void()>> local;
+    {
+        std::lock_guard<std::mutex> l(m_cmdMutex);
+        local.swap(m_cmds);
+    }
+    for (auto& fn : local)
+        fn();
+}

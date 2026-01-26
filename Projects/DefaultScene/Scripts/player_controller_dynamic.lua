@@ -91,7 +91,7 @@ function onJump(action)
 
         if currentTime - lastJumpTime > jumpCooldown then
             lastJumpTime = currentTime
-            local up = Vector3.new(0, moveForce * 10, 0)
+            local up = Vector3.new(0, moveForce * 30, 0)
             physics:addImpulse(up)
             -- print("Jump!")
             return
@@ -115,22 +115,6 @@ function onDown(action)
     end   
 end
 
-function onTorque(action)
-    if not player then
-        -- print("Error: player object not available")
-        return
-    end
-
-    local camera = player:getCameraComponent():getCamera()
-    local physics = player:getPhysics()
-
-    if action == "down" then
-        -- print("Torque!")
-        local down = Vector3.new(0, moveForce, 0)
-        physics:addTorque(down)
-    end   
-end
-
 function onAngularImpulse(action)
     if not player then
         -- print("Error: player object not available")
@@ -143,6 +127,22 @@ function onAngularImpulse(action)
     if action == "down" then
         -- print("AngularImpulse!")
         local down = Vector3.new(0, moveForce, 0)
+        physics:addAngularImpulse(down)
+    end   
+end
+
+function onAngularImpulse_inv(action)
+    if not player then
+        -- print("Error: player object not available")
+        return
+    end
+
+    local camera = player:getCameraComponent():getCamera()
+    local physics = player:getPhysics()
+
+    if action == "down" then
+        -- print("AngularImpulse!")
+        local down = Vector3.new(0, -moveForce, 0)
         physics:addAngularImpulse(down)
     end   
 end

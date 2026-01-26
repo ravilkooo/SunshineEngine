@@ -12,13 +12,13 @@
 // ---------------------------------- Action
 // ------------------------------------------------------------------------------------------------------
 
-EActionCondition Action::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
+EActionCondition Action::Update(const SE::UUID& GOID, BehaviorController* BC, float DeltaTime)
 {
 	if (IsAborted == true)
 	{
 		if (OnActionAbort)
 		{
-			OnActionAbort(GOID, MBoard);
+			OnActionAbort(GOID.GetHilo(), BC);
 		}
 
 		IsAborted = false;
@@ -30,32 +30,64 @@ EActionCondition Action::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoar
 
 	if (OnActionUpdate)
 	{
-		Result = OnActionUpdate(GOID, MBoard, DeltaTime);
+		sol::protected_function_result CallResult = OnActionUpdate(GOID.GetHilo(), BC, DeltaTime);
+
+		if (!CallResult.valid())
+		{
+			sol::error Err = CallResult;
+			//std::cerr << "[Warning] OnActionUpdate error: " << Err.what() << "\n";
+		}
+		else if (CallResult.return_count() == 0)
+		{
+			//std::cerr << "[Warning] OnActionUpdate returned nothing\n";
+		}
+		else
+		{
+			sol::object Ret = CallResult.get<sol::object>();
+
+			if (Ret.is<int>())
+			{
+				const int Value = Ret.as<int>();
+
+				if (Value >= static_cast<int>(EActionResult::Running) && Value <= static_cast<int>(EActionResult::Failed))
+				{
+					Result = static_cast<EActionResult>(Value);
+				}
+				else
+				{
+					//std::cerr << "[Warning] OnActionUpdate returned invalid EActionResult value: " << Value << "\n";
+				}
+			}
+			else
+			{
+				//std::cerr << "[Warning] OnActionUpdate returned non-integer value\n";
+			}
+		}
 	}
 
 	switch (Result)
 	{
-	case EActionResult::Succeeded:
+		case EActionResult::Succeeded:
 
-		if (OnActionComplete)
-		{
-			OnActionComplete(GOID, MBoard, EActionResult::Succeeded);
-		}
+			if (OnActionComplete)
+			{
+				OnActionComplete(GOID.GetHilo(), BC, 1);
+			}
 
-		return EActionCondition::Succeeded;
+			return EActionCondition::Succeeded;
 
-	case EActionResult::Failed:
+		case EActionResult::Failed:
 
-		if (OnActionComplete)
-		{
-			OnActionComplete(GOID, MBoard, EActionResult::Failed);
-		}
+			if (OnActionComplete)
+			{
+				OnActionComplete(GOID.GetHilo(), BC, 2);
+			}
 
-		return EActionCondition::Failed;
+			return EActionCondition::Failed;
 
-	case EActionResult::Running:
+		case EActionResult::Running:
 
-		return EActionCondition::Running;
+			return EActionCondition::Running;
 	}
 }
 
@@ -65,25 +97,60 @@ EActionCondition Action::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoar
 // ---------------------------------- Pattern
 // ------------------------------------------------------------------------------------------------------
 
-void Pattern::AddAction(std::shared_ptr<Action> NewAction)
+// --- Actions ---
+std::shared_ptr<Action> Pattern::Action_GetByName(const std::string& Name) const
 {
-	if (NewAction)
+	for (auto& A : Actions)
 	{
-		Actions.push_back(NewAction);
+		if (A && A->Name == Name)
+		{
+			return A;
+		}
 	}
-	else
-	{
-		std::cerr << "[Warning] Pattern::AddAction: NewAction == nullptr\n";
-	}
+
+	//std::cerr << "[Warning] Pattern::GetActionByName: action not found: " << Name.c_str() << "\n";
+	return nullptr;
 }
 
-void Pattern::InsertAction(std::shared_ptr<Action> NewAction, size_t Index)
+std::shared_ptr<Action> Pattern::Action_GetByIndex(size_t Index) const
 {
-	if (!NewAction)
+	if (Index >= Actions.size())
 	{
-		std::cerr << "[Warning] Pattern::InsertAction: NewAction == nullptr\n";
-		return;
+		//std::cerr << "[Warning] Pattern::GetActionByIndex: index out of range: " << Index << "\n";
+		return nullptr;
 	}
+
+	return Actions[Index];
+}
+
+bool Pattern::Action_Add(const std::string& Name)
+{
+	for (const std::shared_ptr<Action>& Action : Actions)
+	{
+		if (Action && Action->GetName() == Name)
+		{
+			//std::cerr << "[Warning] State::Action_Add: action already exists: " << Name.c_str() << "\n";
+			return false;
+		}
+	}
+
+	Actions.push_back(std::make_shared<Action>(Name));
+
+	return true;
+}
+
+bool Pattern::Action_Insert(const std::string& Name, size_t Index)
+{
+	for (const std::shared_ptr<Action>& Action : Actions)
+	{
+		if (Action && Action->GetName() == Name)
+		{
+			//std::cerr << "[Warning] Pattern::Action_Insert: action already exists: " << Name.c_str() << "\n";
+			return false;
+		}
+	}
+
+	auto NewAction = std::make_shared<Action>(Name);
 
 	if (Index >= Actions.size())
 	{
@@ -94,34 +161,24 @@ void Pattern::InsertAction(std::shared_ptr<Action> NewAction, size_t Index)
 		Actions.insert(Actions.begin() + Index, NewAction);
 	}
 
+	return true;
 }
 
-std::shared_ptr<Action> Pattern::GetActionByName(const std::string& Name) const
+sol::table Pattern::Action_GetAll(sol::this_state L)
 {
-	for (auto& A : Actions)
+	sol::state_view Lua(L);
+	sol::table Result = Lua.create_table(static_cast<int>(Actions.size()), 0);
+
+	int Index = 1;
+	for (const std::shared_ptr<Action>& ActionPtr : Actions)
 	{
-		if (A && A->Name == Name)
-		{
-			return A;
-		}
+		Result[Index++] = ActionPtr;
 	}
 
-	std::cerr << "[Warning] Pattern::GetActionByName: action not found: " << Name.c_str() << "\n";
-	return nullptr;
+	return Result;
 }
 
-std::shared_ptr<Action> Pattern::GetActionByIndex(size_t Index) const
-{
-	if (Index >= Actions.size())
-	{
-		std::cerr << "[Warning] Pattern::GetActionByIndex: index out of range: " << Index << "\n";
-		return nullptr;
-	}
-
-	return Actions[Index];
-}
-
-bool Pattern::RemoveActionByName(const std::string& Name)
+bool Pattern::Action_RemoveByName(const std::string& Name)
 {
 	for (size_t i = 0; i < Actions.size(); ++i)
 	{
@@ -132,15 +189,15 @@ bool Pattern::RemoveActionByName(const std::string& Name)
 		}
 	}
 
-	std::cerr << "[Warning] Pattern::RemoveActionByName: action not found: " << Name.c_str() << "\n";
+	//std::cerr << "[Warning] Pattern::RemoveActionByName: action not found: " << Name.c_str() << "\n";
 	return false;
 }
 
-bool Pattern::RemoveActionByIndex(size_t Index)
+bool Pattern::Action_RemoveByIndex(size_t Index)
 {
 	if (Index >= Actions.size())
 	{
-		std::cerr << "[Warning] Pattern::RemoveActionByIndex: index out of range: " << Index << "\n";
+		//std::cerr << "[Warning] Pattern::RemoveActionByIndex: index out of range: " << Index << "\n";
 		return false;
 	}
 
@@ -148,12 +205,14 @@ bool Pattern::RemoveActionByIndex(size_t Index)
 
 	return true;
 }
+//
 
-EActionCondition Pattern::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
+// --- In game ---
+EActionCondition Pattern::Update(const SE::UUID& GOID, BehaviorController* BC, float DeltaTime)
 {
 	if (OnPatternUpdate)
 	{
-		OnPatternUpdate(GOID, MBoard, DeltaTime);
+		OnPatternUpdate(GOID.GetHilo(), BC, DeltaTime);
 	}
 
 	if (Actions.empty())
@@ -163,13 +222,13 @@ EActionCondition Pattern::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoa
 	{
 		if (Actions[CurrentActionIndex]->OnActionStart)
 		{
-			Actions[CurrentActionIndex]->OnActionStart(GOID, MBoard);
+			Actions[CurrentActionIndex]->OnActionStart(GOID.GetHilo(), BC);
 		}
 
 		bStarted = true;
 	}
 
-	switch (Actions[CurrentActionIndex]->Update(GOID, MBoard, DeltaTime))
+	switch (Actions[CurrentActionIndex]->Update(GOID, BC, DeltaTime))
 	{
 	case EActionCondition::Succeeded:
 
@@ -181,7 +240,7 @@ EActionCondition Pattern::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoa
 
 			if (OnPatternComplete)
 			{
-				OnPatternComplete(GOID, MBoard, EActionResult::Succeeded);
+				OnPatternComplete(GOID.GetHilo(), BC, 1);
 			}
 
 			return EActionCondition::Succeeded;
@@ -199,7 +258,7 @@ EActionCondition Pattern::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoa
 
 		if (OnPatternComplete)
 		{
-			OnPatternComplete(GOID, MBoard, EActionResult::Failed);
+			OnPatternComplete(GOID.GetHilo(), BC, 2);
 		}
 
 		return EActionCondition::Failed;
@@ -214,7 +273,7 @@ EActionCondition Pattern::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoa
 
 		if (OnPatternAbort)
 		{
-			OnPatternAbort(GOID, MBoard);
+			OnPatternAbort(GOID.GetHilo(), BC);
 		}
 
 		return EActionCondition::Aborted;
@@ -234,52 +293,7 @@ void Pattern::Reset()
 	CurrentActionIndex = 0;
 	bStarted = false;
 }
-
-
-
-// ------------------------------------------------------------------------------------------------------
-// ---------------------------------- EventTransition
-// ------------------------------------------------------------------------------------------------------
-
-EventTransition::EventTransition(const std::string& InToState, sol::function InCheck, BehaviorController* FSM) : ToState(InToState), Check(InCheck)
-{
-	Abort =
-		[FSM](const std::string& ToState)
-		{
-			if (FSM)
-			{
-				FSM->Abort(ToState);
-			}
-		};
-}
-
-void EventTransition::Trigger(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard)
-{
-	if (Check)
-	{
-		if (Check(GOID, MBoard))
-		{
-			Abort(ToState);
-		}
-	}
-	else
-	{
-		Abort(ToState);
-	}
-}
-
-void EventTransition::ChangeToState(const std::string& InToState, BehaviorController* FSM)
-{
-	ToState = InToState;
-
-	Abort = [FSM](const std::string& ToState)
-		{
-			if (FSM)
-			{
-				FSM->Abort(ToState);
-			}
-		};
-}
+//
 
 
 
@@ -287,45 +301,40 @@ void EventTransition::ChangeToState(const std::string& InToState, BehaviorContro
 // ---------------------------------- State
 // ------------------------------------------------------------------------------------------------------
 
-bool State::AddPattern(const std::string& Name, std::shared_ptr<Pattern> NewPattern)
-{
-	if (!NewPattern)
-	{
-		std::cerr << "[Warning] State::AddPattern: NewPattern == nullptr (name: " << Name.c_str() << ")\n";
-		return false;
-	}
-
-	if (Patterns.find(Name) != Patterns.end())
-	{
-		std::cerr << "[Warning] State::AddPattern: pattern already exists: " << Name.c_str() << "\n";
-		return false;
-	}
-
-	Patterns[Name] = NewPattern;
-
-	return true;
-}
-
-std::shared_ptr<Pattern> State::GetPattern(const std::string& Name)
+// --- Patterns ---
+std::shared_ptr<Pattern> State::Pattern_Get(const std::string& Name)
 {
 	auto it = Patterns.find(Name);
 
 	if (it == Patterns.end())
 	{
-		std::cerr << "[Warning] State::GetPattern: pattern not found: " << Name.c_str() << "\n";
+		//std::cerr << "[Warning] State::GetPattern: pattern not found: " << Name.c_str() << "\n";
 		return nullptr;
 	}
 
 	return it->second;
 }
 
-bool State::RemovePattern(const std::string& Name)
+bool State::Pattern_Add(const std::string& Name)
+{
+	if (Patterns.find(Name) != Patterns.end())
+	{
+		//std::cerr << "[Warning] State::AddPattern: pattern already exists: " << Name.c_str() << "\n";
+		return false;
+	}
+
+	Patterns[Name] = std::make_shared<Pattern>();
+
+	return true;
+}
+
+bool State::Pattern_Remove(const std::string& Name)
 {
 	auto it = Patterns.find(Name);
 
 	if (it == Patterns.end())
 	{
-		std::cerr << "[Warning] State::RemovePattern: pattern not found: " << Name.c_str() << "\n";
+		//std::cerr << "[Warning] State::RemovePattern: pattern not found: " << Name.c_str() << "\n";
 		return false;
 	}
 
@@ -334,21 +343,30 @@ bool State::RemovePattern(const std::string& Name)
 	return true;
 }
 
-void State::AddConditionTransition(const std::string& InToState, sol::function InCheck)
+sol::table State::Pattern_GetAll(sol::this_state L) const
+{
+	sol::state_view lua(L);
+	sol::table t = lua.create_table();
+
+	int index = 1;
+	for (const auto& [name, pattern] : Patterns)
+	{
+		t[index++] = name;
+	}
+
+	return t;
+}
+//
+
+// --- Transition Conditions ---
+void State::ConditionTransition_Add(const std::string& InToState, sol::function InCheck)
 {
 	auto Transition = std::make_shared<ConditionTransition>(InToState, InCheck);
 
 	ConditionTransitions.push_back(Transition);
 }
 
-void State::AddEventTransition(const std::string& InToState, sol::function InCheck, BehaviorController* FSM)
-{
-	auto Transition = std::make_shared<EventTransition>(InToState, InCheck, FSM);
-
-	EventTransitions.push_back(Transition);
-}
-
-bool State::RemoveConditionTransition(const std::string& ToState)
+bool State::ConditionTransition_Remove(const std::string& ToState)
 {
 	for (auto it = ConditionTransitions.begin(); it != ConditionTransitions.end(); ++it)
 	{
@@ -361,26 +379,14 @@ bool State::RemoveConditionTransition(const std::string& ToState)
 
 	return false;
 }
+//
 
-bool State::RemoveEventTransition(const std::string& ToState)
-{
-	for (auto it = EventTransitions.begin(); it != EventTransitions.end(); ++it)
-	{
-		if ((*it)->ToState == ToState)
-		{
-			EventTransitions.erase(it);
-			return true;
-		}
-	}
-
-	return false;
-}
-
-bool State::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, float DeltaTime)
+// --- In game ---
+bool State::Update(const SE::UUID& GOID, BehaviorController* BC, float DeltaTime)
 {
 	if (OnStateUpdate)
 	{
-		OnStateUpdate(GOID, MBoard, DeltaTime);
+		OnStateUpdate(GOID.GetHilo(), BC, DeltaTime);
 	}
 
 	if (!CurrentPattern)
@@ -389,7 +395,7 @@ bool State::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, f
 		{
 			if (OnStateExit)
 			{
-				OnStateExit(GOID, MBoard);
+				OnStateExit(GOID.GetHilo(), BC);
 			}
 
 			IsRunning = false;
@@ -405,7 +411,7 @@ bool State::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, f
 
 			if (P.second->EvaluateUtility)
 			{
-				sol::protected_function_result res = P.second->EvaluateUtility(GOID, MBoard);
+				sol::protected_function_result res = P.second->EvaluateUtility(GOID.GetHilo(), BC);
 
 				if (res.valid())
 				{
@@ -431,11 +437,11 @@ bool State::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, f
 
 		if (CurrentPattern && CurrentPattern->OnPatternStart)
 		{
-			CurrentPattern->OnPatternStart(GOID, MBoard);
+			CurrentPattern->OnPatternStart(GOID.GetHilo(), BC);
 		}	
 	}
 
-	EActionCondition Result = CurrentPattern->Update(GOID, MBoard, DeltaTime);
+	EActionCondition Result = CurrentPattern->Update(GOID, BC, DeltaTime);
 
 	if (Result == EActionCondition::Running)
 	{
@@ -446,8 +452,10 @@ bool State::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, f
 	{
 		if (OnStateAbort)
 		{
-			OnStateAbort(GOID, MBoard);
+			OnStateAbort(GOID.GetHilo(), BC);
 		}
+
+		CurrentPattern = nullptr;
 
 		IsRunning = false;
 		return true; 
@@ -456,21 +464,50 @@ bool State::Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, f
 	{
 		if (OnStateExit)
 		{
-			OnStateExit(GOID, MBoard);
+			OnStateExit(GOID.GetHilo(), BC);
 		}
+
+		CurrentPattern = nullptr;
 
 		IsRunning = false;
 		return false; 
 	}
 }
 
-std::shared_ptr<ConditionTransition> State::CheckConditionTransitions(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard)
+std::shared_ptr<ConditionTransition> State::CheckConditionTransitions(const SE::UUID& GOID, BehaviorController* BC)
 {
 	for (auto& CT : ConditionTransitions)
 	{
 		if (CT->Check)
 		{
-			if (CT->Check(GOID, MBoard))
+			bool Result = false;
+
+			sol::protected_function_result CallResult = CT->Check(GOID.GetHilo(), BC);
+
+			if (!CallResult.valid())
+			{
+				sol::error Err = CallResult;
+				//std::cerr << "[Warning] State::CheckConditionTransitions error: " << Err.what() << "\n";
+			}
+			else if (CallResult.return_count() == 0)
+			{
+				//std::cerr << "[Warning] State::CheckConditionTransitions returned nothing\n";
+			}
+			else
+			{
+				sol::object Ret = CallResult.get<sol::object>();
+
+				if (Ret.is<bool>())
+				{
+					Result = Ret.as<bool>();
+				}
+				else
+				{
+					//std::cerr << "[Warning] State::CheckConditionTransitions returned non-bool value\n";
+				}
+			}
+
+			if (Result)
 			{
 				return CT;
 			}
@@ -479,6 +516,7 @@ std::shared_ptr<ConditionTransition> State::CheckConditionTransitions(const SE::
 
 	return nullptr;
 }
+//
 
 
 
@@ -486,43 +524,151 @@ std::shared_ptr<ConditionTransition> State::CheckConditionTransitions(const SE::
 // ---------------------------------- BehaviorController
 // ------------------------------------------------------------------------------------------------------
 
-void BehaviorController::SetMemoryBoard(std::shared_ptr<MemoryBoard>& InMemoryBoard)
+// --- General ---
+sol::table BehaviorController::GetAllStates(sol::this_state L) const
 {
-	if (!InMemoryBoard)
+	sol::state_view lua(L);
+	sol::table t = lua.create_table();
+
+	int index = 1;
+	for (const auto& [name, state] : States)
 	{
-		MBoard = nullptr;
+		t[index++] = name;
+	}
+
+	return t;
+}
+
+void BehaviorController::Trigger(const std::string& ToState)
+{
+	auto it = States.find(ToState);
+
+	if (it == States.end())
+	{
 		return;
 	}
 
-	MBoard = std::make_shared<MemoryBoard>(*InMemoryBoard);
+	if (ToState != CurrentStateName)
+		Abort(ToState);
 }
 
-bool BehaviorController::AddState(const std::string& Name, const std::shared_ptr<State>& NewState)
+void BehaviorController::FromJson(const json& j)
 {
-	if (!NewState)
+	if (j.contains("IsEnabled") && j["IsEnabled"].is_boolean())
 	{
-		std::cerr << "[Warning] BehaviorController::AddState: NewState == nullptr (name: " << Name.c_str() << ")\n";
-		return false;
+		IsEnabled = j.at("IsEnabled").get<bool>();
+	}
+}
+//
+
+// --- MemoryBoard ---
+sol::object BehaviorController::MemoryBoard_GetInt(const std::string& Key, sol::this_state L) const
+{
+	int v;
+
+	if (!MBoard->GetInt(Key, v))
+	{
+		return sol::nil;
 	}
 
-	if (States.find(Name) != States.end())
-	{
-		std::cerr << "[Warning] BehaviorController::AddState: state already exists: " << Name.c_str() << "\n";
-		return false;
-	}
-
-	States[Name] = NewState;
-
-	return true;
+	return sol::make_object(L, v);
 }
 
-bool BehaviorController::RemoveState(const std::string& Name)
+sol::object BehaviorController::MemoryBoard_GetFloat(const std::string& Key, sol::this_state L) const
+{
+	float v;
+
+	if (!MBoard->GetFloat(Key, v))
+	{
+		return sol::nil;
+	}
+
+	return sol::make_object(L, v);
+}
+
+sol::object BehaviorController::MemoryBoard_GetBool(const std::string& Key, sol::this_state L) const
+{
+	bool v;
+
+	if (!MBoard->GetBool(Key, v))
+	{
+		return sol::nil;
+	}
+
+	return sol::make_object(L, v);
+}
+
+sol::object BehaviorController::MemoryBoard_GetString(const std::string& Key, sol::this_state L) const
+{
+	std::string v;
+
+	if (!MBoard->GetString(Key, v))
+	{
+		return sol::nil;
+	}
+
+	return sol::make_object(L, v);
+}
+
+sol::object BehaviorController::MemoryBoard_GetVector3(const std::string& Key, sol::this_state L) const
+{
+	DXSM::Vector3 v;
+
+	if (!MBoard->GetVector3(Key, v))
+	{
+		return sol::nil;
+	}
+
+	return sol::make_object(L, v);
+}
+
+sol::object BehaviorController::MemoryBoard_GetUUID(const std::string& Key, sol::this_state L) const
+{
+	SE::UUID v;
+
+	if (!MBoard->GetUUID(Key, v))
+	{
+		return sol::nil;
+	}
+
+	return sol::make_object(L, v.GetHilo());
+}
+//
+
+// --- States ---
+std::shared_ptr<State> BehaviorController::State_Get(const std::string& Name)
 {
 	auto it = States.find(Name);
 
 	if (it == States.end())
 	{
-		std::cerr << "[Warning] BehaviorController::RemoveState: state not found: " << Name.c_str() << "\n";
+		//std::cerr << "[Warning] BehaviorController::GetState: state not found: " << Name.c_str() << "\n";
+		return nullptr;
+	}
+
+	return it->second;
+}
+
+bool BehaviorController::State_Add(const std::string& Name)
+{
+	if (States.find(Name) != States.end())
+	{
+		//std::cerr << "[Warning] BehaviorController::AddState: state already exists: " << Name.c_str() << "\n";
+		return false;
+	}
+
+	States[Name] = std::make_shared<State>();
+
+	return true;
+}
+
+bool BehaviorController::State_Remove(const std::string& Name)
+{
+	auto it = States.find(Name);
+
+	if (it == States.end())
+	{
+		//std::cerr << "[Warning] BehaviorController::RemoveState: state not found: " << Name.c_str() << "\n";
 		return false;
 	}
 
@@ -537,26 +683,13 @@ bool BehaviorController::RemoveState(const std::string& Name)
 	return true;
 }
 
-std::shared_ptr<State> BehaviorController::GetState(const std::string& Name)
+bool BehaviorController::State_SetInitial(const std::string& Name)
 {
 	auto it = States.find(Name);
 
 	if (it == States.end())
 	{
-		std::cerr << "[Warning] BehaviorController::GetState: state not found: " << Name.c_str() << "\n";
-		return nullptr;
-	}
-
-	return it->second;
-}
-
-bool BehaviorController::SetInitialState(const std::string& Name)
-{
-	auto it = States.find(Name);
-
-	if (it == States.end())
-	{
-		std::cerr << "[Warning] BehaviorController::SetInitialState: state not found: " << Name.c_str() << "\n";
+		//std::cerr << "[Warning] BehaviorController::SetInitialState: state not found: " << Name.c_str() << "\n";
 		return false;
 	}
 
@@ -566,10 +699,80 @@ bool BehaviorController::SetInitialState(const std::string& Name)
 	return true;
 }
 
-bool BehaviorController::AddConditionTransition(const std::string& FromState, const std::string& ToState, sol::function InCheck)
+sol::table BehaviorController::State_GetAllPatterns(const std::string& Name, sol::this_state L)
 {
-	auto From = GetState(FromState);
-	auto To = GetState(ToState);
+	auto S = State_Get(Name);
+
+	if (S)
+	{
+		return S->Pattern_GetAll(L);
+	}
+
+	return sol::table();
+}
+
+bool BehaviorController::State_SetOnEnter(const std::string& Name, const sol::function& Func)
+{
+	auto S = State_Get(Name);
+
+	if (S)
+	{
+		S->OnStateEnter = Func;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool BehaviorController::State_SetOnUpdate(const std::string& Name, const sol::function& Func)
+{
+	auto S = State_Get(Name);
+
+	if (S)
+	{
+		S->OnStateUpdate = Func;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool BehaviorController::State_SetOnAbort(const std::string& Name, const sol::function& Func)
+{
+	auto S = State_Get(Name);
+
+	if (S)
+	{
+		S->OnStateAbort = Func;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool BehaviorController::State_SetOnExit(const std::string& Name, const sol::function& Func)
+{
+	auto S = State_Get(Name);
+
+	if (S)
+	{
+		S->OnStateExit = Func;
+
+		return true;
+	}
+
+	return false;
+}
+//
+
+// --- Transition Conditions ---
+bool BehaviorController::ConditionTransition_Add(const std::string& FromState, const std::string& ToState, sol::function InCheck)
+{
+	auto From = State_Get(FromState);
+	auto To = State_Get(ToState);
 
 	if (!From || !To)
 	{
@@ -580,45 +783,42 @@ bool BehaviorController::AddConditionTransition(const std::string& FromState, co
 	{
 		if (CT->ToState == ToState)
 		{
-			std::cerr << "[Warning] BehaviorController::AddConditionTransition: transition already exists: " << FromState.c_str() << " -> " << ToState.c_str() << "\n";
+			//std::cerr << "[Warning] BehaviorController::AddConditionTransition: transition already exists: " << FromState.c_str() << " -> " << ToState.c_str() << "\n";
 			return false;
 		}
 	}
 
-	From->AddConditionTransition(ToState, InCheck);
+	From->ConditionTransition_Add(ToState, InCheck);
 
 	return true;
 }
 
-bool BehaviorController::AddEventTransition(const std::string& FromState, const std::string& ToState, sol::function InCheck)
+bool BehaviorController::ConditionTransition_Has(const std::string& FromState, const std::string& ToState)
 {
-	auto From = GetState(FromState);
-	auto To = GetState(ToState);
+	auto From = State_Get(FromState);
+	auto To = State_Get(ToState);
 
 	if (!From || !To)
 	{
 		return false;
 	}
 
-	for (auto& ET : From->EventTransitions)
+	for (auto& CT : From->ConditionTransitions)
 	{
-		if (ET->ToState == ToState)
+		if (CT->ToState == ToState)
 		{
-			std::cerr << "[Warning] BehaviorController::AddEventTransition: transition already exists: " << FromState.c_str() << " -> " << ToState.c_str() << "\n";
-			return false;
+			return true;
 		}
 	}
 
-	From->AddEventTransition(ToState, InCheck, this);
-
-	return true;
+	return false;
 }
 
-bool BehaviorController::ChangeToStateInConditionTransition(const std::string& FromState, const std::string& OldToState, const std::string& NewToState)
+bool BehaviorController::ConditionTransition_ChangeToState(const std::string& FromState, const std::string& OldToState, const std::string& NewToState)
 {
-	auto From = GetState(FromState);
+	auto From = State_Get(FromState);
 
-	if (!From || !GetState(NewToState))
+	if (!From || !State_Get(NewToState))
 	{
 		return false;
 	}
@@ -632,35 +832,13 @@ bool BehaviorController::ChangeToStateInConditionTransition(const std::string& F
 		}
 	}
 
-	std::cerr << "[Warning] BehaviorController::ChangeToStateInConditionTransition: No condition transition found in state " << FromState.c_str() << " from ToState " << OldToState.c_str() << "\n";
+	//std::cerr << "[Warning] BehaviorController::ChangeToStateInConditionTransition: No condition transition found in state " << FromState.c_str() << " from ToState " << OldToState.c_str() << "\n";
 	return false; 
 }
 
-bool BehaviorController::ChangeToStateInEventTransition(const std::string& FromState, const std::string& OldToState, const std::string& NewToState)
+bool BehaviorController::ConditionTransition_ChangeCheckFunc(const std::string& FromState, const std::string& ToState, sol::function InCheck)
 {
-	auto From = GetState(FromState);
-
-	if (!From || !GetState(NewToState))
-	{
-		return false;
-	}
-
-	for (auto& T : From->EventTransitions)
-	{
-		if (T->ToState == OldToState)
-		{
-			T->ToState = NewToState;
-			return true;
-		}
-	}
-
-	std::cerr << "[Warning] BehaviorController::ChangeToStateInEventTransition: No condition transition found in state " << FromState.c_str() << " from ToState " << OldToState.c_str() << "\n";
-	return false;
-}
-
-bool BehaviorController::ChangeCheckFuncInConditionTransition(const std::string& FromState, const std::string& ToState, sol::function InCheck)
-{
-	auto From = GetState(FromState);
+	auto From = State_Get(FromState);
 
 	if (!From)
 	{
@@ -676,72 +854,354 @@ bool BehaviorController::ChangeCheckFuncInConditionTransition(const std::string&
 		}
 	}
 
-	std::cerr << "[Warning]";
+	//std::cerr << "[Warning]";
 	return false;
 }
 
-bool BehaviorController::ChangeCheckFuncInEventTransition(const std::string& FromState, const std::string& ToState, sol::function InCheck)
+bool BehaviorController::ConditionTransition_Remove(const std::string& FromState, const std::string& ToState)
 {
-	auto From = GetState(FromState);
+	auto From = State_Get(FromState);
 
 	if (!From)
 	{
 		return false;
 	}
 
-	for (auto& T : From->EventTransitions)
+	if (From->ConditionTransition_Remove(ToState))
 	{
-		if (T->ToState == ToState)
+		return true;
+	}
+	else
+	{
+		//std::cerr << "[Warning] BehaviorController::RemoveConditionTransition: tried to remove non-existing transition from " << FromState.c_str() << " to " << ToState.c_str() << "\n";
+		return false;
+	}
+}
+//
+
+// --- Patterns ---
+bool BehaviorController::Pattern_Add(const std::string& NameS, const std::string& NameP)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		return S->Pattern_Add(NameP);
+	}
+
+	return false;
+}
+
+bool BehaviorController::Pattern_Remove(const std::string& NameS, const std::string& NameP)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		return S->Pattern_Remove(NameP);
+	}
+
+	return false;
+}
+
+sol::table BehaviorController::Pattern_GetAllActions(const std::string& NameS, const std::string& NameP, sol::this_state L)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
 		{
-			T->Check = InCheck;
+			return P->Action_GetAll(L);
+		}
+	}
+
+	return sol::table();
+}
+
+int BehaviorController::Pattern_Count(const std::string& NameS, const std::string& NameP)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			return P->Actions.size();
+		}
+	}
+	
+	return -1;
+}
+
+bool BehaviorController::Pattern_SetEvaluateUtility(const std::string& NameS, const std::string& NameP, const sol::function& Func)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			P->EvaluateUtility = Func;
+
 			return true;
 		}
 	}
 
-	std::cerr << "[Warning]";
 	return false;
 }
 
-bool BehaviorController::RemoveConditionTransition(const std::string& FromState, const std::string& ToState)
+bool BehaviorController::Pattern_SetOnStart(const std::string& NameS, const std::string& NameP, const sol::function& Func)
 {
-	auto From = GetState(FromState);
+	auto S = State_Get(NameS);
 
-	if (!From)
+	if (S)
 	{
-		return false;
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			P->OnPatternStart = Func;
+
+			return true;
+		}
 	}
 
-	if (From->RemoveConditionTransition(ToState))
-	{
-		return true;
-	}
-	else
-	{
-		std::cerr << "[Warning] BehaviorController::RemoveConditionTransition: tried to remove non-existing transition from " << FromState.c_str() << " to " << ToState.c_str() << "\n";
-		return false;
-	}
+	return false;
 }
 
-bool BehaviorController::RemoveEventTransition(const std::string& FromState, const std::string& ToState)
+bool BehaviorController::Pattern_SetOnUpdate(const std::string& NameS, const std::string& NameP, const sol::function& Func)
 {
-	auto From = GetState(FromState);
+	auto S = State_Get(NameS);
 
-	if (!From)
+	if (S)
 	{
-		return false;
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			P->OnPatternUpdate = Func;
+
+			return true;
+		}
 	}
 
-	if (From->RemoveEventTransition(ToState))
-	{
-		return true;
-	}
-	else
-	{
-		std::cerr << "[Warning] BehaviorController::RemoveEventTransition: tried to remove non-existing transition from " << FromState.c_str() << " to " << ToState.c_str() << "\n";
-		return false;
-	}
+	return false;
 }
 
+bool BehaviorController::Pattern_SetOnAbort(const std::string& NameS, const std::string& NameP, const sol::function& Func)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			P->OnPatternAbort = Func;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool BehaviorController::Pattern_SetOnComplete(const std::string& NameS, const std::string& NameP, const sol::function& Func)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			P->OnPatternComplete = Func;
+
+			return true;
+		}
+	}
+
+	return false;
+}
+//
+
+// --- Actions ---
+bool BehaviorController::Action_Add(const std::string& NameS, const std::string& NameP, const std::string& NameA)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			return P->Action_Add(NameA);
+		}
+	}
+
+	return false;
+}
+
+bool BehaviorController::Action_Insert(const std::string& NameS, const std::string& NameP, const std::string& NameA, size_t Index)
+{
+	if (Index < 0)
+		return false;
+
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			return P->Action_Insert(NameA, Index);
+		}
+	}
+
+	return false;
+}
+
+bool BehaviorController::Action_RemoveByName(const std::string& NameS, const std::string& NameP, const std::string& NameA)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			return P->Action_RemoveByName(NameA);
+		}
+	}
+
+	return false;
+}
+
+bool BehaviorController::Action_RemoveByIndex(const std::string& NameS, const std::string& NameP, size_t Index)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			return P->Action_RemoveByIndex(Index);
+		}
+	}
+
+	return false;
+}
+
+bool BehaviorController::Action_SetOnStart(const std::string& NameS, const std::string& NameP, const std::string& NameA, const sol::function& Func)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			auto A = P->Action_GetByName(NameA);
+
+			if (A)
+			{
+				A->OnActionStart = Func;
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool BehaviorController::Action_SetOnUpdate(const std::string& NameS, const std::string& NameP, const std::string& NameA, const sol::function& Func)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			auto A = P->Action_GetByName(NameA);
+
+			if (A)
+			{
+				A->OnActionUpdate = Func;
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool BehaviorController::Action_SetOnAbort(const std::string& NameS, const std::string& NameP, const std::string& NameA, const sol::function& Func)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			auto A = P->Action_GetByName(NameA);
+
+			if (A)
+			{
+				A->OnActionAbort = Func;
+
+				return true;
+			}
+		}
+	}
+
+}
+
+bool BehaviorController::Action_SetOnComplete(const std::string& NameS, const std::string& NameP, const std::string& NameA, const sol::function& Func)
+{
+	auto S = State_Get(NameS);
+
+	if (S)
+	{
+		auto P = S->Pattern_Get(NameP);
+
+		if (P)
+		{
+			auto A = P->Action_GetByName(NameA);
+
+			if (A)
+			{
+				A->OnActionComplete = Func;
+
+				return true;
+			}
+		}
+	}
+
+}
+//
+
+// --- In game ---
 void BehaviorController::Update(float DeltaTime)
 {
 	if (!IsEnabled)
@@ -751,15 +1211,15 @@ void BehaviorController::Update(float DeltaTime)
 
 	if (!CurrentState)
 	{
-		std::cerr << "[Warning] BehaviorController::Update: current state is null\n";
+		//std::cerr << "[Warning] BehaviorController::Update: current state is null\n";
 		return;
 	}
 
 	if (!CurrentState->IsRunning)
 	{
-		if (std::shared_ptr<ConditionTransition> CT = CurrentState->CheckConditionTransitions(GOID, MBoard))
+		if (std::shared_ptr<ConditionTransition> CT = CurrentState->CheckConditionTransitions(GOID, this))
 		{
-			ChangeState(GOID, MBoard, CT->ToState);
+			ChangeState(GOID, CT->ToState);
 			return;
 		}
 
@@ -767,13 +1227,13 @@ void BehaviorController::Update(float DeltaTime)
 
 		if (CurrentState->OnStateEnter)
 		{
-			CurrentState->OnStateEnter(GOID, MBoard);
+			CurrentState->OnStateEnter(GOID.GetHilo(), this);
 		}
 	}
 
-	if (CurrentState->Update(GOID, MBoard, DeltaTime))
+	if (CurrentState->Update(GOID, this, DeltaTime))
 	{
-		ChangeState(GOID, MBoard, AfterAbortStateName);
+		ChangeState(GOID, AfterAbortStateName);
 	}
 }
 
@@ -785,11 +1245,11 @@ void BehaviorController::Abort(const std::string& ToState)
 		CurrentState->CurrentPattern->AbortCurrentAction();
 }
 
-void BehaviorController::ChangeState(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, const std::string& NewState)
+void BehaviorController::ChangeState(const SE::UUID& GOID, const std::string& NewState)
 {
 	if (NewState.empty())
 	{
-		std::cerr << "[Warning] ChangeState called with empty NewState\n";
+		//std::cerr << "[Warning] ChangeState called with empty NewState\n";
 		return;
 	}
 
@@ -799,12 +1259,39 @@ void BehaviorController::ChangeState(const SE::UUID& GOID, std::shared_ptr<Memor
 
 		if (it == States.end())
 		{
-			std::cerr << "[Warning] BehaviorController::ChangeState: target state not found: " << NewState.c_str() << "\n";
+			//std::cerr << "[Warning] BehaviorController::ChangeState: target state not found: " << NewState.c_str() << "\n";
 			return;
 		}
 
 		CurrentStateName = NewState;
 		CurrentState = it->second;
+	}
+}
+//
+
+
+
+// ------------------------------------------------------------------------------------------------------
+// ---------------------------------- BehaviorController_Info
+// ------------------------------------------------------------------------------------------------------
+
+json BehaviorController_Info::ToJson() const
+{
+	json j;
+
+	j = nlohmann::json
+	{
+		{"IsEnabled",           IsEnabled},
+	};
+
+	return j;
+}
+
+void BehaviorController_Info::FromJson(const json& j)
+{
+	if (j.contains("IsEnabled") && j["IsEnabled"].is_boolean())
+	{
+		IsEnabled = j.at("IsEnabled").get<bool>();
 	}
 }
 
@@ -814,43 +1301,6 @@ void BehaviorController::ChangeState(const SE::UUID& GOID, std::shared_ptr<Memor
 // ---------------------------------- LUA BINDING
 // ------------------------------------------------------------------------------------------------------
 
-#define ACTION_ADD_FIELD(name) #name, &Action::name
-#define ACTION_FIELD_PAIRS
-
-#define ACTION_ADD_METHOD(k, fn) k, fn
-#define ACTION_METHOD_PAIRS ACTION_LUA_METHODS_APPLY(ACTION_ADD_METHOD)
-
-LUA_REGISTER_TYPE(Action, "Action", ACTION_FIELD_PAIRS, ACTION_METHOD_PAIRS)
-
-#undef ACTION_ADD_METHOD
-#undef ACTION_FIELD_PAIRS
-
-
-
-#define PATTERN_ADD_FIELD(name) #name, &Pattern::name
-#define PATTERN_FIELD_PAIRS
-
-#define PATTERN_ADD_METHOD(k, fn) k, fn
-#define PATTERN_METHOD_PAIRS PATTERN_LUA_METHODS_APPLY(PATTERN_ADD_METHOD)
-
-LUA_REGISTER_TYPE(Pattern, "Pattern", PATTERN_FIELD_PAIRS, PATTERN_METHOD_PAIRS)
-
-#undef PATTERN_ADD_METHOD
-#undef PATTERN_FIELD_PAIRS
-
-
-
-#define STATE_ADD_METHOD(k, fn) k, fn
-#define STATE_METHOD_PAIRS STATE_LUA_METHODS_APPLY(STATE_ADD_METHOD)
-
-#define STATE_FIELD_PAIRS
-LUA_REGISTER_TYPE(State, "State", STATE_FIELD_PAIRS, STATE_METHOD_PAIRS)
-
-#undef STATE_ADD_METHOD
-#undef STATE_FIELD_PAIRS
-
-
-
 #define ADD_METHOD(k, fn) k, fn
 
 LUA_REGISTER_COMPONENT(
@@ -858,5 +1308,5 @@ LUA_REGISTER_COMPONENT(
 	"BehaviorController",
 	/* no fields */,
 	BEHAVIORCONTROLLER_LUA_METHODS_APPLY(ADD_METHOD),
-	"getBehaviorController"
+	"getBehavior"
 )

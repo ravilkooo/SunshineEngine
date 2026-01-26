@@ -63,6 +63,7 @@ public:
     void Start();
     void Stop();
 
+    void ClearCachedAbsoluteTransforms();
     virtual void Update(float deltaTime);
     void ClearScene();
 

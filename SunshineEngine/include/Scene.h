@@ -1,9 +1,12 @@
 #pragma once
 
+#define DELETION_QUEUE_CAPACITY 16384
+
 #include "GameObject/GameObject.h"
 #include "Utils/UUID.h"
 #include <EASTL/hash_map.h>
 #include <EASTL/unique_ptr.h>
+#include <EASTL/fixed_vector.h>
 
 #include <unordered_map>
 
@@ -13,6 +16,21 @@ using json = nlohmann::json;
 class PhysicsSystem;
 class SceneGraph;
 class PlayerObject;
+
+class DeletionQueue {
+    eastl::fixed_vector<SE::UUID, DELETION_QUEUE_CAPACITY> queue;
+    size_t head = 0, tail = 0;
+    size_t count = 0;
+
+public:
+    DeletionQueue();
+
+    void QueueForDestruction(SE::UUID uuid);
+
+    void Flush();
+
+    bool IsEmpty() const;
+};
 
 class Scene
 {
@@ -36,6 +54,9 @@ public:
     GameObject* GetGameObjectByUUID(SE::UUID uuid) const;
     GameObject* GetGameObjectByUUIDhilo(SE::UUIDhilo uuidhilo) const;
     //void RemoveGameObject(eastl::unique_ptr<GameObject> gameObject);
+    void QueueGameObjectForDestruction(SE::UUID uuid);
+    void QueueGameObjectForDestruction(SE::UUIDhilo uuidhilo);
+
     eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(SE::UUID uuid);
     eastl::unique_ptr<GameObject> RemoveGameObjectByUUID(SE::UUIDhilo uuidhilo);
 
@@ -55,6 +76,10 @@ public:
     SE::UUID m_playerObjectUUID = SE::UUID(0u);
     PlayerObject* m_playerObject = nullptr;
 
+    PhysicsSystem* m_physicsSystem = nullptr;
+
+    DeletionQueue m_objectDestructionQueue;
+    void FlushDestructionQueue();
 private:
     Scene();
 };

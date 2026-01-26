@@ -6,6 +6,7 @@
 
 #include <Graphics/Bindable/Sampler.h>
 #include <Utils/StringUtils.h>
+#include <Utils/MathUtils.h>
 
 namespace SE_G {
 	eastl::unique_ptr<Bind::Topology> ColliderPass::s_topology;
@@ -103,20 +104,48 @@ namespace SE_G {
 		s_shapesIndexBuffer->Bind(context.Get());
 		for (auto& tech : m_techniques)
 		{
-			DXSM::Vector3 old_scaleFactor = tech.second->m_assignedTransform->m_scaleFactor;
-			tech.second->m_assignedTransform->m_scaleFactor = DXSM::Vector3::One;
+			DXSM::Vector3 old_localScaleFactor = tech.second->m_assignedTransform->m_localScaleFactor;
+			DXSM::Vector3 old_localRotation = tech.second->m_assignedTransform->m_localRotation;
+			DXSM::Vector3 old_localPosition = tech.second->m_assignedTransform->m_localPosition;
 
+			tech.second->m_assignedTransform->EnableMeshTransformMode();
+			DXSM::Matrix fullTransform = tech.second->m_assignedTransform->GetWorldMatrix_noLocal();
+			DXSM::Vector3 scale;
+			DXSM::Vector3 rotate;
+			DXSM::Vector3 translation;
+			DecomposeTransform(fullTransform, scale, rotate, translation);
+			
+			tech.second->m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
+			tech.second->m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
+			tech.second->m_assignedTransform->m_localScaleFactor = DXSM::Vector3(
+				1.0f / scale.x,
+				1.0f / scale.y,
+				1.0f / scale.z
+			);
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
+			tech.second->m_assignedTransform->DisableMeshTransformMode();
 
-			tech.second->m_assignedTransform->m_scaleFactor = old_scaleFactor;
+			tech.second->m_assignedTransform->m_localPosition = old_localPosition;
+			tech.second->m_assignedTransform->m_localRotation = old_localRotation;
+			tech.second->m_assignedTransform->m_localScaleFactor = old_localScaleFactor;
 		}
 
 		// Custom shapes
 		for (auto& tech : m_customTechniques)
 		{
+			DXSM::Matrix fullTransform = tech->m_assignedTransform->GetWorldMatrix_noLocal();
+			DXSM::Vector3 scale;
+			DXSM::Vector3 rotate;
+			DXSM::Vector3 translation;
+			DecomposeTransform(fullTransform, scale, rotate, translation);
+
 			DXSM::Vector3 old_scaleFactor = tech->m_assignedTransform->m_scaleFactor;
-			tech->m_assignedTransform->m_scaleFactor = DXSM::Vector3::One;
+			tech->m_assignedTransform->m_scaleFactor = DXSM::Vector3(
+				old_scaleFactor.x / scale.x,
+				old_scaleFactor.y / scale.y,
+				old_scaleFactor.z / scale.z
+			);
 
 			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech->Pass(GetDeviceContext());
@@ -350,5 +379,12 @@ namespace SE_G {
 		s_staticDataInitializated = true;
 	}
 
-
+	TriggerPass::TriggerPass(ID3D11Device* device, ID3D11DeviceContext* context,
+		eastl::shared_ptr<GBuffer> pGBuffer,
+		eastl::shared_ptr<Camera> camera)
+		: ColliderPass(device, context, pGBuffer, camera)
+	{
+		techniqueTag = "TriggerPass";
+		m_passType = PassType::Trigger;
+	}
 }

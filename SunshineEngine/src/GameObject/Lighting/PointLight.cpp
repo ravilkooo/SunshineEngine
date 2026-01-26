@@ -29,7 +29,7 @@ PointLight::PointLight(
 
     // TransformComponent
     auto tc = eastl::make_shared<TransformComponent>(device);
-    tc->m_position = initData.Position;
+    // tc->m_position = DXSM::Vector3::Zero;
 
     // RenderComponent and Passes
     auto rc = eastl::make_shared<RenderComponent>(m_UUID, renderSystem);
@@ -57,7 +57,7 @@ PointLight::PointLight(
     if (j["components"].contains("Transform")) {
         tc->FromJson(j["components"]["Transform"]);
     }
-    tc->m_position = m_lightData->Position;
+    // tc->m_position = DXSM::Vector3::Zero;
 
     // RenderComponent and Passes
     auto rc = AddComponent<RenderComponent>(m_UUID, renderSystem);
@@ -91,7 +91,7 @@ PointLight_Info::PointLight_Info(
 
     // TransformComponent
     auto tc_info = AddComponent<TransformComponent_Info>(device);
-    tc_info->m_assignedComponent->m_position = initData.Position;
+    // tc_info->m_assignedComponent->m_position = DXSM::Vector3::Zero;
 
     // RenderComponent and Passes
     auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
@@ -127,7 +127,7 @@ PointLight_Info::PointLight_Info(
     if (j["components"].contains("Transform")) {
         tc_info->FromJson(j["components"]["Transform"], device);
     }
-    tc_info->m_assignedComponent->m_position = m_lightData->Position;
+    // tc_info->m_assignedComponent->m_position = DXSM::Vector3::Zero;
 
     // RenderComponent and Passes
     auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);

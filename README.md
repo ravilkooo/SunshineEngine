@@ -68,8 +68,62 @@
 ## About The Project
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
+![2026-01-23_14-35](https://github.com/user-attachments/assets/bf6cb502-2bc3-48a5-a56a-103341e29493)
 
-Simple 3D Game Engine
+Sunshine Engine is a **3D game engine** built with **C++ and DirectX 11**.
+
+### Core Features
+
+**Graphics**
+- Deferred rendering system with multiple render passes
+- Support for meshes, textures
+- Particle system with compute shaders
+- Shadow mapping and lighting
+- Debug visualization (perception radii, emitters, icons)
+
+**Physics**
+- Jolt Physics integration for collision detection and rigid body dynamics
+- Physics components on game objects
+
+**Scripting**
+- **Lua integration** via Sol2 for game logic
+- Component-based scripting system
+- Lua bindings for engine systems (camera, input, perception, physics,...)
+
+**Audio**
+- FMOD integration for sound playback and management
+
+**Game Objects & Components**
+- GameObject-Component architecture
+- Built-in components: Transform, Render (hidden), Mesh, Physics, Lua, Perception, Behaviour
+- Player object with camera control and input systems
+- JSON serialization for scenes and objects
+
+**AI & Perception**
+- Perception component for NPC awareness (sight, hearing)
+- Behavior tree system via Lua
+- Debug visualization of perception radii
+
+**Editor**
+- **SunshineEditor** - ImGui-based world editor
+- Scene management and object editing
+- Content browser
+- Properties panel for game objects
+- Camera preview with miniature viewport
+
+**Input System**
+- Robust input manager with edge detection (pressed/released/held)
+- Support for keyboard and mouse
+- Key-to-Lua-function mapping for player controllers
+
+### Architecture
+
+- **SunshineEngine** (LIB) - Core engine systems
+- **SunshineEditor** (EXE) - Editor application
+- **Projects** folder - Game projects using the engine
+- Modular rendering with render passes and techniques
+
+The engine is designed for **indie game development** with a focus on **scripting-driven gameplay**.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -112,10 +166,11 @@ Simple 3D Game Engine
    cmake .. -G "Visual Studio 17 2022" -A x64
    ```
 3. Open project `Sunshine.sln`
-4. Copy fmodL.dll file to build: from `$RepoFolder$\ThirdParty\FMOD\api\lib\x64` to `$RepoFolder$\build\bin\Debug`
-5. Build `ALL_BUILD` (see in *CMakePredefinedTargets*)
-6. '*Set as Startup Project*' on `SunshineEditor` (VS 2022)
-7. Run Editor
+4. Build `ALL_BUILD` (see in *CMakePredefinedTargets*)
+5. Copy fmodL.dll file to build: from `$RepoFolder$\ThirdParty\FMOD\api\lib\x64` to `$RepoFolder$\build\bin\Debug`
+6. Copy fmod.dll file to build: from `$RepoFolder$\ThirdParty\FMOD\api\lib\x64` to `$RepoFolder$\build\bin\Release`
+7. '*Set as Startup Project*' on `SunshineEditor` (VS 2022)
+8. Run Editor in *Debug* or *Release* configuration
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -130,8 +185,9 @@ Link to wiki:
 https://github.com/ravilkooo/SunshineEngine/wiki
 
 Link to videoguide:
-[https://youtu.be/PQfZMqGmwHU](https://youtu.be/PQfZMqGmwHU)
-[https://vk.com/video359543554_456240406](https://vk.com/video359543554_456240406)
+[YouTube]([https://youtu.be/PQfZMqGmwHU](https://youtube.com/playlist?list=PLYaUtvngCOWkHuXNp-mbLQ_tkmgm7sHEm&si=J-wMjmR6qrSwSEhl))
+
+[VK]([https://vk.com/video359543554_456240406](https://vkvideo.ru/playlist/359543554_2))
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

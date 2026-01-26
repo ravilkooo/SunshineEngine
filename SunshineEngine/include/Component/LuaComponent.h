@@ -5,6 +5,7 @@
 #include <EASTL/memory.h>
 #include "sol/sol.hpp"
 #include "ScriptComponent.h"
+#include <Utils/AssetPath.h>
 
 class GameObject;
 
@@ -17,6 +18,7 @@ struct ParamEntry {
 class LuaComponent : public Component
 {
     friend class LuaComponent_Info;
+    friend class LuaManager;
 public:
     LuaComponent();
     ~LuaComponent();
@@ -27,7 +29,7 @@ public:
     LuaComponent(LuaComponent&&) noexcept = default;
     LuaComponent& operator=(LuaComponent&&) noexcept = default;
 
-    void Init(GameObject* owner, const eastl::string& inScriptPath);
+    void Init(GameObject* owner, AssetPath inScriptPath);
     void Cleanup();
 
     void LoadScript();
@@ -41,16 +43,13 @@ public:
     eastl::vector<ParamEntry>& GetParams() { return params; }
 
     eastl::vector<eastl::string> GetAvailableFunctions() const;
-    
-    void SetFunctionName(const eastl::string& name);
-    eastl::string GetFunctionName() const;
 
     //runtime
     void FromJson(const json& j, GameObject* obj);
     void LuaUpdate(float deltaTime);
 
-    eastl::string scriptPath;
-    eastl::string assetsPath;
+    AssetPath scriptPath;
+    // eastl::string assetsPath;
     bool scriptLoaded;
     char functionName[128] = "";
     bool foundFunction;
@@ -102,12 +101,12 @@ public:
     json ToJson() const override;
     void FromJson(const json& j) override;
 
-    void InitLuaFile();
-    void ScanLuaFiles(const eastl::string& dirPath);
+    static void ScanLuaFiles();
+    static eastl::vector<AssetPath> luaFiles;
 
-    eastl::vector<eastl::string> luaFiles;
-    eastl::string scriptPath;
+    void InitLuaFile();
+    AssetPath scriptPath;
     bool scriptLoaded;
-    int selectedLuaFile = 0;
+    // int selectedLuaFile = 0;
 
 };

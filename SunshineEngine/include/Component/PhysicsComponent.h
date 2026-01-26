@@ -88,7 +88,24 @@ public:
     void SetActivation(JPH::EActivation activation);
     void SetShape(JPH::ShapeRefC shapePtr);
 
-    void InitTransforms(TransformComponent* tc);
+    // Friction
+    void SetFriction(float inFriction);
+    float GetFriction();
+
+    // Restitution
+    void SetRestitution(float inRestitution);
+    float GetRestitution();
+
+    // GravityFactor
+    void SetGravityFactor(float inGravityFactor);
+    float GetGravityFactor();
+
+    // Set position
+    void SetPosition(DXSM::Vector3 inPosition);
+    // Set rotation
+    void SetRotation(DXSM::Vector3 inRotation);
+
+    void InitTransforms();
 
     JPH::Body* GetBody() const;
     JPH::BodyID GetBodyID() const;
@@ -109,10 +126,19 @@ private:
     JPH::Quat m_orientation = JPH::Quat::sIdentity();
     JPH::EMotionType m_motionType = JPH::EMotionType::Static;
     JPH::EActivation m_activation = JPH::EActivation::Activate;
-    JPH::ObjectLayer m_objectLayer = SE::Layers::NON_MOVING; // default layer
+    JPH::ObjectLayer m_objectLayer = SE::Layers::MOVING; // default layer
     JPH::ShapeRefC m_shape = nullptr;
 
+    // Friction and damping
+    float m_friction = 0.2f;
+    float m_linearDamping = 0.05f;
+    float m_angularDamping = 0.05f;
+
+    // Restitution
+    float m_restitution = 0.0f;
+
     SE::ColliderTransforms m_transformsData;
+    SE::ColliderData m_colliderData;
     /*
     ColliderTransformCB m_transformMat;
     */
@@ -180,8 +206,15 @@ public:
     SE::PhysicsMotionType m_motion = SE::PhysicsMotionType::Static;
     SE::PhysicsActivation m_activation = SE::PhysicsActivation::DontActivate;
 
-    SE::CollisionLayer m_collisionLayer = {};
+    // Friction and damping
+    float m_friction = 0.2f;
+    float m_linearDamping = 0.05f;
+    float m_angularDamping = 0.05f;
+    
+    // Restitution
+    float m_restitution = 0.0f;
 
+    SE::CollisionLayer m_collisionLayer = "MOVING";
 };
 
 // Macro listing methods of PhysicsComponent to expose in Lua bindings
@@ -197,7 +230,11 @@ public:
     FM("getLinearVelocity", [](PhysicsComponent* self){ return self->GetLinearVelocity(); }), \
     FM("getPointVelocity", [](PhysicsComponent* self, const DXSM::Vector3& pt){ return self->GetPointVelocity(pt); }), \
     FM("getPosition", [](PhysicsComponent* self){ return self->GetPosition(); }), \
+    FM("setPosition", [](PhysicsComponent* self, DXSM::Vector3 inVal){ return self->SetPosition(inVal); }), \
     FM("getRotation", [](PhysicsComponent* self){ return self->GetRotation(); }), \
+    FM("setRotation", [](PhysicsComponent* self, DXSM::Vector3 inVal){ return self->SetRotation(inVal); }), \
+    FM("getGravityFactor", [](PhysicsComponent* self){ return self->GetGravityFactor(); }), \
+    FM("setGravityFactor", [](PhysicsComponent* self, float inVal){ return self->SetGravityFactor(inVal); }), \
     FM("resetForce", [](PhysicsComponent* self){ self->ResetForce(); }), \
     FM("resetTorque", [](PhysicsComponent* self){ self->ResetTorque(); }), \
     FM("setAngularVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetAngularVelocity(v); }), \

@@ -1,3 +1,4 @@
+#include <Jolt/Jolt.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/string.h>
 
@@ -28,12 +29,6 @@
 
 #include <Serialization/GraphicsSerialization.h>
 
-#include <Jolt/Jolt.h>
-#include <Jolt/Physics/Collision/Shape/Shape.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Collision/Shape/CapSuleShape.h>
-#include <Jolt/Physics/Collision/Shape/TaperedCapsuleShape.h>
 
 #include <Physics/PhysicsSystem.h>
 
@@ -301,7 +296,12 @@ json PhysicsComponent_Info::ToJson() const {
     j = nlohmann::json{
         {"m_motion",        m_motion},
         {"m_activation",    m_activation},
-        {"m_collisionLayer",  std::string{m_collisionLayer.c_str()} }
+        {"m_collisionLayer",  std::string{m_collisionLayer.c_str()} },
+        //{"m_collisionLayer",  "MOVING" },
+        {"m_friction", m_friction},
+        {"m_linearDamping", m_linearDamping},
+        {"m_angularDamping", m_angularDamping},
+        {"m_restitution", m_restitution},
     };
 
     if (m_colliderData) {
@@ -317,6 +317,7 @@ void PhysicsComponent_Info::FromJson(const json& j) {
 
     if (j.contains("m_collisionLayer") && j["m_collisionLayer"].is_string()) {
         m_collisionLayer = SE::CollisionLayer{ j.at("m_collisionLayer").get<std::string>().c_str() };
+		//m_collisionLayer = SE::CollisionLayer{ "MOVING" };
     }
 
     // Collider/shape data
@@ -326,16 +327,27 @@ void PhysicsComponent_Info::FromJson(const json& j) {
         }
         m_colliderData->FromJson(j["collider"]);
     }
+    else
+    {
+        m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Box);
+    }
 
+    m_friction = j.contains("m_friction") ? j["m_friction"].get<float>() : 0.2f;
+    m_linearDamping = j.contains("m_linearDamping") ? j["m_linearDamping"].get<float>() : 0.05f;
+    m_angularDamping = j.contains("m_angularDamping") ? j["m_angularDamping"].get<float>() : 0.05f;
+    m_restitution = j.contains("m_restitution") ? j["m_restitution"].get<float>() : 0.0f;
 }
 
 void PhysicsComponent::FromJson(const json& j) {
 
     PhysicsComponent_Info info; info.FromJson(j);
-
+    
     if (info.m_collisionLayer == "NON_MOVING")  m_objectLayer = SE::Layers::NON_MOVING;
     else if (info.m_collisionLayer == "MOVING")      m_objectLayer = SE::Layers::MOVING;
+    else if (info.m_collisionLayer == "TRIGGER")      m_objectLayer = SE::Layers::TRIGGER;
     else                                         m_objectLayer = SE::Layers::NON_MOVING;
+    
+    // m_objectLayer = SE::Layers::MOVING;
 
     switch (info.m_motion) {
         case SE::PhysicsMotionType::Static:    m_motionType = JPH::EMotionType::Static; break;
@@ -350,58 +362,13 @@ void PhysicsComponent::FromJson(const json& j) {
 
     // Deserialize shape from collider data
     if (info.m_colliderData) {
-        const SE::ColliderData& colliderData = *info.m_colliderData;
-        JPH::ShapeSettings::ShapeResult shapeResult;
-
-        switch (colliderData.m_shapeType) {
-            case SE::ColliderShapeType::Box: {
-                JPH::BoxShapeSettings boxSettings(
-                    JPH::Vec3(
-                        colliderData.m_settings.data.asBox.m_size.x * 0.5f,
-                        colliderData.m_settings.data.asBox.m_size.y * 0.5f,
-                        colliderData.m_settings.data.asBox.m_size.z * 0.5f
-                    )
-                );
-                shapeResult = boxSettings.Create();
-                break;
-            }
-            case SE::ColliderShapeType::Sphere: {
-                JPH::SphereShapeSettings sphereSettings(colliderData.m_settings.data.asSphere.m_radius);
-                shapeResult = sphereSettings.Create();
-                break;
-            }
-            case SE::ColliderShapeType::Capsule: {
-                JPH::CapsuleShapeSettings capsuleSettings(
-                    colliderData.m_settings.data.asCapsule.m_height * 0.5f,
-                    colliderData.m_settings.data.asCapsule.m_radius
-                );
-                shapeResult = capsuleSettings.Create();
-                break;
-            }
-            case SE::ColliderShapeType::TaperedCapsule: {
-                JPH::TaperedCapsuleShapeSettings taperedCapsuleSettings(
-                    colliderData.m_settings.data.asTaperedCapsule.m_height * 0.5f,
-                    colliderData.m_settings.data.asTaperedCapsule.m_topRadius,
-                    colliderData.m_settings.data.asTaperedCapsule.m_bottomRadius
-                );
-                shapeResult = taperedCapsuleSettings.Create();
-                break;
-            }
-            default:
-                // Fallback to box if shape type is not recognized
-                JPH::BoxShapeSettings defaultBoxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
-                shapeResult = defaultBoxSettings.Create();
-                break;
-        }
-
-        m_transformsData.m_offset = info.m_colliderData->GetTransformData().m_offset;
-        m_transformsData.m_rotation = info.m_colliderData->GetTransformData().m_rotation;
-
-        if (shapeResult.IsValid()) {
-            m_shape = shapeResult.Get();
-        }
+        m_colliderData = *info.m_colliderData;  
     }
 
+    m_friction = j.contains("m_friction") ? j["m_friction"].get<float>() : 0.2f;
+    m_linearDamping = j.contains("m_linearDamping") ? j["m_linearDamping"].get<float>() : 0.05f;
+    m_angularDamping = j.contains("m_angularDamping") ? j["m_angularDamping"].get<float>() : 0.05f;
+    m_restitution = j.contains("m_restitution") ? j["m_restitution"].get<float>() : 0.0f;
 }
 
 // ----------------- LuaComponent -----------------
@@ -409,21 +376,22 @@ void PhysicsComponent::FromJson(const json& j) {
 json LuaComponent_Info::ToJson() const {
     json j;
     j = nlohmann::json{
-        {"scriptPath", std::string{scriptPath.c_str()}},
-        {"selectedLuaFile", selectedLuaFile},
+        {"scriptPath", scriptPath.ToJson() },
+        // {"selectedLuaFile", selectedLuaFile},
         {"scriptLoaded", scriptLoaded}
     };
     return j;
 }
 
 void LuaComponent_Info::FromJson(const json& j) {
-    if (j.contains("scriptPath") && j["scriptPath"].is_string()) {
-        std::string stdPath = j.at("scriptPath").get<std::string>();
-        scriptPath = eastl::string(stdPath.c_str());
+    if (j.contains("scriptPath")) {
+		scriptPath.FromJson(j["scriptPath"]);
+        // std::string stdPath = j.at("scriptPath").get<std::string>();
+        // scriptPath = eastl::string(stdPath.c_str());
     }
-    if (j.contains("selectedLuaFile") && j["selectedLuaFile"].is_number()) {
-        selectedLuaFile = j.at("selectedLuaFile").get<int>();
-    }
+    // if (j.contains("selectedLuaFile") && j["selectedLuaFile"].is_number()) {
+    //     selectedLuaFile = j.at("selectedLuaFile").get<int>();
+    // }
     if (j.contains("scriptLoaded") && j["scriptLoaded"].is_boolean()) {
         scriptLoaded = j.at("scriptLoaded").get<bool>();
     }
@@ -434,7 +402,7 @@ void LuaComponent::FromJson(const json& j, GameObject* obj) {
     LuaComponent_Info info;
     info.FromJson(j);
 
-    if (!info.scriptPath.empty()) {
+    if (!info.scriptPath.m_assetRelativePath.empty()) {
         Init(obj, info.scriptPath);
     }
 }
@@ -492,9 +460,12 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::TRANSFORM: key = "Transform"; break;
             case SE::ComponentType::RENDER:    key = "Render"; break;
             case SE::ComponentType::PHYSICS:   key = "Physics"; break;
+            case SE::ComponentType::TRIGGER:   key = "Trigger"; break;
             case SE::ComponentType::LUA:       key = "Lua"; break;
-            case SE::ComponentType::MESH:      key = "Mesh"; break;
-            case SE::ComponentType::PARTICLE_EMITTER:      key = "ParticleEmitter"; break;
+            case SE::ComponentType::MESH:                key = "Mesh"; break;
+            case SE::ComponentType::PERCEPTION:          key = "Perception"; break;
+            case SE::ComponentType::BEHAVIOR:            key = "Behavior"; break;
+            case SE::ComponentType::PARTICLE_EMITTER:    key = "ParticleEmitter"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -615,7 +586,6 @@ void Scene::FromJson(
     eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
-
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
             GameObjectGroup objGroup = objJ["m_group"];
@@ -696,14 +666,42 @@ void Scene::FromJson(
             }
 
             if (go) {
-                // Other components (Physics, Lua)
+                if (objJ.contains("m_name"))
+                {
+                    go->m_name = objJ["m_name"].get<std::string>().c_str();
+                }
+
+                if (objJ["components"].contains("Mesh") &&
+                    !go->HasComponent<MeshComponent>()) {
+                    auto c = go->AddComponent<MeshComponent>();
+                    c->FromJson(objJ["components"]["Mesh"],
+                        renderSystem->GetDevice(),
+                        go->GetComponent<RenderComponent>().get(),
+                        go->GetComponent<TransformComponent>().get(),
+                        go->m_UUID);
+                }
                 
                 if (objJ["components"].contains("Physics")) {
                     auto c = go->AddComponent<PhysicsComponent>(
                         go->m_UUID, go->GetComponent<TransformComponent>().get());
                     c->FromJson(objJ["components"]["Physics"]);
-                    physicsSystem->CreateAndAddBody(c.get());
                     //physicsSystem->CreateAndBody(c);
+                }
+
+                if (objJ["components"].contains("Trigger")) {
+                    auto c = go->AddComponent<TriggerComponent>(
+                        go->m_UUID, go->GetComponent<TransformComponent>().get());
+                    c->FromJson(objJ["components"]["Trigger"]);
+                }
+
+                if (objJ["components"].contains("Perception")) {
+                    auto c = go->AddComponent<PerceptionComponent>(go->m_UUID);
+                    c->FromJson(objJ["components"]["Perception"]);
+                }
+
+                if (objJ["components"].contains("Behavior")) {
+                    auto c = go->AddComponent<BehaviorController>(go->m_UUID);
+                    c->FromJson(objJ["components"]["Behavior"]);
                 }
 
                 if (objJ["components"].contains("Lua")) {
@@ -728,6 +726,8 @@ void Scene::FromJson(
         }
     }
     GetInstance().RestoreParents();
+
+    GetInstance().FlushDestructionQueue();
 }
 
 // ----------------- Scene_Info -----------------
@@ -840,6 +840,20 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
 
 
             if (go) {
+                if (objJ.contains("m_name"))
+                {
+                    go->m_name = objJ["m_name"].get<std::string>().c_str();
+                }
+
+                if (objJ["components"].contains("Mesh") &&
+                    !go->HasComponent<MeshComponent_Info>()) {
+                    auto c = go->AddComponent<MeshComponent_Info>();
+                    c->FromJson(objJ["components"]["Mesh"],
+                        renderSystem->GetDevice(),
+                        go->GetComponent<RenderComponent_Info>().get(),
+                        go->GetComponent<TransformComponent_Info>().get(),
+                        go->m_UUID);
+                }
 
                 if (objJ["components"].contains("Physics")
                     && objJ["m_group"] != GameObjectGroup::Player)
@@ -849,6 +863,23 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                         go->GetComponent<TransformComponent_Info>().get());
                     c->FromJson(objJ["components"]["Physics"]);
                     //physicsSystem->CreateAndBody(c);
+                }
+
+                if (objJ["components"].contains("Perception")) {
+                    auto c = go->AddComponent<PerceptionComponent_Info>();
+                    c->FromJson(objJ["components"]["Perception"]);
+                }
+
+                if (objJ["components"].contains("Trigger")) {
+                    auto c = go->AddComponent<TriggerComponent_Info>(
+                        go->GetComponent<RenderComponent_Info>().get(),
+                        go->GetComponent<TransformComponent_Info>().get());
+                    c->FromJson(objJ["components"]["Trigger"]);
+                }
+
+                if (objJ["components"].contains("Behavior")) {
+                    auto c = go->AddComponent<BehaviorController_Info>();
+                    c->FromJson(objJ["components"]["Behavior"]);
                 }
 
                 if (objJ["components"].contains("Lua")) {

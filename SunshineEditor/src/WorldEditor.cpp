@@ -11,6 +11,7 @@
 #include <Graphics/Renderer/Pass/IconPass.h>
 #include <Graphics/Renderer/Pass/ColliderPass.h>
 #include <Graphics/Renderer/Pass/EmitterDebugPass.h>
+#include <Graphics/Renderer/Pass/PerceptionDebugPass.h>
 
 #include <GameObject/GameObject.h>
 #include <GameObject/EditorObjectFactory.h>
@@ -170,6 +171,13 @@ void WorldEditor::SetupRendering(
 			);
 	}
 	{
+		m_triggerPass = static_cast<SE_G::TriggerPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::TriggerPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+	}
+	{
 		m_emitterPass = static_cast<SE_G::EmitterDebugPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::EmitterDebugPass>(
 				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
@@ -190,6 +198,14 @@ void WorldEditor::SetupRendering(
 				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
 			);
 		m_selectionPass->m_iconPass = m_iconPass;
+	}
+	{
+		m_perceptionPass = static_cast<SE_G::PerceptionDebugPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::PerceptionDebugPass>(
+				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
+				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+			);
+		m_selectionPass->m_perceptionPass = m_perceptionPass;
 	}
 	m_particleSystem->Enable();
 

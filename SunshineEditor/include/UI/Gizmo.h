@@ -58,4 +58,6 @@ private:
 
     DXSM::Quaternion m_gizmoRotation;
     bool m_hasRotationCache = false;
+
+    bool m_isMeshSettings = false;
 };

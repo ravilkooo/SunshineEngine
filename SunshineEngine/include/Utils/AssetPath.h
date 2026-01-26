@@ -26,6 +26,9 @@ public:
 	json ToJson() const;
 	void FromJson(const json& j);
 
+	bool operator==(const AssetPath& other) const noexcept;
+	bool operator!=(const AssetPath& other) const noexcept;
+
     // JSON enum mappings (serialize as readable strings)
 	NLOHMANN_JSON_SERIALIZE_ENUM(AssetSource, {
 		{AssetSource::Engine, "Engine"},

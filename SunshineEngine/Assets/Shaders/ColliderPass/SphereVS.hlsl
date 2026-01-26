@@ -6,6 +6,7 @@ struct VS_IN
 struct PS_IN
 {
     float4 pos : SV_POSITION;
+    float4 col : COLOR;
 };
 
 cbuffer TransformCBuf : register(b0)
@@ -26,12 +27,14 @@ cbuffer ColliderTransformCBuf : register(b2)
 
 cbuffer SphereColliderSettings : register(b3)
 {
+    float4 colliderColor;
     float m_radius;
 };
 
 PS_IN VSMain(VS_IN input)
 {
     PS_IN output = (PS_IN) 0;
+    output.col = colliderColor;
     output.pos = float4(input.pos, 1.0);
     
     // Collider settings

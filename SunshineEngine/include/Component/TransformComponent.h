@@ -55,6 +55,17 @@ public:
     DXSM::Matrix GetLocalTransformMatrix() const;
     DXSM::Matrix GetWorldMatrix_noLocal() const;
 
+    // Full World Position
+    bool m_isAbsoluteTransformCached = false;
+    DXSM::Vector3 m_cachedAbsoluteWorldPosition;
+    DXSM::Quaternion m_cachedAbsoluteWorldRotation_quat;
+    DXSM::Vector3 m_cachedAbsoluteWorldRotation;
+    void CalcAbsoluteTransform();
+
+    DXSM::Vector3 GetAbsoluteWorldPosition();
+    DXSM::Vector3 GetAbsoluteWorldRotation();
+    DXSM::Quaternion GetAbsoluteWorldRotation_quat();
+
     // World Transform
     DXSM::Matrix GetWorldMatrix() const; // include LocalTransfrom
 
@@ -85,8 +96,14 @@ public:
     void SetParentTransform(TransformComponent* parentTransform);
     TransformComponent* GetParentTransform();
 
-private:
+	void EnableMeshTransformMode();
+	void DisableMeshTransformMode();
+	bool IsMeshTransformMode();
+
     TransformComponent* m_parentTransform = nullptr;
+private:
+
+	bool m_meshTransformMode = false;
 };
 
 class TransformComponent_Info : public Component_Info
@@ -126,4 +143,10 @@ public:
     F(m_localPosition) ,                    \
     F(m_localRotation) ,                    \
     F(m_localScaleFactor)
+#endif
+
+#ifndef TRANSFORMCOMPONENT_LUA_METHODS_APPLY
+#define TRANSFORMCOMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("getAbsolutePosition", &TransformComponent::GetAbsoluteWorldPosition) \
+    FM("getAbsoluteRotation", &TransformComponent::GetAbsoluteWorldRotation)
 #endif

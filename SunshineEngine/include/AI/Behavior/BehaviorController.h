@@ -1,17 +1,13 @@
 #pragma once
 
-//#include <EASTL/string.h>
-//#include <EASTL/hash_map.h>
-//#include <EASTL/vector.h>
-//#include <EASTL/shared_ptr.h>
-//#include <EASTL/optional.h>
-//#include <EASTL/utility.h>
-//#include <EASTL/functional.h>
-
 // Engine
 #include "MemoryBoard.h"
+#include "AI/Behavior/BehaviorStorage.h"
 #include <Utils/UUID.h>
 #include <Component/Component.h>
+
+// Eastl
+#include <EASTL/unique_ptr.h>
 
 // C++
 #include <vector>
@@ -21,20 +17,26 @@
 // Lua
 #include <sol/sol.hpp>
 
+// Json
+#include <nlohmann/json.hpp>
 
-enum class EActionCondition
-{
-    Running,
-    Succeeded,
-    Failed,
-    Aborted
-};
+
+using json = nlohmann::json;
+
 
 enum class EActionResult
 {
-    Running,
+    Running,    // 0
+    Succeeded,  // 1
+    Failed      // 2
+};
+
+enum class EActionCondition
+{
+    Running, 
     Succeeded,
-    Failed
+    Failed,
+    Aborted 
 };
 
 enum class EStateResult
@@ -48,33 +50,31 @@ enum class EStateResult
 using AbortFunc = std::function<void(const std::string& ToState)>;
 
 
+
 class Action
 {
     friend class Pattern;
+    friend class BehaviorController;
 
 public:
+    // --- General ---
     explicit Action(const std::string& InName) : Name(InName) {}
 
-    const std::string& GetName() const       { return Name; }
+    const std::string& GetName() const { return Name; }
     void SetName(const std::string& NewName) { Name = NewName; }
-
-    void SetOnStart(const sol::function& Func)     { OnActionStart = Func; }
-    void SetOnUpdate(const sol::function& Func)    { OnActionUpdate = Func; };
-    void SetOnAbort(const sol::function& Func)     { OnActionAbort = Func; };
-    void SetOnComplete(const sol::function& Func)  { OnActionComplete = Func; };
-
+    //
 private:
-    EActionCondition Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
-
+    // --- In game ---
+    EActionCondition Update(const SE::UUID& GOID, BehaviorController* BC, float DeltaTime);
     void Abort() { IsAborted = true; }
-
+    //
 
     std::string Name;
 
-    sol::function OnActionStart = nullptr;
-    sol::function OnActionUpdate = nullptr;
-    sol::function OnActionAbort = nullptr;
-    sol::function OnActionComplete = nullptr;
+    sol::function OnActionStart;
+    sol::function OnActionUpdate;
+    sol::function OnActionAbort;
+    sol::function OnActionComplete;
 
     bool IsAborted = false;
 };
@@ -88,30 +88,23 @@ class Pattern
 public:
     Pattern() = default;
 
-    void AddAction(std::shared_ptr<Action> NewAction);
-    void InsertAction(std::shared_ptr<Action> NewAction, size_t Index);
+    // --- Actions ---
+    std::shared_ptr<Action> Action_GetByName(const std::string& Name) const;
+    std::shared_ptr<Action> Action_GetByIndex(size_t Index) const;
 
-    std::shared_ptr<Action> GetActionByName(const std::string& Name) const;
-    std::shared_ptr<Action> GetActionByIndex(size_t Index) const;
+    bool Action_Add(const std::string& Name);
+    bool Action_Insert(const std::string& Name, size_t Index);
+    sol::table Action_GetAll(sol::this_state L);
 
-    bool RemoveActionByName(const std::string& Name);
-    bool RemoveActionByIndex(size_t Index);
-
-    std::vector<std::shared_ptr<Action>> GetAllActions() const { return Actions; }
-
-    void SetEvaluateUtility(const sol::function& Func) { EvaluateUtility = Func; }
-
-    void SetOnStart(const sol::function& Func)         { OnPatternStart = Func; }
-    void SetOnUpdate(const sol::function& Func)        { OnPatternUpdate = Func; }
-    void SetOnAbort(const sol::function& Func)         { OnPatternAbort = Func; }
-    void SetOnComplete(const sol::function& Func)      { OnPatternComplete = Func; }
-
+    bool Action_RemoveByName(const std::string& Name);
+    bool Action_RemoveByIndex(size_t Index);
+    //
 private:
-    EActionCondition Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
-
+    // --- In game ---
+    EActionCondition Update(const SE::UUID& GOID, BehaviorController* BC, float DeltaTime);
     void AbortCurrentAction();
-
     void Reset();
+    //
 
 
     std::vector<std::shared_ptr<Action>> Actions;
@@ -120,40 +113,22 @@ private:
 
     bool bStarted = false;
 
-    sol::function EvaluateUtility = nullptr;
+    sol::function EvaluateUtility;
 
-    sol::function OnPatternStart = nullptr;
-    sol::function OnPatternUpdate = nullptr;
-    sol::function OnPatternAbort = nullptr;
-    sol::function OnPatternComplete = nullptr;
+    sol::function OnPatternStart;
+    sol::function OnPatternUpdate;
+    sol::function OnPatternAbort;
+    sol::function OnPatternComplete;
 };
 
 
 class ConditionTransition
 {
 public:
-    explicit ConditionTransition(const std::string& InToState, sol::function InCheck) : ToState(InToState), Check(InCheck) { }
+    explicit ConditionTransition(const std::string& InToState, sol::function InCheck) : ToState(InToState), Check(InCheck) {}
 
 
-    sol::function Check = nullptr;
-
-    std::string ToState;
-};
-
-
-class EventTransition
-{
-public:
-    explicit EventTransition(const std::string& InToState, sol::function InCheck, BehaviorController* FSM);
-
-    void Trigger(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard);
-
-    void ChangeToState(const std::string& InToState, BehaviorController* FSM);
-
-
-    sol::function Check = nullptr;
-
-    AbortFunc Abort = nullptr;
+    sol::function Check;
 
     std::string ToState;
 };
@@ -166,118 +141,152 @@ class State
 public:
     State() = default;
 
-    bool AddPattern(const std::string& Name, std::shared_ptr<Pattern> NewPattern);
-    std::shared_ptr<Pattern> GetPattern(const std::string& Name);
-    bool RemovePattern(const std::string& Name);
+    // --- Patterns ---
+    std::shared_ptr<Pattern> Pattern_Get(const std::string& Name);
 
-    const std::unordered_map<std::string, std::shared_ptr<Pattern>>& GetAllPatterns() { return Patterns; };
-
-    sol::table Lua_GetAllPatterns(sol::this_state L) const
-    {
-        sol::state_view lua(L);
-        sol::table t = lua.create_table();
-
-        for (auto& [k, v] : Patterns)
-            t[k] = v;
-
-        return t;
-    }
-
-    void SetOnEnter(const sol::function& Func)  { OnStateEnter = Func; }
-    void SetOnUpdate(const sol::function& Func) { OnStateUpdate = Func; }
-    void SetOnAbort(const sol::function& Func)  { OnStateAbort = Func; }
-    void SetOnExit(const sol::function& Func)   { OnStateExit = Func; }
-
+    bool Pattern_Add(const std::string& Name);
+    bool Pattern_Remove(const std::string& Name);
+    sol::table Pattern_GetAll(sol::this_state L) const;
+    //
 private:
-    void AddConditionTransition(const std::string& InToState, sol::function InCheck);
-    void AddEventTransition(const std::string& InToState, sol::function InCheck, BehaviorController* FSM);
-
-    bool RemoveConditionTransition(const std::string& ToState);
-    bool RemoveEventTransition(const std::string& ToState);
-
-    bool Update(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, float DeltaTime);
-
-    std::shared_ptr<ConditionTransition> CheckConditionTransitions(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard);
+    // --- Transition Conditions ---
+    void ConditionTransition_Add(const std::string& InToState, sol::function InCheck);
+    bool ConditionTransition_Remove(const std::string& ToState);
+    //
+    
+    // --- In game ---
+    bool Update(const SE::UUID& GOID, BehaviorController* BC, float DeltaTime);
+    std::shared_ptr<ConditionTransition> CheckConditionTransitions(const SE::UUID& GOID, BehaviorController* BC);
+    //
 
 
     std::vector<std::shared_ptr<ConditionTransition>> ConditionTransitions;
-    std::vector<std::shared_ptr<EventTransition>> EventTransitions;
 
     std::unordered_map<std::string, std::shared_ptr<Pattern>> Patterns;
     std::shared_ptr<Pattern> CurrentPattern = nullptr;
 
     bool IsRunning = false;
 
-    sol::function OnStateEnter = nullptr;
-    sol::function OnStateUpdate = nullptr;
-    sol::function OnStateAbort = nullptr;
-    sol::function OnStateExit = nullptr;
+    sol::function OnStateEnter;
+    sol::function OnStateUpdate;
+    sol::function OnStateAbort;
+    sol::function OnStateExit;
 };
 
 
 class BehaviorController : public Component
 {
-    friend class Game;
-    friend class EventTransition;
+    friend class BehaviorStorage;
 
 public:
-    BehaviorController(const SE::UUID& InGOID) : GOID(InGOID) { };
+    // --- General ---
+    explicit BehaviorController(const SE::UUID& InGOID) : GOID(InGOID)
+    {
+        BehaviorStorage::Get().AddBehavior(this);
+        MBoard = std::make_shared<MemoryBoard>();
+    };
+
+    ~BehaviorController()
+    {
+        BehaviorStorage::Get().RemoveBehavior(this);
+        MBoard->Clear();
+    }
+
+    void SetIsEnabled(bool NewCondition) { IsEnabled = NewCondition; }
+    bool GetIsEnabled() { return IsEnabled; }
+    sol::table GetAllStates(sol::this_state L) const;
+
+    void Trigger(const std::string& ToState);
+
+    void FromJson(const json& j) override;
+
+    static const SE::ComponentType s_componentType = SE::ComponentType::BEHAVIOR;
+    const std::type_info& getType() const override { return typeid(BehaviorController); }
+    const SE::ComponentType ComponentType() const override { return s_componentType; }
+    //
 
     // --- MemoryBoard ---
-    void SetMemoryBoard(std::shared_ptr<MemoryBoard>& InMemoryBoard);
-    std::shared_ptr<MemoryBoard> GetMemoryBoard() { return MBoard; };
+    bool MemoryBoard_SetInt(const std::string& Key, int Value) { return MBoard->SetTypedValue<int>(Key, Value); }
+    bool MemoryBoard_SetFloat(const std::string& Key, float Value) { return MBoard->SetTypedValue<float>(Key, Value); }
+    bool MemoryBoard_SetBool(const std::string& Key, bool Value) { return MBoard->SetTypedValue<bool>(Key, Value); }
+    bool MemoryBoard_SetString(const std::string& Key, const std::string& Value) { return MBoard->SetTypedValue<std::string>(Key, Value); }
+    bool MemoryBoard_SetVector3(const std::string& Key, const DXSM::Vector3& Value) { return MBoard->SetTypedValue<DXSM::Vector3>(Key, Value); }
+    bool MemoryBoard_SetUUID(const std::string& Key, const SE::UUIDhilo Value) { return MBoard->SetTypedValue<SE::UUID>(Key, SE::UUID::FromHilo(Value)); }
+
+    sol::object MemoryBoard_GetInt(const std::string& Key, sol::this_state L) const;
+    sol::object MemoryBoard_GetFloat(const std::string& Key, sol::this_state L) const;
+    sol::object MemoryBoard_GetBool(const std::string& Key, sol::this_state L) const;
+    sol::object MemoryBoard_GetString(const std::string& Key, sol::this_state L) const;
+    sol::object MemoryBoard_GetVector3(const std::string& Key, sol::this_state L) const;
+    sol::object MemoryBoard_GetUUID(const std::string& Key, sol::this_state L) const;
+
+    bool MemoryBoard_HasKey(const std::string& Key) const { return MBoard->HasKey(Key); }
+    void MemoryBoard_RemoveKey(const std::string& Key) { MBoard->RemoveKey(Key); }
+    void MemoryBoard_Clear() { MBoard->Clear(); }
+
+    uint64_t MemoryBoard_AddCallback(const std::string& Key, const sol::function& Callback) { return MBoard->AddCallback(Key, Callback);};
+    void MemoryBoard_RemoveCallback(const std::string& Key, uint64_t CallbackId) { MBoard->RemoveCallback(Key, CallbackId); };
+    void MemoryBoard_ClearCallbacks(const std::string& Key) { MBoard->ClearCallbacks(Key); }
     //
 
     // --- States ---
-    bool AddState(const std::string& Name, const std::shared_ptr<State>& NewState);
-    std::shared_ptr<State> GetState(const std::string& Name);
-    bool RemoveState(const std::string& Name);
+    std::shared_ptr<State> State_Get(const std::string& Name);
 
-    bool SetInitialState(const std::string& Name);
-    const std::string& GetCurrentStateName() const { return CurrentStateName; }
+    bool State_Add(const std::string& Name);
+    bool State_Remove(const std::string& Name);
+    bool State_SetInitial(const std::string& Name);
+    const std::string& State_GetCurrent() const { return CurrentStateName; }
+    sol::table State_GetAllPatterns(const std::string& Name, sol::this_state L);
 
-    std::unordered_map<std::string, std::shared_ptr<State>> GetAllStates() const { return States; }
-
-    sol::table Lua_GetAllStates(sol::this_state L) const
-    {
-        sol::state_view lua(L);
-        sol::table t = lua.create_table();
-
-        for (const auto& [name, state] : States)
-        {
-            t[name] = state;
-        }
-
-        return t;
-    }
+    bool State_SetOnEnter(const std::string& Name, const sol::function& Func);
+    bool State_SetOnUpdate(const std::string& Name, const sol::function& Func);
+    bool State_SetOnAbort(const std::string& Name, const sol::function& Func);
+    bool State_SetOnExit(const std::string& Name, const sol::function& Func);
     //
 
-    // --- Conditions ---
-    bool AddConditionTransition(const std::string& FromState, const std::string& ToState, sol::function InCheck);
-    bool AddEventTransition(const std::string& FromState, const std::string& ToState, sol::function InCheck);
-
-    bool ChangeToStateInConditionTransition(const std::string& FromState, const std::string& OldToState, const std::string& NewToState);
-    bool ChangeToStateInEventTransition(const std::string& FromState, const std::string& OldToState, const std::string& NewToState);
-
-    bool ChangeCheckFuncInConditionTransition(const std::string& FromState, const std::string& ToState, sol::function InCheck);
-    bool ChangeCheckFuncInEventTransition(const std::string& FromState, const std::string& ToState, sol::function InCheck);
-
-    bool RemoveConditionTransition(const std::string& FromState, const std::string& ToState);
-    bool RemoveEventTransition(const std::string& FromState, const std::string& ToState);
+    // --- Transition Conditions ---
+    bool ConditionTransition_Add(const std::string& FromState, const std::string& ToState, sol::function InCheck);
+    bool ConditionTransition_Has(const std::string& FromState, const std::string& ToState);
+    bool ConditionTransition_ChangeToState(const std::string& FromState, const std::string& OldToState, const std::string& NewToState);
+    bool ConditionTransition_ChangeCheckFunc(const std::string& FromState, const std::string& ToState, sol::function InCheck);
+    bool ConditionTransition_Remove(const std::string& FromState, const std::string& ToState);
     //
 
-    void SetIsEnabled(bool NewCondition) { IsEnabled = NewCondition; }
+    // --- Patterns ---
+    bool Pattern_Add(const std::string& NameS, const std::string& NameP);
+    bool Pattern_Remove(const std::string& NameS, const std::string& NameP);
+    sol::table Pattern_GetAllActions(const std::string& NameS, const std::string& NameP, sol::this_state L);
+    int Pattern_Count(const std::string& NameS, const std::string& NameP);
+
+    bool Pattern_SetEvaluateUtility(const std::string& NameS, const std::string& NameP, const sol::function& Func);
+    bool Pattern_SetOnStart(const std::string& NameS, const std::string& NameP, const sol::function& Func);
+    bool Pattern_SetOnUpdate(const std::string& NameS, const std::string& NameP, const sol::function& Func);
+    bool Pattern_SetOnAbort(const std::string& NameS, const std::string& NameP, const sol::function& Func);
+    bool Pattern_SetOnComplete(const std::string& NameS, const std::string& NameP, const sol::function& Func);
+    //
+
+    // --- Actions ---
+    bool Action_Add(const std::string& NameS, const std::string& NameP, const std::string& NameA);
+    bool Action_Insert(const std::string& NameS, const std::string& NameP, const std::string& NameA, size_t Index);
+    bool Action_RemoveByName(const std::string& NameS, const std::string& NameP, const std::string& NameA);
+    bool Action_RemoveByIndex(const std::string& NameS, const std::string& NameP, size_t Index);
+
+    bool Action_SetOnStart(const std::string& NameS, const std::string& NameP, const std::string& NameA, const sol::function& Func);
+    bool Action_SetOnUpdate(const std::string& NameS, const std::string& NameP, const std::string& NameA, const sol::function& Func);
+    bool Action_SetOnAbort(const std::string& NameS, const std::string& NameP, const std::string& NameA, const sol::function& Func);
+    bool Action_SetOnComplete(const std::string& NameS, const std::string& NameP, const std::string& NameA, const sol::function& Func);
+    //
 
 private:
+    // --- In game ---
     void Update(float DeltaTime);
-
     void Abort(const std::string& ToState);
-
-    void ChangeState(const SE::UUID& GOID, std::shared_ptr<MemoryBoard>& MBoard, const std::string& NewState);
+    void ChangeState(const SE::UUID& GOID, const std::string& NewState);
+    //
 
 
     SE::UUID GOID;
-    std::shared_ptr<MemoryBoard> MBoard = nullptr;
+    std::shared_ptr<MemoryBoard> MBoard;
 
     std::unordered_map<std::string, std::shared_ptr<State>> States;
     std::string CurrentStateName;
@@ -293,7 +302,7 @@ private:
 class BehaviorController_Info : public Component_Info
 {
 public:
-    BehaviorController_Info() {};
+    explicit BehaviorController_Info() { }
 
     static const SE::ComponentType s_componentType = SE::ComponentType::BEHAVIOR;
 
@@ -301,74 +310,78 @@ public:
     const std::type_info& getType() const override { return typeid(BehaviorController_Info); }
     bool IsAssigned() override { return true; }
 
+    json ToJson() const override;
+    void FromJson(const json& j) override;
 
-    BehaviorController* Controller;
+    bool IsEnabled = false;
 };
 
 
 // --- LUA BINDING ---
 
-#ifndef ACTION_LUA_METHODS_APPLY
-#define ACTION_LUA_METHODS_APPLY(FM) \
-    FM("getName",        &Action::GetName) , \
-    FM("setName",        &Action::SetName) , \
-    FM("setOnStart",     &Action::SetOnStart) , \
-    FM("setOnUpdate",    &Action::SetOnUpdate) , \
-    FM("setOnAbort",     &Action::SetOnAbort) , \
-    FM("setOnComplete",  &Action::SetOnComplete)
-#endif
-
-
-
-#ifndef PATTERN_LUA_METHODS_APPLY
-#define PATTERN_LUA_METHODS_APPLY(FM) \
-    FM("addAction",            &Pattern::AddAction) , \
-    FM("insertAction",         &Pattern::InsertAction) , \
-    FM("getActionByName",      &Pattern::GetActionByName) , \
-    FM("getActionByIndex",     &Pattern::GetActionByIndex) , \
-    FM("removeActionByName",   &Pattern::RemoveActionByName) , \
-    FM("removeActionByIndex",  &Pattern::RemoveActionByIndex) , \
-    FM("getAllActions",        &Pattern::GetAllActions) , \
-    FM("setEvaluateUtility",   &Pattern::SetEvaluateUtility) , \
-    FM("setOnStart",           &Pattern::SetOnStart) , \
-    FM("setOnUpdate",          &Pattern::SetOnUpdate) , \
-    FM("setOnAbort",           &Pattern::SetOnAbort) , \
-    FM("setOnComplete",        &Pattern::SetOnComplete)
-#endif
-
-
-
-#ifndef STATE_LUA_METHODS_APPLY
-#define STATE_LUA_METHODS_APPLY(FM) \
-    FM("addPattern",         &State::AddPattern) , \
-    FM("getPattern",         &State::GetPattern) , \
-    FM("removePattern",      &State::RemovePattern) , \
-    FM("getAllPatterns",     &State::Lua_GetAllPatterns) , \
-    FM("setOnEnter",         &State::SetOnEnter) , \
-    FM("setOnUpdate",        &State::SetOnUpdate) , \
-    FM("setOnAbort",         &State::SetOnAbort) , \
-    FM("setOnExit",          &State::SetOnExit)
-#endif
-
-
-
 #ifndef BEHAVIORCONTROLLER_LUA_METHODS_APPLY
 #define BEHAVIORCONTROLLER_LUA_METHODS_APPLY(FM) \
-    FM("setIsEnabled",                   &BehaviorController::SetIsEnabled) , \
-    FM("setMemoryBoard",                 &BehaviorController::SetMemoryBoard) , \
-    FM("getMemoryBoard",                 &BehaviorController::GetMemoryBoard) , \
-    FM("addState",                       &BehaviorController::AddState) , \
-    FM("getState",                       &BehaviorController::GetState) , \
-    FM("removeState",                    &BehaviorController::RemoveState) , \
-    FM("setInitialState",                &BehaviorController::SetInitialState) , \
-    FM("getCurrentStateName",            &BehaviorController::GetCurrentStateName) , \
-    FM("getAllStates",                   &BehaviorController::Lua_GetAllStates) , \
-    FM("addConditionTransition",         &BehaviorController::AddConditionTransition) , \
-    FM("addEventTransition",             &BehaviorController::AddEventTransition) , \
-    FM("changeConditionToState",         &BehaviorController::ChangeToStateInConditionTransition) , \
-    FM("changeEventToState",             &BehaviorController::ChangeToStateInEventTransition) , \
-    FM("changeConditionCheck",           &BehaviorController::ChangeCheckFuncInConditionTransition) , \
-    FM("changeEventCheck",               &BehaviorController::ChangeCheckFuncInEventTransition) , \
-    FM("removeConditionTransition",      &BehaviorController::RemoveConditionTransition) , \
-    FM("removeEventTransition",          &BehaviorController::RemoveEventTransition)
+    FM("setIsEnabled",                   &BehaviorController::SetIsEnabled), \
+    FM("getIsEnabled",                   &BehaviorController::GetIsEnabled), \
+    FM("getAllStates",                   &BehaviorController::GetAllStates), \
+    FM("trigger",                        &BehaviorController::Trigger), \
+    \
+    FM("MB_setInt",                      &BehaviorController::MemoryBoard_SetInt), \
+    FM("MB_setFloat",                    &BehaviorController::MemoryBoard_SetFloat), \
+    FM("MB_setBool",                     &BehaviorController::MemoryBoard_SetBool), \
+    FM("MB_setString",                   &BehaviorController::MemoryBoard_SetString), \
+    FM("MB_setVector3",                  &BehaviorController::MemoryBoard_SetVector3), \
+    FM("MB_setUUID",                     &BehaviorController::MemoryBoard_SetUUID), \
+    \
+    FM("MB_getInt",                      &BehaviorController::MemoryBoard_GetInt), \
+    FM("MB_getFloat",                    &BehaviorController::MemoryBoard_GetFloat), \
+    FM("MB_getBool",                     &BehaviorController::MemoryBoard_GetBool), \
+    FM("MB_getString",                   &BehaviorController::MemoryBoard_GetString), \
+    FM("MB_getVector3",                  &BehaviorController::MemoryBoard_GetVector3), \
+    FM("MB_getUUID",                     &BehaviorController::MemoryBoard_GetUUID), \
+    \
+    FM("MB_hasKey",                      &BehaviorController::MemoryBoard_HasKey), \
+    FM("MB_removeKey",                   &BehaviorController::MemoryBoard_RemoveKey), \
+    FM("MB_clear",                       &BehaviorController::MemoryBoard_Clear), \
+    \
+    FM("MB_addCallback",                 &BehaviorController::MemoryBoard_AddCallback) , \
+    FM("MB_removeCallback",              &BehaviorController::MemoryBoard_RemoveCallback), \
+    FM("MB_clearCallbacks",              &BehaviorController::MemoryBoard_ClearCallbacks), \
+    \
+    FM("S_add",                          &BehaviorController::State_Add) , \
+    FM("S_remove",                       &BehaviorController::State_Remove) , \
+    FM("S_setInitial",                   &BehaviorController::State_SetInitial), \
+    FM("S_getCurrent",                   &BehaviorController::State_GetCurrent), \
+    FM("S_getAllPatterns",               &BehaviorController::State_GetAllPatterns), \
+    FM("S_setOnEnter",                   &BehaviorController::State_SetOnEnter), \
+    FM("S_setOnUpdate",                  &BehaviorController::State_SetOnUpdate), \
+    FM("S_setOnAbort",                   &BehaviorController::State_SetOnAbort), \
+    FM("S_setOnExit",                    &BehaviorController::State_SetOnExit), \
+    \
+    FM("ET_Trigger",                     &BehaviorController::State_SetOnExit), \
+    \
+    FM("CT_add",                         &BehaviorController::ConditionTransition_Add) , \
+    FM("CT_has",                         &BehaviorController::ConditionTransition_Has) , \
+    FM("CT_changeToState",               &BehaviorController::ConditionTransition_ChangeToState) , \
+    FM("CT_changeCheckFunc",             &BehaviorController::ConditionTransition_ChangeCheckFunc), \
+    FM("CT_remove",                      &BehaviorController::ConditionTransition_Remove) , \
+    \
+    FM("P_add",                          &BehaviorController::Pattern_Add), \
+    FM("P_remove",                       &BehaviorController::Pattern_Remove), \
+    FM("P_getAllActions",                &BehaviorController::Pattern_GetAllActions), \
+    FM("P_count",                        &BehaviorController::Pattern_Count), \
+    FM("P_setEvaluateUtility",           &BehaviorController::Pattern_SetEvaluateUtility), \
+    FM("P_setOnStart",                   &BehaviorController::Pattern_SetOnStart), \
+    FM("P_setOnUpdate",                  &BehaviorController::Pattern_SetOnUpdate), \
+    FM("P_setOnAbort",                   &BehaviorController::Pattern_SetOnAbort), \
+    FM("P_setOnComplete",                &BehaviorController::Pattern_SetOnComplete), \
+    \
+    FM("A_add",                          &BehaviorController::Action_Add), \
+    FM("A_insert",                       &BehaviorController::Action_Insert), \
+    FM("A_removeByName",                 &BehaviorController::Action_RemoveByName), \
+    FM("A_removeByIndex",                &BehaviorController::Action_RemoveByIndex), \
+    FM("A_setOnStart",                   &BehaviorController::Action_SetOnStart), \
+    FM("A_setOnUpdate",                  &BehaviorController::Action_SetOnUpdate), \
+    FM("A_setOnAbort",                   &BehaviorController::Action_SetOnAbort), \
+    FM("A_setOnComplete",                &BehaviorController::Action_SetOnComplete)
 #endif

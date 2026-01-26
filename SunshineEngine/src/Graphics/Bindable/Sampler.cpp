@@ -20,6 +20,11 @@ namespace SE_G {
 			ChangePreset(device, preset);
 		}
 
+		Sampler::Sampler()
+		{
+
+		}
+
 		Sampler::~Sampler() {
 			Release();
 		}

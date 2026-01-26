@@ -30,6 +30,10 @@ void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camer
 		}
 	}
 
+	if (j.contains("fixedCamera")) {
+		m_fixedCamera = j["fixedCamera"].get<bool>();
+	}
+
 	// Load Lua script
 	if (j.contains("luaScript") && j.contains("keyFunctionMappings"))
 	{
@@ -76,6 +80,8 @@ json PlayerObject_Info::SettingsToJson() const
 		j["keyFunctionMappings"].push_back(pair.ToJson());
 	}
 
+	j["fixedCamera"] = m_fixedCamera;
+
 	j["mouseFunctionMapping"] = m_mouseActionsHandlingFunction.c_str();
 
 	return j;
@@ -107,6 +113,10 @@ void PlayerObject_Info::SettingsFromJson(const json& j, SE_G::DeferredRenderer* 
 			m_playerCamera->m_stickParams.offset.y = j["camera"]["offset"][1].get<float>();
 			m_playerCamera->m_stickParams.offset.z = j["camera"]["offset"][2].get<float>();
 		}
+	}
+
+	if (j.contains("fixedCamera")) {
+		m_fixedCamera = j["fixedCamera"].get<bool>();
 	}
 	
 	// Load Lua script

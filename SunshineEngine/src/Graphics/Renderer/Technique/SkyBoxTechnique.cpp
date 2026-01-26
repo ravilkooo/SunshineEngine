@@ -136,7 +136,7 @@ namespace SE_G {
 
     void SkyBoxTechnique::ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos)
     {
-        LightStaticData::rastCullNone->Bind(context);
+        LightStaticData::rastCullFront->Bind(context);
     }
 
     LightPosition SkyBoxTechnique::GetLightPositionInFrustum()
