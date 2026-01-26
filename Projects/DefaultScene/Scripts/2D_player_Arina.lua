@@ -62,6 +62,21 @@ function onJump(action)
     end
 end
 
+-- Interaction callback
+function onUpGravity(action)
+    if not player then
+        -- print("Error: player object not available")
+        return
+    end
+
+    if action == "pressed" then
+        setGloabalGravity(Vector3.new(0,9,0))
+    end
+    
+    if action == "up" then
+        setGloabalGravity(Vector3.new(0,-9.8,0))
+    end
+end
 
 -- Mouse/Look callback
 function onLookAround(deltaX, deltaY, wheelDelta)

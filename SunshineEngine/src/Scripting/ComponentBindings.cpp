@@ -6,6 +6,8 @@
 
 #include <Graphics/Utils/Camera.h>
 #include <GameObject/GameObject.h>
+#include <PlayerObject/PlayerObject.h>
+#include <Component/CameraComponent.h>
 #include <Scene.h>
 #include <Utils/UUID.h>
 #include <Utils/DebugUtils.h>
@@ -101,21 +103,52 @@ namespace ScriptingBindings
         // Base GameObject type; component binders will append getters
         lua.new_usertype<GameObject>("GameObject",
 			sol::no_constructor,
-			"getUUID", [](GameObject* self) { return self->m_UUID.GetHilo(); }
+			"getUUID", [](GameObject* self) { return self->m_UUID.GetHilo(); },
+			"getName", [](GameObject* player) {
+				return player->m_name.c_str();
+			}
 			);
+
+		// Register PlayerObject
+		lua.new_usertype<PlayerObject>("PlayerObject",
+			sol::no_constructor,
+			// "getTransform", [](PlayerObject* player) {
+			// 	return player->GetComponent<TransformComponent>().get();
+			// },
+			// "getPhysics", [](PlayerObject* player) {
+			// 	return player->GetComponent<PhysicsComponent>().get();
+			// },
+			"getCamera", [](PlayerObject* player) {
+				return player->m_playerCamera.get();
+			},
+			"getCameraComponent", [](PlayerObject* player) {
+				return player->GetComponent<CameraComponent>().get();
+			},
+			"getName", [](PlayerObject* player) {
+				return player->m_name.c_str();
+			},
+			"getUUID", [](PlayerObject* self) {
+				return self->m_UUID.GetHilo();
+			}
+		);
+
+        // Execute all component binders registered via LUA_REGISTER_COMPONENT
+        AutoBindings::RegisterAll(lua);
 		
 		// Remove object from scene
 		lua.set_function("removeGameObjectByUUID", [](SE::UUIDhilo uuidhilo) {
 			Scene::GetInstance().QueueGameObjectForDestruction(SE::UUID::FromHilo(uuidhilo));
 			});
 
-		// GetObject by UUID
+		// Get Object by UUID
 		lua.set_function("getGameObjectByUUID", [](SE::UUIDhilo uuidhilo) -> GameObject* {
 			return Scene::GetInstance().GetGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
 			});
 
-        // Execute all component binders registered via LUA_REGISTER_COMPONENT
-        AutoBindings::RegisterAll(lua);
+		// Get PlayerObject
+		lua.set_function("getPlayerObject", []() -> PlayerObject* {
+			return Scene::GetInstance().m_playerObject;
+			});
 
         //lua.new_usertype<PerceptionSystem>("PerceptionSystem",
         //    sol::no_constructor, 

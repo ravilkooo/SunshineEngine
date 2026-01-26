@@ -1,10 +1,15 @@
 #include <PlayerObject/PlayerLuaKeyActionsMapping.h>
+#include <Scripting/AutoBindings.h>
+
+#include <Scene.h>
+#include <Physics/PhysicsSystem.h>
+#include <AI/Perception/PerceptionSystem.h>
 #include <PlayerObject/PlayerObject.h>
-#include <Component/TransformComponent.h>
-#include <Component/TriggerComponent.h>
-#include <Component/PhysicsComponent.h>
 #include <Component/CameraComponent.h>
-#include <ParticleSystem/ParticleEmitterComponent.h>
+// #include <Component/TransformComponent.h>
+// #include <Component/TriggerComponent.h>
+// #include <Component/PhysicsComponent.h>
+// #include <ParticleSystem/ParticleEmitterComponent.h>
 #include <Graphics/Utils/Camera.h>
 
 // #include <Physics/PhysicsSystem.h>
@@ -191,8 +196,7 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"Normalize",
 		[](DXSM::Vector3* self) {
 			return self->Normalize();
-		}
-		/*&DXSM::Vector3::Normalize*/,
+		},
 		"Length", &DXSM::Vector3::Length
 	);
 
@@ -251,12 +255,15 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		*/
 	);
 
+	/*
 	// Register TransformComponent
 	m_luaState->new_usertype<TransformComponent>("TransformComponent",
 		sol::no_constructor,
 		"m_position", &TransformComponent::m_position,
 		"m_rotation", &TransformComponent::m_rotation,
-		"m_scale", &TransformComponent::m_scaleFactor
+		"m_scale", &TransformComponent::m_scaleFactor,
+		"getAbsolutePosition", &TransformComponent::GetAbsoluteWorldPosition,
+		"getAbsoluteRotation", &TransformComponent::GetAbsoluteWorldRotation
 	);
 
 	// Register CameraComponent
@@ -291,16 +298,17 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"setActive", [](PhysicsComponent* self, bool active) { self->SetActive(active); },
 		"isActive", [](PhysicsComponent* self) { return self->IsActive(); }
 	);
+	*/
 
 	// Register PlayerObject
 	m_luaState->new_usertype<PlayerObject>("PlayerObject",
 		sol::no_constructor,
-		"getTransform", [](PlayerObject* player) {
-			return player->GetComponent<TransformComponent>().get();
-		},
-		"getPhysics", [](PlayerObject* player) {
-			return player->GetComponent<PhysicsComponent>().get();
-		},
+		// "getTransform", [](PlayerObject* player) {
+		// 	return player->GetComponent<TransformComponent>().get();
+		// },
+		// "getPhysics", [](PlayerObject* player) {
+		// 	return player->GetComponent<PhysicsComponent>().get();
+		// },
 		"getCamera", [](PlayerObject* player) {
 			return player->m_playerCamera.get();
 		},
@@ -318,18 +326,18 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 	// Base GameObject type; component binders will append getters
 	m_luaState->new_usertype<GameObject>("GameObject",
 		sol::no_constructor,
-		"getTransform", [](GameObject* player) {
-			return player->GetComponent<TransformComponent>().get();
-		},
-		"getPhysics", [](GameObject* player) {
-			return player->GetComponent<PhysicsComponent>().get();
-		},
-		"getParticleEmitter", [](GameObject* player) {
-			return player->GetComponent<ParticleEmitterComponent>().get();
-		},
-		"getTrigger", [](GameObject* player) {
-			return player->GetComponent<TriggerComponent>().get();
-		},
+		// "getTransform", [](GameObject* player) {
+		// 	return player->GetComponent<TransformComponent>().get();
+		// },
+		// "getPhysics", [](GameObject* player) {
+		// 	return player->GetComponent<PhysicsComponent>().get();
+		// },
+		// "getParticleEmitter", [](GameObject* player) {
+		// 	return player->GetComponent<ParticleEmitterComponent>().get();
+		// },
+		// "getTrigger", [](GameObject* player) {
+		// 	return player->GetComponent<TriggerComponent>().get();
+		// },
 		// "getPerception", [](GameObject* player) {
 		// 	return player->GetComponent<PerceptionComponent>().get();
 		// },
@@ -344,6 +352,10 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		}
 	);
 
+	// Execute all component binders registered via LUA_REGISTER_COMPONENT
+	AutoBindings::RegisterAll(*m_luaState);
+
+
 	// Remove object from scene
 	m_luaState->set_function("removeGameObjectByUUID", [](SE::UUIDhilo uuidhilo) {
 		Scene::GetInstance().QueueGameObjectForDestruction(SE::UUID::FromHilo(uuidhilo));
@@ -355,18 +367,18 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		});
 
 
-	// m_luaState->set_function("getPerceptionSystem", []() -> PerceptionSystem& {
-	// 	return PerceptionSystem::Get();
-	// 	});
+	m_luaState->set_function("getPerceptionSystem", []() -> PerceptionSystem& {
+		return PerceptionSystem::Get();
+		});
 
 
-	// m_luaState->set_function("getGloabalGravity", []() -> DXSM::Vector3 {
-	// 	return Scene::GetInstance().m_physicsSystem->GetGravity();
-	// 	});
-	// 
-	// m_luaState->set_function("setGloabalGravity", [](DXSM::Vector3 inVal) {
-	// 	return Scene::GetInstance().m_physicsSystem->SetGravity(inVal);
-	// 	});
+	m_luaState->set_function("getGloabalGravity", []() -> DXSM::Vector3 {
+		return Scene::GetInstance().m_physicsSystem->GetGravity();
+		});
+	
+	m_luaState->set_function("setGloabalGravity", [](DXSM::Vector3 inVal) {
+		return Scene::GetInstance().m_physicsSystem->SetGravity(inVal);
+		});
 
 	// Helper functions
 	(*m_luaState)["print"] = [](const std::string& msg) {
