@@ -1,5 +1,6 @@
 #include <Scene.h>
 #include <SceneHierarchy.h>
+#include <Physics/PhysicsSystem.h>
 
 DeletionQueue::DeletionQueue()
     : queue(), head(0), tail(0), count(0)

@@ -88,6 +88,8 @@ void Game::SetupPhysics()
 			m_physicsSystem->CreateAndAddTrigger(trigc.get());
 	}
 	m_physicsSystem->FinalizeScene();
+
+	Scene::GetInstance().m_physicsSystem = m_physicsSystem.get();
 }
 
 bool Game::LoadScene(const wchar_t* scenePath)

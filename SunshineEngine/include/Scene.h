@@ -76,6 +76,8 @@ public:
     SE::UUID m_playerObjectUUID = SE::UUID(0u);
     PlayerObject* m_playerObject = nullptr;
 
+    PhysicsSystem* m_physicsSystem = nullptr;
+
     DeletionQueue m_objectDestructionQueue;
     void FlushDestructionQueue();
 private:

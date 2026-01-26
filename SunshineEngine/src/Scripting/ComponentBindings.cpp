@@ -2,6 +2,7 @@
 #include <Scripting/AutoBindings.h>
 
 #include <SimpleMath.h>
+#include <Physics/PhysicsSystem.h>
 
 #include <Graphics/Utils/Camera.h>
 #include <GameObject/GameObject.h>
@@ -119,6 +120,15 @@ namespace ScriptingBindings
         lua.set_function("getPerceptionSystem", []() -> PerceptionSystem& {
             return PerceptionSystem::Get();
             });
+
+
+		lua.set_function("getGloabalGravity", []() -> DXSM::Vector3 {
+			return Scene::GetInstance().m_physicsSystem->GetGravity();
+			});
+
+		lua.set_function("setGloabalGravity", [](DXSM::Vector3 inVal) {
+			return Scene::GetInstance().m_physicsSystem->SetGravity(inVal);
+			});
     }
 
 } // namespace ScriptingBindings

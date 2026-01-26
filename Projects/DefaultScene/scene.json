@@ -1383,7 +1383,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_angularDamping": 0.05000000074505806,
+                    "m_angularDamping": 1000.0,
                     "m_collisionLayer": "MOVING",
                     "m_friction": 0.20000000298023224,
                     "m_linearDamping": 0.05000000074505806,

@@ -1,21 +1,29 @@
 behavior = {}
 
 local playerUUID
+local playerObj
 local lastScreamTime = 4
 local screamCooldown = 2
+local playerStartPos
 
 function behavior:start()
 
     playerUUID = UUID.new()
     playerUUID.hi = 253145895
     playerUUID.lo = 2320618671
-    
+    playerObj = getGameObjectByUUID(playerUUID)
+    playerStartPos = playerObj:getTransform():getAbsolutePosition()
+
     local trigger = self.owner:getTrigger()
 
     trigger:setLuaCallback(function(event, otherUUID)
         if event == "enter" then
             if (otherUUID:isEqual(playerUUID)) then
                 removeGameObjectByUUID(self.owner:getUUID())
+                local physics = playerObj:getPhysics()
+                physics:setPosition(playerStartPos)
+                physics:setGravityFactor(0.1)
+                setGloabalGravity(Vector.new(0, 2, 0))
             end
         end
     end)
