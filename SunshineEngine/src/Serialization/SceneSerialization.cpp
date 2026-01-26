@@ -670,7 +670,16 @@ void Scene::FromJson(
                 {
                     go->m_name = objJ["m_name"].get<std::string>().c_str();
                 }
-                // Other components (Physics, Lua)
+
+                if (objJ["components"].contains("Mesh") &&
+                    !go->HasComponent<MeshComponent>()) {
+                    auto c = go->AddComponent<MeshComponent>();
+                    c->FromJson(objJ["components"]["Mesh"],
+                        renderSystem->GetDevice(),
+                        go->GetComponent<RenderComponent>().get(),
+                        go->GetComponent<TransformComponent>().get(),
+                        go->m_UUID);
+                }
                 
                 if (objJ["components"].contains("Physics")) {
                     auto c = go->AddComponent<PhysicsComponent>(
@@ -834,6 +843,16 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 if (objJ.contains("m_name"))
                 {
                     go->m_name = objJ["m_name"].get<std::string>().c_str();
+                }
+
+                if (objJ["components"].contains("Mesh") &&
+                    !go->HasComponent<MeshComponent_Info>()) {
+                    auto c = go->AddComponent<MeshComponent_Info>();
+                    c->FromJson(objJ["components"]["Mesh"],
+                        renderSystem->GetDevice(),
+                        go->GetComponent<RenderComponent_Info>().get(),
+                        go->GetComponent<TransformComponent_Info>().get(),
+                        go->m_UUID);
                 }
 
                 if (objJ["components"].contains("Physics")

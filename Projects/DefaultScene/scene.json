@@ -1139,9 +1139,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -3.389678955078125,
-                        0.30255115032196045,
-                        -9.313225746154785e-10
+                        -8.109148025512695,
+                        0.3024291694164276,
+                        2.667973518371582
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1460,7 +1460,7 @@
                         0.0
                     ]
                 },
-                "fixedCamera": true,
+                "fixedCamera": false,
                 "keyFunctionMappings": [
                     {
                         "functionName": "onMoveLeft",
@@ -2537,6 +2537,226 @@
                 }
             },
             "m_type": "Box"
+        },
+        {
+            "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/collectable.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:250,250,0,255.dds"
+                    }
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        17.46784210205078,
+                        -2.689591646194458,
+                        -6.7639994621276855
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    }
+                }
+            },
+            "m_UUID": 543340317642731850,
+            "m_UUID_hi": 126506275,
+            "m_UUID_lo": 3778949450,
+            "m_group": "Lighting",
+            "m_lightData": {
+                "Att": {
+                    "x": 0.0,
+                    "y": 0.20000000298023224,
+                    "z": 0.20000000298023224
+                },
+                "Diffuse": {
+                    "x": 0.34750914573669434,
+                    "y": 0.8676470518112183,
+                    "z": 0.06379758566617966
+                },
+                "DiffusePad": 1.0,
+                "Position": {
+                    "x": 17.46784210205078,
+                    "y": -2.689591646194458,
+                    "z": -6.7639994621276855
+                },
+                "Range": 20.0,
+                "Specular": {
+                    "x": 0.11707029491662979,
+                    "y": 0.8529411554336548,
+                    "z": 0.11707029491662979
+                },
+                "SpecularPad": 1.0,
+                "pad": 0.0
+            },
+            "m_name": "PointLight",
+            "m_parent": null,
+            "m_type": "PointLight"
+        },
+        {
+            "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/collectable.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:0,150,250,255.dds"
+                    }
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        13.964676856994629,
+                        -3.1107845306396484,
+                        -6.724831581115723
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "sphere": {
+                                "radius": 1.0
+                            }
+                        },
+                        "shapeType": "Sphere",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    }
+                }
+            },
+            "m_UUID": 15857968606328152152,
+            "m_UUID_hi": 3692221037,
+            "m_UUID_lo": 2809946200,
+            "m_group": "Lighting",
+            "m_lightData": {
+                "Att": {
+                    "x": 0.0,
+                    "y": 0.30000001192092896,
+                    "z": 0.30000001192092896
+                },
+                "Diffuse": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "DiffusePad": 1.0,
+                "Position": {
+                    "x": 13.964676856994629,
+                    "y": -3.1107845306396484,
+                    "z": -6.724831581115723
+                },
+                "Range": 20.0,
+                "Specular": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                },
+                "SpecularPad": 1.0,
+                "pad": 0.0
+            },
+            "m_name": "PointLight",
+            "m_parent": null,
+            "m_type": "PointLight"
         }
     ]
 }
