@@ -70,11 +70,11 @@ function onUpGravity(action)
     end
 
     if action == "pressed" then
-        setGloabalGravity(Vector3.new(0,9,0))
+        setGlobalGravity(Vector3.new(0,9,0))
     end
     
     if action == "up" then
-        setGloabalGravity(Vector3.new(0,-9.8,0))
+        setGlobalGravity(Vector3.new(0,-9.8,0))
     end
 end
 

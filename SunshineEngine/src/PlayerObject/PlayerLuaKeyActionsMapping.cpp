@@ -372,11 +372,11 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		});
 
 
-	m_luaState->set_function("getGloabalGravity", []() -> DXSM::Vector3 {
+	m_luaState->set_function("getGlobalGravity", []() -> DXSM::Vector3 {
 		return Scene::GetInstance().m_physicsSystem->GetGravity();
 		});
 	
-	m_luaState->set_function("setGloabalGravity", [](DXSM::Vector3 inVal) {
+	m_luaState->set_function("setGlobalGravity", [](DXSM::Vector3 inVal) {
 		return Scene::GetInstance().m_physicsSystem->SetGravity(inVal);
 		});
 
