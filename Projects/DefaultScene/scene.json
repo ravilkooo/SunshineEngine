@@ -2654,7 +2654,7 @@
                     "scriptLoaded": true,
                     "scriptPath": {
                         "assetSource": 1,
-                        "relativePath": "Scripts/collectable.lua"
+                        "relativePath": "Scripts/collectable_cameraEffect.lua"
                     }
                 },
                 "Mesh": {
@@ -2686,7 +2686,7 @@
                         1.0
                     ],
                     "m_position": [
-                        13.964676856994629,
+                        11.4518461227417,
                         -3.1107845306396484,
                         -6.724831581115723
                     ],
@@ -2741,7 +2741,7 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 13.964676856994629,
+                    "x": 11.4518461227417,
                     "y": -3.1107845306396484,
                     "z": -6.724831581115723
                 },

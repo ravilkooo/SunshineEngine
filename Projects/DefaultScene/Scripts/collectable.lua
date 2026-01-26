@@ -24,7 +24,7 @@ function behavior:start()
                 if otherUUID:isEqual(playerUUID) then
                     collected = true
                     angleOffet = self.owner:getTransform().m_position.x
-                    self.owner:getTransform().m_scale = Vector3.new(scale, scale, scale)
+                    self.owner:getTransform().m_scaleFactor = Vector3.new(scale, scale, scale)
                 end
             end
         end
