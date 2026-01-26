@@ -23,7 +23,6 @@ function behavior:start()
                 local physics = playerObj:getPhysics()
                 physics:setPosition(playerStartPos)
                 physics:setGravityFactor(0.1)
-                setGloabalGravity(Vector.new(0, 2, 0))
             end
         end
     end)

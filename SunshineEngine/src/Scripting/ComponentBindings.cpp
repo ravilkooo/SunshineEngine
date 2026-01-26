@@ -36,7 +36,12 @@ namespace ScriptingBindings
             sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float)>(),
             "x", &DXSM::Vector3::x,
             "y", &DXSM::Vector3::y,
-            "z", &DXSM::Vector3::z
+            "z", &DXSM::Vector3::z,
+			"normalize",
+			[](DXSM::Vector3* self) {
+				return self->Normalize();
+			},
+			"length", &DXSM::Vector3::Length
         );
 
 		// Register Camera type

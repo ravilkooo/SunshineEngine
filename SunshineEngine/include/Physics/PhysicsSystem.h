@@ -362,8 +362,8 @@ private:
 public:
     void EnqueueCommand(std::function<void()> fn);
 
-private:
     void FlushCommands(); // вызвать в безопасной точке
+private:
 
     std::mutex m_cmdMutex;
     std::vector<std::function<void()>> m_cmds;

@@ -377,7 +377,7 @@ void PhysicsSystem::Step(float dt) {
     JPH::Vec3 velocity = bodyInterface->GetLinearVelocity(sphere_id);
     //std::cout << " :: Position = (" << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "), Velocity = (" << velocity.GetX() << ", " << velocity.GetY() << ", " << velocity.GetZ() << ")" << std::endl;
     */
-    FlushCommands();
+    // FlushCommands();
 
     m_physicsSystem->Update(
         dt, /*collisionSteps*/1,
@@ -386,7 +386,7 @@ void PhysicsSystem::Step(float dt) {
 
     UpdateTriggerOverlaps();
 
-    FlushCommands();
+    // FlushCommands();
 }
 
 void PhysicsSystem::ClearAllBodies()

@@ -471,6 +471,13 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/hanging_2.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -515,7 +522,7 @@
                 "Transform": {
                     "m_localPosition": [
                         0.0,
-                        0.0,
+                        -1.2999999523162842,
                         0.0
                     ],
                     "m_localRotation": [
@@ -529,19 +536,19 @@
                         1.0
                     ],
                     "m_position": [
-                        4.663530349731445,
-                        0.13686585426330566,
-                        0.8899879455566406
+                        0.0,
+                        4.202824115753174,
+                        0.0
                     ],
                     "m_rotation": [
-                        1.2980644702911377,
-                        3.117504596710205,
-                        -1.1628031730651855
+                        -0.0,
+                        0.0,
+                        0.0
                     ],
                     "m_scaleFactor": [
-                        0.9999998211860657,
-                        0.9999998211860657,
-                        0.9999997615814209
+                        1.000001311302185,
+                        1.0000003576278687,
+                        1.0000070333480835
                     ]
                 }
             },
@@ -1035,7 +1042,7 @@
                     "m_position": [
                         0.0,
                         -5.0,
-                        0.753502607345581
+                        0.0
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1383,7 +1390,7 @@
                         }
                     },
                     "m_activation": "Activate",
-                    "m_angularDamping": 1000.0,
+                    "m_angularDamping": 100.0,
                     "m_collisionLayer": "MOVING",
                     "m_friction": 0.20000000298023224,
                     "m_linearDamping": 0.05000000074505806,
@@ -1410,11 +1417,11 @@
                     "m_position": [
                         21.773658752441406,
                         -3.048081636428833,
-                        -6.974911689758301
+                        -6.949428081512451
                     ],
                     "m_rotation": [
+                        -0.0,
                         0.0,
-                        -1.350581407546997,
                         0.0
                     ],
                     "m_scaleFactor": [
@@ -1448,49 +1455,25 @@
                 },
                 "keyFunctionMappings": [
                     {
-                        "functionName": "onJump",
-                        "key": 69
-                    },
-                    {
-                        "functionName": "onDown",
-                        "key": 81
-                    },
-                    {
-                        "functionName": "onMoveForward",
-                        "key": 87
-                    },
-                    {
-                        "functionName": "onStrafeLeft",
+                        "functionName": "onMoveLeft",
                         "key": 65
                     },
                     {
-                        "functionName": "onMoveBackward",
-                        "key": 83
-                    },
-                    {
-                        "functionName": "onStrafeRight",
+                        "functionName": "onMoveRight",
                         "key": 68
-                    },
-                    {
-                        "functionName": "onAngularImpulse_inv",
-                        "key": 49
-                    },
-                    {
-                        "functionName": "onAngularImpulse",
-                        "key": 50
                     },
                     {
                         "functionName": "onJump",
                         "key": 32
                     },
                     {
-                        "functionName": "onInteract",
-                        "key": 52
+                        "functionName": "onJump",
+                        "key": 69
                     }
                 ],
                 "luaScript": {
                     "assetSource": 1,
-                    "relativePath": "Scripts/player_controller_dynamic.lua"
+                    "relativePath": "Scripts/2D_player_Arina.lua"
                 },
                 "mouseFunctionMapping": "onLookAround"
             }
@@ -1972,7 +1955,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
-                        "relativePath": "Color:250,0,250,255.dds"
+                        "relativePath": "Color:0,0,250,255.dds"
                     }
                 },
                 "ParticleEmitter": {

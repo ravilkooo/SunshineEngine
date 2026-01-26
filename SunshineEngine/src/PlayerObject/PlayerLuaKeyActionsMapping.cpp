@@ -1,9 +1,15 @@
 #include <PlayerObject/PlayerLuaKeyActionsMapping.h>
 #include <PlayerObject/PlayerObject.h>
 #include <Component/TransformComponent.h>
+#include <Component/TriggerComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <Component/CameraComponent.h>
+#include <ParticleSystem/ParticleEmitterComponent.h>
 #include <Graphics/Utils/Camera.h>
+
+// #include <Physics/PhysicsSystem.h>
+// #include <AI/Perception/PerceptionSystem.h>
+
 
 #include <iostream>
 
@@ -276,7 +282,14 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"resetForce", &PhysicsComponent::ResetForce,
 		"resetTorque", &PhysicsComponent::ResetTorque,
 		"setAngularVelocity", &PhysicsComponent::SetAngularVelocity,
-		"setLinearVelocity", &PhysicsComponent::SetLinearVelocity
+		"setLinearVelocity", &PhysicsComponent::SetLinearVelocity,
+
+		"setPosition", [](PhysicsComponent* self, DXSM::Vector3 inVal) { return self->SetPosition(inVal); },
+		"setRotation", [](PhysicsComponent* self, DXSM::Vector3 inVal) { return self->SetRotation(inVal); },
+		"getGravityFactor", [](PhysicsComponent* self) { return self->GetGravityFactor(); },
+		"setGravityFactor", [](PhysicsComponent* self, float inVal) { return self->SetGravityFactor(inVal); },
+		"setActive", [](PhysicsComponent* self, bool active) { self->SetActive(active); },
+		"isActive", [](PhysicsComponent* self) { return self->IsActive(); }
 	);
 
 	// Register PlayerObject
@@ -311,6 +324,18 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"getPhysics", [](GameObject* player) {
 			return player->GetComponent<PhysicsComponent>().get();
 		},
+		"getParticleEmitter", [](GameObject* player) {
+			return player->GetComponent<ParticleEmitterComponent>().get();
+		},
+		"getTrigger", [](GameObject* player) {
+			return player->GetComponent<TriggerComponent>().get();
+		},
+		// "getPerception", [](GameObject* player) {
+		// 	return player->GetComponent<PerceptionComponent>().get();
+		// },
+		// "getBehavior", [](GameObject* player) {
+		// 	return player->GetComponent<BehaviorController>().get();
+		// },
 		"getName", [](GameObject* player) {
 			return player->m_name.c_str();
 		},
@@ -321,7 +346,7 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 
 	// Remove object from scene
 	m_luaState->set_function("removeGameObjectByUUID", [](SE::UUIDhilo uuidhilo) {
-		Scene::GetInstance().RemoveGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
+		Scene::GetInstance().QueueGameObjectForDestruction(SE::UUID::FromHilo(uuidhilo));
 		});
 
 	// GetObject by UUID
@@ -329,9 +354,23 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		return Scene::GetInstance().GetGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
 		});
 
+
+	// m_luaState->set_function("getPerceptionSystem", []() -> PerceptionSystem& {
+	// 	return PerceptionSystem::Get();
+	// 	});
+
+
+	// m_luaState->set_function("getGloabalGravity", []() -> DXSM::Vector3 {
+	// 	return Scene::GetInstance().m_physicsSystem->GetGravity();
+	// 	});
+	// 
+	// m_luaState->set_function("setGloabalGravity", [](DXSM::Vector3 inVal) {
+	// 	return Scene::GetInstance().m_physicsSystem->SetGravity(inVal);
+	// 	});
+
 	// Helper functions
 	(*m_luaState)["print"] = [](const std::string& msg) {
 		// std::cout << "[Lua] " << msg << std::endl;
-        printf("%s\n", msg.c_str());
+		printf("%s\n", msg.c_str());
 	};
 }
