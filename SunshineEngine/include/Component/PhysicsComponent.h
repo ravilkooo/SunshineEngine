@@ -100,6 +100,11 @@ public:
     void SetGravityFactor(float inGravityFactor);
     float GetGravityFactor();
 
+    // Set position
+    void SetPosition(DXSM::Vector3 inPosition);
+    // Set rotation
+    void SetRotation(DXSM::Vector3 inRotation);
+
     void InitTransforms();
 
     JPH::Body* GetBody() const;
@@ -225,7 +230,11 @@ public:
     FM("getLinearVelocity", [](PhysicsComponent* self){ return self->GetLinearVelocity(); }), \
     FM("getPointVelocity", [](PhysicsComponent* self, const DXSM::Vector3& pt){ return self->GetPointVelocity(pt); }), \
     FM("getPosition", [](PhysicsComponent* self){ return self->GetPosition(); }), \
+    FM("setPosition", [](PhysicsComponent* self, DXSM::Vector3 inVal){ return self->SetPosition(inVal); }), \
     FM("getRotation", [](PhysicsComponent* self){ return self->GetRotation(); }), \
+    FM("setRotation", [](PhysicsComponent* self, DXSM::Vector3 inVal){ return self->SetRotation(inVal); }), \
+    FM("getGravityFactor", [](PhysicsComponent* self){ return self->GetGravityFactor(); }), \
+    FM("setGravityFactor", [](PhysicsComponent* self, float inVal){ return self->SetGravityFactor(inVal); }), \
     FM("resetForce", [](PhysicsComponent* self){ self->ResetForce(); }), \
     FM("resetTorque", [](PhysicsComponent* self){ self->ResetTorque(); }), \
     FM("setAngularVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetAngularVelocity(v); }), \

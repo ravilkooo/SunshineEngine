@@ -251,14 +251,19 @@ void PhysicsComponent::SetObjecUUID(SE::UUID objectUUID) {
 // Can have only two values: MOVING or NON_MOVING
 void PhysicsComponent::SetObjectLayer(JPH::ObjectLayer layer) { m_objectLayer = layer; }
 
+// Initial pos
 void PhysicsComponent::SetPosition(const JPH::RVec3& pos) { m_position = pos; }
 
+// Initial orientation
 void PhysicsComponent::SetOrientation(const JPH::Quat& rot) { m_orientation = rot; }
 
+// Initial
 void PhysicsComponent::SetMotionType(JPH::EMotionType type) { m_motionType = type; }
 
+// Initial
 void PhysicsComponent::SetActivation(JPH::EActivation activation) { activation = activation; }
 
+// Initial
 void PhysicsComponent::SetShape(JPH::ShapeRefC shapePtr) { m_shape = shapePtr; }
 
 void PhysicsComponent::SetFriction(float inFriction)
@@ -266,8 +271,11 @@ void PhysicsComponent::SetFriction(float inFriction)
     if (!m_physicsSystem)
         return;
 
-    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
-    return bodyInterface.SetFriction(m_joltBodyId, inFriction);
+    m_physicsSystem->EnqueueCommand([this, inFriction]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.SetFriction(m_joltBodyId, inFriction);
+        });
 }
 
 float PhysicsComponent::GetFriction()
@@ -284,8 +292,11 @@ void PhysicsComponent::SetRestitution(float inRestitution)
     if (!m_physicsSystem)
         return;
 
-    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
-    return bodyInterface.SetRestitution(m_joltBodyId, inRestitution);
+    m_physicsSystem->EnqueueCommand([this, inRestitution]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.SetRestitution(m_joltBodyId, inRestitution);
+        });
 }
 
 float PhysicsComponent::GetRestitution()
@@ -295,6 +306,62 @@ float PhysicsComponent::GetRestitution()
 
     JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
     return bodyInterface.GetRestitution(m_joltBodyId);
+}
+
+void PhysicsComponent::SetGravityFactor(float inGravityFactor)
+{
+    if (!m_physicsSystem)
+        return;
+
+    m_physicsSystem->EnqueueCommand([this, inGravityFactor]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.SetGravityFactor(m_joltBodyId, inGravityFactor);
+        });
+}
+
+float PhysicsComponent::GetGravityFactor()
+{
+    if (!m_physicsSystem)
+        return 1.0f;
+
+    JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+    return bodyInterface.GetGravityFactor(m_joltBodyId);
+}
+
+// Set position
+void PhysicsComponent::SetPosition(DXSM::Vector3 inPosition)
+{
+    if (!m_physicsSystem)
+        return;
+
+    m_physicsSystem->EnqueueCommand([this, inPosition]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.SetPosition(
+                m_joltBodyId,
+                JPH::Vec3(inPosition.x, inPosition.y, inPosition.z),
+                JPH::EActivation::Activate);
+        });
+}
+
+// Set rotation
+void PhysicsComponent::SetRotation(DXSM::Vector3 inRotation)
+{
+    if (!m_physicsSystem)
+        return;
+
+
+    m_physicsSystem->EnqueueCommand([this, inRotation]()
+        {
+            auto quatRot = DXSM::Quaternion::CreateFromYawPitchRoll(inRotation.y, inRotation.x, inRotation.z);
+
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.SetRotation(
+                m_joltBodyId,
+                JPH::Quat(quatRot.x, quatRot.y, quatRot.z, quatRot.w),
+                JPH::EActivation::Activate);
+        });
 }
 
 void PhysicsComponent::InitTransforms()

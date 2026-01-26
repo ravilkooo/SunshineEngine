@@ -333,6 +333,10 @@ public:
     // Check trigger overlaps each frame
     void UpdateTriggerOverlaps();
 
+    // Global gravity value
+    void SetGravity(DXSM::Vector3 inGravity);
+    DXSM::Vector3 GetGravity();
+
 private:
 
     void ClearAllBodies();
@@ -354,12 +358,14 @@ private:
     eastl::vector<JPH::BodyID> m_activeTriggers;
 
     bool m_isValid = false;
-    // TO-DO
-    // Something like list of all phys objects (or some entries like in nau engine)
-    // It will be used for (Syn Step) syncronization with TransformComponent and other stuff
-    // D:\Workspace\NauFork\NauEnginePublic\engine\core\modules\physics\src\physics_service.cpp
+    
+public:
+    void EnqueueCommand(std::function<void()> fn);
 
-    // You can make PhysicsBodyEntry like in nau
-    // D:\Workspace\NauFork\NauEnginePublic\engine\core\modules\physics\src\physics_world_state.h
+private:
+    void FlushCommands(); // вызвать в безопасной точке
+
+    std::mutex m_cmdMutex;
+    std::vector<std::function<void()>> m_cmds;
 };
 

@@ -377,6 +377,7 @@ void PhysicsSystem::Step(float dt) {
     JPH::Vec3 velocity = bodyInterface->GetLinearVelocity(sphere_id);
     //std::cout << " :: Position = (" << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "), Velocity = (" << velocity.GetX() << ", " << velocity.GetY() << ", " << velocity.GetZ() << ")" << std::endl;
     */
+    FlushCommands();
 
     m_physicsSystem->Update(
         dt, /*collisionSteps*/1,
@@ -384,6 +385,8 @@ void PhysicsSystem::Step(float dt) {
         m_tempAllocator.get(), m_jobSystem.get());
 
     UpdateTriggerOverlaps();
+
+    FlushCommands();
 }
 
 void PhysicsSystem::ClearAllBodies()
@@ -511,4 +514,36 @@ void PhysicsSystem::RemoveTrigger(TriggerComponent* triggerComp)
     triggerComp->m_joltBody = nullptr;
     triggerComp->m_joltBodyId = JPH::BodyID();
     triggerComp->m_physicsSystem = nullptr;
+}
+
+
+void PhysicsSystem::SetGravity(DXSM::Vector3 inGravity)
+{
+    EnqueueCommand([this, inGravity]()
+        {
+            m_physicsSystem->SetGravity(JPH::Vec3(inGravity.x, inGravity.y, inGravity.z));
+        });
+}
+
+DXSM::Vector3 PhysicsSystem::GetGravity()
+{
+    auto currGrav = m_physicsSystem->GetGravity();
+    return DXSM::Vector3(currGrav.GetX(), currGrav.GetY(), currGrav.GetZ());
+}
+
+void PhysicsSystem::EnqueueCommand(std::function<void()> fn)
+{
+    std::lock_guard<std::mutex> l(m_cmdMutex);
+    m_cmds.push_back(std::move(fn));
+}
+
+void PhysicsSystem::FlushCommands()
+{
+    std::vector<std::function<void()>> local;
+    {
+        std::lock_guard<std::mutex> l(m_cmdMutex);
+        local.swap(m_cmds);
+    }
+    for (auto& fn : local)
+        fn();
 }
