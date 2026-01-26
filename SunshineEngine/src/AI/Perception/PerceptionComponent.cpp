@@ -244,7 +244,7 @@ void PerceptionComponent::ChangeInSight(SE::UUID GOID, bool NewCondition)
 
 		if (CB.valid()) [[likely]]
 		{
-			CB(GOID, NewCondition);
+			CB(GOID.GetHilo(), NewCondition);
 		}
 	}
 }
@@ -257,7 +257,7 @@ void PerceptionComponent::Heard(SE::UUID GOID, float Loudness)
 
 		if (CB.valid()) [[likely]]
 		{
-			CB(GOID, Loudness);
+			CB(GOID.GetHilo(), Loudness);
 		}
 	}
 }
@@ -276,7 +276,7 @@ void PerceptionComponent::DealDamage(PerceptionComponent* Instigator, float Dama
 
 		if (CB.valid()) [[likely]]
 		{
-			CB(Instigator->GetOwnerID(), DamageAmount);
+			CB(Instigator->GetOwnerID().GetHilo(), DamageAmount);
 		}
 	}
 };
