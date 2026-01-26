@@ -1460,6 +1460,7 @@
                         0.0
                     ]
                 },
+                "fixedCamera": true,
                 "keyFunctionMappings": [
                     {
                         "functionName": "onMoveLeft",

@@ -177,6 +177,12 @@ void PlayerSettingPanel::DrawPlayerControllerDetails()
         ImGui::Text("Mouse Actions");
         EditorUI::FontStyles::Pop();
 
+        ImGui::Checkbox("Fixed camera", &m_playerObject->m_fixedCamera);
+        ImGui::SetItemTooltip(
+            "Turn on/off default camera\n"
+            "movement controls"
+        );
+
         ImGui::Text("Mouse Handler Function:");
         ImGui::SameLine();
 

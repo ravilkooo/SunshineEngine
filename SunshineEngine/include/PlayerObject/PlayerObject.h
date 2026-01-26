@@ -55,7 +55,6 @@ class PlayerObject_Info : public GameObject_Info
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
-	bool m_fixeCamera = false;
 
 	// Lua script configuration
 	AssetPath m_luaScriptPath;
@@ -174,5 +173,5 @@ public:
 public:
 
 	PlayerLuaKeyActionsMapping m_luaActionMapping;
-
+	bool m_fixedCamera = false;
 };
