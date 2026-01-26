@@ -46,7 +46,7 @@ function behavior:start()
                     collected = true
                     angleOffet = self.owner:getTransform().m_position.x
                     self.owner:getTransform().m_scaleFactor = newScale
-                    setGlobalGravity(0,-1,0)
+                    setGlobalGravity(Vector3.new(0,-1,0))
                 end
             end
         end
@@ -79,7 +79,7 @@ function behavior:update(dt)
             self.owner:getTransform().m_scaleFactor = Vector3.new(
                 startScale.x, startScale.y, startScale.z
             )
-            setGlobalGravity(0,-9.8,0)
+            setGlobalGravity(Vector3.new(0,-9.8,0))
         end
     end
 

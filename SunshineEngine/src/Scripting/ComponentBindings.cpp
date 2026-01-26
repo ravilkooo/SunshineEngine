@@ -160,11 +160,11 @@ namespace ScriptingBindings
             });
 
 
-		lua.set_function("getGloabalGravity", []() -> DXSM::Vector3 {
+		lua.set_function("getGlobalGravity", []() -> DXSM::Vector3 {
 			return Scene::GetInstance().m_physicsSystem->GetGravity();
 			});
 
-		lua.set_function("setGloabalGravity", [](DXSM::Vector3 inVal) {
+		lua.set_function("setGlobalGravity", [](DXSM::Vector3 inVal) {
 			return Scene::GetInstance().m_physicsSystem->SetGravity(inVal);
 			});
     }
