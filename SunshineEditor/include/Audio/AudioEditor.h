@@ -1,6 +1,7 @@
 #pragma once
 #include "Audio/AudioSystem.h"
 #include <Utils/AssetPath.h>
+#include <EASTL/string.h>
 
 class AudioEditor {
 private:
@@ -11,7 +12,7 @@ public:
     static std::vector<AssetPath> m_audioFiles;
 
     std::vector<AudioTrack> m_trackList;
-    static std::string s_configPath;
+    static eastl::wstring s_configPath;
 
     AudioEditor(AudioSystem* audioSystem = nullptr) : m_previewSystem(audioSystem)
     {
@@ -31,8 +32,8 @@ public:
 
     void Update();
 
-    void SetConfigPath(const std::string& path);
-    static const std::string& GetConfigPath();
+    static void SetConfigPath(const eastl::wstring& path);
+    static const eastl::wstring& GetConfigPath();
 
     AudioTrack* getTrack(std::string name);
     AudioTrack* getTrack(AssetPath name);
@@ -47,7 +48,7 @@ public:
     void SetVolume(std::string name, float volume);
     
     void SaveToJson();
-    void SaveToJson(const std::string& path);
+    void SaveToJson(const eastl::wstring& path);
     bool LoadFromJson();
     
     void RenameTrack(const std::string& oldName, const std::string& newName);

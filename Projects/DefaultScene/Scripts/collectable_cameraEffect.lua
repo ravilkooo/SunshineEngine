@@ -47,6 +47,8 @@ function behavior:start()
                     angleOffet = self.owner:getTransform().m_position.x
                     self.owner:getTransform().m_scaleFactor = newScale
                     setGlobalGravity(Vector3.new(0,-1,0))
+                    local audio = getAudioSystem()
+                    audio:play("drumloop")
                 end
             end
         end
@@ -80,6 +82,8 @@ function behavior:update(dt)
                 startScale.x, startScale.y, startScale.z
             )
             setGlobalGravity(Vector3.new(0,-9.8,0))
+            local audio = getAudioSystem()
+            audio:stop("drumloop")
         end
     end
 

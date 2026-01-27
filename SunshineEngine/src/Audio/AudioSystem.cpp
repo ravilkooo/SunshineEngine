@@ -43,7 +43,9 @@ void AudioSystem::Update() {
 }
 
 void AudioSystem::LoadFromJson(const std::string& jsonPath) {
-    std::ifstream file(jsonPath);
+    eastl::wstring w =
+        JoinWchar_Wstring(AssetPath::s_projectPath.c_str(), L"Audio/audio_tracks.json");
+    std::ifstream file(w.c_str());
     if (!file.is_open()) return;
 
     json j;
@@ -73,6 +75,36 @@ void AudioSystem::LoadFromJson(const std::string& jsonPath) {
             }
         }
     }
+}
+
+AudioHandle AudioSystem::PlayWithSettings(const std::string& trackName) {
+    AudioHandle handle = { trackName, 0, false };
+
+    if (m_soundBank.find(trackName) == m_soundBank.end()) {
+        return handle;
+    }
+
+    FMOD::Sound* sound = m_soundBank[trackName];
+    AudioTrack& config = m_tracksData[trackName];
+    
+    FMOD::Channel* channel = nullptr;
+    
+    FMOD_RESULT res = m_system->playSound(sound, 0, true, &channel);
+    CheckError(res);
+
+    if (res == FMOD_OK && channel) {
+        channel->setVolume(config.volume);
+        
+        channel->setMode(config.loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+        
+        channel->setPaused(false);
+
+        m_activeChannels[trackName] = channel;
+        
+        handle.isPlaying = true;
+    }
+
+    return handle;
 }
 
 AudioHandle AudioSystem::Play(const std::string& trackName, float volume, bool loop) {

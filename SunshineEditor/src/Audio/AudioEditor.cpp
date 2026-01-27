@@ -9,11 +9,9 @@
 #include "Utils/StringUtils.h"
 #include <Utils/AssetPath.h>
 
-std::string AudioEditor::s_configPath = []() {
-    eastl::wstring w =
-        JoinWchar_Wstring(AssetPath::s_projectPath.c_str(), L"Audio/audio_tracks.json");
+eastl::wstring AudioEditor::s_configPath = []() {
+    return JoinWchar_Wstring(AssetPath::s_projectPath.c_str(), L"Audio/audio_tracks.json");
         //JoinWchar_Wstring(ENGINE_ASSETS_DIR, L"Config/audio_tracks.json");
-    return std::string(w.begin(), w.end());
 }();
 
 std::vector<AssetPath> AudioEditor::m_audioFiles;
@@ -59,7 +57,12 @@ void AudioEditor::Update() {
     }
 }
 
-const std::string& AudioEditor::GetConfigPath()
+void AudioEditor::SetConfigPath(const eastl::wstring& path)
+{
+    s_configPath = path;
+}
+
+const eastl::wstring& AudioEditor::GetConfigPath()
 {
     return s_configPath;
 }
@@ -91,10 +94,10 @@ void AudioEditor::PlayPreview(std::string name) {
     if (s_configPath.empty()) return;
 
     std::filesystem::path previewPath =
-        std::filesystem::path(s_configPath).parent_path()
+        std::filesystem::path(s_configPath.c_str()).parent_path()
         / "audio_preview.json";
 
-    SaveToJson(previewPath.string());
+    SaveToJson(Utf8ToWString(previewPath.string().c_str()));
     m_previewSystem->LoadFromJson(previewPath.string());
     m_previewSystem->Play(name);
 }
@@ -136,13 +139,13 @@ void AudioEditor::SaveToJson()
     SaveToJson(s_configPath);
 }
 
-void AudioEditor::SaveToJson(const std::string& path)
+void AudioEditor::SaveToJson(const eastl::wstring& path)
 {
     if (path.empty()) return;
     if (m_trackList.empty()) return;
 
     std::filesystem::create_directories(
-        std::filesystem::path(path).parent_path()
+        std::filesystem::path(path.c_str()).parent_path()
     );
 
     json j;
@@ -152,7 +155,7 @@ void AudioEditor::SaveToJson(const std::string& path)
         j["tracks"].push_back(track.ToJson());
     }
 
-    std::ofstream file(path);
+    std::ofstream file(path.c_str());
     if (!file.is_open()) return;
 
     file << j.dump(4);
@@ -162,7 +165,7 @@ bool AudioEditor::LoadFromJson()
 {
     if (s_configPath.empty()) return false;
 
-    std::ifstream file(s_configPath);
+    std::ifstream file(s_configPath.c_str());
     if (!file.is_open()) {
         LOG_EDITOR_WARN("Audio config not found: %s", s_configPath.c_str());
         return false;

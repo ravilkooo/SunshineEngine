@@ -99,6 +99,7 @@ public:
     void LoadFromJson(const std::string& jsonPath);
 
     AudioHandle Play(const std::string& trackName, float volume = 1.0f, bool loop = false);
+    AudioHandle PlayWithSettings(const std::string& trackName);
     void Stop(const std::string& trackName);
     void StopAll(); 
     void Pause(const std::string& trackName, bool pauseState);
@@ -115,8 +116,11 @@ public:
 };
 
 #ifndef AUDIOSYSTEM_LUA_METHODS_APPLY
-#define AUDIOSYSTEM_LUA_METHODS_APPLY(FM) \
+#define AUDIOSYSTEM_LUA_METHODS_APPLY(FM)  \
     FM("play", [](AudioSystem* self, const std::string& name) { \
+        return self->PlayWithSettings(name); \
+    }) , \
+    FM("playOnce", [](AudioSystem* self, const std::string& name) { \
         return self->Play(name); \
     }) , \
     FM("playWithParams", [](AudioSystem* self, const std::string& name, sol::optional<float> vol, sol::optional<bool> loop) { \

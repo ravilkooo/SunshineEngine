@@ -1399,7 +1399,7 @@
                     "m_activation": "Activate",
                     "m_angularDamping": 100.0,
                     "m_collisionLayer": "MOVING",
-                    "m_friction": 10.0,
+                    "m_friction": 1.0,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
@@ -2347,13 +2347,6 @@
         },
         {
             "components": {
-                "Lua": {
-                    "scriptLoaded": true,
-                    "scriptPath": {
-                        "assetSource": 1,
-                        "relativePath": "Scripts/triggerLight.lua"
-                    }
-                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,

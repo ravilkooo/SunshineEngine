@@ -42,8 +42,6 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	}
 	m_audioEditor = eastl::make_unique<AudioEditor>(&AudioSystem::Get());
 	
-	m_audioEditor->LoadFromJson();
-	
 	UINT worldEditorWidth = winWidth / 2;
 	UINT worldEditorHeight = winHeight / 2;
 
@@ -401,7 +399,9 @@ void EditorApp::RunGame()
 	if (m_audioEditor) {
 		m_audioEditor->SetAudioSystem(&AudioSystem::Get());
 	}
-
+	AudioSystem::Get().LoadFromJson(
+		WStringToUtf8(AudioEditor::GetConfigPath().c_str()).c_str()
+	);
 	if (AudioSystem::IsInitialized()) {
 		AudioSystem::Get().StopAll();
 	}
@@ -467,11 +467,13 @@ void EditorApp::StopGame() {
 	m_currentGame->m_particleSystem->DisableAllEmitters();
 	m_currentGame->m_particleSystem;
 	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
+
 	if (m_audioEditor) {
 		AudioSystem::Get().LoadFromJson(
-			m_audioEditor->GetConfigPath()
+			WStringToUtf8(AudioEditor::GetConfigPath().c_str()).c_str()
 		);
 	}
+
 	m_currentGame->ClearScene();
 	m_currentGame.reset(NULL);
 	m_currentGame->ClearScene();
@@ -543,7 +545,11 @@ bool EditorApp::OpenProject()
 		}
 	}
 	
+
 	SetupAssetsDirectory();
+	AudioEditor::SetConfigPath(
+		JoinWchar_Wstring(AssetPath::s_projectPath.c_str(), L"Audio/audio_tracks.json"));
+	m_audioEditor->LoadFromJson();
 	return true;
 }
 

@@ -80,7 +80,7 @@ namespace SE
 
 		//GetFullPath();
 		AssetPath::s_projectPath = GetFullPath();
-
+		
 		if (!std::filesystem::exists(scenePath.c_str()))
 		{
 			return "Scene file not found: " + WStringToUtf8(scenePath);
@@ -320,16 +320,16 @@ namespace SE
 			std::filesystem::copy(playerScriptTemplateFile.c_str(), playerScriptFile.c_str());
     		
 			project.createAudioDirectory();
-			eastl::wstring audioPreviewTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/audio_preview.lua");
-			eastl::wstring audioPreviewFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/audio_preview.lua");
+			eastl::wstring audioPreviewTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/audio_preview.json");
+			eastl::wstring audioPreviewFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/audio_preview.json");
 			std::filesystem::copy(audioPreviewTemplateFile.c_str(), audioPreviewFile.c_str());
 
-			eastl::wstring audioTracksTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/audio_tracks.lua");
-			eastl::wstring audioTracksFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/audio_tracks.lua");
+			eastl::wstring audioTracksTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/audio_tracks.json");
+			eastl::wstring audioTracksFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/audio_tracks.json");
 			std::filesystem::copy(audioTracksTemplateFile.c_str(), audioTracksFile.c_str());
 
-			eastl::wstring pauseTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/pause.wav");
-			eastl::wstring pauseFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/pause.wav");
+			eastl::wstring pauseTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/drumloop.wav");
+			eastl::wstring pauseFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/drumloop.wav");
 			std::filesystem::copy(pauseTemplateFile.c_str(), pauseFile.c_str());
 
 	        return "";

@@ -23,8 +23,6 @@ function behavior:start()
                 local physics = playerObj:getPhysics()
                 physics:setPosition(playerStartPos)
                 physics:setGravityFactor(0.1)
-                local audio = getAudioSystem()
-                audio:play("drumloop")
             end
         end
     end)

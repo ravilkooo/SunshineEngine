@@ -1066,7 +1066,7 @@ void PropertyPanel::DrawAudioPanel()
                     if (strlen(newTrackName) > 0 && !newTrackPath.empty())
                     {
                         AudioTrack newTrack;
-                        newTrack.filePath = AssetPath(Utf8ToWString(newTrackPath.c_str()), AssetPath::AssetSource::Absolute);
+                        newTrack.filePath = AssetPath(Utf8ToWString(newTrackPath.c_str()), AssetPath::AssetSource::Project);
                         newTrack.name = newTrackName;
 
                         switch (newTagIndex) {
