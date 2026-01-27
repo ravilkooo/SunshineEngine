@@ -60,6 +60,7 @@ namespace SE
 
 		eastl::string createDirectory() const;
         eastl::string createScriptsDirectory() const;
+        eastl::string createAudioDirectory() const;
 		static eastl::string createInitialScene(const Project& project);
 		// eastl::string copyTemplateFile(SceneType sceneType) const;
 		eastl::string renameDirectory(const eastl::wstring& newPath) const;

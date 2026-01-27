@@ -1,14 +1,18 @@
 #pragma once
 #include "Audio/AudioSystem.h"
-
+#include <Utils/AssetPath.h>
 
 class AudioEditor {
 private:
-    std::vector<AudioTrack> m_trackList;
     AudioSystem* m_previewSystem;
-    static std::string s_configPath;
 
 public:
+    static void ScanAudioFiles();
+    static std::vector<AssetPath> m_audioFiles;
+
+    std::vector<AudioTrack> m_trackList;
+    static std::string s_configPath;
+
     AudioEditor(AudioSystem* audioSystem = nullptr) : m_previewSystem(audioSystem)
     {
         if (!m_previewSystem && AudioSystem::IsInitialized()) {
@@ -31,6 +35,7 @@ public:
     static const std::string& GetConfigPath();
 
     AudioTrack* getTrack(std::string name);
+    AudioTrack* getTrack(AssetPath name);
     void AddTrack(const AudioTrack& track);
     void RemoveTrack(std::string name);
     const std::vector<AudioTrack>& GetTrackList() const { return m_trackList; }

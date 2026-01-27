@@ -70,8 +70,10 @@ private:
     eastl::shared_ptr<WorldEditor> m_WorldEditor;
     SE::UUID m_SelectedUUID = SE::UUID(0u);
     AudioEditor* m_AudioEditor = nullptr;
+    AssetPath m_selectedAudioPath = AssetPath(L"", AssetPath::AssetSource::Project);
     
     std::string m_selectedAudioName = "";
+    // AssetPath m_selectedAudioName = AssetPath(L"", AssetPath::AssetSource::Project);
     
     bool DrawGameObjectHeader(GameObject_Info* obj);
 

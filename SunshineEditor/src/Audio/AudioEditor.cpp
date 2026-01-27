@@ -3,15 +3,55 @@
 #include <algorithm>
 #include <set>
 #include "Utils/FileCategories.h"
+#include "Utils/FileSystemWrapper.h"
 #include "LogManager.h"
 #include "EASTL/string.h"
 #include "Utils/StringUtils.h"
+#include <Utils/AssetPath.h>
 
 std::string AudioEditor::s_configPath = []() {
     eastl::wstring w =
-        JoinWchar_Wstring(ENGINE_ASSETS_DIR, L"Config/audio_tracks.json");
+        JoinWchar_Wstring(AssetPath::s_projectPath.c_str(), L"Audio/audio_tracks.json");
+        //JoinWchar_Wstring(ENGINE_ASSETS_DIR, L"Config/audio_tracks.json");
     return std::string(w.begin(), w.end());
 }();
+
+std::vector<AssetPath> AudioEditor::m_audioFiles;
+
+void AudioEditor::ScanAudioFiles()
+{
+    m_audioFiles.clear();
+    std::error_code ec;
+
+    AssetPath audioDirPath(L"Audio/", AssetPath::AssetSource::Project);
+    AssetPath currentAudio(L"Audio/", AssetPath::AssetSource::Project);
+    //for (eastlfs::directory_iterator it(dirPath); it != eastlfs::directory_iterator(""); ++it) {
+    eastlfs::directory_iterator end;
+    for (eastlfs::directory_iterator it(WStringToUtf8(audioDirPath.GetFullPath()), ec); it != end; ++it)
+    {
+        auto& entry = it.entry();
+        if (eastlfs::is_regular_file(entry))
+        {
+            eastl::string filename = eastlfs::filename(entry);
+            currentAudio.m_assetRelativePath = L"Audio/" + Utf8ToWString(filename);
+
+            if (filename.size() > 4 && EASTLStringEqualsChar(filename.substr(filename.size() - 4), ".wav"))
+                m_audioFiles.push_back(currentAudio);
+        }
+    }
+    if (ec)
+    {
+        wprintf(L"Audio dir not found: %ls\n", audioDirPath.GetFullPath().c_str());
+    }
+
+    /*
+    std::error_code ec;
+    if (!std::filesystem::exists(scriptPath.GetFullPath().c_str()))
+    {
+        wprintf(L"Lua file not found: %ls\n", scriptPath.GetFullPath().c_str());
+    }
+    */
+}
 
 void AudioEditor::Update() {
     if (m_previewSystem) {
@@ -84,6 +124,13 @@ AudioTrack* AudioEditor::getTrack(std::string name) {
     return nullptr;
 }
 
+AudioTrack* AudioEditor::getTrack(AssetPath name) {
+    for (auto& t : m_trackList) {
+        if (t.filePath == name) return &t;
+    }
+    return nullptr;
+}
+
 void AudioEditor::SaveToJson()
 {
     SaveToJson(s_configPath);
@@ -99,7 +146,11 @@ void AudioEditor::SaveToJson(const std::string& path)
     );
 
     json j;
-    j["tracks"] = m_trackList;
+    j["tracks"] = json::array();
+    for (const auto& track : m_trackList)
+    {
+        j["tracks"].push_back(track.ToJson());
+    }
 
     std::ofstream file(path);
     if (!file.is_open()) return;
@@ -129,7 +180,13 @@ bool AudioEditor::LoadFromJson()
         return false;
 
     m_trackList.clear();
-    m_trackList = j["tracks"].get<std::vector<AudioTrack>>();
+
+    for (const auto& objJ : j["tracks"]) {
+        AudioTrack track;
+        track.FromJson(objJ);
+        m_trackList.push_back(track);
+    }
+
     return true;
 }
 

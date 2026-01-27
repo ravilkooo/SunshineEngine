@@ -1,6 +1,7 @@
 #include "Audio/AudioSystem.h"
 #include <fstream>
 #include <Scripting/AutoBindings.h>
+#include <Utils/StringUtils.h>
 
 AudioSystem* AudioSystem::s_instance = nullptr;
 
@@ -48,23 +49,27 @@ void AudioSystem::LoadFromJson(const std::string& jsonPath) {
     json j;
     file >> j;
 
-    if (j.contains("tracks")) {
-        std::vector<AudioTrack> tracks = j["tracks"].get<std::vector<AudioTrack>>();
-        
-        for (const auto& track : tracks) {
-            m_tracksData[track.name] = track;
+    if (j.contains("tracks") && j["tracks"].is_array()) {
+        for (const auto& objJ : j["tracks"]) {
+            AudioTrack track;
+            track.FromJson(objJ);
+            {
+                m_tracksData[track.name] = track;
 
-            FMOD_MODE mode = FMOD_DEFAULT;
-            if (track.loop) mode |= FMOD_LOOP_NORMAL;
-            else mode |= FMOD_LOOP_OFF;
+                FMOD_MODE mode = FMOD_DEFAULT;
+                if (track.loop) mode |= FMOD_LOOP_NORMAL;
+                else mode |= FMOD_LOOP_OFF;
 
-            FMOD::Sound* sound = nullptr;
-            FMOD_RESULT res = m_system->createSound(track.filePath.c_str(), mode, 0, &sound);
-            
-            if (res == FMOD_OK) {
-                m_soundBank[track.name] = sound;
-            } else {
-                CheckError(res);
+                FMOD::Sound* sound = nullptr;
+                FMOD_RESULT res = m_system->createSound(
+                    WStringToUtf8(track.filePath.GetFullPath()).c_str(), mode, 0, &sound);
+
+                if (res == FMOD_OK) {
+                    m_soundBank[track.name] = sound;
+                }
+                else {
+                    CheckError(res);
+                }
             }
         }
     }

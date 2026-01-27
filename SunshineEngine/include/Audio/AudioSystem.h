@@ -6,20 +6,45 @@
 #include <vector>
 #include <map>
 #include <nlohmann/json.hpp>
-
+#include <Utils/AssetPath.h>
 
 
 using json = nlohmann::json;
 
 struct AudioTrack {
     std::string name;
-    std::string filePath;
+    AssetPath filePath;
     std::string tag;        // "ambient", "sfx", "music"
     bool loop = false;
     float volume = 1.0f;
-};
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioTrack, name, filePath, tag, loop, volume)
+    void FromJson(const json& j)
+    {
+        this->name = j["name"].get<std::string>();
+        this->filePath.FromJson(j["filePath"]);
+        this->tag = j["tag"].get<std::string>();
+        this->loop = j["loop"].get<bool>();
+        this->volume = j["volume"].get<float>();
+    }
+
+    json ToJson() const
+    {
+        json j;
+        j["name"] = name;
+        j["filePath"] = filePath.ToJson();
+        j["tag"] = tag;
+        j["loop"] = loop;
+        j["volume"] = volume;
+        return j;
+    }
+
+    inline void to_json(json& j, const AudioTrack& v) {
+        j = v.ToJson();
+    }
+    inline void from_json(const json& j, AudioTrack& v) {
+        v.FromJson(j);
+    }
+};
 
 struct AudioHandle {
     std::string trackName;

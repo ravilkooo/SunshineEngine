@@ -80,7 +80,7 @@ namespace SE
 
 		//GetFullPath();
 		AssetPath::s_projectPath = GetFullPath();
-		
+
 		if (!std::filesystem::exists(scenePath.c_str()))
 		{
 			return "Scene file not found: " + WStringToUtf8(scenePath);
@@ -234,6 +234,23 @@ namespace SE
         }
     }
 
+	eastl::string Project::createAudioDirectory() const
+	{
+		try
+		{
+			eastl::wstring fullPath = JoinWchar_Wstring(GetFullPath().c_str(), L"Audio/");
+			std::filesystem::create_directories(fullPath.c_str());
+			if (std::filesystem::exists(fullPath.c_str()))
+				return "";
+			else
+				return "Failed to create directory: " + WStringToUtf8(fullPath);
+		}
+		catch (const std::exception& e)
+		{
+			return "Failed to create directory: " + eastl::string(e.what());
+		}
+	}
+
 	eastl::string Project::createScriptsDirectory() const
 	{
 		try
@@ -302,6 +319,19 @@ namespace SE
 			eastl::wstring playerScriptFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Scripts/player_controller.lua");
 			std::filesystem::copy(playerScriptTemplateFile.c_str(), playerScriptFile.c_str());
     		
+			project.createAudioDirectory();
+			eastl::wstring audioPreviewTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/audio_preview.lua");
+			eastl::wstring audioPreviewFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/audio_preview.lua");
+			std::filesystem::copy(audioPreviewTemplateFile.c_str(), audioPreviewFile.c_str());
+
+			eastl::wstring audioTracksTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/audio_tracks.lua");
+			eastl::wstring audioTracksFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/audio_tracks.lua");
+			std::filesystem::copy(audioTracksTemplateFile.c_str(), audioTracksFile.c_str());
+
+			eastl::wstring pauseTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/pause.wav");
+			eastl::wstring pauseFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/pause.wav");
+			std::filesystem::copy(pauseTemplateFile.c_str(), pauseFile.c_str());
+
 	        return "";
 	    }
 	    catch (const std::exception& e)

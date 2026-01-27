@@ -26,6 +26,13 @@ public:
 	json ToJson() const;
 	void FromJson(const json& j);
 
+	inline void to_json(json& j, const AssetPath& v) {
+		j = v.ToJson();
+	}
+	inline void from_json(const json& j, AssetPath& v) {
+		v.FromJson(j);
+	}
+
 	bool operator==(const AssetPath& other) const noexcept;
 	bool operator!=(const AssetPath& other) const noexcept;
 
