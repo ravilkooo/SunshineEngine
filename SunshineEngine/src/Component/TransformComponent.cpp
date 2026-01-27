@@ -126,7 +126,7 @@ void TransformComponent::SetParentTransform(TransformComponent* parentTransform)
             printf("Cyclce transform dependence prevented!\n");
             return;
         }
-        currNode = parentTransform->GetParentTransform();
+        currNode = currNode->GetParentTransform();
     }
     m_parentTransform = parentTransform;
 }

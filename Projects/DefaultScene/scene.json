@@ -811,12 +811,12 @@
                         1.0
                     ],
                     "m_position": [
-                        1.6642787456512451,
+                        17.70271110534668,
                         -3.35492205619812,
                         3.054506778717041
                     ],
                     "m_rotation": [
-                        0.0,
+                        -0.0,
                         0.0,
                         -0.0
                     ],
@@ -833,9 +833,9 @@
             "m_group": "Lighting",
             "m_lightData": {
                 "Ambient": {
-                    "x": 0.6127451062202454,
-                    "y": 0.6127451062202454,
-                    "z": 0.6127451062202454
+                    "x": 0.720588207244873,
+                    "y": 0.5863609910011292,
+                    "z": 0.5863609910011292
                 },
                 "AmbientPad": 1.0
             },
@@ -1460,7 +1460,7 @@
                         0.0
                     ]
                 },
-                "fixedCamera": false,
+                "fixedCamera": true,
                 "keyFunctionMappings": [
                     {
                         "functionName": "onMoveLeft",
@@ -1591,12 +1591,23 @@
         },
         {
             "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:250,0,250,255.dds"
+                    }
+                },
                 "ParticleEmitter": {
                     "emitterData": {
-                        "EmissionRate": 10.0,
+                        "EmissionRate": 28.0,
                         "Emitter": {
-                            "alphaEnd": 1.0,
-                            "alphaStart": 1.0,
+                            "alphaEnd": 0.3176470696926117,
+                            "alphaStart": 0.2823529541492462,
                             "colorEnd": [
                                 1.0,
                                 1.0,
@@ -1612,11 +1623,11 @@
                             "longitudeMax": 6.2831854820251465,
                             "longitudeMin": 0.0,
                             "maxSpawn": 100,
-                            "particleSizeEnd": 0.5,
-                            "particleSizeStart": 0.20000000298023224,
-                            "particlesBaseSpeed": 8.0,
-                            "particlesLifeSpan": 3.0,
-                            "particlesMass": 1.0,
+                            "particleSizeEnd": 4.0,
+                            "particleSizeStart": 4.0,
+                            "particlesBaseSpeed": 9.399999618530273,
+                            "particlesLifeSpan": 2.5999999046325684,
+                            "particlesMass": 0.0,
                             "position": [
                                 0.0,
                                 0.0,
@@ -1641,11 +1652,11 @@
                                 1.0
                             ]
                         },
-                        "MaxParticles": 256,
+                        "MaxParticles": 28,
                         "Simulate": {
                             "force": [
                                 0.0,
-                                10.0,
+                                0.0,
                                 0.0
                             ]
                         },
@@ -1669,23 +1680,23 @@
                     ],
                     "m_localScaleFactor": [
                         1.0,
-                        1.0,
+                        0.10000000149011612,
                         1.0
                     ],
                     "m_position": [
-                        -11.531744003295898,
-                        -3.651210308074951,
-                        25.113813400268555
+                        0.24131202697753906,
+                        1.3639085292816162,
+                        1.1104693412780762
                     ],
                     "m_rotation": [
-                        -0.0009080712916329503,
-                        -1.2777678421116434e-05,
-                        6.751772616553353e-07
+                        1.4250612258911133,
+                        3.0839967727661133,
+                        -3.141592025756836
                     ],
                     "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        0.9999999403953552,
+                        1.0000001192092896,
+                        1.0000001192092896
                     ]
                 }
             },
@@ -1694,7 +1705,10 @@
             "m_UUID_lo": 3056579546,
             "m_group": "ParticleEmitter",
             "m_name": "ParticleEmitter",
-            "m_parent": null
+            "m_parent": {
+                "attached": true,
+                "uuid": 1087253342462268591
+            }
         },
         {
             "components": {
