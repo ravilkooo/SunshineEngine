@@ -46,4 +46,7 @@ public:
     bool LoadFromJson();
     
     void RenameTrack(const std::string& oldName, const std::string& newName);
+    void AddTrackWithPath(const std::string& name, const AssetPath& path, 
+                         const std::string& tag = "sfx", 
+                         bool loop = false, float volume = 1.0f);
 };

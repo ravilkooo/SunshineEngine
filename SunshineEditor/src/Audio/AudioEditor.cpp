@@ -36,6 +36,18 @@ void AudioEditor::AddTrack(const AudioTrack& track) {
     SaveToJson(); 
 }
 
+void AudioEditor::AddTrackWithPath(const std::string& name, const AssetPath& path,
+                                  const std::string& tag, bool loop, float volume) {
+    AudioTrack track;
+    track.name = name;
+    track.filePath = path;
+    track.tag = tag;
+    track.loop = loop;
+    track.volume = volume;
+    
+    AddTrack(track);
+}
+
 void AudioEditor::RemoveTrack(std::string name) {
     auto it = std::remove_if(m_trackList.begin(), m_trackList.end(), 
         [&](const AudioTrack& t) { return t.name == name; });
@@ -99,7 +111,13 @@ void AudioEditor::SaveToJson(const std::string& path)
     );
 
     json j;
-    j["tracks"] = m_trackList;
+    json tracksArray = json::array();
+
+    for (const auto& track : m_trackList) {
+        tracksArray.push_back(track.ToJson());
+    }
+    
+    j["tracks"] = tracksArray;
 
     std::ofstream file(path);
     if (!file.is_open()) return;
@@ -129,7 +147,18 @@ bool AudioEditor::LoadFromJson()
         return false;
 
     m_trackList.clear();
-    m_trackList = j["tracks"].get<std::vector<AudioTrack>>();
+    try {
+        auto tracksArray = j["tracks"];
+        for (const auto& trackJson : tracksArray) {
+            AudioTrack track;
+            track.FromJson(trackJson); 
+            m_trackList.push_back(track);
+        }
+    } catch (const std::exception& e) {
+        LOG_EDITOR_ERROR("Failed to parse audio tracks: %s", e.what());
+        return false;
+    }
+    
     return true;
 }
 

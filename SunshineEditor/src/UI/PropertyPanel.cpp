@@ -1036,7 +1036,10 @@ void PropertyPanel::DrawAudioPanel()
                 
                 ImGui::Separator();
 
-                ImGui::TextDisabled("File: %s", selectedTrack->filePath.c_str());
+                eastl::wstring fullPathW = selectedTrack->filePath.GetFullPath();
+                std::wstring fullPathStd(fullPathW.begin(), fullPathW.end());
+                std::string fullPath(fullPathStd.begin(), fullPathStd.end());
+                ImGui::TextDisabled("File: %s", fullPath.c_str());
                 
                 ImGui::Spacing();
 
@@ -1168,13 +1171,40 @@ void PropertyPanel::DrawAudioPanel()
         ImGui::Spacing();
         ImGui::Separator();
         
+        static AssetPath::AssetSource newTrackSource = AssetPath::AssetSource::Project;
+        
         ImGui::BeginGroup();
         if (ImGui::Button("Add to Library", ImVec2(120, 0)))
         {
             if (strlen(newTrackName) > 0 && !newTrackPath.empty())
             {
                 AudioTrack newTrack;
-                newTrack.filePath = newTrackPath;
+                
+                eastl::string relativePath;
+                
+                if (newTrackSource == AssetPath::AssetSource::Project) {
+                    eastl::wstring projectPathW = AssetPath::s_projectPath;
+                    std::filesystem::path projectPath(projectPathW.c_str());
+                    std::filesystem::path audioPath(newTrackPath.c_str());
+                    
+                    try {
+                        std::filesystem::path relativeFs = 
+                            std::filesystem::relative(audioPath, projectPath);
+                        relativePath = relativeFs.string().c_str();
+                    } catch (...) {
+                        std::filesystem::path fsPath(newTrackPath.c_str());
+                        relativePath = "Sounds/";
+                        relativePath += fsPath.filename().string().c_str();
+                    }
+                } else {
+                    std::filesystem::path fsPath(newTrackPath.c_str());
+                    relativePath = "Sounds/";
+                    relativePath += fsPath.filename().string().c_str();
+                }
+                
+                eastl::wstring relativePathW = Utf8ToWString(relativePath.c_str());
+                newTrack.filePath = AssetPath(relativePathW, newTrackSource);
+                
                 newTrack.name = newTrackName;
                 
                 switch (newTagIndex) {

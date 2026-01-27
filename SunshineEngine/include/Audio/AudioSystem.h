@@ -6,20 +6,23 @@
 #include <vector>
 #include <map>
 #include <nlohmann/json.hpp>
-
+#include "Utils/AssetPath.h"
 
 
 using json = nlohmann::json;
 
 struct AudioTrack {
     std::string name;
-    std::string filePath;
+    AssetPath filePath;
     std::string tag;        // "ambient", "sfx", "music"
     bool loop = false;
     float volume = 1.0f;
+
+    json ToJson() const;
+    void FromJson(const json& j);
 };
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioTrack, name, filePath, tag, loop, volume)
+// NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioTrack, name, filePath, tag, loop, volume)
 
 struct AudioHandle {
     std::string trackName;

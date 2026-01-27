@@ -2,6 +2,24 @@
 #include <fstream>
 #include <Scripting/AutoBindings.h>
 
+json AudioTrack::ToJson() const {
+    json j;
+    j["name"] = name;
+    j["filePath"] = filePath.ToJson();
+    j["tag"] = tag;
+    j["loop"] = loop;
+    j["volume"] = volume;
+    return j;
+}
+
+void AudioTrack::FromJson(const json& j) {
+    if (j.contains("name")) name = j["name"];
+    if (j.contains("filePath")) filePath.FromJson(j["filePath"]);
+    if (j.contains("tag")) tag = j["tag"];
+    if (j.contains("loop")) loop = j["loop"];
+    if (j.contains("volume")) volume = j["volume"];
+}
+
 AudioSystem* AudioSystem::s_instance = nullptr;
 
 void AudioSystem::Initialize() {
@@ -46,20 +64,38 @@ void AudioSystem::LoadFromJson(const std::string& jsonPath) {
     if (!file.is_open()) return;
 
     json j;
-    file >> j;
+    try {
+        file >> j;
+    } catch (const std::exception& e) {
+        return;
+    }
 
-    if (j.contains("tracks")) {
-        std::vector<AudioTrack> tracks = j["tracks"].get<std::vector<AudioTrack>>();
+    if (j.contains("tracks")&& j["tracks"].is_array()) {
+        for (auto& pair : m_soundBank) {
+            pair.second->release();
+        }
+
+        m_soundBank.clear();
+        m_tracksData.clear();
+
+        auto tracks = j["tracks"];
         
-        for (const auto& track : tracks) {
+        auto tracksArray = j["tracks"];
+        for (const auto& trackJson : tracksArray) {
+            AudioTrack track;
+            track.FromJson(trackJson);
             m_tracksData[track.name] = track;
 
+            eastl::wstring fullPathW = track.filePath.GetFullPath();
+            std::wstring fullPathStd(fullPathW.begin(), fullPathW.end());
+            std::string fullPath(fullPathStd.begin(), fullPathStd.end());
+            
             FMOD_MODE mode = FMOD_DEFAULT;
             if (track.loop) mode |= FMOD_LOOP_NORMAL;
             else mode |= FMOD_LOOP_OFF;
 
             FMOD::Sound* sound = nullptr;
-            FMOD_RESULT res = m_system->createSound(track.filePath.c_str(), mode, 0, &sound);
+            FMOD_RESULT res = m_system->createSound(fullPath.c_str(), mode, 0, &sound);
             
             if (res == FMOD_OK) {
                 m_soundBank[track.name] = sound;
@@ -80,16 +116,17 @@ AudioHandle AudioSystem::Play(const std::string& trackName, float volume, bool l
     FMOD::Sound* sound = m_soundBank[trackName];
     AudioTrack& config = m_tracksData[trackName];
     
+    bool actualLoop = loop || config.loop;
+    float actualVolume = volume * config.volume;
+    
     FMOD::Channel* channel = nullptr;
     
     FMOD_RESULT res = m_system->playSound(sound, 0, true, &channel);
     CheckError(res);
 
     if (res == FMOD_OK && channel) {
-        channel->setVolume(volume);
-        
-        channel->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
-        
+        channel->setVolume(actualVolume);
+        channel->setMode(actualLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
         channel->setPaused(false);
 
         m_activeChannels[trackName] = channel;
