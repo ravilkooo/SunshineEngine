@@ -36,6 +36,13 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	m_renderingSystem = eastl::make_shared<SE_G::RenderingSystem>(
 		m_displayWindow.m_hWnd,
 		m_winWidth, m_winHeight);
+
+	if (!AudioSystem::IsInitialized()) {
+		AudioSystem& audioSystem = AudioSystem::Get();
+	}
+	m_audioEditor = eastl::make_unique<AudioEditor>(&AudioSystem::Get());
+	
+	m_audioEditor->LoadFromJson();
 	
 	UINT worldEditorWidth = winWidth / 2;
 	UINT worldEditorHeight = winHeight / 2;
@@ -78,6 +85,8 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	imguiEditorPass->SetVieportGBuffer(
 		m_worldEditor->m_renderer->m_GBuffer.get());
 
+	imguiEditorPass->SetAudioEditor(m_audioEditor.get());
+
 	m_initialized = true;
 
 	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;
@@ -96,6 +105,10 @@ EditorApp::~EditorApp() {
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+
+	if (AudioSystem::IsInitialized()) {
+		AudioSystem::Destroy();
+	}
 }
 
 void EditorApp::RunApp()
@@ -257,6 +270,10 @@ void EditorApp::UpdateGame(float deltaTime)
 
 void EditorApp::UpdateEditor(float deltaTime) 
 {
+	if (m_audioEditor) {
+		m_audioEditor->Update();
+	}
+
 	if (!imguiEditorPass->IsFocusedGameViewport)
 	{
 		// Reset input state when not focused
@@ -379,6 +396,16 @@ void EditorApp::RunGame()
 		m_worldEditor->m_screenWidth, m_worldEditor->m_screenHeight);
 	// m_currentGame->SetParticleSystem(m_worldEditor->m_renderer->m_particleSystem);
 	
+	m_currentGame->m_particleSystem->EnableAllEmitters();
+
+	if (m_audioEditor) {
+		m_audioEditor->SetAudioSystem(&AudioSystem::Get());
+	}
+
+	if (AudioSystem::IsInitialized()) {
+		AudioSystem::Get().StopAll();
+	}
+	
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
 		eastl::wstring scenePath = m_openedProject->GetScenePath();
@@ -406,7 +433,7 @@ void EditorApp::RunGame()
 	}
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
-
+	
 	imguiEditorPass->SetVieportGBuffer(
 		m_currentGame->m_renderer->m_GBuffer.get());
 
@@ -440,6 +467,13 @@ void EditorApp::StopGame() {
 	m_currentGame->m_particleSystem->DisableAllEmitters();
 	m_currentGame->m_particleSystem;
 	m_worldEditor->OnResize(m_currentGame->m_screenWidth, m_currentGame->m_screenHeight);
+	if (m_audioEditor) {
+		AudioSystem::Get().LoadFromJson(
+			m_audioEditor->GetConfigPath()
+		);
+	}
+	m_currentGame->ClearScene();
+	m_currentGame.reset(NULL);
 	m_currentGame->ClearScene();
 	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");

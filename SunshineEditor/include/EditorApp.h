@@ -17,6 +17,7 @@
 // SunshineLibs
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/RenderGroup.h>
+#include <Graphics/Renderer/Pass/RenderPass.h>
 
 #include <Windows/WindowsApp.h>
 
@@ -27,6 +28,7 @@
 #include <WorldEditor.h>
 
 #include <UI/ProjectSelector.h>
+#include <Audio/AudioEditor.h>
 
 
 class ImguiEditorPass;
@@ -125,7 +127,8 @@ private:
     bool m_initialized = false;
 
     bool m_projectSelected = false;
-
+    eastl::unique_ptr<AudioEditor> m_audioEditor;
+    AudioSystem* m_editorAudioSystem = nullptr;
 private:
     // Only for testing
     // void ChooseProject();

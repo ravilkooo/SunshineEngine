@@ -20,6 +20,7 @@ class TransformComponent;
 class RenderComponent;
 class LuaComponent;
 class WorldEditor;
+class AudioEditor;
 
 namespace SE_G {
     namespace Bind {
@@ -55,13 +56,22 @@ public:
     void SetSelectedUUID(SE::UUID uuid) { 
         m_SelectedUUID = uuid; 
     }
+
+    void SetAudioEditor(AudioEditor* audioEditor) { 
+        m_AudioEditor = audioEditor; 
+    }
     
     void OnImGuiRender();
+
+    void DrawAudioPanel();
 
     static bool DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 private:
     eastl::shared_ptr<WorldEditor> m_WorldEditor;
     SE::UUID m_SelectedUUID = SE::UUID(0u);
+    AudioEditor* m_AudioEditor = nullptr;
+    
+    std::string m_selectedAudioName = "";
     
     bool DrawGameObjectHeader(GameObject_Info* obj);
 

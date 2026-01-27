@@ -16,6 +16,8 @@
 #include "AI/Behavior/MemoryBoard.h"
 #include "AI/Behavior/BehaviorController.h"
 
+#include "Audio/AudioSystem.h"
+
 namespace DXSM = DirectX::SimpleMath;
 
 namespace ScriptingBindings
@@ -131,6 +133,11 @@ namespace ScriptingBindings
 				return self->m_UUID.GetHilo();
 			}
 		);
+
+    	// Register audio
+    	lua.set_function("getAudioSystem", []() -> AudioSystem& {
+			return AudioSystem::Get();
+		});
 
         // Execute all component binders registered via LUA_REGISTER_COMPONENT
         AutoBindings::RegisterAll(lua);

@@ -86,6 +86,7 @@ ImguiEditorPass::ImguiEditorPass(
 
 	m_ToolbarPanel.Init(m_editorApp);
 	m_Gizmo.Init();
+	// m_PropertyPanel.SetAudioEditor(m_AudioEditor);
 }
 
 void ImguiEditorPass::SetVieportGBuffer(
@@ -469,13 +470,25 @@ void ImguiEditorPass::ShowProperties()
 			ImGui::EndTabItem();
 		}
 
+		if (ImGui::BeginTabItem("Audio Manager"))
+		{
+			pObj->m_miniViewRenderer->Disable();
+
+			if (m_AudioEditor)
+			{
+				m_PropertyPanel.DrawAudioPanel();
+			}
+			else
+			{
+				ImGui::TextDisabled("Audio Editor system not connected");
+			}
+			ImGui::EndTabItem();
+		}
+
 		ImGui::EndTabBar();
 	}
 
 	ImGui::End();
-
-
-
 }
 
 void ImguiEditorPass::ShowGameObjectProperties()

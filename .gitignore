@@ -85,3 +85,7 @@ Projects/*
 *.swp
 *.swo
 /Projects
+SunshineEditor/include/.idea/vcs.xml
+SunshineEditor/include/.idea/indexLayout.xml
+SunshineEngine/src/.idea/indexLayout.xml
+SunshineEngine/src/.idea/vcs.xml

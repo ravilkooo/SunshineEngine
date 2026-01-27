@@ -20,6 +20,7 @@
 #include <Physics/PhysicsSystem.h>
 
 #include <Windows/InputDevice.h>
+#include <Audio/AudioSystem.h>
 
 #include <Scripting/LuaManager.h>
 #include <Utils/ILogManager.h>
@@ -54,6 +55,8 @@ public:
     void SetParticleSystem(eastl::shared_ptr<SE::ParticleSystem> ps);
 
     void SetupPhysics();
+
+    void InitializeAudio();
 
     void Run();
 
@@ -93,6 +96,8 @@ public:
     SE_G::ShadowMapPass* m_shadowMapPass;
     SE_G::GPass* m_gPass;
     SE_G::LightPass* m_lightPass;
+
+    AudioSystem* m_audioSystem;
 
     float m_deltaTime = 0.0f;
 

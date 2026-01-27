@@ -23,6 +23,7 @@ Game::Game()
 Game::~Game()
 {
 	// ������������ ��������
+	m_audioSystem = nullptr;
 }
 
 void Game::ClearScene()
@@ -108,10 +109,16 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		return false;
 	}
 
+	SetupPhysics();
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	m_playerObject = Scene::GetInstance().m_playerObject;
 	SetupPhysics();
 	m_luaManager.InitializeBehavior();
+
+	m_physicsSystem->FinalizeScene();
+	
+	InitializeAudio();
+	
 	return true;
 }
 
@@ -123,6 +130,9 @@ bool Game::LoadGAIScene()
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	InitializeAudio();
+	
 	return true;
 }
 
@@ -134,6 +144,9 @@ bool Game::LoadDefaultScene()
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	InitializeAudio();
+	
 	return true;
 }
 
@@ -146,6 +159,9 @@ bool Game::LoadParentScene()
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	InitializeAudio();
+	
 	return true;
 }
 
@@ -158,6 +174,9 @@ bool Game::LoadLuaScene()
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	InitializeAudio();
+	
 	return true;
 }
 
@@ -170,7 +189,26 @@ bool Game::LoadResourcesScene()
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
+	
+	InitializeAudio();
+	
 	return true;
+}
+
+void Game::InitializeAudio()
+{
+	if (!AudioSystem::IsInitialized()) {
+		m_audioSystem = &AudioSystem::Get();
+		
+		m_audioSystem->LoadFromJson("assets/config/audio_tracks.json");
+		
+		// audioSystem.Play("ambient_forest", 0.5f, true);
+		// m_audioSystemPtr = &audioSystem;
+	} else {
+		m_audioSystem = &AudioSystem::Get();
+
+		m_audioSystem->LoadFromJson("assets/config/audio_tracks.json");
+	}
 }
 
 
@@ -262,6 +300,7 @@ void Game::Update(float deltaTime) {
 
 	 m_physicsSystem->FlushCommands();
 	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
+
 	 m_physicsSystem->Step(deltaTime);
 	 m_physicsSystem->FlushCommands();
 
@@ -279,6 +318,15 @@ void Game::Update(float deltaTime) {
 	 ClearCachedAbsoluteTransforms();
 
 	 m_renderer->GetMainCamera()->Update(deltaTime);
+
+	if (AudioSystem::IsInitialized()) {
+		AudioSystem::Get().Update();
+        
+		if (auto transform = m_playerObject->GetComponent<TransformComponent>()) {
+			auto pos = transform->m_position;
+			AudioSystem::Get().SetListenerPosition(pos.x, pos.y, pos.z);
+		}
+	}
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {

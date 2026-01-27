@@ -22,6 +22,7 @@
 #include <UI/ProjectSelector.h>
 #include <UI/Gizmo.h>
 #include <UI/PlayerSettingPanel.h>
+#include <Audio/AudioEditor.h>
 
 class EditorApp;
 class WorldEditor;
@@ -63,6 +64,7 @@ public:
     SE::Project* GetSelectedProject() { return m_ProjectSelector.GetSelectedProject(); }
     void ResetProjectSelection() { m_ProjectSelected = false; m_ProjectSelector.Close(); }
     void SetScene(const eastl::shared_ptr<Scene_Info>& scene) { m_ToolbarPanel.SetScene(scene); }
+    void SetAudioEditor(AudioEditor* editor) { m_AudioEditor = editor; m_PropertyPanel.SetAudioEditor(editor);}
 
     UINT m_editorAppWidth = 800;
     UINT m_editorAppHeight = 800;
@@ -93,6 +95,8 @@ public:
     using SceneType = SE::SceneType;
 
     Gizmo m_Gizmo;
+
+    AudioEditor* m_AudioEditor = nullptr;
 
     bool m_ShowEditorLogPanel = false;
     bool m_ShowGameLogPanel = false;
