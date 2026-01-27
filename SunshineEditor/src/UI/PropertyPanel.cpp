@@ -1035,7 +1035,6 @@ void PropertyPanel::DrawAudioPanel()
 
                     ImGui::OpenPopup("Configure Audio Track");
                 }
-                ImGui::CloseCurrentPopup();
             }
 
             if (ImGui::BeginPopupModal("Configure Audio Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
