@@ -26,13 +26,19 @@ public:
 #ifndef AUDIOCOMP_LUA_METHODS_APPLY
 #define AUDIOCOMP_LUA_METHODS_APPLY(FM) \
     FM("play", [](AudioComponent* self) { \
-        // auto* audio = AudioSystem::Get(); \
+        auto& audio = AudioSystem::Get(); \
+        \
         if (self->spatial && self->owner) { \
             auto pos = self->owner->GetTransform()->GetPosition(); \
-            audio->Play3D(self->trackName, pos.x, pos.y, pos.z, \
-                            self->volume, self->minDistance, self->maxDistance); \
+            audio.Play3D( \
+                self->trackName, \
+                pos.x, pos.y, pos.z, \
+                self->volume, \
+                self->minDistance, \
+                self->maxDistance \
+            ); \
         } else { \
-            audio->Play(self->trackName, self->volume, self->loop); \
+            audio.Play(self->trackName, self->volume, self->loop); \
         } \
     }) , \
     FM("stop", [](AudioComponent* self) { \
@@ -45,8 +51,44 @@ public:
     FM("updatePosition", [](AudioComponent* self) { \
         if (self->spatial && self->owner) { \
             auto pos = self->owner->GetTransform()->GetPosition(); \
-            AudioSystem::Get()->SetSourcePosition(self->trackName, pos.x, pos.y, pos.z); \
+            AudioSystem::Get()->SetSourcePosition( \
+                self->trackName, pos.x, pos.y, pos.z \
+            ); \
         } \
     })
 #endif
 };
+
+#ifndef AUDIOCOMP_LUA_METHODS_APPLY
+#define AUDIOCOMP_LUA_METHODS_APPLY(FM) \
+    FM("play", [](AudioComponent* self) { \
+        auto& audio = AudioSystem::Get(); \
+        if (self->spatial && self->owner) { \
+            auto pos = self->owner->GetTransform()->GetPosition(); \
+            audio.Play3D( \
+                    self->trackName, \
+                    pos.x, pos.y, pos.z, \
+                    self->volume, \
+                    self->minDistance, \
+                    self->maxDistance \
+            ); \
+        } else { \
+            audio.Play(self->trackName, self->volume, self->loop); \
+        } \
+    }) , \
+    FM("stop", [](AudioComponent* self) { \
+        AudioSystem::Get()->Stop(self->trackName); \
+    }) , \
+    FM("setVolume", [](AudioComponent* self, float v) { \
+        self->volume = v; \
+        AudioSystem::Get()->SetVolume(self->trackName, v); \
+    }) , \
+    FM("updatePosition", [](AudioComponent* self) { \
+        if (self->spatial && self->owner) { \
+            auto pos = self->owner->GetTransform()->GetPosition(); \
+            AudioSystem::Get()->SetSourcePosition( \
+                self->trackName, pos.x, pos.y, pos.z \
+            ); \
+        } \
+    })
+#endif
