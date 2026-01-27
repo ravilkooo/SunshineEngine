@@ -24,6 +24,8 @@ PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
 
 PhysicsComponent::~PhysicsComponent()
 {
+    if (!m_physicsSystem)
+        return;
 	m_physicsSystem->RemoveBody(this);
 }
 

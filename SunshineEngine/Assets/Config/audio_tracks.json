@@ -1,0 +1,11 @@
+{
+    "tracks": [
+        {
+            "filePath": "D:\\Studyspace\\Sunshine\\SunshineEngine\\Assets\\Sounds\\drumloop.wav",
+            "loop": false,
+            "name": "drumloop",
+            "tag": "sfx",
+            "volume": 1.0
+        }
+    ]
+}
