@@ -14,7 +14,8 @@ end
 
 function behavior:update(dt)
     local physics = self.owner:getPhysics()
-    
+    local rot = physics:getRotation()
+    physics:setRotation(Vector3.new(0, rot.y, 0))
     -- print("Behavior update", self.id)
     
     -- local uuid = self.owner:getUUID()

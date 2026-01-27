@@ -178,18 +178,18 @@ DXSM::Vector3 PhysicsComponent::GetPosition()
     return DXSM::Vector3::Zero;
 }
 
-DXSM::Quaternion PhysicsComponent::GetRotation()
+DXSM::Vector3 PhysicsComponent::GetRotation()
 {
     if (!m_physicsSystem)
-        return DXSM::Quaternion::Identity;
+        return DXSM::Vector3::Zero;
 
     JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
     if (bodyInterface.IsAdded(m_joltBodyId))
     {
         JPH::Quat q = bodyInterface.GetRotation(m_joltBodyId);
-        return DXSM::Quaternion(q.GetX(), q.GetY(), q.GetZ(), q.GetW());
+        return DXSM::Quaternion(q.GetX(), q.GetY(), q.GetZ(), q.GetW()).ToEuler();
     }
-    return DXSM::Quaternion::Identity;
+    return DXSM::Vector3::Zero;
 }
 
 void PhysicsComponent::ResetForce()

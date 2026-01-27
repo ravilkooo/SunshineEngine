@@ -65,7 +65,7 @@ public:
     DXSM::Vector3 GetLinearVelocity();
     DXSM::Vector3 GetPointVelocity(const DXSM::Vector3& inPoint);
     DXSM::Vector3 GetPosition();
-    DXSM::Quaternion GetRotation();
+    DXSM::Vector3 GetRotation();
 
     // Reset accumulated force/torque
     void ResetForce();
