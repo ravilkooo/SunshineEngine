@@ -71,7 +71,7 @@ private:
     SE::UUID m_SelectedUUID = SE::UUID(0u);
     AudioEditor* m_AudioEditor = nullptr;
     
-    std::string m_selectedAudioID = "";
+    std::string m_selectedAudioName = "";
     
     bool DrawGameObjectHeader(GameObject_Info* obj);
 

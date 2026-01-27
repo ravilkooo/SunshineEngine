@@ -128,8 +128,7 @@ private:
 
     bool m_projectSelected = false;
     eastl::unique_ptr<AudioEditor> m_audioEditor;
-    std::unique_ptr<AudioSystem> m_editorAudioSystem;
-
+    AudioSystem* m_editorAudioSystem = nullptr;
 private:
     // Only for testing
     // void ChooseProject();

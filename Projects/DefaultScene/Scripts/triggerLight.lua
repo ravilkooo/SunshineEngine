@@ -6,6 +6,7 @@ local platformUUID
 local platformObj
 local upSpeed
 local bodiesOnPlatform = 0
+local audio = getAudioSystem()
 
 function behavior:start()
 
@@ -28,6 +29,7 @@ function behavior:start()
         if event == "enter" then
             bodiesOnPlatform = bodiesOnPlatform + 1;
             print("Object entered trigger:", otherUUID:toString(), ", bodiesOnPlatform = ", bodiesOnPlatform)
+            audio:play("drumloop", 1.0, true)
         elseif event == "exit" then
             if bodiesOnPlatform > 0 then
                 bodiesOnPlatform = bodiesOnPlatform - 1

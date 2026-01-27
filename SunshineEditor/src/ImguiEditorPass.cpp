@@ -86,7 +86,7 @@ ImguiEditorPass::ImguiEditorPass(
 
 	m_ToolbarPanel.Init(m_editorApp);
 	m_Gizmo.Init();
-	m_PropertyPanel.SetAudioEditor(m_AudioEditor);
+	// m_PropertyPanel.SetAudioEditor(m_AudioEditor);
 }
 
 void ImguiEditorPass::SetVieportGBuffer(

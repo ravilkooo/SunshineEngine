@@ -957,11 +957,42 @@ void PropertyPanel::DrawAudioPanel()
         return; 
     }
     static float listWidth = 200.0f;
+    static std::string newTrackPath = "";
+    static char newTrackName[256] = "";
+    static float newVolume = 1.0f;
+    static bool newLoop = false;
+    static int newTagIndex = 0; // 0: sfx, 1: music, 2: ambient
     
     ImGui::BeginGroup();
     {
         ImGui::Text("Tracks Library");
         ImGui::Separator();
+        if (ImGui::Button("Add Audio Track", ImVec2(listWidth, 30)))
+        {
+            auto selectedPath = FileDialogManager::Get().OpenFile(
+                FileDialogManager::DialogType::Audio, 
+                L"Import Audio Track"
+            );
+            
+            if (!selectedPath.empty())
+            {
+                newTrackPath = selectedPath.string();
+                
+                std::filesystem::path fsPath(newTrackPath);
+                std::string fileName = fsPath.stem().string();
+                strcpy(newTrackName, fileName.c_str());
+                
+                ImGui::OpenPopup("Configure Audio Track");
+            }
+        }
+
+        // ImGui::SameLine();
+        // if (ImGui::Button("Scan Assets", ImVec2(listWidth, 30))) {
+        //     if (m_WorldEditor) {
+        //         std::wstring assetsPath = EDITOR_ASSETS_DIR;
+        //         m_AudioEditor->ScanAndSync(assetsPath);
+        //     }
+        // }
         
         ImGui::BeginChild("TrackList", ImVec2(listWidth, -40), true);
 
@@ -970,18 +1001,19 @@ void PropertyPanel::DrawAudioPanel()
         {
             for (const auto& track : trackList) 
             {
-                std::string itemLabel = track.id + "##" + track.id; 
-                bool isSelected = (m_selectedAudioID == track.id);
+                std::string itemLabel = track.name + "##" + track.name; 
+                bool isSelected = (m_selectedAudioName == track.name);
     
                 if (ImGui::Selectable(itemLabel.c_str(), isSelected))
                 {
-                    m_selectedAudioID = track.id;
+                    m_selectedAudioName = track.name;
                 }
             }
         }
         else
         {
             ImGui::TextDisabled("No tracks found");
+            ImGui::TextDisabled("Click 'Add Audio Track' to import");
         }
         
         ImGui::EndChild();
@@ -1038,12 +1070,12 @@ void PropertyPanel::DrawAudioPanel()
     {
         ImGui::Text("Track Details");
         ImGui::Separator();
-        AudioTrack* selectedTrack = m_AudioEditor->getTrack(m_selectedAudioID);
+        AudioTrack* selectedTrack = m_AudioEditor->getTrack(m_selectedAudioName);
         ImGui::BeginChild("TrackDetails", ImVec2(0, -40), true);
         if (selectedTrack != nullptr)
         {
             EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
-                ImGui::Text("%s", selectedTrack->id.c_str());
+                ImGui::Text("%s", selectedTrack->name.c_str());
                 EditorUI::FontStyles::Pop();
                 
                 ImGui::Separator();
@@ -1054,7 +1086,7 @@ void PropertyPanel::DrawAudioPanel()
 
                 if (ImGui::Button("Play Preview", ImVec2(100, 0)))
                 {
-                    m_AudioEditor->PlayPreview(selectedTrack->id);
+                    m_AudioEditor->PlayPreview(selectedTrack->name);
                 }
                 
                 ImGui::SameLine();
@@ -1064,43 +1096,88 @@ void PropertyPanel::DrawAudioPanel()
                     m_AudioEditor->StopPreview();
                 }
 
+                ImGui::SameLine();
+
+                if (ImGui::Button("3D Test", ImVec2(80, 0)))
+                {
+                    auto* audioSystem = m_AudioEditor->GetAudioSystem();
+                    if (audioSystem) {
+                        audioSystem->Play3D(selectedTrack->name, 0, 0, 0, selectedTrack->volume);
+                    }
+                }
+
                 ImGui::Separator();
                 
                 ImGui::Text("Settings");
 
+                static char editNameBuffer[256] = {0};
+                static std::string editingTrackname = "";
+                    
+                if (editingTrackname != selectedTrack->name) {
+                    strcpy(editNameBuffer, selectedTrack->name.c_str());
+                    editingTrackname = selectedTrack->name;
+                }
+                    
+                if (ImGui::InputText("Track Name", editNameBuffer, sizeof(editNameBuffer)))
+                {
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Update Name"))
+                {
+                    std::string newName = editNameBuffer;
+                    if (!newName.empty() && newName != selectedTrack->name) {
+                        m_AudioEditor->RenameTrack(selectedTrack->name, newName);
+                        m_selectedAudioName = newName;
+                    }
+                }
+
+                int currentTag = 0;
+                if (selectedTrack->tag == "music") currentTag = 1;
+                else if (selectedTrack->tag == "ambient") currentTag = 2;
+                    
+                if (ImGui::Combo("Category", &currentTag, "SFX\0Music\0Ambient\0"))
+                {
+                    switch (currentTag) {
+                    case 0: selectedTrack->tag = "sfx"; break;
+                    case 1: selectedTrack->tag = "music"; break;
+                    case 2: selectedTrack->tag = "ambient"; break;
+                    }
+                }
+
                 float vol = selectedTrack->volume;
                 if (ImGui::SliderFloat("Volume", &vol, 0.0f, 1.0f))
                 {
-                    m_AudioEditor->SetVolume(selectedTrack->id, vol);
+                    selectedTrack->volume = vol;
+                    m_AudioEditor->SetVolume(selectedTrack->name, vol);
                 }
 
                 if (ImGui::Checkbox("Loop", &selectedTrack->loop))
                 {
-                    m_AudioEditor->SetLoop(selectedTrack->id, selectedTrack->loop);
+                    m_AudioEditor->SetLoop(selectedTrack->name, selectedTrack->loop);
                     std::cout<< "selectedTrack->loop = " << selectedTrack->loop << std::endl;
                 }
                 
-                static char tagBuf[64];
-                strncpy(tagBuf, selectedTrack->tag.c_str(), sizeof(tagBuf));
-                if (ImGui::InputText("Tag", tagBuf, sizeof(tagBuf)))
-                {
-                    selectedTrack->tag = std::string(tagBuf);
-                }
+                // static char tagBuf[64];
+                // strncpy(tagBuf, selectedTrack->tag.c_str(), sizeof(tagBuf));
+                // if (ImGui::InputText("Tag", tagBuf, sizeof(tagBuf)))
+                // {
+                //     selectedTrack->tag = std::string(tagBuf);
+                // }
 
                 ImGui::Spacing();
                 ImGui::Separator();
                 
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
-                // if (ImGui::Button("Delete Track", ImVec2(-1, 30)))
-                // {
-                //     m_AudioEditor->RemoveTrack(selectedTrack->id);
-                //     m_selectedAudioID = ""; 
-                // }
+                if (ImGui::Button("Delete Track", ImVec2(-1, 30)))
+                {
+                    m_AudioEditor->RemoveTrack(selectedTrack->name);
+                    m_selectedAudioName = ""; 
+                }
                 ImGui::PopStyleColor();
                 
                 if (ImGui::Button("Save Audio Config", ImVec2(-1, 30)))
                 {
-                    m_AudioEditor->Save();
+                    m_AudioEditor->SaveToJson();
                 }
         }
         else
@@ -1111,7 +1188,75 @@ void PropertyPanel::DrawAudioPanel()
         
     }
     ImGui::EndGroup();
-    
+
+    if (ImGui::BeginPopupModal("Configure Audio Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Add Audio Track to Library");
+        ImGui::Separator();
+        
+        ImGui::Text("File: %s", newTrackPath.c_str());
+        ImGui::Spacing();
+        
+        ImGui::Text("Track Settings:");
+        
+        ImGui::InputText("Track name", newTrackName, sizeof(newTrackName));
+        ImGui::SameLine();
+        ImGui::TextDisabled("(used in Lua scripts)");
+        
+        const char* tagItems[] = { "SFX", "Music", "Ambient" };
+        ImGui::Combo("Category", &newTagIndex, tagItems, IM_ARRAYSIZE(tagItems));
+        
+        ImGui::SliderFloat("Volume", &newVolume, 0.0f, 2.0f, "%.2f");
+        ImGui::Checkbox("Loop", &newLoop);
+        
+        ImGui::Spacing();
+        ImGui::Separator();
+        
+        ImGui::BeginGroup();
+        if (ImGui::Button("Add to Library", ImVec2(120, 0)))
+        {
+            if (strlen(newTrackName) > 0 && !newTrackPath.empty())
+            {
+                AudioTrack newTrack;
+                newTrack.filePath = newTrackPath;
+                newTrack.name = newTrackName;
+                
+                switch (newTagIndex) {
+                    case 0: newTrack.tag = "sfx"; break;
+                    case 1: newTrack.tag = "music"; break;
+                    case 2: newTrack.tag = "ambient"; break;
+                }
+                
+                newTrack.loop = newLoop;
+                newTrack.volume = newVolume;
+
+                m_AudioEditor->AddTrack(newTrack);
+                
+                newTrackPath = "";
+                memset(newTrackName, 0, sizeof(newTrackName));
+                newVolume = 1.0f;
+                newLoop = false;
+                newTagIndex = 0;
+                
+                ImGui::CloseCurrentPopup();
+            }
+            else
+            {
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), "Please enter a Track ID");
+            }
+        }
+        
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0)))
+        {
+            newTrackPath = "";
+            memset(newTrackName, 0, sizeof(newTrackName));
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndGroup();
+        
+        ImGui::EndPopup();
+    }
 }
 
 void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)

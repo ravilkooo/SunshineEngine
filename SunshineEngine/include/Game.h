@@ -56,7 +56,7 @@ public:
 
     void SetupPhysics();
 
-    void SetUpAudio();
+    void InitializeAudio();
 
     void Run();
 

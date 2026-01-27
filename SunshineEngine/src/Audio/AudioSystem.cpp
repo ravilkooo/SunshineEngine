@@ -1,13 +1,8 @@
 #include "Audio/AudioSystem.h"
 #include <fstream>
+#include <Scripting/AutoBindings.h>
 
-AudioSystem::AudioSystem() {
-    Initialize();
-}
-
-AudioSystem::~AudioSystem() {
-    Shutdown();
-}
+AudioSystem* AudioSystem::s_instance = nullptr;
 
 void AudioSystem::Initialize() {
     FMOD_RESULT result;
@@ -57,7 +52,7 @@ void AudioSystem::LoadFromJson(const std::string& jsonPath) {
         std::vector<AudioTrack> tracks = j["tracks"].get<std::vector<AudioTrack>>();
         
         for (const auto& track : tracks) {
-            m_tracksData[track.id] = track;
+            m_tracksData[track.name] = track;
 
             FMOD_MODE mode = FMOD_DEFAULT;
             if (track.loop) mode |= FMOD_LOOP_NORMAL;
@@ -67,7 +62,7 @@ void AudioSystem::LoadFromJson(const std::string& jsonPath) {
             FMOD_RESULT res = m_system->createSound(track.filePath.c_str(), mode, 0, &sound);
             
             if (res == FMOD_OK) {
-                m_soundBank[track.id] = sound;
+                m_soundBank[track.name] = sound;
             } else {
                 CheckError(res);
             }
@@ -75,15 +70,15 @@ void AudioSystem::LoadFromJson(const std::string& jsonPath) {
     }
 }
 
-AudioHandle AudioSystem::Play(const std::string& trackId) {
-    AudioHandle handle = { trackId, 0, false };
+AudioHandle AudioSystem::Play(const std::string& trackName, float volume, bool loop) {
+    AudioHandle handle = { trackName, 0, false };
 
-    if (m_soundBank.find(trackId) == m_soundBank.end()) {
+    if (m_soundBank.find(trackName) == m_soundBank.end()) {
         return handle;
     }
 
-    FMOD::Sound* sound = m_soundBank[trackId];
-    AudioTrack& config = m_tracksData[trackId];
+    FMOD::Sound* sound = m_soundBank[trackName];
+    AudioTrack& config = m_tracksData[trackName];
     
     FMOD::Channel* channel = nullptr;
     
@@ -91,13 +86,13 @@ AudioHandle AudioSystem::Play(const std::string& trackId) {
     CheckError(res);
 
     if (res == FMOD_OK && channel) {
-        channel->setVolume(config.volume);
+        channel->setVolume(volume);
         
-        channel->setMode(config.loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+        channel->setMode(loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
         
         channel->setPaused(false);
 
-        m_activeChannels[trackId] = channel;
+        m_activeChannels[trackName] = channel;
         
         handle.isPlaying = true;
     }
@@ -105,10 +100,10 @@ AudioHandle AudioSystem::Play(const std::string& trackId) {
     return handle;
 }
 
-void AudioSystem::Stop(const std::string& trackId) {
-    if (m_activeChannels.count(trackId)) {
-        m_activeChannels[trackId]->stop();
-        m_activeChannels.erase(trackId);
+void AudioSystem::Stop(const std::string& trackName) {
+    if (m_activeChannels.count(trackName)) {
+        m_activeChannels[trackName]->stop();
+        m_activeChannels.erase(trackName);
     }
 }
 
@@ -119,14 +114,96 @@ void AudioSystem::StopAll() {
     m_activeChannels.clear();
 }
 
-void AudioSystem::Pause(const std::string& trackId, bool pauseState) {
-    if (m_activeChannels.count(trackId)) {
-        m_activeChannels[trackId]->setPaused(pauseState);
+void AudioSystem::Pause(const std::string& trackName, bool pauseState) {
+    if (m_activeChannels.count(trackName)) {
+        m_activeChannels[trackName]->setPaused(pauseState);
     }
 }
 
-void AudioSystem::SetVolume(const std::string& trackId, float volume) {
-    if (m_activeChannels.count(trackId)) {
-        m_activeChannels[trackId]->setVolume(volume);
+void AudioSystem::SetVolume(const std::string& trackName, float volume) {
+    if (m_activeChannels.count(trackName)) {
+        m_activeChannels[trackName]->setVolume(volume);
     }
 }
+
+bool AudioSystem::IsPlaying(const std::string& trackName) {
+    if (m_activeChannels.count(trackName)) {
+        bool isPlaying = false;
+        m_activeChannels[trackName]->isPlaying(&isPlaying);
+        return isPlaying;
+    }
+    return false;
+}
+
+AudioHandle AudioSystem::Play3D(const std::string& trackName, float x, float y, float z, 
+                               float volume, float minDist, float maxDist) {
+    AudioHandle handle = { trackName, 0, false };
+    
+    if (m_soundBank.find(trackName) == m_soundBank.end()) {
+        return handle;
+    }
+    
+    FMOD::Sound* sound = m_soundBank[trackName];
+    AudioTrack& config = m_tracksData[trackName];
+    
+    FMOD::Channel* channel = nullptr;
+    FMOD_RESULT res = m_system->playSound(sound, 0, true, &channel);
+    CheckError(res);
+    
+    if (res == FMOD_OK && channel) {
+        FMOD_VECTOR pos = { x, y, z };
+        FMOD_VECTOR vel = { 0, 0, 0 };
+        channel->set3DAttributes(&pos, &vel);
+        
+        channel->set3DMinMaxDistance(minDist, maxDist);
+        
+        channel->setVolume(volume * config.volume);
+        channel->setMode(config.loop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+        channel->setPaused(false);
+        
+        std::string channelKey = trackName + "_3d_" + std::to_string(rand());
+        m_activeChannels[channelKey] = channel;
+        
+        handle.isPlaying = true;
+        handle.instanceId = rand();
+    }
+    
+    return handle;
+}
+
+void AudioSystem::SetSourcePosition(const std::string& trackName, float x, float y, float z) {
+    for (auto& pair : m_activeChannels) {
+        if (pair.first.find(trackName) != std::string::npos) {
+            FMOD_VECTOR pos = { x, y, z };
+            FMOD_VECTOR vel = { 0, 0, 0 };
+            pair.second->set3DAttributes(&pos, &vel);
+        }
+    }
+}
+
+void AudioSystem::SetListenerPosition(float x, float y, float z) {
+    if (!m_system) return;
+    
+    FMOD_VECTOR pos = { x, y, z };
+    FMOD_VECTOR vel = { 0, 0, 0 };
+    FMOD_VECTOR forward = { 0, 0, 1 };
+    FMOD_VECTOR up = { 0, 1, 0 };
+    
+    m_system->set3DListenerAttributes(0, &pos, &vel, &forward, &up);
+}
+
+void AudioSystem::MuteAll(bool mute) {
+    for (auto& pair : m_activeChannels) {
+        pair.second->setMute(mute);
+    }
+}
+
+#define ADD_METHOD(k, fn) k, fn
+
+LUA_REGISTER_TYPE(
+    AudioSystem,
+    "AudioSystem",
+    /* no fields */ ,
+    AUDIOSYSTEM_LUA_METHODS_APPLY(ADD_METHOD))
+
+#undef ADD_METHOD
