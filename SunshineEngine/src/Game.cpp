@@ -108,7 +108,8 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		//LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()));
 		return false;
 	}
-
+	
+	InitializeAudio();
 	SetupPhysics();
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	m_playerObject = Scene::GetInstance().m_playerObject;
@@ -117,72 +118,65 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	m_physicsSystem->FinalizeScene();
 	
-	InitializeAudio();
 	
 	return true;
 }
 
 bool Game::LoadGAIScene()
 {
+	InitializeAudio();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
 	
 	return true;
 }
 
 bool Game::LoadDefaultScene()
 {
+	InitializeAudio();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
 	
 	return true;
 }
 
 bool Game::LoadParentScene()
 {
-	
+	InitializeAudio();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
 	
 	return true;
 }
 
 bool Game::LoadLuaScene()
 {
-	
+	InitializeAudio();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
 
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
 	
 	return true;
 }
 
 bool Game::LoadResourcesScene()
 {
-	
+	InitializeAudio();
 	SetupPhysics();
 
 	// Add objects, add components, set parents
@@ -190,25 +184,24 @@ bool Game::LoadResourcesScene()
 	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	
-	InitializeAudio();
-	
 	return true;
 }
 
 void Game::InitializeAudio()
 {
-	if (!AudioSystem::IsInitialized()) {
-		m_audioSystem = &AudioSystem::Get();
-		
-		m_audioSystem->LoadFromJson("assets/config/audio_tracks.json");
-		
-		// audioSystem.Play("ambient_forest", 0.5f, true);
-		// m_audioSystemPtr = &audioSystem;
-	} else {
-		m_audioSystem = &AudioSystem::Get();
-
-		m_audioSystem->LoadFromJson("assets/config/audio_tracks.json");
-	}
+	m_audioSystem = &AudioSystem::Get();
+	m_audioSystem->LoadFromJson("assets/config/audio_tracks.json");
+	
+	// if (!AudioSystem::IsInitialized()) {
+	// 	m_audioSystem = &AudioSystem::Get();
+	// 	
+	// 	m_audioSystem->LoadFromJson("assets/config/audio_tracks.json");
+	// 	
+	// } else {
+	// 	m_audioSystem = &AudioSystem::Get();
+	//
+	// 	m_audioSystem->LoadFromJson("assets/config/audio_tracks.json");
+	// }
 }
 
 
@@ -297,6 +290,14 @@ void Game::Update(float deltaTime) {
 
 	Scene::GetInstance().FlushDestructionQueue();
 
+	if (AudioSystem::IsInitialized()) {
+		AudioSystem::Get().Update();
+        
+		if (auto transform = m_playerObject->GetComponent<TransformComponent>()) {
+			auto pos = transform->m_position;
+			AudioSystem::Get().SetListenerPosition(pos.x, pos.y, pos.z);
+		}
+	}
 
 	 m_physicsSystem->FlushCommands();
 	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
@@ -318,15 +319,6 @@ void Game::Update(float deltaTime) {
 	 ClearCachedAbsoluteTransforms();
 
 	 m_renderer->GetMainCamera()->Update(deltaTime);
-
-	if (AudioSystem::IsInitialized()) {
-		AudioSystem::Get().Update();
-        
-		if (auto transform = m_playerObject->GetComponent<TransformComponent>()) {
-			auto pos = transform->m_position;
-			AudioSystem::Get().SetListenerPosition(pos.x, pos.y, pos.z);
-		}
-	}
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {

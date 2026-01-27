@@ -1017,50 +1017,6 @@ void PropertyPanel::DrawAudioPanel()
         }
         
         ImGui::EndChild();
-
-        // if (ImGui::Button("Import Audio", ImVec2(listWidth, 30)))
-        // {
-        //     std::filesystem::path selectedPath = FileDialogManager::Get().OpenFile(
-        //         FileDialogManager::DialogType::Audio, 
-        //         L"Import Audio Track"
-        //     );
-        //
-        //     if (!selectedPath.empty())
-        //     {
-        //         std::filesystem::path destDir = ContentBrowserPanel::s_AssetsDirectory;
-        //         std::filesystem::path destPath = destDir / selectedPath.filename();
-        //
-        //         if (std::filesystem::exists(destPath)) {
-        //             try {
-        //                 std::filesystem::copy_file(selectedPath, destPath);
-        //                 const auto& trackList = m_AudioEditor->GetTrackList();
-        //             } catch (std::filesystem::filesystem_error& e) {
-        //                 LOG_EDITOR_ERROR("Import error %s", e.what());
-        //             }
-        //         }
-        //     }
-        // }
-        // if (ImGui::Button("Scan Assets", ImVec2(listWidth, 30))) {
-        //     m_AudioEditor->ScanForAudioFiles(ContentBrowserPanel::s_AssetsDirectory);
-        // }
-        // if (ImGui::Button("Add Track", ImVec2(listWidth, 30)))
-        // {
-        //     ImGui::OpenPopup("AddAudioPopup");
-        // }
-        //     
-        // if (ImGui::BeginPopup("AddAudioPopup"))
-        // {
-        //     static char pathBuf[256] = "";
-        //     ImGui::InputText("Path", pathBuf, 256);
-            // if (ImGui::Button("Add"))
-            // {
-            //     m_AudioEditor->AddTrack(pathBuf);
-            //     ImGui::CloseCurrentPopup();
-            //     memset(pathBuf, 0, 256);
-            // }
-            //
-            // ImGui::EndPopup();
-        // }
     }
     ImGui::EndGroup();
 
@@ -1086,7 +1042,7 @@ void PropertyPanel::DrawAudioPanel()
 
                 if (ImGui::Button("Play Preview", ImVec2(100, 0)))
                 {
-                    m_AudioEditor->PlayPreview(selectedTrack->name);
+                    m_AudioEditor->PlayPreview(selectedTrack->name, selectedTrack->volume, selectedTrack->loop);
                 }
                 
                 ImGui::SameLine();
@@ -1154,7 +1110,7 @@ void PropertyPanel::DrawAudioPanel()
                 if (ImGui::Checkbox("Loop", &selectedTrack->loop))
                 {
                     m_AudioEditor->SetLoop(selectedTrack->name, selectedTrack->loop);
-                    std::cout<< "selectedTrack->loop = " << selectedTrack->loop << std::endl;
+                    // std::cout<< "selectedTrack->loop = " << selectedTrack->loop << std::endl;
                 }
                 
                 // static char tagBuf[64];

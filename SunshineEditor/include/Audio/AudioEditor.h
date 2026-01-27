@@ -35,7 +35,7 @@ public:
     void RemoveTrack(std::string name);
     const std::vector<AudioTrack>& GetTrackList() const { return m_trackList; }
     
-    void PlayPreview(std::string name);
+    void PlayPreview(std::string name, float volume = 1.0f, bool loop = false);
     void StopPreview();
     
     void SetLoop(std::string name, bool loop);

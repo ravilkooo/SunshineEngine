@@ -46,7 +46,7 @@ void AudioEditor::RemoveTrack(std::string name) {
     }
 }
 
-void AudioEditor::PlayPreview(std::string name) {
+void AudioEditor::PlayPreview(std::string name, float volume, bool loop) {
     if (!m_previewSystem) return;
     if (s_configPath.empty()) return;
 
@@ -56,7 +56,7 @@ void AudioEditor::PlayPreview(std::string name) {
 
     SaveToJson(previewPath.string());
     m_previewSystem->LoadFromJson(previewPath.string());
-    m_previewSystem->Play(name);
+    m_previewSystem->Play(name, volume, loop);
 }
 
 void AudioEditor::StopPreview() {

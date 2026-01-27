@@ -38,7 +38,7 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 		m_winWidth, m_winHeight);
 
 	if (!AudioSystem::IsInitialized()) {
-		AudioSystem& audioSystem = AudioSystem::Get();
+		AudioSystem::Get();
 	}
 	m_audioEditor = eastl::make_unique<AudioEditor>(&AudioSystem::Get());
 	
@@ -383,6 +383,14 @@ void EditorApp::RunGame()
 {
 	m_runtimeMode = RuntimeMode::GAME_MODE;
 
+	if (m_audioEditor) {
+		m_audioEditor->SetAudioSystem(&AudioSystem::Get());
+	}
+
+	if (AudioSystem::IsInitialized()) {
+		AudioSystem::Get().StopAll();
+	}
+	
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
 		m_openedProject->Save();
@@ -397,14 +405,6 @@ void EditorApp::RunGame()
 	// m_currentGame->SetParticleSystem(m_worldEditor->m_renderer->m_particleSystem);
 	
 	m_currentGame->m_particleSystem->EnableAllEmitters();
-
-	if (m_audioEditor) {
-		m_audioEditor->SetAudioSystem(&AudioSystem::Get());
-	}
-
-	if (AudioSystem::IsInitialized()) {
-		AudioSystem::Get().StopAll();
-	}
 	
 	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
 	{
@@ -471,6 +471,7 @@ void EditorApp::StopGame() {
 		AudioSystem::Get().LoadFromJson(
 			m_audioEditor->GetConfigPath()
 		);
+		AudioSystem::Get().StopAll();
 	}
 	m_currentGame->ClearScene();
 	m_currentGame.reset(NULL);
