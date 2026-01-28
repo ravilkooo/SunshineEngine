@@ -6,6 +6,7 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 #include <EASTL/shared_ptr.h>
+#include <EASTL/weak_ptr.h>
 
 // forward-declare heavy graphics types to reduce header dependencies
 namespace SE_G {
@@ -70,6 +71,7 @@ namespace SE_G {
 
         eastl::string m_techniqueTag;
 
+        // TO-DO: make weak ptr
         TransformComponent* m_assignedTransform;
 
     private:
