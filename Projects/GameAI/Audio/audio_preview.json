@@ -1,0 +1,14 @@
+{
+    "tracks": [
+        {
+            "filePath": {
+                "assetSource": 1,
+                "relativePath": "Audio/drumloop.wav"
+            },
+            "loop": true,
+            "name": "drumloop",
+            "tag": "sfx",
+            "volume": 1.0
+        }
+    ]
+}
