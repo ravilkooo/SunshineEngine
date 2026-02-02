@@ -1,0 +1,44 @@
+{
+    "tracks": [
+        {
+            "filePath": {
+                "assetSource": 1,
+                "relativePath": "Audio/drumloop.wav"
+            },
+            "loop": true,
+            "name": "drumloop",
+            "tag": "ambient",
+            "volume": 0.656000018119812
+        },
+        {
+            "filePath": {
+                "assetSource": 1,
+                "relativePath": "Audio/jaguar.wav"
+            },
+            "loop": false,
+            "name": "jaguar",
+            "tag": "sfx",
+            "volume": 1.0
+        },
+        {
+            "filePath": {
+                "assetSource": 1,
+                "relativePath": "Audio/pause.wav"
+            },
+            "loop": false,
+            "name": "pause",
+            "tag": "sfx",
+            "volume": 1.0
+        },
+        {
+            "filePath": {
+                "assetSource": 1,
+                "relativePath": "Audio/finish.mp3"
+            },
+            "loop": false,
+            "name": "finish",
+            "tag": "sfx",
+            "volume": 0.7680000066757202
+        }
+    ]
+}
