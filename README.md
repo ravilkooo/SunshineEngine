@@ -70,7 +70,7 @@
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
 ![2026-01-23_14-35](https://github.com/user-attachments/assets/bf6cb502-2bc3-48a5-a56a-103341e29493)
 
-Sunshine Engine is a **3D game engine** built with **C++ and DirectX 11**.
+Sunshine Engine is a **3D game engine** built with **C++**.
 
 ### Core Features
 
@@ -132,7 +132,7 @@ The engine is designed for **indie game development** with a focus on **scriptin
 ### Built With
 
 * C++
-* DirectX 11
+* DirectX
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -199,10 +199,13 @@ Link to videoguide:
 
 - [x] Add Graphics module
 - [x] Add Physics and Collision module (Jolt)
-- [ ] Add audio module (fmod)
+- [x] Add audio module (fmod)
 - [x] Lua integration
 - [x] World Editor
 - [x] PlayerController
+- [x] Perception system
+- [x] Behavior action-pattern system
+- [ ] Navigation mesh
 
 See the [open issues](https://github.com/ravilkooo/SunshineEngine/issues) for a full list of proposed features (and known issues).
 
