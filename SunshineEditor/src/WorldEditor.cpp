@@ -75,7 +75,7 @@ void WorldEditor::PixelUUIDHandler::Init(ID3D11Device* device) {
 	CD3D11_BUFFER_DESC clickBufferDesc(2 * sizeof(uint64_t), D3D11_BIND_CONSTANT_BUFFER);
 	HRESULT hr = device->CreateBuffer(&clickBufferDesc, nullptr, &m_clickMouseBuffer);
 	if (FAILED(hr)) {
-		printf("error!!!\n");
+		LOG_EDITOR_ERROR("D3D11 CreateBuffer error!\n");
 	}
 
 	Microsoft::WRL::ComPtr<ID3DBlob> cs_blob;

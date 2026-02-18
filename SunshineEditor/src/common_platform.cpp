@@ -199,6 +199,7 @@ HFONT CreateDisplayFont()
         CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, 0);
 }
 
+/*
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if (message == WM_PAINT)
@@ -279,8 +280,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     return 0;
 }
+*/
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, PSTR /*pCmdLine*/, int nCmdShow)
+/*
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
 {
     const char CLASS_NAME[] = "FMOD Example Window Class";
 
@@ -304,3 +307,4 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, PSTR /*pCmd
 
     return FMOD_Main();
 }
+*/

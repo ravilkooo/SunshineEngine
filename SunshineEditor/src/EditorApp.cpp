@@ -17,14 +17,18 @@
 
 EditorApp::EditorApp()
 {
+	m_applicationName = L"SunshineEngine";
+	m_hInstance = GetModuleHandle(nullptr);
+}
 
+EditorApp::EditorApp(HINSTANCE hInstance)
+{
+	m_applicationName = L"SunshineEngine";
+	m_hInstance = hInstance;
 }
 
 void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 {
-	m_applicationName = L"SunshineEngine";
-	m_hInstance = GetModuleHandle(nullptr);
-
 	m_winWidth = winWidth;
 	m_winHeight = winHeight;
 

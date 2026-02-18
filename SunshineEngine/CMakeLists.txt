@@ -33,6 +33,7 @@ set_target_properties(SunshineEngine PROPERTIES
 # Link to system DirectX libraries
 target_link_libraries(SunshineEngine PUBLIC
     d3d11
+    d3d12
     dxgi
     d3dcompiler
     dxguid
