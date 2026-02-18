@@ -31,6 +31,7 @@
 #include <Utils/StringUtils.h>
 #include <Utils/UUID.h>
 #include <Utils/MathUtils.h>
+#include <Utils/GameLogManager.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -146,7 +147,7 @@ public:
         {
             if (currNode == this)
             {
-                printf("Cyclce parentness dependence prevented!\n");
+                LOG_GAME_WARN("Cyclce parentness dependence prevented!\n");
                 if (parent.ptr->m_UUID == m_parent.ptr->m_UUID)
                 {
                     m_parent.uuid = SE::UUID(0u);
@@ -287,7 +288,7 @@ public:
         {
             if (currNode == this)
             {
-                printf("Cyclce parentness dependence prevented!\n");
+                LOG_GAME_WARN("Cyclce parentness dependence prevented!\n");
                 if (parent.ptr->m_UUID == m_parent.ptr->m_UUID)
                 {
                     m_parent.uuid = SE::UUID(0u);

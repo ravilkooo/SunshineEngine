@@ -22,3 +22,8 @@ void printSunshineMessage(eastl::wstring message)
 {
 	LOG_GAME_INFO("%s\n", WStringToUtf8(message).c_str());
 }
+
+void printSunshineErrorMessage(eastl::wstring errorMessage)
+{
+	LOG_GAME_ERROR("%s\n", WStringToUtf8(errorMessage).c_str());
+}
