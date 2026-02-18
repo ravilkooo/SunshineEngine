@@ -1,21 +1,24 @@
 #include "Utils/DebugUtils.h"
+#include <Utils/StringUtils.h>
+#include "Utils/GameLogManager.h"
 
 void printSunshineErrorMessage()
 {
-	printf("%s\n", sunshineErrorMessage.c_str());
+	//printf("%s\n", sunshineErrorMessage.c_str());
+	LOG_GAME_ERROR("%s\n", sunshineErrorMessage.c_str());
 }
 
 void printSunshineErrorMessage(eastl::string errorMessage)
 {
-	printf("%s\n", errorMessage.c_str());
+	LOG_GAME_ERROR("%s\n", errorMessage.c_str());
 }
 
 void printSunshineMessage(eastl::string message)
 {
-	printf("%s\n", message.c_str());
+	LOG_GAME_INFO("%s\n", message.c_str());
 }
 
 void printSunshineMessage(eastl::wstring message)
 {
-	wprintf(L"%ls\n", message.c_str());
+	LOG_GAME_INFO("%s\n", WStringToUtf8(message).c_str());
 }

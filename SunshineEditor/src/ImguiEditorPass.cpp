@@ -18,6 +18,8 @@
 
 #include <Utils/DebugUtils.h>
 #include <Utils/StringUtils.h>
+#include <Utils/GameLogManager.h>
+#include <EditorLogManager.h>
 
 #include <UI/FontStyles.h>
 #include "UI/PropertyPanel.h"

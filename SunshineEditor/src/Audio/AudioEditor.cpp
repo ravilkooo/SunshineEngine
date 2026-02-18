@@ -4,7 +4,7 @@
 #include <set>
 #include "Utils/FileCategories.h"
 #include "Utils/FileSystemWrapper.h"
-#include <LogManager.h>
+#include <EditorLogManager.h>
 #include "EASTL/string.h"
 #include "Utils/StringUtils.h"
 #include <Utils/AssetPath.h>

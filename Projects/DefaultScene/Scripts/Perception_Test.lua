@@ -207,6 +207,7 @@ function TestPerceptionComponentWithPerceptionSystem(self)
 
     local sightCbId = perception:addSightCallback(
         function(targetId, newCond)
+            LOG_GAME_INFO("I can see ")
             print("I can see", targetId, newCond)
         end)
 
@@ -218,7 +219,8 @@ function TestPerceptionComponentWithPerceptionSystem(self)
     -- ---------- HEARING CALLBACK ----------
     local hearingCbId = perception:addHearingCallback(
         function(sourceId, loudness)
-             print("I can hear", sourceId, "with loudness", loudness)
+            LOG_GAME_INFO("I can hear")
+            print("I can hear", sourceId, "with loudness", loudness)
         end)
 
     testEqual("AddHearingCallback id valid", true, hearingCbId ~= 0)
@@ -229,6 +231,7 @@ function TestPerceptionComponentWithPerceptionSystem(self)
     -- ---------- DAMAGE CALLBACK ----------
     local damageCbId = perception:addDamageCallback(
         function(instId, dmg)
+            LOG_GAME_INFO("I can feel pain")
             print("I can feel pain", instId, "with damage", dmg)
         end)
 

@@ -5,7 +5,6 @@
 #include <fstream>
 #include <EASTL/string.h>
 
-#include "../../../SunshineEditor/include/LogManager.h"
 #include "Component/TransformComponent.h"
 #include "Utils/StringUtils.h"
 #include "Utils/DebugUtils.h"

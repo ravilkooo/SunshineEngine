@@ -1,12 +1,12 @@
 #pragma once
 #include <imgui.h>
 
-#include "LogManager.h"
+#include <Utils/ILogManager.h>
 
 class LogPanel
 {
 public:
-    LogPanel(const char* title, LogManager::LogTarget target);
+    LogPanel(const char* title, ILogManager::LogTarget target);
 
     void OnImguiRender(bool& showLogPanel);
     void SetBottomOffset(float bottomHeight);
@@ -16,7 +16,7 @@ private:
     float                 m_BottomOffset = 30.0f;
     float                 m_CurrentHeight = 100.0f;
     const char*           m_Title;
-    LogManager::LogTarget m_Target;
+    ILogManager::LogTarget m_Target;
 };
 
 
