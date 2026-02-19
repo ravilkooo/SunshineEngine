@@ -11,6 +11,7 @@
 #include <Scene.h>
 #include <Utils/UUID.h>
 #include <Utils/DebugUtils.h>
+#include <Utils/GameLogManager.h>
 
 #include <AI/Perception/PerceptionSystem.h>
 #include "AI/Behavior/MemoryBoard.h"
@@ -174,6 +175,26 @@ namespace ScriptingBindings
 		lua.set_function("setGlobalGravity", [](DXSM::Vector3 inVal) {
 			return Scene::GetInstance().m_physicsSystem->SetGravity(inVal);
 			});
+
+
+		lua.set_function("LOG_GAME_INFO", [](const std::string& msg) {
+			// std::cout << "[Lua] " << msg << std::endl;
+			LOG_GAME_INFO("%s\n", msg.c_str());
+			});
+		
+		/*
+		lua.set_function("LOG_GAME_INFO", [](const std::string& fmt, sol::variadic_args args) {
+			std::vector<sol::object> arg_objects(args.begin(), args.end());
+
+			std::string message = std::string(fmt);  // fmt как базовая строка
+			for (const auto& arg : arg_objects) {
+				message += " " + arg.as<std::string>();
+			}
+			auto formatted = message;
+
+			LOG_GAME_INFO("%s", formatted.c_str());  // Вызов оригинальной функции
+		});
+		*/
     }
 
 } // namespace ScriptingBindings

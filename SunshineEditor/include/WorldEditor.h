@@ -13,7 +13,7 @@
 
 #include <Scripting/LuaManager.h>
 
-#include <LogManager.h>
+#include <EditorLogManager.h>
 
 #include <Windows/InputManager.h>
 #include <Windows/InputDevice.h>

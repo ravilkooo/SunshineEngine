@@ -83,8 +83,8 @@ public:
     ContentBrowserPanel m_ContentBrowserPanel;
     MainMenuBarPanel m_MainMenuBarPanel;
     ToolbarPanel m_ToolbarPanel;
-    LogPanel m_EditorLogPanel = LogPanel{"Editor Output Log", LogManager::LogTarget::Editor};
-    LogPanel m_GameLogPanel = LogPanel{"Game Output Log", LogManager::LogTarget::Game};
+    LogPanel m_EditorLogPanel = LogPanel{"Editor Output Log", ILogManager::LogTarget::Editor};
+    LogPanel m_GameLogPanel = LogPanel{"Game Output Log", ILogManager::LogTarget::Game};
     BottomBarPanel m_BottomPanel;
     PropertyPanel m_PropertyPanel;
 	PlayerSettingPanel m_PlayerSettingPanel;

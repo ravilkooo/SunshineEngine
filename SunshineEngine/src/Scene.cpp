@@ -60,7 +60,7 @@ SE::UUID Scene::AddGameObject(eastl::unique_ptr<GameObject> gameObject)
     auto [it, inserted] = uuidToObjectMap.emplace(id, nullptr);
     if (!inserted)
     {
-        printf("Duplicate UUID in Scene::AddGameObject");
+        LOG_GAME_WARN("Duplicate UUID in Scene::AddGameObject");
         return SE::UUID(0u);
     }
     it->second = std::move(gameObject);
@@ -206,7 +206,8 @@ SE::UUID Scene_Info::AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject
     auto [it, inserted] = uuidToObjectMap.emplace(id, nullptr);
     if (!inserted)
     {
-        printf("Duplicate UUID in Scene_Info::AddGameObject");
+        // TO-do: move warning to editor
+        LOG_GAME_WARN("Duplicate UUID in Scene_Info::AddGameObject");
         return SE::UUID(0u);
     }
     it->second = std::move(gameObject);

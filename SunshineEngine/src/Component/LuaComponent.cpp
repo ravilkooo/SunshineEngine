@@ -5,7 +5,6 @@
 #include <fstream>
 #include <EASTL/string.h>
 
-#include "../../../SunshineEditor/include/LogManager.h"
 #include "Component/TransformComponent.h"
 #include "Utils/StringUtils.h"
 #include "Utils/DebugUtils.h"
@@ -13,6 +12,7 @@
 #include "Scripting/ComponentBindings.h"
 #include <GameObject/GameObject.h>
 #include <Utils/StringHelper.h>
+#include <Utils/GameLogManager.h>
 
 eastl::vector<AssetPath> LuaComponent_Info::luaFiles;
 
@@ -39,7 +39,7 @@ void LuaComponent_Info::ScanLuaFiles()
 	}
 	if (ec)
 	{
-		wprintf(L"Lua dir not found: %ls\n", scriptDirPath.GetFullPath().c_str());
+		LOG_GAME_ERROR("Lua dir not found: %ls\n", WStringToUtf8(scriptDirPath.GetFullPath()).c_str());
 	}
 	
 	/*
@@ -189,7 +189,7 @@ void LuaComponent::LoadParamsFromLua() {
 void LuaComponent::InitializeBehavior()
 {
 	if (!scriptLoaded) {
-		wprintf(L"%ls: InitializeBehavior: scriptLoaded is false!", scriptPath.GetFullPath().c_str());
+		printSunshineErrorMessage(L"%ls: InitializeBehavior: scriptLoaded is false!", scriptPath.GetFullPath().c_str());
 		return;
 	}
 

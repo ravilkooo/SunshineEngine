@@ -12,6 +12,8 @@
 // #include <ParticleSystem/ParticleEmitterComponent.h>
 #include <Graphics/Utils/Camera.h>
 
+#include <Utils/GameLogManager.h>
+
 // #include <Physics/PhysicsSystem.h>
 // #include <AI/Perception/PerceptionSystem.h>
 
@@ -383,6 +385,11 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 	// Helper functions
 	(*m_luaState)["print"] = [](const std::string& msg) {
 		// std::cout << "[Lua] " << msg << std::endl;
-		printf("%s\n", msg.c_str());
+		LOG_GAME_INFO("%s\n", msg.c_str());
 	};
+
+	(*m_luaState)["LOG_GAME_INFO"] = [](const std::string& msg) {
+		// std::cout << "[Lua] " << msg << std::endl;
+		LOG_GAME_INFO("%s\n", msg.c_str());
+		};
 }

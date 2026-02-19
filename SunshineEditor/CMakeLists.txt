@@ -12,7 +12,7 @@ set_property(GLOBAL PROPERTY CMAKE_CONFIGURE_DEPENDS
 file(GLOB_RECURSE EDITOR_SOURCES "${EDITOR_SRC_DIR}/*.cpp")
 file(GLOB_RECURSE EDITOR_HEADERS "${EDITOR_INCLUDE_DIR}/*.h")
 
-add_executable(SunshineEditor
+add_executable(SunshineEditor WIN32
     ${EDITOR_SOURCES}
     ${EDITOR_HEADERS}
 )

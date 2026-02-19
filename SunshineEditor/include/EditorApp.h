@@ -49,6 +49,7 @@ class EditorApp : public WindowsApp
 public:
 
     EditorApp();
+    EditorApp(HINSTANCE hInstance);
     void InitEditorApp(UINT winWidth = 1600u, UINT winHeight = 800u);
     ~EditorApp();
 

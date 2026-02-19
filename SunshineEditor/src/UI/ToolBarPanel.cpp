@@ -6,6 +6,7 @@
 #include <GameObject/EditorObjectFactory.h>
 #include <SceneHierarchy.h>
 
+#include <Utils/GameLogManager.h>
 #include "Utils/FileDialogManager.h"
 
 void ToolbarPanel::OnImGuiRender(float menuBarHeight)
