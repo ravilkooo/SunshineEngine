@@ -70,7 +70,8 @@
                     "Texture": {
                         "assetSource": 1,
                         "relativePath": "Textures/carpet.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -194,7 +195,8 @@
                     "Texture": {
                         "assetSource": 1,
                         "relativePath": "Textures/football.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -294,7 +296,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/DefaultSphereTexture.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -387,7 +390,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/DefaultSphereTexture.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -487,7 +491,8 @@
                     "Texture": {
                         "assetSource": 1,
                         "relativePath": "Textures/pixeleye.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -590,7 +595,8 @@
                     "Texture": {
                         "assetSource": 1,
                         "relativePath": "Textures/eye.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Perception": {
                     "CanHear": true,
@@ -709,7 +715,8 @@
                     "Texture": {
                         "assetSource": 1,
                         "relativePath": "Textures/eye.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -994,7 +1001,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/PawBgBlue.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -1089,7 +1097,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/DefaultSphereTexture.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -1186,7 +1195,8 @@
                     "Texture": {
                         "assetSource": 1,
                         "relativePath": "Textures/horse_Diffuse.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -1353,7 +1363,8 @@
                     "Texture": {
                         "assetSource": 1,
                         "relativePath": "Textures/plane_Diffuse.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Perception": {
                     "CanHear": false,
@@ -1508,7 +1519,8 @@
                     "Texture": {
                         "assetSource": 1,
                         "relativePath": "Textures/eye.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -1600,7 +1612,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Color:250,0,250,255.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "ParticleEmitter": {
                     "emitterData": {
@@ -1828,7 +1841,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Color:250,0,250,255.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "ParticleEmitter": {
                     "emitterData": {
@@ -1982,7 +1996,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Color:0,0,250,255.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "ParticleEmitter": {
                     "emitterData": {
@@ -2275,7 +2290,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/DefaultTexture.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -2370,7 +2386,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/DefaultTexture.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -2472,7 +2489,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/DefaultTexture.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -2570,7 +2588,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Color:250,250,0,255.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -2680,7 +2699,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Color:0,150,250,255.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -2783,7 +2803,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/DefaultTexture.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
@@ -2885,7 +2906,8 @@
                     "Texture": {
                         "assetSource": 0,
                         "relativePath": "Textures/DefaultTexture.dds"
-                    }
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -2964,6 +2986,430 @@
                 }
             },
             "m_type": "Box"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/2k_poly_crash_body.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/crash_full_texture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    0.800000011920929,
+                                    2.299999952316284,
+                                    0.4099999964237213
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        -1.1399999856948853,
+                        0.27000001072883606
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -22.125022888183594,
+                        0.0,
+                        -0.2974904775619507
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 3659096847568696043,
+            "m_UUID_hi": 851949874,
+            "m_UUID_lo": 907375339,
+            "m_group": "CustomMesh",
+            "m_name": "CrashBody",
+            "m_parent": null
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/2k_poly_crash_left_hand.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/crash_full_texture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        -0.27000001072883606,
+                        -1.7599999904632568,
+                        0.27000001072883606
+                    ],
+                    "m_localRotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.27000001072883606,
+                        0.6200000047683716,
+                        0.009999999776482582
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 5558100396512506810,
+            "m_UUID_hi": 1294096092,
+            "m_UUID_lo": 3491099578,
+            "m_group": "CustomMesh",
+            "m_name": "RightHand",
+            "m_parent": {
+                "attached": true,
+                "uuid": 3659096847568696043
+            }
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/2k_poly_crash_right_hand.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/crash_full_texture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.27000001072883606,
+                        -1.7599999904632568,
+                        0.27000001072883606
+                    ],
+                    "m_localRotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -0.2711830139160156,
+                        0.6200000047683716,
+                        0.009999990463256836
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 4738926185029805931,
+            "m_UUID_hi": 1103367233,
+            "m_UUID_lo": 3816793963,
+            "m_group": "CustomMesh",
+            "m_name": "LeftHand",
+            "m_parent": {
+                "attached": true,
+                "uuid": 3659096847568696043
+            }
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/bat.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/bat.dds"
+                    },
+                    "m_cullMode": "CULL_NONE"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -2.6038498878479004,
+                        -2.2001194953918457,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 12889556292334862822,
+            "m_UUID_hi": 3001083687,
+            "m_UUID_lo": 4110762470,
+            "m_group": "CustomMesh",
+            "m_name": "Bat",
+            "m_parent": null
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/cannon.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/cannon.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -1.7559455633163452,
+                        -3.6733546257019043,
+                        -1.5092220306396484
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 14297714680283234754,
+            "m_UUID_hi": 3328946111,
+            "m_UUID_lo": 3391848898,
+            "m_group": "CustomMesh",
+            "m_name": "Cannon",
+            "m_parent": null
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/bush.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/bush.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -5.144854545593262,
+                        -3.931849956512451,
+                        0.7073700428009033
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 13859351014420552676,
+            "m_UUID_hi": 3226881617,
+            "m_UUID_lo": 1341955044,
+            "m_group": "CustomMesh",
+            "m_name": "Bush",
+            "m_parent": null
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/burger.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/burger.dds"
+                    },
+                    "m_cullMode": "CULL_NONE"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -8.936792373657227,
+                        -3.184088945388794,
+                        2.4834771156311035
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 6027667213436299612,
+            "m_UUID_hi": 1403425637,
+            "m_UUID_lo": 153332060,
+            "m_group": "CustomMesh",
+            "m_name": "Bush",
+            "m_parent": null
         }
     ]
 }
