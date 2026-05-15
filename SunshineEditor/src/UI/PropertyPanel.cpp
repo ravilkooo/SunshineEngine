@@ -1696,6 +1696,15 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 
         auto meshPtr = assigned->GetMesh();
         auto newMesh = DrawMeshSettings(meshPtr, obj->m_group, "Mesh");
+
+        // Cull Mode
+        auto cullMode = static_cast<int>(assigned->GetCullMode()) - 1;
+
+        if (ImGui::Combo("Cull mode", &cullMode, "None\0Front\0Back\0"))
+        {
+            assigned->SetCullMode(static_cast<D3D11_CULL_MODE>(static_cast<int>(cullMode) + 1));
+        }
+
         if (newMesh)
         {
             assigned->SetMesh(newMesh);

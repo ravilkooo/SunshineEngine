@@ -108,24 +108,29 @@ namespace SE_G {
 		}
 	}
 
-GPassTechnique::GPassTechnique(GPassTechnique&& other) noexcept
-	: RenderTechnique(eastl::move(other)),
-	  m_uuidBuffer(eastl::move(other.m_uuidBuffer)),
-	  m_device(other.m_device)
-{
-	other.m_device = nullptr;
-}
-
-GPassTechnique& GPassTechnique::operator=(GPassTechnique&& other) noexcept
-{
-	if (this != &other) {
-		RenderTechnique::operator=(eastl::move(other));
-		m_uuidBuffer = eastl::move(other.m_uuidBuffer);
-		m_device = other.m_device;
+	GPassTechnique::GPassTechnique(GPassTechnique&& other) noexcept
+		: RenderTechnique(eastl::move(other)),
+		  m_uuidBuffer(eastl::move(other.m_uuidBuffer)),
+		  m_device(other.m_device)
+	{
 		other.m_device = nullptr;
 	}
-	return *this;
-}
+
+	GPassTechnique& GPassTechnique::operator=(GPassTechnique&& other) noexcept
+	{
+		if (this != &other) {
+			RenderTechnique::operator=(eastl::move(other));
+			m_uuidBuffer = eastl::move(other.m_uuidBuffer);
+			m_device = other.m_device;
+			other.m_device = nullptr;
+		}
+		return *this;
+	}
+
+	void GPassTechnique::SetRasterizer(D3D11_RASTERIZER_DESC rastDesc)
+	{
+		m_rasterizer = eastl::make_unique<Bind::Rasterizer>(m_device, rastDesc);
+	}
 
 	void GPassTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{

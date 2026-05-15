@@ -23,6 +23,8 @@ namespace SE_G {
         GPassTechnique(GPassTechnique&& other) noexcept;
         GPassTechnique& operator=(GPassTechnique&& other) noexcept;
 
+        void SetRasterizer(D3D11_RASTERIZER_DESC rastDesc);
+
         void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
         void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
 

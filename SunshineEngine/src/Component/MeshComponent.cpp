@@ -97,6 +97,21 @@ MeshComponent& MeshComponent::operator=(MeshComponent&& other) noexcept
     return *this;
 }
 
+D3D11_CULL_MODE MeshComponent::GetCullMode()
+{
+    return m_cullMode;
+};
+
+void MeshComponent::SetCullMode(D3D11_CULL_MODE cullMode)
+{
+    m_cullMode = cullMode;
+
+    D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
+    rastDesc.CullMode = m_cullMode;
+    rastDesc.FillMode = m_fillMode;
+    m_gBufferTech->SetRasterizer(rastDesc);
+}
+
 /*
 void MeshComponent::Bind(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 {

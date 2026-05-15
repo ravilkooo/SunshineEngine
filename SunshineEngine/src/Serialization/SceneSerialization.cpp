@@ -249,12 +249,15 @@ void MeshComponent::FromJson(const json& j, ID3D11Device* device,
     if (j.contains("Mesh")) {
         m_meshData = eastl::make_shared<MeshData>();
         m_meshData->FromJson(j, device);
+        if (j.contains("m_cullMode"))
+            j.at("m_cullMode").get_to(m_cullMode);
 
         auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
             rc->GetDevice(), tc, "GPass", uuid);
         m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
 
         m_gBufferTech->InitByMeshData(m_meshData);
+        SetCullMode(m_cullMode);
     }
 }
 
@@ -264,7 +267,8 @@ json MeshComponent_Info::ToJson() const
 
     // prefer assigned component's mesh if present
     if (m_assignedComponent && m_assignedComponent->m_meshData) {
-        return m_assignedComponent->m_meshData->ToJson();
+        j = m_assignedComponent->m_meshData->ToJson();
+        j["m_cullMode"] = m_assignedComponent->m_cullMode;
     }
 
     return j;

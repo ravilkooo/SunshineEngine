@@ -1,5 +1,6 @@
 #pragma once
 
+#include <d3d11.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
 #include <EASTL/string.h>
@@ -71,6 +72,9 @@ public:
     void SetTextureSamplerPreset(eastl::shared_ptr<SE_G::Bind::Sampler> sampler) { m_meshData->m_textureSampler = sampler; }
     eastl::shared_ptr<SE_G::Bind::Sampler> GetTextureSamplerPreset() { return m_meshData->m_textureSampler; }
 
+    D3D11_CULL_MODE GetCullMode();
+    void SetCullMode(D3D11_CULL_MODE cullMode);
+
     void FromJson(const json& j, ID3D11Device* device,
         RenderComponent* rc, TransformComponent* tc,
         SE::UUID uuid);
@@ -78,6 +82,9 @@ public:
 private:
     eastl::shared_ptr<MeshData> m_meshData;
     SE_G::GPassTechnique* m_gBufferTech;
+
+    D3D11_CULL_MODE m_cullMode = D3D11_CULL_BACK;
+    D3D11_FILL_MODE m_fillMode = D3D11_FILL_SOLID;
 };
 
 class MeshComponent_Info : public Component_Info
@@ -104,6 +111,9 @@ public:
 
     eastl::shared_ptr<SE_G::Bind::Sampler> GetTextureSamplerPreset() { return m_assignedComponent->GetTextureSamplerPreset(); }
     void SetTextureSamplerPreset(eastl::shared_ptr<SE_G::Bind::Sampler> sampler) { m_assignedComponent->SetTextureSamplerPreset(sampler); }
+
+    D3D11_CULL_MODE GetCullMode() { m_assignedComponent->GetCullMode(); };
+    void SetCullMode(D3D11_CULL_MODE cullMode) { m_assignedComponent->SetCullMode(cullMode); };
 
     bool IsAssigned() override { return m_assignedComponent != nullptr; }
 
