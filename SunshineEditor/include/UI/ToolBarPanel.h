@@ -31,6 +31,7 @@ private:
     void AddBoxShape();
     void AddSphereShape();
     void AddGeosphereShape();
+    void AddCylinderShape();
     void AddSkyBox();
     void AddAmbientLight();
     void AddDirectionalLight();

@@ -566,6 +566,96 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 	return obj;
 }
 
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
+	SE_G::DeferredRenderer* renderSystem, float radius, float height)
+{
+	auto device = renderSystem->GetDevice();
+
+	auto obj = eastl::make_unique<GameObject>();
+	auto tc = obj->AddComponent<TransformComponent>(device);
+	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+
+	auto meshPtr = SE_G::Mesh::CreateCylinderMesh(device, radius, height);
+	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
+
+	auto& rm = ResourceManagerFacade::Instance();
+	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
+	ResourceHandle texHandle = rm.LoadByPath(texPath);
+	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+	if (texRes)
+	{
+		auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+			texRes,
+			[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+		mc->SetTexture(texture);
+	}
+	else
+	{
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			rc->GetDevice(), texPath, 0u,
+			SE_G::Bind::PipelineStage::PIXEL_SHADER);
+		mc->SetTexture(texture);
+	}
+
+	return obj;
+}
+
+eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
+	SE_G::DeferredRenderer* renderSystem,
+	const json& j)
+{
+	eastl::unique_ptr<GameObject> obj = eastl::make_unique<GameObject>();
+
+	obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
+	obj->m_name = "Cylinder";
+
+	auto device = renderSystem->GetDevice();
+
+	// TransformComponent
+	auto tc = obj->AddComponent<TransformComponent>(device);
+	if (j["components"].contains("Transform")) {
+		tc->FromJson(j["components"]["Transform"]);
+	}
+
+	// RenderComponent and technique
+	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+
+	auto shapeData = eastl::make_shared<CylinderShapeData>(j["m_shapeData"].get<CylinderShapeData>());
+	auto meshPtr = SE_G::Mesh::CreateCylinderMesh(device, shapeData->Radius, shapeData->Height, shapeData->SliceCount);
+	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
+
+	AssetPath texPath;
+	if (j["components"]["Mesh"].contains("Texture"))
+	{
+		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
+	}
+	else {
+		texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
+	}
+
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle texHandle = rm.LoadByPath(texPath);
+	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
+
+	if (texRes)
+	{
+		auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+			texRes,
+			[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+		mc->SetTexture(texture);
+	}
+	else
+	{
+		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
+			rc->GetDevice(), texPath, 0u,
+			SE_G::Bind::PipelineStage::PIXEL_SHADER);
+		mc->SetTexture(texture);
+	}
+
+	return obj;
+}
+
 eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,

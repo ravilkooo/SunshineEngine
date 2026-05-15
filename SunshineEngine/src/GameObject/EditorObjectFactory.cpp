@@ -293,6 +293,22 @@ eastl::unique_ptr<GeosphereShapeObject_Info> EditorObjectFactory::CreateGeospher
 	return obj;
 }
 
+eastl::unique_ptr<CylinderShapeObject_Info> EditorObjectFactory::CreateCylinderObject(
+	SE_G::DeferredRenderer* renderSystem, float radius, float height)
+{
+	auto obj = eastl::make_unique<CylinderShapeObject_Info>(renderSystem,
+		CylinderShapeData{ radius, height, 10u });
+	return obj;
+}
+
+eastl::unique_ptr<CylinderShapeObject_Info> EditorObjectFactory::CreateCylinderObject(
+	SE_G::DeferredRenderer* renderSystem,
+	const json& j)
+{
+	auto obj = CylinderShapeObject_Info::FromJson(renderSystem, j);
+	return obj;
+}
+
 eastl::unique_ptr<SkyBox_Info> EditorObjectFactory::CreateSkyBox(
 	SE_G::DeferredRenderer* renderSystem,
 	eastl::shared_ptr<SE_G::Camera> camera,

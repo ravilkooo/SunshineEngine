@@ -29,13 +29,14 @@ NLOHMANN_JSON_SERIALIZE_ENUM(LightObjectType, {
     })
 
 enum class ShapeObjectType {
-    Box, Sphere, Geosphere,
+    Box, Sphere, Geosphere, Cylinder
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(ShapeObjectType, {
     {ShapeObjectType::Box, "Box"},
     {ShapeObjectType::Sphere, "Sphere"},
     {ShapeObjectType::Geosphere, "Geosphere"},
+    {ShapeObjectType::Cylinder, "Cylinder"},
     })
 
 struct ObjectType {

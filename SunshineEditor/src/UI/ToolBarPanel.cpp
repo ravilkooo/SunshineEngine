@@ -130,6 +130,10 @@ void ToolbarPanel::ShowAddMenu()
         {
             AddGeosphereShape();
         }
+        if (ImGui::MenuItem("Cylinder"))
+        {
+            AddCylinderShape();
+        }
         ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Lightning"))
@@ -205,6 +209,20 @@ void ToolbarPanel::AddGeosphereShape()
         if (geosphereObject)
         {
             auto uuid = m_scene->AddGameObject(std::move(geosphereObject));
+            m_scene->m_sceneGraph->Add(uuid);
+        }
+    }
+}
+
+void ToolbarPanel::AddCylinderShape()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        auto ñylinderObject = EditorObjectFactory::CreateCylinderObject(m_renderer, 1.0f, 1.0f);
+
+        if (ñylinderObject)
+        {
+            auto uuid = m_scene->AddGameObject(std::move(ñylinderObject));
             m_scene->m_sceneGraph->Add(uuid);
         }
     }

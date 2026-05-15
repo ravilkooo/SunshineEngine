@@ -66,6 +66,13 @@ public:
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
+	static eastl::unique_ptr<CylinderShapeObject_Info> CreateCylinderObject(
+		SE_G::DeferredRenderer* renderSystem, float radius, float height);
+
+	static eastl::unique_ptr<CylinderShapeObject_Info> CreateCylinderObject(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
 	static eastl::unique_ptr<SkyBox_Info> CreateSkyBox(
 		SE_G::DeferredRenderer* renderSystem,
 		eastl::shared_ptr<SE_G::Camera> camera,

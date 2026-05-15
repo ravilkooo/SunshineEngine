@@ -640,6 +640,9 @@ void Scene::FromJson(
                 case ShapeObjectType::Geosphere:
                     go = GameObjectFactory::CreateGeosphereObject(renderSystem, objJ);
                     break;
+                case ShapeObjectType::Cylinder:
+                    go = GameObjectFactory::CreateCylinderObject(renderSystem, objJ);
+                    break;
                 }
                 break;
             case GameObjectGroup::CustomMesh:
@@ -811,6 +814,10 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 case ShapeObjectType::Geosphere:
                     //go = EditorObjectFactory::CreateDefaultGeosphereObject(renderSystem, objJ);
                     go = GeosphereShapeObject_Info::FromJson(renderSystem, objJ);
+                    break;
+                case ShapeObjectType::Cylinder:
+                    //go = EditorObjectFactory::CreateDefaultCylinderObject(renderSystem, objJ);
+                    go = CylinderShapeObject_Info::FromJson(renderSystem, objJ);
                     break;
                 }
                 break;

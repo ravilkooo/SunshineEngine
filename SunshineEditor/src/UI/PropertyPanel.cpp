@@ -360,6 +360,13 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
                     DrawGeosphereShapeDetails(shapeObj);
                 }
                 break;
+
+            case ShapeObjectType::Cylinder:
+                if (auto shapeObj = static_cast<CylinderShapeObject_Info*>(obj))
+                {
+                    DrawCylinderShapeDetails(shapeObj);
+                }
+                break;
                 
             default:
                 break;
@@ -626,6 +633,43 @@ void PropertyPanel::DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj)
         {
             obj->SetNumSubdivisions(m_WorldEditor->m_renderer.get(), currentNumSubdiv);
         }
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+}
+   
+void PropertyPanel::DrawCylinderShapeDetails(CylinderShapeObject_Info* obj)
+{
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Cylinder Shape", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        float currentRadius = obj->GetRadius();
+        float currentHeight = obj->GetHeight();
+        uint32_t currentSliceCount = obj->GetSliceCount();
+
+        if (DrawFloatControl("Radius", currentRadius, 1.0f))
+        {
+            obj->SetRadius(m_WorldEditor->m_renderer.get(), currentRadius);
+        }
+
+        if (DrawFloatControl("Height", currentHeight, 1.0f))
+        {
+            obj->SetHeight(m_WorldEditor->m_renderer.get(), currentHeight);
+        }
+
+        uint32_t min_slice = 3, max_slice = 64;
+        if (DrawUIntControl("Slice Count", currentSliceCount, 10, 1.0f, min_slice, max_slice))
+        {
+            obj->SetSliceCount(m_WorldEditor->m_renderer.get(), currentSliceCount);
+        }
+
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();

@@ -18,3 +18,9 @@ struct GeosphereShapeData {
 	DXSM::Vector3 Size = DXSM::Vector3::One;
 	uint32_t NumSubdivisions = 6u;
 };
+
+struct CylinderShapeData {
+	float Radius = 1.0f;
+	float Height = 1.0f;
+	uint32_t SliceCount = 10u;
+};

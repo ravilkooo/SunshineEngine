@@ -80,6 +80,12 @@ namespace SE_G {
             DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             uint32_t numSubdivisions = 2);
 
+        static eastl::shared_ptr<Mesh> CreateCylinderMesh(
+            ID3D11Device* device,
+            float radius = 1,
+            float height = 1,
+            uint32_t sliceCount = 10);
+
         static eastl::shared_ptr<Mesh> CreateScreenAlignedQuad(
             ID3D11Device* device);
 
@@ -117,6 +123,13 @@ namespace SE_G {
             eastl::vector<uint32_t>& indices,
             DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             uint32_t numSubdivisions = 6u);
+
+        static void FillCylinderMesh(
+            eastl::vector<Vertex>& vertices,
+            eastl::vector<uint32_t>& indices,
+            float radius = 1,
+            float height = 1,
+            uint32_t sliceCount = 10);
 
         static void FillScreenAlignedQuad(
             eastl::vector<Vertex>& vertices,

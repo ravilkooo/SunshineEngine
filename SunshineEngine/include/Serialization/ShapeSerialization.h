@@ -44,3 +44,16 @@ inline void from_json(const json& j, GeosphereShapeData& obj) {
 	obj.NumSubdivisions = std::min<uint32_t>(std::max<uint32_t>(obj.NumSubdivisions, 0), 5);
 }
 
+inline void to_json(json& j, const CylinderShapeData& obj) {
+	j = json{
+		{"Radius", obj.Radius},
+		{"Height", obj.Height},
+		{"SliceCount", obj.SliceCount}
+	};
+}
+
+inline void from_json(const json& j, CylinderShapeData& obj) {
+	j.at("Radius").get_to(obj.Radius);
+	j.at("Height").get_to(obj.Height);
+	j.at("SliceCount").get_to(obj.SliceCount);
+}

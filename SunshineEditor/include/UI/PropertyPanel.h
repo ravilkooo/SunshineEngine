@@ -14,6 +14,7 @@ class GameObject_Info;
 class BoxShapeObject_Info;
 class SphereShapeObject_Info;
 class GeosphereShapeObject_Info;
+class CylinderShapeObject_Info;
 class SkyBox_Info;
 
 class TransformComponent;
@@ -101,6 +102,7 @@ private:
     void DrawBoxShapeDetails(BoxShapeObject_Info* obj);
     void DrawSphereShapeDetails(SphereShapeObject_Info* obj);
     void DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj);
+    void DrawCylinderShapeDetails(CylinderShapeObject_Info* obj);
 
     void DrawPhysicsComponent(GameObject_Info* obj);
     void DrawTriggerComponent(GameObject_Info* obj);

@@ -247,11 +247,11 @@
                     "m_position": [
                         3.6458497047424316,
                         -3.1275529861450195,
-                        4.713081359863281
+                        4.143132209777832
                     ],
                     "m_rotation": [
                         -0.00843821931630373,
-                        -0.00892497505992651,
+                        -0.008924975991249084,
                         7.531135634053499e-05
                     ],
                     "m_scaleFactor": [
@@ -940,12 +940,12 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
-                        0.0,
-                        0.0
+                        -14.22970199584961,
+                        -2.1570029258728027,
+                        -10.54141616821289
                     ],
                     "m_rotation": [
-                        0.0,
+                        -0.0,
                         0.0,
                         -0.0
                     ],
@@ -962,7 +962,7 @@
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
-                    "x": 0.10000000149011612,
+                    "x": 1.0,
                     "y": 0.10000000149011612,
                     "z": 0.10000000149011612
                 },
@@ -973,11 +973,11 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
+                    "x": -14.22970199584961,
+                    "y": -2.1570029258728027,
+                    "z": -10.54141616821289
                 },
-                "Range": 16.5,
+                "Range": 20.5,
                 "Specular": {
                     "x": 0.9460784196853638,
                     "y": 0.10202808678150177,
@@ -2261,7 +2261,7 @@
                 "Position": {
                     "x": 3.6458497047424316,
                     "y": -3.1275529861450195,
-                    "z": 4.713081359863281
+                    "z": 4.143132209777832
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -2693,12 +2693,12 @@
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
-                        "relativePath": "Box_repeat"
+                        "relativePath": "Box"
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Color:0,150,250,255.dds"
+                        "assetSource": 1,
+                        "relativePath": "Textures/jump.dds"
                     },
                     "m_cullMode": "CULL_BACK"
                 },
@@ -2716,13 +2716,13 @@
                     ],
                     "m_localScaleFactor": [
                         1.0,
-                        1.0,
+                        0.10000000149011612,
                         1.0
                     ],
                     "m_position": [
-                        11.4518461227417,
-                        -3.1107845306396484,
-                        -6.724831581115723
+                        10.744019508361816,
+                        -3.1107852458953857,
+                        -6.934171676635742
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2775,9 +2775,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 11.4518461227417,
-                    "y": -3.1107845306396484,
-                    "z": -6.724831581115723
+                    "x": 10.744019508361816,
+                    "y": -3.1107852458953857,
+                    "z": -6.934171676635742
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -3410,6 +3410,97 @@
             "m_group": "CustomMesh",
             "m_name": "Bush",
             "m_parent": null
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Cylinder"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/bounce.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "capsule": {
+                                "height": 1.7999999523162842,
+                                "radius": 1.399999976158142
+                            }
+                        },
+                        "shapeType": "Capsule",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 1.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -12.37410831451416,
+                        -1.8529839515686035,
+                        -7.683167457580566
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 13129473324827503355,
+            "m_UUID_hi": 3056943725,
+            "m_UUID_lo": 240085755,
+            "m_group": "Shapes",
+            "m_name": "Cylinder",
+            "m_parent": null,
+            "m_shapeData": {
+                "Height": 2.9000000953674316,
+                "Radius": 1.2999999523162842,
+                "SliceCount": 39
+            },
+            "m_type": "Cylinder"
         }
     ]
 }

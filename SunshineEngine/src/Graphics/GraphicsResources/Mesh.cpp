@@ -39,6 +39,10 @@ namespace SE_G {
             FillGeosphereMesh(vertices, indices, DXSM::Vector3::One, 0u);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
+        else if (meshPath.m_assetRelativePath == L"Cylinder") {
+            FillCylinderMesh(vertices, indices);
+            m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        }
         else if (meshPath.m_assetRelativePath == L"Box_repeat") {
             FillUnwrappedBoxMesh_repeat(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -492,6 +496,184 @@ namespace SE_G {
         return;
     }
 
+    void Mesh::FillCylinderMesh(
+        eastl::vector<Vertex>& vertices,
+        eastl::vector<uint32_t>& indices,
+        float radius,
+        float height,
+        uint32_t sliceCount)
+    {
+        vertices.clear();
+        indices.clear();
+
+        const float halfHeight = height * 0.5f;
+
+        const float PI = DirectX::XM_PI;
+        const float dTheta = 2.0f * PI / static_cast<float>(sliceCount);
+
+        for (uint32_t i = 0; i <= sliceCount; ++i)
+        {
+            float theta = i * dTheta;
+
+            float c = cosf(theta);
+            float s = sinf(theta);
+
+            DXSM::Vector3 normal(c, 0.0f, s);
+
+            float u = static_cast<float>(i) / static_cast<float>(sliceCount);
+
+            {
+                Vertex v{};
+
+                v.position = DXSM::Vector3(
+                    radius * c,
+                    halfHeight,
+                    radius * s);
+
+                v.normal = normal;
+
+                v.texcoord = DXSM::Vector2(
+                    u,
+                    0.0f);
+
+                vertices.push_back(v);
+            }
+
+            {
+                Vertex v{};
+
+                v.position = DXSM::Vector3(
+                    radius * c,
+                    -halfHeight,
+                    radius * s);
+
+                v.normal = normal;
+
+                v.texcoord = DXSM::Vector2(
+                    u,
+                    0.5f);
+
+                vertices.push_back(v);
+            }
+        }
+
+        for (uint32_t i = 0; i < sliceCount; ++i)
+        {
+            uint32_t i0 = i * 2 + 0;
+            uint32_t i1 = i * 2 + 1;
+            uint32_t i2 = i * 2 + 2;
+            uint32_t i3 = i * 2 + 3;
+
+            // Triangle 1
+            indices.push_back(i0);
+            indices.push_back(i2);
+            indices.push_back(i1);
+
+            // Triangle 2
+            indices.push_back(i1);
+            indices.push_back(i2);
+            indices.push_back(i3);
+        }
+
+        uint32_t topCenterIndex = static_cast<uint32_t>(vertices.size());
+
+        {
+            Vertex center{};
+
+            center.position = DXSM::Vector3(0.0f, halfHeight, 0.0f);
+            center.normal = DXSM::Vector3(0.0f, 1.0f, 0.0f);
+
+            center.texcoord = DXSM::Vector2(0.25f, 0.75f);
+
+            vertices.push_back(center);
+        }
+
+        for (uint32_t i = 0; i <= sliceCount; ++i)
+        {
+            float theta = i * dTheta;
+
+            float c = cosf(theta);
+            float s = sinf(theta);
+
+            Vertex v{};
+
+            v.position = DXSM::Vector3(
+                radius * c,
+                halfHeight,
+                radius * s);
+
+            v.normal = DXSM::Vector3(0.0f, 1.0f, 0.0f);
+
+            float localU = c * 0.5f;
+            float localV = s * 0.5f;
+
+            v.texcoord.x = 0.25f + localU * 0.5f;
+            v.texcoord.y = 0.75f - localV * 0.5f;
+
+            vertices.push_back(v);
+        }
+
+        for (uint32_t i = 0; i < sliceCount; ++i)
+        {
+            uint32_t center = topCenterIndex;
+            uint32_t v0 = topCenterIndex + 1 + i;
+            uint32_t v1 = topCenterIndex + 1 + i + 1;
+
+            indices.push_back(center);
+            indices.push_back(v1);
+            indices.push_back(v0);
+        }
+
+        uint32_t bottomCenterIndex = static_cast<uint32_t>(vertices.size());
+
+        {
+            Vertex center{};
+
+            center.position = DXSM::Vector3(0.0f, -halfHeight, 0.0f);
+            center.normal = DXSM::Vector3(0.0f, -1.0f, 0.0f);
+
+            center.texcoord = DXSM::Vector2(0.75f, 0.75f);
+
+            vertices.push_back(center);
+        }
+
+        for (uint32_t i = 0; i <= sliceCount; ++i)
+        {
+            float theta = i * dTheta;
+
+            float c = cosf(theta);
+            float s = sinf(theta);
+
+            Vertex v{};
+
+            v.position = DXSM::Vector3(
+                radius * c,
+                -halfHeight,
+                radius * s);
+
+            v.normal = DXSM::Vector3(0.0f, -1.0f, 0.0f);
+
+            float localU = c * 0.5f;
+            float localV = s * 0.5f;
+
+            v.texcoord.x = 0.75f + localU * 0.5f;
+            v.texcoord.y = 0.75f - localV * 0.5f;
+
+            vertices.push_back(v);
+        }
+
+        for (uint32_t i = 0; i < sliceCount; ++i)
+        {
+            uint32_t center = bottomCenterIndex;
+            uint32_t v0 = bottomCenterIndex + 1 + i;
+            uint32_t v1 = bottomCenterIndex + 1 + i + 1;
+
+            indices.push_back(center);
+            indices.push_back(v0);
+            indices.push_back(v1);
+        }
+    }
+
     void Mesh::Subdivide(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
     {
         // Save a copy of the input geometry.
@@ -734,6 +916,22 @@ namespace SE_G {
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         mesh->m_meshPath = AssetPath(eastl::wstring(L"Geosphere"));
+        mesh->m_indexCount = static_cast<UINT>(indices.size());
+        mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
+        mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
+        return mesh;
+    }
+
+    eastl::shared_ptr<Mesh> Mesh::CreateCylinderMesh(ID3D11Device* device, float radius, float height, uint32_t sliceCount)
+    {
+        eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
+        eastl::vector<Vertex> vertices;
+        eastl::vector<uint32_t> indices;
+
+        FillCylinderMesh(vertices, indices, radius, height, sliceCount);
+        mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        mesh->m_meshPath = AssetPath(eastl::wstring(L"Cylinder"));
         mesh->m_indexCount = static_cast<UINT>(indices.size());
         mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
         mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
