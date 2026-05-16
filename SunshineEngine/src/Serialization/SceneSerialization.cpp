@@ -643,6 +643,9 @@ void Scene::FromJson(
                 case ShapeObjectType::Box:
                     go = GameObjectFactory::CreateBoxObject(renderSystem, objJ);
                     break;
+                case ShapeObjectType::Plane:
+                    go = GameObjectFactory::CreatePlaneObject(renderSystem, objJ);
+                    break;
                 case ShapeObjectType::Sphere:
                     go = GameObjectFactory::CreateSphereObject(renderSystem, objJ);
                     break;
@@ -815,6 +818,10 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
                 case ShapeObjectType::Box:
                     //go = EditorObjectFactory::CreateDefaultBoxObject(renderSystem, objJ);
                     go = BoxShapeObject_Info::FromJson(renderSystem, objJ);
+                    break;
+                case ShapeObjectType::Plane:
+                    //go = EditorObjectFactory::CreateDefaultPlaneObject(renderSystem, objJ);
+                    go = PlaneShapeObject_Info::FromJson(renderSystem, objJ);
                     break;
                 case ShapeObjectType::Sphere:
                     //go = EditorObjectFactory::CreateDefaultSphereObject(renderSystem, objJ);

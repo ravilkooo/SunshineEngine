@@ -23,7 +23,7 @@ SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
-	auto mesh = SE_G::Mesh::CreateSphereMesh(device, initData.Size, initData.SliceCount, initData.StackCount);
+	auto mesh = SE_G::Mesh::CreateSphereMesh(device, initData.SliceCount, initData.StackCount);
 	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, mesh);
 
 	/*
@@ -81,7 +81,7 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	auto newMesh = SE_G::Mesh::CreateSphereMesh(device, obj->m_shapeData->Size, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
+	auto newMesh = SE_G::Mesh::CreateSphereMesh(device, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	AssetPath texPath;
@@ -115,10 +115,6 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	return obj;
 }
 
-DXSM::Vector3 SphereShapeObject_Info::GetSize() {
-	return m_shapeData->Size;
-}
-
 uint32_t SphereShapeObject_Info::GetSliceCount() {
 	return m_shapeData->SliceCount;
 }
@@ -127,24 +123,12 @@ uint32_t SphereShapeObject_Info::GetStackCount() {
 	return m_shapeData->StackCount;
 }
 
-void SphereShapeObject_Info::SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize) {
-	if (DX::XMVector3Greater(newSize, DXSM::Vector3::Zero)) {
-		m_shapeData->Size = newSize;
-
-		eastl::shared_ptr<SE_G::Mesh> newMesh =
-			SE_G::Mesh::CreateSphereMesh(renderSystem->GetDevice(),
-				newSize, m_shapeData->SliceCount, m_shapeData->StackCount);
-		auto mc = GetComponent<MeshComponent_Info>();
-		mc->m_assignedComponent->SetMesh(newMesh);
-	}
-}
-
 void SphereShapeObject_Info::SetSliceCount(SE_G::DeferredRenderer* renderSystem, uint32_t newSliceCount) {
 	if (newSliceCount > 0) {
 		m_shapeData->SliceCount = newSliceCount;
 		eastl::shared_ptr<SE_G::Mesh> newMesh =
 			SE_G::Mesh::CreateSphereMesh(renderSystem->GetDevice(),
-				m_shapeData->Size, m_shapeData->SliceCount, m_shapeData->StackCount);
+				m_shapeData->SliceCount, m_shapeData->StackCount);
 		auto mc = GetComponent<MeshComponent_Info>();
 		mc->m_assignedComponent->SetMesh(newMesh);
 	}
@@ -155,7 +139,7 @@ void SphereShapeObject_Info::SetStackCount(SE_G::DeferredRenderer* renderSystem,
 		m_shapeData->StackCount = newStackCount;
 		eastl::shared_ptr<SE_G::Mesh> newMesh =
 			SE_G::Mesh::CreateSphereMesh(renderSystem->GetDevice(),
-				m_shapeData->Size, m_shapeData->SliceCount, m_shapeData->StackCount);
+				m_shapeData->SliceCount, m_shapeData->StackCount);
 		auto mc = GetComponent<MeshComponent_Info>();
 		mc->m_assignedComponent->SetMesh(newMesh);
 	}

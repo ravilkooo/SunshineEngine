@@ -562,11 +562,12 @@ void PropertyPanel::DrawBoxShapeDetails(BoxShapeObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        DXSM::Vector3 currentSize = obj->GetSize();
+        bool uvCubeMapMode = obj->IsUvCubeMapMode();
 
-        if (DrawVector3Control("Size", currentSize, 1.0f))
+        ImGui::Checkbox("UV Cubemap Mode", &uvCubeMapMode);
+        if (uvCubeMapMode != obj->IsUvCubeMapMode())
         {
-            obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
+            obj->SetUvCubeMapMode(m_WorldEditor->m_renderer.get(), uvCubeMapMode);
         }
         ImGui::TreePop();
     }
@@ -585,14 +586,8 @@ void PropertyPanel::DrawSphereShapeDetails(SphereShapeObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        DXSM::Vector3 currentSize = obj->GetSize();
         uint32_t currentSliceCount = obj->GetSliceCount();
         uint32_t currentStackCount = obj->GetStackCount();
-
-        if (DrawVector3Control("Size", currentSize, 1.0f))
-        {
-            obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
-        }
 
         uint32_t min_slice = 3, max_slice = 64;
         if (DrawUIntControl("Slice Count", currentSliceCount, 10, 1.0f, min_slice, max_slice))
@@ -622,18 +617,13 @@ void PropertyPanel::DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        DXSM::Vector3 currentSize = obj->GetSize();
         uint32_t currentNumSubdiv = obj->GetNumSubdivisions();
-
-        if (DrawVector3Control("Size", currentSize, 1.0f))
-        {
-            obj->SetSize(m_WorldEditor->m_renderer.get(), currentSize);
-        }
 
         uint32_t min_numsubdiv = 0, max_numsubdiv = 5;
         if (DrawUIntControl("Subdivisions number", currentNumSubdiv, 6, 1.0f, min_numsubdiv, max_numsubdiv))
         {
-            obj->SetNumSubdivisions(m_WorldEditor->m_renderer.get(), currentNumSubdiv);
+            obj->
+                SetNumSubdivisions(m_WorldEditor->m_renderer.get(), currentNumSubdiv);
         }
         ImGui::TreePop();
     }
@@ -652,19 +642,7 @@ void PropertyPanel::DrawCylinderShapeDetails(CylinderShapeObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        float currentRadius = obj->GetRadius();
-        float currentHeight = obj->GetHeight();
         uint32_t currentSliceCount = obj->GetSliceCount();
-
-        if (DrawFloatControl("Radius", currentRadius, 1.0f))
-        {
-            obj->SetRadius(m_WorldEditor->m_renderer.get(), currentRadius);
-        }
-
-        if (DrawFloatControl("Height", currentHeight, 1.0f))
-        {
-            obj->SetHeight(m_WorldEditor->m_renderer.get(), currentHeight);
-        }
 
         uint32_t min_slice = 3, max_slice = 64;
         if (DrawUIntControl("Slice Count", currentSliceCount, 10, 1.0f, min_slice, max_slice))

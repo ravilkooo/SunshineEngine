@@ -245,11 +245,10 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 }
 
 eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateBoxObject(
-	SE_G::DeferredRenderer* renderSystem,
-	float width, float height, float length)
+	SE_G::DeferredRenderer* renderSystem)
 {
 	auto obj = eastl::make_unique<BoxShapeObject_Info>(renderSystem,
-		BoxShapeData{ DXSM::Vector3(width, height, length) });
+		BoxShapeData{ });
 	return obj;
 }
 
@@ -261,11 +260,24 @@ eastl::unique_ptr<BoxShapeObject_Info> EditorObjectFactory::CreateBoxObject(
 	return obj;
 }
 
+eastl::unique_ptr<PlaneShapeObject_Info> EditorObjectFactory::CreatePlaneObject(SE_G::DeferredRenderer* renderSystem)
+{
+	auto obj = eastl::make_unique<PlaneShapeObject_Info>(renderSystem,
+		PlaneShapeData{ });
+	return obj;
+}
+
+eastl::unique_ptr<PlaneShapeObject_Info> EditorObjectFactory::CreatePlaneObject(SE_G::DeferredRenderer* renderSystem, const json& j)
+{
+	auto obj = PlaneShapeObject_Info::FromJson(renderSystem, j);
+	return obj;
+}
+
 eastl::unique_ptr<SphereShapeObject_Info> EditorObjectFactory::CreateSphereObject(
-	SE_G::DeferredRenderer* renderSystem, float radius)
+	SE_G::DeferredRenderer* renderSystem)
 {
 	auto obj = eastl::make_unique<SphereShapeObject_Info>(renderSystem,
-		SphereShapeData{ DXSM::Vector3::One * radius, 10u, 10u });
+		SphereShapeData{ 10u, 10u });
 	return obj;
 }
 
@@ -278,10 +290,10 @@ eastl::unique_ptr<SphereShapeObject_Info> EditorObjectFactory::CreateSphereObjec
 }
 
 eastl::unique_ptr<GeosphereShapeObject_Info> EditorObjectFactory::CreateGeosphereObject(
-	SE_G::DeferredRenderer* renderSystem, float radius)
+	SE_G::DeferredRenderer* renderSystem)
 {
 	auto obj = eastl::make_unique<GeosphereShapeObject_Info>(renderSystem,
-		GeosphereShapeData{ DXSM::Vector3::One * radius, 2u });
+		GeosphereShapeData{ 2u });
 	return obj;
 }
 
@@ -294,10 +306,10 @@ eastl::unique_ptr<GeosphereShapeObject_Info> EditorObjectFactory::CreateGeospher
 }
 
 eastl::unique_ptr<CylinderShapeObject_Info> EditorObjectFactory::CreateCylinderObject(
-	SE_G::DeferredRenderer* renderSystem, float radius, float height)
+	SE_G::DeferredRenderer* renderSystem)
 {
 	auto obj = eastl::make_unique<CylinderShapeObject_Info>(renderSystem,
-		CylinderShapeData{ radius, height, 10u });
+		CylinderShapeData{ 10u });
 	return obj;
 }
 

@@ -4,23 +4,22 @@
 
 namespace DXSM = DirectX::SimpleMath;
 
+struct PlaneShapeData
+{ ; };
+
 struct BoxShapeData {
-	DXSM::Vector3 Size = DXSM::Vector3::One;
+	bool UvCubeMapMode = false;
 };
 
 struct SphereShapeData {
-	DXSM::Vector3 Size = DXSM::Vector3::One;
 	uint32_t SliceCount = 10u;
 	uint32_t StackCount = 10u;
 };
 
 struct GeosphereShapeData {
-	DXSM::Vector3 Size = DXSM::Vector3::One;
 	uint32_t NumSubdivisions = 6u;
 };
 
 struct CylinderShapeData {
-	float Radius = 1.0f;
-	float Height = 1.0f;
 	uint32_t SliceCount = 10u;
 };

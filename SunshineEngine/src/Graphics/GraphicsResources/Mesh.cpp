@@ -36,7 +36,7 @@ namespace SE_G {
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
         else if (meshPath.m_assetRelativePath == L"Geosphere") {
-            FillGeosphereMesh(vertices, indices, DXSM::Vector3::One, 0u);
+            FillGeosphereMesh(vertices, indices, 0u);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
         else if (meshPath.m_assetRelativePath == L"Cylinder") {
@@ -152,9 +152,27 @@ namespace SE_G {
         }
     }
 
+    void Mesh::FillPlaneMesh(eastl::vector<Vertex>& vertices, eastl::vector<uint32_t>& indices)
+    {
+        // Плоскость в XZ, нормаль смотрит в +Y
+        Vertex v0 = { {-0.5f, 0, -0.5f}, {1, 1, 1, 1}, {0, 1}, {0, 1, 0} };
+        Vertex v1 = { { 0.5f, 0, -0.5f}, {1, 1, 1, 1}, {1, 1}, {0, 1, 0} };
+        Vertex v2 = { { 0.5f, 0,  0.5f}, {1, 1, 1, 1}, {1, 0}, {0, 1, 0} };
+        Vertex v3 = { {-0.5f, 0,  0.5f}, {1, 1, 1, 1}, {0, 0}, {0, 1, 0} };
+        vertices.push_back(v0);
+        vertices.push_back(v1);
+        vertices.push_back(v2);
+        vertices.push_back(v3);
+        indices.push_back(0);
+        indices.push_back(2);
+        indices.push_back(1);
+        indices.push_back(0);
+        indices.push_back(3);
+		indices.push_back(2);
+    }
+
     void Mesh::FillUnwrappedBoxMesh_repeat(eastl::vector<Vertex>& vertices,
-        eastl::vector<uint32_t>& indices,
-        DXSM::Vector3 size)
+        eastl::vector<uint32_t>& indices)
     {
         // Развёртка "крестом" (UV-карта 3x4 квадрата, каждая грань в своём прямоугольнике)
         // Текстурные координаты (U, V) для каждой из 6 граней
@@ -195,9 +213,9 @@ namespace SE_G {
             for (int i = 0; i < 4; ++i)
             {
                 Vertex vert;
-                vert.position.x = pos[i].x * size.x;
-                vert.position.y = pos[i].y * size.y;
-                vert.position.z = pos[i].z * size.z;
+                vert.position.x = pos[i].x;
+                vert.position.y = pos[i].y;
+                vert.position.z = pos[i].z;
                 vert.normal.x = faces[f].normal.x;
                 vert.normal.y = faces[f].normal.y;
                 vert.normal.z = faces[f].normal.z;
@@ -219,7 +237,7 @@ namespace SE_G {
     void Mesh::FillSphereMesh(
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices,
-        DXSM::Vector3 size, uint32_t sliceCount, uint32_t stackCount)
+        uint32_t sliceCount, uint32_t stackCount)
     {
         sliceCount = eastl::max(sliceCount, 4u);
         stackCount = eastl::max(stackCount, 1u);
@@ -234,7 +252,7 @@ namespace SE_G {
         // top vertex (sliceCount times)
         for (UINT j = 0; j < sliceCount; ++j) {
             vertices[_offsetCommonVertexIdx++] = {
-                DXSM::Vector3(0.0f, size.y, 0.0f), DXSM::Vector4::One, DXSM::Vector2((2 * j + 1) * 0.5f / sliceCount, 0), DXSM::Vector3(0,1,0)
+                DXSM::Vector3(0.0f, 1.0f, 0.0f), DXSM::Vector4::One, DXSM::Vector2((2 * j + 1) * 0.5f / sliceCount, 0), DXSM::Vector3(0,1,0)
             };
         }
 
@@ -244,9 +262,9 @@ namespace SE_G {
             for (UINT j = 0; j <= sliceCount; ++j) {
                 vertices[_offsetCommonVertexIdx++] =
                 { DXSM::Vector3(
-                    size.x * sinf(elevationStep * i) * cosf(sliceStep * j),
-                    size.y * cosf(elevationStep * i),
-                    size.z * sinf(elevationStep * i) * sinf(sliceStep * j)
+                    sinf(elevationStep * i) * cosf(sliceStep * j),
+                    cosf(elevationStep * i),
+                    sinf(elevationStep * i) * sinf(sliceStep * j)
                 ),
                     DXSM::Vector4::One,
                     DXSM::Vector2(j * 1.0f / sliceCount, (i * 1.0f) / (2 * stackCount + 2)),
@@ -260,7 +278,7 @@ namespace SE_G {
         // bottom vertex (sliceCount times)
         for (UINT j = 0; j < sliceCount; ++j) {
             vertices[_offsetCommonVertexIdx++] = {
-                DXSM::Vector3(0.0f, -size.y, 0.0f), DXSM::Vector4::One, DXSM::Vector2((2 * j + 1) * 0.5f / sliceCount, 1),
+                DXSM::Vector3(0.0f, -1.0f, 0.0f), DXSM::Vector4::One, DXSM::Vector2((2 * j + 1) * 0.5f / sliceCount, 1),
                 DXSM::Vector3(0,-1,0) };
         }
 
@@ -316,19 +334,19 @@ namespace SE_G {
     void Mesh::FillSphereMesh_old(
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices,
-        DXSM::Vector3 size, uint32_t sliceCount, uint32_t stackCount)
+        uint32_t sliceCount, uint32_t stackCount)
     {
         vertices.resize(0);
         indices.resize(0);
 
         Vertex topVertex(
-            DXSM::Vector3(0.0f, +size.y, 0.0f),
+            DXSM::Vector3(0.0f, +1.0f, 0.0f),
             DXSM::Vector4::One,
             DXSM::Vector2(0.0f, 0.0f),
             DXSM::Vector3(0.0f, +1.0f, 0.0f));
 
         Vertex bottomVertex(
-            DXSM::Vector3(0.0f, -size.y, 0.0f),
+            DXSM::Vector3(0.0f, -1.0f, 0.0f),
             DXSM::Vector4::One,
             DXSM::Vector2(0.0f, 1.0f),
             DXSM::Vector3(0.0f, -1.0f, 0.0f));
@@ -348,9 +366,9 @@ namespace SE_G {
 
                 Vertex v;
 
-                v.position.x = size.x * sinf(phi) * cosf(theta);
-                v.position.y = size.y * cosf(phi);
-                v.position.z = size.z * sinf(phi) * sinf(theta);
+                v.position.x = sinf(phi) * cosf(theta);
+                v.position.y = cosf(phi);
+                v.position.z = sinf(phi) * sinf(theta);
 
                 v.color = DXSM::Vector4::One;
                 v.normal = v.position;
@@ -405,7 +423,6 @@ namespace SE_G {
 
     void Mesh::FillGeosphereMesh(eastl::vector<Vertex>& vertices,
         eastl::vector<UINT>& indices,
-        DXSM::Vector3 size,
         uint32_t numSubdivisions)
     {
         numSubdivisions = std::min<uint32_t>(std::max<uint32_t>(numSubdivisions, 0), 5);
@@ -486,9 +503,9 @@ namespace SE_G {
             vertices[i].texcoord.x = theta / DX::XM_2PI;
             vertices[i].texcoord.y = phi / DX::XM_PI;
 
-            vertices[i].position.x = vertices[i].normal.x * size.x;
-            vertices[i].position.y = vertices[i].normal.y * size.y;
-            vertices[i].position.z = vertices[i].normal.z * size.z;
+            vertices[i].position.x = vertices[i].normal.x;
+            vertices[i].position.y = vertices[i].normal.y;
+            vertices[i].position.z = vertices[i].normal.z;
 
             vertices[i].normal = vertices[i].position;
             vertices[i].normal.Normalize();
@@ -499,14 +516,12 @@ namespace SE_G {
     void Mesh::FillCylinderMesh(
         eastl::vector<Vertex>& vertices,
         eastl::vector<uint32_t>& indices,
-        float radius,
-        float height,
         uint32_t sliceCount)
     {
         vertices.clear();
         indices.clear();
 
-        const float halfHeight = height * 0.5f;
+        const float halfHeight = 0.5f;
 
         const float PI = DirectX::XM_PI;
         const float dTheta = 2.0f * PI / static_cast<float>(sliceCount);
@@ -526,9 +541,9 @@ namespace SE_G {
                 Vertex v{};
 
                 v.position = DXSM::Vector3(
-                    radius * c,
+                    c,
                     halfHeight,
-                    radius * s);
+                    s);
 
                 v.normal = normal;
 
@@ -543,9 +558,9 @@ namespace SE_G {
                 Vertex v{};
 
                 v.position = DXSM::Vector3(
-                    radius * c,
+                    c,
                     -halfHeight,
-                    radius * s);
+                    s);
 
                 v.normal = normal;
 
@@ -598,9 +613,9 @@ namespace SE_G {
             Vertex v{};
 
             v.position = DXSM::Vector3(
-                radius * c,
+                c,
                 halfHeight,
-                radius * s);
+                s);
 
             v.normal = DXSM::Vector3(0.0f, 1.0f, 0.0f);
 
@@ -647,9 +662,9 @@ namespace SE_G {
             Vertex v{};
 
             v.position = DXSM::Vector3(
-                radius * c,
+                c,
                 -halfHeight,
-                radius * s);
+                s);
 
             v.normal = DXSM::Vector3(0.0f, -1.0f, 0.0f);
 
@@ -851,14 +866,13 @@ namespace SE_G {
     }
 
     eastl::shared_ptr<Mesh> Mesh::CreateUnwrappedBoxMesh(
-        ID3D11Device* device,
-        DXSM::Vector3 size)
+        ID3D11Device* device)
     {
         eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
         eastl::vector<Vertex> vertices;
         eastl::vector<uint32_t> indices;
 
-        FillUnwrappedBoxMesh(vertices, indices, size);
+        FillUnwrappedBoxMesh(vertices, indices);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         mesh->m_meshPath = AssetPath(eastl::wstring(L"Box"));
         mesh->m_indexCount = static_cast<UINT>(indices.size());
@@ -867,15 +881,29 @@ namespace SE_G {
         return mesh;
     }
 
-    eastl::shared_ptr<Mesh> Mesh::CreateUnwrappedBoxMesh_repeat(
-        ID3D11Device* device,
-        DXSM::Vector3 size)
+    eastl::shared_ptr<Mesh> Mesh::CreatePlaneMesh(ID3D11Device* device)
     {
         eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
         eastl::vector<Vertex> vertices;
         eastl::vector<uint32_t> indices;
 
-        FillUnwrappedBoxMesh_repeat(vertices, indices, size);
+        FillPlaneMesh(vertices, indices);
+        mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        mesh->m_meshPath = AssetPath(eastl::wstring(L"Plane"));
+        mesh->m_indexCount = static_cast<UINT>(indices.size());
+        mesh->m_vertexBuffer = eastl::make_unique<Bind::VertexBuffer>(device, vertices.data(), vertices.size(), sizeof(Vertex));
+        mesh->m_indexBuffer = eastl::make_unique<Bind::IndexBuffer>(device, indices.data(), mesh->m_indexCount);
+        return mesh;
+    }
+
+    eastl::shared_ptr<Mesh> Mesh::CreateUnwrappedBoxMesh_repeat(
+        ID3D11Device* device)
+    {
+        eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
+        eastl::vector<Vertex> vertices;
+        eastl::vector<uint32_t> indices;
+
+        FillUnwrappedBoxMesh_repeat(vertices, indices);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         mesh->m_meshPath = AssetPath(eastl::wstring(L"Box_repeat"));
@@ -888,13 +916,13 @@ namespace SE_G {
 
     eastl::shared_ptr<Mesh> Mesh::CreateSphereMesh(
         ID3D11Device* device,
-        DXSM::Vector3 size, uint32_t sliceCount, uint32_t stackCount)
+        uint32_t sliceCount, uint32_t stackCount)
     {
         eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
         eastl::vector<Vertex> vertices;
         eastl::vector<uint32_t> indices;
 
-        FillSphereMesh(vertices, indices, size, sliceCount, stackCount);
+        FillSphereMesh(vertices, indices, sliceCount, stackCount);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         
         mesh->m_meshPath = AssetPath(eastl::wstring(L"Sphere"));
@@ -906,13 +934,13 @@ namespace SE_G {
 
     eastl::shared_ptr<Mesh> Mesh::CreateGeosphereMesh(
         ID3D11Device* device,
-        DXSM::Vector3 size, uint32_t numSubdivisions)
+        uint32_t numSubdivisions)
     {
         eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
         eastl::vector<Vertex> vertices;
         eastl::vector<uint32_t> indices;
 
-        FillGeosphereMesh(vertices, indices, size, numSubdivisions);
+        FillGeosphereMesh(vertices, indices, numSubdivisions);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         mesh->m_meshPath = AssetPath(eastl::wstring(L"Geosphere"));
@@ -922,13 +950,13 @@ namespace SE_G {
         return mesh;
     }
 
-    eastl::shared_ptr<Mesh> Mesh::CreateCylinderMesh(ID3D11Device* device, float radius, float height, uint32_t sliceCount)
+    eastl::shared_ptr<Mesh> Mesh::CreateCylinderMesh(ID3D11Device* device, uint32_t sliceCount)
     {
         eastl::shared_ptr<Mesh> mesh = eastl::make_shared<Mesh>();
         eastl::vector<Vertex> vertices;
         eastl::vector<uint32_t> indices;
 
-        FillCylinderMesh(vertices, indices, radius, height, sliceCount);
+        FillCylinderMesh(vertices, indices, sliceCount);
         mesh->m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         mesh->m_meshPath = AssetPath(eastl::wstring(L"Cylinder"));

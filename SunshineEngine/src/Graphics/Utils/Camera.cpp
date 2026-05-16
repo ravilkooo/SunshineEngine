@@ -38,13 +38,13 @@ namespace SE_G {
         DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
         //CameraBuffer{ viewProjMat };
         cameraBuffer = eastl::make_unique<Bind::VertexConstantBuffer<CameraBuffer>>(
-            device, CameraBuffer{ viewProjMat, GetPosition(), 1.0f }, 1u);
+            device, CameraBuffer{ viewProjMat, GetPosition(), farZ }, 1u);
     }
 
     void Camera::UpdateBuffer(ID3D11DeviceContext* context)
     {
         DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
-        cameraBuffer->Update(context, { viewProjMat, GetPosition(), 1.0f });
+        cameraBuffer->Update(context, { viewProjMat, GetPosition(), farZ });
     }
 
     void Camera::BindBuffer(ID3D11DeviceContext* context)

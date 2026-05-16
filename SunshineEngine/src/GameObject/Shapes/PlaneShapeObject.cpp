@@ -1,26 +1,32 @@
-#include <GameObject/Shapes/CylinderShapeObject.h>
+#include <GameObject/Shapes/PlaneShapeObject.h>
+
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Graphics/GraphicsResources/Texture.h>
+
+#include <Component/PhysicsComponent.h>
+#include <Component/MeshComponent.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 
-CylinderShapeObject_Info::CylinderShapeObject_Info(SE::UUID uuid,
-	SE_G::DeferredRenderer* renderSystem, CylinderShapeData initData)
+PlaneShapeObject_Info::PlaneShapeObject_Info(SE::UUID uuid,
+	SE_G::DeferredRenderer* renderSystem, PlaneShapeData initData)
 {
 	auto device = renderSystem->GetDevice();
 	m_UUID = uuid;
 	m_group = GameObjectGroup::Shapes;
-	m_type.m_asShape = ShapeObjectType::Cylinder;
-	m_name = "Cylinder";
-	m_shapeData = eastl::make_shared<CylinderShapeData>(initData);
+	m_type.m_asShape = ShapeObjectType::Plane;
+	m_name = "Plane";
+	m_shapeData = eastl::make_shared<PlaneShapeData>(initData);
 
 	// TransformComponent
 	auto tc_info = AddComponent<TransformComponent_Info>(device);
 
+	// RenderComponent and techniques
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
-	auto mesh = SE_G::Mesh::CreateCylinderMesh(
-		device, static_cast<UINT>(initData.SliceCount));
-	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, mesh);
+	// MeshComponent (holds shared mesh resource)
+	auto newMesh = SE_G::Mesh::CreatePlaneMesh(device);
+	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, newMesh);
 
 	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
@@ -43,21 +49,21 @@ CylinderShapeObject_Info::CylinderShapeObject_Info(SE::UUID uuid,
 	}
 }
 
-CylinderShapeObject_Info::CylinderShapeObject_Info(SE_G::DeferredRenderer* renderSystem, CylinderShapeData initData) :
-	CylinderShapeObject_Info(SE::UUID(), renderSystem, initData)
+PlaneShapeObject_Info::PlaneShapeObject_Info(SE_G::DeferredRenderer* renderSystem, PlaneShapeData initData) :
+	PlaneShapeObject_Info(SE::UUID(), renderSystem, initData)
 {
 }
 
-eastl::unique_ptr<CylinderShapeObject_Info> CylinderShapeObject_Info::FromJson(
+eastl::unique_ptr<PlaneShapeObject_Info> PlaneShapeObject_Info::FromJson(
 	SE_G::DeferredRenderer* renderSystem, const json& j)
 {
-	eastl::unique_ptr<CylinderShapeObject_Info> obj = eastl::make_unique<CylinderShapeObject_Info>();
+	eastl::unique_ptr<PlaneShapeObject_Info> obj = eastl::make_unique<PlaneShapeObject_Info>();
 
 	obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-	obj->m_shapeData = eastl::make_shared<CylinderShapeData>(j["m_shapeData"].get<CylinderShapeData>());
-	obj->m_name = "Cylinder";
+	obj->m_shapeData = eastl::make_shared<PlaneShapeData>(j["m_shapeData"].get<PlaneShapeData>());
+	obj->m_name = "Plane";
 	obj->m_group = GameObjectGroup::Shapes;
-	obj->m_type.m_asShape = ShapeObjectType::Cylinder;
+	obj->m_type.m_asShape = ShapeObjectType::Plane;
 
 	auto device = renderSystem->GetDevice();
 
@@ -70,9 +76,15 @@ eastl::unique_ptr<CylinderShapeObject_Info> CylinderShapeObject_Info::FromJson(
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	auto newMesh = SE_G::Mesh::CreateCylinderMesh(
-		device,
-		obj->m_shapeData->SliceCount);
+	/*
+	auto mc_info = obj->AddComponent<MeshComponent_Info>();
+	mc_info->FromJson(j["components"]["Mesh"],
+		device, rc_info.get(),
+		tc_info.get(), obj->m_UUID);
+	*/
+
+	// MeshComponent (holds shared mesh resource)
+	auto newMesh = SE_G::Mesh::CreatePlaneMesh(device);
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	AssetPath texPath;
@@ -104,19 +116,4 @@ eastl::unique_ptr<CylinderShapeObject_Info> CylinderShapeObject_Info::FromJson(
 	}
 
 	return obj;
-}
-
-uint32_t CylinderShapeObject_Info::GetSliceCount() {
-	return m_shapeData->SliceCount;
-}
-
-void CylinderShapeObject_Info::SetSliceCount(SE_G::DeferredRenderer* renderSystem, uint32_t newSliceCount) {
-	if (newSliceCount > 0) {
-		m_shapeData->SliceCount = newSliceCount;
-		eastl::shared_ptr<SE_G::Mesh> newMesh =
-			SE_G::Mesh::CreateCylinderMesh(renderSystem->GetDevice(),
-				m_shapeData->SliceCount);
-		auto mc = GetComponent<MeshComponent_Info>();
-		mc->m_assignedComponent->SetMesh(newMesh);
-	}
 }

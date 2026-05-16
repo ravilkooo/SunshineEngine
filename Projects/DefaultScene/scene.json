@@ -177,11 +177,7 @@
             "m_name": "Carpet",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                }
+                "UvCubeMapMode": false
             },
             "m_type": "Box"
         },
@@ -280,11 +276,6 @@
             "m_name": "Sphere",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
                 "SliceCount": 19,
                 "StackCount": 11
             },
@@ -385,11 +376,6 @@
             "m_name": "DefaultSphere",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
                 "SliceCount": 10,
                 "StackCount": 10
             },
@@ -483,11 +469,6 @@
             "m_name": "Oval",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
                 "SliceCount": 10,
                 "StackCount": 10
             },
@@ -591,11 +572,6 @@
                 "uuid": 1087253342462268591
             },
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
                 "SliceCount": 10,
                 "StackCount": 10
             },
@@ -712,11 +688,6 @@
             "m_name": "BasketBall",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
                 "SliceCount": 22,
                 "StackCount": 16
             },
@@ -820,11 +791,6 @@
             "m_name": "EyeBall",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                },
                 "SliceCount": 10,
                 "StackCount": 10
             },
@@ -975,9 +941,9 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        20.5,
+                        20.5,
+                        20.5
                     ],
                     "m_position": [
                         -14.22970199584961,
@@ -1109,9 +1075,9 @@
                         -0.0
                     ],
                     "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        100.0,
+                        0.10000000149011612,
+                        100.0
                     ],
                     "m_uvMultiplier": [
                         10.0,
@@ -1126,11 +1092,7 @@
             "m_name": "Floor",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 100.0,
-                    "y": 0.10000000149011612,
-                    "z": 100.0
-                }
+                "UvCubeMapMode": false
             },
             "m_type": "Box"
         },
@@ -1226,11 +1188,6 @@
                 "uuid": 10055640163896243162
             },
             "m_shapeData": {
-                "Size": {
-                    "x": 0.5,
-                    "y": 0.5,
-                    "z": 0.5
-                },
                 "SliceCount": 10,
                 "StackCount": 10
             },
@@ -1343,9 +1300,9 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        20.0,
+                        20.0,
+                        20.0
                     ],
                     "m_position": [
                         0.0,
@@ -1660,12 +1617,7 @@
             "m_name": "GeosphereEye",
             "m_parent": null,
             "m_shapeData": {
-                "NumSubdivisions": 3,
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                }
+                "NumSubdivisions": 3
             },
             "m_type": "Geosphere"
         },
@@ -2232,9 +2184,9 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        20.0,
+                        20.0,
+                        20.0
                     ],
                     "m_position": [
                         0.0,
@@ -2309,9 +2261,9 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        20.0,
+                        20.0,
+                        20.0
                     ],
                     "m_position": [
                         0.0,
@@ -2463,11 +2415,7 @@
             "m_name": "Box",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                }
+                "UvCubeMapMode": false
             },
             "m_type": "Box"
         },
@@ -2563,11 +2511,7 @@
             "m_name": "Platform",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                }
+                "UvCubeMapMode": false
             },
             "m_type": "Box"
         },
@@ -2666,11 +2610,7 @@
                 "uuid": 13258442304443240871
             },
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                }
+                "UvCubeMapMode": false
             },
             "m_type": "Box"
         },
@@ -2682,18 +2622,6 @@
                         "assetSource": 1,
                         "relativePath": "Scripts/collectable.lua"
                     }
-                },
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Box_repeat"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Color:250,250,0,255.dds"
-                    },
-                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -2798,18 +2726,6 @@
                         "relativePath": "Scripts/collectable_cameraEffect.lua"
                     }
                 },
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Box"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 1,
-                        "relativePath": "Textures/jump.dds"
-                    },
-                    "m_cullMode": "CULL_BACK"
-                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -2824,11 +2740,11 @@
                     ],
                     "m_localScaleFactor": [
                         1.0,
-                        0.10000000149011612,
+                        1.0,
                         1.0
                     ],
                     "m_position": [
-                        10.744019508361816,
+                        3.228867769241333,
                         -3.1107852458953857,
                         -6.934171676635742
                     ],
@@ -2887,7 +2803,7 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": 10.744019508361816,
+                    "x": 3.228867769241333,
                     "y": -3.1107852458953857,
                     "z": -6.934171676635742
                 },
@@ -2996,11 +2912,7 @@
             "m_name": "Platform",
             "m_parent": null,
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                }
+                "UvCubeMapMode": false
             },
             "m_type": "Box"
         },
@@ -3099,11 +3011,7 @@
                 "uuid": 13258442304443240872
             },
             "m_shapeData": {
-                "Size": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                }
+                "UvCubeMapMode": false
             },
             "m_type": "Box"
         },
@@ -3648,11 +3556,103 @@
             "m_name": "Cylinder",
             "m_parent": null,
             "m_shapeData": {
-                "Height": 2.9000000953674316,
-                "Radius": 1.2999999523162842,
                 "SliceCount": 39
             },
             "m_type": "Cylinder"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/PawBgBlue.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        19.604488372802734,
+                        -1.6425126791000366,
+                        -6.513628959655762
+                    ],
+                    "m_rotation": [
+                        0.38222721219062805,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        3.4000000953674316,
+                        0.9999998807907104,
+                        5.500000476837158
+                    ],
+                    "m_uvMultiplier": [
+                        4.0,
+                        4.0
+                    ]
+                }
+            },
+            "m_UUID": 18209765770469436742,
+            "m_UUID_hi": 4239791485,
+            "m_UUID_lo": 535162182,
+            "m_group": "Shapes",
+            "m_name": "Plane",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
         }
     ]
 }

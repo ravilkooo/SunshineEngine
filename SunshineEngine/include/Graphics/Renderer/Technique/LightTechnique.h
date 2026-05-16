@@ -45,7 +45,8 @@ namespace SE_G {
     public:
 
         eastl::shared_ptr<T> m_lightData;
-        eastl::shared_ptr<Bind::PixelConstantBuffer<T>> m_lightDataBuffer;
+        eastl::shared_ptr<Bind::VertexConstantBuffer<T>> m_lightDataVertexCBuffer;
+        eastl::shared_ptr<Bind::PixelConstantBuffer<T>> m_lightDataPixelCBuffer;
         eastl::shared_ptr<Camera> m_camera;
 
         LightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
@@ -72,8 +73,15 @@ namespace SE_G {
 			m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 
 			m_lightData = lightData;
-			m_lightDataBuffer =
+			m_lightDataPixelCBuffer =
 				eastl::make_shared<Bind::PixelConstantBuffer<T>>(
+					device,
+					*(lightData),
+					2u
+				);
+
+			m_lightDataVertexCBuffer =
+				eastl::make_shared<Bind::VertexConstantBuffer<T>>(
 					device,
 					*(lightData),
 					2u
@@ -107,8 +115,12 @@ namespace SE_G {
 				m_textureSampler->Bind(context.Get());
 			}
 
-			if (m_lightDataBuffer) {
-				m_lightDataBuffer->Bind(context.Get());
+			if (m_lightDataPixelCBuffer) {
+				m_lightDataPixelCBuffer->Bind(context.Get());
+			}
+
+			if (m_lightDataVertexCBuffer) {
+				m_lightDataVertexCBuffer->Bind(context.Get());
 			}
 
 			if (m_blendState)

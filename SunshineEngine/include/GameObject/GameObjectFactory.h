@@ -60,6 +60,13 @@ public:
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
+	static eastl::unique_ptr<GameObject> CreatePlaneObject(
+		SE_G::DeferredRenderer* renderSystem);
+
+	static eastl::unique_ptr<GameObject> CreatePlaneObject(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
 	static eastl::unique_ptr<GameObject> CreateSphereObject(
 		SE_G::DeferredRenderer* renderSystem, float radius);
 

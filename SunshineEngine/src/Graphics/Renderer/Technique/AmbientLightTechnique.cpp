@@ -30,7 +30,7 @@ namespace SE_G {
     void AmbientLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
     {
         // to-do: update only when changed
-        m_lightDataBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
         BindAll(context);
         DrawTechnique(context);
     }

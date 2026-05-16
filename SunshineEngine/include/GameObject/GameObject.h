@@ -397,8 +397,7 @@ public:
                 auto rc_info = GetComponent<RenderComponent_Info>();
                 
                 auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-                    rc_info->GetDevice(),
-                    DXSM::Vector3(1.0f, 1.0f, 1.0f)
+                    rc_info->GetDevice()
                 );
                 auto meshComp = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, meshPtr);
 

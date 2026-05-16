@@ -15,11 +15,12 @@ namespace SE_G {
     {
         m_depthStencilState.reset(NULL);
         m_rasterizer.reset(NULL);
-        m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, DXSM::Vector3::One * lightData->Range, 1);
+        m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, 1);
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
             device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/PointLightVShader.hlsl").c_str());
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
             device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/PointLightPShader.hlsl").c_str());
+		// m_assignedTransform->m_localScaleFactor = DXSM::Vector3(m_lightData->Range, m_lightData->Range, m_lightData->Range);
     }
 
     void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -46,7 +47,8 @@ namespace SE_G {
 
         // to-do: update only when changed
 		m_lightData->Position = DXSM::Vector3(fullTransform._41, fullTransform._42, fullTransform._43);
-        m_lightDataBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataVertexCBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
         BindAll(context);
         DrawTechnique(context);
 

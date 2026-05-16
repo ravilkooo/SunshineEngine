@@ -25,15 +25,16 @@ cbuffer CameraCBuf : register(b1)
 {
     row_major float4x4 viewProjMat;
     float3 cameraPos;
-    float pad;
+    float farZ;
 }
 
 
 PS_IN VSMain(VS_IN input)
 {
     PS_IN output = (PS_IN) 0;
-    
-    output.pos = mul(float4(input.pos, 1.0), wMat);
+    float toHalfDiag = 1.15f; // 2 / sqrt(3) = 1,15470053838
+    // farZ * toHalfDiag
+    output.pos = mul(float4(input.pos * farZ * toHalfDiag, 1.0), wMat);
     output.pos = output.pos.xyzw / output.pos.w + float4(cameraPos, 0);
     output.wPos = output.pos.xyz;
     output.pos = mul(output.pos, viewProjMat);

@@ -60,10 +60,8 @@ namespace SE_G {
             SE_G::Bind::PipelineStage::PIXEL_SHADER
         );
 
-        float toHalfDiag = 1.15; // 2 / sqrt(3) = 1,15470053838
         // Add mesh for Ambient
-        m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device,
-            DXSM::Vector3::One * camera->GetFarZ() * toHalfDiag);
+        m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device);
 
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
             device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/SkyBoxVShader.hlsl").c_str());
@@ -96,8 +94,8 @@ namespace SE_G {
             m_textureSampler->Bind(context.Get());
         }
 
-        if (m_lightDataBuffer) {
-            m_lightDataBuffer->Bind(context.Get());
+        if (m_lightDataPixelCBuffer) {
+            m_lightDataPixelCBuffer->Bind(context.Get());
         }
 
         if (m_blendState)
@@ -124,7 +122,7 @@ namespace SE_G {
     void SkyBoxTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
     {
         // to-do: update only when changed
-        m_lightDataBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
         BindAll(context);
         DrawTechnique(context);
     }

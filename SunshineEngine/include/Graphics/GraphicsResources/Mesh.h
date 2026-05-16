@@ -62,28 +62,24 @@ namespace SE_G {
             UINT attrFlags = VertexAttributesFlags::POSITION);
 
         static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh(
-            ID3D11Device* device,
-            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */
-        );
+            ID3D11Device* device);
+
+        static eastl::shared_ptr<Mesh> CreatePlaneMesh(
+            ID3D11Device* device);
 
         static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh_repeat(
-            ID3D11Device* device,
-            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */);
+            ID3D11Device* device);
 
         static eastl::shared_ptr<Mesh> CreateSphereMesh(
             ID3D11Device* device,
-            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             uint32_t sliceCount = 10, uint32_t stackCount = 20);
 
         static eastl::shared_ptr<Mesh> CreateGeosphereMesh(
             ID3D11Device* device,
-            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             uint32_t numSubdivisions = 2);
 
         static eastl::shared_ptr<Mesh> CreateCylinderMesh(
             ID3D11Device* device,
-            float radius = 1,
-            float height = 1,
             uint32_t sliceCount = 10);
 
         static eastl::shared_ptr<Mesh> CreateScreenAlignedQuad(
@@ -101,34 +97,32 @@ namespace SE_G {
             eastl::vector<uint32_t>& indices,
             DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */);
 
+        static void FillPlaneMesh(
+            eastl::vector<Vertex>& vertices,
+            eastl::vector<uint32_t>& indices);
+
         static void FillUnwrappedBoxMesh_repeat(
             eastl::vector<Vertex>& vertices,
-            eastl::vector<uint32_t>& indices,
-            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */);
+            eastl::vector<uint32_t>& indices);
 
         static void FillSphereMesh(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             uint32_t sliceCount = 10, uint32_t stackCount = 10);
 
         static void FillSphereMesh_old(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             uint32_t sliceCount = 10, uint32_t stackCount = 10);
 
         static void FillGeosphereMesh(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            DXSM::Vector3 size = DXSM::Vector3::One /* (width, height, length), (x, y, z) */,
             uint32_t numSubdivisions = 6u);
 
         static void FillCylinderMesh(
             eastl::vector<Vertex>& vertices,
             eastl::vector<uint32_t>& indices,
-            float radius = 1,
-            float height = 1,
             uint32_t sliceCount = 10);
 
         static void FillScreenAlignedQuad(

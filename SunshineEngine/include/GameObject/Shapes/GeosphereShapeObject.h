@@ -26,10 +26,8 @@ public:
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
-	DXSM::Vector3 GetSize();
 	uint32_t GetNumSubdivisions();
 
-	void SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize);
 	void SetNumSubdivisions(SE_G::DeferredRenderer* renderSystem, uint32_t newNumSubdivisions);
 
 };

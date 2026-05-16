@@ -12,6 +12,19 @@ struct PS_IN
     float3 wPos : POSITION;
 };
 
+struct PointLight
+{
+    float3 Diffuse;
+    float DiffusePad;
+    float3 Specular;
+    float SpecularPad;
+    float3 Position;
+    float Range;
+
+    float3 Att;
+    float pad;
+};
+
 cbuffer TransformCBuf : register(b0)
 {
     row_major float4x4 wMat;
@@ -23,11 +36,16 @@ cbuffer CameraCBuf : register(b1)
     row_major float4x4 viewProjMat;
 }
 
+cbuffer LightBuffer : register(b2) // per object
+{
+    PointLight pointLight1;
+};
+
 PS_IN VSMain(VS_IN input)
 {
     PS_IN output = (PS_IN) 0;
     
-    output.pos = mul(float4(input.pos, 1.0), wMat);
+    output.pos = mul(float4(input.pos * pointLight1.Range, 1.0), wMat);
     output.pos = output.pos.xyzw / output.pos.w;
     output.wPos = output.pos.xyz;
     output.pos = mul(output.pos, viewProjMat);

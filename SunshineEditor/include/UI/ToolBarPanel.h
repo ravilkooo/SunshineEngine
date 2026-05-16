@@ -29,6 +29,7 @@ private:
     void ShowAddMenu();
     
     void AddBoxShape();
+    void AddPlaneShape();
     void AddSphereShape();
     void AddGeosphereShape();
     void AddCylinderShape();

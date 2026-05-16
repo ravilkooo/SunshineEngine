@@ -20,7 +20,7 @@ GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
 	auto mesh = SE_G::Mesh::CreateGeosphereMesh(
-		device, initData.Size, static_cast<UINT>(initData.NumSubdivisions));
+		device, static_cast<UINT>(initData.NumSubdivisions));
 	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, mesh);
 
 	/*
@@ -80,7 +80,7 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
 	auto newMesh = SE_G::Mesh::CreateGeosphereMesh(
-		device, obj->m_shapeData->Size,
+		device,
 		obj->m_shapeData->NumSubdivisions);
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
@@ -115,24 +115,8 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 	return obj;
 }
 
-DXSM::Vector3 GeosphereShapeObject_Info::GetSize() {
-	return m_shapeData->Size;
-}
-
 uint32_t GeosphereShapeObject_Info::GetNumSubdivisions() {
 	return m_shapeData->NumSubdivisions;
-}
-
-void GeosphereShapeObject_Info::SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize) {
-	if (DX::XMVector3Greater(newSize, DXSM::Vector3::Zero)) {
-		m_shapeData->Size = newSize;
-		eastl::shared_ptr<SE_G::Mesh> newMesh =
-			SE_G::Mesh::CreateGeosphereMesh(renderSystem->GetDevice(),
-				newSize, static_cast<UINT>(m_shapeData->NumSubdivisions));
-
-		auto mc = GetComponent<MeshComponent_Info>();
-		mc->m_assignedComponent->SetMesh(newMesh);
-	}
 }
 
 void GeosphereShapeObject_Info::SetNumSubdivisions(SE_G::DeferredRenderer* renderSystem, uint32_t newNumSubdivisions) {
@@ -140,7 +124,7 @@ void GeosphereShapeObject_Info::SetNumSubdivisions(SE_G::DeferredRenderer* rende
 		m_shapeData->NumSubdivisions = std::min<uint32_t>(std::max<uint32_t>(newNumSubdivisions, 0), 5);
 		eastl::shared_ptr<SE_G::Mesh> newMesh =
 			SE_G::Mesh::CreateGeosphereMesh(renderSystem->GetDevice(),
-				m_shapeData->Size, static_cast<UINT>(m_shapeData->NumSubdivisions));
+				m_shapeData->NumSubdivisions);
 
 		auto mc = GetComponent<MeshComponent_Info>();
 		mc->m_assignedComponent->SetMesh(newMesh);

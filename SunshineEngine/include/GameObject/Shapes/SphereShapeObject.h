@@ -26,11 +26,9 @@ public:
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
-	DXSM::Vector3 GetSize();
 	uint32_t GetSliceCount();
 	uint32_t GetStackCount();
 
-	void SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize);
 	void SetSliceCount(SE_G::DeferredRenderer* renderSystem, uint32_t newSliceCount);
 	void SetStackCount(SE_G::DeferredRenderer* renderSystem, uint32_t newStackCount);
 };

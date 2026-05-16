@@ -26,12 +26,8 @@ public:
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
-	float GetRadius();
-	float GetHeight();
 	uint32_t GetSliceCount();
 
-	void SetRadius(SE_G::DeferredRenderer* renderSystem, float newRadius);
-	void SetHeight(SE_G::DeferredRenderer* renderSystem, float newHeight);
 	void SetSliceCount(SE_G::DeferredRenderer* renderSystem, uint32_t newSliceCount);
 
 };

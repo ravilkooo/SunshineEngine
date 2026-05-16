@@ -34,7 +34,7 @@ namespace SE_G {
         // to-do: update only when changed
         auto wMat = m_assignedTransform->GetWorldMatrix();
         m_lightData->Position = DXSM::Vector3(wMat._41, wMat._42, wMat._43);
-        m_lightDataBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
         BindAll(context);
 
         if (m_castsShadow)

@@ -25,7 +25,7 @@ BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
 	// MeshComponent (holds shared mesh resource)
-	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, initData.Size);
+	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
 	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, newMesh);
 
 	/*
@@ -91,7 +91,7 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	*/
 
 	// MeshComponent (holds shared mesh resource)
-	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device, obj->m_shapeData->Size);
+	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	AssetPath texPath;
@@ -125,19 +125,27 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	return obj;
 }
 
-DXSM::Vector3 BoxShapeObject_Info::GetSize() {
-	return m_shapeData->Size;
+bool BoxShapeObject_Info::IsUvCubeMapMode()
+{
+	return m_shapeData->UvCubeMapMode;
 }
 
-void BoxShapeObject_Info::SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize) {
-	if (DX::XMVector3Greater(newSize, DXSM::Vector3::Zero)) {
-		m_shapeData->Size = newSize;
-
-		eastl::shared_ptr<SE_G::Mesh> newMesh =
-			SE_G::Mesh::CreateUnwrappedBoxMesh(renderSystem->GetDevice(),
-				newSize);
-
-		auto mc = GetComponent<MeshComponent_Info>();
-		mc->m_assignedComponent->SetMesh(newMesh);
+void BoxShapeObject_Info::SetUvCubeMapMode(SE_G::DeferredRenderer* renderSystem, bool cubeMapUV)
+{
+	if (m_shapeData->UvCubeMapMode == cubeMapUV)
+		return;
+	m_shapeData->UvCubeMapMode = cubeMapUV;
+	
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	if (cubeMapUV)
+	{
+		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh(renderSystem->GetDevice());
 	}
+	else
+	{
+		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(renderSystem->GetDevice());
+	}
+
+	auto mc = GetComponent<MeshComponent_Info>();
+	mc->m_assignedComponent->SetMesh(newMesh);
 }

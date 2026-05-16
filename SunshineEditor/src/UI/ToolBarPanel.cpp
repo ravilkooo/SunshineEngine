@@ -118,6 +118,10 @@ void ToolbarPanel::ShowAddMenu()
 {
     if (ImGui::BeginMenu("Shape"))
     {
+        if (ImGui::MenuItem("Plane")) 
+        {
+            AddPlaneShape();
+        }
         if (ImGui::MenuItem("Box")) 
         {
             AddBoxShape();
@@ -176,12 +180,26 @@ void ToolbarPanel::AddBoxShape()
 {
     if (m_editorApp && m_renderer && m_scene)
     {
-        auto boxObject = EditorObjectFactory::CreateBoxObject(m_renderer, 1.0f, 1.0f, 1.0f);
+        auto boxObject = EditorObjectFactory::CreateBoxObject(m_renderer);
         
         if (boxObject)
         {
             auto uuid = m_scene->AddGameObject(std::move(boxObject));
 			m_scene->m_sceneGraph->Add(uuid);
+        }
+    }
+}
+
+void ToolbarPanel::AddPlaneShape()
+{
+    if (m_editorApp && m_renderer && m_scene)
+    {
+        auto planeObject = EditorObjectFactory::CreatePlaneObject(m_renderer);
+
+        if (planeObject)
+        {
+            auto uuid = m_scene->AddGameObject(std::move(planeObject));
+            m_scene->m_sceneGraph->Add(uuid);
         }
     }
 }
@@ -218,7 +236,7 @@ void ToolbarPanel::AddCylinderShape()
 {
     if (m_editorApp && m_renderer && m_scene)
     {
-        auto ñylinderObject = EditorObjectFactory::CreateCylinderObject(m_renderer, 1.0f, 1.0f);
+        auto ñylinderObject = EditorObjectFactory::CreateCylinderObject(m_renderer);
 
         if (ñylinderObject)
         {

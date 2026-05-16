@@ -45,29 +45,35 @@ public:
 		const json& j);
 
 	static eastl::unique_ptr<BoxShapeObject_Info> CreateBoxObject(
-		SE_G::DeferredRenderer* renderSystem,
-		float width, float height, float length);
+		SE_G::DeferredRenderer* renderSystem);
 
 	static eastl::unique_ptr<BoxShapeObject_Info> CreateBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
+	static eastl::unique_ptr<PlaneShapeObject_Info> CreatePlaneObject(
+		SE_G::DeferredRenderer* renderSystem);
+
+	static eastl::unique_ptr<PlaneShapeObject_Info> CreatePlaneObject(
+		SE_G::DeferredRenderer* renderSystem,
+		const json& j);
+
 	static eastl::unique_ptr<SphereShapeObject_Info> CreateSphereObject(
-		SE_G::DeferredRenderer* renderSystem, float radius);
+		SE_G::DeferredRenderer* renderSystem);
 
 	static eastl::unique_ptr<SphereShapeObject_Info> CreateSphereObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
 	static eastl::unique_ptr<GeosphereShapeObject_Info> CreateGeosphereObject(
-		SE_G::DeferredRenderer* renderSystem, float radius);
+		SE_G::DeferredRenderer* renderSystem);
 
 	static eastl::unique_ptr<GeosphereShapeObject_Info> CreateGeosphereObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
 	static eastl::unique_ptr<CylinderShapeObject_Info> CreateCylinderObject(
-		SE_G::DeferredRenderer* renderSystem, float radius, float height);
+		SE_G::DeferredRenderer* renderSystem);
 
 	static eastl::unique_ptr<CylinderShapeObject_Info> CreateCylinderObject(
 		SE_G::DeferredRenderer* renderSystem,

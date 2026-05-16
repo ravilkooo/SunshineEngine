@@ -20,11 +20,13 @@ namespace SE_G {
         float width = lightData->Range * sinf(coneAngle);
         float depth = lightData->Range;
 
-        m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device, DXSM::Vector3(width, depth, width));
+        m_mesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device);
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
             device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/SpotLightVShader.hlsl").c_str());
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
             device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/SpotLightPShader.hlsl").c_str());
+
+		// m_assignedTransform->m_localScaleFactor = DXSM::Vector3(width, depth, width);
     }
 
     void SpotLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -40,7 +42,8 @@ namespace SE_G {
         float az = (h > (1.0f - eps)) ? atan2f(dir.z, dir.x) : 0.0f;
         m_lightData->Direction = { az, h };
 
-        m_lightDataBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataVertexCBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
         BindAll(context);
         DrawTechnique(context);
     }

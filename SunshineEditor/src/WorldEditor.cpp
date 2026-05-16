@@ -230,7 +230,7 @@ void WorldEditor::CreateParentScene()
 		{
 			boxId = m_scene->AddGameObject(
 				EditorObjectFactory::CreateBoxObject(
-					m_renderer.get(), 1.0f, 1.0f, 1.0f
+					m_renderer.get()
 				)
 			);
 
@@ -309,8 +309,8 @@ void WorldEditor::CreateParentScene()
 		SE::UUID floorId;
 		{
 			floorId = m_scene->AddGameObject(EditorObjectFactory::CreateBoxObject(
-				m_renderer.get(), 100.0f, 0.1f, 100.0f)
-			);
+				m_renderer.get()
+			));
 
 			auto floorObj = m_scene->GetGameObjectByUUID(floorId);
 			auto tc_info = floorObj->GetComponent<TransformComponent_Info>();
@@ -391,7 +391,7 @@ void WorldEditor::CreateDefaultScene()
 
 			SE::UUID boxId = m_scene->AddGameObject(
 				EditorObjectFactory::CreateBoxObject(
-					m_renderer.get(), 1.0f, 1.0f, 1.0f
+					m_renderer.get()
 				)
 			);
 
@@ -467,7 +467,7 @@ void WorldEditor::CreateDefaultScene()
 		// Floor
 		{
 			SE::UUID floorId = m_scene->AddGameObject(EditorObjectFactory::CreateBoxObject(
-				m_renderer.get(), 100.0f, 0.1f, 100.0f)
+				m_renderer.get())
 			);
 
 			auto floorObj = m_scene->GetGameObjectByUUID(floorId);

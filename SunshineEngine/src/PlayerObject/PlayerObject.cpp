@@ -289,8 +289,7 @@ void PlayerObject_Info::AddTransformComponent(ID3D11Device* device)
 void PlayerObject_Info::AddMeshComponent()
 {
 	auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-		m_renderComp->GetDevice(),
-		DXSM::Vector3(1.0f, 1.0f, 1.0f)
+		m_renderComp->GetDevice()
 	);
 	m_meshComp = this->AddComponent<MeshComponent_Info>(
 		m_renderComp, m_transformComp, this->m_UUID, meshPtr).get();

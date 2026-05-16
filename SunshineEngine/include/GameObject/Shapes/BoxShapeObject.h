@@ -26,6 +26,6 @@ public:
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
-	DXSM::Vector3 GetSize();
-	void SetSize(SE_G::DeferredRenderer* renderSystem, DXSM::Vector3 newSize);
+	bool IsUvCubeMapMode();
+	void SetUvCubeMapMode(SE_G::DeferredRenderer* renderSystem, bool cubeMapUV);
 };
