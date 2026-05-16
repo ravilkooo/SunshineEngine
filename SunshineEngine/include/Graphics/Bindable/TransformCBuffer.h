@@ -18,6 +18,8 @@ namespace SE_G {
 			{
 				DirectX::XMMATRIX wMat;
 				DirectX::XMMATRIX wMatInvTranspose;
+				float uMultiplier = 1;
+				float vMultiplier = 1;
 				//DirectX::XMMATRIX viewProj;
 			};
 		public:

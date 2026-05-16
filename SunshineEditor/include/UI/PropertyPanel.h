@@ -67,6 +67,8 @@ public:
     void DrawAudioPanel();
 
     static bool DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+
+    static bool DrawVector2Control(const char* label, DirectX::SimpleMath::Vector2& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 private:
     eastl::shared_ptr<WorldEditor> m_WorldEditor;
     SE::UUID m_SelectedUUID = SE::UUID(0u);

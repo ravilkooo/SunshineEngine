@@ -19,6 +19,7 @@ cbuffer TransformCBuf : register(b0)
 {
     row_major float4x4 wMat;
     row_major float4x4 wInvTransposeMat;
+    float2 uvMultiplier;
 }
 
 cbuffer CameraCBuf : register(b1)
@@ -35,7 +36,7 @@ PS_IN VSMain(VS_IN input)
     output.wPos = output.pos.xyz;
     output.pos = mul(output.pos, viewProjMat);
     output.col = input.col;
-    output.texCoord = input.texCoord;
+    output.texCoord = input.texCoord * uvMultiplier;
         
     output.normal = normalize(mul(float4(input.normal, 0), wInvTransposeMat));
 	

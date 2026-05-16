@@ -79,6 +79,8 @@ public:
     DXSM::Vector3 m_localRotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
     DXSM::Vector3 m_localScaleFactor = { 1, 1, 1 };
 
+    DXSM::Vector2 m_uvMultiplier = { 1, 1 };
+
     DXSM::Matrix localTransfrom = DXSM::Matrix::Identity;
 
     const std::type_info& getType() const override {

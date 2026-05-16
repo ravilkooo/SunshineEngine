@@ -49,6 +49,8 @@ json TransformComponent_Info::ToJson() const {
         j["m_rotation"] = { m_assignedComponent->m_rotation.x, m_assignedComponent->m_rotation.y, m_assignedComponent->m_rotation.z };
         j["m_scaleFactor"] = { m_assignedComponent->m_scaleFactor.x, m_assignedComponent->m_scaleFactor.y, m_assignedComponent->m_scaleFactor.z };
 
+        j["m_uvMultiplier"] = { m_assignedComponent->m_uvMultiplier.x, m_assignedComponent->m_uvMultiplier.y };
+
         j["m_localPosition"] = { m_assignedComponent->m_localPosition.x, m_assignedComponent->m_localPosition.y, m_assignedComponent->m_localPosition.z };
         j["m_localRotation"] = { m_assignedComponent->m_localRotation.x, m_assignedComponent->m_localRotation.y, m_assignedComponent->m_localRotation.z };
         j["m_localScaleFactor"] = { m_assignedComponent->m_localScaleFactor.x, m_assignedComponent->m_localScaleFactor.y, m_assignedComponent->m_localScaleFactor.z };
@@ -57,6 +59,8 @@ json TransformComponent_Info::ToJson() const {
         j["m_position"] = { 0.0f, 0.0f, 0.0f };
         j["m_rotation"] = { 0.0f, 0.0f, 0.0f };
         j["m_scaleFactor"] = { 1.0f, 1.0f, 1.0f };
+
+        j["m_uvMultiplier"] = { 1.0f, 1.0f };
 
         j["m_localPosition"] = { 0.0f, 0.0f, 0.0f };
         j["m_localRotation"] = { 0.0f, 0.0f, 0.0f };
@@ -87,6 +91,11 @@ void TransformComponent::FromJson(const json& j)
         m_scaleFactor.x = j["m_scaleFactor"][0].get<float>();
         m_scaleFactor.y = j["m_scaleFactor"][1].get<float>();
         m_scaleFactor.z = j["m_scaleFactor"][2].get<float>();
+    }
+
+    if (j.contains("m_uvMultiplier") && j["m_uvMultiplier"].is_array() && j["m_uvMultiplier"].size() >= 2) {
+        m_uvMultiplier.x = j["m_uvMultiplier"][0].get<float>();
+        m_uvMultiplier.y = j["m_uvMultiplier"][1].get<float>();
     }
 
     if (j.contains("m_localPosition") && j["m_localPosition"].is_array() && j["m_localPosition"].size() >= 3) {
