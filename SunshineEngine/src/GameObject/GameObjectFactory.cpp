@@ -327,7 +327,15 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
 	auto shapeData = eastl::make_shared<BoxShapeData>(j["m_shapeData"].get<BoxShapeData>());
-	auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	if (shapeData->UvCubeMapMode)
+	{
+		meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh(device);
+	}
+	else
+	{
+		meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
+	}
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
 	AssetPath texPath;

@@ -2527,12 +2527,12 @@
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
-                        "relativePath": "Box_repeat"
+                        "relativePath": "Box"
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Textures/DefaultTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "Textures/box.dds"
                     },
                     "m_cullMode": "CULL_BACK"
                 },
@@ -2610,7 +2610,7 @@
                 "uuid": 13258442304443240871
             },
             "m_shapeData": {
-                "UvCubeMapMode": false
+                "UvCubeMapMode": true
             },
             "m_type": "Box"
         },
@@ -2622,6 +2622,18 @@
                         "assetSource": 1,
                         "relativePath": "Scripts/collectable.lua"
                     }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:250,250,0,255.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -2725,6 +2737,18 @@
                         "assetSource": 1,
                         "relativePath": "Scripts/collectable_cameraEffect.lua"
                     }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:250,0,250,255.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -3524,9 +3548,9 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        1.399999976158142,
+                        3.5999999046325684,
+                        1.399999976158142
                     ],
                     "m_position": [
                         -12.37410831451416,

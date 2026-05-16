@@ -25,7 +25,15 @@ BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
 	// MeshComponent (holds shared mesh resource)
-	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	if (m_shapeData->UvCubeMapMode)
+	{
+		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device);
+	}
+	else
+	{
+		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
+	}
 	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, newMesh);
 
 	/*
@@ -91,7 +99,15 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	*/
 
 	// MeshComponent (holds shared mesh resource)
-	auto newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	if (obj->m_shapeData->UvCubeMapMode)
+	{
+		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device);
+	}
+	else
+	{
+		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
+	}
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	AssetPath texPath;
