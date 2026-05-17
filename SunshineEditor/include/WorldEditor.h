@@ -94,8 +94,6 @@ public:
     void CloseProject();
     void ClearScene();
 
-    void CreateDefaultScene();
-
     void SaveScene(const wchar_t* scenePath);
     bool LoadScene(const wchar_t* scenePath);
 
@@ -152,6 +150,20 @@ public:
     float const MinCameraSpeed = 10.0f;
     float const CameraSpeedStep = 10.0f;
     float const CameraRotateSpeed = 0.5f;
+
+    // Context menu and tool bar panel
+    void AddBoxShape();
+    void AddPlaneShape();
+    void AddSphereShape();
+    void AddGeosphereShape();
+    void AddCylinderShape();
+    void AddSkyBox();
+    void AddAmbientLight();
+    void AddDirectionalLight();
+    void AddPointLight();
+    void AddSpotLight();
+    void AddCustomMesh();
+    void AddParticleEmitter();
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

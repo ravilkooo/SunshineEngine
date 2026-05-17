@@ -24,6 +24,8 @@
 #include <ParticleSystem/ParticleSystem.h>
 // #include <ParticleSystem/ParticleEmitter.h>
 
+#include <SceneHierarchy.h>
+
 #include <ResourceManager/ResourceLoaderFactory.h>
 
 WorldEditor::WorldEditor()
@@ -213,158 +215,6 @@ void WorldEditor::SetupRendering(
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
 
 	m_renderingSystem->AddRenderGroup(m_renderer.get());
-}
-
-void WorldEditor::CreateDefaultScene()
-{
-	{
-		this->m_scene = eastl::make_shared<Scene_Info>();
-
-		m_scene->AddGameObject(EditorObjectFactory::CreateSkyBox(
-			m_renderer.get(),
-			m_renderer->GetMainCamera())
-		);
-
-		{
-
-			SE::UUID boxId = m_scene->AddGameObject(
-				EditorObjectFactory::CreateBoxObject(
-					m_renderer.get()
-				)
-			);
-
-			auto obj = m_scene->GetGameObjectByUUID(boxId);
-
-			auto tc_info = obj->GetComponent<TransformComponent_Info>();
-			auto rc_info = obj->GetComponent<RenderComponent_Info>();
-
-			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
-
-			pc_info->SetCollisionLayer("MOVING");
-			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
-			pc_info->SetActivation(SE::PhysicsActivation::Activate);
-			pc_info->SetShape(SE::ColliderShapeType::Box);
-			SE::ColliderSettings collSettings{};
-			collSettings.data.asBox = { { 1.0f, 1.0f, 1.0f } };
-			pc_info->m_colliderData->SetColliderSettings(collSettings);
-		}
-
-		for (size_t i = 0; i < 6; i++)
-		{
-			SE::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateSphereObject(
-				m_renderer.get(), 1.0f)
-			);
-			auto obj = m_scene->GetGameObjectByUUID(m_scene->gameObjects.back());
-			auto tc_info = obj->GetComponent<TransformComponent_Info>();
-
-			tc_info->m_assignedComponent->m_position = DXSM::Vector3(
-				3.0f * cos(DX::XM_2PI * i / 6.0f),
-				3.0f * sin(DX::XM_2PI * i / 6.0f),
-				0.0f);
-
-			auto rc_info = obj->GetComponent<RenderComponent_Info>();
-
-			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
-
-			pc_info->SetCollisionLayer("MOVING");
-			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
-			pc_info->SetActivation(SE::PhysicsActivation::Activate);
-			pc_info->SetShape(SE::ColliderShapeType::Sphere);
-			SE::ColliderSettings collSettings{};
-			collSettings.data.asSphere = { 1.0f };
-			pc_info->m_colliderData->SetColliderSettings(collSettings);
-		}
-
-		m_scene->AddGameObject(EditorObjectFactory::CreateAmbientLightObject(
-			m_renderer.get(),
-			m_renderer->GetMainCamera(),
-			{ DXSM::Vector3::One * 0.5f, 1.0f })
-		);
-		m_scene->AddGameObject(EditorObjectFactory::CreateDirectionalLightObject(
-			m_renderer.get(),
-			m_renderer->GetMainCamera(),
-			{
-				DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f) * 0.5f, 1.0f,
-				DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f) * 0.5f, 1.0f,
-				DXSM::Vector3::Zero, 0,
-				DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
-			})
-		);
-		m_scene->AddGameObject(EditorObjectFactory::CreatePointLightObject(
-			m_renderer.get(),
-			m_renderer->GetMainCamera(),
-			{
-				DXSM::Vector3(1.0f, 1.0f, 1.0f), 1.0f,
-				DXSM::Vector3(1.0f, 1.0f, 1.0f), 1.0f,
-				DXSM::Vector3(1.0f, 0.0f, 0.0f), 20,
-				DXSM::Vector3(0.0f, 0.0f, 0.1f), 0
-			})
-		);
-
-		// ----------------------------------------------------
-		// Floor
-		{
-			SE::UUID floorId = m_scene->AddGameObject(EditorObjectFactory::CreateBoxObject(
-				m_renderer.get())
-			);
-
-			auto floorObj = m_scene->GetGameObjectByUUID(floorId);
-			auto tc_info = floorObj->GetComponent<TransformComponent_Info>();
-			tc_info->m_assignedComponent->m_position.y = -5.0f;
-
-			auto rc_info = floorObj->GetComponent<RenderComponent_Info>();
-
-			auto pc_info = floorObj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
-
-			pc_info->SetCollisionLayer("NON_MOVING");
-			pc_info->SetMotion(SE::PhysicsMotionType::Static);
-			pc_info->SetActivation(SE::PhysicsActivation::DontActivate);
-			pc_info->SetShape(SE::ColliderShapeType::Box);
-			SE::ColliderSettings floorCollSettings{};
-			floorCollSettings.data.asBox = { { 100.0f, 0.1f, 100.0f } };
-
-			pc_info->m_colliderData->SetColliderSettings(floorCollSettings);
-		}
-		// ----------------------------------------------------
-
-		// Ball
-		{
-			SE::UUID ballId = m_scene->AddGameObject(EditorObjectFactory::CreateSphereObject(
-				m_renderer.get(), 0.5f)
-			);
-
-			auto obj = m_scene->GetGameObjectByUUID(ballId);
-
-			auto tc_info = obj->GetComponent<TransformComponent_Info>();
-			tc_info->m_assignedComponent->m_position.y = 2.0f;
-
-			auto rc_info = obj->GetComponent<RenderComponent_Info>();
-
-			auto pc_info = obj->AddComponent<PhysicsComponent_Info>(rc_info.get(), tc_info.get());
-
-			pc_info->SetCollisionLayer("MOVING");
-			pc_info->SetMotion(SE::PhysicsMotionType::Dynamic);
-			pc_info->SetActivation(SE::PhysicsActivation::Activate);
-			pc_info->SetShape(SE::ColliderShapeType::Capsule);
-			SE::ColliderSettings collSettings{};
-			collSettings.data.asCapsule = { 1.0f, 0.2f };
-
-			pc_info->m_colliderData->SetColliderSettings(collSettings);
-		}
-
-		{
-			SE::UUID customMeshId = m_scene->AddGameObject(
-				EditorObjectFactory::CreateCustomMesh(
-					m_renderer.get(), AssetPath(L"Meshes/plane.obj", AssetPath::AssetSource::Project)
-				)
-			);
-		}
-		// ----------------------------------------------------
-
-		//m_physicsSystem->FinalizeScene();
-	}
-
-	m_selectionPass->m_scene = m_scene.get();
 }
 
 void WorldEditor::HandleKeyDown(Keys key)
@@ -573,47 +423,169 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 		m_renderingSystem->AddRenderGroup(pObj->m_miniViewRenderer.get());
 	}
 
-	// TestEmitter
-	{
-		/*
-		SE::ParticleData::EmitterPointConstantBuffer emitterDesc;
-		SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc;
-
-		// Bubble Particles
-		emitterDesc =
-		{
-			DXSM::Matrix::Identity,
-			{ 15, 0, 0 }, 3,
-			{ 1, 1, 1 }, 8,
-			{ 1, 1, 1 }, 1,
-			
-			0.2, 0.5, 0, DX::XM_2PI,
-
-			-DX::XM_PI / 10, DX::XM_PI / 10, 100u, 0
-		};
-		simulatorDesc = {
-			{ 0, -5, 0 }, 0
-		};
-
-		auto go = eastl::make_unique<SE::ParticleEmitter_Info>(
-			m_particleSystem.get(),
-			emitterDesc,
-			simulatorDesc);
-
-		AssetPath bubble(L"Textures/bubble24bpp.dds");
-
-		auto bubbleTex = eastl::make_unique<SE_G::Bind::Texture>(m_renderer->GetDevice(), bubble, 0u);
-
-		go->m_particleData->SetTexture(eastl::move(bubbleTex));
-		go->m_particleData->SetEmissionRate(40);
-		*/
-		/*
-		auto go = EditorObjectFactory::CreateParticleEmitter(m_particleSystem);
-		auto bubbleUUID = m_scene->AddGameObject(eastl::move(go));
-		*/
-	}
-
 	return true;
+}
+
+void WorldEditor::AddBoxShape()
+{
+	auto boxObject = EditorObjectFactory::CreateBoxObject(m_renderer.get());
+
+	if (boxObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(boxObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddPlaneShape()
+{
+	auto planeObject = EditorObjectFactory::CreatePlaneObject(m_renderer.get());
+
+	if (planeObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(planeObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddSphereShape()
+{
+	auto sphereObject = EditorObjectFactory::CreateSphereObject(m_renderer.get(), 1.0f);
+
+	if (sphereObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(sphereObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddGeosphereShape()
+{
+	auto geosphereObject = EditorObjectFactory::CreateGeosphereObject(m_renderer.get(), 1.0f);
+
+	if (geosphereObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(geosphereObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddCylinderShape()
+{
+	auto сylinderObject = EditorObjectFactory::CreateCylinderObject(m_renderer.get());
+
+	if (сylinderObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(сylinderObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddSkyBox()
+{
+	auto skyboxObject = EditorObjectFactory::CreateSkyBox(m_renderer.get(), m_renderer->GetMainCamera());
+
+	if (skyboxObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(skyboxObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddAmbientLight()
+{
+	auto ambientLightObject = EditorObjectFactory::CreateAmbientLightObject(m_renderer.get(), m_renderer->GetMainCamera());
+
+	if (ambientLightObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(ambientLightObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddDirectionalLight()
+{
+	auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
+		{
+			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
+			DXSM::Vector3::Zero, 0,
+			DXSM::Vector2(0, -DX::XM_PIDIV4), 0, 0
+		});
+
+	if (directionalLightObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(directionalLightObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddPointLight()
+{
+	auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
+		{
+			DXSM::Vector3::One, 1.0f,
+			DXSM::Vector3::One, 1.0f,
+			DXSM::Vector3::Zero, 20,
+			DXSM::Vector3::One, 0
+		});
+
+	if (pointLightObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(pointLightObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddSpotLight()
+{
+	auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
+		{
+			DXSM::Vector3::One, 1.0f,
+			DXSM::Vector3::One, 1.0f,
+			DXSM::Vector3::Zero, 20,
+			DXSM::Vector2(0, -DX::XM_PIDIV4), 10, 0,
+			DXSM::Vector3::One, 0
+		});
+
+	if (spotLightObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(spotLightObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+void WorldEditor::AddCustomMesh()
+{
+	auto customMeshObject = EditorObjectFactory::CreateCustomMesh(
+		m_renderer.get(),
+		AssetPath(L"Box"));
+
+	if (customMeshObject)
+	{
+		auto uuid = m_scene->AddGameObject(std::move(customMeshObject));
+		m_scene->m_sceneGraph->Add(uuid);
+	}
+}
+
+
+void WorldEditor::AddParticleEmitter()
+{
+	if (m_renderer && m_scene)
+	{
+		auto particleEmitter = EditorObjectFactory::CreateParticleEmitter(
+			m_renderer->m_particleSystem.get());
+
+		if (particleEmitter)
+		{
+			auto uuid = m_scene->AddGameObject(std::move(particleEmitter));
+			m_scene->m_sceneGraph->Add(uuid);
+		}
+	}
+	else
+	{
+		LOG_EDITOR_ERROR("Cannot add Custom Mesh: Renderer or Scene not initialized");
+	}
 }
 
 /*

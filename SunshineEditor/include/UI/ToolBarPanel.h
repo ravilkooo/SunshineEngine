@@ -27,17 +27,4 @@ private:
     eastl::shared_ptr<SE_G::Camera> m_camera = nullptr;
 
     void ShowAddMenu();
-    
-    void AddBoxShape();
-    void AddPlaneShape();
-    void AddSphereShape();
-    void AddGeosphereShape();
-    void AddCylinderShape();
-    void AddSkyBox();
-    void AddAmbientLight();
-    void AddDirectionalLight();
-    void AddPointLight();
-    void AddSpotLight();
-    void AddCustomMesh();
-    void AddParticleEmitter();
 };
