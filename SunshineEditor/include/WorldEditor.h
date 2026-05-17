@@ -29,6 +29,7 @@ namespace SE_G
     class DeferredRenderer;
 
     class GPass;
+    class GBuffer;
     class LightPass;
     class SelectionPass;
     class IconPass;
@@ -51,7 +52,15 @@ class WorldEditor
 {
 public:
 
-    class PixelUUIDHandler {
+    struct PixelInfo
+    {
+        DXSM::Vector3 worldPos;
+        uint32_t hi;
+        DXSM::Vector3 worldNormal;
+        uint32_t lo;
+    };
+
+    class PixelInfoHandler {
     public:
 
         Microsoft::WRL::ComPtr<ID3D11Buffer> m_clickMouseBuffer;
@@ -61,18 +70,19 @@ public:
         Microsoft::WRL::ComPtr<ID3D11Buffer> m_outputUUIDBufferStaged;
         Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_outputUUIDUAV;
 
-        PixelUUIDHandler();
+        PixelInfoHandler();
 
-        ~PixelUUIDHandler();
+        ~PixelInfoHandler();
 
         void Init(ID3D11Device* device);
-        SE::UUID GetUUID(ID3D11DeviceContext* context,
-            ID3D11ShaderResourceView* UUIDTextureView,
+
+        PixelInfo GetPixelInfo(ID3D11DeviceContext* context,
+            eastl::shared_ptr<SE_G::GBuffer> gbuffer,
             UINT mouseClickX, UINT mouseClickY);
 
     };
 
-    PixelUUIDHandler* m_pixelUUIDHandler;
+    PixelInfoHandler* m_pixelUUIDHandler;
 
     WorldEditor();
     ~WorldEditor();

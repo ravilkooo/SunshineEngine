@@ -39,10 +39,10 @@ WorldEditor::~WorldEditor()
 }
 
 
-WorldEditor::PixelUUIDHandler::PixelUUIDHandler() {
+WorldEditor::PixelInfoHandler::PixelInfoHandler() {
 }
 
-WorldEditor::PixelUUIDHandler::~PixelUUIDHandler() {
+WorldEditor::PixelInfoHandler::~PixelInfoHandler() {
 	m_clickMouseBuffer.ReleaseAndGetAddressOf();
 	m_UUIDOnMouseClickShader.ReleaseAndGetAddressOf();
 	m_outputUUIDBuffer.ReleaseAndGetAddressOf();
@@ -50,13 +50,14 @@ WorldEditor::PixelUUIDHandler::~PixelUUIDHandler() {
 	m_outputUUIDUAV.ReleaseAndGetAddressOf();
 }
 
-void WorldEditor::PixelUUIDHandler::Init(ID3D11Device* device) {
-	D3D11_BUFFER_DESC outputUUIDBufferDesc;
+void WorldEditor::PixelInfoHandler::Init(ID3D11Device* device) {
+	D3D11_BUFFER_DESC outputUUIDBufferDesc = {};
 	ZeroMemory(&outputUUIDBufferDesc, sizeof(outputUUIDBufferDesc));
 	outputUUIDBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	outputUUIDBufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
-	outputUUIDBufferDesc.ByteWidth = 4 * sizeof(UINT);
-	//outputUUIDBufferDesc.MiscFlags = D3D1_RESOURCE_MISC_;
+	outputUUIDBufferDesc.ByteWidth = sizeof(PixelInfo);
+	outputUUIDBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	outputUUIDBufferDesc.StructureByteStride = sizeof(PixelInfo);
 	device->CreateBuffer(&outputUUIDBufferDesc, nullptr,
 		m_outputUUIDBuffer.GetAddressOf());
 
@@ -67,10 +68,10 @@ void WorldEditor::PixelUUIDHandler::Init(ID3D11Device* device) {
 		m_outputUUIDBufferStaged.GetAddressOf());
 
 	D3D11_UNORDERED_ACCESS_VIEW_DESC outputUUIDUAVDesc;
-	outputUUIDUAVDesc.Format = DXGI_FORMAT_R32_UINT;
+	outputUUIDUAVDesc.Format = DXGI_FORMAT_UNKNOWN;
 	outputUUIDUAVDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 	outputUUIDUAVDesc.Buffer.FirstElement = 0;
-	outputUUIDUAVDesc.Buffer.NumElements = 4;
+	outputUUIDUAVDesc.Buffer.NumElements = 1;
 	outputUUIDUAVDesc.Buffer.Flags = 0;
 	device->CreateUnorderedAccessView(m_outputUUIDBuffer.Get(), &outputUUIDUAVDesc, m_outputUUIDUAV.GetAddressOf());
 
@@ -96,11 +97,16 @@ void WorldEditor::PixelUUIDHandler::Init(ID3D11Device* device) {
 	return;
 }
 
-SE::UUID WorldEditor::PixelUUIDHandler::GetUUID(ID3D11DeviceContext* context,
-	ID3D11ShaderResourceView* UUIDTextureView,
+WorldEditor::PixelInfo WorldEditor::PixelInfoHandler::GetPixelInfo(ID3D11DeviceContext * context,
+	eastl::shared_ptr<SE_G::GBuffer> gbuffer,
 	UINT mouseClickX, UINT mouseClickY)
 {
+	ID3D11ShaderResourceView* UUIDTextureView = gbuffer->pUUIDSRV.Get();
 	context->CSSetShaderResources(0u, 1u, &UUIDTextureView);
+	ID3D11ShaderResourceView* WorldPosTextureView = gbuffer->pWorldPosSRV.Get();
+	context->CSSetShaderResources(1u, 1u, &WorldPosTextureView);
+	ID3D11ShaderResourceView* WorldNormalTextureView = gbuffer->pNormalSRV.Get();
+	context->CSSetShaderResources(2u, 1u, &WorldNormalTextureView);
 
 	UINT clickPos[2] = { mouseClickX, mouseClickY };
 	context->UpdateSubresource(m_clickMouseBuffer.Get(), 0, nullptr, &clickPos, 0, 0);
@@ -114,21 +120,27 @@ SE::UUID WorldEditor::PixelUUIDHandler::GetUUID(ID3D11DeviceContext* context,
 	context->CSSetShader(nullptr, nullptr, 0);
 	ID3D11UnorderedAccessView* uavs[] = { nullptr };
 	context->CSSetUnorderedAccessViews(0, 1, uavs, nullptr);
-	ID3D11ShaderResourceView* nullSRVs[] = { nullptr };
-	context->CSSetShaderResources(0, 1, nullSRVs);
+	ID3D11ShaderResourceView* nullSRVs[3] =
+	{
+		nullptr, nullptr, nullptr
+	};
+	context->CSSetShaderResources(0, 3, nullSRVs);
 
 	context->CopyResource(m_outputUUIDBufferStaged.Get(), m_outputUUIDBuffer.Get());
 	D3D11_MAPPED_SUBRESOURCE mappedData;
 	context->Map(m_outputUUIDBufferStaged.Get(), 0, D3D11_MAP_READ, 0, &mappedData);
 
-	uint32_t* hilo = reinterpret_cast<uint32_t*>(mappedData.pData);
-	uint64_t uuid = (uint64_t)hilo[0] << 32 | hilo[1];
+	PixelInfo* pixelInfo = reinterpret_cast<PixelInfo*>(mappedData.pData);
+
+	// uint64_t uuid = (uint64_t)pixelInfo->hi << 32 | pixelInfo->lo;
+	PixelInfo output;
+	output = *pixelInfo;
 
 	context->Unmap(m_outputUUIDBufferStaged.Get(), 0);
 
-	return SE::UUID(uuid);
-
-	//return SE::UUID(0u);
+	// PixelInfo pixelInfo;
+	// pixelInfo.uuid = SE::UUID(uuid);
+	return output;
 }
 
 void WorldEditor::SetupRendering(
@@ -211,7 +223,7 @@ void WorldEditor::SetupRendering(
 	}
 	m_particleSystem->Enable();
 
-	m_pixelUUIDHandler = new PixelUUIDHandler();
+	m_pixelUUIDHandler = new PixelInfoHandler();
 	m_pixelUUIDHandler->Init(m_renderer->GetDevice());
 
 	m_renderingSystem->AddRenderGroup(m_renderer.get());
@@ -354,8 +366,10 @@ void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
 
 SE::UUID WorldEditor::ChooseObjectByClick(UINT x, UINT y)
 {
-	return SE::UUID(m_pixelUUIDHandler->GetUUID(m_renderer->GetDeviceContext(),
-		m_renderer->m_GBuffer->pUUIDSRV.Get(), x, y));
+	auto pixelInfo = m_pixelUUIDHandler->GetPixelInfo(m_renderer->GetDeviceContext(),
+		m_renderer->m_GBuffer, x, y);
+	uint64_t uuid = (uint64_t)pixelInfo.hi << 32 | pixelInfo.lo;
+	return SE::UUID(uuid);
 }
 
 void WorldEditor::SaveScene(const wchar_t* scenePath)
