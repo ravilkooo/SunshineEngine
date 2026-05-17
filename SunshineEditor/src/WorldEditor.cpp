@@ -364,6 +364,12 @@ void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {
 	m_renderer->OnResize(resizeWidth, resizeHeight);
 }
 
+WorldEditor::PixelInfo WorldEditor::GetPixelInfo(UINT x, UINT y)
+{
+	return m_pixelUUIDHandler->GetPixelInfo(m_renderer->GetDeviceContext(),
+		m_renderer->m_GBuffer, x, y);
+}
+
 SE::UUID WorldEditor::ChooseObjectByClick(UINT x, UINT y)
 {
 	auto pixelInfo = m_pixelUUIDHandler->GetPixelInfo(m_renderer->GetDeviceContext(),
@@ -440,84 +446,91 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	return true;
 }
 
-void WorldEditor::AddBoxShape()
+void WorldEditor::AddBoxShape(DXSM::Vector3 initPos)
 {
 	auto boxObject = EditorObjectFactory::CreateBoxObject(m_renderer.get());
 
 	if (boxObject)
 	{
+		boxObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(boxObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddPlaneShape()
+void WorldEditor::AddPlaneShape(DXSM::Vector3 initPos)
 {
 	auto planeObject = EditorObjectFactory::CreatePlaneObject(m_renderer.get());
 
 	if (planeObject)
 	{
+		planeObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(planeObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddSphereShape()
+void WorldEditor::AddSphereShape(DXSM::Vector3 initPos)
 {
 	auto sphereObject = EditorObjectFactory::CreateSphereObject(m_renderer.get(), 1.0f);
 
 	if (sphereObject)
 	{
+		sphereObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(sphereObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddGeosphereShape()
+void WorldEditor::AddGeosphereShape(DXSM::Vector3 initPos)
 {
 	auto geosphereObject = EditorObjectFactory::CreateGeosphereObject(m_renderer.get(), 1.0f);
 
 	if (geosphereObject)
 	{
+		geosphereObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(geosphereObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddCylinderShape()
+void WorldEditor::AddCylinderShape(DXSM::Vector3 initPos)
 {
-	auto сylinderObject = EditorObjectFactory::CreateCylinderObject(m_renderer.get());
+	auto cylinderObject = EditorObjectFactory::CreateCylinderObject(m_renderer.get());
 
-	if (сylinderObject)
+	if (cylinderObject)
 	{
-		auto uuid = m_scene->AddGameObject(std::move(сylinderObject));
+		cylinderObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		auto uuid = m_scene->AddGameObject(std::move(cylinderObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddSkyBox()
+void WorldEditor::AddSkyBox(DXSM::Vector3 initPos)
 {
 	auto skyboxObject = EditorObjectFactory::CreateSkyBox(m_renderer.get(), m_renderer->GetMainCamera());
 
 	if (skyboxObject)
 	{
+		skyboxObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(skyboxObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddAmbientLight()
+void WorldEditor::AddAmbientLight(DXSM::Vector3 initPos)
 {
 	auto ambientLightObject = EditorObjectFactory::CreateAmbientLightObject(m_renderer.get(), m_renderer->GetMainCamera());
 
 	if (ambientLightObject)
 	{
+		ambientLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(ambientLightObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddDirectionalLight()
+void WorldEditor::AddDirectionalLight(DXSM::Vector3 initPos)
 {
 	auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
 		{
@@ -529,12 +542,13 @@ void WorldEditor::AddDirectionalLight()
 
 	if (directionalLightObject)
 	{
+		directionalLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(directionalLightObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddPointLight()
+void WorldEditor::AddPointLight(DXSM::Vector3 initPos)
 {
 	auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
 		{
@@ -546,12 +560,13 @@ void WorldEditor::AddPointLight()
 
 	if (pointLightObject)
 	{
+		pointLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(pointLightObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddSpotLight()
+void WorldEditor::AddSpotLight(DXSM::Vector3 initPos)
 {
 	auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
 		{
@@ -564,12 +579,13 @@ void WorldEditor::AddSpotLight()
 
 	if (spotLightObject)
 	{
+		spotLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(spotLightObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
-void WorldEditor::AddCustomMesh()
+void WorldEditor::AddCustomMesh(DXSM::Vector3 initPos)
 {
 	auto customMeshObject = EditorObjectFactory::CreateCustomMesh(
 		m_renderer.get(),
@@ -577,13 +593,14 @@ void WorldEditor::AddCustomMesh()
 
 	if (customMeshObject)
 	{
+		customMeshObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 		auto uuid = m_scene->AddGameObject(std::move(customMeshObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
 }
 
 
-void WorldEditor::AddParticleEmitter()
+void WorldEditor::AddParticleEmitter(DXSM::Vector3 initPos)
 {
 	if (m_renderer && m_scene)
 	{
@@ -592,6 +609,7 @@ void WorldEditor::AddParticleEmitter()
 
 		if (particleEmitter)
 		{
+			particleEmitter->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
 			auto uuid = m_scene->AddGameObject(std::move(particleEmitter));
 			m_scene->m_sceneGraph->Add(uuid);
 		}

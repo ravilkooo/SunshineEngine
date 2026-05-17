@@ -113,6 +113,7 @@ public:
         UINT x;
         UINT y;
     } m_mouseClickCoords = { 0u, 0u };
+    DXSM::Vector3 m_clickWorldPos = DXSM::Vector3::Zero;
 
     void ShowSceneHierarchy();
     void DrawNode(SE::UUID nodeUUID, Selection& sel);

@@ -116,6 +116,7 @@ public:
 
     // void DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize);
 
+    PixelInfo GetPixelInfo(UINT x, UINT y);
     SE::UUID ChooseObjectByClick(UINT x, UINT y);
 
     SE_G::RenderingSystem* m_renderingSystem;
@@ -162,18 +163,18 @@ public:
     float const CameraRotateSpeed = 0.5f;
 
     // Context menu and tool bar panel
-    void AddBoxShape();
-    void AddPlaneShape();
-    void AddSphereShape();
-    void AddGeosphereShape();
-    void AddCylinderShape();
-    void AddSkyBox();
-    void AddAmbientLight();
-    void AddDirectionalLight();
-    void AddPointLight();
-    void AddSpotLight();
-    void AddCustomMesh();
-    void AddParticleEmitter();
+    void AddBoxShape(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddPlaneShape(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddSphereShape(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddGeosphereShape(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddCylinderShape(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddSkyBox(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddAmbientLight(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddDirectionalLight(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddPointLight(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddSpotLight(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddCustomMesh(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
+    void AddParticleEmitter(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
 
 private:
     //eastl::shared_ptr<PhysicsSystem> m_physicsSystem;

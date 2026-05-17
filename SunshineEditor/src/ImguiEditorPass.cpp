@@ -262,10 +262,17 @@ void ImguiEditorPass::Pass()
 			*/
 
 			if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
-					auto selectedUUID = m_editorApp->m_worldEditor->ChooseObjectByClick(m_mouseClickCoords.x, m_mouseClickCoords.y);
+				auto pixelInfo = m_editorApp->m_worldEditor->GetPixelInfo(m_mouseClickCoords.x, m_mouseClickCoords.y);
+				uint64_t uuid = (uint64_t)pixelInfo.hi << 32 | pixelInfo.lo;
+				auto selectedUUID = SE::UUID(uuid);
 				if (selectedUUID != SE::UUID(0u))
 				{
 					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
+					m_clickWorldPos = pixelInfo.worldPos;
+				}
+				else
+				{
+					m_clickWorldPos = DXSM::Vector3::Zero;
 				}
 				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
 				m_PropertyPanel.s_meshEditor.m_editMesh = false;
@@ -307,23 +314,23 @@ void ImguiEditorPass::Pass()
 		{
 			if (ImGui::MenuItem("Plane"))
 			{
-				m_editorApp->m_worldEditor->AddPlaneShape();
+				m_editorApp->m_worldEditor->AddPlaneShape(m_clickWorldPos);
 			}
 			if (ImGui::MenuItem("Box"))
 			{
-				m_editorApp->m_worldEditor->AddBoxShape();
+				m_editorApp->m_worldEditor->AddBoxShape(m_clickWorldPos);
 			}
 			if (ImGui::MenuItem("Sphere"))
 			{
-				m_editorApp->m_worldEditor->AddSphereShape();
+				m_editorApp->m_worldEditor->AddSphereShape(m_clickWorldPos);
 			}
 			if (ImGui::MenuItem("Geosphere"))
 			{
-				m_editorApp->m_worldEditor->AddGeosphereShape();
+				m_editorApp->m_worldEditor->AddGeosphereShape(m_clickWorldPos);
 			}
 			if (ImGui::MenuItem("Cylinder"))
 			{
-				m_editorApp->m_worldEditor->AddCylinderShape();
+				m_editorApp->m_worldEditor->AddCylinderShape(m_clickWorldPos);
 			}
 			ImGui::EndMenu();
 		}
@@ -331,35 +338,35 @@ void ImguiEditorPass::Pass()
 		{
 			if (ImGui::MenuItem("SkyBox"))
 			{
-				m_editorApp->m_worldEditor->AddSkyBox();
+				m_editorApp->m_worldEditor->AddSkyBox(m_clickWorldPos);
 			}
 			if (ImGui::MenuItem("Ambient"))
 			{
-				m_editorApp->m_worldEditor->AddAmbientLight();
+				m_editorApp->m_worldEditor->AddAmbientLight(m_clickWorldPos);
 			}
 			if (ImGui::MenuItem("Directional"))
 			{
-				m_editorApp->m_worldEditor->AddDirectionalLight();
+				m_editorApp->m_worldEditor->AddDirectionalLight(m_clickWorldPos);
 			}
 			if (ImGui::MenuItem("Point Light"))
 			{
-				m_editorApp->m_worldEditor->AddPointLight();
+				m_editorApp->m_worldEditor->AddPointLight(m_clickWorldPos);
 			}
 			if (ImGui::MenuItem("Spot Light"))
 			{
-				m_editorApp->m_worldEditor->AddSpotLight();
+				m_editorApp->m_worldEditor->AddSpotLight(m_clickWorldPos);
 			}
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::MenuItem("Custom Mesh"))
 		{
-			m_editorApp->m_worldEditor->AddCustomMesh();
+			m_editorApp->m_worldEditor->AddCustomMesh(m_clickWorldPos);
 		}
 
 		if (ImGui::MenuItem("Particle Emitter"))
 		{
-			m_editorApp->m_worldEditor->AddParticleEmitter();
+			m_editorApp->m_worldEditor->AddParticleEmitter(m_clickWorldPos);
 		}
 
 		ImGui::EndPopup();
