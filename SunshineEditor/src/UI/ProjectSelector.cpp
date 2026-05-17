@@ -183,17 +183,6 @@ namespace SE
         }
 
         ImGui::SameLine();
-
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 0.6f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 0.8f));
-        if (ImGui::Button("[DEV] TESTING SCENES"))
-        {
-            ImGui::OpenPopup("Test Scenes");
-        }
-        ImGui::PopStyleColor(2);
-
-
-        DrawTestScenesPopup();
         
         ImGui::End();
     }
@@ -315,76 +304,6 @@ namespace SE
         }
     }
 
-    void ProjectSelector::DrawTestScenesPopup()
-    {
-        if (ImGui::BeginPopupModal("Test Scenes", NULL, 
-                                   ImGuiWindowFlags_AlwaysAutoResize | 
-                                   ImGuiWindowFlags_NoTitleBar))
-        {
-            ImGui::Text("Select Test Scene");
-            ImGui::Separator();
-            
-            float windowWidth = ImGui::GetWindowSize().x;
-            float buttonWidth = 150.0f;
-
-            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Default), ImVec2(buttonWidth, 40)))
-            {
-                m_selectedSceneType = SceneType::Default;
-                m_isVisible = false;
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImGui::Spacing();
-            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::GAI), ImVec2(buttonWidth, 40)))
-            {
-                m_selectedSceneType = SceneType::GAI;
-                m_isVisible = false;
-                ImGui::CloseCurrentPopup();
-            }
-            
-            ImGui::Spacing();
-            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Parent), ImVec2(buttonWidth, 40)))
-            {
-                m_selectedSceneType = SceneType::Parent;
-                m_isVisible = false;
-                ImGui::CloseCurrentPopup();
-            }
-            
-            ImGui::Spacing();
-            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Lua), ImVec2(buttonWidth, 40)))
-            {
-                m_selectedSceneType = SceneType::Lua;
-                m_isVisible = false;
-                ImGui::CloseCurrentPopup();
-            }
-            
-            ImGui::Spacing();
-            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button(SceneTypeToDisplayName(SceneType::Resources), ImVec2(buttonWidth, 40)))
-            {
-                m_selectedSceneType = SceneType::Resources;
-                m_isVisible = false;
-                ImGui::CloseCurrentPopup();
-            }
-            
-            ImGui::Spacing();
-            ImGui::Separator();
-            ImGui::Spacing();
-            
-            ImGui::SetCursorPosX((windowWidth - 100) * 0.5f);
-            if (ImGui::Button("Cancel", ImVec2(100, 30)))
-            {
-                ImGui::CloseCurrentPopup();
-            }
-            
-            ImGui::EndPopup();
-        }
-    }
-
     void ProjectSelector::RefreshProjectList()
     {
         eastl::string error = SE::LoadProjects(m_projectsList);
@@ -499,47 +418,6 @@ namespace SE
             m_deletingIndex--;
 
         m_lastError.clear();
-    }
-
-    const char* ProjectSelector::SceneTypeToString(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::Custom: return "Custom";
-        case SceneType::GAI: return "GAI Testing";
-        case SceneType::Default: return "Default Testing";
-        case SceneType::Parent: return "Parent Testing";
-        case SceneType::Lua: return "Lua Testing";
-        case SceneType::Resources: return "Resources Testing";
-        default: return "Default Testing";
-        }
-    }
-
-    const char* ProjectSelector::SceneTypeToDisplayName(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::GAI: return "GAI Testing Scene";
-        case SceneType::Default: return "Default Testing Scene";
-        case SceneType::Parent: return "Parent Testing Scene";
-        case SceneType::Lua: return "Lua Scripting Testing Scene";
-        case SceneType::Resources: return "Resources Testing Scene";
-        default: return "Default Testing Scene";
-        }
-    }
-
-    const wchar_t* ProjectSelector::SceneTypeToWString(SceneType type)
-    {
-        switch (type)
-        {
-        case SceneType::Custom: return L"Custom";
-        case SceneType::GAI: return L"GAI Testing";
-        case SceneType::Default: return L"Default Testing";
-        case SceneType::Parent: return L"Parent Testing";
-        case SceneType::Lua: return L"Lua Testing";
-        case SceneType::Resources: return L"Resources Testing";
-        default: return L"Default Testing";
-        }
     }
 }
 

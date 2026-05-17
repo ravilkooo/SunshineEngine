@@ -172,14 +172,7 @@ void EditorApp::RunApp()
 
 			if (m_projectSelected)
 			{
-				if (m_loadedSceneType == SE::SceneType::Custom)
-					swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), m_openedProject->GetSubPath().c_str(), fps);
-				else
-				{
-					const char* sceneName = SE::ProjectSelector::SceneTypeToDisplayName(m_loadedSceneType);
-					swprintf_s(text, TEXT("SunshineEngine: %hs - FPS: %.1f"), sceneName, fps);
-				}
-					
+				swprintf_s(text, TEXT("SunshineEngine: [%ls]   FPS: %f"), m_openedProject->GetSubPath().c_str(), fps);			
 			}
 			else
 			{
@@ -381,10 +374,11 @@ void EditorApp::RunGame()
 {
 	m_runtimeMode = RuntimeMode::GAME_MODE;
 
-	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
+	if (m_openedProject)
 	{
 		m_openedProject->Save();
 	}
+
 	m_worldEditor->m_particleSystem->DisableAllEmitters();
 	m_worldEditor->Pause();
 
@@ -406,30 +400,10 @@ void EditorApp::RunGame()
 		AudioSystem::Get().StopAll();
 	}
 	
-	if (m_loadedSceneType == SE::SceneType::Custom && m_openedProject)
+	if (m_openedProject)
 	{
 		eastl::wstring scenePath = m_openedProject->GetScenePath();
 		m_currentGame->LoadScene(scenePath.c_str());
-	}
-	else if (m_loadedSceneType == SE::SceneType::Default)
-	{
-		m_currentGame->LoadDefaultScene();
-	}
-	else if (m_loadedSceneType == SE::SceneType::GAI)
-	{
-		m_currentGame->LoadGAIScene();
-	}
-	else if (m_loadedSceneType == SE::SceneType::Parent)
-	{
-		m_currentGame->LoadParentScene();
-	}
-	else if (m_loadedSceneType == SE::SceneType::Lua)
-	{
-		m_currentGame->LoadLuaScene();
-	}
-	else if (m_loadedSceneType == SE::SceneType::Resources)
-	{
-		m_currentGame->LoadResourcesScene();
 	}
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());
@@ -505,7 +479,7 @@ void EditorApp::StopGame() {
 
 void EditorApp::SaveProject()
 {
-	if (m_openedProject && m_loadedSceneType == SE::SceneType::Custom)
+	if (m_openedProject)
 	{
 		eastl::string error = m_openedProject->Save();
 		if (!error.empty())
@@ -519,32 +493,10 @@ void EditorApp::SaveProject()
 bool EditorApp::OpenProject()
 {
 	m_openedProject = imguiEditorPass->GetSelectedProject();
-	m_loadedSceneType = imguiEditorPass->m_ProjectSelector.GetSelectedSceneType();
-	if (m_loadedSceneType == SE::SceneType::Custom)
-	{
-		eastl::string error = m_openedProject->Open();
-		if (!error.empty())
-			return false;
-	}
-	else
-	{
-		switch (m_loadedSceneType)
-		{
-		case SE::SceneType::GAI:
-			m_worldEditor->CreateGAIScene();
-			break;
-		case SE::SceneType::Default:
-			m_worldEditor->CreateDefaultScene();
-			break;
-		case SE::SceneType::Parent:
-			m_worldEditor->CreateParentScene();
-			break;
-		case SE::SceneType::Resources:
-			m_worldEditor->CreateResourcesScene();
-			break;
-		}
-	}
-	
+
+	eastl::string error = m_openedProject->Open();
+	if (!error.empty())
+		return false;
 
 	SetupAssetsDirectory();
 	AudioEditor::SetConfigPath(
@@ -564,38 +516,9 @@ void EditorApp::CloseProject()
 
 void EditorApp::SetupAssetsDirectory()
 {
-	switch (m_loadedSceneType)
+	if (m_openedProject)
 	{
-	    case SE::SceneType::Custom:
-	        if (m_openedProject)
-	        {
-	            ContentBrowserPanel::s_AssetsDirectory = 
-	                std::filesystem::path(m_openedProject->GetFullPath().c_str());
-	        }
-	        break;
-	    case SE::SceneType::GAI:
-	        ContentBrowserPanel::s_AssetsDirectory = 
-	            std::filesystem::path(SE::Project(L"GAI/").GetFullPath().c_str());
-	        break;
-	    case SE::SceneType::Default:
-	        ContentBrowserPanel::s_AssetsDirectory = 
-	            std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
-	        break;
-	    case SE::SceneType::Parent:
-	        ContentBrowserPanel::s_AssetsDirectory = 
-	            std::filesystem::path(SE::Project(L"Hierarchy/").GetFullPath().c_str());
-	        break;
-	    case SE::SceneType::Lua:
-	        ContentBrowserPanel::s_AssetsDirectory = 
-	            std::filesystem::path(SE::Project(L"Lua/").GetFullPath().c_str());
-	        break;
-	    case SE::SceneType::Resources:
-	        ContentBrowserPanel::s_AssetsDirectory = 
-	            std::filesystem::path(SE::Project(L"Resources/").GetFullPath().c_str());
-	        break;
-	    default:
-	        ContentBrowserPanel::s_AssetsDirectory = 
-	            std::filesystem::path(SE::Project(L"DefaultScene/").GetFullPath().c_str());
-	        break;
+		ContentBrowserPanel::s_AssetsDirectory =
+			std::filesystem::path(m_openedProject->GetFullPath().c_str());
 	}
 }

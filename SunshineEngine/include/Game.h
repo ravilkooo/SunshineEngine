@@ -69,11 +69,7 @@ public:
 
     bool LoadScene(const wchar_t* scenePath);
     
-    bool LoadGAIScene();
     bool LoadDefaultScene();
-    bool LoadParentScene();
-    bool LoadLuaScene();
-    bool LoadResourcesScene();
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 

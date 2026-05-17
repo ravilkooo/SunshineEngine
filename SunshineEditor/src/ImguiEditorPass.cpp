@@ -243,7 +243,9 @@ void ImguiEditorPass::Pass()
 
 	if (IsHoveredGameViewport)
 	{
-		if (!ImGuizmo::IsOver() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		if (!ImGuizmo::IsOver() &&
+			(ImGui::IsMouseClicked(ImGuiMouseButton_Left)
+				|| ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
 		{
 			ImVec2 mousePosScreen = ImGui::GetMousePos();
 			// ImVec2 WindowPos = ImGui::GetWindowPos();
@@ -295,8 +297,73 @@ void ImguiEditorPass::Pass()
 	{
 		m_Gizmo.Update();
 	}
-	
 	RenderGameWorld();
+
+	if (ImGui::BeginPopupContextWindow("viewport_contextmenu"))
+	{
+		ImGui::Text("Add...");
+
+		if (ImGui::BeginMenu("Shape"))
+		{
+			if (ImGui::MenuItem("Plane"))
+			{
+				// AddPlaneShape();
+			}
+			if (ImGui::MenuItem("Box"))
+			{
+				// AddBoxShape();
+			}
+			if (ImGui::MenuItem("Sphere"))
+			{
+				// AddSphereShape();
+			}
+			if (ImGui::MenuItem("Geosphere"))
+			{
+				// AddGeosphereShape();
+			}
+			if (ImGui::MenuItem("Cylinder"))
+			{
+				// AddCylinderShape();
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Lightning"))
+		{
+			if (ImGui::MenuItem("SkyBox"))
+			{
+				// AddSkyBox();
+			}
+			if (ImGui::MenuItem("Ambient"))
+			{
+				// AddAmbientLight();
+			}
+			if (ImGui::MenuItem("Directional"))
+			{
+				// AddDirectionalLight();
+			}
+			if (ImGui::MenuItem("Point Light"))
+			{
+				// AddPointLight();
+			}
+			if (ImGui::MenuItem("Spot Light"))
+			{
+				// AddSpotLight();
+			}
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::MenuItem("Custom Mesh"))
+		{
+			// AddCustomMesh();
+		}
+
+		if (ImGui::MenuItem("Particle Emitter"))
+		{
+			// AddParticleEmitter();
+		}
+
+		ImGui::EndPopup();
+	}
 	
 	if (isEditorMode && selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u)
 		&& m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID != SE::UUID(0u))

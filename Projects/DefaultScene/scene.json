@@ -20,12 +20,12 @@
                         1.0
                     ],
                     "m_position": [
-                        12.337416648864746,
-                        0.7354838848114014,
-                        14.042142868041992
+                        -8.316158294677734,
+                        0.7354766726493835,
+                        -7.749161720275879
                     ],
                     "m_rotation": [
-                        0.0,
+                        -0.0,
                         0.0,
                         -0.0
                     ],
@@ -183,53 +183,17 @@
         },
         {
             "components": {
-                "Lua": {
-                    "scriptLoaded": true,
-                    "scriptPath": {
-                        "assetSource": 1,
-                        "relativePath": "Scripts/jumpUp_dynamicPhysics.lua"
-                    }
-                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
-                        "relativePath": "Sphere"
+                        "relativePath": "Plane"
                     },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "Textures/football.dds"
+                        "relativePath": "Textures/grass.dds"
                     },
                     "m_cullMode": "CULL_BACK"
-                },
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "sphere": {
-                                "radius": 1.0
-                            }
-                        },
-                        "shapeType": "Sphere",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_angularDamping": 0.05000000074505806,
-                    "m_collisionLayer": "MOVING",
-                    "m_friction": 0.20000000298023224,
-                    "m_linearDamping": 0.05000000074505806,
-                    "m_motion": "Dynamic",
-                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -249,87 +213,48 @@
                         1.0
                     ],
                     "m_position": [
-                        3.6458497047424316,
-                        -3.1275529861450195,
-                        4.143132209777832
+                        0.0,
+                        7.0,
+                        32.0
                     ],
                     "m_rotation": [
-                        -0.00843821931630373,
-                        -0.008924975991249084,
-                        7.531135634053499e-05
+                        -0.0,
+                        0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        60.0,
+                        1.0000001192092896,
+                        60.0
                     ],
                     "m_uvMultiplier": [
-                        1.0,
-                        1.0
+                        10.0,
+                        10.0
                     ]
                 }
             },
-            "m_UUID": 1179623425869587445,
-            "m_UUID_hi": 274652481,
-            "m_UUID_lo": 2209326069,
+            "m_UUID": 15833114226596990644,
+            "m_UUID_hi": 3686434176,
+            "m_UUID_lo": 1820282548,
             "m_group": "Shapes",
-            "m_name": "Sphere",
+            "m_name": "Plane",
             "m_parent": null,
-            "m_shapeData": {
-                "SliceCount": 19,
-                "StackCount": 11
-            },
-            "m_type": "Sphere"
+            "m_shapeData": null,
+            "m_type": "Plane"
         },
         {
             "components": {
-                "Lua": {
-                    "scriptLoaded": true,
-                    "scriptPath": {
-                        "assetSource": 1,
-                        "relativePath": "Scripts/jumpUp_dynamicPhysics.lua"
-                    }
-                },
                 "Mesh": {
                     "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Sphere"
+                        "assetSource": 1,
+                        "relativePath": "Meshes/burger.obj"
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Textures/DefaultSphereTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "Textures/burger.dds"
                     },
-                    "m_cullMode": "CULL_BACK"
-                },
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "sphere": {
-                                "radius": 1.0
-                            }
-                        },
-                        "shapeType": "Sphere",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_angularDamping": 0.05000000074505806,
-                    "m_collisionLayer": "MOVING",
-                    "m_friction": 0.20000000298023224,
-                    "m_linearDamping": 0.05000000074505806,
-                    "m_motion": "Dynamic",
-                    "m_restitution": 0.0
+                    "m_cullMode": "CULL_NONE"
                 },
                 "Render": null,
                 "Transform": {
@@ -349,9 +274,9 @@
                         1.0
                     ],
                     "m_position": [
-                        2.700000047683716,
-                        -1.2014492750167847,
-                        10.365477561950684
+                        -8.936792373657227,
+                        -3.184088945388794,
+                        2.4834771156311035
                     ],
                     "m_rotation": [
                         -0.0,
@@ -369,17 +294,12 @@
                     ]
                 }
             },
-            "m_UUID": 13836700115024532676,
-            "m_UUID_hi": 3221607793,
-            "m_UUID_lo": 3550794948,
-            "m_group": "Shapes",
-            "m_name": "DefaultSphere",
-            "m_parent": null,
-            "m_shapeData": {
-                "SliceCount": 10,
-                "StackCount": 10
-            },
-            "m_type": "Sphere"
+            "m_UUID": 6027667213436299612,
+            "m_UUID_hi": 1403425637,
+            "m_UUID_lo": 153332060,
+            "m_group": "CustomMesh",
+            "m_name": "Bush",
+            "m_parent": null
         },
         {
             "components": {
@@ -442,19 +362,19 @@
                         1.0000227689743042
                     ],
                     "m_position": [
-                        -2.2605843544006348,
-                        -3.2329354286193848,
-                        -7.732400894165039
+                        -4.825530529022217,
+                        -3.232875347137451,
+                        -5.68850040435791
                     ],
                     "m_rotation": [
-                        0.182716965675354,
-                        -1.576675295829773,
+                        0.18271702527999878,
+                        -1.5766750574111938,
                         -2.254514694213867
                     ],
                     "m_scaleFactor": [
-                        1.2926512956619263,
-                        0.7546645998954773,
-                        0.5675921440124512
+                        1.2926511764526367,
+                        0.7546643614768982,
+                        0.5675919651985168
                     ],
                     "m_uvMultiplier": [
                         1.0,
@@ -946,9 +866,9 @@
                         20.5
                     ],
                     "m_position": [
-                        -14.22970199584961,
-                        -2.1570029258728027,
-                        -10.54141616821289
+                        -1.266014814376831,
+                        10.105003356933594,
+                        21.319034576416016
                     ],
                     "m_rotation": [
                         -0.0,
@@ -972,7 +892,7 @@
             "m_group": "Lighting",
             "m_lightData": {
                 "Att": {
-                    "x": 1.0,
+                    "x": 0.10000000149011612,
                     "y": 0.10000000149011612,
                     "z": 0.10000000149011612
                 },
@@ -983,11 +903,11 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": -14.22970199584961,
-                    "y": -2.1570029258728027,
-                    "z": -10.54141616821289
+                    "x": -1.266014814376831,
+                    "y": 10.105003356933594,
+                    "z": 21.319034576416016
                 },
-                "Range": 20.5,
+                "Range": 29.0,
                 "Specular": {
                     "x": 0.9460784196853638,
                     "y": 0.10202808678150177,
@@ -1065,9 +985,9 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
+                        0.09947013854980469,
                         -5.0,
-                        0.0
+                        -3.997499465942383
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1158,9 +1078,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -8.109148025512695,
+                        -16.143007278442383,
                         0.3024291694164276,
-                        2.667973518371582
+                        1.6022170782089233
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1342,9 +1262,9 @@
                 },
                 "DiffusePad": 1.0,
                 "Position": {
-                    "x": -2.2605843544006348,
-                    "y": -3.2329354286193848,
-                    "z": -7.732400894165039
+                    "x": -4.825530529022217,
+                    "y": -3.232875347137451,
+                    "z": -5.68850040435791
                 },
                 "Range": 20.0,
                 "Specular": {
@@ -1524,33 +1444,27 @@
         },
         {
             "components": {
-                "Lua": {
-                    "scriptLoaded": true,
-                    "scriptPath": {
-                        "assetSource": 1,
-                        "relativePath": "Scripts/offsetPosition_dynamicPhysics.lua"
-                    }
-                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
-                        "relativePath": "Geosphere"
+                        "relativePath": "Cylinder"
                     },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "Textures/eye.dds"
+                        "relativePath": "Textures/bounce.dds"
                     },
                     "m_cullMode": "CULL_BACK"
                 },
                 "Physics": {
                     "collider": {
                         "settings": {
-                            "sphere": {
-                                "radius": 1.100000023841858
+                            "capsule": {
+                                "height": 1.7999999523162842,
+                                "radius": 1.399999976158142
                             }
                         },
-                        "shapeType": "Sphere",
+                        "shapeType": "Capsule",
                         "transforms": {
                             "offset": [
                                 0.0,
@@ -1570,7 +1484,7 @@
                     "m_friction": 0.20000000298023224,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
-                    "m_restitution": 0.0
+                    "m_restitution": 1.0
                 },
                 "Render": null,
                 "Transform": {
@@ -1585,24 +1499,24 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        1.399999976158142,
+                        3.5999999046325684,
+                        1.399999976158142
                     ],
                     "m_position": [
-                        8.5,
-                        0.0,
-                        0.0
+                        -12.37410831451416,
+                        -1.8529839515686035,
+                        -7.683167457580566
                     ],
                     "m_rotation": [
                         -0.0,
-                        -0.12708641588687897,
-                        0.0
+                        0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
-                        0.9999998807907104,
                         1.0,
-                        0.9999998807907104
+                        1.0,
+                        1.0
                     ],
                     "m_uvMultiplier": [
                         1.0,
@@ -1610,16 +1524,16 @@
                     ]
                 }
             },
-            "m_UUID": 3619104566789212522,
-            "m_UUID_hi": 842638445,
-            "m_UUID_lo": 3161917802,
+            "m_UUID": 13129473324827503355,
+            "m_UUID_hi": 3056943725,
+            "m_UUID_lo": 240085755,
             "m_group": "Shapes",
-            "m_name": "GeosphereEye",
+            "m_name": "Cylinder",
             "m_parent": null,
             "m_shapeData": {
-                "NumSubdivisions": 3
+                "SliceCount": 39
             },
-            "m_type": "Geosphere"
+            "m_type": "Cylinder"
         },
         {
             "components": {
@@ -1749,69 +1663,17 @@
         },
         {
             "components": {
-                "ParticleEmitter": {
-                    "emitterData": {
-                        "EmissionRate": 10.0,
-                        "Emitter": {
-                            "alphaEnd": 1.0,
-                            "alphaStart": 1.0,
-                            "colorEnd": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "colorStart": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "latitudeMax": 0.3141592741012573,
-                            "latitudeMin": -0.3141592741012573,
-                            "longitudeMax": 6.2831854820251465,
-                            "longitudeMin": 0.0,
-                            "maxSpawn": 100,
-                            "particleSizeEnd": 0.5,
-                            "particleSizeStart": 0.20000000298023224,
-                            "particlesBaseSpeed": 8.0,
-                            "particlesLifeSpan": 1.0,
-                            "particlesMass": 1.0,
-                            "position": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotMatrix": [
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0
-                            ]
-                        },
-                        "MaxParticles": 256,
-                        "Simulate": {
-                            "force": [
-                                0.0,
-                                -5.0,
-                                0.0
-                            ]
-                        },
-                        "Texture": {
-                            "assetSource": 0,
-                            "relativePath": "Textures/DefaultTexture.dds"
-                        }
-                    }
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/bush.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/bush.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -1831,19 +1693,19 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
-                        -1.4775829315185547,
-                        10.034829139709473
+                        -4.929291725158691,
+                        7.256799697875977,
+                        7.589932441711426
                     ],
                     "m_rotation": [
-                        0.0,
+                        -0.0,
                         0.0,
                         -0.0
                     ],
                     "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        2.0,
+                        2.0,
+                        2.0
                     ],
                     "m_uvMultiplier": [
                         1.0,
@@ -1851,11 +1713,11 @@
                     ]
                 }
             },
-            "m_UUID": 2222185986879794610,
-            "m_UUID_hi": 517392993,
-            "m_UUID_lo": 2765237682,
-            "m_group": "ParticleEmitter",
-            "m_name": "ParticleEmitter_eq",
+            "m_UUID": 13859351014420552676,
+            "m_UUID_hi": 3226881617,
+            "m_UUID_lo": 1341955044,
+            "m_group": "CustomMesh",
+            "m_name": "Bush",
             "m_parent": null
         },
         {
@@ -1983,9 +1845,9 @@
                         1.0
                     ],
                     "m_position": [
-                        7.3542094230651855,
-                        -1.6702100038528442,
-                        13.940587043762207
+                        -11.294380187988281,
+                        -1.6701725721359253,
+                        -0.42923665046691895
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2248,6 +2110,51 @@
         },
         {
             "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/ground_badres.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
@@ -2261,24 +2168,24 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        20.0,
-                        20.0,
-                        20.0
+                        1.0,
+                        1.0,
+                        1.0
                     ],
                     "m_position": [
-                        0.0,
-                        0.0,
-                        0.0
+                        19.0,
+                        12.133742332458496,
+                        29.275257110595703
                     ],
                     "m_rotation": [
-                        -3.382860924716624e-08,
-                        0.07526884227991104,
-                        6.726651236022008e-09
+                        -1.5707963705062866,
+                        0.0,
+                        1.570796012878418
                     ],
                     "m_scaleFactor": [
-                        0.9999940395355225,
-                        0.9999945759773254,
-                        0.999993622303009
+                        40.0,
+                        0.9999998211860657,
+                        10.0
                     ],
                     "m_uvMultiplier": [
                         1.0,
@@ -2286,42 +2193,14 @@
                     ]
                 }
             },
-            "m_UUID": 7459046466795466112,
-            "m_UUID_hi": 1736694589,
-            "m_UUID_lo": 3900304768,
-            "m_group": "Lighting",
-            "m_lightData": {
-                "Att": {
-                    "x": 0.10000000149011612,
-                    "y": 0.10000000149011612,
-                    "z": 0.10000000149011612
-                },
-                "Diffuse": {
-                    "x": 1.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "DiffusePad": 1.0,
-                "Position": {
-                    "x": 3.6458497047424316,
-                    "y": -3.1275529861450195,
-                    "z": 4.143132209777832
-                },
-                "Range": 20.0,
-                "Specular": {
-                    "x": 1.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "SpecularPad": 1.0,
-                "pad": 0.0
-            },
-            "m_name": "PointLight",
-            "m_parent": {
-                "attached": true,
-                "uuid": 1179623425869587445
-            },
-            "m_type": "PointLight"
+            "m_UUID": 18209765770469436742,
+            "m_UUID_hi": 4239791485,
+            "m_UUID_lo": 535162182,
+            "m_group": "Shapes",
+            "m_name": "Plane",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
         },
         {
             "components": {
@@ -2424,12 +2303,12 @@
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
-                        "relativePath": "Box_repeat"
+                        "relativePath": "Box"
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Textures/DefaultTexture.dds"
+                        "assetSource": 1,
+                        "relativePath": "Textures/jump.dds"
                     },
                     "m_cullMode": "CULL_BACK"
                 },
@@ -2484,9 +2363,9 @@
                         10.0
                     ],
                     "m_position": [
-                        -33.22550582885742,
-                        -4.045217990875244,
-                        -6.4507975578308105
+                        0.4472205638885498,
+                        8.771828651428223,
+                        45.03505325317383
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2511,7 +2390,7 @@
             "m_name": "Platform",
             "m_parent": null,
             "m_shapeData": {
-                "UvCubeMapMode": false
+                "UvCubeMapMode": true
             },
             "m_type": "Box"
         },
@@ -3104,9 +2983,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -22.125022888183594,
-                        0.0,
-                        -0.2974904775619507
+                        -1.7571834325790405,
+                        8.681772232055664,
+                        8.83016300201416
                     ],
                     "m_rotation": [
                         -0.0,
@@ -3287,19 +3166,19 @@
                         1.0
                     ],
                     "m_position": [
-                        -2.6038498878479004,
-                        -2.2001194953918457,
-                        0.0
+                        4.3997111320495605,
+                        6.059648513793945,
+                        16.45841407775879
                     ],
                     "m_rotation": [
                         -0.0,
-                        0.0,
-                        -0.0
+                        -0.961676299571991,
+                        0.0
                     ],
                     "m_scaleFactor": [
+                        0.9999998211860657,
                         1.0,
-                        1.0,
-                        1.0
+                        0.9999998211860657
                     ],
                     "m_uvMultiplier": [
                         1.0,
@@ -3377,163 +3256,15 @@
             "components": {
                 "Mesh": {
                     "Mesh": {
-                        "assetSource": 1,
-                        "relativePath": "Meshes/bush.obj"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 1,
-                        "relativePath": "Textures/bush.dds"
-                    },
-                    "m_cullMode": "CULL_BACK"
-                },
-                "Render": null,
-                "Transform": {
-                    "m_localPosition": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localRotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_position": [
-                        -5.144854545593262,
-                        -3.931849956512451,
-                        0.7073700428009033
-                    ],
-                    "m_rotation": [
-                        -0.0,
-                        0.0,
-                        -0.0
-                    ],
-                    "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_uvMultiplier": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            "m_UUID": 13859351014420552676,
-            "m_UUID_hi": 3226881617,
-            "m_UUID_lo": 1341955044,
-            "m_group": "CustomMesh",
-            "m_name": "Bush",
-            "m_parent": null
-        },
-        {
-            "components": {
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 1,
-                        "relativePath": "Meshes/burger.obj"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 1,
-                        "relativePath": "Textures/burger.dds"
-                    },
-                    "m_cullMode": "CULL_NONE"
-                },
-                "Render": null,
-                "Transform": {
-                    "m_localPosition": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localRotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_position": [
-                        -8.936792373657227,
-                        -3.184088945388794,
-                        2.4834771156311035
-                    ],
-                    "m_rotation": [
-                        -0.0,
-                        0.0,
-                        -0.0
-                    ],
-                    "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_uvMultiplier": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            "m_UUID": 6027667213436299612,
-            "m_UUID_hi": 1403425637,
-            "m_UUID_lo": 153332060,
-            "m_group": "CustomMesh",
-            "m_name": "Bush",
-            "m_parent": null
-        },
-        {
-            "components": {
-                "Mesh": {
-                    "Mesh": {
                         "assetSource": 0,
-                        "relativePath": "Cylinder"
+                        "relativePath": "Plane"
                     },
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 1,
-                        "relativePath": "Textures/bounce.dds"
+                        "relativePath": "Textures/ground_badres.dds"
                     },
                     "m_cullMode": "CULL_BACK"
-                },
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "capsule": {
-                                "height": 1.7999999523162842,
-                                "radius": 1.399999976158142
-                            }
-                        },
-                        "shapeType": "Capsule",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_angularDamping": 0.05000000074505806,
-                    "m_collisionLayer": "MOVING",
-                    "m_friction": 0.20000000298023224,
-                    "m_linearDamping": 0.05000000074505806,
-                    "m_motion": "Dynamic",
-                    "m_restitution": 1.0
                 },
                 "Render": null,
                 "Transform": {
@@ -3548,24 +3279,24 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        1.399999976158142,
-                        3.5999999046325684,
-                        1.399999976158142
-                    ],
-                    "m_position": [
-                        -12.37410831451416,
-                        -1.8529839515686035,
-                        -7.683167457580566
-                    ],
-                    "m_rotation": [
-                        -0.0,
-                        0.0,
-                        -0.0
-                    ],
-                    "m_scaleFactor": [
                         1.0,
                         1.0,
                         1.0
+                    ],
+                    "m_position": [
+                        -19.0,
+                        12.0,
+                        28.0
+                    ],
+                    "m_rotation": [
+                        -1.5707963705062866,
+                        0.0,
+                        -1.5707954168319702
+                    ],
+                    "m_scaleFactor": [
+                        40.0,
+                        0.9999996423721313,
+                        10.0
                     ],
                     "m_uvMultiplier": [
                         1.0,
@@ -3573,16 +3304,14 @@
                     ]
                 }
             },
-            "m_UUID": 13129473324827503355,
-            "m_UUID_hi": 3056943725,
-            "m_UUID_lo": 240085755,
+            "m_UUID": 13310298368583408490,
+            "m_UUID_hi": 3099045336,
+            "m_UUID_lo": 1642077034,
             "m_group": "Shapes",
-            "m_name": "Cylinder",
+            "m_name": "Plane",
             "m_parent": null,
-            "m_shapeData": {
-                "SliceCount": 39
-            },
-            "m_type": "Cylinder"
+            "m_shapeData": null,
+            "m_type": "Plane"
         },
         {
             "components": {
@@ -3593,43 +3322,10 @@
                     },
                     "Sampler": 0,
                     "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Textures/PawBgBlue.dds"
+                        "assetSource": 1,
+                        "relativePath": "Textures/ice_badres.dds"
                     },
                     "m_cullMode": "CULL_BACK"
-                },
-                "Physics": {
-                    "collider": {
-                        "settings": {
-                            "box": {
-                                "size": [
-                                    1.0,
-                                    1.0,
-                                    1.0
-                                ]
-                            }
-                        },
-                        "shapeType": "Box",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ]
-                        }
-                    },
-                    "m_activation": "Activate",
-                    "m_angularDamping": 0.05000000074505806,
-                    "m_collisionLayer": "MOVING",
-                    "m_friction": 0.20000000298023224,
-                    "m_linearDamping": 0.05000000074505806,
-                    "m_motion": "Dynamic",
-                    "m_restitution": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -3649,29 +3345,29 @@
                         1.0
                     ],
                     "m_position": [
-                        19.604488372802734,
-                        -1.6425126791000366,
-                        -6.513628959655762
+                        -5.059821128845215,
+                        10.260058403015137,
+                        17.941421508789063
                     ],
                     "m_rotation": [
-                        0.38222721219062805,
+                        -0.0,
                         0.0,
-                        0.0
+                        -0.0
                     ],
                     "m_scaleFactor": [
-                        3.4000000953674316,
-                        0.9999998807907104,
-                        5.500000476837158
+                        8.613130569458008,
+                        1.0,
+                        8.2064790725708
                     ],
                     "m_uvMultiplier": [
-                        4.0,
-                        4.0
+                        3.0,
+                        3.0
                     ]
                 }
             },
-            "m_UUID": 18209765770469436742,
-            "m_UUID_hi": 4239791485,
-            "m_UUID_lo": 535162182,
+            "m_UUID": 593914480070882273,
+            "m_UUID_hi": 138281490,
+            "m_UUID_lo": 2878731233,
             "m_group": "Shapes",
             "m_name": "Plane",
             "m_parent": null,

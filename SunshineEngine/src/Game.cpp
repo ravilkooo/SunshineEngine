@@ -122,67 +122,8 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	return true;
 }
 
-bool Game::LoadGAIScene()
-{
-	SetupPhysics();
-
-	// Add objects, add components, set parents
-
-	Scene::GetInstance().RestoreParents();
-	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
-	
-	return true;
-}
-
 bool Game::LoadDefaultScene()
 {
-	SetupPhysics();
-
-	// Add objects, add components, set parents
-
-	Scene::GetInstance().RestoreParents();
-	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
-	
-	return true;
-}
-
-bool Game::LoadParentScene()
-{
-	
-	SetupPhysics();
-
-	// Add objects, add components, set parents
-
-	Scene::GetInstance().RestoreParents();
-	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
-	
-	return true;
-}
-
-bool Game::LoadLuaScene()
-{
-	
-	SetupPhysics();
-
-	// Add objects, add components, set parents
-
-	Scene::GetInstance().RestoreParents();
-	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
-	
-	return true;
-}
-
-bool Game::LoadResourcesScene()
-{
-	
 	SetupPhysics();
 
 	// Add objects, add components, set parents

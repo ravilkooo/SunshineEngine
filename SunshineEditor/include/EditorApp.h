@@ -85,8 +85,6 @@ public:
     void OnResize(UINT resizeWidth, UINT resizeHeight) override;
     void SetIcon(HWND hwnd) override;
 
-    SE::SceneType m_loadedSceneType = SE::SceneType::Custom;
-
     eastl::shared_ptr<SE_G::RenderingSystem> m_renderingSystem;
     
     eastl::shared_ptr<WorldEditor> m_worldEditor;
@@ -133,6 +131,5 @@ private:
     // Only for testing
     // void ChooseProject();
     
-    bool LoadTestScene(SE::SceneType sceneType);
     void SetupAssetsDirectory();
 };

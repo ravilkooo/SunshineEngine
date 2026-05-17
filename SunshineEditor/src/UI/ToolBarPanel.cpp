@@ -354,25 +354,6 @@ void ToolbarPanel::AddCustomMesh()
 {
     if (m_renderer && m_scene)
     {
-        // auto filters = FileDialogManager::Get3DModelFilters();
-        // auto modelPath = FileDialogManager::Get().OpenFile(
-        //     L"Select 3D Model",
-        //     filters,
-        //     ContentBrowserPanel::s_AssetsDirectory
-        // );
-        //
-        // if (!modelPath.empty())
-        // {
-        //     eastl::string filePath = FileDialogManager::ToUTF8(modelPath.wstring()).c_str();
-        //     
-        //     auto customMeshObject = EditorObjectFactory::CreateCustomMesh(m_renderer, filePath);
-        //     
-        //     if (customMeshObject)
-        //     {
-        //         m_scene->AddGameObject(std::move(customMeshObject));
-        //     }
-        // }
-
         auto customMeshObject = EditorObjectFactory::CreateCustomMesh(
             m_renderer,
             AssetPath(L"Box"));

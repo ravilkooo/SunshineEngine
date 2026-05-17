@@ -6,17 +6,7 @@
 #include "EASTL/shared_ptr.h"
 
 namespace SE
-{
-    enum class SceneType
-    {
-        Custom = 0, 
-        GAI = 1,
-        Default = 2,   
-        Parent = 3,      
-        Lua = 4,         
-        Resources = 5   
-    };
-    
+{    
     class ProjectSelector
     {
     public:
@@ -31,7 +21,6 @@ namespace SE
         bool Show();
         void Close();
 
-        SceneType GetSelectedSceneType() const { return m_selectedSceneType; }
         SE::Project* GetSelectedProject() { return m_selectedProject; }
 
         bool IsVisible() const { return m_isVisible; }
@@ -40,15 +29,9 @@ namespace SE
         {
             m_selectedIndex = -1;
             m_selectedProject = nullptr;
-            m_selectedSceneType = SceneType::Custom;
             m_lastError.clear();
         }
         void SetWindowSize(ImVec2 windowSize) { m_windowSize = windowSize; }
-
-        // For testing
-        static const char* SceneTypeToString(SceneType type);
-        static const char* SceneTypeToDisplayName(SceneType type);
-        static const wchar_t* SceneTypeToWString(SceneType type);
 
         SE::ProjectList m_projectsList = { SE::Project() };
 
@@ -58,7 +41,6 @@ namespace SE
         bool CreateNewProject();
         void DrawEditPopup();
         void DrawDeletePopup();
-        void DrawTestScenesPopup();
         bool RenameProject(int index, const eastl::string& newName);
         void DeleteProject(int index, bool deleteFilesFromDisk);
 
@@ -69,8 +51,6 @@ namespace SE
         //SE::ProjectList* m_projects = nullptr;
         int m_selectedIndex = -1;
         char m_newProjectName[256] = "";
-        
-        SceneType m_selectedSceneType = SceneType::Custom;
 
         int m_editingIndex = -1;
         char m_editBuffer[256] = "";

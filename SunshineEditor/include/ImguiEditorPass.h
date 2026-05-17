@@ -92,8 +92,6 @@ public:
     SE::ProjectSelector m_ProjectSelector;
     bool m_ProjectSelected = false;
 
-    using SceneType = SE::SceneType;
-
     Gizmo m_Gizmo;
 
     AudioEditor* m_AudioEditor = nullptr;
