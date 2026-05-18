@@ -4,20 +4,21 @@
 #include <ResourceManager/MemoryManager/ResourceMemoryManager.h>
 #include <ResourceManager/ResourceRegistry.h>
 
-class TextureLoader : public IResourceLoader
+class MeshLoader :
+    public IResourceLoader
 {
 public:
-    explicit TextureLoader(ID3D11Device* device);
+    explicit MeshLoader(ID3D11Device* device);
 
-    IResource* Load(const AssetPath& path,
-        ResourceRegistry* pRegistry,
+    // Inherited via IResourceLoader
+    IResource* Load(const AssetPath& path, ResourceRegistry* pRegistry,
         StackMemoryManager* pMemMgr) override;
 
     SunshineResource::ResourceType GetResourceType(IResource* pDepResource,
-        Model* pModel,
-        ResourceGUID depGUID) const override;
+        Model* pModel, ResourceGUID depGUID) const override;
 
     bool CanLoad(const eastl::string& path) const override;
+
 private:
     ID3D11Device* m_device;
 };

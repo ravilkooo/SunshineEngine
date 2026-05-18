@@ -7,6 +7,9 @@
 #include <ParticleSystem/ParticleSystem.h>
 #include <ResourceManager/ResourceManagerFacade.h>
 #include <ResourceManager/ResourceLoader/TextureLoader.h>
+#include <ResourceManager/ResourceLoader/MeshLoader.h>
+
+#include <Graphics/GraphicsResources/Texture.h>
 
 #include <Graphics/Renderer/Pass/RenderPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
@@ -249,6 +252,10 @@ void EditorApp::InitResourceLoaders(ID3D11Device* device)
 		SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
 		AssetPath::AssetSource::Engine);
 	ResourceManagerFacade::Instance().LoadByPath(ap);
+
+	auto meshLoader = eastl::make_unique<MeshLoader>(device);
+	ResourceLoaderFactory::RegisterLoader(SunshineResource::ResourceType::MESH,
+		eastl::move(meshLoader));
 }
 
 void EditorApp::UpdateGame(float deltaTime)

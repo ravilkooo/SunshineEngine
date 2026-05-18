@@ -1020,4 +1020,16 @@ namespace SE_G {
     {
         return m_meshPath;
     }
+    SunshineResource::ResourceType Mesh::GetType() const
+    {
+        return SunshineResource::ResourceType::MESH;
+    }
+    ResourceGUID Mesh::GetGUID() const
+    {
+        return m_GUID;
+    }
+    size_t Mesh::GetSizeInMemory() const
+    {
+        return m_MemorySize;
+    }
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <IResource.h>
+#include <ResourceManager/IResource.h>
 
 #include <memory>
 #include <vector>
@@ -46,7 +46,7 @@ namespace SE_G {
 
 
     class Mesh
-        // : public Resource
+        : public IResource
     {
     public:
         Mesh() {};
@@ -136,7 +136,10 @@ namespace SE_G {
         AssetPath m_meshPath;
         AssetPath GetCurrentMeshPath();
 
-        //UINT GetIndexCount() const { return m_indexCount; }
+        // Inherited via IResource
+        SunshineResource::ResourceType GetType() const override;
+        ResourceGUID GetGUID() const override;
+        size_t GetSizeInMemory() const override;
 
     private:
         UINT m_indexCount = 0;
@@ -144,8 +147,8 @@ namespace SE_G {
         eastl::unique_ptr<Bind::VertexBuffer> m_vertexBuffer;
         eastl::unique_ptr<Bind::Topology> m_topology;
 
-        //eastl::string m_path;
-
+        ResourceGUID m_GUID = 0;
+        size_t m_MemorySize = 0;
 
     // private cause every mesh should correspond to its key in ResourceManager
         void ChangeMesh(ID3D11Device* device,

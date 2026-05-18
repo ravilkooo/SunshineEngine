@@ -110,9 +110,7 @@ SunshineResource::ResourceType DetermineResourceType(const eastl::string& path)
 
     auto ext = path.substr(dotPos + 1);
     if (ext == "mesh") return SunshineResource::ResourceType::MESH;
-    if (ext == "mat" || ext == "material") return SunshineResource::ResourceType::MATERIAL;
     if (ext == "dds" || ext == "png" || ext == "jpg") return SunshineResource::ResourceType::TEXTURE;
-    if (ext == "anim") return SunshineResource::ResourceType::ANIMATION;
     // ... � �.�.
 
     return SunshineResource::ResourceType::COUNT;
@@ -172,17 +170,8 @@ SunshineResource::ResourceType CompositeResourceLoader::GetResourceType(IResourc
     case SunshineResource::ResourceType::MESH:
         pModel->m_Meshes.push_back(depGUID);
         break;
-    case SunshineResource::ResourceType::MATERIAL:
-        pModel->m_Materials.push_back(depGUID);
-        break;
     case SunshineResource::ResourceType::SHADER:
         pModel->m_Shaders.push_back(depGUID);
-        break;
-    case SunshineResource::ResourceType::SKELETON:
-        pModel->m_Skeleton = depGUID;
-        break;
-    case SunshineResource::ResourceType::ANIMATION:
-        pModel->m_Animations.push_back(depGUID);
         break;
     default:
         printSunshineErrorMessage(("Unhandled resource type in dependencies: {}",
