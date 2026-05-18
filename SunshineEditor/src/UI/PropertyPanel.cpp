@@ -2180,35 +2180,32 @@ eastl::shared_ptr<SE_G::Bind::Texture> PropertyPanel::DrawTextureSettings(
             std::string relNarrow = s_meshEditor.m_texPathBuf;
             std::wstring relWide(relNarrow.begin(), relNarrow.end());
             AssetPath ap(relWide.c_str(), src);
-            // Without Resource manager
-            /*
-            {
-                newTexture = eastl::make_shared<SE_G::Bind::Texture>(m_WorldEditor->m_renderer->GetDevice(), ap, 4u);
-                // skyBoxObj->SetTexture(newTexture);
-                
-            }
-            */
+
             // Using Resource manager
             ResourceHandle texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
 
             if (texHandle.guid == 0) {
-                //s_meshEditor.m_texError = "Failed to load texture: " + relNarrow;
+                // Error
+                ap = AssetPath(
+                    SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
+                    AssetPath::AssetSource::Engine);
+                texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+            }
+
+            SE_G::Bind::Texture* texture =
+                ResourceManagerFacade::Instance().Get<SE_G::Bind::Texture>(texHandle);
+
+            if (texture) {
+                newTexture = eastl::shared_ptr<SE_G::Bind::Texture>(
+                    texture,
+                    [](SE_G::Bind::Texture*) {}
+                );
+                newTexture->m_texturePath = texture->m_texturePath;
             }
             else {
-                SE_G::Bind::Texture* texture =
-                    ResourceManagerFacade::Instance().Get<SE_G::Bind::Texture>(texHandle);
-
-                if (texture) {
-                    newTexture = eastl::shared_ptr<SE_G::Bind::Texture>(
-                        texture,
-                        [](SE_G::Bind::Texture*) {}
-                    );
-                    newTexture->m_texturePath = texture->m_texturePath;
-                }
-                else {
-                    s_meshEditor.m_texError = "Failed to cast loaded resource to Texture";
-                }
+                s_meshEditor.m_texError = "Failed to cast loaded resource to Texture";
             }
+
             s_meshEditor.m_editTexture = false;
         }
 
@@ -2281,16 +2278,40 @@ eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
                 s_meshEditor.m_meshError.clear();
 
                 AssetPath::AssetSource src = s_meshEditor.m_meshAssetSource;
-
                 std::string relNarrow = s_meshEditor.m_meshPathBuf;
                 std::wstring relWide(relNarrow.begin(), relNarrow.end());
-
                 AssetPath ap(relWide.c_str(), src);
 
+                /*
                 {
                     newMesh = eastl::make_shared<SE_G::Mesh>(m_WorldEditor->m_renderer->GetDevice(), ap);
                     //assigned->SetMesh(newMesh);
 
+                }
+                */
+                // Using Resource manager
+                ResourceHandle meshHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+
+                if (meshHandle.guid == 0) {
+                    // Error
+                    ap = AssetPath(L"Box_repeat");
+                    meshHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+                }
+
+                {
+                    SE_G::Mesh* mesh =
+                        ResourceManagerFacade::Instance().Get<SE_G::Mesh>(meshHandle);
+
+                    if (mesh) {
+                        newMesh = eastl::shared_ptr<SE_G::Mesh>(
+                            mesh,
+                            [](SE_G::Mesh*) {}
+                        );
+                        newMesh->m_meshPath = mesh->m_meshPath;
+                    }
+                    else {
+                        s_meshEditor.m_texError = "Failed to cast loaded resource to Mesh";
+                    }
                 }
 
                 s_meshEditor.m_editMesh = false;

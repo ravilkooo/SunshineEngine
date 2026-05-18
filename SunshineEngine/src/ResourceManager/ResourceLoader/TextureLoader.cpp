@@ -36,8 +36,10 @@ IResource* TextureLoader::Load(const AssetPath& path, ResourceRegistry* pRegistr
     }
     else
     {
-        SE_G::Color col = SE_G::Colors::UnloadedTextureColor;
-        tex = new (mem) SE_G::Bind::Texture(m_device, col, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+        // SE_G::Color col = SE_G::Colors::UnloadedTextureColor;
+        // tex = new (mem) SE_G::Bind::Texture(m_device, col, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
+        pMemMgr->Deallocate(tex, sizeof(SE_G::Bind::Texture));
+        tex = nullptr;
     }
     return tex;
 }

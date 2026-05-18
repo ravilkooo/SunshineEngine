@@ -24,34 +24,22 @@ namespace SE_G {
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
         m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 
-        /*
-        m_texture = eastl::make_shared<SE_G::Bind::Texture>(
-            device,
-            assetPath,
-            4u,
-            SE_G::Bind::PipelineStage::PIXEL_SHADER
-        );
-        */
-
         auto& rm = ResourceManagerFacade::Instance();
         ResourceHandle texHandle = rm.LoadByPath(assetPath);
+        if (texHandle.guid == 0) {
+            // Error
+            auto ap = AssetPath(
+                SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
+                AssetPath::AssetSource::Engine);
+            texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+        }
+
         SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
-        if (texRes)
-        {
-            m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
-                texRes,
-                [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
-            m_texture->SetSlot(4u);
-        }
-        else
-        {
-            m_texture = eastl::make_shared<SE_G::Bind::Texture>(
-                device,
-                assetPath,
-                4u,
-                SE_G::Bind::PipelineStage::PIXEL_SHADER);
-        }
+        m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+            texRes,
+            [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+        m_texture->SetSlot(4u);
 
         m_textureSampler = eastl::make_shared<SE_G::Bind::Sampler>(
             device,

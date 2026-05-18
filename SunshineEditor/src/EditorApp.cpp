@@ -256,6 +256,10 @@ void EditorApp::InitResourceLoaders(ID3D11Device* device)
 	auto meshLoader = eastl::make_unique<MeshLoader>(device);
 	ResourceLoaderFactory::RegisterLoader(SunshineResource::ResourceType::MESH,
 		eastl::move(meshLoader));
+
+	ap = AssetPath(L"Box_repeat");
+	ResourceManagerFacade::Instance().LoadByPath(ap);
+
 }
 
 void EditorApp::UpdateGame(float deltaTime)

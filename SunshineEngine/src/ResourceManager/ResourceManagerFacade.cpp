@@ -31,7 +31,7 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const AssetPath& path)
 
     if (!res) {
         printSunshineErrorMessage(("Failed to load resource: {}", fullPath.c_str()));
-        return ResourceHandle{ guid, 0u };
+        return ResourceHandle{ 0u, 0u };
     }
 
     if (res->GetType() == SunshineResource::ResourceType::TEXTURE)

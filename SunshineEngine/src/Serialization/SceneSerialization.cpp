@@ -191,17 +191,28 @@ json MeshData::ToJson() const
 void MeshData::FromJson(const json& j, ID3D11Device* device)
 {
     // Mesh
+    AssetPath meshPath;
     if (j.contains("Mesh")) {
-
-        AssetPath meshPath;
         meshPath.FromJson(j["Mesh"]);
-
-        m_mesh = eastl::make_shared<SE_G::Mesh>(device, meshPath);
     }
     else
     {
-        m_mesh = eastl::make_shared<SE_G::Mesh>(device, AssetPath(L"Box_repeat"));
+        meshPath = AssetPath(L"Box_repeat");
     }
+    auto& rm = ResourceManagerFacade::Instance();
+    ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+    if (meshHandle.guid == 0) {
+        // Error
+        auto ap = AssetPath(L"Box_repeat");
+        meshHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+    }
+    SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+
+    m_mesh = eastl::shared_ptr<SE_G::Mesh>(
+        meshRes,
+        [](SE_G::Mesh*) {}
+    );
+    m_mesh->m_meshPath = meshRes->m_meshPath;
 
     // Texture
     AssetPath texPath;
@@ -212,33 +223,22 @@ void MeshData::FromJson(const json& j, ID3D11Device* device)
     else {
         texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
     }
-    /*
-    m_texture = eastl::make_shared<SE_G::Bind::Texture>(
-        device,
-        texPath, 0u,
-        SE_G::Bind::PipelineStage::PIXEL_SHADER);
-    */
-    auto& rm = ResourceManagerFacade::Instance();
+
     ResourceHandle texHandle = rm.LoadByPath(texPath);
+    if (texHandle.guid == 0) {
+        // Error
+        auto ap = AssetPath(
+            SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
+            AssetPath::AssetSource::Engine);
+        texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+    }
     SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
-    if (texRes)
-    {
-        m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
-            texRes,
-            [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
-        //mc_info->SetTexture(texture);
-    }
-    else
-    {
-        m_texture = eastl::make_shared<SE_G::Bind::Texture>(
-            device,
-            AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine),
-            0u,
-            SE_G::Bind::PipelineStage::PIXEL_SHADER);
-        //mc_info->SetTexture(texture);
-    }
-
+    m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+        texRes,
+        [](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+    //mc_info->SetTexture(texture);
+    m_texture->m_texturePath = texRes->m_texturePath;
 
 
     // Sampler

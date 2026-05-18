@@ -19,6 +19,7 @@ public:
 
     bool CanLoad(const eastl::string& path) const override;
 
+    static eastl::string defaultMeshes[6];
 private:
     ID3D11Device* m_device;
 };

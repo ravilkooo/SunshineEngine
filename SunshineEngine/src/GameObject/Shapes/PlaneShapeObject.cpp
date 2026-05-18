@@ -33,20 +33,10 @@ PlaneShapeObject_Info::PlaneShapeObject_Info(SE::UUID uuid,
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
-	if (texRes)
-	{
-		auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
-			texRes,
-			[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
-		mesh_info->SetTexture(texture);
-	}
-	else
-	{
-		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-			renderSystem->GetDevice(), texPath, 0u,
-			SE_G::Bind::PipelineStage::PIXEL_SHADER);
-		mesh_info->SetTexture(texture);
-	}
+	auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+		texRes,
+		[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+	mesh_info->SetTexture(texture);
 }
 
 PlaneShapeObject_Info::PlaneShapeObject_Info(SE_G::DeferredRenderer* renderSystem, PlaneShapeData initData) :
@@ -98,22 +88,19 @@ eastl::unique_ptr<PlaneShapeObject_Info> PlaneShapeObject_Info::FromJson(
 
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
+	if (texHandle.guid == 0) {
+		// Error
+		auto ap = AssetPath(
+			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
+			AssetPath::AssetSource::Engine);
+		texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+	}
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
-	if (texRes)
-	{
-		auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
-			texRes,
-			[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
-		mesh_info->SetTexture(texture);
-	}
-	else
-	{
-		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-			renderSystem->GetDevice(), texPath, 0u,
-			SE_G::Bind::PipelineStage::PIXEL_SHADER);
-		mesh_info->SetTexture(texture);
-	}
+	auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+		texRes,
+		[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+	mesh_info->SetTexture(texture);
 
 	return obj;
 }

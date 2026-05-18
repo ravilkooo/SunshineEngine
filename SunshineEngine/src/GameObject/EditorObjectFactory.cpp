@@ -183,34 +183,20 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
 	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc_info->GetDevice(), meshPath);
+
+
 	auto mc_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, meshPtr);
 
-	/*
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc_info->GetDevice(),
-		AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	*/
 	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
-	if (texRes)
-	{
-		auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
-			texRes,
-			[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
-		mc_info->SetTexture(texture);
-	}
-	else
-	{
-		auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-			renderSystem->GetDevice(),
-			texPath, 0u,
-			SE_G::Bind::PipelineStage::PIXEL_SHADER);
-		mc_info->SetTexture(texture);
-	}
+	auto texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+		texRes,
+		[](SE_G::Bind::Texture*) { /* do nothing, ResourceManager releases */ });
+	texture->m_texturePath = texRes->m_texturePath;
+	mc_info->SetTexture(texture);
 
 	return obj;
 }

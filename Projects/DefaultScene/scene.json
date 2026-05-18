@@ -3373,6 +3373,65 @@
             "m_parent": null,
             "m_shapeData": null,
             "m_type": "Plane"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/bat.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/bat.dds"
+                    },
+                    "m_cullMode": "CULL_NONE"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        2.4901187419891357,
+                        9.189352989196777,
+                        17.847856521606445
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 9869831567116696448,
+            "m_UUID_hi": 2297999236,
+            "m_UUID_lo": 2263710592,
+            "m_group": "CustomMesh",
+            "m_name": "CustomObject",
+            "m_parent": null
         }
     ]
 }

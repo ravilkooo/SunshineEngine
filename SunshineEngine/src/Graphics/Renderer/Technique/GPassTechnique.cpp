@@ -87,10 +87,18 @@ namespace SE_G {
 		//// Сохраняем для дальнейшего использования в рендере (в shared_ptr, если требуется)
 		//m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(tex, [](SE_G::Bind::Texture*) {});
 
-		m_texture = eastl::make_shared<SE_G::Bind::Texture>(device,
-			SE_G::Colors::UnloadedTextureColor,
-			0u,
-			SE_G::Bind::PipelineStage::PIXEL_SHADER);
+		auto ap = AssetPath(
+			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
+			AssetPath::AssetSource::Engine);
+		ResourceHandle texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+		SE_G::Bind::Texture* texture =
+			ResourceManagerFacade::Instance().Get<SE_G::Bind::Texture>(texHandle);
+
+		m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(
+			texture,
+			[](SE_G::Bind::Texture*) {}
+		);
+		m_texture->m_texturePath = texture->m_texturePath;
 
 		m_textureSampler = eastl::make_unique<SE_G::Bind::Sampler>(
 			device,
@@ -146,34 +154,6 @@ namespace SE_G {
 		m_meshData->m_mesh->Draw(context.Get());
 	}
 
-	/*
-	void GPassTechnique::SetColor(SE_G::Color color) {
-		m_texture->ChangeColor(m_device, color);
-
-		if (!m_colored)
-		{
-			m_colored = true;
-		}
-	}
-
-	void GPassTechnique::SetTexture(const eastl::wstring& filePath,
-		SE_G::Bind::SamplerPreset samplerPreset) {
-		m_texture->ChangeTexture(m_device, filePath);
-
-		if (m_colored)
-		{
-			m_colored = false;
-		}
-
-		m_textureSampler->ChangePreset(m_device, samplerPreset);
-	}
-
-	void GPassTechnique::ClearTexture() {
-		m_texture->ClearTexture();
-		SetColor(SE_G::Colors::UnloadedTextureColor);
-	}
-	*/
-
 	void GPassTechnique::InitByMeshData(eastl::shared_ptr<MeshData> meshData)
 	{
 		m_meshData = meshData;
@@ -182,25 +162,4 @@ namespace SE_G {
 		// m_textureSampler = meshComponent->GetTextureSamplerPreset();
 	}
 
-	/*
-	void GPassTechnique::SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh) {
-		m_mesh->ClearMesh();
-		m_mesh = newMesh;
-	}
-
-	void GPassTechnique::SetMesh(const eastl::string& filePath)
-	{
-		eastl::shared_ptr<SE_G::Mesh> newMesh = eastl::make_shared<SE_G::Mesh>(
-			m_device, filePath);
-		m_mesh->ClearMesh();
-		m_mesh = newMesh;
-		//m_mesh->ChangeMesh(device, filePath);
-	}
-	*/
-
-	/*
-	void GPassTechnique::ClearMesh() {
-		
-	}
-	*/
 }

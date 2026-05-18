@@ -6,6 +6,10 @@
 #include <Utils/StringHelper.h>
 #include <Utils/FileUtils.h>
 
+eastl::string MeshLoader::defaultMeshes[6] = {
+    "Box", "Sphere", "Geosphere", "Cylinder", "Box_repeat", "ScreenAlignedQuad"
+};
+
 MeshLoader::MeshLoader(ID3D11Device* device) : m_device(device)
 {
 }
@@ -20,14 +24,22 @@ IResource* MeshLoader::Load(const AssetPath& path, ResourceRegistry* pRegistry, 
 
     std::filesystem::path fp(path.GetFullPath().c_str());
 
-    if (FileExistsNoThrow(fp))
+    bool isDefaultMesh = false;
+    for (size_t i = 0; i < 6; i++)
+    {
+        isDefaultMesh |= (WStringToUtf8(path.m_assetRelativePath) == defaultMeshes[i]);
+    }
+
+    if (FileExistsNoThrow(fp) || isDefaultMesh)
     {
         mesh = new (mem) SE_G::Mesh(m_device, path);
     }
     else
     {
-        auto meshPath = AssetPath(eastl::wstring(L"Box_repeat"));
-        mesh = new (mem) SE_G::Mesh(m_device, meshPath);
+        // auto meshPath = AssetPath(eastl::wstring(L"Box_repeat"));
+        // mesh = new (mem) SE_G::Mesh(m_device, meshPath);
+        pMemMgr->Deallocate(mesh, sizeof(SE_G::Mesh));
+        mesh = nullptr;
     }
     return mesh;
 }
@@ -39,12 +51,13 @@ SunshineResource::ResourceType MeshLoader::GetResourceType(IResource* pDepResour
 
 bool MeshLoader::CanLoad(const eastl::string& path) const
 {
-    if (path == "Box") return true;
-    if (path == "Sphere") return true;
-    if (path == "Geosphere") return true;
-    if (path == "Cylinder") return true;
-    if (path == "Box_repeat") return true;
-    if (path == "ScreenAlignedQuad") return true;
+    for (size_t i = 0; i < 6; i++)
+    {
+        if (path.length() >= defaultMeshes[i].length() &&
+            path.substr(path.length() - defaultMeshes[i].length()) == defaultMeshes[i]) {
+            return true;
+        }
+    }
 
     auto dot = path.find_last_of('.');
     if (dot == eastl::string::npos) return false;
