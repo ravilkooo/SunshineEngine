@@ -25,10 +25,19 @@ PlaneShapeObject_Info::PlaneShapeObject_Info(SE::UUID uuid,
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
 	// MeshComponent (holds shared mesh resource)
-	auto newMesh = SE_G::Mesh::CreatePlaneMesh(device);
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	AssetPath meshPath = AssetPath(L"Plane");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
+
 	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, newMesh);
 
-	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -66,15 +75,18 @@ eastl::unique_ptr<PlaneShapeObject_Info> PlaneShapeObject_Info::FromJson(
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	/*
-	auto mc_info = obj->AddComponent<MeshComponent_Info>();
-	mc_info->FromJson(j["components"]["Mesh"],
-		device, rc_info.get(),
-		tc_info.get(), obj->m_UUID);
-	*/
-
 	// MeshComponent (holds shared mesh resource)
-	auto newMesh = SE_G::Mesh::CreatePlaneMesh(device);
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	AssetPath meshPath = AssetPath(L"Plane");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
+
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	AssetPath texPath;
@@ -86,7 +98,6 @@ eastl::unique_ptr<PlaneShapeObject_Info> PlaneShapeObject_Info::FromJson(
 		texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	}
 
-	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error

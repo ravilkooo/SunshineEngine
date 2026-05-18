@@ -1,6 +1,8 @@
 #include "Graphics/Renderer/Technique/PointLightTechnique.h"
 #include <Graphics/GraphicsResources/Mesh.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
 #include <Component/TransformComponent.h>
 
 #include <Utils/StringUtils.h>
@@ -15,7 +17,18 @@ namespace SE_G {
     {
         m_depthStencilState.reset(NULL);
         m_rasterizer.reset(NULL);
-        m_mesh = SE_G::Mesh::CreateGeosphereMesh(device, 1);
+        
+        AssetPath meshPath = AssetPath(L"Geosphere");
+        meshPath.m_params.param1 = 1; // m_shapeData->NumSubdivisions;
+        auto& rm = ResourceManagerFacade::Instance();
+        ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+        SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+        m_mesh = eastl::shared_ptr<SE_G::Mesh>(
+            meshRes,
+            [](SE_G::Mesh*) {}
+        );
+        m_mesh->m_meshPath = meshRes->m_meshPath;
+
         m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
             device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/PointLightVShader.hlsl").c_str());
         m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(

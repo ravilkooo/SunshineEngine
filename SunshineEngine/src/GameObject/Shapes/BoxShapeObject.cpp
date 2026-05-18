@@ -26,24 +26,18 @@ BoxShapeObject_Info::BoxShapeObject_Info(SE::UUID uuid,
 
 	// MeshComponent (holds shared mesh resource)
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
-	if (m_shapeData->UvCubeMapMode)
-	{
-		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device);
-	}
-	else
-	{
-		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
-	}
+	AssetPath meshPath = m_shapeData->UvCubeMapMode ? AssetPath(L"Box") : AssetPath(L"Box_repeat");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
+
 	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, newMesh);
 
-	/*
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc_info->GetDevice(),
-		AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	mesh_info->SetTexture(texture);
-	*/
-	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -81,23 +75,17 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	/*
-	auto mc_info = obj->AddComponent<MeshComponent_Info>();
-	mc_info->FromJson(j["components"]["Mesh"],
-		device, rc_info.get(),
-		tc_info.get(), obj->m_UUID);
-	*/
-
 	// MeshComponent (holds shared mesh resource)
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
-	if (obj->m_shapeData->UvCubeMapMode)
-	{
-		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh(device);
-	}
-	else
-	{
-		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
-	}
+	AssetPath meshPath = obj->m_shapeData->UvCubeMapMode ? AssetPath(L"Box") : AssetPath(L"Box_repeat");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	AssetPath texPath;
@@ -109,7 +97,6 @@ eastl::unique_ptr<BoxShapeObject_Info> BoxShapeObject_Info::FromJson(
 		texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	}
 
-	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error
@@ -140,14 +127,15 @@ void BoxShapeObject_Info::SetUvCubeMapMode(SE_G::DeferredRenderer* renderSystem,
 	m_shapeData->UvCubeMapMode = cubeMapUV;
 	
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
-	if (cubeMapUV)
-	{
-		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh(renderSystem->GetDevice());
-	}
-	else
-	{
-		newMesh = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(renderSystem->GetDevice());
-	}
+	AssetPath meshPath = m_shapeData->UvCubeMapMode ? AssetPath(L"Box") : AssetPath(L"Box_repeat");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
 
 	auto mc = GetComponent<MeshComponent_Info>();
 	mc->m_assignedComponent->SetMesh(newMesh);

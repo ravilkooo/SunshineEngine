@@ -14,6 +14,8 @@ using json = nlohmann::json;
 class SphereShapeObject_Info :
 	public ShapeObject_Info<SphereShapeData>
 {
+	static const uint32_t MaxSliceCount = 40;
+	static const uint32_t MaxStackCount = 40;
 public:
 
 	SphereShapeObject_Info() {};

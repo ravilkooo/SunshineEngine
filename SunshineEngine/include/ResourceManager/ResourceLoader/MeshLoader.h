@@ -4,6 +4,8 @@
 #include <ResourceManager/MemoryManager/ResourceMemoryManager.h>
 #include <ResourceManager/ResourceRegistry.h>
 
+#define DEFAULT_MESHES_NUM 7
+
 class MeshLoader :
     public IResourceLoader
 {
@@ -19,7 +21,7 @@ public:
 
     bool CanLoad(const eastl::string& path) const override;
 
-    static eastl::string defaultMeshes[6];
+    static eastl::string defaultMeshes[DEFAULT_MESHES_NUM];
 private:
     ID3D11Device* m_device;
 };

@@ -31,20 +31,24 @@ namespace SE_G {
             FillUnwrappedBoxMesh(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
-        else if (meshPath.m_assetRelativePath == L"Sphere") {
-            FillSphereMesh(vertices, indices);
-            m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        }
-        else if (meshPath.m_assetRelativePath == L"Geosphere") {
-            FillGeosphereMesh(vertices, indices, 0u);
-            m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        }
-        else if (meshPath.m_assetRelativePath == L"Cylinder") {
-            FillCylinderMesh(vertices, indices);
+        else if (meshPath.m_assetRelativePath == L"Plane") {
+            FillPlaneMesh(vertices, indices);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
         else if (meshPath.m_assetRelativePath == L"Box_repeat") {
             FillUnwrappedBoxMesh_repeat(vertices, indices);
+            m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        }
+        else if (meshPath.m_assetRelativePath == L"Sphere") {
+            FillSphereMesh(vertices, indices, meshPath.m_params.param1, meshPath.m_params.param2);
+            m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        }
+        else if (meshPath.m_assetRelativePath == L"Geosphere") {
+            FillGeosphereMesh(vertices, indices, meshPath.m_params.param1);
+            m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        }
+        else if (meshPath.m_assetRelativePath == L"Cylinder") {
+            FillCylinderMesh(vertices, indices, meshPath.m_params.param1);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
         else if (meshPath.m_assetRelativePath == L"ScreenAlignedQuad") {

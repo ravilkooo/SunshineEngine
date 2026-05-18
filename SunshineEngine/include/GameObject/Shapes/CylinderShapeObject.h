@@ -14,6 +14,7 @@ using json = nlohmann::json;
 class CylinderShapeObject_Info :
 	public ShapeObject_Info<CylinderShapeData>
 {
+	static const uint32_t MaxSliceCount = 40;
 public:
 
 	CylinderShapeObject_Info() {};

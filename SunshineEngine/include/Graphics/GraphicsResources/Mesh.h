@@ -61,30 +61,6 @@ namespace SE_G {
             AssetPath meshPath,
             UINT attrFlags = VertexAttributesFlags::POSITION);
 
-        static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh(
-            ID3D11Device* device);
-
-        static eastl::shared_ptr<Mesh> CreatePlaneMesh(
-            ID3D11Device* device);
-
-        static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh_repeat(
-            ID3D11Device* device);
-
-        static eastl::shared_ptr<Mesh> CreateSphereMesh(
-            ID3D11Device* device,
-            uint32_t sliceCount = 10, uint32_t stackCount = 20);
-
-        static eastl::shared_ptr<Mesh> CreateGeosphereMesh(
-            ID3D11Device* device,
-            uint32_t numSubdivisions = 2);
-
-        static eastl::shared_ptr<Mesh> CreateCylinderMesh(
-            ID3D11Device* device,
-            uint32_t sliceCount = 10);
-
-        static eastl::shared_ptr<Mesh> CreateScreenAlignedQuad(
-            ID3D11Device* device);
-
         static Vertex MidPoint(
             const Vertex& v0, const Vertex& v1);
 
@@ -153,5 +129,29 @@ namespace SE_G {
     // private cause every mesh should correspond to its key in ResourceManager
         void ChangeMesh(ID3D11Device* device,
             AssetPath meshPath);
+
+        static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh(
+            ID3D11Device* device);
+
+        static eastl::shared_ptr<Mesh> CreatePlaneMesh(
+            ID3D11Device* device);
+
+        static eastl::shared_ptr<Mesh> CreateUnwrappedBoxMesh_repeat(
+            ID3D11Device* device);
+
+        static eastl::shared_ptr<Mesh> CreateScreenAlignedQuad(
+            ID3D11Device* device);
+
+        static eastl::shared_ptr<Mesh> CreateSphereMesh(
+            ID3D11Device* device,
+            uint32_t sliceCount = 10, uint32_t stackCount = 20);
+
+        static eastl::shared_ptr<Mesh> CreateGeosphereMesh(
+            ID3D11Device* device,
+            uint32_t numSubdivisions = 1);
+
+        static eastl::shared_ptr<Mesh> CreateCylinderMesh(
+            ID3D11Device* device,
+            uint32_t sliceCount = 10);
     };
 }

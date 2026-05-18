@@ -8,6 +8,8 @@
 #include <Component/MeshComponent.h>
 #include <Component/CameraComponent.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
 #include <Utils/AssetPath.h>
 #include <Utils/StringUtils.h>
 
@@ -288,9 +290,17 @@ void PlayerObject_Info::AddTransformComponent(ID3D11Device* device)
 
 void PlayerObject_Info::AddMeshComponent()
 {
-	auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-		m_renderComp->GetDevice()
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Box_repeat");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
 	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	m_meshComp = this->AddComponent<MeshComponent_Info>(
 		m_renderComp, m_transformComp, this->m_UUID, meshPtr).get();
 };

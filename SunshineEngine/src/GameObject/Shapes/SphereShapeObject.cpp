@@ -17,23 +17,28 @@ SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 	m_type.m_asShape = ShapeObjectType::Sphere;
 	m_name = "Sphere";
 	m_shapeData = eastl::make_shared<SphereShapeData>(initData);
-
+	m_shapeData->SliceCount= std::min(m_shapeData->SliceCount, MaxSliceCount);
+	m_shapeData->StackCount = std::min(m_shapeData->StackCount, MaxStackCount);
 	// TransformComponent
 	auto tc_info = AddComponent<TransformComponent_Info>(device);
 
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
-	auto mesh = SE_G::Mesh::CreateSphereMesh(device, initData.SliceCount, initData.StackCount);
-	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, mesh);
-
-	/*
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc_info->GetDevice(),
-		AssetPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	mesh_info->SetTexture(texture);
-	*/
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	AssetPath meshPath = AssetPath(L"Sphere");
+	meshPath.m_params.param1 = m_shapeData->SliceCount;
+	meshPath.m_params.param2 = m_shapeData->StackCount;
 	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
+
+	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, newMesh);
+
 	AssetPath texPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -55,10 +60,12 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	eastl::unique_ptr<SphereShapeObject_Info> obj = eastl::make_unique<SphereShapeObject_Info>();
 
 	obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-	obj->m_shapeData = eastl::make_shared<SphereShapeData>(j["m_shapeData"].get<SphereShapeData>());
 	obj->m_name = "Sphere";
 	obj->m_group = GameObjectGroup::Shapes;
 	obj->m_type.m_asShape = ShapeObjectType::Sphere;
+	obj->m_shapeData = eastl::make_shared<SphereShapeData>(j["m_shapeData"].get<SphereShapeData>());
+	obj->m_shapeData->SliceCount = std::min(obj->m_shapeData->SliceCount, MaxSliceCount);
+	obj->m_shapeData->StackCount = std::min(obj->m_shapeData->StackCount, MaxStackCount);
 
 	auto device = renderSystem->GetDevice();
 
@@ -71,7 +78,19 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	auto newMesh = SE_G::Mesh::CreateSphereMesh(device, obj->m_shapeData->SliceCount, obj->m_shapeData->StackCount);
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	AssetPath meshPath = AssetPath(L"Sphere");
+	meshPath.m_params.param1 = obj->m_shapeData->SliceCount;
+	meshPath.m_params.param2 = obj->m_shapeData->StackCount;
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
+
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	AssetPath texPath;
@@ -83,7 +102,6 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 		texPath = AssetPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
 	}
 
-	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error
@@ -112,10 +130,21 @@ uint32_t SphereShapeObject_Info::GetStackCount() {
 
 void SphereShapeObject_Info::SetSliceCount(SE_G::DeferredRenderer* renderSystem, uint32_t newSliceCount) {
 	if (newSliceCount > 0) {
-		m_shapeData->SliceCount = newSliceCount;
-		eastl::shared_ptr<SE_G::Mesh> newMesh =
-			SE_G::Mesh::CreateSphereMesh(renderSystem->GetDevice(),
-				m_shapeData->SliceCount, m_shapeData->StackCount);
+		m_shapeData->SliceCount = std::min(newSliceCount, MaxSliceCount);
+
+		eastl::shared_ptr<SE_G::Mesh> newMesh;
+		AssetPath meshPath = AssetPath(L"Sphere");
+		meshPath.m_params.param1 = m_shapeData->SliceCount;
+		meshPath.m_params.param2 = m_shapeData->StackCount;
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+		SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+		newMesh = eastl::shared_ptr<SE_G::Mesh>(
+			meshRes,
+			[](SE_G::Mesh*) {}
+		);
+		newMesh->m_meshPath = meshRes->m_meshPath;
+
 		auto mc = GetComponent<MeshComponent_Info>();
 		mc->m_assignedComponent->SetMesh(newMesh);
 	}
@@ -123,10 +152,21 @@ void SphereShapeObject_Info::SetSliceCount(SE_G::DeferredRenderer* renderSystem,
 
 void SphereShapeObject_Info::SetStackCount(SE_G::DeferredRenderer* renderSystem, uint32_t newStackCount) {
 	if (newStackCount > 0) {
-		m_shapeData->StackCount = newStackCount;
-		eastl::shared_ptr<SE_G::Mesh> newMesh =
-			SE_G::Mesh::CreateSphereMesh(renderSystem->GetDevice(),
-				m_shapeData->SliceCount, m_shapeData->StackCount);
+		m_shapeData->StackCount = std::min(newStackCount, MaxStackCount);
+
+		eastl::shared_ptr<SE_G::Mesh> newMesh;
+		AssetPath meshPath = AssetPath(L"Sphere");
+		meshPath.m_params.param1 = m_shapeData->SliceCount;
+		meshPath.m_params.param2 = m_shapeData->StackCount;
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+		SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+		newMesh = eastl::shared_ptr<SE_G::Mesh>(
+			meshRes,
+			[](SE_G::Mesh*) {}
+		);
+		newMesh->m_meshPath = meshRes->m_meshPath;
+
 		auto mc = GetComponent<MeshComponent_Info>();
 		mc->m_assignedComponent->SetMesh(newMesh);
 	}

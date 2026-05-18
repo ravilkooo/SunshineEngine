@@ -589,13 +589,13 @@ void PropertyPanel::DrawSphereShapeDetails(SphereShapeObject_Info* obj)
         uint32_t currentSliceCount = obj->GetSliceCount();
         uint32_t currentStackCount = obj->GetStackCount();
 
-        uint32_t min_slice = 3, max_slice = 64;
+        uint32_t min_slice = 3, max_slice = 40;
         if (DrawUIntControl("Slice Count", currentSliceCount, 10, 1.0f, min_slice, max_slice))
         {
             obj->SetSliceCount(m_WorldEditor->m_renderer.get(), currentSliceCount);
         }
 
-        uint32_t min_stack = 3, max_stack = 64;
+        uint32_t min_stack = 3, max_stack = 40;
         if (DrawUIntControl("Stack Count", currentStackCount, 10, 1.0f, min_stack, max_stack))
         {
             obj->SetStackCount(m_WorldEditor->m_renderer.get(), currentStackCount);
@@ -644,7 +644,7 @@ void PropertyPanel::DrawCylinderShapeDetails(CylinderShapeObject_Info* obj)
 
         uint32_t currentSliceCount = obj->GetSliceCount();
 
-        uint32_t min_slice = 3, max_slice = 64;
+        uint32_t min_slice = 3, max_slice = 40;
         if (DrawUIntControl("Slice Count", currentSliceCount, 10, 1.0f, min_slice, max_slice))
         {
             obj->SetSliceCount(m_WorldEditor->m_renderer.get(), currentSliceCount);

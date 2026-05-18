@@ -14,6 +14,7 @@ using json = nlohmann::json;
 class GeosphereShapeObject_Info :
 	public ShapeObject_Info<GeosphereShapeData>
 {
+	static const uint32_t MaxNumSubdivisions = 5;
 public:
 	
 	GeosphereShapeObject_Info() {};

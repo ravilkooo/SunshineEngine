@@ -175,12 +175,6 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
 
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, mesh);
 
-	/*
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc->GetDevice(),
-		SE_G::Colors::UnloadedTextureColor, 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	*/
 	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"UnloadedTextureColor.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
@@ -220,12 +214,6 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
 	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc->GetDevice(), meshPath);
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	/*
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc->GetDevice(),
-		AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	*/
 	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
@@ -241,8 +229,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
 }
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
-	SE_G::DeferredRenderer* renderSystem,
-	float width, float height, float length)
+	SE_G::DeferredRenderer* renderSystem)
 {
 	auto device = renderSystem->GetDevice();
 
@@ -250,10 +237,19 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 	auto tc = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-	auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Box_repeat");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -288,15 +284,18 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
 	auto shapeData = eastl::make_shared<BoxShapeData>(j["m_shapeData"].get<BoxShapeData>());
+
 	eastl::shared_ptr<SE_G::Mesh> meshPtr;
-	if (shapeData->UvCubeMapMode)
-	{
-		meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh(device);
-	}
-	else
-	{
-		meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(device);
-	}
+	AssetPath meshPath = shapeData->UvCubeMapMode ? AssetPath(L"Box") : AssetPath(L"Box_repeat");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
 	AssetPath texPath;
@@ -307,18 +306,14 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 	else {
 		texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	}
-	/*
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	*/
-	auto& rm = ResourceManagerFacade::Instance();
+
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error
 		auto ap = AssetPath(
 			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
 			AssetPath::AssetSource::Engine);
-		texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+		texHandle = rm.LoadByPath(ap);
 	}
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
@@ -339,16 +334,19 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreatePlaneObject(
 	auto tc = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-	auto meshPtr = SE_G::Mesh::CreatePlaneMesh(device);
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Plane");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	/*
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc->GetDevice(),
-		AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	*/
-	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -383,7 +381,18 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreatePlaneObject(
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
 	auto shapeData = eastl::make_shared<PlaneShapeData>(j["m_shapeData"].get<PlaneShapeData>());
-	auto meshPtr = SE_G::Mesh::CreatePlaneMesh(device);
+	
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Plane");
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
 	AssetPath texPath;
@@ -394,14 +403,13 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreatePlaneObject(
 	else {
 		texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	}
-	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error
 		auto ap = AssetPath(
 			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
 			AssetPath::AssetSource::Engine);
-		texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+		texHandle = rm.LoadByPath(ap);
 	}
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
@@ -414,7 +422,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreatePlaneObject(
 }
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
-	SE_G::DeferredRenderer* renderSystem, float radius)
+	SE_G::DeferredRenderer* renderSystem)
 {
 	auto device = renderSystem->GetDevice();
 
@@ -422,7 +430,19 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 	auto tc = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-	auto meshPtr = SE_G::Mesh::CreateSphereMesh(device);
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Sphere");
+	meshPath.m_params.param1 = 10; // shapeData->SliceCount;
+	meshPath.m_params.param2 = 20; // shapeData->StackCount;
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
 	/*auto texture = eastl::make_shared<SE_G::Bind::Texture>(
@@ -431,7 +451,6 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mc->SetTexture(texture);*/
 
-	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -465,7 +484,20 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
 	auto shapeData = eastl::make_shared<SphereShapeData>(j["m_shapeData"].get<SphereShapeData>());
-	auto meshPtr = SE_G::Mesh::CreateSphereMesh(device, shapeData->SliceCount, shapeData->StackCount);
+
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Sphere");
+	meshPath.m_params.param1 = shapeData->SliceCount;
+	meshPath.m_params.param2 = shapeData->StackCount;
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
 	AssetPath texPath;
@@ -481,14 +513,13 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 		device, texPath, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mc->SetTexture(texture);
 	*/
-	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error
 		auto ap = AssetPath(
 			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
 			AssetPath::AssetSource::Engine);
-		texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+		texHandle = rm.LoadByPath(ap);
 	}
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
@@ -501,7 +532,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 }
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
-	SE_G::DeferredRenderer* renderSystem, float radius)
+	SE_G::DeferredRenderer* renderSystem)
 {
 	auto device = renderSystem->GetDevice();
 
@@ -509,7 +540,18 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 	auto tc = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-	auto meshPtr = SE_G::Mesh::CreateGeosphereMesh(device, 2u);
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Geosphere");
+	meshPath.m_params.param1 = 1; // shapeData->NumSubdivisions;
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
 	/*auto texture = eastl::make_shared<SE_G::Bind::Texture>(
@@ -518,7 +560,6 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 		SE_G::Bind::PipelineStage::PIXEL_SHADER);
 	mc->SetTexture(texture);*/
 
-	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -552,7 +593,19 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
 	auto shapeData = eastl::make_shared<GeosphereShapeData>(j["m_shapeData"].get<GeosphereShapeData>());
-	auto meshPtr = SE_G::Mesh::CreateGeosphereMesh(device, shapeData->NumSubdivisions);
+
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Geosphere");
+	meshPath.m_params.param1 = shapeData->NumSubdivisions;
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
 	AssetPath texPath;
@@ -564,14 +617,13 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 		texPath = AssetPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
 	}
 
-	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error
 		auto ap = AssetPath(
 			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
 			AssetPath::AssetSource::Engine);
-		texHandle = ResourceManagerFacade::Instance().LoadByPath(ap);
+		texHandle = rm.LoadByPath(ap);
 	}
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
 
@@ -584,7 +636,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 }
 
 eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
-	SE_G::DeferredRenderer* renderSystem, float radius, float height)
+	SE_G::DeferredRenderer* renderSystem)
 {
 	auto device = renderSystem->GetDevice();
 
@@ -592,10 +644,20 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
 	auto tc = obj->AddComponent<TransformComponent>(device);
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
-	auto meshPtr = SE_G::Mesh::CreateCylinderMesh(device);
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Cylinder");
+	meshPath.m_params.param1 = 10; // shapeData->SliceCount;
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	auto& rm = ResourceManagerFacade::Instance();
 	AssetPath texPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -629,7 +691,19 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
 
 	auto shapeData = eastl::make_shared<CylinderShapeData>(j["m_shapeData"].get<CylinderShapeData>());
-	auto meshPtr = SE_G::Mesh::CreateCylinderMesh(device, shapeData->SliceCount);
+
+	eastl::shared_ptr<SE_G::Mesh> meshPtr;
+	AssetPath meshPath = AssetPath(L"Cylinder");
+	meshPath.m_params.param1 = shapeData->SliceCount;
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	meshPtr->m_meshPath = meshRes->m_meshPath;
+
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
 	AssetPath texPath;
@@ -641,7 +715,6 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
 		texPath = AssetPath(L"Textures/DefaultTexture.dds", AssetPath::AssetSource::Engine);
 	}
 
-	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error

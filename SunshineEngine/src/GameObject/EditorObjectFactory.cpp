@@ -184,7 +184,6 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 
 	auto meshPtr = eastl::make_shared<SE_G::Mesh>(rc_info->GetDevice(), meshPath);
 
-
 	auto mc_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, meshPtr);
 
 	auto& rm = ResourceManagerFacade::Instance();

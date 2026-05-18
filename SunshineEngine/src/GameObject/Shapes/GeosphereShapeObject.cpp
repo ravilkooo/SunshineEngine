@@ -12,25 +12,27 @@ GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
 	m_type.m_asShape = ShapeObjectType::Geosphere;
 	m_name = "Geosphere";
 	m_shapeData = eastl::make_shared<GeosphereShapeData>(initData);
-	m_shapeData->NumSubdivisions = std::min<uint32_t>(std::max<uint32_t>(m_shapeData->NumSubdivisions, 0), 5);
+	m_shapeData->NumSubdivisions = std::min(std::max(m_shapeData->NumSubdivisions, 0u), MaxNumSubdivisions);
 
 	// TransformComponent
 	auto tc_info = AddComponent<TransformComponent_Info>(device);
 
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 
-	auto mesh = SE_G::Mesh::CreateGeosphereMesh(
-		device, static_cast<UINT>(initData.NumSubdivisions));
-	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, mesh);
-
-	/*
-	auto texture = eastl::make_shared<SE_G::Bind::Texture>(
-		rc_info->GetDevice(),
-		AssetPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine), 0u,
-		SE_G::Bind::PipelineStage::PIXEL_SHADER);
-	mesh_info->SetTexture(texture);
-	*/
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	AssetPath meshPath = AssetPath(L"Geosphere");
+	meshPath.m_params.param1 = m_shapeData->NumSubdivisions;
 	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
+
+	auto mesh_info = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, newMesh);
+
 	AssetPath texPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	SE_G::Bind::Texture* texRes = rm.Get<SE_G::Bind::Texture>(texHandle);
@@ -53,7 +55,7 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 
 	obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
 	obj->m_shapeData = eastl::make_shared<GeosphereShapeData>(j["m_shapeData"].get<GeosphereShapeData>());
-	obj->m_shapeData->NumSubdivisions = std::min<uint32_t>(std::max<uint32_t>(obj->m_shapeData->NumSubdivisions, 0), 5);
+	obj->m_shapeData->NumSubdivisions = std::min(std::max(obj->m_shapeData->NumSubdivisions, 0u), MaxNumSubdivisions);
 	obj->m_name = "Geosphere";
 	obj->m_group = GameObjectGroup::Shapes;
 	obj->m_type.m_asShape = ShapeObjectType::Geosphere;
@@ -69,9 +71,18 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
 
-	auto newMesh = SE_G::Mesh::CreateGeosphereMesh(
-		device,
-		obj->m_shapeData->NumSubdivisions);
+	eastl::shared_ptr<SE_G::Mesh> newMesh;
+	AssetPath meshPath = AssetPath(L"Geosphere");
+	meshPath.m_params.param1 = obj->m_shapeData->NumSubdivisions;
+	auto& rm = ResourceManagerFacade::Instance();
+	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+	newMesh = eastl::shared_ptr<SE_G::Mesh>(
+		meshRes,
+		[](SE_G::Mesh*) {}
+	);
+	newMesh->m_meshPath = meshRes->m_meshPath;
+
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
 	AssetPath texPath;
@@ -83,7 +94,6 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 		texPath = AssetPath(L"Textures/DefaultSphereTexture.dds", AssetPath::AssetSource::Engine);
 	}
 
-	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle texHandle = rm.LoadByPath(texPath);
 	if (texHandle.guid == 0) {
 		// Error
@@ -108,10 +118,19 @@ uint32_t GeosphereShapeObject_Info::GetNumSubdivisions() {
 
 void GeosphereShapeObject_Info::SetNumSubdivisions(SE_G::DeferredRenderer* renderSystem, uint32_t newNumSubdivisions) {
 	if (newNumSubdivisions > 0) {
-		m_shapeData->NumSubdivisions = std::min<uint32_t>(std::max<uint32_t>(newNumSubdivisions, 0), 5);
-		eastl::shared_ptr<SE_G::Mesh> newMesh =
-			SE_G::Mesh::CreateGeosphereMesh(renderSystem->GetDevice(),
-				m_shapeData->NumSubdivisions);
+		m_shapeData->NumSubdivisions = std::min(std::max(newNumSubdivisions, 0u), MaxNumSubdivisions);
+
+		eastl::shared_ptr<SE_G::Mesh> newMesh;
+		AssetPath meshPath = AssetPath(L"Geosphere");
+		meshPath.m_params.param1 = m_shapeData->NumSubdivisions;
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+		SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+		newMesh = eastl::shared_ptr<SE_G::Mesh>(
+			meshRes,
+			[](SE_G::Mesh*) {}
+		);
+		newMesh->m_meshPath = meshRes->m_meshPath;
 
 		auto mc = GetComponent<MeshComponent_Info>();
 		mc->m_assignedComponent->SetMesh(newMesh);

@@ -472,7 +472,7 @@ void WorldEditor::AddPlaneShape(DXSM::Vector3 initPos)
 
 void WorldEditor::AddSphereShape(DXSM::Vector3 initPos)
 {
-	auto sphereObject = EditorObjectFactory::CreateSphereObject(m_renderer.get(), 1.0f);
+	auto sphereObject = EditorObjectFactory::CreateSphereObject(m_renderer.get());
 
 	if (sphereObject)
 	{
@@ -484,7 +484,7 @@ void WorldEditor::AddSphereShape(DXSM::Vector3 initPos)
 
 void WorldEditor::AddGeosphereShape(DXSM::Vector3 initPos)
 {
-	auto geosphereObject = EditorObjectFactory::CreateGeosphereObject(m_renderer.get(), 1.0f);
+	auto geosphereObject = EditorObjectFactory::CreateGeosphereObject(m_renderer.get());
 
 	if (geosphereObject)
 	{

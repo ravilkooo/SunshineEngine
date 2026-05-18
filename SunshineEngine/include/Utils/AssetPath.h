@@ -12,14 +12,17 @@ public:
 	enum class AssetSource {
 		Engine,
 		Project,
-		/* Only for devs! Don't show t0 users!*/ Absolute,
+		/* Only for devs! Don't show to users!*/ Absolute,
 	} m_assetSource = AssetSource::Project;
 
 	static eastl::wstring s_projectPath;
+	eastl::wstring m_assetRelativePath;
+	struct AdditionalParams {
+		uint32_t param1 = 1; // slice, numSubdivisions
+		uint32_t param2 = 1; // stack
+	} m_params;
 
 	explicit AssetPath(eastl::wstring relativePath = L"", AssetSource assetSource = AssetSource::Engine);
-
-	eastl::wstring m_assetRelativePath;
 
 	eastl::wstring GetFullPath() const;
 

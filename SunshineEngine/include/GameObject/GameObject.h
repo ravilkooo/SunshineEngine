@@ -26,7 +26,7 @@
 #include <GameObject/ParentNode.h>
 #include <GameObject/ObjectGroupType.h>
 
-//#include <Graphics/Renderer/DeferredRenderer.h>
+#include <ResourceManager/ResourceManagerFacade.h>
 
 #include <Utils/StringUtils.h>
 #include <Utils/UUID.h>
@@ -396,9 +396,17 @@ public:
                 auto tc_info = GetComponent<TransformComponent_Info>();
                 auto rc_info = GetComponent<RenderComponent_Info>();
                 
-                auto meshPtr = SE_G::Mesh::CreateUnwrappedBoxMesh_repeat(
-                    rc_info->GetDevice()
+                eastl::shared_ptr<SE_G::Mesh> meshPtr;
+                AssetPath meshPath = AssetPath(L"Box_repeat");
+                auto& rm = ResourceManagerFacade::Instance();
+                ResourceHandle meshHandle = rm.LoadByPath(meshPath);
+                SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
+                meshPtr = eastl::shared_ptr<SE_G::Mesh>(
+                    meshRes,
+                    [](SE_G::Mesh*) {}
                 );
+                meshPtr->m_meshPath = meshRes->m_meshPath;
+
                 auto meshComp = AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), m_UUID, meshPtr);
 
             }

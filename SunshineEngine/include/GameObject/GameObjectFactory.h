@@ -53,8 +53,7 @@ public:
 		AssetPath meshPath);
 
 	static eastl::unique_ptr<GameObject> CreateBoxObject(
-		SE_G::DeferredRenderer* renderSystem,
-		float width, float height, float length);
+		SE_G::DeferredRenderer* renderSystem);
 
 	static eastl::unique_ptr<GameObject> CreateBoxObject(
 		SE_G::DeferredRenderer* renderSystem,
@@ -68,21 +67,21 @@ public:
 		const json& j);
 
 	static eastl::unique_ptr<GameObject> CreateSphereObject(
-		SE_G::DeferredRenderer* renderSystem, float radius);
+		SE_G::DeferredRenderer* renderSystem);
 
 	static eastl::unique_ptr<GameObject> CreateSphereObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
 	static eastl::unique_ptr<GameObject> CreateGeosphereObject(
-		SE_G::DeferredRenderer* renderSystem, float radius);
+		SE_G::DeferredRenderer* renderSystem);
 
 	static eastl::unique_ptr<GameObject> CreateGeosphereObject(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);
 
 	static eastl::unique_ptr<GameObject> CreateCylinderObject(
-		SE_G::DeferredRenderer* renderSystem, float radius, float height);
+		SE_G::DeferredRenderer* renderSystem);
 
 	static eastl::unique_ptr<GameObject> CreateCylinderObject(
 		SE_G::DeferredRenderer* renderSystem,

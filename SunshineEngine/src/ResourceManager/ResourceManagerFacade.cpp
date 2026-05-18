@@ -11,7 +11,8 @@ void ResourceManagerFacade::Initialize(size_t maxMemorySize)
 ResourceHandle ResourceManagerFacade::LoadByPath(const AssetPath& path)
 {
     auto fullPath = WStringToUtf8(path.GetFullPath());
-    ResourceGUID guid = ComputeGUID(fullPath);
+    eastl::string guidCodeWord = fullPath + path.m_params.param1 + path.m_params.param2;
+    ResourceGUID guid = ComputeGUID(guidCodeWord);
 
     // If already present, just bump ref and return
     if (m_registry.Contains(guid)) {
@@ -36,8 +37,10 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const AssetPath& path)
 
     if (res->GetType() == SunshineResource::ResourceType::TEXTURE)
     {
-        fullPath = WStringToUtf8(static_cast<SE_G::Bind::Texture*>(res)->m_texturePath.GetFullPath());
-        guid = ComputeGUID(fullPath);
+        AssetPath ap = static_cast<SE_G::Bind::Texture*>(res)->m_texturePath;
+        fullPath = WStringToUtf8(ap.GetFullPath());
+        eastl::string guidCodeWord = fullPath + ap.m_params.param1 + ap.m_params.param2;
+        guid = ComputeGUID(guidCodeWord);
         /*
         if (m_registry.Contains(guid)) {
             m_registry.IncrementRefCount(guid);

@@ -43,8 +43,9 @@ IResource* CompositeResourceLoader::Load(const AssetPath& path,
         }
 
         auto depFullPath = WStringToUtf8(depPath.GetFullPath());
-
-        ResourceGUID depGUID = ComputeGUID(depFullPath);
+        eastl::string guidCodeWord = depFullPath + depPath.m_params.param1 + depPath.m_params.param2;
+        //ResourceGUID depGUID = ComputeGUID(depFullPath);
+        ResourceGUID depGUID = ComputeGUID(guidCodeWord);
         IResource* pDepResource = pRegistry->Get(depGUID);
 
         if (!pDepResource)

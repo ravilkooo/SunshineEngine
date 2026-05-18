@@ -6,8 +6,8 @@
 #include <Utils/StringHelper.h>
 #include <Utils/FileUtils.h>
 
-eastl::string MeshLoader::defaultMeshes[6] = {
-    "Box", "Sphere", "Geosphere", "Cylinder", "Box_repeat", "ScreenAlignedQuad"
+eastl::string MeshLoader::defaultMeshes[DEFAULT_MESHES_NUM] = {
+    "Box", "Plane", "Sphere", "Geosphere", "Cylinder", "Box_repeat", "ScreenAlignedQuad"
 };
 
 MeshLoader::MeshLoader(ID3D11Device* device) : m_device(device)
@@ -25,7 +25,7 @@ IResource* MeshLoader::Load(const AssetPath& path, ResourceRegistry* pRegistry, 
     std::filesystem::path fp(path.GetFullPath().c_str());
 
     bool isDefaultMesh = false;
-    for (size_t i = 0; i < 6; i++)
+    for (size_t i = 0; i < DEFAULT_MESHES_NUM; i++)
     {
         isDefaultMesh |= (WStringToUtf8(path.m_assetRelativePath) == defaultMeshes[i]);
     }
@@ -51,7 +51,7 @@ SunshineResource::ResourceType MeshLoader::GetResourceType(IResource* pDepResour
 
 bool MeshLoader::CanLoad(const eastl::string& path) const
 {
-    for (size_t i = 0; i < 6; i++)
+    for (size_t i = 0; i < DEFAULT_MESHES_NUM; i++)
     {
         if (path.length() >= defaultMeshes[i].length() &&
             path.substr(path.length() - defaultMeshes[i].length()) == defaultMeshes[i]) {
