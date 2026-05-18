@@ -272,6 +272,7 @@ void ImguiEditorPass::Pass()
 				}
 				else
 				{
+					// Calculate place in front of camera on some distance
 					m_clickWorldPos = DXSM::Vector3::Zero;
 				}
 				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
@@ -308,65 +309,110 @@ void ImguiEditorPass::Pass()
 
 	if (ImGui::BeginPopupContextWindow("viewport_contextmenu"))
 	{
-		ImGui::Text("Add...");
-
-		if (ImGui::BeginMenu("Shape"))
+		if (ImGui::BeginMenu("Add..."))
 		{
-			if (ImGui::MenuItem("Plane"))
+			if (ImGui::BeginMenu("Shape"))
 			{
-				m_editorApp->m_worldEditor->AddPlaneShape(m_clickWorldPos);
+				if (ImGui::MenuItem("Plane"))
+				{
+					m_editorApp->m_worldEditor->AddPlaneShape(m_clickWorldPos);
+				}
+				if (ImGui::MenuItem("Box"))
+				{
+					m_editorApp->m_worldEditor->AddBoxShape(m_clickWorldPos);
+				}
+				if (ImGui::MenuItem("Sphere"))
+				{
+					m_editorApp->m_worldEditor->AddSphereShape(m_clickWorldPos);
+				}
+				if (ImGui::MenuItem("Geosphere"))
+				{
+					m_editorApp->m_worldEditor->AddGeosphereShape(m_clickWorldPos);
+				}
+				if (ImGui::MenuItem("Cylinder"))
+				{
+					m_editorApp->m_worldEditor->AddCylinderShape(m_clickWorldPos);
+				}
+				ImGui::EndMenu();
 			}
-			if (ImGui::MenuItem("Box"))
+			if (ImGui::BeginMenu("Lightning"))
 			{
-				m_editorApp->m_worldEditor->AddBoxShape(m_clickWorldPos);
+				if (ImGui::MenuItem("SkyBox"))
+				{
+					m_editorApp->m_worldEditor->AddSkyBox(m_clickWorldPos);
+				}
+				if (ImGui::MenuItem("Ambient"))
+				{
+					m_editorApp->m_worldEditor->AddAmbientLight(m_clickWorldPos);
+				}
+				if (ImGui::MenuItem("Directional"))
+				{
+					m_editorApp->m_worldEditor->AddDirectionalLight(m_clickWorldPos);
+				}
+				if (ImGui::MenuItem("Point Light"))
+				{
+					m_editorApp->m_worldEditor->AddPointLight(m_clickWorldPos);
+				}
+				if (ImGui::MenuItem("Spot Light"))
+				{
+					m_editorApp->m_worldEditor->AddSpotLight(m_clickWorldPos);
+				}
+				ImGui::EndMenu();
 			}
-			if (ImGui::MenuItem("Sphere"))
+			if (ImGui::MenuItem("Custom Mesh"))
 			{
-				m_editorApp->m_worldEditor->AddSphereShape(m_clickWorldPos);
+				m_editorApp->m_worldEditor->AddCustomMesh(m_clickWorldPos);
 			}
-			if (ImGui::MenuItem("Geosphere"))
+			if (ImGui::MenuItem("Particle Emitter"))
 			{
-				m_editorApp->m_worldEditor->AddGeosphereShape(m_clickWorldPos);
+				m_editorApp->m_worldEditor->AddParticleEmitter(m_clickWorldPos);
 			}
-			if (ImGui::MenuItem("Cylinder"))
-			{
-				m_editorApp->m_worldEditor->AddCylinderShape(m_clickWorldPos);
-			}
+
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Lightning"))
+		auto selectedUUID = m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID;
+		if (selectedUUID != SE::UUID(0u))
 		{
-			if (ImGui::MenuItem("SkyBox"))
+			if (ImGui::MenuItem("Duplicate"))
 			{
-				m_editorApp->m_worldEditor->AddSkyBox(m_clickWorldPos);
-			}
-			if (ImGui::MenuItem("Ambient"))
-			{
-				m_editorApp->m_worldEditor->AddAmbientLight(m_clickWorldPos);
-			}
-			if (ImGui::MenuItem("Directional"))
-			{
-				m_editorApp->m_worldEditor->AddDirectionalLight(m_clickWorldPos);
-			}
-			if (ImGui::MenuItem("Point Light"))
-			{
-				m_editorApp->m_worldEditor->AddPointLight(m_clickWorldPos);
-			}
-			if (ImGui::MenuItem("Spot Light"))
-			{
-				m_editorApp->m_worldEditor->AddSpotLight(m_clickWorldPos);
-			}
-			ImGui::EndMenu();
-		}
+				auto j = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(selectedUUID)->ToJson();
 
-		if (ImGui::MenuItem("Custom Mesh"))
-		{
-			m_editorApp->m_worldEditor->AddCustomMesh(m_clickWorldPos);
-		}
+				j["m_UUID"] = (uint64_t)SE::UUID();
 
-		if (ImGui::MenuItem("Particle Emitter"))
+				eastl::unique_ptr<GameObject_Info> go = Scene_Info::JsonToGameObject_Info(
+					m_editorApp->m_worldEditor->m_scene, m_editorApp->m_worldEditor->m_renderer.get(), m_camera,
+					j);
+
+				if (go)
+				{
+					go->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position += DXSM::Vector3(1,0,0);
+					auto uuid = m_editorApp->m_worldEditor->m_scene->AddGameObject(std::move(go));
+					m_editorApp->m_worldEditor->m_scene->m_sceneGraph->Add(uuid);
+				}
+			}
+			if (ImGui::MenuItem("Copy"))
+			{
+				m_editorApp->m_worldEditor->m_copiedObjUUID = selectedUUID;
+				m_editorApp->m_worldEditor->m_copiedObjSerialized = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(selectedUUID)->ToJson();
+			}
+		}
+		if (m_editorApp->m_worldEditor->m_copiedObjUUID != SE::UUID(0u))
 		{
-			m_editorApp->m_worldEditor->AddParticleEmitter(m_clickWorldPos);
+			if (ImGui::MenuItem("Paste"))
+			{
+				m_editorApp->m_worldEditor->m_copiedObjSerialized["m_UUID"] = (uint64_t)SE::UUID();
+
+				eastl::unique_ptr<GameObject_Info> go = Scene_Info::JsonToGameObject_Info(
+					m_editorApp->m_worldEditor->m_scene, m_editorApp->m_worldEditor->m_renderer.get(), m_camera,
+					m_editorApp->m_worldEditor->m_copiedObjSerialized);
+
+				if (go)
+				{
+					go->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = m_clickWorldPos;
+					auto uuid = m_editorApp->m_worldEditor->m_scene->AddGameObject(std::move(go));
+					m_editorApp->m_worldEditor->m_scene->m_sceneGraph->Add(uuid);
+				}
+			}
 		}
 
 		ImGui::EndPopup();
@@ -473,45 +519,6 @@ void ImguiEditorPass::RenderGameWorld()
 void ImguiEditorPass::ShowSceneHierarchy()
 {
 	DrawSceneGraph(m_editorApp->m_worldEditor->m_scene->m_sceneGraph.get(), m_editorApp->m_worldEditor->m_hierarchySelection);
-	/*
-	InitHierarchy();
-
-	ImGui::Text("Scene Hierarchy");
-	if (ImGui::TreeNode(WStringToUtf8(m_editorApp->m_openedProject->GetSubPath()).c_str()))
-	{
-		auto& objects = m_editorApp->m_worldEditor->m_scene->gameObjects;
-		for (size_t i = 0; i < objects.size(); ++i)
-		{
-			// selectedIdx
-			ImGui::PushID((int)i);
-			bool isSelected = (selectedUUID == objects[i].m_UUID);
-
-			// �������� ���� �������� �� ������ � ���� �� �� ������� �� �������� �� ������
-			// �������� ���� �������� �� �������
-
-			//eastl::string objLabel = eastl::string("GameObject ") + to_string_eastl(i);
-			//m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->Name = objLabel;
-
-			eastl::string objName = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(objects[i])->m_name;
-			if (objName == "")
-				objName = std::to_string(objects[i].m_UUID).c_str();
-			// if (ImGui::Selectable(std::to_string(objects[i].m_UUID).c_str(), isSelected))
-			if (ImGui::Selectable(objName.c_str(), isSelected))
-			{
-				selectedUUID = objects[i];
-				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
-			}
-			ImGui::PopID();
-		}
-
-		for (auto& node : nodesHierarchy)
-		{
-			ShowNode(node);
-		}
-
-		ImGui::TreePop();
-	}
-	*/
 }
 
 void ImguiEditorPass::ShowContentBrowser()

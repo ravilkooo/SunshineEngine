@@ -118,54 +118,12 @@ void TransformComponent::FromJson(const json& j)
 // ----------------- RenderComponent -----------------
 json RenderComponent_Info::ToJson() const {
     json j;
-    
-    /*
-    //j["techniques"] = json::array();
-    for (const auto& t : techniques) {
-        json j_t;
-
-        if (t == "GPass")
-        {
-            j_t["Mesh"] = GetCurrentMeshPath().c_str();
-            j_t["Texture"] = GetCurrentTexturePath().c_str();
-            j_t["Sampler"] = GetCurrentTextureSampler();
-
-            j["techniques"]["GPass"] = j_t;
-        }
-    }
-    */
 
     return j;
 }
-//void RenderComponent_Info::RestoreRenderTechniques(
-//    GameObject_Info* gameObject,
-//    const json& j)
-//{
-//    
-//}
 
 void RenderComponent_Info::FromJson(const json& j) {
-    //techniques.clear();
-    /*
-    if (j.contains("techniques"))
-    {
-        if (j["techniques"].contains("GPass"))
-        {
-            eastl::string meshFullPath = j["techniques"]["GPass"]["Mesh"].get<std::string>().c_str();
-            eastl::wstring textureFullPath = j["techniques"]["GPass"]["Texture"].get<std::wstring>().c_str();
-            SE_G::Bind::SamplerPreset samplePreset = j["techniques"]["GPass"]["Sampler"];
 
-        }
-    }
-    */
-    
-    /*
-    if (j.contains("techniques") && j["techniques"].is_array()) {
-        for (const auto& v : j["techniques"]) {
-            techniques.insert( StdToEASTLString(v.get<std::string>()));
-        }
-    }
-    */
 }
 
 // ----------------- MeshComponent -----------------
@@ -486,111 +444,6 @@ json GameObject_Info::ToJson() const {
     return j;
 }
 
-/*
-eastl::unique_ptr<GameObject_Info> GameObject_Info::FromJson(
-    SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera,
-    const json& j)
-{
-    eastl::unique_ptr<GameObject_Info> out;
-    GameObjectGroup objGroup = j["m_group"];
-    ObjectType objType;
-
-    switch (objGroup)
-    {
-        // Lighting Group
-    case GameObjectGroup::Lighting:
-        objType.m_asLight = j["m_type"];
-
-        switch (objType.m_asLight)
-        {
-        case LightObjectType::SkyBox:
-            out = eastl::make_unique<SkyBox_Info>();
-            break;
-        case LightObjectType::AmbientLight:
-            out = eastl::make_unique<AmbientLight_Info>();
-            break;
-        case LightObjectType::PointLight:
-            out = eastl::make_unique<PointLight_Info>();
-            break;
-        case LightObjectType::DirectionalLight:
-            out = eastl::make_unique<DirectionalLight_Info>();
-            break;
-        }
-        out->m_type = objType;
-        break;
-
-        // Shapes Group
-    case GameObjectGroup::Shapes:
-        objType.m_asShape = j["m_type"];
-
-        switch (objType.m_asShape)
-        {
-        case ShapeObjectType::Box:
-            out = eastl::make_unique<GameObject_Info>();
-            break;
-        case ShapeObjectType::Box_repeat:
-            out = eastl::make_unique<GameObject_Info>();
-            break;
-        case ShapeObjectType::Sphere:
-            out = eastl::make_unique<GameObject_Info>();
-            break;
-        case ShapeObjectType::Geosphere:
-            out = eastl::make_unique<GameObject_Info>();
-            break;
-        }
-        out->m_type = objType;
-        break;
-        
-    // case GameObjectGroup::CustomMesh:
-    //     break;
-    // case GameObjectGroup::Other:
-    //     break;
-        
-    default:
-        out = eastl::make_unique<GameObject_Info>();
-        break;
-    }
-    out->m_group = objGroup;
-
-    auto out = eastl::make_unique<GameObject_Info>();
-    //if (j.contains("m_name")) out->m_name = j["m_name"].get<std::string>().c_str();
-    //if (j.contains("m_UUID")) out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-    //if (j.contains("m_group")) out->m_group = static_cast<GameObjectGroup>(j["m_group"].get<int>());
-    out->m_name = j["m_name"].get<std::string>().c_str();
-    out->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-
-    if (j.contains("components") && j["components"].is_object()) {
-        // Load components in strict order: Transform -> Render -> Physics -> Lua
-        eastl::shared_ptr<TransformComponent_Info> tc_info;
-        if (j["components"].contains("Transform")) {
-            tc_info = out->AddComponent<TransformComponent_Info>();
-            //tc_info->m_assignedComponent = eastl::make_shared<TransformComponent>(renderSystem->GetDevice());
-            tc_info->FromJson(j["components"]["Transform"], renderSystem->GetDevice());
-        }
-        if (j["components"].contains("Render")) {
-            auto rc_info = out->AddComponent<RenderComponent_Info>(out->m_UUID, renderSystem);
-            rc_info->m_assignedComponent = eastl::make_shared<RenderComponent>(out->m_UUID, renderSystem);
-            // Restore Render techniques
-
-            
-            
-            //c->FromJson(j["components"]["Render"]);
-        }
-        if (j["components"].contains("Physics")) {
-            auto c = out->AddComponent<PhysicsComponent_Info>();
-            c->FromJson(j["components"]["Physics"]);
-        }
-        if (j["components"].contains("Lua")) {
-            auto c = out->AddComponent<LuaComponent_Info>();
-            c->FromJson(j["components"]["Lua"]);
-        }
-    }
-
-    return out;
-}
-*/
-
 // ----------------- Scene -----------------
 
 void Scene::FromJson(
@@ -767,6 +620,166 @@ json Scene_Info::ToJson() const {
     return j;
 }
 
+eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
+    eastl::shared_ptr<Scene_Info> scene,
+    SE_G::DeferredRenderer* renderSystem,
+    eastl::shared_ptr<SE_G::Camera> camera, const json& objJ)
+{
+    GameObjectGroup objGroup = objJ["m_group"];
+    ObjectType objType;
+    eastl::unique_ptr<GameObject_Info> go;
+    // objJ;
+    switch (objGroup)
+    {
+    case GameObjectGroup::Lighting:
+        objType = ObjectType(objGroup, objJ["m_type"]);
+
+        switch (objType.m_asLight)
+        {
+        case LightObjectType::SkyBox:
+            go = eastl::make_unique<SkyBox_Info>(
+                renderSystem, camera, objJ);
+            break;
+        case LightObjectType::AmbientLight:
+            go = eastl::make_unique<AmbientLight_Info>(
+                renderSystem, camera, objJ);
+            break;
+        case LightObjectType::PointLight:
+            go = eastl::make_unique<PointLight_Info>(
+                renderSystem, camera, objJ);
+            break;
+        case LightObjectType::DirectionalLight:
+            go = eastl::make_unique<DirectionalLight_Info>(
+                renderSystem, camera, objJ);
+            break;
+        case LightObjectType::SpotLight:
+            go = eastl::make_unique<SpotLight_Info>(
+                renderSystem, camera, objJ);
+            break;
+        }
+        break;
+
+    case GameObjectGroup::Shapes:
+        objType = ObjectType(objGroup, objJ["m_type"]);
+
+        switch (objType.m_asShape)
+        {
+        case ShapeObjectType::Box:
+            //go = EditorObjectFactory::CreateDefaultBoxObject(renderSystem, objJ);
+            go = BoxShapeObject_Info::FromJson(renderSystem, objJ);
+            break;
+        case ShapeObjectType::Plane:
+            //go = EditorObjectFactory::CreateDefaultPlaneObject(renderSystem, objJ);
+            go = PlaneShapeObject_Info::FromJson(renderSystem, objJ);
+            break;
+        case ShapeObjectType::Sphere:
+            //go = EditorObjectFactory::CreateDefaultSphereObject(renderSystem, objJ);
+            go = SphereShapeObject_Info::FromJson(renderSystem, objJ);
+            break;
+        case ShapeObjectType::Geosphere:
+            //go = EditorObjectFactory::CreateDefaultGeosphereObject(renderSystem, objJ);
+            go = GeosphereShapeObject_Info::FromJson(renderSystem, objJ);
+            break;
+        case ShapeObjectType::Cylinder:
+            //go = EditorObjectFactory::CreateDefaultCylinderObject(renderSystem, objJ);
+            go = CylinderShapeObject_Info::FromJson(renderSystem, objJ);
+            break;
+        }
+        break;
+
+    case GameObjectGroup::CustomMesh:
+    {
+        go = EditorObjectFactory::CreateCustomMesh(renderSystem, objJ);
+    }
+    break;
+
+    case GameObjectGroup::Player:
+    {
+        if (scene->m_playerObject == SE::UUID(0u))
+        {
+            go = eastl::make_unique<PlayerObject_Info>(objJ, renderSystem);
+            auto playerObj = static_cast<PlayerObject_Info*>(go.get());
+            playerObj->AssignSceneToCamera(scene.get());
+            scene->m_playerObject = playerObj->m_UUID;
+        }
+        else
+        {
+            printSunshineErrorMessage("Only one PlayerObject can exist in scene");
+        }
+    }
+    break;
+    case GameObjectGroup::ParticleEmitter:
+    {
+        go = EditorObjectFactory::CreateParticleEmitter(
+            renderSystem->m_particleSystem.get(), objJ);
+
+        break;
+    }
+    case GameObjectGroup::Other:
+        break;
+    default:
+        break;
+    }
+
+
+    if (go) {
+        if (objJ.contains("m_name"))
+        {
+            go->m_name = objJ["m_name"].get<std::string>().c_str();
+        }
+
+        if (objJ["components"].contains("Mesh") &&
+            !go->HasComponent<MeshComponent_Info>()) {
+            auto c = go->AddComponent<MeshComponent_Info>();
+            c->FromJson(objJ["components"]["Mesh"],
+                renderSystem->GetDevice(),
+                go->GetComponent<RenderComponent_Info>().get(),
+                go->GetComponent<TransformComponent_Info>().get(),
+                go->m_UUID);
+        }
+
+        if (objJ["components"].contains("Physics")
+            && objJ["m_group"] != GameObjectGroup::Player)
+        {
+            auto c = go->AddComponent<PhysicsComponent_Info>(
+                go->GetComponent<RenderComponent_Info>().get(),
+                go->GetComponent<TransformComponent_Info>().get());
+            c->FromJson(objJ["components"]["Physics"]);
+            //physicsSystem->CreateAndBody(c);
+        }
+
+        if (objJ["components"].contains("Perception")) {
+            auto c = go->AddComponent<PerceptionComponent_Info>();
+            c->FromJson(objJ["components"]["Perception"]);
+        }
+
+        if (objJ["components"].contains("Trigger")) {
+            auto c = go->AddComponent<TriggerComponent_Info>(
+                go->GetComponent<RenderComponent_Info>().get(),
+                go->GetComponent<TransformComponent_Info>().get());
+            c->FromJson(objJ["components"]["Trigger"]);
+        }
+
+        if (objJ["components"].contains("Behavior")) {
+            auto c = go->AddComponent<BehaviorController_Info>();
+            c->FromJson(objJ["components"]["Behavior"]);
+        }
+
+        if (objJ["components"].contains("Lua")) {
+            auto c = go->AddComponent<LuaComponent_Info>();
+            c->FromJson(objJ["components"]["Lua"]);
+        }
+
+        // Parentnes
+        if (objJ.contains("m_parent"))
+        {
+            go->SetParent(ParentNode<GameObject_Info>::FromJson(objJ["m_parent"]));
+        }
+
+    }
+    return go;
+}
+
 eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
     SE_G::DeferredRenderer* renderSystem,
     eastl::shared_ptr<SE_G::Camera> camera,
@@ -776,150 +789,10 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
 
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
-            GameObjectGroup objGroup = objJ["m_group"];
-            ObjectType objType;
-            eastl::unique_ptr<GameObject_Info> go;
-            // objJ;
-            switch (objGroup)
+            eastl::unique_ptr<GameObject_Info> go = JsonToGameObject_Info(
+                scene, renderSystem, camera, objJ);
+            if (go)
             {
-            case GameObjectGroup::Lighting:
-                objType = ObjectType(objGroup, objJ["m_type"]);
-
-                switch (objType.m_asLight)
-                {
-                case LightObjectType::SkyBox:
-                    go = eastl::make_unique<SkyBox_Info>(
-                        renderSystem, camera, objJ);
-                    break;
-                case LightObjectType::AmbientLight:
-                    go = eastl::make_unique<AmbientLight_Info>(
-                        renderSystem, camera, objJ);
-                    break;
-                case LightObjectType::PointLight:
-                    go = eastl::make_unique<PointLight_Info>(
-                        renderSystem, camera, objJ);
-                    break;
-                case LightObjectType::DirectionalLight:
-                    go = eastl::make_unique<DirectionalLight_Info>(
-                        renderSystem, camera, objJ);
-                    break;
-                case LightObjectType::SpotLight:
-                    go = eastl::make_unique<SpotLight_Info>(
-                        renderSystem, camera, objJ);
-                    break;
-                }
-                break;
-
-            case GameObjectGroup::Shapes:
-                objType = ObjectType(objGroup, objJ["m_type"]);
-
-                switch (objType.m_asShape)
-                {
-                case ShapeObjectType::Box:
-                    //go = EditorObjectFactory::CreateDefaultBoxObject(renderSystem, objJ);
-                    go = BoxShapeObject_Info::FromJson(renderSystem, objJ);
-                    break;
-                case ShapeObjectType::Plane:
-                    //go = EditorObjectFactory::CreateDefaultPlaneObject(renderSystem, objJ);
-                    go = PlaneShapeObject_Info::FromJson(renderSystem, objJ);
-                    break;
-                case ShapeObjectType::Sphere:
-                    //go = EditorObjectFactory::CreateDefaultSphereObject(renderSystem, objJ);
-                    go = SphereShapeObject_Info::FromJson(renderSystem, objJ);
-                    break;
-                case ShapeObjectType::Geosphere:
-                    //go = EditorObjectFactory::CreateDefaultGeosphereObject(renderSystem, objJ);
-                    go = GeosphereShapeObject_Info::FromJson(renderSystem, objJ);
-                    break;
-                case ShapeObjectType::Cylinder:
-                    //go = EditorObjectFactory::CreateDefaultCylinderObject(renderSystem, objJ);
-                    go = CylinderShapeObject_Info::FromJson(renderSystem, objJ);
-                    break;
-                }
-                break;
-
-            case GameObjectGroup::CustomMesh:
-            {
-                go = EditorObjectFactory::CreateCustomMesh(renderSystem, objJ);
-            }
-                break;
-
-            case GameObjectGroup::Player:
-            {
-                go = eastl::make_unique<PlayerObject_Info>(objJ, renderSystem);
-                auto playerObj = static_cast<PlayerObject_Info*>(go.get());
-                playerObj->AssignSceneToCamera(scene.get());
-                scene->m_playerObject = playerObj->m_UUID;
-                break;
-            }
-            case GameObjectGroup::ParticleEmitter:
-            {
-                go = EditorObjectFactory::CreateParticleEmitter(
-                    renderSystem->m_particleSystem.get(), objJ);
-                    
-                break;
-            }
-            case GameObjectGroup::Other:
-                break;
-            default:
-                break;
-            }
-
-
-            if (go) {
-                if (objJ.contains("m_name"))
-                {
-                    go->m_name = objJ["m_name"].get<std::string>().c_str();
-                }
-
-                if (objJ["components"].contains("Mesh") &&
-                    !go->HasComponent<MeshComponent_Info>()) {
-                    auto c = go->AddComponent<MeshComponent_Info>();
-                    c->FromJson(objJ["components"]["Mesh"],
-                        renderSystem->GetDevice(),
-                        go->GetComponent<RenderComponent_Info>().get(),
-                        go->GetComponent<TransformComponent_Info>().get(),
-                        go->m_UUID);
-                }
-
-                if (objJ["components"].contains("Physics")
-                    && objJ["m_group"] != GameObjectGroup::Player)
-                {
-                    auto c = go->AddComponent<PhysicsComponent_Info>(
-                        go->GetComponent<RenderComponent_Info>().get(),
-                        go->GetComponent<TransformComponent_Info>().get());
-                    c->FromJson(objJ["components"]["Physics"]);
-                    //physicsSystem->CreateAndBody(c);
-                }
-
-                if (objJ["components"].contains("Perception")) {
-                    auto c = go->AddComponent<PerceptionComponent_Info>();
-                    c->FromJson(objJ["components"]["Perception"]);
-                }
-
-                if (objJ["components"].contains("Trigger")) {
-                    auto c = go->AddComponent<TriggerComponent_Info>(
-                        go->GetComponent<RenderComponent_Info>().get(),
-                        go->GetComponent<TransformComponent_Info>().get());
-                    c->FromJson(objJ["components"]["Trigger"]);
-                }
-
-                if (objJ["components"].contains("Behavior")) {
-                    auto c = go->AddComponent<BehaviorController_Info>();
-                    c->FromJson(objJ["components"]["Behavior"]);
-                }
-
-                if (objJ["components"].contains("Lua")) {
-                    auto c = go->AddComponent<LuaComponent_Info>();
-                    c->FromJson(objJ["components"]["Lua"]);
-                }
-
-                // Parentnes
-                if (objJ.contains("m_parent"))
-                {
-                    go->SetParent(ParentNode<GameObject_Info>::FromJson(objJ["m_parent"]));
-                }
-
                 scene->AddGameObject(eastl::move(go));
             }
         }

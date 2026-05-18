@@ -103,6 +103,10 @@ public:
     eastl::unique_ptr<GameObject_Info> RemoveGameObjectByUUID(SE::UUID uuid);
 
     // Serialization
+    static eastl::unique_ptr<GameObject_Info> JsonToGameObject_Info(
+        eastl::shared_ptr<Scene_Info> scene,
+        SE_G::DeferredRenderer* renderSystem,
+        eastl::shared_ptr<SE_G::Camera> camera, const json& objJ);
     json ToJson() const;
     static eastl::shared_ptr<Scene_Info> FromJson(
         SE_G::DeferredRenderer* renderSystem,
