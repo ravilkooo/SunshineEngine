@@ -40,15 +40,15 @@ namespace SE_G {
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
         else if (meshPath.m_assetRelativePath == L"Sphere") {
-            FillSphereMesh(vertices, indices, meshPath.m_params.param1, meshPath.m_params.param2);
+            FillSphereMesh(vertices, indices, meshPath.m_params.asMesh.param1, meshPath.m_params.asMesh.param2);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
         else if (meshPath.m_assetRelativePath == L"Geosphere") {
-            FillGeosphereMesh(vertices, indices, meshPath.m_params.param1);
+            FillGeosphereMesh(vertices, indices, meshPath.m_params.asMesh.param1);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
         else if (meshPath.m_assetRelativePath == L"Cylinder") {
-            FillCylinderMesh(vertices, indices, meshPath.m_params.param1);
+            FillCylinderMesh(vertices, indices, meshPath.m_params.asMesh.param1);
             m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
         else if (meshPath.m_assetRelativePath == L"ScreenAlignedQuad") {

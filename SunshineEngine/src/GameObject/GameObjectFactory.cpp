@@ -298,7 +298,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	AssetPath texPath;
+	AssetPath texPath(L"");
 	if (j["components"]["Mesh"].contains("Texture"))
 	{
 		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
@@ -395,7 +395,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreatePlaneObject(
 
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	AssetPath texPath;
+	AssetPath texPath(L"");
 	if (j["components"]["Mesh"].contains("Texture"))
 	{
 		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
@@ -432,8 +432,8 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 
 	eastl::shared_ptr<SE_G::Mesh> meshPtr;
 	AssetPath meshPath = AssetPath(L"Sphere");
-	meshPath.m_params.param1 = 10; // shapeData->SliceCount;
-	meshPath.m_params.param2 = 20; // shapeData->StackCount;
+	meshPath.m_params.asMesh.param1 = 10; // shapeData->SliceCount;
+	meshPath.m_params.asMesh.param2 = 20; // shapeData->StackCount;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -487,8 +487,8 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 
 	eastl::shared_ptr<SE_G::Mesh> meshPtr;
 	AssetPath meshPath = AssetPath(L"Sphere");
-	meshPath.m_params.param1 = shapeData->SliceCount;
-	meshPath.m_params.param2 = shapeData->StackCount;
+	meshPath.m_params.asMesh.param1 = shapeData->SliceCount;
+	meshPath.m_params.asMesh.param2 = shapeData->StackCount;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -500,7 +500,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	AssetPath texPath;
+	AssetPath texPath(L"");
 	if (j["components"]["Mesh"].contains("Texture"))
 	{
 		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
@@ -542,7 +542,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 
 	eastl::shared_ptr<SE_G::Mesh> meshPtr;
 	AssetPath meshPath = AssetPath(L"Geosphere");
-	meshPath.m_params.param1 = 1; // shapeData->NumSubdivisions;
+	meshPath.m_params.asMesh.param1 = 1; // shapeData->NumSubdivisions;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -596,7 +596,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 
 	eastl::shared_ptr<SE_G::Mesh> meshPtr;
 	AssetPath meshPath = AssetPath(L"Geosphere");
-	meshPath.m_params.param1 = shapeData->NumSubdivisions;
+	meshPath.m_params.asMesh.param1 = shapeData->NumSubdivisions;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -608,7 +608,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	AssetPath texPath;
+	AssetPath texPath(L"");
 	if (j["components"]["Mesh"].contains("Texture"))
 	{
 		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
@@ -646,7 +646,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
 
 	eastl::shared_ptr<SE_G::Mesh> meshPtr;
 	AssetPath meshPath = AssetPath(L"Cylinder");
-	meshPath.m_params.param1 = 10; // shapeData->SliceCount;
+	meshPath.m_params.asMesh.param1 = 10; // shapeData->SliceCount;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -694,7 +694,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
 
 	eastl::shared_ptr<SE_G::Mesh> meshPtr;
 	AssetPath meshPath = AssetPath(L"Cylinder");
-	meshPath.m_params.param1 = shapeData->SliceCount;
+	meshPath.m_params.asMesh.param1 = shapeData->SliceCount;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -706,7 +706,7 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
 
 	auto mc = obj->AddComponent<MeshComponent>(rc.get(), tc.get(), obj->m_UUID, meshPtr);
 
-	AssetPath texPath;
+	AssetPath texPath(L"");
 	if (j["components"]["Mesh"].contains("Texture"))
 	{
 		texPath.FromJson(j["components"]["Mesh"]["Texture"]);

@@ -3,6 +3,8 @@
 #include <Utils/StringUtils.h>
 #include <EASTL/string.h>
 
+#include <Graphics/Bindable/Bindable.h>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
@@ -18,8 +20,20 @@ public:
 	static eastl::wstring s_projectPath;
 	eastl::wstring m_assetRelativePath;
 	struct AdditionalParams {
-		uint32_t param1 = 1; // slice, numSubdivisions
-		uint32_t param2 = 1; // stack
+		union {
+			struct MeshParams
+			{
+				uint32_t param1 = 1; // slice, numSubdivisions
+				uint32_t param2 = 1; // stack
+			} asMesh;
+			struct ShaderParams
+			{
+				SE_G::Bind::PipelineStage shaderType;
+				UINT numInputElements;
+				D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements;
+			} asShader;
+		};
+
 	} m_params;
 
 	explicit AssetPath(eastl::wstring relativePath = L"", AssetSource assetSource = AssetSource::Engine);

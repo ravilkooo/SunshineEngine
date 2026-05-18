@@ -1,9 +1,10 @@
 #include <Utils/AssetPath.h>
 
 AssetPath::AssetPath(eastl::wstring relativePath, AssetSource assetSource)
-	: m_assetRelativePath(relativePath), m_assetSource(assetSource)
+	: m_assetRelativePath(relativePath), m_assetSource(assetSource), m_params({})
 {
-
+	m_params.asMesh.param1 = 1;
+	m_params.asMesh.param1 = 2;
 }
 
 eastl::wstring AssetPath::s_projectPath = eastl::wstring(L"");

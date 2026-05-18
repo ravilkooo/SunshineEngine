@@ -1,4 +1,6 @@
-#include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/GraphicsResources/VertexShader.h>
+#include <Graphics/GraphicsResources/PixelShader.h>
+#include <Graphics/GraphicsResources/GeometryShader.h>
 
 #include <ResourceManager/ResourceLoader/ShaderLoader.h>
 #include <ResourceManager/MemoryManager/StackMemoryManager.h>
@@ -10,44 +12,85 @@ ShaderLoader::ShaderLoader(ID3D11Device* device) : m_device(device)
 {
 }
 
-// to-do"
 IResource* ShaderLoader::Load(const AssetPath& path, ResourceRegistry* pRegistry,
     StackMemoryManager* pMemMgr)
 {
-    /*
-    void* mem = pMemMgr->Allocate(sizeof(SE_G::Bind::Texture), SunshineResource::ResourceType::SHADER);
+    void* mem = nullptr;
 
-    if (!mem) return nullptr;
+    auto shaderType = static_cast<SE_G::Bind::PipelineStage>(path.m_params.asShader.shaderType);
 
-    SE_G::Bind::Texture* tex = nullptr;
 
-    const auto p0 = path.m_assetRelativePath.find(L"Color:");
-
-    std::filesystem::path fp(path.GetFullPath().c_str());
-
-    //if (path.m_assetRelativePath.substr(0u, 6u) == eastl::wstring(L"Color:"))
-    if (p0 != eastl::wstring::npos)
+    switch (shaderType)
     {
-        //SE_G::Color col = SE_G::Bind::Texture::GetColorFromPath(path.m_assetRelativePath);
-        SE_G::Color col = SE_G::Bind::Texture::GetRGBAColorFromPath(path.m_assetRelativePath);
-        tex = new (mem) SE_G::Bind::Texture(m_device, col, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
-    }
-    else if (FileExistsNoThrow(fp))
+    case SE_G::Bind::PipelineStage::VERTEX_SHADER:
     {
-        tex = new (mem) SE_G::Bind::Texture(m_device, path, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
-    }
-    else
-    {
-        // SE_G::Color col = SE_G::Colors::UnloadedTextureColor;
-        // tex = new (mem) SE_G::Bind::Texture(m_device, col, 0u, SE_G::Bind::PipelineStage::PIXEL_SHADER);
-        pMemMgr->Deallocate(tex, sizeof(SE_G::Bind::Texture));
-        tex = nullptr;
-    }
-    return tex;
-    */
+        mem = pMemMgr->Allocate(sizeof(SE_G::Bind::VertexShader), SunshineResource::ResourceType::SHADER);
+        if (!mem) return nullptr;
+        SE_G::Bind::VertexShader* shader = nullptr;
+        std::filesystem::path fp(path.GetFullPath().c_str());
 
-    SE_G::Bind::Texture* tex = nullptr;
-    return tex;
+        if (FileExistsNoThrow(fp))
+        {
+            shader = new (mem) SE_G::Bind::VertexShader(m_device, path);
+        }
+        else
+        {
+            pMemMgr->Deallocate(shader, sizeof(SE_G::Bind::VertexShader));
+            shader = nullptr;
+        }
+        return shader;
+    }
+
+        break;
+    case SE_G::Bind::PipelineStage::PIXEL_SHADER:
+    {
+        mem = pMemMgr->Allocate(sizeof(SE_G::Bind::PixelShader), SunshineResource::ResourceType::SHADER);
+        if (!mem) return nullptr;
+        SE_G::Bind::PixelShader* shader = nullptr;
+        std::filesystem::path fp(path.GetFullPath().c_str());
+
+        if (FileExistsNoThrow(fp))
+        {
+            shader = new (mem) SE_G::Bind::PixelShader(m_device, path.GetFullPath());
+        }
+        else
+        {
+            pMemMgr->Deallocate(shader, sizeof(SE_G::Bind::PixelShader));
+            shader = nullptr;
+        }
+        return shader;
+    }
+
+        break;
+    case SE_G::Bind::PipelineStage::GEOMETRY_SHADER:
+    {
+        mem = pMemMgr->Allocate(sizeof(SE_G::Bind::GeometryShader), SunshineResource::ResourceType::SHADER);
+        if (!mem) return nullptr;
+        SE_G::Bind::GeometryShader* shader = nullptr;
+        std::filesystem::path fp(path.GetFullPath().c_str());
+
+        if (FileExistsNoThrow(fp))
+        {
+            shader = new (mem) SE_G::Bind::GeometryShader(m_device, path.GetFullPath());
+        }
+        else
+        {
+            pMemMgr->Deallocate(shader, sizeof(SE_G::Bind::GeometryShader));
+            shader = nullptr;
+        }
+        return shader;
+
+    }
+
+
+        break;
+    case SE_G::Bind::PipelineStage::COMPUTE_SHADER:
+        return nullptr;
+        break;
+    default:
+        return nullptr;
+        break;
+    }
 }
 
 SunshineResource::ResourceType ShaderLoader::GetResourceType(

@@ -21,7 +21,7 @@ GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
 
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
 	AssetPath meshPath = AssetPath(L"Geosphere");
-	meshPath.m_params.param1 = m_shapeData->NumSubdivisions;
+	meshPath.m_params.asMesh.param1 = m_shapeData->NumSubdivisions;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -73,7 +73,7 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
 	AssetPath meshPath = AssetPath(L"Geosphere");
-	meshPath.m_params.param1 = obj->m_shapeData->NumSubdivisions;
+	meshPath.m_params.asMesh.param1 = obj->m_shapeData->NumSubdivisions;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -122,7 +122,7 @@ void GeosphereShapeObject_Info::SetNumSubdivisions(SE_G::DeferredRenderer* rende
 
 		eastl::shared_ptr<SE_G::Mesh> newMesh;
 		AssetPath meshPath = AssetPath(L"Geosphere");
-		meshPath.m_params.param1 = m_shapeData->NumSubdivisions;
+		meshPath.m_params.asMesh.param1 = m_shapeData->NumSubdivisions;
 		auto& rm = ResourceManagerFacade::Instance();
 		ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 		SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);

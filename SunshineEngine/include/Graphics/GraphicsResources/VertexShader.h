@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Utils/AssetPath.h>
 
 #include <Graphics/Bindable/Bindable.h>
 #include <d3dcompiler.h>
@@ -15,6 +16,7 @@ namespace SE_G {
         {
         public:
             VertexShader() {};
+            VertexShader(ID3D11Device* device, AssetPath assetPath);
             VertexShader(ID3D11Device* device, eastl::wstring filePath)
                 : VertexShader(device, filePath.c_str()) {};
             VertexShader(ID3D11Device* device, LPCWSTR filePath);

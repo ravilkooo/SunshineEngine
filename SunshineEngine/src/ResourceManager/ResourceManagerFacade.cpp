@@ -11,7 +11,7 @@ void ResourceManagerFacade::Initialize(size_t maxMemorySize)
 ResourceHandle ResourceManagerFacade::LoadByPath(const AssetPath& path)
 {
     auto fullPath = WStringToUtf8(path.GetFullPath());
-    eastl::string guidCodeWord = fullPath + path.m_params.param1 + path.m_params.param2;
+    eastl::string guidCodeWord = fullPath + path.m_params.asMesh.param1 + path.m_params.asMesh.param2;
     ResourceGUID guid = ComputeGUID(guidCodeWord);
 
     // If already present, just bump ref and return
@@ -39,7 +39,7 @@ ResourceHandle ResourceManagerFacade::LoadByPath(const AssetPath& path)
     {
         AssetPath ap = static_cast<SE_G::Bind::Texture*>(res)->m_texturePath;
         fullPath = WStringToUtf8(ap.GetFullPath());
-        eastl::string guidCodeWord = fullPath + ap.m_params.param1 + ap.m_params.param2;
+        eastl::string guidCodeWord = fullPath + ap.m_params.asMesh.param1 + ap.m_params.asMesh.param2;
         guid = ComputeGUID(guidCodeWord);
         /*
         if (m_registry.Contains(guid)) {

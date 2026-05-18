@@ -19,7 +19,7 @@ namespace SE_G {
         m_rasterizer.reset(NULL);
         
         AssetPath meshPath = AssetPath(L"Geosphere");
-        meshPath.m_params.param1 = 1; // m_shapeData->NumSubdivisions;
+        meshPath.m_params.asMesh.param1 = 1; // m_shapeData->NumSubdivisions;
         auto& rm = ResourceManagerFacade::Instance();
         ResourceHandle meshHandle = rm.LoadByPath(meshPath);
         SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);

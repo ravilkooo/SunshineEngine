@@ -21,7 +21,7 @@ CylinderShapeObject_Info::CylinderShapeObject_Info(SE::UUID uuid,
 
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
 	AssetPath meshPath = AssetPath(L"Cylinder");
-	meshPath.m_params.param1 = m_shapeData->SliceCount;
+	meshPath.m_params.asMesh.param1 = m_shapeData->SliceCount;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -73,7 +73,7 @@ eastl::unique_ptr<CylinderShapeObject_Info> CylinderShapeObject_Info::FromJson(
 
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
 	AssetPath meshPath = AssetPath(L"Cylinder");
-	meshPath.m_params.param1 = std::min(obj->m_shapeData->SliceCount, MaxSliceCount);
+	meshPath.m_params.asMesh.param1 = std::min(obj->m_shapeData->SliceCount, MaxSliceCount);
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -123,7 +123,7 @@ void CylinderShapeObject_Info::SetSliceCount(SE_G::DeferredRenderer* renderSyste
 
 		eastl::shared_ptr<SE_G::Mesh> newMesh;
 		AssetPath meshPath = AssetPath(L"Cylinder");
-		meshPath.m_params.param1 = m_shapeData->SliceCount;
+		meshPath.m_params.asMesh.param1 = m_shapeData->SliceCount;
 		auto& rm = ResourceManagerFacade::Instance();
 		ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 		SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);

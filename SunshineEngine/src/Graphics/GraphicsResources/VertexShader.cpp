@@ -4,6 +4,14 @@
 namespace SE_G {
 	namespace Bind
 	{
+		VertexShader::VertexShader(ID3D11Device* device, AssetPath assetPath)
+			: VertexShader(
+				device, assetPath.GetFullPath(),
+				assetPath.m_params.asShader.numInputElements,
+				assetPath.m_params.asShader.IALayoutInputElements)
+		{
+		}
+
 		VertexShader::VertexShader(ID3D11Device* device, LPCWSTR filePath)
 		{
 			Microsoft::WRL::ComPtr<ID3DBlob> errorVertexCode;

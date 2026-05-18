@@ -78,15 +78,6 @@ namespace SE_G {
 		m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
 			device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
 
-		
-		//eastl::string texturePath = "Assets/Textures/UnloadedTextureColor.dds";
-		//// Загружаем и получаем handle
-		//ResourceHandle texHandle = ResourceManagerFacade::Instance().LoadByPath(texturePath);
-		//// Получаем указатель на Texture
-		//SE_G::Bind::Texture* tex = ResourceManagerFacade::Instance().Get<SE_G::Bind::Texture>(texHandle);
-		//// Сохраняем для дальнейшего использования в рендере (в shared_ptr, если требуется)
-		//m_texture = eastl::shared_ptr<SE_G::Bind::Texture>(tex, [](SE_G::Bind::Texture*) {});
-
 		auto ap = AssetPath(
 			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
 			AssetPath::AssetSource::Engine);

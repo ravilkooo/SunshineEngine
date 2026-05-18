@@ -26,8 +26,8 @@ SphereShapeObject_Info::SphereShapeObject_Info(SE::UUID uuid,
 
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
 	AssetPath meshPath = AssetPath(L"Sphere");
-	meshPath.m_params.param1 = m_shapeData->SliceCount;
-	meshPath.m_params.param2 = m_shapeData->StackCount;
+	meshPath.m_params.asMesh.param1 = m_shapeData->SliceCount;
+	meshPath.m_params.asMesh.param2 = m_shapeData->StackCount;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -80,8 +80,8 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
 	AssetPath meshPath = AssetPath(L"Sphere");
-	meshPath.m_params.param1 = obj->m_shapeData->SliceCount;
-	meshPath.m_params.param2 = obj->m_shapeData->StackCount;
+	meshPath.m_params.asMesh.param1 = obj->m_shapeData->SliceCount;
+	meshPath.m_params.asMesh.param2 = obj->m_shapeData->StackCount;
 	auto& rm = ResourceManagerFacade::Instance();
 	ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 	SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -93,7 +93,7 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
 
-	AssetPath texPath;
+	AssetPath texPath(L"");
 	if (j["components"]["Mesh"].contains("Texture"))
 	{
 		texPath.FromJson(j["components"]["Mesh"]["Texture"]);
@@ -134,8 +134,8 @@ void SphereShapeObject_Info::SetSliceCount(SE_G::DeferredRenderer* renderSystem,
 
 		eastl::shared_ptr<SE_G::Mesh> newMesh;
 		AssetPath meshPath = AssetPath(L"Sphere");
-		meshPath.m_params.param1 = m_shapeData->SliceCount;
-		meshPath.m_params.param2 = m_shapeData->StackCount;
+		meshPath.m_params.asMesh.param1 = m_shapeData->SliceCount;
+		meshPath.m_params.asMesh.param2 = m_shapeData->StackCount;
 		auto& rm = ResourceManagerFacade::Instance();
 		ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 		SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
@@ -156,8 +156,8 @@ void SphereShapeObject_Info::SetStackCount(SE_G::DeferredRenderer* renderSystem,
 
 		eastl::shared_ptr<SE_G::Mesh> newMesh;
 		AssetPath meshPath = AssetPath(L"Sphere");
-		meshPath.m_params.param1 = m_shapeData->SliceCount;
-		meshPath.m_params.param2 = m_shapeData->StackCount;
+		meshPath.m_params.asMesh.param1 = m_shapeData->SliceCount;
+		meshPath.m_params.asMesh.param2 = m_shapeData->StackCount;
 		auto& rm = ResourceManagerFacade::Instance();
 		ResourceHandle meshHandle = rm.LoadByPath(meshPath);
 		SE_G::Mesh* meshRes = rm.Get<SE_G::Mesh>(meshHandle);
