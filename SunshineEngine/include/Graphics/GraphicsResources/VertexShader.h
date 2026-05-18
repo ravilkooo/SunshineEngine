@@ -5,13 +5,13 @@
 #include <d3dcompiler.h>
 #include <EASTL/string.h>
 #include <ResourceManager/IResource.h>
+#include <Graphics/GraphicsResources/IShader.h>
 
 namespace SE_G {
     namespace Bind
     {
         class VertexShader :
-            public Bindable
-            , public IResource
+            public Bindable, public IShader
         {
         public:
             VertexShader() {};
@@ -30,6 +30,9 @@ namespace SE_G {
                 UINT numInputElements,
                 D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements);
             ~VertexShader();
+
+            SE_G::Bind::PipelineStage GetPipelineStage() override { return SE_G::Bind::PipelineStage::VERTEX_SHADER; }
+
             void Release();
 
             void Bind(ID3D11DeviceContext* context) noexcept override;

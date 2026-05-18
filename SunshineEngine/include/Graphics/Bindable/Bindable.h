@@ -8,7 +8,7 @@ namespace SE_G
 	namespace Bind
 	{
 		enum class PipelineStage {
-			VERTEX_SHADER, PIXEL_SHADER, COMPUTE_SHADER
+			VERTEX_SHADER, PIXEL_SHADER, GEOMETRY_SHADER, COMPUTE_SHADER
 		};
 
 		class Bindable

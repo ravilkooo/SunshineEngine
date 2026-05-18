@@ -20,8 +20,7 @@ namespace SE_G {
 	namespace Bind
 	{
 		class Texture :
-			public Bindable
-			, public IResource
+			public Bindable, public IResource
 		{
 		public:
 			static SE_G::Color GetColorFromPath(eastl::wstring path);
