@@ -239,9 +239,10 @@ void ImguiEditorPass::Pass()
 		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
 	);
 	m_Gizmo.SetSelectedObject(selectedObj);
-    
 
-	if (IsHoveredGameViewport)
+	bool isEditorMode = (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE);
+
+	if (IsHoveredGameViewport && isEditorMode)
 	{
 		if (!ImGuizmo::IsOver() &&
 			(ImGui::IsMouseClicked(ImGuiMouseButton_Left)
@@ -251,8 +252,8 @@ void ImguiEditorPass::Pass()
 			// ImVec2 WindowPos = ImGui::GetWindowPos();
 
 			m_mouseClickCoords = {
-				(UINT) (mousePosScreen.x - windowPos.x - vMin.x),
-				(UINT) (mousePosScreen.y - windowPos.y - vMin.y)
+				(UINT)(mousePosScreen.x - windowPos.x - vMin.x),
+				(UINT)(mousePosScreen.y - windowPos.y - vMin.y)
 			};
 			/*
 			m_worldEditor->DeprojectScreenToWorld(
@@ -261,24 +262,22 @@ void ImguiEditorPass::Pass()
 			);
 			*/
 
-			if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
-				auto pixelInfo = m_editorApp->m_worldEditor->GetPixelInfo(m_mouseClickCoords.x, m_mouseClickCoords.y);
-				uint64_t uuid = (uint64_t)pixelInfo.hi << 32 | pixelInfo.lo;
-				auto selectedUUID = SE::UUID(uuid);
-				if (selectedUUID != SE::UUID(0u))
-				{
-					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
-					m_clickWorldPos = pixelInfo.worldPos;
-				}
-				else
-				{
-					// Calculate place in front of camera on some distance
-					m_clickWorldPos = DXSM::Vector3::Zero;
-				}
-				m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
-				m_PropertyPanel.s_meshEditor.m_editMesh = false;
-				m_PropertyPanel.s_meshEditor.m_editTexture = false;
+			auto pixelInfo = m_editorApp->m_worldEditor->GetPixelInfo(m_mouseClickCoords.x, m_mouseClickCoords.y);
+			uint64_t uuid = (uint64_t)pixelInfo.hi << 32 | pixelInfo.lo;
+			auto selectedUUID = SE::UUID(uuid);
+			if (selectedUUID != SE::UUID(0u))
+			{
+				m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
+				m_clickWorldPos = pixelInfo.worldPos;
 			}
+			else
+			{
+				// Calculate place in front of camera on some distance
+				m_clickWorldPos = DXSM::Vector3::Zero;
+			}
+			m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+			m_PropertyPanel.s_meshEditor.m_editMesh = false;
+			m_PropertyPanel.s_meshEditor.m_editTexture = false;
 		}
 	}
 
@@ -290,7 +289,7 @@ void ImguiEditorPass::Pass()
 	m_gameViewportJustResized = (contentSize.x != m_lastGameViewportSize.x) || (contentSize.y != m_lastGameViewportSize.y);
 	if (m_gameViewportJustResized && contentSize.x > 0 && contentSize.y > 0)
 	{
-		if (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE) {
+		if (isEditorMode) {
 			m_editorApp->m_worldEditor->OnResize((UINT)contentSize.x, (UINT)contentSize.y);
 		}
 		else {
@@ -299,7 +298,6 @@ void ImguiEditorPass::Pass()
 	}
 	m_lastGameViewportSize = contentSize;
 
-	bool isEditorMode = (m_editorApp->m_runtimeMode == EditorApp::RuntimeMode::WORLD_EDITOR_MODE);
 	
 	if (isEditorMode && selectedObj && m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked != SE::UUID(0u))
 	{
@@ -307,7 +305,7 @@ void ImguiEditorPass::Pass()
 	}
 	RenderGameWorld();
 
-	if (ImGui::BeginPopupContextWindow("viewport_contextmenu"))
+	if (isEditorMode && ImGui::BeginPopupContextWindow("viewport_contextmenu"))
 	{
 		if (ImGui::BeginMenu("Add..."))
 		{
