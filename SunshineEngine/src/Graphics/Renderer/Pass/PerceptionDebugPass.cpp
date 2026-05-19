@@ -102,12 +102,12 @@ namespace SE_G {
 			MakeEngineAssetPath_Wstring(L"Shaders/PerceptionDebugPass/PerceptionPassVS.hlsl").c_str(),
 			numInputElements,
 			IALayoutInputElements);
+		*/
 
 		m_settingsCB = eastl::make_unique<Bind::VertexConstantBuffer<PerceptionSettings>>(
 			device,
 			m_perceptionData,
 			2u);
-		*/
 
 		InitVertexBuffer(device);
 	}
