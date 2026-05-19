@@ -386,6 +386,12 @@ void ImguiEditorPass::Pass()
 					go->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position += DXSM::Vector3(1,0,0);
 					auto uuid = m_editorApp->m_worldEditor->m_scene->AddGameObject(std::move(go));
 					m_editorApp->m_worldEditor->m_scene->m_sceneGraph->Add(uuid);
+
+					selectedUUID = uuid;
+					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
+					m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+					m_PropertyPanel.s_meshEditor.m_editMesh = false;
+					m_PropertyPanel.s_meshEditor.m_editTexture = false;
 				}
 			}
 			if (ImGui::MenuItem("Copy"))
@@ -409,6 +415,12 @@ void ImguiEditorPass::Pass()
 					go->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = m_clickWorldPos;
 					auto uuid = m_editorApp->m_worldEditor->m_scene->AddGameObject(std::move(go));
 					m_editorApp->m_worldEditor->m_scene->m_sceneGraph->Add(uuid);
+
+					selectedUUID = uuid;
+					m_editorApp->m_worldEditor->m_hierarchySelection.SetSingle(selectedUUID);
+					m_editorApp->m_worldEditor->m_selectionPass->m_selectedObjectUUID = selectedUUID;
+					m_PropertyPanel.s_meshEditor.m_editMesh = false;
+					m_PropertyPanel.s_meshEditor.m_editTexture = false;
 				}
 			}
 		}
