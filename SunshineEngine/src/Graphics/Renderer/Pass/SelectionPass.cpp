@@ -112,11 +112,28 @@ namespace SE_G {
 
 		m_selectionBuffer = eastl::make_unique<Bind::GeometryConstantBuffer<float>>(device, 1u);
 
-		m_iconGeometryShader = eastl::make_unique<Bind::GeometryShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl").c_str());
+		// m_iconGeometryShader = eastl::make_unique<Bind::GeometryShader>(device,
+		// 	MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl").c_str());
 
-		m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionMeshShaderPS.hlsl").c_str());
+		// m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
+		// 	MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionMeshShaderPS.hlsl").c_str());
+
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::GEOMETRY_SHADER;
+		ResourceHandle gshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::GeometryShader* gshaderRes = rm.Get<SE_G::Bind::GeometryShader>(gshaderHandle);
+		m_iconGeometryShader = eastl::shared_ptr<SE_G::Bind::GeometryShader>(
+			gshaderRes,
+			[](SE_G::Bind::GeometryShader*) {}
+		);
+
+		shaderPath = AssetPath(L"Shaders/SelectionPass/SelectionMeshShaderPS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
+		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::PixelShader* pshaderRes = rm.Get<SE_G::Bind::PixelShader>(pshaderHandle);
+		m_pixelShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+			pshaderRes,
+			[](SE_G::Bind::PixelShader*) {}
+		);
 
 		m_selectedObjectUUID = SE::UUID(0u);
 	}

@@ -77,8 +77,17 @@ namespace SE_G {
 
 		AddPerFrameBind(m_camGCB.get());
 
-		m_iconGeometryShader = eastl::make_unique<Bind::GeometryShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/IconPass/IconShaderGS.hlsl").c_str());
+		// m_iconGeometryShader = eastl::make_unique<Bind::GeometryShader>(device,
+		// 	MakeEngineAssetPath_Wstring(L"Shaders/IconPass/IconShaderGS.hlsl").c_str());
+
+		shaderPath = AssetPath(L"Shaders/IconPass/IconShaderGS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::GEOMETRY_SHADER;
+		ResourceHandle gshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::GeometryShader* gshaderRes = rm.Get<SE_G::Bind::GeometryShader>(gshaderHandle);
+		m_iconGeometryShader = eastl::shared_ptr<SE_G::Bind::GeometryShader>(
+			gshaderRes,
+			[](SE_G::Bind::GeometryShader*) {}
+		);
 
 		m_iconSprites = eastl::make_unique<Bind::Texture>(
 			device,
@@ -111,8 +120,16 @@ namespace SE_G {
 			0u);
 		AddPerFrameBind(m_spritesheetInfoPCB.get());
 
-		m_iconPixelShader = eastl::make_unique<Bind::PixelShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/IconPass/IconShaderPS.hlsl").c_str());
+		// m_iconPixelShader = eastl::make_unique<Bind::PixelShader>(device,
+		// 	MakeEngineAssetPath_Wstring(L"Shaders/IconPass/IconShaderPS.hlsl").c_str());
+		shaderPath = AssetPath(L"Shaders/IconPass/IconShaderPS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
+		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::PixelShader* pshaderRes = rm.Get<SE_G::Bind::PixelShader>(pshaderHandle);
+		m_iconPixelShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+			pshaderRes,
+			[](SE_G::Bind::PixelShader*) {}
+		);
 	}
 
 	IconPass::~IconPass() {

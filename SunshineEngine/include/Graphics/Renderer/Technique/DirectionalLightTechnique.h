@@ -33,7 +33,7 @@ namespace SE_G {
 
         static bool s_staticDataInitializated;
 
-        static eastl::unique_ptr<Bind::PixelShader> s_noShadowShader;
-        static eastl::unique_ptr<Bind::PixelShader> s_shadowShader;
+        static eastl::shared_ptr<Bind::PixelShader> s_noShadowShader;
+        static eastl::shared_ptr<Bind::PixelShader> s_shadowShader;
     };
 }

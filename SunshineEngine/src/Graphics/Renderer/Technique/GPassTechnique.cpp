@@ -85,8 +85,16 @@ namespace SE_G {
 		// 	device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassShaderVS.hlsl").c_str());
 
 		//m_colored = true;
-		m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-			device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
+		// m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
+		// 	device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
+		shaderPath = AssetPath(L"Shaders/GPass/GPassTextureShaderPS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
+		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::PixelShader* pshaderRes = rm.Get<SE_G::Bind::PixelShader>(pshaderHandle);
+		m_pixelShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+			pshaderRes,
+			[](SE_G::Bind::PixelShader*) {}
+		);
 
 		auto ap = AssetPath(
 			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),

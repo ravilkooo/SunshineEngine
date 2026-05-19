@@ -70,8 +70,17 @@ namespace SE_G {
 		m_GBufferSampler = eastl::make_unique<Bind::Sampler>(device, samplerDesc, 0u);
 		AddPerFrameBind(m_GBufferSampler.get());
 
-		m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/ColliderShaderPS.hlsl").c_str());
+		// m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
+		// 	MakeEngineAssetPath_Wstring(L"Shaders/ColliderPass/ColliderShaderPS.hlsl").c_str());
+		AssetPath shaderPath = AssetPath(L"Shaders/ColliderPass/ColliderShaderPS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::PixelShader* pshaderRes = rm.Get<SE_G::Bind::PixelShader>(pshaderHandle);
+		m_pixelShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+			pshaderRes,
+			[](SE_G::Bind::PixelShader*) {}
+		);
 	}
 
 	ColliderPass::~ColliderPass() {

@@ -66,9 +66,6 @@ namespace SE_G {
 		m_GBufferSampler = eastl::make_unique<Bind::Sampler>(device, samplerDesc, 0u);
 		AddPerFrameBind(m_GBufferSampler.get());
 
-		m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/PerceptionDebugPass/PerceptionPassPS.hlsl").c_str());
-
 		AssetPath shaderPath = AssetPath(L"Shaders/PerceptionDebugPass/PerceptionPassVS.hlsl", AssetPath::AssetSource::Engine);
 		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
 		shaderPath.m_params.asShader.numInputElements = 1;
@@ -82,6 +79,19 @@ namespace SE_G {
 			[](SE_G::Bind::VertexShader*) {}
 		);
 		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
+
+		// m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
+		// 	MakeEngineAssetPath_Wstring(L"Shaders/PerceptionDebugPass/PerceptionPassPS.hlsl").c_str());
+
+		shaderPath = AssetPath(L"Shaders/PerceptionDebugPass/PerceptionPassPS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
+		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::PixelShader* pshaderRes = rm.Get<SE_G::Bind::PixelShader>(pshaderHandle);
+		m_pixelShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+			pshaderRes,
+			[](SE_G::Bind::PixelShader*) {}
+		);
+
 		/*
 		UINT numInputElements = 1;
 		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =

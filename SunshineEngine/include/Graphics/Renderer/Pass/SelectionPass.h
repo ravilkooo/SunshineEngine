@@ -53,11 +53,11 @@ namespace SE_G {
         eastl::shared_ptr<Bind::VertexShader> m_meshVertexShader;
 
         eastl::shared_ptr<Bind::VertexShader> m_iconVertexShader;
-        eastl::unique_ptr<Bind::GeometryShader> m_iconGeometryShader;
+        eastl::shared_ptr<Bind::GeometryShader> m_iconGeometryShader;
         eastl::unique_ptr<Bind::GeometryConstantBuffer<float>> m_selectionBuffer;
         IconPass* m_iconPass;
 
-        eastl::unique_ptr<Bind::PixelShader> m_pixelShader;
+        eastl::shared_ptr<Bind::PixelShader> m_pixelShader;
 
         Scene_Info* m_scene;
 

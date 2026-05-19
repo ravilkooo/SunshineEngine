@@ -9,8 +9,8 @@
 
 namespace SE_G {
     bool DirectionalLightTechnique::s_staticDataInitializated = false;
-    eastl::unique_ptr<Bind::PixelShader> DirectionalLightTechnique::s_noShadowShader;
-    eastl::unique_ptr<Bind::PixelShader> DirectionalLightTechnique::s_shadowShader;
+    eastl::shared_ptr<Bind::PixelShader> DirectionalLightTechnique::s_noShadowShader;
+    eastl::shared_ptr<Bind::PixelShader> DirectionalLightTechnique::s_shadowShader;
 
 
     DirectionalLightTechnique::DirectionalLightTechnique(ID3D11Device* device,
@@ -111,10 +111,29 @@ namespace SE_G {
 
     void DirectionalLightTechnique::InitStaticData(ID3D11Device* device)
     {
-        s_noShadowShader = eastl::make_unique<SE_G::Bind::PixelShader>(
-            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightPS.hlsl").c_str());
-        s_shadowShader = eastl::make_unique<SE_G::Bind::PixelShader>(
-            device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightShadowPS.hlsl").c_str());
+        // s_noShadowShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+        //     device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightPS.hlsl").c_str());
+        // s_shadowShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+        //     device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightShadowPS.hlsl").c_str());
+        AssetPath shaderPath = AssetPath(L"Shaders/LightPass/DirectionalLightPS.hlsl", AssetPath::AssetSource::Engine);
+        shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
+        auto& rm = ResourceManagerFacade::Instance();
+        ResourceHandle pshaderNoShadowHandle = rm.LoadByPath(shaderPath);
+        SE_G::Bind::PixelShader* pshaderNoShadowRes = rm.Get<SE_G::Bind::PixelShader>(pshaderNoShadowHandle);
+        s_noShadowShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+            pshaderNoShadowRes,
+            [](SE_G::Bind::PixelShader*) {}
+        );
+
+        shaderPath = AssetPath(L"Shaders/LightPass/DirectionalLightShadowPS.hlsl", AssetPath::AssetSource::Engine);
+        shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
+        ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
+        SE_G::Bind::PixelShader* pshaderRes = rm.Get<SE_G::Bind::PixelShader>(pshaderHandle);
+        s_shadowShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+            pshaderRes,
+            [](SE_G::Bind::PixelShader*) {}
+        );
+
 
         s_staticDataInitializated = true;
     }
