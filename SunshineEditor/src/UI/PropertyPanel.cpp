@@ -249,15 +249,24 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        DrawVector3Control("Position", transform->m_position, 0.0f);
+        DrawVector3Control("Position", transform->m_position,
+            DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+            DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+            0.0f);
         
         DXSM::Vector3 rotationDeg = transform->m_rotation * (180.0f / DirectX::XM_PI);
-        if (DrawVector3Control("Rotation", rotationDeg, 0.0f))
+        if (DrawVector3Control("Rotation", rotationDeg,
+            DXSM::Vector3(-360.0f, -360.0f, -360.0f),
+            DXSM::Vector3(360.0f, 360.0f, 360.0f),
+            0.0f))
         {
             transform->m_rotation = rotationDeg * (DirectX::XM_PI / 180.0f);
         }
         
-        DrawVector3Control("Scale", transform->m_scaleFactor, 1.0f);
+        DrawVector3Control("Scale", transform->m_scaleFactor,
+            DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+            DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+            1.0f);
 
         DrawVector2Control("UV Multiplier", transform->m_uvMultiplier, 1.0f);
         
@@ -1545,8 +1554,9 @@ bool PropertyPanel::DrawUIntControl(const char* label, uint32_t& value, uint32_t
     return changed;
 }
 
-bool PropertyPanel::DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values, 
-                                      float resetValue, float columnWidth)
+bool PropertyPanel::DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values,
+    DXSM::Vector3 minValues, DXSM::Vector3 maxValues,
+    float resetValue, float columnWidth)
 {
     bool changed = false;
     
@@ -1589,7 +1599,7 @@ bool PropertyPanel::DrawVector3Control(const char* label, DirectX::SimpleMath::V
         
         ImGui::SameLine();
         ImGui::SetNextItemWidth(itemWidth);
-        if (ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f"))
+        if (ImGui::DragFloat("##X", &values.x, 0.1f, minValues.x, maxValues.x, "%.2f", ImGuiSliderFlags_AlwaysClamp))
             changed = true;
         ImGui::SameLine();
         
@@ -1605,7 +1615,7 @@ bool PropertyPanel::DrawVector3Control(const char* label, DirectX::SimpleMath::V
         
         ImGui::SameLine();
         ImGui::SetNextItemWidth(itemWidth);
-        if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f"))
+        if (ImGui::DragFloat("##Y", &values.y, 0.1f, minValues.y, maxValues.y, "%.2f", ImGuiSliderFlags_AlwaysClamp))
             changed = true;
         ImGui::SameLine();
         
@@ -1621,7 +1631,7 @@ bool PropertyPanel::DrawVector3Control(const char* label, DirectX::SimpleMath::V
         
         ImGui::SameLine();
         ImGui::SetNextItemWidth(itemWidth);
-        if (ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f"))
+        if (ImGui::DragFloat("##Z", &values.z, 0.1f, minValues.z, maxValues.z, "%.2f", ImGuiSliderFlags_AlwaysClamp))
             changed = true;
         
         ImGui::SameLine(0, 4);
@@ -1793,15 +1803,24 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
             EditorUI::FontStyles::Pop();
             auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-            DrawVector3Control("Mesh Offset", transform->m_localPosition, 0.0f);
+            DrawVector3Control("Mesh Offset", transform->m_localPosition,
+                DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+                DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+                0.0f);
 
             DXSM::Vector3 localRotDeg = transform->m_localRotation * (180.0f / DirectX::XM_PI);
-            if (DrawVector3Control("Mesh Rotation", localRotDeg, 0.0f))
+            if (DrawVector3Control("Mesh Rotation", localRotDeg,
+                DXSM::Vector3(-360.0f, -360.0f, -360.0f),
+                DXSM::Vector3(360.0f, 360.0f, 360.0f),
+                0.0f))
             {
                 transform->m_localRotation = localRotDeg * (DirectX::XM_PI / 180.0f);
             }
 
-            DrawVector3Control("Mesh Scale", transform->m_localScaleFactor, 1.0f);
+            DrawVector3Control("Mesh Scale", transform->m_localScaleFactor,
+                DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+                DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+                1.0f);
 
             ImGui::TreePop();
         }
@@ -1911,7 +1930,10 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
         }
 
         DXSM::Vector3 EyesOffset = percInfo->EyesOffset;
-        if (DrawVector3Control("Eyes Offset", EyesOffset, 0.0f));
+        if (DrawVector3Control("Eyes Offset", EyesOffset,
+            DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+            DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+            0.0f));
         {
             percInfo->EyesOffset = EyesOffset;
         }
@@ -2018,7 +2040,10 @@ void PropertyPanel::DrawEmitterDetails(
         }
 
 
-        DrawVector3Control("Position", emitterPointBuffer->position, 0.0f);
+        DrawVector3Control("Position", emitterPointBuffer->position,
+            DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+            DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+            0.0f);
 
         ImGui::ColorEdit3("Color start", &emitterPointBuffer->colorStart.x, ImGuiColorEditFlags_Float);
         ImGui::ColorEdit3("Color end", &emitterPointBuffer->colorEnd.x, ImGuiColorEditFlags_Float);
@@ -2094,7 +2119,10 @@ void PropertyPanel::DrawEmitterDetails(
         ImGui::Text("Particle force");
         EditorUI::FontStyles::Pop();
 
-        DrawVector3Control("Force vector", simulateParticlesBuffer->force, 0.0f);
+        DrawVector3Control("Force vector", simulateParticlesBuffer->force,
+            DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+            DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+            0.0f);
 
         ImGui::Separator();
         // Texture
@@ -2358,7 +2386,10 @@ void PropertyPanel::DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> col
         switch (colliderData->GetShapeType())
         {
         case SE::ColliderShapeType::Box:
-            if (DrawVector3Control("Box Size", settings.data.asBox.m_size, 1.0f))
+            if (DrawVector3Control("Box Size", settings.data.asBox.m_size,
+                DXSM::Vector3(0.0001f, 0.0001f, 0.0001f),
+                DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+                1.0f))
                 settingsChanged = true;
             break;
 

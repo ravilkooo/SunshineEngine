@@ -44,6 +44,13 @@ void Scene::ClearScene() {
         if (it == uuidToObjectMap.end())
             continue;
 
+        auto ptr = it->second.get();
+        if (ptr == nullptr)
+        {
+            uuidToObjectMap.extract(it);
+            continue;
+        }
+
         uuidToObjectMap.erase(it);
     }
     gameObjects.clear();

@@ -373,32 +373,32 @@ namespace SE {
                 case ColliderShapeType::Box:
                     if (s.contains("box") && s["box"].contains("size") && s["box"]["size"].is_array()) {
                         auto a = s["box"]["size"];
-                        m_settings.data.asBox.m_size.x = a[0].get<float>();
-                        m_settings.data.asBox.m_size.y = a[1].get<float>();
-                        m_settings.data.asBox.m_size.z = a[2].get<float>();
+                        m_settings.data.asBox.m_size.x = std::max(a[0].get<float>(), 0.0001f);
+                        m_settings.data.asBox.m_size.y = std::max(a[1].get<float>(), 0.0001f);
+                        m_settings.data.asBox.m_size.z = std::max(a[2].get<float>(), 0.0001f);
                     }
                     break;
                 case ColliderShapeType::Sphere:
                     if (s.contains("sphere") && s["sphere"].contains("radius")) {
-                        m_settings.data.asSphere.m_radius = s["sphere"]["radius"].get<float>();
+                        m_settings.data.asSphere.m_radius = std::max(s["sphere"]["radius"].get<float>(), 0.0001f);
                     }
                     break;
                 case ColliderShapeType::Capsule:
                     if (s.contains("capsule")) {
                         if (s["capsule"].contains("height"))
-                            m_settings.data.asCapsule.m_height = s["capsule"]["height"].get<float>();
+                            m_settings.data.asCapsule.m_height = std::max(s["capsule"]["height"].get<float>(), 0.0001f);
                         if (s["capsule"].contains("radius"))
-                            m_settings.data.asCapsule.m_radius = s["capsule"]["radius"].get<float>();
+                            m_settings.data.asCapsule.m_radius = std::max(s["capsule"]["radius"].get<float>(), 0.0001f);
                     }
                     break;
                 case ColliderShapeType::TaperedCapsule:
                     if (s.contains("taperedCapsule")) {
                         if (s["taperedCapsule"].contains("height"))
-                            m_settings.data.asTaperedCapsule.m_height = s["taperedCapsule"]["height"].get<float>();
+                            m_settings.data.asTaperedCapsule.m_height = std::max(s["taperedCapsule"]["height"].get<float>(), 0.0001f);
                         if (s["taperedCapsule"].contains("upperRadius"))
-                            m_settings.data.asTaperedCapsule.m_topRadius = s["taperedCapsule"]["upperRadius"].get<float>();
+                            m_settings.data.asTaperedCapsule.m_topRadius = std::max(s["taperedCapsule"]["upperRadius"].get<float>(), 0.0001f);
                         if (s["taperedCapsule"].contains("lowerRadius"))
-                            m_settings.data.asTaperedCapsule.m_bottomRadius = s["taperedCapsule"]["lowerRadius"].get<float>();
+                            m_settings.data.asTaperedCapsule.m_bottomRadius = std::max(s["taperedCapsule"]["lowerRadius"].get<float>(), 0.0001f);
                     }
                     break;
                 case ColliderShapeType::Mesh:

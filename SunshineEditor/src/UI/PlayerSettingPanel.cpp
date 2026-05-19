@@ -70,7 +70,10 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
         // ImGui::ColorEdit3("Camera Offset",
         // 	&(m_playerObject->m_playerCamera->m_stickParams.offset.x), ImGuiColorEditFlags_Float);
         PropertyPanel::DrawVector3Control("Camera Offset",
-            m_playerObject->m_playerCamera->m_stickParams.offset, 0.0f);
+            m_playerObject->m_playerCamera->m_stickParams.offset,
+            DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+            DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+            0.0f);
 
         //ImGui::ColorEdit3("Camera Rotation",
         //	&(m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll.x), ImGuiColorEditFlags_Float);

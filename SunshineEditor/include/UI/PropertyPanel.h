@@ -66,7 +66,9 @@ public:
 
     void DrawAudioPanel();
 
-    static bool DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+    static bool DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values,
+        DXSM::Vector3 minValues, DXSM::Vector3 maxValues,
+        float resetValue = 0.0f, float columnWidth = 100.0f);
 
     static bool DrawVector2Control(const char* label, DirectX::SimpleMath::Vector2& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 private:
