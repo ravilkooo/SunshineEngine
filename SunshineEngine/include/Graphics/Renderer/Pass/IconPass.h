@@ -43,7 +43,7 @@ namespace SE_G {
         ID3D11RenderTargetView* m_bufferRTVs[2];
         D3D11_VIEWPORT m_viewport;
 
-        eastl::unique_ptr<Bind::VertexShader> m_iconVertexShader;
+        eastl::shared_ptr<Bind::VertexShader> m_iconVertexShader;
         eastl::unique_ptr<Bind::GeometryShader> m_iconGeometryShader;
         eastl::unique_ptr<Bind::PixelShader> m_iconPixelShader;
         eastl::unique_ptr<Bind::Texture> m_iconSprites;

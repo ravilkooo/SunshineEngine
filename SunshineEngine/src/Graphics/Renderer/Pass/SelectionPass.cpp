@@ -33,15 +33,6 @@ namespace SE_G {
 		m_viewport.MinDepth = 0;
 		m_viewport.MaxDepth = 1.0f;
 
-		/*
-		m_screenInfoPCB = new Bind::PixelConstantBuffer<ScreenInfoPCB>(device,
-			{ DXSM::Vector2(
-				static_cast<float>(m_screenWidth),
-				static_cast<float>(m_screenHeight)) },
-			1u);
-		AddPerFrameBind(m_screenInfoPCB);
-		*/
-
 		// Usual sampler for all SRV
 		D3D11_SAMPLER_DESC samplerDesc;
 		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -87,18 +78,37 @@ namespace SE_G {
 		desc.BackFace = stencil_op;
 		device->CreateDepthStencilState(&desc, m_depthStencilReadMask.GetAddressOf());
 
-		m_meshVertexShader = eastl::make_unique<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionMeshShaderVS.hlsl").c_str());
+		// m_meshVertexShader = eastl::make_unique<Bind::VertexShader>(device,
+		//	MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionMeshShaderVS.hlsl").c_str());
+		AssetPath shaderPath = AssetPath(L"Shaders/SelectionPass/SelectionMeshShaderVS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
+		SE_G::Bind::VertexShader::FillStandartInputLayout(shaderPath.m_params.asShader.numInputElements,
+			shaderPath.m_params.asShader.IALayoutInputElements);
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle vshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::VertexShader* vshaderRes = rm.Get<SE_G::Bind::VertexShader>(vshaderHandle);
+		m_meshVertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(
+			vshaderRes,
+			[](SE_G::Bind::VertexShader*) {}
+		);
+		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
 
-		UINT numInputElements = 2;
-		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-		};
-		m_iconVertexShader = eastl::make_unique<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl").c_str(),
-			numInputElements, IALayoutInputElements);
+		shaderPath = AssetPath(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
+		shaderPath.m_params.asShader.numInputElements = 2;
+		shaderPath.m_params.asShader.IALayoutInputElements = new D3D11_INPUT_ELEMENT_DESC[shaderPath.m_params.asShader.numInputElements];
+		shaderPath.m_params.asShader.IALayoutInputElements[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		shaderPath.m_params.asShader.IALayoutInputElements[1] = { "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		// m_iconVertexShader = eastl::make_unique<Bind::VertexShader>(device,
+		// 	MakeEngineAssetPath_Wstring(L"Shaders/SelectionPass/SelectionIconShaderVGS.hlsl").c_str(),
+		// 	numInputElements, IALayoutInputElements);
+		ResourceHandle iconVshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::VertexShader* iconVshaderRes = rm.Get<SE_G::Bind::VertexShader>(iconVshaderHandle);
+		m_iconVertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(
+			vshaderRes,
+			[](SE_G::Bind::VertexShader*) {}
+		);
+		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
 
 		m_selectionBuffer = eastl::make_unique<Bind::GeometryConstantBuffer<float>>(device, 1u);
 

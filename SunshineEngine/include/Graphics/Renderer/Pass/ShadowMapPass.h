@@ -57,9 +57,9 @@ namespace SE_G {
         CascadesData m_cascadesData;
 
         D3D11_VIEWPORT m_smViewport;
-        
+
         eastl::unique_ptr<Bind::Rasterizer> m_shadowMapRasterizer;
-        eastl::unique_ptr<SE_G::Bind::VertexShader> vertexShader;
+        eastl::shared_ptr<SE_G::Bind::VertexShader> vertexShader;
 
         eastl::unique_ptr<SE_G::Bind::VertexConstantBuffer<ShadowTransformData>> m_shadowTransformsConstantBuffer;
 

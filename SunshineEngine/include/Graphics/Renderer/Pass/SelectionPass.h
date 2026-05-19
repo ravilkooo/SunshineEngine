@@ -50,9 +50,9 @@ namespace SE_G {
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilReadMask;
         SE::UUID m_selectedObjectUUID;
 
-        eastl::unique_ptr<Bind::VertexShader> m_meshVertexShader;
+        eastl::shared_ptr<Bind::VertexShader> m_meshVertexShader;
 
-        eastl::unique_ptr<Bind::VertexShader> m_iconVertexShader;
+        eastl::shared_ptr<Bind::VertexShader> m_iconVertexShader;
         eastl::unique_ptr<Bind::GeometryShader> m_iconGeometryShader;
         eastl::unique_ptr<Bind::GeometryConstantBuffer<float>> m_selectionBuffer;
         IconPass* m_iconPass;

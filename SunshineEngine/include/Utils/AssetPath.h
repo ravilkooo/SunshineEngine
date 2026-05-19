@@ -37,6 +37,7 @@ public:
 	} m_params;
 
 	explicit AssetPath(eastl::wstring relativePath = L"", AssetSource assetSource = AssetSource::Engine);
+	~AssetPath();
 
 	eastl::wstring GetFullPath() const;
 

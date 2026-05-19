@@ -69,14 +69,25 @@ namespace SE_G {
 		m_pixelShader = eastl::make_unique<Bind::PixelShader>(device,
 			MakeEngineAssetPath_Wstring(L"Shaders/PerceptionDebugPass/PerceptionPassPS.hlsl").c_str());
 
-		// UINT numInputElements = 2;
+		AssetPath shaderPath = AssetPath(L"Shaders/PerceptionDebugPass/PerceptionPassVS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
+		shaderPath.m_params.asShader.numInputElements = 1;
+		shaderPath.m_params.asShader.IALayoutInputElements = new D3D11_INPUT_ELEMENT_DESC[shaderPath.m_params.asShader.numInputElements];
+		shaderPath.m_params.asShader.IALayoutInputElements[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle iconVshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::VertexShader* iconVshaderRes = rm.Get<SE_G::Bind::VertexShader>(iconVshaderHandle);
+		m_vertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(
+			iconVshaderRes,
+			[](SE_G::Bind::VertexShader*) {}
+		);
+		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
+		/*
 		UINT numInputElements = 1;
 		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
 		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			// { "TEXCOORD", 0, DXGI_FORMAT_R32_UINT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
-
 		m_vertexShader = eastl::make_unique<Bind::VertexShader>(device,
 			MakeEngineAssetPath_Wstring(L"Shaders/PerceptionDebugPass/PerceptionPassVS.hlsl").c_str(),
 			numInputElements,
@@ -86,6 +97,7 @@ namespace SE_G {
 			device,
 			m_perceptionData,
 			2u);
+		*/
 
 		InitVertexBuffer(device);
 	}

@@ -65,7 +65,7 @@ namespace SE_G {
         D3D11_VIEWPORT m_viewport;
         
         eastl::unique_ptr<Bind::DepthStencilState> m_depthStencilState;
-        eastl::unique_ptr<Bind::VertexShader> m_vertexShader;
+        eastl::shared_ptr<Bind::VertexShader> m_vertexShader;
         eastl::unique_ptr<Bind::PixelShader> m_pixelShader;
 
         eastl::unique_ptr<Bind::Sampler> m_GBufferSampler;

@@ -43,16 +43,31 @@ namespace SE_G {
 		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 		m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
 
+		AssetPath shaderPath = AssetPath(L"Shaders/IconPass/IconShaderVS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
+		shaderPath.m_params.asShader.numInputElements = 2;
+		shaderPath.m_params.asShader.IALayoutInputElements = new D3D11_INPUT_ELEMENT_DESC[shaderPath.m_params.asShader.numInputElements];
+		shaderPath.m_params.asShader.IALayoutInputElements[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		shaderPath.m_params.asShader.IALayoutInputElements[1] = { "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle iconVshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::VertexShader* iconVshaderRes = rm.Get<SE_G::Bind::VertexShader>(iconVshaderHandle);
+		m_iconVertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(
+			iconVshaderRes,
+			[](SE_G::Bind::VertexShader*) {}
+		);
+		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
+		/*
 		UINT numInputElements = 2;
 		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
-
 		m_iconVertexShader = eastl::make_unique<Bind::VertexShader>(device,
 			MakeEngineAssetPath_Wstring(L"Shaders/IconPass/IconShaderVS.hlsl").c_str(),
 			numInputElements, IALayoutInputElements);
+		*/
 
 		m_camGCB = eastl::make_unique<Bind::GeometryConstantBuffer<CamGCB>>
 			(

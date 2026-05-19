@@ -50,46 +50,9 @@ namespace SE_G {
 				pVertexShader.GetAddressOf()
 			);
 
-			UINT numInputElements = 4;
-			D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements =
-				(D3D11_INPUT_ELEMENT_DESC*)malloc(numInputElements * sizeof(D3D11_INPUT_ELEMENT_DESC));
-
-			IALayoutInputElements[0] =
-				D3D11_INPUT_ELEMENT_DESC{
-					"POSITION",
-					0,
-					DXGI_FORMAT_R32G32B32_FLOAT,
-					0,
-					0,
-					D3D11_INPUT_PER_VERTEX_DATA,
-					0 };
-			IALayoutInputElements[1] =
-				D3D11_INPUT_ELEMENT_DESC{
-					"COLOR",
-					0,
-					DXGI_FORMAT_R32G32B32A32_FLOAT,
-					0,
-					D3D11_APPEND_ALIGNED_ELEMENT,
-					D3D11_INPUT_PER_VERTEX_DATA,
-					0 };
-			IALayoutInputElements[2] =
-				D3D11_INPUT_ELEMENT_DESC{
-					"TEXCOORD",
-					0,
-					DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT,
-					0,
-					D3D11_APPEND_ALIGNED_ELEMENT,
-					D3D11_INPUT_PER_VERTEX_DATA,
-					0 };
-			IALayoutInputElements[3] =
-				D3D11_INPUT_ELEMENT_DESC{
-					"NORMAL",
-					0,
-					DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT,
-					0,
-					D3D11_APPEND_ALIGNED_ELEMENT,
-					D3D11_INPUT_PER_VERTEX_DATA,
-					0 };
+			UINT numInputElements;
+			D3D11_INPUT_ELEMENT_DESC* IALayoutInputElements = nullptr;
+			FillStandartInputLayout(numInputElements, IALayoutInputElements);
 
 			device->CreateInputLayout(
 				IALayoutInputElements,
@@ -98,7 +61,8 @@ namespace SE_G {
 				pShaderBytecodeBlob->GetBufferSize(),
 				pInputLayout.GetAddressOf());
 
-			free(IALayoutInputElements);
+			// free(IALayoutInputElements);
+			delete[] IALayoutInputElements;
 			errorVertexCode.Reset();
 		}
 
@@ -184,6 +148,49 @@ namespace SE_G {
 		size_t VertexShader::GetSizeInMemory() const
 		{
 			return m_MemorySize;
+		}
+
+		void VertexShader::FillStandartInputLayout(UINT& numInputElements, D3D11_INPUT_ELEMENT_DESC* &IALayoutInputElements)
+		{
+			numInputElements = 4;
+			IALayoutInputElements = new D3D11_INPUT_ELEMENT_DESC[numInputElements];
+
+			IALayoutInputElements[0] =
+				D3D11_INPUT_ELEMENT_DESC{
+					"POSITION",
+					0,
+					DXGI_FORMAT_R32G32B32_FLOAT,
+					0,
+					0,
+					D3D11_INPUT_PER_VERTEX_DATA,
+					0 };
+			IALayoutInputElements[1] =
+				D3D11_INPUT_ELEMENT_DESC{
+					"COLOR",
+					0,
+					DXGI_FORMAT_R32G32B32A32_FLOAT,
+					0,
+					D3D11_APPEND_ALIGNED_ELEMENT,
+					D3D11_INPUT_PER_VERTEX_DATA,
+					0 };
+			IALayoutInputElements[2] =
+				D3D11_INPUT_ELEMENT_DESC{
+					"TEXCOORD",
+					0,
+					DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT,
+					0,
+					D3D11_APPEND_ALIGNED_ELEMENT,
+					D3D11_INPUT_PER_VERTEX_DATA,
+					0 };
+			IALayoutInputElements[3] =
+				D3D11_INPUT_ELEMENT_DESC{
+					"NORMAL",
+					0,
+					DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT,
+					0,
+					D3D11_APPEND_ALIGNED_ELEMENT,
+					D3D11_INPUT_PER_VERTEX_DATA,
+					0 };
 		}
 	}
 }

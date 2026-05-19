@@ -69,10 +69,20 @@ namespace SE_G {
 		//	m_vertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(shader, {});
 		//}
 
-
-
-		m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-			device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassShaderVS.hlsl").c_str());
+		AssetPath shaderPath = AssetPath(L"Shaders/GPass/GPassShaderVS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
+		SE_G::Bind::VertexShader::FillStandartInputLayout(shaderPath.m_params.asShader.numInputElements,
+			shaderPath.m_params.asShader.IALayoutInputElements);
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle vshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::VertexShader* vshaderRes = rm.Get<SE_G::Bind::VertexShader>(vshaderHandle);
+		m_vertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(
+			vshaderRes,
+			[](SE_G::Bind::VertexShader*) {}
+		);
+		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
+		// m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
+		// 	device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassShaderVS.hlsl").c_str());
 
 		//m_colored = true;
 		m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
@@ -94,7 +104,6 @@ namespace SE_G {
 		m_textureSampler = eastl::make_unique<SE_G::Bind::Sampler>(
 			device,
 			SE_G::Bind::SamplerPreset::Wrap);
-			device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str();
 	}
 
 	GPassTechnique::~GPassTechnique()

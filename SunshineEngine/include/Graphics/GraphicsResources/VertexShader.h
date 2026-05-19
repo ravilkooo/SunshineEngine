@@ -45,6 +45,9 @@ namespace SE_G {
             SunshineResource::ResourceType GetType() const override;
             ResourceGUID GetGUID() const override;
             size_t GetSizeInMemory() const override;
+
+            static void FillStandartInputLayout(UINT& numInputElements,
+                D3D11_INPUT_ELEMENT_DESC* &IALayoutInputElements);
         private:
             ResourceGUID m_GUID = 0;
             size_t m_MemorySize = 0;

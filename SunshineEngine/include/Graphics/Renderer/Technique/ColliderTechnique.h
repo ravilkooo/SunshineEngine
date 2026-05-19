@@ -44,19 +44,19 @@ namespace SE_G {
         // every object need constantBuffer for settings
         
         // (radius)
-        static eastl::unique_ptr<Bind::VertexShader> s_sphereShader;
-        
+        static eastl::shared_ptr<Bind::VertexShader> s_sphereShader;
+
         // (xyz-size)
-        static eastl::unique_ptr<Bind::VertexShader> s_boxShader;
+        static eastl::shared_ptr<Bind::VertexShader> s_boxShader;
 
         // (upper, lower radius, height)
-        static eastl::unique_ptr<Bind::VertexShader> s_capsuleShader;
+        static eastl::shared_ptr<Bind::VertexShader> s_capsuleShader;
 
         // (upper, lower radius, height)
-        static eastl::unique_ptr<Bind::VertexShader> s_taperedCapsuleShader;
+        static eastl::shared_ptr<Bind::VertexShader> s_taperedCapsuleShader;
 
         // (at least scaling or full transform buffer, see local transform)
-        static eastl::unique_ptr<Bind::VertexShader> s_customShader;
+        static eastl::shared_ptr<Bind::VertexShader> s_customShader;
 
     };
 

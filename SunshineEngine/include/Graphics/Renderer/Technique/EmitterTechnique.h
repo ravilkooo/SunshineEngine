@@ -78,6 +78,6 @@ namespace SE_G {
 
         static bool s_staticDataInitializated;
         
-        static eastl::unique_ptr<Bind::VertexShader> s_pointEmitterShader;
+        static eastl::shared_ptr<Bind::VertexShader> s_pointEmitterShader;
     };
 }

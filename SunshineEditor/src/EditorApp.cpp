@@ -8,6 +8,7 @@
 #include <ResourceManager/ResourceManagerFacade.h>
 #include <ResourceManager/ResourceLoader/TextureLoader.h>
 #include <ResourceManager/ResourceLoader/MeshLoader.h>
+#include <ResourceManager/ResourceLoader/ShaderLoader.h>
 
 #include <Graphics/GraphicsResources/Texture.h>
 
@@ -48,10 +49,10 @@ void EditorApp::InitEditorApp(UINT winWidth, UINT winHeight)
 	UINT worldEditorWidth = winWidth / 2;
 	UINT worldEditorHeight = winHeight / 2;
 
+	InitResourceLoaders(m_renderingSystem->GetDevice());
 	// Init WorldEditor with all it's passes
 	m_worldEditor = eastl::make_shared<WorldEditor>();
 	m_worldEditor->SetupRendering(m_renderingSystem, worldEditorWidth, worldEditorHeight);
-	InitResourceLoaders(m_renderingSystem->GetDevice());
 
 	// Init lua/sol2 state
 	m_lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::table, sol::lib::math);
@@ -260,6 +261,9 @@ void EditorApp::InitResourceLoaders(ID3D11Device* device)
 	ap = AssetPath(L"Box_repeat");
 	ResourceManagerFacade::Instance().LoadByPath(ap);
 
+	auto shaderLoader = eastl::make_unique<ShaderLoader>(device);
+	ResourceLoaderFactory::RegisterLoader(SunshineResource::ResourceType::SHADER,
+		eastl::move(shaderLoader));
 }
 
 void EditorApp::UpdateGame(float deltaTime)

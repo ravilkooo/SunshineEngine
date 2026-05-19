@@ -7,6 +7,11 @@ AssetPath::AssetPath(eastl::wstring relativePath, AssetSource assetSource)
 	m_params.asMesh.param1 = 2;
 }
 
+AssetPath::~AssetPath()
+{
+	m_assetRelativePath.clear();
+}
+
 eastl::wstring AssetPath::s_projectPath = eastl::wstring(L"");
 
 eastl::wstring AssetPath::GetFullPath() const

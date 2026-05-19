@@ -50,9 +50,20 @@ namespace SE_G {
 		m_smViewport.MinDepth = 0.0f;
 		m_smViewport.MaxDepth = 1.0f;
 
-
-		vertexShader = eastl::make_unique<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/ShadowMapPass/ShadowMapVS.hlsl").c_str());
+		AssetPath shaderPath = AssetPath(L"Shaders/ShadowMapPass/ShadowMapVS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
+		SE_G::Bind::VertexShader::FillStandartInputLayout(shaderPath.m_params.asShader.numInputElements,
+			shaderPath.m_params.asShader.IALayoutInputElements);
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle vshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::VertexShader* vshaderRes = rm.Get<SE_G::Bind::VertexShader>(vshaderHandle);
+		vertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(
+			vshaderRes,
+			[](SE_G::Bind::VertexShader*) {}
+		);
+		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
+		// vertexShader = eastl::make_unique<Bind::VertexShader>(device,
+		// 	MakeEngineAssetPath_Wstring(L"Shaders/ShadowMapPass/ShadowMapVS.hlsl").c_str());
 		//AddPerFrameBind(vertexShader);
 
 		// Buffer for transformation respect to light camera

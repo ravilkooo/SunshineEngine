@@ -7,7 +7,7 @@
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
-	eastl::unique_ptr<Bind::VertexShader> EmitterTechnique::s_pointEmitterShader;
+	eastl::shared_ptr<Bind::VertexShader> EmitterTechnique::s_pointEmitterShader;
 
 	bool EmitterTechnique::s_staticDataInitializated = false;
 
@@ -100,6 +100,20 @@ namespace SE_G {
 
 	void EmitterTechnique::InitStaticData(ID3D11Device* device)
 	{
+		AssetPath shaderPath = AssetPath(L"Shaders/EmitterDebugPass/PointEmitterVS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
+		shaderPath.m_params.asShader.numInputElements = 1;
+		shaderPath.m_params.asShader.IALayoutInputElements = new D3D11_INPUT_ELEMENT_DESC[shaderPath.m_params.asShader.numInputElements];
+		shaderPath.m_params.asShader.IALayoutInputElements[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle iconVshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::VertexShader* iconVshaderRes = rm.Get<SE_G::Bind::VertexShader>(iconVshaderHandle);
+		s_pointEmitterShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(
+			iconVshaderRes,
+			[](SE_G::Bind::VertexShader*) {}
+		);
+		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
+		/*
 		UINT numInputElements = 1;
 		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
 		{
@@ -110,6 +124,7 @@ namespace SE_G {
 			MakeEngineAssetPath_Wstring(L"Shaders/EmitterDebugPass/PointEmitterVS.hlsl").c_str(),
 			numInputElements,
 			IALayoutInputElements);
+		*/
 		s_staticDataInitializated = true;
 	}
 }
