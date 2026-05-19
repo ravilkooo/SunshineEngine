@@ -12,6 +12,7 @@ namespace SE_G {
         class Texture;
         class DepthStencilState;
         class Sampler;
+        class BlendState;
         template<typename> class GeometryConstantBuffer;
         template<typename> class PixelConstantBuffer;
     }
@@ -48,20 +49,20 @@ namespace SE_G {
         eastl::unique_ptr<Bind::Sampler> m_GBufferSampler;
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilWriteMask;
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilReadMask;
+        eastl::unique_ptr<Bind::BlendState> m_blendState;
         SE::UUID m_selectedObjectUUID;
 
         eastl::shared_ptr<Bind::VertexShader> m_meshVertexShader;
-
         eastl::shared_ptr<Bind::VertexShader> m_iconVertexShader;
         eastl::shared_ptr<Bind::GeometryShader> m_iconGeometryShader;
-        eastl::unique_ptr<Bind::GeometryConstantBuffer<float>> m_selectionBuffer;
-        IconPass* m_iconPass;
-
         eastl::shared_ptr<Bind::PixelShader> m_pixelShader;
+        eastl::unique_ptr<Bind::GeometryConstantBuffer<float>> m_selectionBuffer;
+
+        IconPass* m_iconPass;
+		PerceptionDebugPass* m_perceptionPass = nullptr;
 
         Scene_Info* m_scene;
 
-		PerceptionDebugPass* m_perceptionPass = nullptr;
         /*
         struct ScreenInfoPCB {
             DXSM::Vector2 screenSize;

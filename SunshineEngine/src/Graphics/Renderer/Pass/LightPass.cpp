@@ -121,23 +121,6 @@ namespace SE_G {
 	void LightPass::Pass()
 	{
 
-		/*
-		for (const auto& gameObjectUUID : scene.gameObjects) {
-			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
-			if (gameObject->HasComponent<RenderComponent>() &&
-				gameObject->HasComponent<TransformComponent>()) {
-
-				auto renderComponent = gameObject->GetComponent<RenderComponent>();
-
-				if (!renderComponent->HasTechnique(techniqueTag))
-					continue;
-
-				gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
-				renderComponent->PassTechnique(techniqueTag, GetDeviceContext());
-
-			}
-		}
-		*/
 		for (auto& tech : m_techniques) {
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());

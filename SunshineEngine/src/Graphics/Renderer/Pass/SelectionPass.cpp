@@ -8,6 +8,7 @@
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/Bindable/Sampler.h>
+#include <Graphics/Bindable/BlendState.h>
 
 #include <Utils/StringUtils.h>
 
@@ -105,7 +106,7 @@ namespace SE_G {
 		ResourceHandle iconVshaderHandle = rm.LoadByPath(shaderPath);
 		SE_G::Bind::VertexShader* iconVshaderRes = rm.Get<SE_G::Bind::VertexShader>(iconVshaderHandle);
 		m_iconVertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(
-			vshaderRes,
+			iconVshaderRes,
 			[](SE_G::Bind::VertexShader*) {}
 		);
 		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
@@ -136,6 +137,18 @@ namespace SE_G {
 		);
 
 		m_selectedObjectUUID = SE::UUID(0u);
+		
+		D3D11_BLEND_DESC blendDesc = {};
+		blendDesc.RenderTarget[0].BlendEnable = TRUE;
+		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
 	}
 
 	SelectionPass::~SelectionPass()
@@ -159,12 +172,6 @@ namespace SE_G {
 
 			return;
 		}
-
-		/*
-		m_screenInfoPCB->Update(GetDeviceContext(), { DXSM::Vector2(
-			static_cast<float>(m_screenWidth),
-			static_cast<float>(m_screenHeight)) });
-		*/
 
 		BindAllPerFrame();
 
@@ -232,6 +239,7 @@ namespace SE_G {
 				);
 
 				//renderComp_info->techniques["GPass"]->mesh->Draw(context.Get());
+				m_blendState->Bind(context.Get());
 				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
 
 				transformComponent->m_localScaleFactor = actualLocalScaleFactor;
@@ -263,6 +271,7 @@ namespace SE_G {
 				m_selectionBuffer->Bind(context.Get());
 
 				renderComp_info->m_selectionTechnique->BindAll(context.Get());
+				m_blendState->Bind(context.Get());
 				renderComp_info->m_selectionTechnique->DrawTechnique(context.Get());
 
 				transformComponent->m_localScaleFactor = actualLocalScaleFactor;
