@@ -1,6 +1,8 @@
 #include <GameObject/Shapes/GeosphereShapeObject.h>
 #include <Graphics/GraphicsResources/Texture.h>
 
+#include <Serialization/GraphicsSerialization.h>
+
 #include <ResourceManager/ResourceManagerFacade.h>
 
 GeosphereShapeObject_Info::GeosphereShapeObject_Info(SE::UUID uuid,
@@ -84,6 +86,12 @@ eastl::unique_ptr<GeosphereShapeObject_Info> GeosphereShapeObject_Info::FromJson
 	newMesh->m_meshPath = meshRes->m_meshPath;
 
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
+	if (j["components"]["Mesh"].contains("m_cullMode"))
+	{
+		D3D11_CULL_MODE cullMode = D3D11_CULL_BACK;
+		j["components"]["Mesh"].at("m_cullMode").get_to(cullMode);
+		mesh_info->SetCullMode(cullMode);
+	}
 
 	AssetPath texPath;
 	if (j["components"]["Mesh"].contains("Texture"))

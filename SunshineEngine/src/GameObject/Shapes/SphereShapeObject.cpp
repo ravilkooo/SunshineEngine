@@ -3,6 +3,8 @@
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>
 
+#include <Serialization/GraphicsSerialization.h>
+
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Graphics/GraphicsResources/Texture.h>
 
@@ -92,6 +94,12 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 	newMesh->m_meshPath = meshRes->m_meshPath;
 
 	auto mesh_info = obj->AddComponent<MeshComponent_Info>(rc_info.get(), tc_info.get(), obj->m_UUID, newMesh);
+	if (j["components"]["Mesh"].contains("m_cullMode"))
+	{
+		D3D11_CULL_MODE cullMode = D3D11_CULL_BACK;
+		j["components"]["Mesh"].at("m_cullMode").get_to(cullMode);
+		mesh_info->SetCullMode(cullMode);
+	}
 
 	AssetPath texPath(L"");
 	if (j["components"]["Mesh"].contains("Texture"))
