@@ -246,12 +246,13 @@ namespace SE_G {
 
             DXSM::Matrix springArmRot = DXSM::Matrix::CreateFromYawPitchRoll(m_stickParams.pitchYawRoll.y, m_stickParams.pitchYawRoll.x, m_stickParams.pitchYawRoll.z);
 
-            final_position = targetPoistion + DXSM::Vector3::Transform(final_position, springArmRot);
-            
+            final_position = DXSM::Vector3::Transform(final_position, springArmRot);
+
             right = DXSM::Vector3(1.0f, 0.0f, 0.0f); right = DXSM::Vector3::Transform(right, springArmRot);
-            up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
+            up = DXSM::Vector3(0.0f, 1.0f, 0.0f); up = DXSM::Vector3::Transform(up, springArmRot);
             forward = DXSM::Vector3(0.0f, 0.0f, 1.0f); forward = DXSM::Vector3::Transform(forward, springArmRot);
 
+            final_position = targetPoistion + final_position;
             position = final_position;
             
             target = position + forward;
