@@ -240,8 +240,10 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		// Rotation methods
 		"rotateYaw", &SE_G::Camera::RotateYaw,
 		"rotatePitch", &SE_G::Camera::RotatePitch,
+		"rotateStickYawPitch", &SE_G::Camera::RotateStickYawPitch,
 		// Stick Properties
-		"getStickDirection", &SE_G::Camera::GetStickDirection,
+		"getStickRotation", &SE_G::Camera::GetStickRotation,
+		"setStickRotation", &SE_G::Camera::SetStickRotation,
 		"getStickLength", &SE_G::Camera::GetStickLength,
 		"setStickLength", &SE_G::Camera::SetStickLength,
 		// Camera mode

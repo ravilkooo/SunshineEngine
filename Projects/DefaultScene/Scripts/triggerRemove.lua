@@ -35,9 +35,9 @@ function behavior:update(dt)
     local currentTime = os.clock()
     if (currentTime - lastScreamTime > screamCooldown) then
         lastScreamTime = currentTime
-        local audio = getAudioSystem()
-        audio:play("jaguar")
-        print("CATCH ME IF YOU CAN!!!")
+        -- local audio = getAudioSystem()
+        -- audio:play("jaguar")
+        -- print("CATCH ME IF YOU CAN!!!")
     end
 
     return "success"

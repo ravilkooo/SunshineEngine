@@ -45,32 +45,25 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
         ImGui::Text("Stick Params");
         EditorUI::FontStyles::Pop();
 
-        float stickLength = m_playerObject->m_playerCamera->m_stickParams.stickLength;
+        float stickLength = m_playerObject->m_playerCamera->m_stickParams.length;
         if (ImGui::DragFloat("Stick length", &stickLength, 0.1f, 0.1f, 90.0f, "%.1f m"))
         {
-            m_playerObject->m_playerCamera->m_stickParams.stickLength = stickLength;
+            m_playerObject->m_playerCamera->m_stickParams.length = stickLength;
         }
 
-        float stickYaw = m_playerObject->m_playerCamera->m_stickParams.stickYaw;
-        stickYaw *= 360.0f / DirectX::XM_2PI;
-        if (ImGui::DragFloat("Stick yaw", &stickYaw, 0.1f, -90.0f, 90.0f, "%.1f"))
+        DXSM::Vector3 rotationDeg = m_playerObject->m_playerCamera->m_stickParams.pitchYawRoll * (180.0f / DirectX::XM_PI);
+        if (PropertyPanel::DrawVector3Control("Stick Rotation", rotationDeg,
+            DXSM::Vector3(-90.0f, -80.0f, -360.0f),
+            DXSM::Vector3(90.0f, 80.0f, 360.0f),
+            0.0f))
         {
-            m_playerObject->m_playerCamera->m_stickParams.stickYaw =
-                DirectX::XM_2PI / 360.0f * stickYaw;
-        }
-
-        float stickPitch = m_playerObject->m_playerCamera->m_stickParams.stickPitch;
-        stickPitch *= 360.0f / DirectX::XM_2PI;
-        if (ImGui::DragFloat("Stick pitch", &stickPitch, 0.1f, -80.0f, 80.0f, "%.1f"))
-        {
-            m_playerObject->m_playerCamera->m_stickParams.stickPitch =
-                DirectX::XM_2PI / 360.0f * stickPitch;
+            m_playerObject->m_playerCamera->m_stickParams.pitchYawRoll = rotationDeg * (DirectX::XM_PI / 180.0f);
         }
 
         // ImGui::ColorEdit3("Camera Offset",
         // 	&(m_playerObject->m_playerCamera->m_stickParams.offset.x), ImGuiColorEditFlags_Float);
-        PropertyPanel::DrawVector3Control("Camera Offset",
-            m_playerObject->m_playerCamera->m_stickParams.offset,
+        PropertyPanel::DrawVector3Control("Spring Arm Offset",
+            m_playerObject->m_playerCamera->m_stickParams.rootOffset,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             0.0f);

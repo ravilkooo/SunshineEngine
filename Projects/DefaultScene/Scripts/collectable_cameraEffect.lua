@@ -82,8 +82,8 @@ function behavior:update(dt)
                 startScale.x, startScale.y, startScale.z
             )
             setGlobalGravity(Vector3.new(0,-9.8,0))
-            local audio = getAudioSystem()
-            audio:stop("drumloop")
+            -- local audio = getAudioSystem()
+            -- audio:stop("drumloop")
         end
     end
 

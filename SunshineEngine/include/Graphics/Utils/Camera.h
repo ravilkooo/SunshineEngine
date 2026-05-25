@@ -31,7 +31,7 @@ namespace SE_G {
 
         enum class CAMERA_MODE
         {
-            FPS, ORBITAL, FOLLOW
+            FPS, FOLLOW
         };
 
         Camera(ID3D11Device* device);
@@ -76,9 +76,6 @@ namespace SE_G {
 
         void Update(float deltaTime);
         void Update(const DXSM::Vector3 targetPoistion);
-        void Update(const DXSM::Matrix targetTransform);
-        void Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction);
-        void Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen);
 
         DX::XMMATRIX GetViewMatrix();
         DX::XMMATRIX GetProjectionMatrix() const;
@@ -101,9 +98,11 @@ namespace SE_G {
         void SetFollowPlayer(SE::UUID playerUUID);
         void InitFollowModeParams();
 
+        /*
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget);
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis);
         void SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis, float referenceLen);
+        */
 
         void SwitchProjection();
         bool IsPerspectiveCamera();
@@ -126,6 +125,20 @@ namespace SE_G {
 
         FrustumCorners GetFrustumCorners();
 
+
+        // view options
+        // spring arm options
+        struct FollowSpringArmParams
+        {
+            float length = 10.0f;
+            DXSM::Vector3 pitchYawRoll = DXSM::Vector3::Zero;
+            DXSM::Vector3 rootOffset = DXSM::Vector3::Zero;
+        } m_stickParams;
+        // camera options
+        DXSM::Vector3 cameraOffset = DXSM::Vector3::Zero;
+        DXSM::Vector3 cameraRotation = DXSM::Vector3::Zero;
+
+        // auxiliary values (based on view params)
         DXSM::Vector3 position;
         DXSM::Vector3 followDirection;
         DXSM::Vector3 target;
@@ -133,26 +146,14 @@ namespace SE_G {
         DXSM::Vector3 forward;
         DXSM::Vector3 right;
 
-        DXSM::Matrix rotateCamToForward;
+        DXSM::Vector3 GetStickRotation();
+        void SetStickRotation(DXSM::Vector3 newRotation);
 
-        struct FollowStickParams
-        {
-            float stickLength = 10.0f;
-
-            float stickYaw = 0.0f;
-            float stickPitch = 0.0f;
-
-            DXSM::Vector3 viewPitchYawRoll = DXSM::Vector3::Zero;
-
-            DXSM::Vector3 offset = DXSM::Vector3::Zero;
-        } m_stickParams;
-        DXSM::Vector3 stickDirection;
-        
-        DXSM::Vector3 GetStickDirection();
-        float GetStickLength() { return m_stickParams.stickLength; };
-        void SetStickLength(float newLen) { m_stickParams.stickLength = fmin(fmax(0.0f, newLen), 100.0f); };
+        float GetStickLength() { return m_stickParams.length; };
+        void SetStickLength(float newLen) { m_stickParams.length = fmin(fmax(0.0f, newLen), 1000.0f); };
 
         void RotateStickYawPitch(float yawSpeed, float pitchSpeed);
+        void RollStick(float rollSpeed);
 
         float m_deltaTime = 1.0f;
     private:
@@ -161,33 +162,21 @@ namespace SE_G {
         void SetViewWidth(float viewWidth);
         void SetViewHeight(float viewHeight);
 
+        // projection options
         bool isPerspective = true;
-
         float fov;
         float aspectRatio;
         float nearZ;
         float farZ;
-
         float orthZ;
-
         float referenceLen;
 
         // for Orthographic projection
         float viewWidth;
         float viewHeight;
 
-
+        // camera mode
         CAMERA_MODE cameraMode = CAMERA_MODE::FPS;
-
-        // for ORBITAL camera mode
-        DXSM::Vector3 orbitalTarget;
-        float minOrbitalDistance;
-        float orbitalDistance;
-        float orbitalYaw;
-        float orbitalPitch;
-        float orbitalAngleSpeed;
-        //float orbitalAngleSpeed;
-        DXSM::Vector3 spinAxis;
 
         // for FOLLOW camera mode
         float followPitch;
@@ -200,12 +189,6 @@ namespace SE_G {
             Scene_Info* asInfo;
         } m_scene;
 
-        /*
-        union {
-            PlayerObject* asObject;
-            PlayerObject_Info* asInfo;
-        } m_player;
-        */
         TransformComponent* m_playerTransform = nullptr;
         bool m_playerPointerInited = false;
 

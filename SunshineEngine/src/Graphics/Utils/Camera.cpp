@@ -14,10 +14,7 @@ namespace SE_G {
         : position(0.0f, 0.0f, -5.0f), target(0.0f, 0.0f, 1.0f), up(0.0f, 1.0f, 0.0f),
         aspectRatio(aspectRatio), nearZ(0.1f), farZ(1000.0f),
         orthZ(10.0f), isPerspective(true),
-        cameraMode(CAMERA_MODE::FPS), orbitalTarget(0.0f, 0.0f, 0.0f),
-        orbitalDistance(5.0f), minOrbitalDistance(5.0f),
-        orbitalPitch(0.0f), orbitalYaw(0.0f),
-        spinAxis(0.0f, 1.0f, 0.0f), orbitalAngleSpeed(0.0f)
+        cameraMode(CAMERA_MODE::FPS)
     {
         //SetUpCameraViewByAspectRatio(aspectRatio);
         //fov = 2.0f * atan(aspectRatio * 0.5625f); 
@@ -245,116 +242,19 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
-            stickDirection = DXSM::Vector3(
-                cosf(m_stickParams.stickPitch) * sinf(m_stickParams.stickYaw),
-                sinf(m_stickParams.stickPitch),
-                cosf(m_stickParams.stickPitch) * cosf(m_stickParams.stickYaw));
-            
-            DXSM::Vector3 _camPos = -m_stickParams.stickLength * stickDirection;
-            
-            position = targetPoistion + _camPos;
+            DXSM::Vector3 final_position = m_stickParams.rootOffset + DXSM::Vector3{ 0,0,-m_stickParams.length };
 
-            right = DXSM::Vector3(sinf(m_stickParams.stickYaw + DX::XM_PIDIV2), 0.0f, cosf(m_stickParams.stickYaw + DX::XM_PIDIV2));
+            DXSM::Matrix springArmRot = DXSM::Matrix::CreateFromYawPitchRoll(m_stickParams.pitchYawRoll.y, m_stickParams.pitchYawRoll.x, m_stickParams.pitchYawRoll.z);
+
+            final_position = targetPoistion + DXSM::Vector3::Transform(final_position, springArmRot);
+            
+            right = DXSM::Vector3(1.0f, 0.0f, 0.0f); right = DXSM::Vector3::Transform(right, springArmRot);
             up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
-            forward = DXSM::Vector3(sinf(m_stickParams.stickYaw), 0.0f, cosf(m_stickParams.stickYaw));
+            forward = DXSM::Vector3(0.0f, 0.0f, 1.0f); forward = DXSM::Vector3::Transform(forward, springArmRot);
+
+            position = final_position;
             
-            /*
-            rotateCamToForward = DXSM::Matrix::CreateFromYawPitchRoll(
-                -m_stickParams.stickYaw,
-                -m_stickParams.stickPitch,
-                0.0f);
-
-            _up = DXSM::Vector3::Transform(_up, rotateCamToForward);
-            _forward = DXSM::Vector3::Transform(_forward, rotateCamToForward);
-            _right = DXSM::Vector3::Transform(_right, rotateCamToForward);
-            */
-
-            position = position
-                + right * m_stickParams.offset.x
-                + up * m_stickParams.offset.y
-                + forward * m_stickParams.offset.z;
-            
-            target = position - _camPos;
-
-            /*
-            DXSM::Vector3 stickVector(
-                -1.0f * sinf(m_stickParams.stickYaw) * cosf(m_stickParams.stickPitch),
-                1.0f * sinf(m_stickParams.stickPitch),
-                -1.0f * cosf(m_stickParams.stickYaw) * cosf(m_stickParams.stickPitch)
-            );
-
-            stickVector *= m_stickParams.stickLength;
-
-            position = targetPoistion + stickVector + m_stickParams.offset;
-
-            DXSM::Vector3 _forward(0.0f, 0.0f, 1.0f);
-            DXSM::Vector3 _up(0.0f, 1.0f, 0.0f);
-            DXSM::Vector3 _right(1.0f, 0.0f, 0.0f);
-            rotateCamToForward = DXSM::Matrix::CreateFromYawPitchRoll(
-                m_stickParams.viewPitchYawRoll.y,
-                -m_stickParams.viewPitchYawRoll.x,
-                -m_stickParams.viewPitchYawRoll.z);
-            up = DXSM::Vector3::Transform(_up, rotateCamToForward);
-            forward = DXSM::Vector3::Transform(_forward, rotateCamToForward);
-            right = DXSM::Vector3::Transform(_right, rotateCamToForward);
-
-            target = position + _forward;
-            */
-        }
-    }
-
-    void Camera::Update(const DXSM::Matrix targetTransform)
-    {
-        if (cameraMode == CAMERA_MODE::ORBITAL)
-        {
-            //orbitalYaw += orbitalAngleSpeed * deltaTime;
-
-            position.x = orbitalDistance * cosf(orbitalPitch) * cosf(orbitalYaw);
-            position.y = orbitalDistance * sinf(orbitalPitch);
-            position.z = orbitalDistance * cosf(orbitalPitch) * sinf(orbitalYaw);
-
-            position = DXSM::Vector3::Transform(position, targetTransform);
-
-            orbitalTarget = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
-            target = orbitalTarget;
-
-            up = DXSM::Vector3::Transform(spinAxis, targetTransform) - orbitalTarget;
-        }
-        else if (cameraMode == CAMERA_MODE::FOLLOW)
-        {
-            //orbitalYaw += orbitalAngleSpeed * deltaTime;
-
-            target = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
-
-            float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
-            position = target - cam2targetDist * (this->followDirection + sinf(followPitch) * up);
-        }
-    }
-
-    void Camera::Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction)
-    {
-        if (cameraMode == CAMERA_MODE::FOLLOW)
-        {
-            //orbitalYaw += orbitalAngleSpeed * deltaTime;
-
-            target = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
-
-            float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
-            position = target - cam2targetDist * (direction + sinf(followPitch) * up);
-        }
-    }
-
-    void Camera::Update(const DXSM::Matrix targetTransform, DXSM::Vector3 direction, float referenceLen)
-    {
-        this->referenceLen = referenceLen;
-        if (cameraMode == CAMERA_MODE::FOLLOW)
-        {
-            //orbitalYaw += orbitalAngleSpeed * deltaTime;
-
-            target = DXSM::Vector3::Transform(DXSM::Vector3::Zero, targetTransform);
-
-            float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
-            position = target - cam2targetDist * (direction + sinf(followPitch) * up);
+            target = position + forward;
         }
     }
 
@@ -373,22 +273,16 @@ namespace SE_G {
 
     void Camera::MoveForward(float speed)
     {
-        if (cameraMode == CAMERA_MODE::ORBITAL)
-        {
-            orbitalDistance = eastl::max(orbitalDistance - speed * m_deltaTime, referenceLen);
-        }
-        else
-        {
-            //DX::XMVECTOR forward = XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position));
-            DXSM::Vector3 forward = target - position;
-            forward.Normalize();
-            position.x += speed * m_deltaTime * forward.x;
-            position.y += speed * m_deltaTime * forward.y;
-            position.z += speed * m_deltaTime * forward.z;
-            target.x += speed * m_deltaTime * forward.x;
-            target.y += speed * m_deltaTime * forward.y;
-            target.z += speed * m_deltaTime * forward.z;
-        }
+
+        //DX::XMVECTOR forward = XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position));
+        DXSM::Vector3 forward = target - position;
+        forward.Normalize();
+        position.x += speed * m_deltaTime * forward.x;
+        position.y += speed * m_deltaTime * forward.y;
+        position.z += speed * m_deltaTime * forward.z;
+        target.x += speed * m_deltaTime * forward.x;
+        target.y += speed * m_deltaTime * forward.y;
+        target.z += speed * m_deltaTime * forward.z;
         if (!isPerspective)
         {
             // orthZ = eastl::max(orthZ + speed * m_deltaTime, nearZ * 1.1f);
@@ -402,27 +296,21 @@ namespace SE_G {
 
     void Camera::MoveLeft(float speed)
     {
-        if (cameraMode == CAMERA_MODE::ORBITAL)
-        {
-            orbitalYaw -= speed * m_deltaTime;
-        }
-        else
-        {
-            /*
-            DX::XMVECTOR right = XMVector3Cross(
-                XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position)),
-                MLoadFloat3(&up)
-            );
-            */
-            DXSM::Vector3 right = (target - position).Cross(up);
-            right.Normalize();
-            position.x += speed * m_deltaTime * right.x;
-            position.y += speed * m_deltaTime * right.y;
-            position.z += speed * m_deltaTime * right.z;
-            target.x += speed * m_deltaTime * right.x;
-            target.y += speed * m_deltaTime * right.y;
-            target.z += speed * m_deltaTime * right.z;
-        }
+
+        /*
+        DX::XMVECTOR right = XMVector3Cross(
+            XMVectorSubtract(XMLoadFloat3(&target), XMLoadFloat3(&position)),
+            MLoadFloat3(&up)
+        );
+        */
+        DXSM::Vector3 right = (target - position).Cross(up);
+        right.Normalize();
+        position.x += speed * m_deltaTime * right.x;
+        position.y += speed * m_deltaTime * right.y;
+        position.z += speed * m_deltaTime * right.z;
+        target.x += speed * m_deltaTime * right.x;
+        target.y += speed * m_deltaTime * right.y;
+        target.z += speed * m_deltaTime * right.z;
     }
 
     void Camera::MoveRight(float speed)
@@ -432,15 +320,9 @@ namespace SE_G {
 
     void Camera::MoveUp(float speed)
     {
-        if (cameraMode == CAMERA_MODE::ORBITAL)
-        {
-            orbitalPitch += speed * m_deltaTime;
-        }
-        else
-        {
-            position.y += speed * m_deltaTime;
-            target.y += speed * m_deltaTime;
-        }
+
+        position.y += speed * m_deltaTime;
+        target.y += speed * m_deltaTime;
     }
 
     void Camera::MoveDown(float speed)
@@ -450,25 +332,14 @@ namespace SE_G {
 
     void Camera::RotateYaw(float angle)
     {
-        if (cameraMode == CAMERA_MODE::ORBITAL)
-        {
-            orbitalYaw += angle * m_deltaTime;
-        }
-        else
-        {
-            DXSM::Vector3 look_dir = DXSM::Vector3::Transform(target - position,
-                DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(up, angle * m_deltaTime)));
-            target = position + look_dir;
-        }
+        DXSM::Vector3 look_dir = DXSM::Vector3::Transform(target - position,
+            DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(up, angle * m_deltaTime)));
+        target = position + look_dir;
     }
 
     void Camera::RotatePitch(float angle)
     {
-        if (cameraMode == CAMERA_MODE::ORBITAL)
-        {
-            orbitalPitch += angle * m_deltaTime;
-        }
-        else if (cameraMode == CAMERA_MODE::FOLLOW)
+        if (cameraMode == CAMERA_MODE::FOLLOW)
         {
             followPitch = eastl::min(eastl::max(-DX::XM_PIDIV2 * 0.9f, followPitch + angle * m_deltaTime), 0.0f);
             float cam2targetDist = 2.0f * referenceLen / tanf(fov * 0.5);
@@ -513,14 +384,10 @@ namespace SE_G {
     {
         cameraMode = CAMERA_MODE::FOLLOW;
 
-        m_stickParams.stickLength = 10.0f;
-        m_stickParams.stickPitch = DX::XM_PI * 0.166f;
-        m_stickParams.stickYaw = 0.0f;
+        m_stickParams.length = 10.0f;
+        m_stickParams.pitchYawRoll = DXSM::Vector3( DX::XM_PI * 0.166f, 0.0f, 0.0f );
 
-        //m_stickParams.viewPitchYawRoll = { -DX::XM_PI * 0.166f, 0.0f, 0.0f };
-        m_stickParams.viewPitchYawRoll = { 0.0f, 0.0f, 0.0f };
-
-        m_stickParams.offset = DXSM::Vector3::Zero;
+        m_stickParams.rootOffset = DXSM::Vector3::Zero;
         /*
         followPitch = -DX::XM_PI * 0.166f;
         this->referenceLen = referenceLen;
@@ -528,50 +395,12 @@ namespace SE_G {
         */
     }
 
-    void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget)
-    {
-        SwitchToOrbitalMode(orbitalTarget, DXSM::Vector3(0.0f, 1.0f, 0.0f), 1.0f);
-    }
-
-    void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis)
-    {
-        SwitchToOrbitalMode(orbitalTarget, spinAxis, 1.0f);
-    }
-    
-    void Camera::SwitchToOrbitalMode(DXSM::Vector3 orbitalTarget, DXSM::Vector3 spinAxis, float referenceLen)
-    {
-        this->referenceLen = referenceLen;
-        cameraMode = CAMERA_MODE::ORBITAL;
-        orbitalAngleSpeed = 0.0f;
-        orbitalDistance = 2.0f * referenceLen / tanf(fov * 0.5);
-        minOrbitalDistance = orbitalDistance;
-        orthZ = 2.0f * referenceLen / tanf(fov * 0.5);
-        orbitalYaw = 0.0f;
-        orbitalPitch = DX::XM_PIDIV4;
-        this->orbitalTarget = orbitalTarget;
-        target = orbitalTarget;
-        this->spinAxis = spinAxis;
-        up = spinAxis;
-        //orbitalDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(XMLoadFloat3(&position), XMLoadFloat3(&target))));
-    }
-
     void Camera::SwitchProjection() {
         isPerspective = !isPerspective;
-        if (cameraMode == CAMERA_MODE::ORBITAL)
+        if (cameraMode == CAMERA_MODE::FPS)
         {
             if (isPerspective)
-                orbitalDistance = orthZ;
-            else
-            {
-                orthZ = orbitalDistance;
-                SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
-                SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
-            }
-        }
-        else if (cameraMode == CAMERA_MODE::FPS)
-        {
-            if (isPerspective)
-                orbitalDistance = orthZ;
+                ;
             else
             {
                 orthZ = (position - target).Length();
@@ -650,28 +479,40 @@ namespace SE_G {
         float deltaYaw = yawSpeed * m_deltaTime;
         float deltaPitch = pitchSpeed * m_deltaTime;
 
-        float _stickYaw = m_stickParams.stickYaw + deltaYaw;
-        float _stickPitch = m_stickParams.stickPitch + deltaPitch;
+        float _stickYaw = m_stickParams.pitchYawRoll.y + deltaYaw;
+        _stickYaw = _stickYaw > DX::XM_PI ? (_stickYaw - DX::XM_2PI) : _stickYaw;
+        _stickYaw = _stickYaw < -DX::XM_PI ? (_stickYaw + DX::XM_2PI) : _stickYaw;
 
+        float _stickPitch = m_stickParams.pitchYawRoll.x + deltaPitch;
         _stickPitch = fmax(-80.0f * DX::XM_PIDIV2 / 90.0f, fmin(_stickPitch, 80.0f * DX::XM_PIDIV2 / 90.0f));
         //deltaPitch = _stickPitch - m_stickParams.stickPitch;
 
-        m_stickParams.stickPitch = _stickPitch;
-        //m_stickParams.viewPitchYawRoll.x -= deltaPitch;
+        m_stickParams.pitchYawRoll.x = _stickPitch;
 
         //deltaYaw = _stickYaw - m_stickParams.stickYaw;
-        m_stickParams.stickYaw = _stickYaw;
-        //m_stickParams.viewPitchYawRoll.y += deltaYaw;
-
-        // _stickYaw = _stickYaw > DX::XM_PI ? (_stickYaw - DX::XM_2PI) : _stickYaw;
-        // _stickYaw = _stickYaw < -DX::XM_PI ? (_stickYaw + DX::XM_2PI) : _stickYaw;
-
-        
+        m_stickParams.pitchYawRoll.y = _stickYaw;
     }
 
-    DXSM::Vector3 Camera::GetStickDirection()
+    void Camera::RollStick(float rollSpeed)
     {
-        return stickDirection;
+        float deltaRoll = rollSpeed * m_deltaTime;
+
+        float _stickRoll = m_stickParams.pitchYawRoll.z + deltaRoll;
+
+        _stickRoll = _stickRoll > DX::XM_PI ? (_stickRoll - DX::XM_2PI) : _stickRoll;
+        _stickRoll = _stickRoll < -DX::XM_PI ? (_stickRoll + DX::XM_2PI) : _stickRoll;
+
+        m_stickParams.pitchYawRoll.z = _stickRoll;
+    }
+
+    DXSM::Vector3 Camera::GetStickRotation()
+    {
+        return m_stickParams.pitchYawRoll;
+    }
+
+    void Camera::SetStickRotation(DXSM::Vector3 newRotation)
+    {
+        m_stickParams.pitchYawRoll = newRotation;
     }
 
     bool Camera::IsPerspectiveCamera()
