@@ -1,0 +1,62 @@
+{
+    "gameObjects": [
+        {
+            "components": {
+                "Render": {
+                    "techniques": [
+                        {
+                            "Tag": "LightPass"
+                        },
+                        {
+                            "Tag": "IconPass"
+                        }
+                    ]
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 17826629471134943277,
+            "m_group": "Lighting",
+            "m_lightData": {
+                "Power": 0.0,
+                "Tint": {
+                    "x": 1.0,
+                    "y": 1.0,
+                    "z": 1.0
+                }
+            },
+            "m_name": "SkyBox",
+            "m_type": "SkyBox"
+        }
+    ]
+}

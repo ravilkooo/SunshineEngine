@@ -216,9 +216,11 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		// Target methods
 		"setTarget", &SE_G::Camera::SetTarget,
 		"getTarget", &SE_G::Camera::GetTarget,
-		// Up vector methods
+		// Up/right/forward vector methods
 		"setUp", &SE_G::Camera::SetUp,
 		"getUp", &SE_G::Camera::GetUp,
+		"getRight", &SE_G::Camera::GetRight,
+		"getForward", &SE_G::Camera::GetForward,
 		// Near/Far Z methods
 		"setNearZ", &SE_G::Camera::SetNearZ,
 		"getNearZ", &SE_G::Camera::GetNearZ,
@@ -238,14 +240,21 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"moveUp", &SE_G::Camera::MoveUp,
 		"moveDown", &SE_G::Camera::MoveDown,
 		// Rotation methods
-		"rotateYaw", &SE_G::Camera::RotateYaw,
-		"rotatePitch", &SE_G::Camera::RotatePitch,
-		"rotateStickYawPitch", &SE_G::Camera::RotateStickYawPitch,
-		// Stick Properties
-		"getStickRotation", &SE_G::Camera::GetStickRotation,
-		"setStickRotation", &SE_G::Camera::SetStickRotation,
-		"getStickLength", &SE_G::Camera::GetStickLength,
-		"setStickLength", &SE_G::Camera::SetStickLength,
+		"rotateSpringArmYaw", &SE_G::Camera::RotateSpringArmYaw,
+		"rotateSpringArmPitch", &SE_G::Camera::RotateSpringArmPitch,
+		"rollSpringArm", &SE_G::Camera::RollSpringArm,
+		"rotateSpringArmYawPitch", &SE_G::Camera::RotateSpringArmYawPitch,
+		"rotateSpringArm", &SE_G::Camera::RotateSpringArm,
+		// Camera Properties
+		"getCameraRotation", &SE_G::Camera::GetCameraRotation,
+		"setCameraRotation", &SE_G::Camera::SetCameraRotation,
+		// SpringArm Properties
+		"getSpringArmRotation", &SE_G::Camera::GetSpringArmRotation,
+		"setSpringArmRotation", &SE_G::Camera::SetSpringArmRotation,
+		"getSpringArmRootOffset", &SE_G::Camera::GetSpringArmRootOffset,
+		"setSpringArmRootOffset", &SE_G::Camera::SetSpringArmRootOffset,
+		"getSpringArmLength", &SE_G::Camera::GetSpringArmLength,
+		"setSpringArmLength", &SE_G::Camera::SetSpringArmLength,
 		// Camera mode
 		"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode
 		/*

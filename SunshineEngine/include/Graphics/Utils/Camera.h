@@ -50,6 +50,8 @@ namespace SE_G {
 
         void SetUp(DXSM::Vector3 up);
         DXSM::Vector3 GetUp();
+        DXSM::Vector3 GetRight();
+        DXSM::Vector3 GetForward();
 
         void SetNearZ(float nearZ);
         float GetNearZ();
@@ -75,7 +77,7 @@ namespace SE_G {
         float GetReferenceLen();
 
         void Update(float deltaTime);
-        void Update(const DXSM::Vector3 targetPoistion);
+        void UpdateTargetPoistion(const DXSM::Vector3 targetPoistion);
 
         DX::XMMATRIX GetViewMatrix();
         DX::XMMATRIX GetProjectionMatrix() const;
@@ -145,14 +147,29 @@ namespace SE_G {
         DXSM::Vector3 forward;
         DXSM::Vector3 right;
 
-        DXSM::Vector3 GetStickRotation();
-        void SetStickRotation(DXSM::Vector3 newRotation);
+        DXSM::Vector3 GetSpringArmRootOffset();
+        void SetSpringArmRootOffset(DXSM::Vector3 newRootOffset);
 
-        float GetStickLength() { return m_springArmParams.length; };
-        void SetStickLength(float newLen) { m_springArmParams.length = fmin(fmax(0.0f, newLen), 1000.0f); };
+        DXSM::Vector3 GetSpringArmRotation();
+        void SetSpringArmRotation(DXSM::Vector3 newRotation);
 
-        void RotateStickYawPitch(float yawSpeed, float pitchSpeed);
-        void RollStick(float rollSpeed);
+        float GetSpringArmLength() { return m_springArmParams.length; };
+        void SetSpringArmLength(float newLen) { m_springArmParams.length = fmin(fmax(0.0f, newLen), 1000.0f); };
+
+        void RotateSpringArmYaw(float yawSpeed);
+        void RotateSpringArmPitch(float pitchSpeed);
+        void RollSpringArm(float rollSpeed);
+        void RotateSpringArmYawPitch(float yawSpeed, float pitchSpeed);
+        void RotateSpringArm(float yawSpeed, float pitchSpeed, float rollSpeed);
+
+        DXSM::Vector3 GetCameraRotation();
+        void SetCameraRotation(DXSM::Vector3 newRotation);
+
+        void RotateCameraYaw(float yawSpeed);
+        void RotateCameraPitch(float pitchSpeed);
+        void RollCamera(float rollSpeed);
+        void RotateCameraYawPitch(float yawSpeed, float pitchSpeed);
+        void RotateCamera(float yawSpeed, float pitchSpeed, float rollSpeed);
 
         float m_deltaTime = 1.0f;
     private:

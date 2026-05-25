@@ -32,7 +32,7 @@ function behavior:start()
 
     playerObj = getPlayerObject()
     camera = playerObj:getCamera()
-    baseStickLength = camera:getStickLength()
+    baseStickLength = camera:getSpringArmLength()
     stcikLenMaxDelta = math.min(stcikLenMaxDelta, baseStickLength * 0.95)
     
     playerUUID = playerObj:getUUID()
@@ -72,7 +72,7 @@ function behavior:update(dt)
 
             self.owner:getTransform().m_position = newPos
 
-            camera:setStickLength(baseStickLength + stcikLenMaxDelta * math.sin(stcikLenFreq * currentTime))
+            camera:setSpringArmLength(baseStickLength + stcikLenMaxDelta * math.sin(stcikLenFreq * currentTime))
         else
             collected = false
             self.owner:getTransform().m_position = Vector3.new(

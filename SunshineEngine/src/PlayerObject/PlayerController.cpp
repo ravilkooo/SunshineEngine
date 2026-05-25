@@ -53,7 +53,7 @@ void PlayerController::HandleMouseMove(const InputDevice::MouseMoveEventArgs& ar
 		m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
 		m_stickPitchMoveDir = -args.Offset.y * m_stickYawPitchSpeed;
 		
-		m_player->m_playerCamera->RotateStickYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
+		m_player->m_playerCamera->RotateSpringArmYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
 	}
 	m_player->m_luaActionMapping.ExecuteMouseMoveAction(args);
 }
