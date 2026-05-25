@@ -9,18 +9,26 @@ void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camer
 {
 	if (j.contains("camera"))
 	{
-		if (j["camera"].contains("length")) {
-			m_playerCamera->m_stickParams.length = j["camera"]["length"].get<float>();
+		if (j["camera"].contains("m_springArmParams"))
+		{
+			if (j["camera"]["m_springArmParams"].contains("length")) {
+				m_playerCamera->m_springArmParams.length = j["camera"]["m_springArmParams"]["length"].get<float>();
+			}
+			if (j["camera"]["m_springArmParams"].contains("pitchYawRoll") && j["camera"]["m_springArmParams"]["pitchYawRoll"].is_array() && j["camera"]["m_springArmParams"]["pitchYawRoll"].size() >= 3) {
+				m_playerCamera->m_springArmParams.pitchYawRoll.x = j["camera"]["m_springArmParams"]["pitchYawRoll"][0].get<float>();
+				m_playerCamera->m_springArmParams.pitchYawRoll.y = j["camera"]["m_springArmParams"]["pitchYawRoll"][1].get<float>();
+				m_playerCamera->m_springArmParams.pitchYawRoll.z = j["camera"]["m_springArmParams"]["pitchYawRoll"][2].get<float>();
+			}
+			if (j["camera"]["m_springArmParams"].contains("rootOffset") && j["camera"]["m_springArmParams"]["rootOffset"].is_array() && j["camera"]["m_springArmParams"]["rootOffset"].size() >= 3) {
+				m_playerCamera->m_springArmParams.rootOffset.x = j["camera"]["m_springArmParams"]["rootOffset"][0].get<float>();
+				m_playerCamera->m_springArmParams.rootOffset.y = j["camera"]["m_springArmParams"]["rootOffset"][1].get<float>();
+				m_playerCamera->m_springArmParams.rootOffset.z = j["camera"]["m_springArmParams"]["rootOffset"][2].get<float>();
+			}
 		}
-		if (j["camera"].contains("pitchYawRoll") && j["camera"]["pitchYawRoll"].is_array() && j["camera"]["pitchYawRoll"].size() >= 3) {
-			m_playerCamera->m_stickParams.pitchYawRoll.x = j["camera"]["pitchYawRoll"][0].get<float>();
-			m_playerCamera->m_stickParams.pitchYawRoll.y = j["camera"]["pitchYawRoll"][1].get<float>();
-			m_playerCamera->m_stickParams.pitchYawRoll.z = j["camera"]["pitchYawRoll"][2].get<float>();
-		}
-		if (j["camera"].contains("rootOffset") && j["camera"]["rootOffset"].is_array() && j["camera"]["rootOffset"].size() >= 3) {
-			m_playerCamera->m_stickParams.rootOffset.x = j["camera"]["rootOffset"][0].get<float>();
-			m_playerCamera->m_stickParams.rootOffset.y = j["camera"]["rootOffset"][1].get<float>();
-			m_playerCamera->m_stickParams.rootOffset.z = j["camera"]["rootOffset"][2].get<float>();
+		if (j["camera"].contains("cameraPitchYawRoll") && j["camera"]["cameraPitchYawRoll"].is_array() && j["camera"]["cameraPitchYawRoll"].size() >= 3) {
+			m_playerCamera->cameraPitchYawRoll.x = j["camera"]["cameraPitchYawRoll"][0].get<float>();
+			m_playerCamera->cameraPitchYawRoll.y = j["camera"]["cameraPitchYawRoll"][1].get<float>();
+			m_playerCamera->cameraPitchYawRoll.z = j["camera"]["cameraPitchYawRoll"][2].get<float>();
 		}
 	}
 
@@ -51,16 +59,23 @@ json PlayerObject_Info::SettingsToJson() const
 	json j;
 
 	j["camera"] = json::object();
-	j["camera"]["length"] = m_playerCamera->m_stickParams.length;
-	j["camera"]["pitchYawRoll"] = {
-		m_playerCamera->m_stickParams.pitchYawRoll.x,
-		m_playerCamera->m_stickParams.pitchYawRoll.y,
-		m_playerCamera->m_stickParams.pitchYawRoll.z
+	j["camera"]["cameraPitchYawRoll"] = {
+		m_playerCamera->cameraPitchYawRoll.x,
+		m_playerCamera->cameraPitchYawRoll.y,
+		m_playerCamera->cameraPitchYawRoll.z
 	};
-	j["camera"]["rootOffset"] = {
-		m_playerCamera->m_stickParams.rootOffset.x,
-		m_playerCamera->m_stickParams.rootOffset.y,
-		m_playerCamera->m_stickParams.rootOffset.z
+
+	j["camera"]["m_springArmParams"] = json::object();
+	j["camera"]["m_springArmParams"]["length"] = m_playerCamera->m_springArmParams.length;
+	j["camera"]["m_springArmParams"]["pitchYawRoll"] = {
+		m_playerCamera->m_springArmParams.pitchYawRoll.x,
+		m_playerCamera->m_springArmParams.pitchYawRoll.y,
+		m_playerCamera->m_springArmParams.pitchYawRoll.z
+	};
+	j["camera"]["m_springArmParams"]["rootOffset"] = {
+		m_playerCamera->m_springArmParams.rootOffset.x,
+		m_playerCamera->m_springArmParams.rootOffset.y,
+		m_playerCamera->m_springArmParams.rootOffset.z
 	};
 
 	// Serialize Lua script path
@@ -86,18 +101,26 @@ void PlayerObject_Info::SettingsFromJson(const json& j, SE_G::DeferredRenderer* 
 
 	if (j.contains("camera"))
 	{
-		if (j["camera"].contains("length")) {
-			m_playerCamera->m_stickParams.length = j["camera"]["length"].get<float>();
+		if (j["camera"].contains("m_springArmParams"))
+		{
+			if (j["camera"]["m_springArmParams"].contains("length")) {
+				m_playerCamera->m_springArmParams.length = j["camera"]["m_springArmParams"]["length"].get<float>();
+			}
+			if (j["camera"]["m_springArmParams"].contains("pitchYawRoll") && j["camera"]["m_springArmParams"]["pitchYawRoll"].is_array() && j["camera"]["m_springArmParams"]["pitchYawRoll"].size() >= 3) {
+				m_playerCamera->m_springArmParams.pitchYawRoll.x = j["camera"]["m_springArmParams"]["pitchYawRoll"][0].get<float>();
+				m_playerCamera->m_springArmParams.pitchYawRoll.y = j["camera"]["m_springArmParams"]["pitchYawRoll"][1].get<float>();
+				m_playerCamera->m_springArmParams.pitchYawRoll.z = j["camera"]["m_springArmParams"]["pitchYawRoll"][2].get<float>();
+			}
+			if (j["camera"]["m_springArmParams"].contains("rootOffset") && j["camera"]["m_springArmParams"]["rootOffset"].is_array() && j["camera"]["m_springArmParams"]["rootOffset"].size() >= 3) {
+				m_playerCamera->m_springArmParams.rootOffset.x = j["camera"]["m_springArmParams"]["rootOffset"][0].get<float>();
+				m_playerCamera->m_springArmParams.rootOffset.y = j["camera"]["m_springArmParams"]["rootOffset"][1].get<float>();
+				m_playerCamera->m_springArmParams.rootOffset.z = j["camera"]["m_springArmParams"]["rootOffset"][2].get<float>();
+			}
 		}
-		if (j["camera"].contains("pitchYawRoll") && j["camera"]["pitchYawRoll"].is_array() && j["camera"]["pitchYawRoll"].size() >= 3) {
-			m_playerCamera->m_stickParams.pitchYawRoll.x = j["camera"]["pitchYawRoll"][0].get<float>();
-			m_playerCamera->m_stickParams.pitchYawRoll.y = j["camera"]["pitchYawRoll"][1].get<float>();
-			m_playerCamera->m_stickParams.pitchYawRoll.z = j["camera"]["pitchYawRoll"][2].get<float>();
-		}
-		if (j["camera"].contains("rootOffset") && j["camera"]["rootOffset"].is_array() && j["camera"]["rootOffset"].size() >= 3) {
-			m_playerCamera->m_stickParams.rootOffset.x = j["camera"]["rootOffset"][0].get<float>();
-			m_playerCamera->m_stickParams.rootOffset.y = j["camera"]["rootOffset"][1].get<float>();
-			m_playerCamera->m_stickParams.rootOffset.z = j["camera"]["rootOffset"][2].get<float>();
+		if (j["camera"].contains("cameraPitchYawRoll") && j["camera"]["cameraPitchYawRoll"].is_array() && j["camera"]["cameraPitchYawRoll"].size() >= 3) {
+			m_playerCamera->cameraPitchYawRoll.x = j["camera"]["cameraPitchYawRoll"][0].get<float>();
+			m_playerCamera->cameraPitchYawRoll.y = j["camera"]["cameraPitchYawRoll"][1].get<float>();
+			m_playerCamera->cameraPitchYawRoll.z = j["camera"]["cameraPitchYawRoll"][2].get<float>();
 		}
 	}
 

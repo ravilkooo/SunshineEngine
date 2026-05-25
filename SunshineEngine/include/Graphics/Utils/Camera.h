@@ -133,10 +133,9 @@ namespace SE_G {
             float length = 10.0f;
             DXSM::Vector3 pitchYawRoll = DXSM::Vector3::Zero;
             DXSM::Vector3 rootOffset = DXSM::Vector3::Zero;
-        } m_stickParams;
+        } m_springArmParams;
         // camera options
-        DXSM::Vector3 cameraOffset = DXSM::Vector3::Zero;
-        DXSM::Vector3 cameraRotation = DXSM::Vector3::Zero;
+        DXSM::Vector3 cameraPitchYawRoll = DXSM::Vector3::Zero;
 
         // auxiliary values (based on view params)
         DXSM::Vector3 position;
@@ -149,8 +148,8 @@ namespace SE_G {
         DXSM::Vector3 GetStickRotation();
         void SetStickRotation(DXSM::Vector3 newRotation);
 
-        float GetStickLength() { return m_stickParams.length; };
-        void SetStickLength(float newLen) { m_stickParams.length = fmin(fmax(0.0f, newLen), 1000.0f); };
+        float GetStickLength() { return m_springArmParams.length; };
+        void SetStickLength(float newLen) { m_springArmParams.length = fmin(fmax(0.0f, newLen), 1000.0f); };
 
         void RotateStickYawPitch(float yawSpeed, float pitchSpeed);
         void RollStick(float rollSpeed);

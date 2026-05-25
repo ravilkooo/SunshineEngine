@@ -31,8 +31,8 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
         ImGuiTreeNodeFlags_Framed |
         ImGuiTreeNodeFlags_SpanAvailWidth;
-    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
-    if (ImGui::TreeNodeEx("Camera Settings", flags))
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
+    if (ImGui::TreeNodeEx("Camera Component", flags))
     {
         EditorUI::FontStyles::Pop();
 
@@ -41,43 +41,43 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
 
         ImGui::Image((ImTextureID)m_playerObject->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
 
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
-        ImGui::Text("Stick Params");
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Spring Arm Params");
         EditorUI::FontStyles::Pop();
 
-        float stickLength = m_playerObject->m_playerCamera->m_stickParams.length;
-        if (ImGui::DragFloat("Stick length", &stickLength, 0.1f, 0.1f, 90.0f, "%.1f m"))
+        float stickLength = m_playerObject->m_playerCamera->m_springArmParams.length;
+        if (ImGui::DragFloat("Length", &stickLength, 0.1f, 0.1f, 90.0f, "%.1f m"))
         {
-            m_playerObject->m_playerCamera->m_stickParams.length = stickLength;
+            m_playerObject->m_playerCamera->m_springArmParams.length = stickLength;
         }
 
-        DXSM::Vector3 rotationDeg = m_playerObject->m_playerCamera->m_stickParams.pitchYawRoll * (180.0f / DirectX::XM_PI);
-        if (PropertyPanel::DrawVector3Control("Stick Rotation", rotationDeg,
+        DXSM::Vector3 springArmRotationDeg = m_playerObject->m_playerCamera->m_springArmParams.pitchYawRoll * (180.0f / DirectX::XM_PI);
+        if (PropertyPanel::DrawVector3Control("Rotation", springArmRotationDeg,
             DXSM::Vector3(-90.0f, -80.0f, -360.0f),
             DXSM::Vector3(90.0f, 80.0f, 360.0f),
             0.0f))
         {
-            m_playerObject->m_playerCamera->m_stickParams.pitchYawRoll = rotationDeg * (DirectX::XM_PI / 180.0f);
+            m_playerObject->m_playerCamera->m_springArmParams.pitchYawRoll = springArmRotationDeg * (DirectX::XM_PI / 180.0f);
         }
 
-        // ImGui::ColorEdit3("Camera Offset",
-        // 	&(m_playerObject->m_playerCamera->m_stickParams.offset.x), ImGuiColorEditFlags_Float);
-        PropertyPanel::DrawVector3Control("Spring Arm Offset",
-            m_playerObject->m_playerCamera->m_stickParams.rootOffset,
+        PropertyPanel::DrawVector3Control("Offset",
+            m_playerObject->m_playerCamera->m_springArmParams.rootOffset,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             0.0f);
 
-        //ImGui::ColorEdit3("Camera Rotation",
-        //	&(m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll.x), ImGuiColorEditFlags_Float);
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Camera Params");
+        EditorUI::FontStyles::Pop();
 
-        /*
-        DXSM::Vector3 viewPitchYawRoll = m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll * (180.0f / DirectX::XM_PI);
-        if (PropertyPanel::DrawVector3Control("Camera Rotation", viewPitchYawRoll, 0.0f))
+        DXSM::Vector3 cameraRotationDeg = m_playerObject->m_playerCamera->cameraPitchYawRoll * (180.0f / DirectX::XM_PI);
+        if (PropertyPanel::DrawVector3Control("Rotation", cameraRotationDeg,
+            DXSM::Vector3(-90.0f, -80.0f, -360.0f),
+            DXSM::Vector3(90.0f, 80.0f, 360.0f),
+            0.0f))
         {
-            m_playerObject->m_playerCamera->m_stickParams.viewPitchYawRoll = viewPitchYawRoll * (DirectX::XM_PI / 180.0f);
+            m_playerObject->m_playerCamera->cameraPitchYawRoll = cameraRotationDeg * (DirectX::XM_PI / 180.0f);
         }
-        */
 
         ImGui::TreePop();
     }
@@ -97,7 +97,7 @@ void PlayerSettingPanel::DrawPlayerControllerDetails()
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
         ImGuiTreeNodeFlags_Framed |
         ImGuiTreeNodeFlags_SpanAvailWidth;
-    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
 
     if (ImGui::TreeNodeEx("Controller Settings", flags))
     {
@@ -110,7 +110,7 @@ void PlayerSettingPanel::DrawPlayerControllerDetails()
         }
 
         // ===== LUA SCRIPT SELECTION =====
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Lua Script");
         EditorUI::FontStyles::Pop();
 
@@ -169,7 +169,7 @@ void PlayerSettingPanel::DrawPlayerControllerDetails()
         ImGui::Spacing();
 
         // ===== MOUSE ACTIONS CONFIGURATION =====
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Mouse Actions");
         EditorUI::FontStyles::Pop();
 
@@ -247,7 +247,7 @@ void PlayerSettingPanel::DrawPlayerControllerDetails()
         ImGui::Spacing();
 
         // ===== KEY-FUNCTION PAIR MANAGEMENT =====
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Key Bindings");
         EditorUI::FontStyles::Pop();
 

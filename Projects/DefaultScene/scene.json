@@ -1413,17 +1413,24 @@
             "m_parent": null,
             "settings": {
                 "camera": {
-                    "length": 6.0,
-                    "pitchYawRoll": [
-                        0.8883723020553589,
-                        -0.4380776584148407,
-                        0.0
-                    ],
-                    "rootOffset": [
-                        -1.899999976158142,
+                    "cameraPitchYawRoll": [
+                        0.0,
                         0.0,
                         0.0
-                    ]
+                    ],
+                    "m_springArmParams": {
+                        "length": 10.0,
+                        "pitchYawRoll": [
+                            0.521504282951355,
+                            -0.4904375374317169,
+                            0.0
+                        ],
+                        "rootOffset": [
+                            -4.0,
+                            2.0,
+                            -0.800000011920929
+                        ]
+                    }
                 },
                 "fixedCamera": true,
                 "keyFunctionMappings": [

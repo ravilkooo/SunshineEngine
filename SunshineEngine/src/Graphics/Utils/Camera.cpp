@@ -242,15 +242,21 @@ namespace SE_G {
     {
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
-            DXSM::Vector3 final_position = m_stickParams.rootOffset + DXSM::Vector3{ 0,0,-m_stickParams.length };
+            DXSM::Matrix cameraRot = DXSM::Matrix::CreateFromYawPitchRoll(cameraPitchYawRoll.y, cameraPitchYawRoll.x, cameraPitchYawRoll.z);
 
-            DXSM::Matrix springArmRot = DXSM::Matrix::CreateFromYawPitchRoll(m_stickParams.pitchYawRoll.y, m_stickParams.pitchYawRoll.x, m_stickParams.pitchYawRoll.z);
+            right = DXSM::Vector3(1.0f, 0.0f, 0.0f); right = DXSM::Vector3::Transform(right, cameraRot);
+            up = DXSM::Vector3(0.0f, 1.0f, 0.0f); up = DXSM::Vector3::Transform(up, cameraRot);
+            forward = DXSM::Vector3(0.0f, 0.0f, 1.0f); forward = DXSM::Vector3::Transform(forward, cameraRot);
+
+            DXSM::Vector3 final_position = m_springArmParams.rootOffset + DXSM::Vector3{ 0,0,-m_springArmParams.length };
+
+            DXSM::Matrix springArmRot = DXSM::Matrix::CreateFromYawPitchRoll(m_springArmParams.pitchYawRoll.y, m_springArmParams.pitchYawRoll.x, m_springArmParams.pitchYawRoll.z);
 
             final_position = DXSM::Vector3::Transform(final_position, springArmRot);
 
-            right = DXSM::Vector3(1.0f, 0.0f, 0.0f); right = DXSM::Vector3::Transform(right, springArmRot);
-            up = DXSM::Vector3(0.0f, 1.0f, 0.0f); up = DXSM::Vector3::Transform(up, springArmRot);
-            forward = DXSM::Vector3(0.0f, 0.0f, 1.0f); forward = DXSM::Vector3::Transform(forward, springArmRot);
+            right = DXSM::Vector3::Transform(right, springArmRot);
+            up = DXSM::Vector3::Transform(up, springArmRot);
+            forward = DXSM::Vector3::Transform(forward, springArmRot);
 
             final_position = targetPoistion + final_position;
             position = final_position;
@@ -385,10 +391,10 @@ namespace SE_G {
     {
         cameraMode = CAMERA_MODE::FOLLOW;
 
-        m_stickParams.length = 10.0f;
-        m_stickParams.pitchYawRoll = DXSM::Vector3( DX::XM_PI * 0.166f, 0.0f, 0.0f );
+        m_springArmParams.length = 10.0f;
+        m_springArmParams.pitchYawRoll = DXSM::Vector3( DX::XM_PI * 0.166f, 0.0f, 0.0f );
 
-        m_stickParams.rootOffset = DXSM::Vector3::Zero;
+        m_springArmParams.rootOffset = DXSM::Vector3::Zero;
         /*
         followPitch = -DX::XM_PI * 0.166f;
         this->referenceLen = referenceLen;
@@ -480,40 +486,40 @@ namespace SE_G {
         float deltaYaw = yawSpeed * m_deltaTime;
         float deltaPitch = pitchSpeed * m_deltaTime;
 
-        float _stickYaw = m_stickParams.pitchYawRoll.y + deltaYaw;
+        float _stickYaw = m_springArmParams.pitchYawRoll.y + deltaYaw;
         _stickYaw = _stickYaw > DX::XM_PI ? (_stickYaw - DX::XM_2PI) : _stickYaw;
         _stickYaw = _stickYaw < -DX::XM_PI ? (_stickYaw + DX::XM_2PI) : _stickYaw;
 
-        float _stickPitch = m_stickParams.pitchYawRoll.x + deltaPitch;
+        float _stickPitch = m_springArmParams.pitchYawRoll.x + deltaPitch;
         _stickPitch = fmax(-80.0f * DX::XM_PIDIV2 / 90.0f, fmin(_stickPitch, 80.0f * DX::XM_PIDIV2 / 90.0f));
-        //deltaPitch = _stickPitch - m_stickParams.stickPitch;
+        //deltaPitch = _stickPitch - m_springArmParams.stickPitch;
 
-        m_stickParams.pitchYawRoll.x = _stickPitch;
+        m_springArmParams.pitchYawRoll.x = _stickPitch;
 
-        //deltaYaw = _stickYaw - m_stickParams.stickYaw;
-        m_stickParams.pitchYawRoll.y = _stickYaw;
+        //deltaYaw = _stickYaw - m_springArmParams.stickYaw;
+        m_springArmParams.pitchYawRoll.y = _stickYaw;
     }
 
     void Camera::RollStick(float rollSpeed)
     {
         float deltaRoll = rollSpeed * m_deltaTime;
 
-        float _stickRoll = m_stickParams.pitchYawRoll.z + deltaRoll;
+        float _stickRoll = m_springArmParams.pitchYawRoll.z + deltaRoll;
 
         _stickRoll = _stickRoll > DX::XM_PI ? (_stickRoll - DX::XM_2PI) : _stickRoll;
         _stickRoll = _stickRoll < -DX::XM_PI ? (_stickRoll + DX::XM_2PI) : _stickRoll;
 
-        m_stickParams.pitchYawRoll.z = _stickRoll;
+        m_springArmParams.pitchYawRoll.z = _stickRoll;
     }
 
     DXSM::Vector3 Camera::GetStickRotation()
     {
-        return m_stickParams.pitchYawRoll;
+        return m_springArmParams.pitchYawRoll;
     }
 
     void Camera::SetStickRotation(DXSM::Vector3 newRotation)
     {
-        m_stickParams.pitchYawRoll = newRotation;
+        m_springArmParams.pitchYawRoll = newRotation;
     }
 
     bool Camera::IsPerspectiveCamera()
