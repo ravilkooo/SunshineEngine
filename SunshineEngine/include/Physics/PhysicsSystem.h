@@ -197,13 +197,11 @@ public:
         case SE::Layers::MOVING:
             // Moving collides with non-moving and triggers
             return inObject2 == SE::Layers::NON_MOVING || 
-                   inObject2 == SE::Layers::MOVING ||
-                   inObject2 == SE::Layers::TRIGGER;
+                   inObject2 == SE::Layers::MOVING;
 
         case SE::Layers::TRIGGER:
-            // Triggers ONLY collide with MOVING bodies
-            // (not with static non-moving objects or other triggers)
-            return inObject2 == SE::Layers::MOVING;
+            // Triggers ONLY collide with TRIGGER bodies
+            return inObject2 == SE::Layers::TRIGGER;
 
         default:
             JPH_ASSERT(false);
@@ -268,11 +266,10 @@ public:
 
         case SE::Layers::MOVING:
             return inLayer2 == SE::BroadPhaseLayers::NON_MOVING || 
-                   inLayer2 == SE::BroadPhaseLayers::MOVING ||
-                   inLayer2 == SE::BroadPhaseLayers::TRIGGER;
+                   inLayer2 == SE::BroadPhaseLayers::MOVING;
 
         case SE::Layers::TRIGGER:
-            return inLayer2 == SE::BroadPhaseLayers::MOVING;
+            return inLayer2 == SE::BroadPhaseLayers::TRIGGER;
 
         default:
             JPH_ASSERT(false);

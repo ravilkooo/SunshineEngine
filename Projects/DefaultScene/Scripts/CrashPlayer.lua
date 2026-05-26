@@ -1,10 +1,16 @@
 -- 2D Platformer Player Controller
-local moveForce = 800.0
-local jumpForce = 2500.0
-local lastJumpTime = 0
-local jumpCooldown = 3
-local moveDirection = 0
-local mouseSensitivity = 1.0
+local moveForce = 500.0
+
+local behObj
+local behUUID
+
+local moveX = 0.0
+local moveZ = 0.0
+
+local pressedW = false
+local pressedA = false
+local pressedS = false
+local pressedD = false
 
 -- Movement callback functions
 function onMoveForward(action)
@@ -12,16 +18,48 @@ function onMoveForward(action)
         print("Error: player object not available")
         return
     end
-    
-    
-    local camera = player:getCameraComponent():getCamera()
-    local physics = player:getPhysics()
-    
+      
     if action == "down" then
+        pressedW = true
+        
+        if not behObj then
+            behObj = getGameObjectByUUID(behUUID)
+        end
+        local bc = behObj:getBehavior()
+        
+        if pressedS then
+            moveZ = 0.0
+            bc:MB_setFloat("moveZ", moveZ)
+            return
+        end
+        
+        moveZ = 1.0
+        bc:MB_setFloat("moveZ", moveZ)
+        
         -- print("Moving forward...")
-        local forward = Vector3.new(camera.forward.x * moveForce, camera.forward.y * moveForce, camera.forward.z * moveForce)
+        local camForward = player:getCameraComponent():getCamera().forward
+        
+        Vector3.normalize(camForward)
+        
+        local forward = Vector3.new(camForward.x * moveForce, 0, camForward.z * moveForce)
+        local physics = player:getPhysics()
         physics:addImpulse(forward)
-    end    
+    elseif action == "up" then
+        pressedW = false
+
+        if not behObj then
+            behObj = getGameObjectByUUID(behUUID)
+        end
+        local bc = behObj:getBehavior()
+
+        if pressedS then
+            moveZ = -1.0
+        else
+            moveZ = -0.0
+        end
+
+        bc:MB_setFloat("moveZ", moveZ)
+    end
 end
 
 function onMoveBackward(action)
@@ -29,15 +67,48 @@ function onMoveBackward(action)
         -- print("Error: player object not available")
         return
     end
-
-    local camera = player:getCameraComponent():getCamera()
-    local physics = player:getPhysics()
-
+      
     if action == "down" then
-        -- print("Moving backward...")
-        local forward = Vector3.new(camera.forward.x * -moveForce, camera.forward.y * -moveForce, camera.forward.z * -moveForce)
+        pressedS = true
+        
+        if not behObj then
+            behObj = getGameObjectByUUID(behUUID)
+        end
+        local bc = behObj:getBehavior()
+        
+        if pressedW then
+            moveZ = 0.0
+            bc:MB_setFloat("moveZ", moveZ)
+            return
+        end
+        
+        moveZ = -1.0
+        bc:MB_setFloat("moveZ", moveZ)
+        
+        -- print("Moving forward...")
+        local camForward = player:getCameraComponent():getCamera().forward
+        
+        Vector3.normalize(camForward)
+        
+        local forward = Vector3.new(-camForward.x * moveForce, 0, -camForward.z * moveForce)
+        local physics = player:getPhysics()
         physics:addImpulse(forward)
-    end    
+    elseif action == "up" then
+        pressedS = false
+        
+        if not behObj then
+            behObj = getGameObjectByUUID(behUUID)
+        end
+        local bc = behObj:getBehavior()
+
+        if pressedW then
+            moveZ = 1.0
+        else
+            moveZ = 0.0
+        end
+
+        bc:MB_setFloat("moveZ", moveZ)
+    end
 end
 
 function onStrafeLeft(action)
@@ -78,17 +149,38 @@ function onJump(action)
         return
     end
     
-    local physics = player:getPhysics()
     
     if action == "down" then
-        local currentTime = os.clock()
-        
-        if currentTime - lastJumpTime > jumpCooldown then
-            lastJumpTime = currentTime
-            local jump = Vector3.new(0, jumpForce * 10, 0)
-            physics:addImpulse(jump)
-            print("Jump!")
+        if not behObj then
+            behObj = getGameObjectByUUID(behUUID)
         end
+        local bc = behObj:getBehavior()
+
+        if bc:MB_getBool("isGrounded") then
+            bc:MB_setBool("isGrounded", false)
+            bc:MB_setFloat("velocityY", 5.0)
+            
+            local physics = player:getPhysics()
+
+            local velocity = physics:getLinearVelocity()
+            physics:setLinearVelocity(Vector3.new(velocity.x, velocity.y + 5.0, velocity.z))
+        end
+    end
+end
+
+-- Interaction callback
+function onAtack(action)
+    if not player then
+        -- print("Error: player object not available")
+        return
+    end
+
+    if action == "down" then
+        if not behObj then
+            behObj = getGameObjectByUUID(behUUID)
+        end
+        local bc = behObj:getBehavior()
+        bc:MB_setBool("attackPressed", true)
     end
 end
 
@@ -125,18 +217,17 @@ function onLookAround(deltaX, deltaY, wheelDelta)
     
     camera:rotateSpringArmYawPitch(yawDelta, pitchDelta)
 
-    -- print("yawDelta: " .. yawDelta .. ", pitchDelta: " .. pitchDelta)
-    
-    -- local physics = player:getPhysics()
-    -- local rotation = physics:getRotation()
-    -- local stickDir = camera:getStickDirection()
-    -- stickDir.y = 0
-    -- local stickDirLen = stickDir:Length()
-    -- -- stickDir.x = stickDir.x / stickDirLen
-    -- -- stickDir.z = stickDir.z / stickDirLen
-    -- physics:setRotation(Vector3.new(rotation.x, math.atan(stickDir.z, stickDir.x), rotation.z))
 
-    -- camera:setStickDirection()
+    if not behObj then
+        behObj = getGameObjectByUUID(behUUID)
+    end
+    local bc = behObj:getBehavior()
+    if not (bc:S_getCurrent() == "Attack") then
+        local rot = camera:getSpringArmRotation()
+        local physics = player:getPhysics()
+        physics:setRotation(Vector3.new(0, rot.y, 0))
+    end
+
 
     -- Handle mouse wheel for zooming (adjust reference length)
     if wheelDelta ~= 0 then
@@ -144,18 +235,9 @@ function onLookAround(deltaX, deltaY, wheelDelta)
         local zoomAmount = wheelDelta * deltaTime
         local newLen = currentLen - zoomAmount
         -- Clamp zoom distance between 1 and 100 units
-
-        -- local rot = camera:getSpringArmRotation()
-        local rot = camera:getSpringArmRootOffset()
-        -- local rot = camera:getCameraRotation()
-        local newRotZ = rot.y + 0.001 * wheelDelta
-        -- camera:setSpringArmRotation(Vector3.new(rot.x, rot.y, newRotZ))
-        -- camera:setCameraRotation(Vector3.new(rot.x, rot.y, newRotZ))
-        camera:setSpringArmRootOffset(Vector3.new(rot.x, newRotZ, rot.z))
-        
-        -- if newLen >= 0.0 and newLen <= 100.0 then
-        --     camera:setSpringArmLength(newLen)
-        -- end
+        if newLen >= 0.0 and newLen <= 100.0 then
+            camera:setSpringArmLength(newLen)
+        end
     end
 end
 
@@ -163,6 +245,10 @@ end
 function onInit()
     print("2D Platformer Player Controller initialized!")
     print("Controls: Move Left/Right to move, Jump to jump")
+
+    behUUID = UUID.new()
+    behUUID.hi = 3821726256
+    behUUID.lo = 1576604890
 end
 
 -- Call init

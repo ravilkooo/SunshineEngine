@@ -465,8 +465,6 @@ void EditorApp::StopGame() {
 
 	m_currentGame->ClearScene();
 	m_currentGame.reset(NULL);
-	m_currentGame->ClearScene();
-	m_currentGame.reset(NULL);
 	m_renderingSystem->RemoveRenderGroup("GameDeferred");
 
 	m_runtimeMode = RuntimeMode::WORLD_EDITOR_MODE;

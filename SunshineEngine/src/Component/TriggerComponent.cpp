@@ -44,6 +44,8 @@ void TriggerComponent::SetLuaCallback(sol::function callback)
 
 void TriggerComponent::OnEnter(SE::UUID otherUUID)
 {
+    if (otherUUID == m_objectUUID)
+        return;
     if (m_insideObjects.find(otherUUID) != m_insideObjects.end())
     {
         return;  // Already inside, don't trigger again
@@ -66,6 +68,8 @@ void TriggerComponent::OnEnter(SE::UUID otherUUID)
 
 void TriggerComponent::OnExit(SE::UUID otherUUID)
 {
+    if (otherUUID == m_objectUUID)
+        return;
     auto it = m_insideObjects.find(otherUUID);
     if (it == m_insideObjects.end())
     {

@@ -193,11 +193,11 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		"x", &DXSM::Vector3::x,
 		"y", &DXSM::Vector3::y,
 		"z", &DXSM::Vector3::z,
-		"Normalize",
+		"normalize",
 		[](DXSM::Vector3* self) {
 			return self->Normalize();
 		},
-		"Length", &DXSM::Vector3::Length
+		"length", &DXSM::Vector3::Length
 	);
 
 	// Register Camera type

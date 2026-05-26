@@ -89,6 +89,9 @@ void TriggerContactListener::HandleTriggerContact(
     SE::UUID uuid1 = SE::UUID((std::uint64_t)body1.GetUserData());
     SE::UUID uuid2 = SE::UUID((std::uint64_t)body2.GetUserData());
 
+    if (uuid1 == uuid2)
+        return;
+
     auto go1 = Scene::GetInstance().GetGameObjectByUUID(uuid1);
     auto go2 = Scene::GetInstance().GetGameObjectByUUID(uuid2);
 
