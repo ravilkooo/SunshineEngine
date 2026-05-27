@@ -432,6 +432,7 @@ json CharacterControllerComponent_Info::ToJson() const
             j["collider"] = m_assignedComponent->m_colliderData->ToJson();
         }
     }
+    return j;
 }
 
 void CharacterControllerComponent_Info::FromJson(const json& j)
