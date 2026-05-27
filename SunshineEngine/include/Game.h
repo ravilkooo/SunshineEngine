@@ -68,8 +68,6 @@ public:
     void ClearScene();
 
     bool LoadScene(const wchar_t* scenePath);
-    
-    bool LoadDefaultScene();
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 

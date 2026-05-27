@@ -76,8 +76,6 @@ void Game::SetParticleSystem(eastl::shared_ptr <SE::ParticleSystem> ps)
 
 void Game::SetupPhysics()
 {
-	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
-
 	for (auto& it : Scene::GetInstance().uuidToObjectMap)
 	{
 		auto pc = it.second->GetComponent<PhysicsComponent>();
@@ -109,26 +107,14 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		return false;
 	}
 
-	SetupPhysics();
+	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
+
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	m_playerObject = Scene::GetInstance().m_playerObject;
+
 	SetupPhysics();
 	m_luaManager.InitializeBehavior();
 
-	m_physicsSystem->FinalizeScene();
-	
-	InitializeAudio();
-	
-	return true;
-}
-
-bool Game::LoadDefaultScene()
-{
-	SetupPhysics();
-
-	// Add objects, add components, set parents
-
-	Scene::GetInstance().RestoreParents();
 	m_physicsSystem->FinalizeScene();
 	
 	InitializeAudio();

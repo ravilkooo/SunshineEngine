@@ -391,6 +391,8 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         }
 
         DrawMeshComponent(obj);
+        DrawCharacterComponent(obj);
+        DrawCharacterControllerComponent(obj);
         DrawPhysicsComponent(obj);
         DrawTriggerComponent(obj);
         DrawPerceptionComponent(obj);
@@ -1917,6 +1919,97 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
         else {
             ImGui::TextDisabled("Sampler: (none)");
         }
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawCharacterComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<CharacterComponent_Info>())
+        return;
+    auto characterInfo = obj->GetComponent<CharacterComponent_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Character Component", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        bool HasCharacterControllerComponent = obj->HasComponent<CharacterControllerComponent_Info>();
+        ImGui::BeginDisabled(HasCharacterControllerComponent);
+
+        if (DrawComponentRemoveButton<CharacterComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            ImGui::EndDisabled();
+            return;
+        }
+
+        if (HasCharacterControllerComponent)
+            ImGui::SetItemTooltip("Can't delete Character Component before Character Controller");
+
+        ImGui::EndDisabled();
+
+        ImGui::Checkbox("Is player controlled", &characterInfo->m_assignedComponent->IsPlayerControlled);
+
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<CharacterControllerComponent_Info>())
+        return;
+    auto charContrInfo = obj->GetComponent<CharacterControllerComponent_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Character controller settings", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        if (DrawComponentRemoveButton<CharacterControllerComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
+
+        if (auto colliderData = charContrInfo->m_assignedComponent->m_colliderData)
+        {
+            DrawColliderSettings(colliderData);
+        }
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        if (ImGui::TreeNodeEx("Additional Forces", flags))
+        {
+            EditorUI::FontStyles::Pop();
+            DrawFloatControl("Move speed", charContrInfo->m_assignedComponent->MoveSpeed, 6.0f, 0.01f, 0.0f, 100.0f, "%.2f");
+            DrawFloatControl("Acceleration", charContrInfo->m_assignedComponent->Acceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");
+            DrawFloatControl("Air acceleration", charContrInfo->m_assignedComponent->AirAcceleration, 8.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
+            DrawFloatControl("Jump speed", charContrInfo->m_assignedComponent->JumpSpeed, 8.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
+            DrawFloatControl("Gravity", charContrInfo->m_assignedComponent->Gravity, -24.0f, 0.01f, -1000.0f, 1000.0f, "%.2f");
+            DrawFloatControl("MaxFallSpeed", charContrInfo->m_assignedComponent->MaxFallSpeed, -24.0f, 0.01f, -1000.0f, 1000.0f, "%.2f");
+
+            ImGui::Checkbox("EnableStickToFloor", &charContrInfo->m_assignedComponent->EnableStickToFloor);
+            ImGui::Checkbox("EnableWalkStairs", &charContrInfo->m_assignedComponent->EnableWalkStairs);
+
+            DrawFloatControl("StepHeight", charContrInfo->m_assignedComponent->StepHeight, 0.3f, 0.001f, 0.0f, 10.0f, "%.3f");
+            DrawFloatControl("MaxSlopeAngle", charContrInfo->m_assignedComponent->MaxSlopeAngle, 45.0f, 0.01f, 0.0f, 90.0f, "%.2f");
+
+            ImGui::TreePop();
+        }
+        else EditorUI::FontStyles::Pop();
+
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();

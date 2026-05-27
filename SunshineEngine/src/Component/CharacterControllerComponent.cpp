@@ -74,3 +74,8 @@ void CharacterControllerComponent::DestroyCharacter()
 
 	GroundNormal = DXSM::Vector3(0.0f, 1.0f, 0.0f);
 }
+
+CharacterControllerComponent_Info::CharacterControllerComponent_Info()
+{
+	m_assignedComponent = eastl::make_unique<CharacterControllerComponent>();
+}

@@ -386,9 +386,9 @@ json CharacterComponent_Info::ToJson() const
 {
     json j;
     j = nlohmann::json{
-        "IsPlayerControlled", m_assignedComponent->IsPlayerControlled,
-		// "Yaw", m_assignedComponent->Yaw,
-		// "Pitch", m_assignedComponent->Pitch
+        {"IsPlayerControlled", m_assignedComponent->IsPlayerControlled},
+		// {"Yaw", m_assignedComponent->Yaw},
+		// {"Pitch", m_assignedComponent->Pitch}
     };
     return j;
 }
@@ -560,6 +560,8 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::PERCEPTION:          key = "Perception"; break;
             case SE::ComponentType::BEHAVIOR:            key = "Behavior"; break;
             case SE::ComponentType::PARTICLE_EMITTER:    key = "ParticleEmitter"; break;
+            case SE::ComponentType::CHARACTER_CONTROLLER:   key = "CharacterController"; break;
+            case SE::ComponentType::CHARACTER:              key = "Character"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -702,6 +704,19 @@ void Scene::FromJson(
                 if (objJ["components"].contains("Lua")) {
                     auto luaComp = go->AddComponent<LuaComponent>();
                     luaComp->FromJson(objJ["components"]["Lua"], go.get());
+                }
+
+                if (objJ["components"].contains("Character")) {
+                    auto characterComp = go->AddComponent<CharacterComponent>();
+                    characterComp->FromJson(objJ["components"]["Character"]);
+
+                    if (objJ["components"].contains("CharacterController")) {
+                        auto controllerComp = go->AddComponent<CharacterControllerComponent>();
+                        controllerComp->FromJson(
+                            objJ["components"]["CharacterController"],
+                            physicsSystem,
+                            go->GetComponent<TransformComponent>().get(), go->m_UUID);
+                    }
                 }
                 
                 // Parentnes
@@ -891,6 +906,16 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         if (objJ["components"].contains("Lua")) {
             auto c = go->AddComponent<LuaComponent_Info>();
             c->FromJson(objJ["components"]["Lua"]);
+        }
+
+        if (objJ["components"].contains("Character")) {
+            auto c = go->AddComponent<CharacterComponent_Info>();
+            c->FromJson(objJ["components"]["Character"]);
+
+            if (objJ["components"].contains("CharacterController")) {
+                auto c = go->AddComponent<CharacterControllerComponent_Info>();
+                c->FromJson(objJ["components"]["CharacterController"]);
+            }
         }
 
         // Parentnes

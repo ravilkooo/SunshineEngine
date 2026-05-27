@@ -56,11 +56,11 @@ public:
     float Acceleration = 30.0f;
     float AirAcceleration = 8.0f;
 
-    float JumpSpeed = 7.5f;
+    float JumpSpeed = 8.0f;
 
     float Gravity = -24.0f;
 
-    float MaxFallSpeed = -40.0f;
+    float MaxFallSpeed = -24.0f;
 
     bool EnableStickToFloor = false;
     bool EnableWalkStairs = false;
@@ -98,6 +98,8 @@ class CharacterControllerComponent_Info :
     public Component_Info
 {
 public:
+
+    CharacterControllerComponent_Info();
 
     // Inherited via Component
     const std::type_info& getType() const override {
