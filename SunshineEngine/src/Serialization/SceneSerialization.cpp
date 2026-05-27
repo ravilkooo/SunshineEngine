@@ -490,14 +490,15 @@ void CharacterControllerComponent::FromJson(const json& j)
     }
 }
 
-void CharacterControllerComponent::FromJson(const json& j, PhysicsSystem* physicsSystem, TransformComponent* transformComp)
+void CharacterControllerComponent::FromJson(const json& j, PhysicsSystem* physicsSystem,
+    TransformComponent* transformComp, SE::UUID uuid)
 {
     if (Initialized) {
         // If already initialized, we need to destroy the existing character before reinitializing
         DestroyCharacter();
     }
     FromJson(j);
-    Initialize(physicsSystem, transformComp);
+    Initialize(physicsSystem, transformComp, uuid);
 }
 
 // ----------------- GameObject_Info -----------------

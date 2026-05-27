@@ -4,6 +4,8 @@
 #include <Jolt/Physics/Character/CharacterVirtual.h>
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 
+#include <Utils/UUID.h>
+
 #include <Component/Component.h>
 #include <SimpleMath.h>
 
@@ -18,11 +20,15 @@ public:
 	CharacterControllerComponent();
 	~CharacterControllerComponent();
 	CharacterControllerComponent(PhysicsSystem* physicsSystem,
-        TransformComponent* transformComp);
+        TransformComponent* transformComp,
+        SE::UUID uuid);
 
-    void Initialize(PhysicsSystem* physicsSystem, TransformComponent* transformComp);
+    void Initialize(PhysicsSystem* physicsSystem, TransformComponent* transformComp,
+        SE::UUID uuid);
     
     bool Initialized = false;
+
+    SE::UUID m_uuid = SE::UUID(0u);
 
     //
     // Jolt character
@@ -83,7 +89,7 @@ public:
 
     void FromJson(const json& j) override;
     void FromJson(const json& j, PhysicsSystem* physicsSystem,
-        TransformComponent* transformComp);
+        TransformComponent* transformComp, SE::UUID uuid);
 private:
     void DestroyCharacter();
 };

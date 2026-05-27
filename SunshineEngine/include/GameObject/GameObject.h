@@ -19,6 +19,8 @@
 #include <Component/TriggerComponent.h>
 #include <Component/MeshComponent.h>
 #include <Component/LuaComponent.h>
+#include <Component/CharacterComponent.h>
+#include <Component/CharacterControllerComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -352,6 +354,12 @@ public:
 
                 // Add PhysicsComponent with default values
             {
+                if (HasComponent<CharacterControllerComponent_Info>())
+                {
+                    printSunshineErrorMessage("Cannot add PhysicsComponent when CharacterControllerComponent exists. Please remove CharacterControllerComponent first.");
+                    break;
+                }
+
                 auto tc_info = GetComponent<TransformComponent_Info>();
                 auto rc_info = GetComponent<RenderComponent_Info>();
 
@@ -412,6 +420,36 @@ public:
             }
 
                 break;
+
+            case SE::ComponentType::CHARACTER:
+
+                // Add CharacterComponent with default values
+            {
+				auto ch_info = AddComponent<CharacterComponent_Info>();
+            }
+            break;
+
+
+            case SE::ComponentType::CHARACTER_CONTROLLER:
+
+                // Add PhysicsComponent with default values
+            {
+                if (HasComponent<PhysicsComponent_Info>())
+                {
+					printSunshineErrorMessage("Cannot add CharacterControllerComponent when PhysicsComponent exists. Please remove PhysicsComponent first.");
+                    break;
+                }
+
+                if (!HasComponent<CharacterComponent_Info>())
+                {
+					printSunshineErrorMessage("CharacterControllerComponent requires CharacterComponent. Please add CharacterComponent first.");
+					break;
+                }
+
+                auto cc_info = AddComponent<CharacterControllerComponent_Info>();
+
+            }
+            break;
 
             default:
                 break;

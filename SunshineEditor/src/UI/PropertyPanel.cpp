@@ -27,6 +27,8 @@
 #include <Component/MeshComponent.h>
 #include <Component/LuaComponent.h>
 #include <Component/TriggerComponent.h>
+#include <Component/CharacterComponent.h>
+#include <Component/CharacterControllerComponent.h>
 
 #include <SceneHierarchy.h>
 
@@ -1357,7 +1359,6 @@ void PropertyPanel::DrawAudioPanel()
 
 void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
 {
-    bool HasAllComponents = true;
 
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
     
@@ -1368,6 +1369,11 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
     
     if (ImGui::BeginPopup("AddComponentPopup"))
     {
+        bool HasAllComponents = true;
+        bool HasPhysicsComponent = obj->HasComponent<PhysicsComponent_Info>();
+        bool HasCharacterComponent = obj->HasComponent<CharacterComponent_Info>();
+        bool HasCharacterControllerComponent = obj->HasComponent<CharacterControllerComponent_Info>();
+
         ImGui::Text("Add Component");
         ImGui::Separator();
 
@@ -1381,14 +1387,21 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             }
         }
 
-        if (!obj->HasComponent<PhysicsComponent_Info>())
+        if (!HasPhysicsComponent)
         {
             HasAllComponents = false;
+
+            ImGui::BeginDisabled(HasCharacterControllerComponent);
 
             if (ImGui::MenuItem("Physics Component", nullptr, false, true))
             {
                 obj->AddDefaultComponent(SE::ComponentType::PHYSICS);
             }
+
+            ImGui::EndDisabled();
+
+            if (HasCharacterControllerComponent)
+                ImGui::SetItemTooltip("Can't have both Character Controller and Physics components");
         }
 
         if (!obj->HasComponent<TriggerComponent_Info>())
@@ -1429,6 +1442,35 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             {
                 obj->AddDefaultComponent(SE::ComponentType::LUA);
             }
+        }
+
+        if (!obj->HasComponent<CharacterComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Character Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::CHARACTER);
+            }
+        }
+        
+        if (!obj->HasComponent<CharacterControllerComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            ImGui::BeginDisabled(HasPhysicsComponent || !HasCharacterComponent);
+
+            if (ImGui::MenuItem("Character Controller", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::CHARACTER_CONTROLLER);
+            }
+
+            ImGui::EndDisabled();
+
+            if (!HasCharacterComponent)
+                ImGui::SetItemTooltip("Can't have Character Controller without Character component");
+            else if (HasPhysicsComponent)
+                ImGui::SetItemTooltip("Can't have both Character Controller and Physics components");
         }
         
         if (HasAllComponents)

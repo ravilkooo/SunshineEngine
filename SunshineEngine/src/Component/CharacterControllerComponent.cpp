@@ -16,14 +16,16 @@ CharacterControllerComponent::~CharacterControllerComponent()
 }
 
 CharacterControllerComponent::CharacterControllerComponent(PhysicsSystem* physicsSystem,
-	TransformComponent* transformComp)
+	TransformComponent* transformComp, SE::UUID uuid)
 {
-	Initialize(physicsSystem, transformComp);
+	Initialize(physicsSystem, transformComp, uuid);
 }
 
 void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
-	TransformComponent* transformComp)
+	TransformComponent* transformComp, SE::UUID uuid)
 {
+	m_uuid = uuid;
+
 	JPH::PhysicsSystem& physSystem = physicsSystem->GetWorld();
 
 	float Radius = m_colliderData->m_settings.data.asCapsule.m_radius;
@@ -45,13 +47,15 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 	settings.mPenetrationRecoverySpeed = 1.0f;
 	settings.mInnerBodyLayer = SE::Layers::MOVING;
 
+	DXSM::Quaternion _quat = transformComp->GetAbsoluteWorldRotation_quat();
+	const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
 	Character = new JPH::CharacterVirtual(&settings,
 		JPH::RVec3(
 			transformComp->m_position.x,
 			transformComp->m_position.y,
 			transformComp->m_position.z),
-		JPH::Quat::sIdentity(), 0, &physSystem);
+		targetRot, m_uuid.m_UUID, &physSystem);
 
 	Initialized = true;
 }

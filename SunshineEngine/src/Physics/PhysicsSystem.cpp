@@ -163,7 +163,8 @@ void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
 
     JPH::BodyInterface& bodyInterface = Bodies();
 
-    JPH::BodyCreationSettings settings(physComp->m_shape, physComp->m_position, physComp->m_orientation, physComp->m_motionType, physComp->m_objectLayer);
+    JPH::BodyCreationSettings settings(physComp->m_shape, physComp->m_position,
+        physComp->m_orientation, physComp->m_motionType, physComp->m_objectLayer);
     settings.mObjectLayer = physComp->m_objectLayer;
     settings.mAllowSleeping = (physComp->m_activation != JPH::EActivation::DontActivate);
     settings.mFriction = physComp->m_friction;

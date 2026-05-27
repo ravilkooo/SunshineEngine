@@ -65,6 +65,7 @@ class CharacterComponent_Info :
     public Component_Info
 {
 public:
+    CharacterComponent_Info();
 
     // Inherited via Component
     const std::type_info& getType() const override {
