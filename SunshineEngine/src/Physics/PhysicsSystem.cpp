@@ -429,6 +429,8 @@ void PhysicsSystem::ClearAllBodies()
 
 JPH::PhysicsSystem& PhysicsSystem::GetWorld() { return *m_physicsSystem; }
 
+JPH::TempAllocatorImpl& PhysicsSystem::GetAllocator() { return *m_tempAllocator; }
+
 JPH::BodyInterface& PhysicsSystem::Bodies() { return *m_bodyInterface; }
 
 void PhysicsSystem::UpdateTriggerOverlaps()

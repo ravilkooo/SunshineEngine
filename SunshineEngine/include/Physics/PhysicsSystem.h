@@ -317,6 +317,7 @@ public:
     void Step(float dt);
 
     JPH::PhysicsSystem& GetWorld();
+    JPH::TempAllocatorImpl& GetAllocator();
     JPH::BodyInterface& Bodies();
 
     bool IsValid() { return m_isValid; }
