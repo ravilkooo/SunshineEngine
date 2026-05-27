@@ -446,7 +446,10 @@ public:
 					break;
                 }
 
-                auto cc_info = AddComponent<CharacterControllerComponent_Info>();
+                auto tc_info = GetComponent<TransformComponent_Info>();
+                auto rc_info = GetComponent<RenderComponent_Info>();
+
+                auto cc_info = AddComponent<CharacterControllerComponent_Info>(rc_info.get(), tc_info.get());
 
             }
             break;

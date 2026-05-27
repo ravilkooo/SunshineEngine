@@ -1,7 +1,10 @@
 #include <Physics/PhysicsSystem.h>
 
-#include <Component/TransformComponent.h>
 #include <Component/CharacterControllerComponent.h>
+#include <Component/TransformComponent.h>
+#include <Component/RenderComponent.h>
+
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
 CharacterControllerComponent::CharacterControllerComponent()
 {
@@ -75,7 +78,25 @@ void CharacterControllerComponent::DestroyCharacter()
 	GroundNormal = DXSM::Vector3(0.0f, 1.0f, 0.0f);
 }
 
-CharacterControllerComponent_Info::CharacterControllerComponent_Info()
+CharacterControllerComponent_Info::CharacterControllerComponent_Info(
+	RenderComponent_Info* rc_info,
+	TransformComponent_Info* tc_info)
+	: m_rc_info(rc_info)
 {
 	m_assignedComponent = eastl::make_unique<CharacterControllerComponent>();
+
+	// Init collider
+	auto device = rc_info->m_assignedComponent.get()->GetDevice();
+	auto colliderTech = eastl::make_unique<SE_G::ColliderTechnique>(
+		device, tc_info->m_assignedComponent.get(), eastl::string("ColliderPass"),
+		m_assignedComponent->m_colliderData);
+
+	rc_info->AddTechnique(eastl::move(colliderTech));
+
+	m_isValid = true;
+}
+
+CharacterControllerComponent_Info::~CharacterControllerComponent_Info() {
+	if (m_isValid)
+		m_rc_info->RemoveTechnique("ColliderPass");
 }

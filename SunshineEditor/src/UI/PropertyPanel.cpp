@@ -1986,7 +1986,7 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
 
         if (auto colliderData = charContrInfo->m_assignedComponent->m_colliderData)
         {
-            DrawColliderSettings(colliderData);
+            DrawColliderSettings(colliderData, true);
         }
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
@@ -2496,7 +2496,7 @@ eastl::shared_ptr<SE_G::Mesh> PropertyPanel::DrawMeshSettings(
     return newMesh;
 }
 
-void PropertyPanel::DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> colliderData)
+void PropertyPanel::DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> colliderData, bool fixedShapeType)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
         ImGuiTreeNodeFlags_Framed |
@@ -2507,6 +2507,7 @@ void PropertyPanel::DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> col
     {
         EditorUI::FontStyles::Pop();
 
+        ImGui::BeginDisabled(fixedShapeType);
         auto currentShape = colliderData->GetShapeType();
         const char* shapeItems =
             "Sphere\0Box\0Capsule\0TaperedCapsule\0";
@@ -2514,6 +2515,7 @@ void PropertyPanel::DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> col
         {
             colliderData->SetShapeType(currentShape);
         }
+        ImGui::EndDisabled();
 
         auto settings = colliderData->GetColliderSettings();
         bool settingsChanged = false;

@@ -5,6 +5,7 @@
 #include <Physics/PhysicsSystem.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>

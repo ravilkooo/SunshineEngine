@@ -913,7 +913,9 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
             c->FromJson(objJ["components"]["Character"]);
 
             if (objJ["components"].contains("CharacterController")) {
-                auto c = go->AddComponent<CharacterControllerComponent_Info>();
+                auto c = go->AddComponent<CharacterControllerComponent_Info>(
+                    go->GetComponent<RenderComponent_Info>().get(),
+                    go->GetComponent<TransformComponent_Info>().get());
                 c->FromJson(objJ["components"]["CharacterController"]);
             }
         }

@@ -110,7 +110,7 @@ private:
 
     void DrawPhysicsComponent(GameObject_Info* obj);
     void DrawTriggerComponent(GameObject_Info* obj);
-    void DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> colliderData);
+    void DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> colliderData, bool fixedShapeType = false);
 
     void DrawMeshComponent(GameObject_Info* obj);
 

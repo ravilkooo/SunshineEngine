@@ -94,12 +94,18 @@ private:
     void DestroyCharacter();
 };
 
+class RenderComponent_Info;
+class TransformComponent_Info;
+
 class CharacterControllerComponent_Info :
     public Component_Info
 {
 public:
 
-    CharacterControllerComponent_Info();
+    CharacterControllerComponent_Info(
+        RenderComponent_Info* rc_info,
+        TransformComponent_Info* tc_info);
+    ~CharacterControllerComponent_Info();
 
     // Inherited via Component
     const std::type_info& getType() const override {
@@ -116,4 +122,7 @@ public:
     // Serialization
     json ToJson() const override;
     void FromJson(const json& j) override;
+
+    bool m_isValid = false;
+    RenderComponent_Info* m_rc_info;
 };

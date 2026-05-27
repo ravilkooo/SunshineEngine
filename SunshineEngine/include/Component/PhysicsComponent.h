@@ -9,8 +9,6 @@
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 #include <Jolt/Physics/EActivation.h>
 
-#include <Graphics/Renderer/Technique/ColliderTechnique.h>
-
 #include <Component/Component.h>
 #include <Physics/CollisionUtils.h>
 #include <Physics/PhysicsEnums.h>
