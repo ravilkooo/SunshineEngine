@@ -20,6 +20,8 @@ enum class CharacterState
 class CharacterComponent : public Component
 {
 public:
+    CharacterComponent() = default;
+
     //
     // Gameplay state
     //
@@ -46,4 +48,37 @@ public:
 
     float Yaw = 0.0f;
     float Pitch = 0.0f;
+
+    // Inherited via Component
+    const std::type_info& getType() const override {
+        return typeid(CharacterComponent);
+    }
+    static const SE::ComponentType s_componentType = SE::ComponentType::CHARACTER;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+
+    void FromJson(const json& j) override;
+};
+
+class CharacterComponent_Info :
+    public Component_Info
+{
+public:
+
+    // Inherited via Component
+    const std::type_info& getType() const override {
+        return typeid(CharacterComponent_Info);
+    }
+    static const SE::ComponentType s_componentType = SE::ComponentType::CHARACTER;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+
+    bool IsAssigned() override { return true; }
+    eastl::unique_ptr<CharacterComponent> m_assignedComponent;
+
+    // Serialization
+    json ToJson() const override;
+    void FromJson(const json& j) override;
 };

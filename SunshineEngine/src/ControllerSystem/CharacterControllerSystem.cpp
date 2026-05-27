@@ -33,13 +33,7 @@ void CharacterControllerSystem::Update(float deltaTime)
 {
     for (auto& pair : m_scene->uuidToObjectMap)
     {
-        auto charComp = pair.second->GetComponent<CharacterComponent>();
-        auto charContrComp = pair.second->GetComponent<CharacterControllerComponent>();
-
-        if (charComp && charContrComp)
-        {
-            UpdateCharacter(pair.second.get(), deltaTime);
-        }
+        UpdateCharacter(pair.second.get(), deltaTime);
     }
 }
 
@@ -50,6 +44,11 @@ void CharacterControllerSystem::UpdateCharacter(
     auto charComp = gameObj->GetComponent<CharacterComponent>();
     auto charContrComp = gameObj->GetComponent<CharacterControllerComponent>();
 
+    if (!charComp || !charContrComp)
+    {
+        return;
+	}
+
     ApplyMovementInput(charComp, charContrComp, deltaTime);
 
     ApplyGravity(charComp, charContrComp, deltaTime);
@@ -59,6 +58,8 @@ void CharacterControllerSystem::UpdateCharacter(
     UpdatePhysics(charComp, charContrComp, deltaTime);
 
     UpdateGroundState(charComp, charContrComp);
+
+    SynchronizeTransforms(gameObj);
 
     ClearFrameState(charComp, charContrComp);
 }
@@ -206,6 +207,32 @@ void CharacterControllerSystem::ClearFrameState(
 {
     character->JumpRequested = false;
 }
+
+void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)
+{
+    auto charComp = gameObj->GetComponent<CharacterComponent>();
+    auto charContrComp = gameObj->GetComponent<CharacterControllerComponent>();
+	auto transformComp = gameObj->GetComponent<TransformComponent>();
+
+    if (!charComp || !charContrComp || !transformComp)
+    {
+        return;
+    }
+
+    JPH::RVec3 charPos = charContrComp->Character->GetPosition();
+    transformComp->m_position = DXSM::Vector3(charPos.GetX(), charPos.GetY(), charPos.GetZ());
+
+    DXSM::Quaternion _quat = transformComp->GetAbsoluteWorldRotation_quat();
+    const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
+
+    charContrComp->Character->SetRotation(
+        JPH::Quat::sRotation(
+            JPH::Vec3::sAxisY(),
+            charComp->Yaw
+        )
+    );
+}
+
 
 /*
 void CharacterControllerSystem::Update(float dt)

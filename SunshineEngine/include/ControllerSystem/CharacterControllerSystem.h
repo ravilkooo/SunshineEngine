@@ -76,6 +76,7 @@ private:
         eastl::shared_ptr<CharacterControllerComponent> controller
     );
 
+    void SynchronizeTransforms(GameObject* gameObj);
 
 private:
     Scene* m_scene = nullptr;

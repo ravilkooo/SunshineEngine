@@ -9,6 +9,8 @@
 #include <Component/RenderComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <Component/LuaComponent.h>
+#include <Component/CharacterComponent.h>
+#include <Component/CharacterControllerComponent.h>
 
 #include <Utils/StringUtils.h>
 
@@ -376,6 +378,125 @@ void LuaComponent::FromJson(const json& j, GameObject* obj) {
     if (!info.scriptPath.m_assetRelativePath.empty()) {
         Init(obj, info.scriptPath);
     }
+}
+
+// ----------------- CharacterComponent -----------------
+
+json CharacterComponent_Info::ToJson() const
+{
+    json j;
+    j = nlohmann::json{
+        "IsPlayerControlled", m_assignedComponent->IsPlayerControlled,
+		// "Yaw", m_assignedComponent->Yaw,
+		// "Pitch", m_assignedComponent->Pitch
+    };
+    return j;
+}
+
+void CharacterComponent_Info::FromJson(const json& j)
+{
+    if (!m_assignedComponent)
+        m_assignedComponent = eastl::make_unique<CharacterComponent>();
+    m_assignedComponent->FromJson(j);
+}
+
+void CharacterComponent::FromJson(const json& j)
+{
+    if (j.contains("IsPlayerControlled") && j["IsPlayerControlled"].is_boolean()) {
+        IsPlayerControlled = j["IsPlayerControlled"].get<bool>();
+    }
+    // if (j.contains("Yaw") && j["Yaw"].is
+}
+
+// ----------------- CharacterControllerComponent -----------------
+
+json CharacterControllerComponent_Info::ToJson() const
+{
+    json j;
+    if (m_assignedComponent) {
+        j = nlohmann::json{
+            {"MoveSpeed", m_assignedComponent->MoveSpeed},
+            {"Acceleration", m_assignedComponent->Acceleration},
+            {"AirAcceleration", m_assignedComponent->AirAcceleration},
+            {"JumpSpeed", m_assignedComponent->JumpSpeed},
+            {"Gravity", m_assignedComponent->Gravity},
+            {"MaxFallSpeed", m_assignedComponent->MaxFallSpeed},
+            {"EnableStickToFloor", m_assignedComponent->EnableStickToFloor},
+            {"EnableWalkStairs", m_assignedComponent->EnableWalkStairs},
+            {"StepHeight", m_assignedComponent->StepHeight},
+            {"MaxSlopeAngle", m_assignedComponent->MaxSlopeAngle}
+        };
+
+
+        if (m_assignedComponent->m_colliderData) {
+            j["collider"] = m_assignedComponent->m_colliderData->ToJson();
+        }
+    }
+}
+
+void CharacterControllerComponent_Info::FromJson(const json& j)
+{
+    if (!m_assignedComponent)
+        m_assignedComponent = eastl::make_unique<CharacterControllerComponent>();
+    m_assignedComponent->FromJson(j);
+}
+
+void CharacterControllerComponent::FromJson(const json& j)
+{
+    if (j.contains("MoveSpeed") && j["MoveSpeed"].is_number_float()) {
+        MoveSpeed = j["MoveSpeed"].get<float>();
+    }
+    if (j.contains("Acceleration") && j["Acceleration"].is_number_float()) {
+        Acceleration = j["Acceleration"].get<float>();
+    }
+    if (j.contains("AirAcceleration") && j["AirAcceleration"].is_number_float()) {
+        AirAcceleration = j["AirAcceleration"].get<float>();
+    }
+    if (j.contains("JumpSpeed") && j["JumpSpeed"].is_number_float()) {
+        JumpSpeed = j["JumpSpeed"].get<float>();
+    }
+    if (j.contains("Gravity") && j["Gravity"].is_number_float()) {
+        Gravity = j["Gravity"].get<float>();
+    }
+    if (j.contains("MaxFallSpeed") && j["MaxFallSpeed"].is_number_float()) {
+        MaxFallSpeed = j["MaxFallSpeed"].get<float>();
+    }
+    if (j.contains("EnableStickToFloor") && j["EnableStickToFloor"].is_number_float()) {
+        EnableStickToFloor = j["EnableStickToFloor"].get<float>();
+    }
+    if (j.contains("EnableWalkStairs") && j["EnableWalkStairs"].is_number_float()) {
+        EnableWalkStairs = j["EnableWalkStairs"].get<float>();
+    }
+    if (j.contains("StepHeight") && j["StepHeight"].is_number_float()) {
+        StepHeight = j["StepHeight"].get<float>();
+    }
+    if (j.contains("MaxSlopeAngle") && j["MaxSlopeAngle"].is_number_float()) {
+        MaxSlopeAngle = j["MaxSlopeAngle"].get<float>();
+    }
+    
+    // Collider/shape data
+    if (j.contains("collider") && j["collider"].is_object()) {
+        if (!m_colliderData) {
+            m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Capsule);
+        }
+        m_colliderData->FromJson(j["collider"]);
+    }
+    else
+    {
+        m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Capsule);
+        m_colliderData->m_settings.data.asCapsule.m_radius = 0.35f;
+        m_colliderData->m_settings.data.asCapsule.m_height = 1.8f;
+    }
+}
+
+void CharacterControllerComponent::FromJson(const json& j, PhysicsSystem* physicsSystem, TransformComponent* transformComp)
+{
+    if (Initialized) {
+        // If already initialized, we need to destroy the existing character before reinitializing
+        DestroyCharacter();
+    }
+    FromJson(j);
+    Initialize(physicsSystem, transformComp);
 }
 
 // ----------------- GameObject_Info -----------------

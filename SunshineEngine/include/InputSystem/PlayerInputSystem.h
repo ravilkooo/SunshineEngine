@@ -55,7 +55,6 @@ private:
 
     std::unordered_map<Keys, std::string> m_keyToAction;
 
-
     //
     // Runtime states
     //
