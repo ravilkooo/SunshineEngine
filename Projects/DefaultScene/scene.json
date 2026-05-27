@@ -2908,30 +2908,18 @@
         },
         {
             "components": {
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 1,
-                        "relativePath": "Meshes/2k_poly_crash_body.obj"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 1,
-                        "relativePath": "Textures/crash_full_texture.dds"
-                    },
-                    "m_cullMode": "CULL_BACK"
+                "Character": {
+                    "m_isPlayerControlled": false
                 },
-                "Physics": {
+                "CharacterController": {
                     "collider": {
                         "settings": {
-                            "box": {
-                                "size": [
-                                    0.800000011920929,
-                                    2.299999952316284,
-                                    0.4099999964237213
-                                ]
+                            "capsule": {
+                                "height": 1.7999999523162842,
+                                "radius": 0.3499999940395355
                             }
                         },
-                        "shapeType": "Box",
+                        "shapeType": "Capsule",
                         "transforms": {
                             "offset": [
                                 0.0,
@@ -2945,13 +2933,35 @@
                             ]
                         }
                     },
-                    "m_activation": "Activate",
-                    "m_angularDamping": 0.05000000074505806,
-                    "m_collisionLayer": "MOVING",
-                    "m_friction": 0.20000000298023224,
-                    "m_linearDamping": 0.05000000074505806,
-                    "m_motion": "Dynamic",
-                    "m_restitution": 0.0
+                    "m_acceleration": 30.0,
+                    "m_airAcceleration": 8.0,
+                    "m_enableStickToFloor": false,
+                    "m_enableWalkStairs": false,
+                    "m_gravity": -24.0,
+                    "m_jumpSpeed": 8.0,
+                    "m_maxFallSpeed": -24.0,
+                    "m_maxSlopeAngle": 45.0,
+                    "m_moveSpeed": 6.0,
+                    "m_stepHeight": 0.30000001192092896
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/CharacterExample.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/2k_poly_crash_body.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/crash_full_texture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
                 },
                 "Render": null,
                 "Transform": {
@@ -2971,9 +2981,9 @@
                         1.0
                     ],
                     "m_position": [
-                        14.778467178344727,
-                        8.318044662475586,
-                        5.214189529418945
+                        11.821694374084473,
+                        8.318047523498535,
+                        14.079035758972168
                     ],
                     "m_rotation": [
                         -0.0,

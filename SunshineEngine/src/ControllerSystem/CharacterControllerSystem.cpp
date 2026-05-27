@@ -69,7 +69,7 @@ void CharacterControllerSystem::ApplyMovementInput(
     eastl::shared_ptr<CharacterControllerComponent> controller,
     float deltaTime)
 {
-    DXSM::Vector2 input = character->MoveInput;
+    DXSM::Vector2 input = character->m_moveInput;
 
     if (input.Length() > 1.0f)
     {
@@ -77,23 +77,23 @@ void CharacterControllerSystem::ApplyMovementInput(
     }
 
     DXSM::Vector3 desiredVelocity(
-        input.x * controller->MoveSpeed,
-        controller->Velocity.y,
-        input.y * controller->MoveSpeed
+        input.x * controller->m_moveSpeed,
+        controller->m_velocity.y,
+        input.y * controller->m_moveSpeed
     );
 
     float accel =
-        controller->Grounded
-        ? controller->Acceleration
-        : controller->AirAcceleration;
+        controller->m_grounded
+        ? controller->m_acceleration
+        : controller->m_airAcceleration;
 
-    controller->Velocity.x = std::lerp(
-        controller->Velocity.x,
+    controller->m_velocity.x = std::lerp(
+        controller->m_velocity.x,
         desiredVelocity.x,
         accel * deltaTime);
 
-    controller->Velocity.z = std::lerp(
-        controller->Velocity.z,
+    controller->m_velocity.z = std::lerp(
+        controller->m_velocity.z,
         desiredVelocity.z,
         accel * deltaTime
     );
@@ -104,19 +104,19 @@ void CharacterControllerSystem::ApplyGravity(
     eastl::shared_ptr<CharacterControllerComponent> controller,
     float deltaTime)
 {
-    if (controller->Grounded)
+    if (controller->m_grounded)
     {
         return;
     }
 
-    controller->Velocity.y +=
-        controller->Gravity * deltaTime;
+    controller->m_velocity.y +=
+        controller->m_gravity * deltaTime;
 
-    if (controller->Velocity.y <
-        controller->MaxFallSpeed)
+    if (controller->m_velocity.y <
+        controller->m_maxFallSpeed)
     {
-        controller->Velocity.y =
-            controller->MaxFallSpeed;
+        controller->m_velocity.y =
+            controller->m_maxFallSpeed;
     }
 }
 
@@ -124,20 +124,20 @@ void CharacterControllerSystem::ApplyJump(
     eastl::shared_ptr<CharacterComponent> character,
     eastl::shared_ptr<CharacterControllerComponent> controller)
 {
-    if (!character->JumpRequested)
+    if (!character->m_jumpRequested)
     {
         return;
     }
 
-    if (!controller->Grounded)
+    if (!controller->m_grounded)
     {
         return;
     }
 
-    controller->Velocity.y =
-        controller->JumpSpeed;
+    controller->m_velocity.y =
+        controller->m_jumpSpeed;
 
-    controller->Grounded = false;
+    controller->m_grounded = false;
 }
 
 void CharacterControllerSystem::UpdatePhysics(
@@ -145,24 +145,24 @@ void CharacterControllerSystem::UpdatePhysics(
     eastl::shared_ptr<CharacterControllerComponent> controller,
     float deltaTime)
 {
-    if (!controller->Character)
+    if (!controller->m_character)
     {
         return;
     }
 
-    controller->Character->SetLinearVelocity(
+    controller->m_character->SetLinearVelocity(
         JPH::Vec3(
-            controller->Velocity.x,
-            controller->Velocity.y,
-            controller->Velocity.z
+            controller->m_velocity.x,
+            controller->m_velocity.y,
+            controller->m_velocity.z
         )
     );
 
     JPH::CharacterVirtual::ExtendedUpdateSettings update_settings;
-    DXSM::Vector3 upVector = controller->GroundNormal;
+    DXSM::Vector3 upVector = controller->m_groundNormal;
     JPH::Vec3 joltUpVector(upVector.x, upVector.y, upVector.z);
     JPH::Vec3 joltDownVector(-upVector.x, -upVector.y, -upVector.z);
-    if (!controller->EnableStickToFloor)
+    if (!controller->m_enableStickToFloor)
     {
         update_settings.mStickToFloorStepDown = JPH::Vec3::sZero();
     }
@@ -170,7 +170,7 @@ void CharacterControllerSystem::UpdatePhysics(
     {
         update_settings.mStickToFloorStepDown = joltDownVector * update_settings.mStickToFloorStepDown.Length();
     }
-    if (!controller->EnableWalkStairs)
+    if (!controller->m_enableWalkStairs)
     {
         update_settings.mWalkStairsStepUp = JPH::Vec3::sZero();
     }
@@ -181,9 +181,9 @@ void CharacterControllerSystem::UpdatePhysics(
 
     JPH::PhysicsSystem& physSystem = m_PhysicsSystem->GetWorld();
 
-    controller->Character->ExtendedUpdate(
+    controller->m_character->ExtendedUpdate(
         deltaTime,
-        JPH::Vec3(0.0f, controller->Gravity, 0.0f), update_settings,
+        JPH::Vec3(0.0f, controller->m_gravity, 0.0f), update_settings,
         physSystem.GetDefaultBroadPhaseLayerFilter(SE::Layers::MOVING), // SE::Layers
         physSystem.GetDefaultLayerFilter(SE::Layers::MOVING), // SE::Layers
         {},
@@ -196,8 +196,8 @@ void CharacterControllerSystem::UpdateGroundState(
     eastl::shared_ptr<CharacterComponent> character,
     eastl::shared_ptr<CharacterControllerComponent> controller)
 {
-    controller->Grounded =
-        controller->Character->GetGroundState() ==
+    controller->m_grounded =
+        controller->m_character->GetGroundState() ==
         JPH::CharacterBase::EGroundState::OnGround;
 }
 
@@ -205,7 +205,7 @@ void CharacterControllerSystem::ClearFrameState(
     eastl::shared_ptr<CharacterComponent> character,
     eastl::shared_ptr<CharacterControllerComponent> controller)
 {
-    character->JumpRequested = false;
+    character->m_jumpRequested = false;
 }
 
 void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)
@@ -219,16 +219,16 @@ void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)
         return;
     }
 
-    JPH::RVec3 charPos = charContrComp->Character->GetPosition();
+    JPH::RVec3 charPos = charContrComp->m_character->GetPosition();
     transformComp->m_position = DXSM::Vector3(charPos.GetX(), charPos.GetY(), charPos.GetZ());
 
     DXSM::Quaternion _quat = transformComp->GetAbsoluteWorldRotation_quat();
     const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
-    charContrComp->Character->SetRotation(
+    charContrComp->m_character->SetRotation(
         JPH::Quat::sRotation(
             JPH::Vec3::sAxisY(),
-            charComp->Yaw
+            charComp->m_yaw
         )
     );
 }
@@ -249,9 +249,9 @@ void CharacterControllerSystem::Update(float dt)
 
         DXSM::Vector3 desired =
         {
-            character->MoveInput.x,
+            character->m_moveInput.x,
             0.0f,
-            character->MoveInput.y
+            character->m_moveInput.y
         };
 
         if (glm::length(desired) > 1.0f)
@@ -282,12 +282,12 @@ void CharacterControllerSystem::Update(float dt)
         // Jump
         //
 
-        if (character->JumpRequested && controller->Grounded)
+        if (character->m_jumpRequested && controller->Grounded)
         {
             controller->Velocity.y = controller->JumpSpeed;
         }
 
-        character->JumpRequested = false;
+        character->m_jumpRequested = false;
 
 
         //

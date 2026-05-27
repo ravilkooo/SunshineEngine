@@ -48,6 +48,17 @@ namespace ScriptingBindings
 			"length", &DXSM::Vector3::Length
         );
 
+		lua.new_usertype<DXSM::Vector2>("Vector2",
+			sol::constructors<DXSM::Vector2(), DXSM::Vector2(float, float)>(),
+			"x", &DXSM::Vector2::x,
+			"y", &DXSM::Vector2::y,
+			"normalize",
+			[](DXSM::Vector2* self) {
+				return self->Normalize();
+			},
+			"length", &DXSM::Vector2::Length
+		);
+
 		// Register Camera type
 		lua.new_usertype<SE_G::Camera>("Camera",
 			sol::no_constructor,

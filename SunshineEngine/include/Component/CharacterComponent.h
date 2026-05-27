@@ -28,26 +28,26 @@ public:
 
     //CharacterState State = CharacterState::Idle;
 
-    bool IsPlayerControlled = false;
+    bool m_isPlayerControlled = false;
 
-    bool IsDead = false;
-    bool IsAttacking = false;
+    bool m_isDead = false;
+    bool m_isAttacking = false;
 
     //
     // Input intentions
     //
 
-    DXSM::Vector2 MoveInput = DXSM::Vector2::Zero;
+    DXSM::Vector2 m_moveInput = DXSM::Vector2::Zero;
 
-    bool JumpRequested = false;
-    bool AttackRequested = false;
+    bool m_jumpRequested = false;
+    bool m_attackRequested = false;
 
     //
     // View rotation
     //
 
-    float Yaw = 0.0f;
-    float Pitch = 0.0f;
+    float m_yaw = 0.0f;
+    float m_pitch = 0.0f;
 
     // Inherited via Component
     const std::type_info& getType() const override {
@@ -83,3 +83,16 @@ public:
     json ToJson() const override;
     void FromJson(const json& j) override;
 };
+
+// Macro listing fields of CharacterComponent to expose in Lua bindings
+#ifndef CHARACTERCOMPONENT_LUA_FIELDS_APPLY
+#define CHARACTERCOMPONENT_LUA_FIELDS_APPLY(F) \
+    F(m_isPlayerControlled) ,   \
+    F(m_isDead) ,               \
+    F(m_isAttacking) ,          \
+    F(m_moveInput) ,            \
+    F(m_jumpRequested) ,        \
+    F(m_attackRequested) ,      \
+    F(m_yaw) ,                  \
+    F(m_pitch)
+#endif

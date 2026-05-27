@@ -6,6 +6,9 @@
 
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
+
 CharacterControllerComponent::CharacterControllerComponent()
 {
 	m_colliderData = eastl::make_shared<SE::ColliderData>(SE::ColliderShapeType::Capsule);
@@ -34,16 +37,16 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 	float Radius = m_colliderData->m_settings.data.asCapsule.m_radius;
 	float Height = m_colliderData->m_settings.data.asCapsule.m_height;
 
-	Shape = new JPH::CapsuleShape(
+	m_shape = new JPH::CapsuleShape(
 		Height * 0.5f - Radius,
 		Radius
 	);
 
 	JPH::CharacterVirtualSettings settings;
-	settings.mShape = Shape;
+	settings.mShape = m_shape;
 	settings.mMaxSlopeAngle =
 		JPH::DegreesToRadians(
-			MaxSlopeAngle
+			m_maxSlopeAngle
 		);
 	settings.mMaxStrength = 100.0f;
 	settings.mCharacterPadding = 0.02f;
@@ -53,7 +56,7 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 	DXSM::Quaternion _quat = transformComp->GetAbsoluteWorldRotation_quat();
 	const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
-	Character = new JPH::CharacterVirtual(&settings,
+	m_character = new JPH::CharacterVirtual(&settings,
 		JPH::RVec3(
 			transformComp->m_position.x,
 			transformComp->m_position.y,
@@ -68,14 +71,14 @@ void CharacterControllerComponent::DestroyCharacter()
 {
 	Initialized = false;
 
-	Character = nullptr;
-	Shape = nullptr;
+	m_character = nullptr;
+	m_shape = nullptr;
 
-	Velocity = DXSM::Vector3::Zero;
+	m_velocity = DXSM::Vector3::Zero;
 
-	Grounded = false;
+	m_grounded = false;
 
-	GroundNormal = DXSM::Vector3(0.0f, 1.0f, 0.0f);
+	m_groundNormal = DXSM::Vector3(0.0f, 1.0f, 0.0f);
 }
 
 CharacterControllerComponent_Info::CharacterControllerComponent_Info(
@@ -100,3 +103,13 @@ CharacterControllerComponent_Info::~CharacterControllerComponent_Info() {
 	if (m_isValid)
 		m_rc_info->RemoveTechnique("ColliderPass");
 }
+
+#define CHARCONTR_ADD_FIELD(name) #name, &CharacterControllerComponent::name
+#define CHARCONTR_FIELD_PAIRS CHARACTERCONTROLLER_LUA_FIELDS_APPLY(CHARCONTR_ADD_FIELD)
+
+#define CHARCONTR_METHOD_PAIRS
+
+LUA_REGISTER_COMPONENT(CharacterControllerComponent, "CharacterControllerComponent", CHARCONTR_FIELD_PAIRS, CHARCONTR_METHOD_PAIRS, "getCharacterController")
+
+#undef CHARCONTR_ADD_FIELD
+#undef CHARCONTR_METHOD_PAIRS

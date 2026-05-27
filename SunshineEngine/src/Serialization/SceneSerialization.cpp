@@ -386,7 +386,7 @@ json CharacterComponent_Info::ToJson() const
 {
     json j;
     j = nlohmann::json{
-        {"IsPlayerControlled", m_assignedComponent->IsPlayerControlled},
+        {"m_isPlayerControlled", m_assignedComponent->m_isPlayerControlled},
 		// {"Yaw", m_assignedComponent->Yaw},
 		// {"Pitch", m_assignedComponent->Pitch}
     };
@@ -402,8 +402,8 @@ void CharacterComponent_Info::FromJson(const json& j)
 
 void CharacterComponent::FromJson(const json& j)
 {
-    if (j.contains("IsPlayerControlled") && j["IsPlayerControlled"].is_boolean()) {
-        IsPlayerControlled = j["IsPlayerControlled"].get<bool>();
+    if (j.contains("m_isPlayerControlled") && j["m_isPlayerControlled"].is_boolean()) {
+        m_isPlayerControlled = j["m_isPlayerControlled"].get<bool>();
     }
     // if (j.contains("Yaw") && j["Yaw"].is
 }
@@ -415,16 +415,16 @@ json CharacterControllerComponent_Info::ToJson() const
     json j;
     if (m_assignedComponent) {
         j = nlohmann::json{
-            {"MoveSpeed", m_assignedComponent->MoveSpeed},
-            {"Acceleration", m_assignedComponent->Acceleration},
-            {"AirAcceleration", m_assignedComponent->AirAcceleration},
-            {"JumpSpeed", m_assignedComponent->JumpSpeed},
-            {"Gravity", m_assignedComponent->Gravity},
-            {"MaxFallSpeed", m_assignedComponent->MaxFallSpeed},
-            {"EnableStickToFloor", m_assignedComponent->EnableStickToFloor},
-            {"EnableWalkStairs", m_assignedComponent->EnableWalkStairs},
-            {"StepHeight", m_assignedComponent->StepHeight},
-            {"MaxSlopeAngle", m_assignedComponent->MaxSlopeAngle}
+            {"m_moveSpeed", m_assignedComponent->m_moveSpeed},
+            {"m_acceleration", m_assignedComponent->m_acceleration},
+            {"m_airAcceleration", m_assignedComponent->m_airAcceleration},
+            {"m_jumpSpeed", m_assignedComponent->m_jumpSpeed},
+            {"m_gravity", m_assignedComponent->m_gravity},
+            {"m_maxFallSpeed", m_assignedComponent->m_maxFallSpeed},
+            {"m_enableStickToFloor", m_assignedComponent->m_enableStickToFloor},
+            {"m_enableWalkStairs", m_assignedComponent->m_enableWalkStairs},
+            {"m_stepHeight", m_assignedComponent->m_stepHeight},
+            {"m_maxSlopeAngle", m_assignedComponent->m_maxSlopeAngle}
         };
 
 
@@ -444,35 +444,35 @@ void CharacterControllerComponent_Info::FromJson(const json& j)
 
 void CharacterControllerComponent::FromJson(const json& j)
 {
-    if (j.contains("MoveSpeed") && j["MoveSpeed"].is_number_float()) {
-        MoveSpeed = j["MoveSpeed"].get<float>();
+    if (j.contains("m_moveSpeed") && j["m_moveSpeed"].is_number_float()) {
+        m_moveSpeed = j["m_moveSpeed"].get<float>();
     }
-    if (j.contains("Acceleration") && j["Acceleration"].is_number_float()) {
-        Acceleration = j["Acceleration"].get<float>();
+    if (j.contains("m_acceleration") && j["m_acceleration"].is_number_float()) {
+        m_acceleration = j["m_acceleration"].get<float>();
     }
-    if (j.contains("AirAcceleration") && j["AirAcceleration"].is_number_float()) {
-        AirAcceleration = j["AirAcceleration"].get<float>();
+    if (j.contains("m_airAcceleration") && j["m_airAcceleration"].is_number_float()) {
+        m_airAcceleration = j["m_airAcceleration"].get<float>();
     }
-    if (j.contains("JumpSpeed") && j["JumpSpeed"].is_number_float()) {
-        JumpSpeed = j["JumpSpeed"].get<float>();
+    if (j.contains("m_jumpSpeed") && j["m_jumpSpeed"].is_number_float()) {
+        m_jumpSpeed = j["m_jumpSpeed"].get<float>();
     }
-    if (j.contains("Gravity") && j["Gravity"].is_number_float()) {
-        Gravity = j["Gravity"].get<float>();
+    if (j.contains("m_gravity") && j["m_gravity"].is_number_float()) {
+        m_gravity = j["m_gravity"].get<float>();
     }
-    if (j.contains("MaxFallSpeed") && j["MaxFallSpeed"].is_number_float()) {
-        MaxFallSpeed = j["MaxFallSpeed"].get<float>();
+    if (j.contains("m_maxFallSpeed") && j["m_maxFallSpeed"].is_number_float()) {
+        m_maxFallSpeed = j["m_maxFallSpeed"].get<float>();
     }
-    if (j.contains("EnableStickToFloor") && j["EnableStickToFloor"].is_number_float()) {
-        EnableStickToFloor = j["EnableStickToFloor"].get<float>();
+    if (j.contains("m_enableStickToFloor") && j["m_enableStickToFloor"].is_number_float()) {
+        m_enableStickToFloor = j["m_enableStickToFloor"].get<float>();
     }
-    if (j.contains("EnableWalkStairs") && j["EnableWalkStairs"].is_number_float()) {
-        EnableWalkStairs = j["EnableWalkStairs"].get<float>();
+    if (j.contains("m_enableWalkStairs") && j["m_enableWalkStairs"].is_number_float()) {
+        m_enableWalkStairs = j["m_enableWalkStairs"].get<float>();
     }
-    if (j.contains("StepHeight") && j["StepHeight"].is_number_float()) {
-        StepHeight = j["StepHeight"].get<float>();
+    if (j.contains("m_stepHeight") && j["m_stepHeight"].is_number_float()) {
+        m_stepHeight = j["m_stepHeight"].get<float>();
     }
-    if (j.contains("MaxSlopeAngle") && j["MaxSlopeAngle"].is_number_float()) {
-        MaxSlopeAngle = j["MaxSlopeAngle"].get<float>();
+    if (j.contains("m_maxSlopeAngle") && j["m_maxSlopeAngle"].is_number_float()) {
+        m_maxSlopeAngle = j["m_maxSlopeAngle"].get<float>();
     }
     
     // Collider/shape data

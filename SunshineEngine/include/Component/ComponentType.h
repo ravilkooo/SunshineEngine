@@ -32,4 +32,6 @@ NLOHMANN_JSON_SERIALIZE_ENUM(SE::ComponentType, {
 	{SE::ComponentType::MESH,   "MESH"},
 	{SE::ComponentType::CAMERA,   "CAMERA"},
 	{SE::ComponentType::PARTICLE_EMITTER,   "PARTICLE_EMITTER"},
+	{SE::ComponentType::CHARACTER,   "CHARACTER"},
+	{SE::ComponentType::CHARACTER_CONTROLLER,   "CHARACTER_CONTROLLER"},
 })

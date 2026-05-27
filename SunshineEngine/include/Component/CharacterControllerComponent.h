@@ -34,36 +34,36 @@ public:
     // Jolt character
     //
 
-    JPH::Ref<JPH::CharacterVirtual> Character;
-    JPH::Ref<JPH::Shape> Shape;
+    JPH::Ref<JPH::CharacterVirtual> m_character;
+    JPH::Ref<JPH::Shape> m_shape;
 
     //
     // Runtime state
     //
 
-    DXSM::Vector3 Velocity = DXSM::Vector3::Zero;
+    DXSM::Vector3 m_velocity = DXSM::Vector3::Zero;
 
-    bool Grounded = false;
+    bool m_grounded = false;
 
-    DXSM::Vector3 GroundNormal = DXSM::Vector3(0, 1, 0);
+    DXSM::Vector3 m_groundNormal = DXSM::Vector3(0, 1, 0);
 
     //
     // Movement tuning
     //
 
-    float MoveSpeed = 6.0f;
+    float m_moveSpeed = 6.0f;
 
-    float Acceleration = 30.0f;
-    float AirAcceleration = 8.0f;
+    float m_acceleration = 30.0f;
+    float m_airAcceleration = 8.0f;
 
-    float JumpSpeed = 8.0f;
+    float m_jumpSpeed = 8.0f;
 
-    float Gravity = -24.0f;
+    float m_gravity = -24.0f;
 
-    float MaxFallSpeed = -24.0f;
+    float m_maxFallSpeed = -24.0f;
 
-    bool EnableStickToFloor = false;
-    bool EnableWalkStairs = false;
+    bool m_enableStickToFloor = false;
+    bool m_enableWalkStairs = false;
 
 
     //
@@ -74,9 +74,9 @@ public:
     // float Radius = 0.35f;
     // float Height = 1.8f;
 
-    float StepHeight = 0.3f;
+    float m_stepHeight = 0.3f;
 
-    float MaxSlopeAngle = 45.0f;
+    float m_maxSlopeAngle = 45.0f;
 
     // Inherited via Component
     const std::type_info& getType() const override {
@@ -126,3 +126,21 @@ public:
     bool m_isValid = false;
     RenderComponent_Info* m_rc_info;
 };
+
+// Macro listing fields of CharacterControllerComponent to expose in Lua bindings
+#ifndef CHARACTERCONTROLLER_LUA_FIELDS_APPLY
+#define CHARACTERCONTROLLER_LUA_FIELDS_APPLY(F) \
+    F(m_velocity) ,             \
+    F(m_grounded) ,             \
+    F(m_groundNormal) ,         \
+    F(m_moveSpeed) ,            \
+    F(m_acceleration) ,         \
+    F(m_airAcceleration) ,      \
+    F(m_jumpSpeed) ,            \
+    F(m_gravity) ,              \
+    F(m_maxFallSpeed) ,         \
+    F(m_enableStickToFloor) ,   \
+    F(m_enableWalkStairs) ,     \
+    F(m_stepHeight) ,           \
+    F(m_maxSlopeAngle)
+#endif
