@@ -2907,6 +2907,26 @@
         },
         {
             "components": {
+                "Camera": {
+                    "cameraPitchYawRoll": [
+                        0.0,
+                        0.0,
+                        -0.33510321378707886
+                    ],
+                    "m_springArmParams": {
+                        "length": 12.100000381469727,
+                        "pitchYawRoll": [
+                            0.5215044021606445,
+                            0.0,
+                            0.0
+                        ],
+                        "rootOffset": [
+                            5.800000190734863,
+                            -4.599999904632568,
+                            0.0
+                        ]
+                    }
+                },
                 "Character": {
                     "m_isPlayerControlled": false
                 },
