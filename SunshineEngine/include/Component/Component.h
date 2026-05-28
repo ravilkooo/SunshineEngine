@@ -3,6 +3,7 @@
 #include <typeinfo>
 #include <EASTL/shared_ptr.h>
 #include <Component/ComponentType.h>
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 

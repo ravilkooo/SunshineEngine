@@ -48,14 +48,11 @@ void PlayerController::HandleKeyUp(Keys key)
 
 void PlayerController::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
-	SUNSHINE_ROOT_DIR;
-	if (!m_player->m_fixedCamera)
-	{
-		m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
-		m_stickPitchMoveDir = -args.Offset.y * m_stickYawPitchSpeed;
+	m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
+	m_stickPitchMoveDir = -args.Offset.y * m_stickYawPitchSpeed;
 		
-		m_player->m_playerCamera->RotateSpringArmYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
-	}
+	m_player->m_playerCamera->RotateSpringArmYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
+
 	m_player->m_luaActionMapping.ExecuteMouseMoveAction(args);
 }
 

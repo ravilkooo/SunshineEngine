@@ -1,7 +1,7 @@
 #include "UI/MainMenuBarPanel.h"
 #include "EditorApp.h"
 #include "ImguiEditorPass.h"
-#include <WorldEditor.h>s
+#include <WorldEditor.h>
 
 void MainMenuBarPanel::OnImGuiRender()
 {

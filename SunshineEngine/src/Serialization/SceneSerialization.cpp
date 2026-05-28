@@ -11,6 +11,7 @@
 #include <Component/TriggerComponent.h>
 #include <Component/LuaComponent.h>
 #include <Component/MeshComponent.h>
+#include <Component/CameraComponent.h>
 #include <Component/CharacterComponent.h>
 #include <Component/CharacterControllerComponent.h>
 
@@ -568,6 +569,7 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::PARTICLE_EMITTER:    key = "ParticleEmitter"; break;
             case SE::ComponentType::CHARACTER_CONTROLLER:   key = "CharacterController"; break;
             case SE::ComponentType::CHARACTER:              key = "Character"; break;
+            case SE::ComponentType::CAMERA:              key = "Camera"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -722,6 +724,15 @@ void Scene::FromJson(
                             physicsSystem,
                             go->GetComponent<TransformComponent>().get(), go->m_UUID);
                     }
+                }
+
+                if (objJ["components"].contains("Camera"))
+                {
+                    auto c = go->AddComponent<CameraComponent>(
+                        renderSystem->GetDevice(),
+                        go->GetComponent<TransformComponent>().get(),
+                        go->m_UUID);
+                    c->FromJson(objJ["components"]["Camera"]);
                 }
                 
                 // Parentnes
@@ -923,6 +934,15 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
                     go->GetComponent<TransformComponent_Info>().get());
                 c->FromJson(objJ["components"]["CharacterController"]);
             }
+        }
+
+        if (objJ["components"].contains("Camera"))
+        {
+            auto c = go->AddComponent<CameraComponent_Info>(
+                renderSystem->GetDevice(),
+                go->GetComponent<TransformComponent_Info>()->m_assignedComponent.get(),
+                go->m_UUID);
+            c->FromJson(objJ["components"]["Camera"]);
         }
 
         // Parentnes

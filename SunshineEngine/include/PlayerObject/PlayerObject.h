@@ -31,7 +31,6 @@ class PlayerObject : public GameObject
 public:
 	// camera settings
 	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
-	bool m_fixedCamera = false;
 
 	// Input
 	PlayerController m_playerController;

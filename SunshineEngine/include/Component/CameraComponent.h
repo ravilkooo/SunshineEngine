@@ -40,6 +40,9 @@ public:
     SE_G::Camera* GetCamera();
 
     eastl::shared_ptr<SE_G::Camera> m_camera;
+
+    void FromJson(const json& j) override;
+    void FromJson(const json& j, ID3D11Device* device, TransformComponent* trComp, SE::UUID uuid);
 };
 
 
@@ -70,6 +73,10 @@ public:
 
     bool IsAssigned() override { return true; }
     eastl::unique_ptr<CameraComponent> m_assignedComponent;
+
+    json ToJson() const override;
+    void FromJson(const json& j) override;
+    void FromJson(const json& j, ID3D11Device* device, TransformComponent* trComp, SE::UUID uuid);
 };
 
 // Macro listing methods of CameraComponent to expose in Lua bindings

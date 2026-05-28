@@ -34,10 +34,6 @@ void PlayerObject::SettingsFromJson(const json& j)
 		}
 	}
 
-	if (j.contains("fixedCamera")) {
-		m_fixedCamera = j["fixedCamera"].get<bool>();
-	}
-
 	// Load Lua script
 	if (j.contains("luaScript") && j.contains("keyFunctionMappings"))
 	{
@@ -90,8 +86,6 @@ json PlayerObject_Info::SettingsToJson() const
 	for (const auto& pair : m_keyFunctionMapping) {
 		j["keyFunctionMappings"].push_back(pair.ToJson());
 	}
-
-	j["fixedCamera"] = m_fixedCamera;
 
 	j["mouseFunctionMapping"] = m_mouseActionsHandlingFunction.c_str();
 
