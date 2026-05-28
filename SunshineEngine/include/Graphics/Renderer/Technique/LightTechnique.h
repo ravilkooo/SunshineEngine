@@ -5,7 +5,7 @@
 #include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
-#include <Graphics/GraphicsResources/Mesh.h>																																						.h>
+#include <Graphics/GraphicsResources/Mesh.h>
 #include <Graphics/Bindable/BlendState.h>
 #include <Graphics/Bindable/Rasterizer.h>
 #include <Graphics/Bindable/DepthStencilState.h>

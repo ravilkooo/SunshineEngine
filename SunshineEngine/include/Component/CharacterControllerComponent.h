@@ -23,6 +23,12 @@ public:
         TransformComponent* transformComp,
         SE::UUID uuid);
 
+    CharacterControllerComponent(const CharacterControllerComponent&) = delete;
+    CharacterControllerComponent& operator=(const CharacterControllerComponent&) = delete;
+
+    CharacterControllerComponent(CharacterControllerComponent&&) noexcept = default;
+    CharacterControllerComponent& operator=(CharacterControllerComponent&&) noexcept = default;
+
     void Initialize(PhysicsSystem* physicsSystem, TransformComponent* transformComp,
         SE::UUID uuid);
     
@@ -102,10 +108,17 @@ class CharacterControllerComponent_Info :
 {
 public:
 
+    CharacterControllerComponent_Info() = default;
     CharacterControllerComponent_Info(
         RenderComponent_Info* rc_info,
         TransformComponent_Info* tc_info);
     ~CharacterControllerComponent_Info();
+
+    CharacterControllerComponent_Info(const CharacterControllerComponent_Info&) = delete;
+    CharacterControllerComponent_Info& operator=(const CharacterControllerComponent_Info&) = delete;
+
+    CharacterControllerComponent_Info(CharacterControllerComponent_Info&&) noexcept = default;
+    CharacterControllerComponent_Info& operator=(CharacterControllerComponent_Info&&) noexcept = default;
 
     // Inherited via Component
     const std::type_info& getType() const override {

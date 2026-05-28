@@ -7,15 +7,13 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/unordered_set.h>
 
-#include <Graphics/Renderer/Technique/RenderTechnique.h>
-#include <Graphics/Renderer/Technique/GPassTechnique.h>
-
 #include <Component/Component.h>
 #include <Utils/UUID.h>
 
 namespace SE_G {
     class DeferredRenderer;
     class GPassTechnique;
+    class RenderTechnique;
 }
 
 //class GameObject_Info;
@@ -76,58 +74,17 @@ public:
 
     bool IsAssigned() override { return true; }
 
-    void AddTechnique_Info(SE_G::RenderTechnique *tech)
-    {
-        if (tech->GetTechniqueTag() == "IconPass") {
-            m_selectionTechnique = tech;
-        }
-        else if (tech->GetTechniqueTag() == "GPass") {
-            m_selectionTechnique = tech;
-            m_hasGPassMesh = true;
-            m_gPassTech = dynamic_cast<SE_G::GPassTechnique*>(tech);
-        }
+    // Just add only in Info component
+    void AddTechnique_Info(SE_G::RenderTechnique* tech);
 
-        techniques.insert(tech->GetTechniqueTag());
-    }
-
-    SE_G::RenderTechnique* AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> tech)
-    {
-        AddTechnique_Info(tech.get());
-        return m_assignedComponent->AddTechnique(eastl::move(tech));
-    }
+    // Also add in Info component
+    SE_G::RenderTechnique* AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> tech);
     
-    bool HasTechnique(eastl::string technique) {
-        return (techniques.find(technique) != techniques.end());
-    }
+    bool HasTechnique(eastl::string technique);
 
-    void RemoveTechnique(eastl::string technique) {
-        if (techniques.find(technique) != techniques.end())
-        {
-            if (technique == "GPass")
-            {
-                m_selectionTechnique = nullptr;
-                if (HasTechnique("IconPass"))
-                {
-                    m_selectionTechnique = m_assignedComponent->GetTechnique("IconPass");
-                }
-            }
-
-            techniques.erase(technique);
-            m_assignedComponent->RemoveTechnique(technique);
-        }
-    }
+    void RemoveTechnique(eastl::string technique);
 
     bool HasGPassMesh();
-
-    /*
-    void SetMesh(const eastl::string& filePath);
-    void SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh);
-    void SetMeshTexture(const eastl::wstring& filePath,
-        SE_G::Bind::SamplerPreset samplerPreset = SE_G::Bind::SamplerPreset::Wrap);
-    eastl::string GetCurrentMeshPath() const;
-    eastl::wstring GetCurrentTexturePath() const;
-    SE_G::Bind::SamplerPreset GetCurrentTextureSampler() const;
-    */
 
     eastl::unordered_set<eastl::string> techniques;
     eastl::unique_ptr<RenderComponent> m_assignedComponent;
@@ -145,13 +102,3 @@ private:
     SE_G::GPassTechnique* m_gPassTech;
     bool m_hasGPassMesh = false;
 };
-
-/*
-// Methods of RenderComponent to expose in Lua bindings
-#ifndef RENDERCOMPONENT_LUA_METHODS_APPLY
-#define RENDERCOMPONENT_LUA_METHODS_APPLY(FM) \
-    FM("hasTechnique", [](RenderComponent* self, const char* technique) -> bool { \
-        return self->HasTechnique(eastl::string(technique));                       \
-    })
-#endif
-*/

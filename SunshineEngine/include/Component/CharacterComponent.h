@@ -21,6 +21,13 @@ class CharacterComponent : public Component
 {
 public:
     CharacterComponent() = default;
+    ~CharacterComponent() = default;
+
+    CharacterComponent(const CharacterComponent&) = delete;
+    CharacterComponent& operator=(const CharacterComponent&) = delete;
+
+    CharacterComponent(CharacterComponent&&) noexcept = default;
+    CharacterComponent& operator=(CharacterComponent&&) noexcept = default;
 
     //
     // Gameplay state
@@ -66,6 +73,13 @@ class CharacterComponent_Info :
 {
 public:
     CharacterComponent_Info();
+    ~CharacterComponent_Info() = default;
+
+    CharacterComponent_Info(const CharacterComponent_Info&) = delete;
+    CharacterComponent_Info& operator=(const CharacterComponent_Info&) = delete;
+
+    CharacterComponent_Info(CharacterComponent_Info&&) noexcept = default;
+    CharacterComponent_Info& operator=(CharacterComponent_Info&&) noexcept = default;
 
     // Inherited via Component
     const std::type_info& getType() const override {

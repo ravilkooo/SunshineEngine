@@ -5,6 +5,9 @@
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
+
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {

@@ -1,6 +1,7 @@
 #include <Component/RenderComponent.h>
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
@@ -46,51 +47,44 @@ bool RenderComponent_Info::HasGPassMesh() {
 	return m_hasGPassMesh;
 }
 
-/*
-void RenderComponent_Info::SetMesh(const eastl::string& filePath) {
-	m_gPassTech->SetMesh(filePath);
-}
-
-void RenderComponent_Info::SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh) {
-	m_gPassTech->SetMesh(newMesh);
-}
-
-void RenderComponent_Info::SetMeshTexture(const eastl::wstring& filePath,
-	SE_G::Bind::SamplerPreset samplerPreset) {
-	m_gPassTech->SetTexture(filePath, samplerPreset);
-}
-
-eastl::string RenderComponent_Info::GetCurrentMeshPath() const {
-	return m_gPassTech->m_mesh->GetCurrentMeshPath();
-}
-
-eastl::wstring RenderComponent_Info::GetCurrentTexturePath() const {
-	return m_gPassTech->m_texture->GetCurrentTexturePath();
-}
-
-SE_G::Bind::SamplerPreset RenderComponent_Info::GetCurrentTextureSampler() const {
-	return m_gPassTech->m_textureSampler->m_preset;
-}
-*/
-
-/*
-bool RenderComponent::HasTechnique(eastl::string technique)
+void RenderComponent_Info::AddTechnique_Info(SE_G::RenderTechnique* tech)
 {
-	return techniques.find(technique) != techniques.end();
+	if (tech->GetTechniqueTag() == "IconPass") {
+		m_selectionTechnique = tech;
+	}
+	else if (tech->GetTechniqueTag() == "GPass") {
+		m_selectionTechnique = tech;
+		m_hasGPassMesh = true;
+		m_gPassTech = static_cast<SE_G::GPassTechnique*>(tech);
+	}
+
+	techniques.insert(tech->GetTechniqueTag());
 }
 
-void RenderComponent::PassTechnique(eastl::string technique, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+SE_G::RenderTechnique* RenderComponent_Info::AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> tech)
 {
-	techniques[technique]->Pass(context);
+	AddTechnique_Info(tech.get());
+	return m_assignedComponent->AddTechnique(eastl::move(tech));
 }
-*/
 
+bool RenderComponent_Info::HasTechnique(eastl::string technique) {
+	return (techniques.find(technique) != techniques.end());
+}
 
-// #define RC_ADD_METHOD(k, fn) k, fn
-// LUA_REGISTER_COMPONENT(
-//     RenderComponent,
-//     "RenderComponent",
-//     /* no fields */ ,
-//     RENDERCOMPONENT_LUA_METHODS_APPLY(RC_ADD_METHOD),
-//     "getRender")
-// #undef RC_ADD_METHOD
+void RenderComponent_Info::RemoveTechnique(eastl::string technique) {
+	if (techniques.find(technique) != techniques.end())
+	{
+		if (technique == "GPass")
+		{
+			m_selectionTechnique = nullptr;
+			if (HasTechnique("IconPass"))
+			{
+				m_selectionTechnique = m_assignedComponent->GetTechnique("IconPass");
+			}
+		}
+
+		techniques.erase(technique);
+		m_assignedComponent->RemoveTechnique(technique);
+	}
+}
+

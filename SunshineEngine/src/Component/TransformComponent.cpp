@@ -1,6 +1,10 @@
-#include "Component/TransformComponent.h"
+#include <Component/TransformComponent.h>
+#include <Graphics/Bindable/TransformCBuffer.h>
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>
+
+TransformComponent::TransformComponent() {
+}
 
 TransformComponent::TransformComponent(ID3D11Device* device) {
     SetupBuffer(device);

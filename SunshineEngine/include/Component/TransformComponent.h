@@ -3,17 +3,22 @@
 #include "Component.h"
 #include <SimpleMath.h>
 #include <d3d11.h>
-#include <Graphics/Bindable/TransformCBuffer.h>
 #include <EASTL/unique_ptr.h>
 
 namespace DXSM = DirectX::SimpleMath;
+
+namespace SE_G {
+    namespace Bind {
+        class TransformCBuffer;
+    }
+}
 
 class SUNSHINE_ENGINE_API TransformComponent :
     public Component
 {
     friend class TransformComponent_Info;
 public:
-    TransformComponent() {};    
+    TransformComponent();
     ~TransformComponent();
 
     TransformComponent(ID3D11Device* device);

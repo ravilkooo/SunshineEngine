@@ -3,7 +3,7 @@
 #include <EASTL/string.h>
 #include <sol/sol.hpp>
 
-extern struct ScriptComponent 
+struct ScriptComponent 
 {
 	sol::table self;
 	struct 
