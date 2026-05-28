@@ -19,28 +19,22 @@ namespace DXSM = DX::SimpleMath;
 #include <sol_ImGui.h>
 
 // SunshineLibs
-#include <Graphics/Renderer/RenderingSystem.h>
-#include <Graphics/Renderer/RenderGroup.h>
-#include <Graphics/Renderer/Pass/RenderPass.h>
-
 #include <Windows/WindowsApp.h>
-
-//#include <ResourceManager.h>
-#include <GameTimer.h>
-#include <Game.h>
-
-#include <WorldEditor.h>
 
 #include <UI/ProjectSelector.h>
 #include <Audio/AudioEditor.h>
 
-
 class ImguiEditorPass;
+class WorldEditor;
+class Game;
 
 namespace SE
 {
     class Project;
-
+}
+namespace SE_G {
+    class RenderingSystem;
+    class RenderGroup;
 }
 struct Ray
 {
@@ -94,8 +88,6 @@ public:
     eastl::shared_ptr<WorldEditor> m_worldEditor;
     SE::Project* m_openedProject = nullptr;
     eastl::unique_ptr<Game> m_currentGame;
-
-    //GameTimer m_timer;
 
     float m_deltaTime = 0.0f;
 

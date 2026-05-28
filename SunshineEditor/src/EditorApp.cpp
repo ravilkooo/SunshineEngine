@@ -10,11 +10,16 @@
 #include <ResourceManager/ResourceLoader/MeshLoader.h>
 #include <ResourceManager/ResourceLoader/ShaderLoader.h>
 
+#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/RenderGroup.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/Pass/RenderPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
 
 #include <Graphics/GraphicsResources/Texture.h>
+
+#include <Game.h>
+#include <WorldEditor.h>
 
 #include <ImguiEditorPass.h>
 

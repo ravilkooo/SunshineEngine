@@ -22,6 +22,8 @@
 #include <UI/FontStyles.h>
 #include "UI/PropertyPanel.h"
 
+#include <Game.h>
+
 #include <sstream>
 
 template <typename T>
