@@ -7,6 +7,8 @@
 
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/MiniViewRenderer.h>
+
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
@@ -238,6 +240,23 @@ void WorldEditor::SetupRendering(
 	m_renderingSystem->AddRenderGroup(m_renderer.get());
 }
 
+void WorldEditor::InitMiniViewport()
+{
+	m_renderingSystem->RemoveRenderGroup("CharacterViewport");
+
+	m_miniViewRenderer = eastl::make_shared<SE_G::MiniViewRenderer>(
+		"CharacterViewport", m_renderer->GetDevice(), m_renderer->GetDeviceContext());
+	m_miniViewRenderer->SetParentRenderer(m_renderer.get());
+	m_miniViewRenderer->Disable();
+
+	m_renderingSystem->AddRenderGroup(m_miniViewRenderer.get());
+}
+
+void WorldEditor::RenderMiniViewport()
+{
+	m_miniViewRenderer->Pass();
+}
+
 void WorldEditor::HandleKeyDown(Keys key)
 {
 	// In editor mode, use editor input manager
@@ -280,13 +299,13 @@ void WorldEditor::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 
 void WorldEditor::Start() {
 	m_renderer->Enable();
-	static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject))->m_miniViewRenderer->Enable();
+	m_miniViewRenderer->Enable();
 	m_particleSystem->Enable();
 }
 
 void WorldEditor::Pause() {
 	m_renderer->Disable();
-	static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject))->m_miniViewRenderer->Disable();
+	m_miniViewRenderer->Disable();
 	m_particleSystem->Disable();
 }
 
@@ -321,10 +340,9 @@ void WorldEditor::Update(float deltaTime)
 
 	m_renderer->GetMainCamera()->Update(deltaTime);
 
-	if (m_scene && (m_scene->m_playerObject != SE::UUID(0u)))
+	if (m_scene && m_miniViewRenderer && m_miniViewRenderer->IsEnabled())
 	{
-		static_cast<PlayerObject_Info*>(
-			m_scene->GetGameObjectByUUID(m_scene->m_playerObject))->m_playerCamera->Update(deltaTime);
+		m_miniViewRenderer->m_mainCamera->Update(deltaTime);
 	}
 	//scene->m_playerObject
 
@@ -437,7 +455,6 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 
 			json _empty;
 			go->SettingsFromJson(_empty, m_renderer.get());
-			go->AssignSceneToCamera(m_scene.get());
 
 			m_playerObject = m_scene->AddGameObject(eastl::move(go));
 			m_scene->m_playerObject = m_playerObject;
@@ -449,7 +466,7 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 
 		auto pObj = static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject));
 
-		m_renderingSystem->AddRenderGroup(pObj->m_miniViewRenderer.get());
+		InitMiniViewport();
 	}
 
 	return true;

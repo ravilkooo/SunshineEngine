@@ -42,7 +42,7 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
         ImVec2 avail = ImGui::GetContentRegionAvail();
         avail.y = avail.x * 360.0f / 640.0f;
 
-        ImGui::Image((ImTextureID)m_playerObject->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
+        // ImGui::Image((ImTextureID) m_playerObject->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Spring Arm Params");

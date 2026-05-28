@@ -302,7 +302,8 @@ void GameObject_Info::AddDefaultComponent(SE::ComponentType compType)
         case SE::ComponentType::CAMERA:
         {
             auto rc_info = GetComponent<RenderComponent_Info>();
-            auto cam_info = AddComponent<CameraComponent_Info>(rc_info->GetDevice());
+            auto tc_info = GetComponent<TransformComponent_Info>();
+            auto cam_info = AddComponent<CameraComponent_Info>(rc_info->GetDevice(), tc_info->m_assignedComponent.get(), m_UUID);
         }
 
         break;

@@ -651,7 +651,6 @@ void Scene::FromJson(
             {
                 go = eastl::make_unique<PlayerObject>(objJ, renderSystem, camera);
                 auto playerObj = static_cast<PlayerObject*>(go.get());
-                playerObj->AssignSceneToCamera(&GetInstance());
                 GetInstance().m_playerObjectUUID = playerObj->m_UUID;
                 break;
             }
@@ -843,7 +842,7 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         {
             go = eastl::make_unique<PlayerObject_Info>(objJ, renderSystem);
             auto playerObj = static_cast<PlayerObject_Info*>(go.get());
-            playerObj->AssignSceneToCamera(scene.get());
+            //playerObj->m_playerCamera->AssignTransformComponent(play)
             scene->m_playerObject = playerObj->m_UUID;
         }
         else

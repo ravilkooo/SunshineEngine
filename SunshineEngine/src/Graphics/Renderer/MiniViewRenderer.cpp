@@ -1,4 +1,4 @@
-#include <PlayerObject/MiniViewRenderer.h>
+#include <Graphics/Renderer/MiniViewRenderer.h>
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>

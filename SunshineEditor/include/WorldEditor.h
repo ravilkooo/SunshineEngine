@@ -36,6 +36,7 @@ namespace SE_G
 {
     class RenderingSystem;
     class DeferredRenderer;
+    class MiniViewRenderer;
 
     class GPass;
     class GBuffer;
@@ -100,7 +101,8 @@ public:
         eastl::shared_ptr<SE_G::RenderingSystem> renderSystem,
         UINT screenWidth = 800u,
         UINT screenHeight = 600u);
-    void SetUpPlayerObject();
+    void InitMiniViewport();
+    void RenderMiniViewport();
 
     void InitResourceLoaders(ID3D11Device* device);
 
@@ -133,6 +135,7 @@ public:
     GameTimer m_timer;
     eastl::shared_ptr<Scene_Info> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
+    eastl::shared_ptr<SE_G::MiniViewRenderer> m_miniViewRenderer;
     LuaManager m_luaManager;
 
     UINT m_screenWidth = 800u;

@@ -8,7 +8,6 @@
 #include <PlayerObject/PlayerController.h>
 #include <PlayerObject/PlayerLuaKeyActionsMapping.h>
 #include <PlayerObject/KeyFunctionPair.h>
-#include <PlayerObject/MiniViewRenderer.h>
 
 #include <Utils/AssetPath.h>
 
@@ -41,11 +40,9 @@ public:
 
 	PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, eastl::shared_ptr<SE_G::Camera> camera);
 
-	void SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera);
+	void SettingsFromJson(const json& j);
 
 	void SetUpCamera(SE_G::DeferredRenderer* renderSystem);
-
-	void AssignSceneToCamera(Scene* scene);
 
 	void SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer);
 
@@ -73,7 +70,7 @@ public:
 	eastl::string m_mouseActionsHandlingFunction;
 
 	// MiniViewRenderer
-	eastl::shared_ptr<SE_G::MiniViewRenderer> m_miniViewRenderer;
+	// eastl::shared_ptr<SE_G::MiniViewRenderer> m_miniViewRenderer;
 
 	// allowed components:
 	// transform, mesh, physics?
@@ -172,10 +169,7 @@ public:
 	void AddMeshComponent();
 	void AddPhysicsComponent();
 
-	void InitMiniViewport(SE_G::DeferredRenderer* defRenderer);
-	void AssignSceneToCamera(Scene_Info* scene);
-	void SetUpCamera();
-	void RenderViewport();
+	void SetUpCamera(SE_G::DeferredRenderer* defRenderer);
 
 public:
 

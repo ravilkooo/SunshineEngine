@@ -48,31 +48,27 @@ PlayerObject::PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, 
 	m_playerController.SetPlayerObject(this);
 
 	m_playerCamera = camera;
-	m_playerCamera->SetFollowPlayer(m_UUID);
+	m_playerCamera->SetFollowUUID(m_UUID);
 
 	if (j.contains("settings"))
 	{
-		SettingsFromJson(j["settings"], camera);
+		SettingsFromJson(j["settings"]);
 	}
 	else
 	{
 		json _empty;
-		SettingsFromJson(_empty, camera);
+		SettingsFromJson(_empty);
 	}
 
-	AddComponent<CameraComponent>(m_playerCamera);
+	AddComponent<CameraComponent>(m_playerCamera, tc, m_UUID);
 }
 
 void PlayerObject::SetUpCamera(SE_G::DeferredRenderer* renderSystem)
 {
 	m_playerCamera = eastl::make_shared<SE_G::Camera>(
 		renderSystem->GetDevice(), renderSystem->m_screenWidth / renderSystem->m_screenHeight);
-	m_playerCamera->SetFollowPlayer(m_UUID);
-}
-
-void PlayerObject::AssignSceneToCamera(Scene* scene)
-{
-	m_playerCamera->AssignScene(scene);
+	m_playerCamera->AssignTransformComponent(GetComponent<TransformComponent>().get());
+	m_playerCamera->SetFollowUUID(m_UUID);
 }
 
 void PlayerObject::SetDefaultLuaActionMapping()
@@ -132,6 +128,8 @@ PlayerObject_Info::PlayerObject_Info(SE_G::DeferredRenderer* renderSystem) : Gam
 	
 	m_luaScriptPath = AssetPath();
 	m_keyFunctionMapping = eastl::vector<KeyFunctionPair>();
+
+	SetUpCamera(renderSystem);
 };
 
 PlayerObject_Info::PlayerObject_Info(const json& j, SE_G::DeferredRenderer* renderSystem)
@@ -318,28 +316,11 @@ void PlayerObject_Info::AddPhysicsComponent()
 	m_physComp->SetMotion(SE::PhysicsMotionType::Kinematic);
 };
 
-void PlayerObject_Info::InitMiniViewport(SE_G::DeferredRenderer* defRenderer)
-{
-	m_miniViewRenderer = eastl::make_shared<SE_G::MiniViewRenderer>(
-		"PlayerViewport", defRenderer->GetDevice(), defRenderer->GetDeviceContext());
-	m_miniViewRenderer->SetParentRenderer(defRenderer);
-	m_miniViewRenderer->Disable();
-}
-
-void PlayerObject_Info::AssignSceneToCamera(Scene_Info* scene)
-{
-	m_playerCamera->AssignScene(scene);
-}
-
-void PlayerObject_Info::SetUpCamera()
+void PlayerObject_Info::SetUpCamera(SE_G::DeferredRenderer* defRenderer)
 {
 	m_playerCamera = eastl::make_shared<SE_G::Camera>(
-		m_miniViewRenderer->GetDevice(), 640.0f / 360.0f);
-	m_playerCamera->SetFollowPlayer(m_UUID);
-	m_miniViewRenderer->SetMainCamera(m_playerCamera);
+		defRenderer->GetDevice(), 640.0f / 360.0f);
+	m_playerCamera->AssignTransformComponent(m_transformComp->m_assignedComponent.get());
+	m_playerCamera->SetFollowUUID(m_UUID);
 }
 
-void PlayerObject_Info::RenderViewport()
-{
-	m_miniViewRenderer->Pass();
-}

@@ -6,7 +6,6 @@
 #include <PlayerObject/PlayerObject.h>
 
 #include <iostream>
-#include <Scene.h>
 
 namespace SE_G {
     Camera::Camera(ID3D11Device* device) : Camera(device, 1.0f) {
@@ -205,6 +204,11 @@ namespace SE_G {
         this->viewHeight = viewHeight;
     }
 
+    void Camera::AssignTransformComponent(TransformComponent* trComp)
+    {
+        m_assignedTransform = trComp;
+    }
+
     float Camera::GetViewHeight()
     {
         return viewHeight;
@@ -226,21 +230,11 @@ namespace SE_G {
 
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
-            if (!m_playerTransform)
+            if (!m_assignedTransform)
             {
-                if (m_playerAsObject)
-                {
-                    auto pObj = m_scene.asScene->GetGameObjectByUUID(m_playerUUID);
-
-                    m_playerTransform = pObj->GetComponent<TransformComponent>().get();
-                }
-                else
-                {
-                    auto pObj = m_scene.asInfo->GetGameObjectByUUID(m_playerUUID);
-                    m_playerTransform = pObj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
-                }
+                UpdateTargetPoistion(DXSM::Vector3::Zero);
             }
-            DXSM::Matrix targetTransform = m_playerTransform->GetWorldMatrix_noLocal();
+            DXSM::Matrix targetTransform = m_assignedTransform->GetWorldMatrix_noLocal();
 
             DXSM::Vector3 targetPos;
             targetPos.x = targetTransform._41;
@@ -381,6 +375,7 @@ namespace SE_G {
         cameraMode = CAMERA_MODE::FPS;
     }
 
+    /*
     void Camera::AssignScene(Scene* scene)
     {
         m_playerAsObject = true;
@@ -392,10 +387,11 @@ namespace SE_G {
         m_playerAsObject = false;
         m_scene.asInfo = scene;
     }
+    */
 
-    void Camera::SetFollowPlayer(SE::UUID playerUUID)
+    void Camera::SetFollowUUID(SE::UUID followUUID)
     {
-        m_playerUUID = playerUUID;
+        m_assignedUUID = followUUID;
         InitFollowModeParams();
     }
 

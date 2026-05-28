@@ -528,7 +528,7 @@ void EditorApp::CloseProject()
 {
 	m_projectSelected = NULL;
 
-	m_renderingSystem->RemoveRenderGroup("PlayerViewport");
+	m_renderingSystem->RemoveRenderGroup("CharacterViewport");
 	// m_openedProject = NULL;
 	// m_loadedSceneType = SE::SceneType::Custom;
 }

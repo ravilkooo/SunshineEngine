@@ -12,8 +12,8 @@
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
-class Scene;
-class Scene_Info;
+// class Scene;
+// class Scene_Info;
 class TransformComponent;
 
 namespace SE_G {
@@ -99,10 +99,8 @@ namespace SE_G {
 
         void SwitchToFPSMode();
 
-        void AssignScene(Scene* scene);
-        void AssignScene(Scene_Info* scene);
-
-        void SetFollowPlayer(SE::UUID playerUUID);
+        void SetFollowUUID(SE::UUID followUUID);
+        void AssignTransformComponent(TransformComponent* trComp);
         void InitFollowModeParams();
 
         /*
@@ -202,18 +200,19 @@ namespace SE_G {
         // for FOLLOW camera mode
         float followPitch;
 
-        // Follow PlayerObject
-        bool m_playerAsObject = false;
-
+        /*
         union {
             Scene* asScene;
             Scene_Info* asInfo;
         } m_scene;
 
-        TransformComponent* m_playerTransform = nullptr;
-        bool m_playerPointerInited = false;
+        void AssignScene(Scene* scene);
+        void AssignScene(Scene_Info* scene);
+        */
 
-        SE::UUID m_playerUUID = SE::UUID(0u);
+        TransformComponent* m_assignedTransform = nullptr;
+
+        SE::UUID m_assignedUUID = SE::UUID(0u);
 
     };
 }

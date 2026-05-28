@@ -4,7 +4,10 @@
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
 
+#include <Utils/UUID.h>
+
 class ID3D11Device;
+class TransformComponent;
 
 namespace SE_G
 {
@@ -16,8 +19,8 @@ class CameraComponent :
 {
 public:
     CameraComponent() = default;
-    CameraComponent(ID3D11Device* device);
-    CameraComponent(eastl::shared_ptr<SE_G::Camera> camera);
+    CameraComponent(ID3D11Device* device, TransformComponent* trComp, SE::UUID uuid);
+    CameraComponent(eastl::shared_ptr<SE_G::Camera> camera, TransformComponent* trComp, SE::UUID uuid);
     ~CameraComponent() = default;
 
     CameraComponent(const CameraComponent&) = delete;
@@ -45,8 +48,8 @@ class CameraComponent_Info :
 {
 public:
     CameraComponent_Info() = default;
-    CameraComponent_Info(ID3D11Device* device);
-    CameraComponent_Info(eastl::shared_ptr<SE_G::Camera> camera);
+    CameraComponent_Info(ID3D11Device* device, TransformComponent* trComp, SE::UUID uuid);
+    CameraComponent_Info(eastl::shared_ptr<SE_G::Camera> camera, TransformComponent* trComp, SE::UUID uuid);
     ~CameraComponent_Info() = default;
 
     CameraComponent_Info(const CameraComponent_Info&) = delete;

@@ -2,11 +2,12 @@
 
 #include <Serialization/GraphicsSerialization.h>
 #include <Graphics/Utils/Camera.h>
+#include <Component/TransformComponent.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camera> camera)
+void PlayerObject::SettingsFromJson(const json& j)
 {
 	if (j.contains("camera"))
 	{
@@ -46,6 +47,8 @@ void PlayerObject::SettingsFromJson(const json& j, eastl::shared_ptr<SE_G::Camer
 	{
 		SetDefaultLuaActionMapping();
 	}
+	m_playerCamera->AssignTransformComponent(GetComponent<TransformComponent>().get());
+	m_playerCamera->SetFollowUUID(m_UUID);
 }
 
 json PlayerObject_Info::ToJson() const {
@@ -97,8 +100,7 @@ json PlayerObject_Info::SettingsToJson() const
 
 void PlayerObject_Info::SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer)
 {
-	InitMiniViewport(defRenderer);
-	SetUpCamera();
+	SetUpCamera(defRenderer);
 
 	if (j.contains("camera"))
 	{

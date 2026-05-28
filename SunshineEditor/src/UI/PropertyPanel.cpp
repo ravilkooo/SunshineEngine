@@ -2,6 +2,8 @@
 
 #include "WorldEditor.h"
 
+#include <Graphics/Renderer/MiniViewRenderer.h>
+#include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/GraphicsResources/Mesh.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/Bindable/Sampler.h>
@@ -28,6 +30,7 @@
 #include <Component/LuaComponent.h>
 #include <Component/TriggerComponent.h>
 #include <Component/CharacterComponent.h>
+#include <Component/CameraComponent.h>
 #include <Component/CharacterControllerComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
@@ -42,6 +45,7 @@
 #include "Audio/AudioSystem.h"
 #include "UI/ContentBrowserPanel.h"
 #include "Utils/FileDialogManager.h"
+
 #include <ResourceManager/ResourceManagerFacade.h>
 
 
@@ -397,6 +401,7 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         DrawMeshComponent(obj);
         DrawCharacterComponent(obj);
         DrawCharacterControllerComponent(obj);
+        DrawCameraComponent(obj);
         DrawPhysicsComponent(obj);
         DrawTriggerComponent(obj);
         DrawPerceptionComponent(obj);
@@ -1459,6 +1464,16 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
                 obj->AddDefaultComponent(SE::ComponentType::CHARACTER);
             }
         }
+
+        if (!obj->HasComponent<CameraComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Camera Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::CAMERA);
+            }
+        }
         
         if (!obj->HasComponent<CharacterControllerComponent_Info>())
         {
@@ -2017,6 +2032,85 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<CameraComponent_Info>())
+        return;
+    auto cameraInfo = obj->GetComponent<CameraComponent_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Camera Component", flags))
+    {
+        EditorUI::FontStyles::Pop();
+        cameraInfo->m_assignedComponent->m_camera->SetUpCameraViewByAspectRatio(640.0f / 360.0f);
+        m_WorldEditor->m_miniViewRenderer->SetMainCamera(cameraInfo->m_assignedComponent->m_camera);
+        m_WorldEditor->m_miniViewRenderer->Enable();
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        avail.y = avail.x * 360.0f / 640.0f;
+
+        ImGui::Image((ImTextureID) m_WorldEditor->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("Visualisation");
+        EditorUI::FontStyles::Pop();
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("Spring Arm Params");
+        EditorUI::FontStyles::Pop();
+
+        float stickLength = cameraInfo->m_assignedComponent->m_camera->m_springArmParams.length;
+        if (ImGui::DragFloat("Length", &stickLength, 0.1f, 0.1f, 90.0f, "%.1f m"))
+        {
+            cameraInfo->m_assignedComponent->m_camera->m_springArmParams.length = stickLength;
+        }
+
+        DXSM::Vector3 springArmRotationDeg = cameraInfo->m_assignedComponent->m_camera->m_springArmParams.pitchYawRoll * (180.0f / DirectX::XM_PI);
+        if (PropertyPanel::DrawVector3Control("Rotation", springArmRotationDeg,
+            DXSM::Vector3(-90.0f, -80.0f, -360.0f),
+            DXSM::Vector3(90.0f, 80.0f, 360.0f),
+            0.0f))
+        {
+            cameraInfo->m_assignedComponent->m_camera->m_springArmParams.pitchYawRoll = springArmRotationDeg * (DirectX::XM_PI / 180.0f);
+        }
+
+        PropertyPanel::DrawVector3Control("Offset",
+            cameraInfo->m_assignedComponent->m_camera->m_springArmParams.rootOffset,
+            DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
+            DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+            0.0f);
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("Camera Params");
+        EditorUI::FontStyles::Pop();
+
+        DXSM::Vector3 cameraRotationDeg = cameraInfo->m_assignedComponent->m_camera->cameraPitchYawRoll * (180.0f / DirectX::XM_PI);
+        if (PropertyPanel::DrawVector3Control("Rotation", cameraRotationDeg,
+            DXSM::Vector3(-90.0f, -80.0f, -360.0f),
+            DXSM::Vector3(90.0f, 80.0f, 360.0f),
+            0.0f))
+        {
+            cameraInfo->m_assignedComponent->m_camera->cameraPitchYawRoll = cameraRotationDeg * (DirectX::XM_PI / 180.0f);
+        }
+
+        if (DrawComponentRemoveButton<CameraComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
+
+        ImGui::TreePop();
+    }
+    else
+    {
+        EditorUI::FontStyles::Pop();
+    }
 }
 
 void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)

@@ -1,4 +1,5 @@
 #include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/MiniViewRenderer.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 #include <Graphics/Renderer/GBuffer.h>
 
@@ -548,15 +549,15 @@ void ImguiEditorPass::ShowProperties()
 
 		if (ImGui::BeginTabItem("Object Properties"))
 		{
-			pObj->m_miniViewRenderer->Disable();
-
 			ShowGameObjectProperties();
 			ImGui::EndTabItem();
 		}
 
 		if (ImGui::BeginTabItem("Player Settings"))
 		{
-			pObj->m_miniViewRenderer->Enable();
+			pObj->m_playerCamera->SetUpCameraViewByAspectRatio(640.0f / 360.0f);
+			m_editorApp->m_worldEditor->m_miniViewRenderer->SetMainCamera(pObj->m_playerCamera);
+			m_editorApp->m_worldEditor->m_miniViewRenderer->Enable();
 
 			ShowPlayerProperties();
 
@@ -565,7 +566,7 @@ void ImguiEditorPass::ShowProperties()
 
 		if (ImGui::BeginTabItem("Audio Manager"))
 		{
-			pObj->m_miniViewRenderer->Disable();
+			m_editorApp->m_worldEditor->m_miniViewRenderer->Disable();
 
 			if (m_AudioEditor)
 			{
@@ -589,10 +590,6 @@ void ImguiEditorPass::ShowGameObjectProperties()
 	m_PropertyPanel.SetWorldEditor(m_editorApp->m_worldEditor);
 	m_PropertyPanel.SetSelectedUUID(m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked);
 	m_PropertyPanel.OnImGuiRender();
-
-	GameObject_Info* obj = m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(
-		m_editorApp->m_worldEditor->m_hierarchySelection.last_clicked
-	);
 }
 
 void ImguiEditorPass::ShowPlayerProperties()
