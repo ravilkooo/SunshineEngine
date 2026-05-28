@@ -2,20 +2,32 @@
 
 #include <stdexcept>
 #include <EASTL/unique_ptr.h>
+#include <EASTL/shared_ptr.h>
 
 #include "RenderPass.h"
 
-#include <Graphics/Renderer/GBuffer.h>
-#include <Graphics/Utils/Camera.h>
-#include <Graphics/Bindable/ConstantBuffer.h>
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
-#include <GameObject/Lighting/LightCollection.h>
 
 namespace SE {
     class ParticleSystem;
 }
 
 namespace SE_G {
+    class GBuffer;
+    class Camera;
+
+    namespace Bind {
+        template <typename T>
+        class PixelConstantBuffer;
+
+        class BlendState;
+        class Sampler;
+        class Texture;
+    }
+
     class LightPass :
         public RenderPass
     {

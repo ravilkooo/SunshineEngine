@@ -5,11 +5,28 @@
 #include <wrl.h>
 
 #include <Graphics/Renderer/Pass/RenderPass.h>
-#include <Graphics/Renderer/Pass/GPass.h>
 
+#include <Graphics/Lighting/LightData.h>
 #include <Graphics/Renderer/ShadowMap.h>
 
 namespace SE_G {
+    class GPass;
+    class Camera;
+
+    namespace Bind {
+        class Rasterizer;
+        class VertexShader;
+        class Texture;
+        class Sampler;
+        class Rasterizer;
+
+        template <typename T>
+        class VertexConstantBuffer;
+
+        template <typename T>
+        class PixelConstantBuffer;
+    }
+
     class ShadowMapPass :
         public RenderPass
     {

@@ -5,7 +5,6 @@
 #include <EASTL/string.h>
 
 #include "RenderTechnique.h"
-#include <Graphics/Bindable/ConstantBuffer.h>
 
 #include <Physics/PhysicsEnums.h>
 #include <Physics/CollisionUtils.h>
@@ -52,6 +51,10 @@ namespace SE
 }
 
 namespace SE_G {
+    namespace Bind {
+        template <typename T>
+        class VertexConstantBuffer;
+    }
 
     class EmitterTechnique :
         public RenderTechnique

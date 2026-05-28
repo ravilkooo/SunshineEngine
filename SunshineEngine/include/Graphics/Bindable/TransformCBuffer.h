@@ -2,7 +2,6 @@
 
 #include <directxmath.h>
 #include "Bindable.h"
-#include "ConstantBuffer.h"
 #include <EASTL/unique_ptr.h>
 
 class TransformComponent;
@@ -10,6 +9,8 @@ class TransformComponent;
 namespace SE_G {
 	namespace Bind
 	{
+		template <typename T>
+		class VertexConstantBuffer;
 
 		class TransformCBuffer : public Bindable
 		{

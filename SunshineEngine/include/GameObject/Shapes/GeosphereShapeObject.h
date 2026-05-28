@@ -6,8 +6,6 @@
 #include <GameObject/Shapes/ShapeObject.h>
 #include <GameObject/Shapes/ShapeData.h>
 
-#include <Serialization/ShapeSerialization.h>
-#include <Serialization/DXSMSerialization.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 

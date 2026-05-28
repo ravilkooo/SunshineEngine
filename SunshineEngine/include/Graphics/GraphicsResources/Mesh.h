@@ -21,14 +21,16 @@
 
 #include <Utils/AssetPath.h>
 
-#include <Graphics/Bindable/VertexBuffer.h>
-#include <Graphics/Bindable/IndexBuffer.h>
-#include <Graphics/Bindable/Topology.h>
-
 namespace DXSM = DirectX::SimpleMath;
 namespace DX = DirectX;
 
 namespace SE_G {
+    namespace Bind {
+        class VertexBuffer;
+        class IndexBuffer;
+        class Topology;
+    }
+
     struct Vertex
     {
         DXSM::Vector3 position;
@@ -49,7 +51,7 @@ namespace SE_G {
         : public IResource
     {
     public:
-        Mesh() {};
+        Mesh();
         Mesh(ID3D11Device* device,
             AssetPath meshPath);
         ~Mesh();

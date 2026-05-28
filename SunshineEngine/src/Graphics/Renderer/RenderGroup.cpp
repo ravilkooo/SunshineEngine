@@ -1,4 +1,6 @@
 #include <Graphics/Renderer/RenderGroup.h>
+#include <Graphics/Renderer/Pass/RenderPass.h>
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
 
 namespace SE_G {
 	RenderGroup::RenderGroup(
@@ -38,7 +40,7 @@ namespace SE_G {
 
 	RenderPass* RenderGroup::AddPass(eastl::unique_ptr<RenderPass> pass)
 	{
-		const SE_G::RenderPass::PassType passType = pass->m_passType;
+		const PassType passType = pass->m_passType;
 		auto [it, inserted] = m_passes.emplace(passType, nullptr);
 		if (!inserted)
 		{
@@ -49,7 +51,7 @@ namespace SE_G {
 		return m_passes[passType].get();
 	}
 
-	RenderPass* RenderGroup::GetPass(RenderPass::PassType passType)
+	RenderPass* RenderGroup::GetPass(PassType passType)
 	{
 		if (!m_passes.contains(passType))
 		{
@@ -61,7 +63,7 @@ namespace SE_G {
 		}
 	}
 
-	void RenderGroup::RemovePass(RenderPass::PassType passType)
+	void RenderGroup::RemovePass(PassType passType)
 	{
 		auto it = m_passes.find(passType);
 		if (it == m_passes.end())

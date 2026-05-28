@@ -1,14 +1,14 @@
 #pragma once
 
+#include <d3d11.h>
+
 #include <EASTL/algorithm.h>
 #include <EASTL/unique_ptr.h>
 
-#include <DirectXMath.h>
-#include <SimpleMath.h>
-
-#include "Graphics/Bindable/ConstantBuffer.h"
 #include <Utils/UUID.h>
 
+#include <DirectXMath.h>
+#include <SimpleMath.h>
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
@@ -17,6 +17,11 @@ class Scene_Info;
 class TransformComponent;
 
 namespace SE_G {
+    namespace Bind {
+        template <typename T>
+        class VertexConstantBuffer;
+    }
+
     class Camera
     {
         friend class ShadowMapPass;

@@ -1,4 +1,8 @@
 #include "Graphics/Renderer/Pass/RenderPass.h"
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
+#include <Graphics/Bindable/Bindable.h>
+
+#include <Graphics/Utils/Camera.h>
 
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>

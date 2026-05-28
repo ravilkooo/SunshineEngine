@@ -9,8 +9,6 @@
 #include <EASTL/unordered_map.h>
 #include <EASTL/string.h>
 
-#include <ParticleSystem/Particle.h>
-
 #include <Utils/UUID.h>
 
 namespace DX = DirectX;

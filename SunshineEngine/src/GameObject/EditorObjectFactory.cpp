@@ -1,8 +1,7 @@
 #include <GameObject/EditorObjectFactory.h>
+
 #include <GameObject/GameObject.h>
-
 #include <GameObject/Lighting/LightCollection.h>
-
 #include <GameObject/Shapes/ShapeCollection.h>
 
 #include <ParticleSystem/ParticleEmitterComponent.h>
@@ -21,6 +20,8 @@
 #include <Graphics/Renderer/Technique/EmitterTechnique.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
+
+#include <Graphics/Utils/Camera.h>
 
 eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateParticleEmitter(
 	SE::ParticleSystem* particleSystem)

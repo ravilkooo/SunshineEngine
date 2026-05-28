@@ -33,6 +33,7 @@
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
 
+#include <Scene.h>
 #include <SceneHierarchy.h>
 
 #include <UI/PropertyPanel.h>

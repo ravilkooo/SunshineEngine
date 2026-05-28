@@ -1,19 +1,20 @@
-
 #pragma once
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 #include <Utils/StringUtils.h>
-#include <wrl.h>
-#include <d3d11.h>
-#include <Graphics/Utils/Camera.h>
 #include <Graphics/Lighting/LightData.h>
 
 #include <Utils/AssetPath.h>
+
+#include <wrl.h>
+#include <d3d11.h>
+namespace DX = DirectX;
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 class GameObject;
+
 class AmbientLight;
 class DirectionalLight;
 class PointLight;
@@ -28,6 +29,7 @@ namespace SE
 namespace SE_G {
 	class DeferredRenderer;
 	class Mesh;
+	class Camera;
 }
 
 class GameObjectFactory

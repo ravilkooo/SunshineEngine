@@ -1,18 +1,24 @@
 #include "Graphics/Renderer/Technique/GPassTechnique.h"
 #include <Graphics/Renderer/DeferredRenderer.h>
+
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/DepthStencilState.h>
 #include <Graphics/Bindable/Rasterizer.h>
 #include <Graphics/Bindable/BlendState.h>
+#include <Graphics/Bindable/ConstantBuffer.h>
+
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/GraphicsResources/Mesh.h>
+
 #include <Component/MeshComponent.h>
-#include <Utils/StringUtils.h>
 #include <ResourceManager/ResourceManagerFacade.h>
+
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
+
+#include <Utils/StringUtils.h>
 
 
 namespace SE_G {

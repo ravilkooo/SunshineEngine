@@ -9,6 +9,8 @@
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 
+#include <Serialization/LightDataSerialization.h>
+#include <Serialization/DXSMSerialization.h>
 
 
 SkyBox::SkyBox(

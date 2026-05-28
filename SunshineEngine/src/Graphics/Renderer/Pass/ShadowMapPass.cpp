@@ -1,16 +1,22 @@
 #include <Graphics/Renderer/RenderingSystem.h>
 
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
+#include <Graphics/Renderer/Pass/GPass.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
+
 #include <Graphics/Bindable/Rasterizer.h>
 #include <Graphics/Bindable/Sampler.h>
+#include <Graphics/Bindable/ConstantBuffer.h>
+
 #include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
 
-#include <Graphics/Renderer/Technique/GPassTechnique.h>
+#include <Graphics/GraphicsResources/Mesh.h>
+
+#include <Graphics/Utils/Camera.h>
 
 #include <Component/TransformComponent.h>
 #include <Component/MeshComponent.h>
-#include <Graphics/GraphicsResources/Mesh.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 

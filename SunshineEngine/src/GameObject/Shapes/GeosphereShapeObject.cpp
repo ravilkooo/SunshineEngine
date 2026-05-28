@@ -5,6 +5,8 @@
 #include <Component/MeshComponent.h>
 
 #include <Serialization/GraphicsSerialization.h>
+#include <Serialization/ShapeSerialization.h>
+#include <Serialization/DXSMSerialization.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 

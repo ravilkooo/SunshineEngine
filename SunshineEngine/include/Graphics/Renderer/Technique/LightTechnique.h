@@ -6,6 +6,7 @@
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/GraphicsResources/Mesh.h>
+#include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/BlendState.h>
 #include <Graphics/Bindable/Rasterizer.h>
 #include <Graphics/Bindable/DepthStencilState.h>
@@ -152,17 +153,4 @@ namespace SE_G {
         virtual void ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos) = 0;
         virtual void ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos) = 0;
     };
-    /*
-    template class LightTechnique<AmbientLightData>;
-    template void LightTechnique<AmbientLightData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);
-
-    template class LightTechnique<DirectionalLightData>;
-    template void LightTechnique<DirectionalLightData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);
-
-    template class LightTechnique<PointLightData>;
-    template void LightTechnique<PointLightData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);
-
-    template class LightTechnique<SkyBoxData>;
-    template void LightTechnique<SkyBoxData>::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext>);
-    */
 }

@@ -19,6 +19,8 @@ class RenderComponent_Info;
 class TransformComponent_Info;
 class MeshComponent_Info;
 class PhysicsComponent_Info;
+class Scene_Info;
+class Scene;
 
 namespace SE_G
 {

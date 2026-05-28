@@ -5,6 +5,7 @@
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/Bindable/BlendState.h>
+#include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/Rasterizer.h>
 #include <Graphics/Bindable/DepthStencilState.h>
 #include <Component/TransformComponent.h>

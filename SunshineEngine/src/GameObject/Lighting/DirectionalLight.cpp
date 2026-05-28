@@ -4,6 +4,7 @@
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/Pass/RenderPass.h>
+#include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
 
 #include <Component/RenderComponent.h>
@@ -37,7 +38,7 @@ DirectionalLight::DirectionalLight(
 	if (castsShadow)
 	{
 		//renderSystem->
-		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
+		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::PassType::GPass));
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
@@ -82,7 +83,7 @@ DirectionalLight::DirectionalLight(
 	if (castsShadow)
 	{
 		
-		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
+		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::PassType::GPass));
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
@@ -101,7 +102,7 @@ void DirectionalLight::EnableShadow(
 		m_lightTech->EnableShadow();
 	else
 	{
-		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
+		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::PassType::GPass));
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
@@ -144,7 +145,7 @@ DirectionalLight_Info::DirectionalLight_Info(
 	if (castsShadow)
 	{
 		//renderSystem->
-		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
+		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::PassType::GPass));
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
@@ -193,7 +194,7 @@ DirectionalLight_Info::DirectionalLight_Info(
 
 	if (j.contains("CastsShadow") && j["CastsShadow"])
 	{
-		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
+		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::PassType::GPass));
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
@@ -218,7 +219,7 @@ void DirectionalLight_Info::EnableShadow(
 		m_lightTech->EnableShadow();
 	else
 	{
-		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::RenderPass::PassType::GPass));
+		auto gPass = static_cast<SE_G::GPass*>(renderSystem->GetPass(SE_G::PassType::GPass));
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(

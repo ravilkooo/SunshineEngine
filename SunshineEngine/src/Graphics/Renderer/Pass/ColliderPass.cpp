@@ -7,6 +7,7 @@
 
 #include <Graphics/Bindable/DepthStencilState.h>
 #include <Graphics/Bindable/IndexBuffer.h>
+#include <Graphics/Bindable/VertexBuffer.h>
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/Topology.h>
 

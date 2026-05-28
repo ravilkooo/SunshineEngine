@@ -1,8 +1,12 @@
 #include <ParticleSystem/ParticleEmitterComponent.h>
 #include <ParticleSystem/ParticleSystem.h>
+#include <ParticleSystem/Particle.h>
+
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/GraphicsResources/Texture.h>
+
 #include <Graphics/Bindable/TransformCBuffer.h>
+#include <Graphics/Bindable/ConstantBuffer.h>
 
 #include <Component/TransformComponent.h>
 

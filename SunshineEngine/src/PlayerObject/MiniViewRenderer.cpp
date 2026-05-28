@@ -20,15 +20,15 @@ namespace SE_G {
 		m_parentRenderer = parentRenderer;
 
 		// Passes
-		for (UINT i = 0u; i < static_cast<UINT>(RenderPass::PassType::Count); i++)
+		for (UINT i = 0u; i < static_cast<UINT>(PassType::Count); i++)
 		{
-			if (!parentRenderer->m_passes.contains(static_cast<RenderPass::PassType>(i)))
+			if (!parentRenderer->m_passes.contains(static_cast<PassType>(i)))
 				continue;
-			auto passType = static_cast<RenderPass::PassType>(i);
+			auto passType = static_cast<PassType>(i);
 
 			switch (passType)
 			{
-			case (SE_G::RenderPass::PassType::GPass): {
+			case (SE_G::PassType::GPass): {
 				auto pass = static_cast<SE_G::GPass*>(parentRenderer->m_passes[passType].get());
 				this->AddPass(eastl::make_unique<SE_G::GPass>(
 					GetDevice(), GetDeviceContext(),
@@ -36,10 +36,10 @@ namespace SE_G {
 
 				break;
 			}
-			case (SE_G::RenderPass::PassType::Shadow): {
+			case (SE_G::PassType::Shadow): {
 				break;
 			}
-			case (SE_G::RenderPass::PassType::Light): {
+			case (SE_G::PassType::Light): {
 				auto pass = static_cast<SE_G::LightPass*>(parentRenderer->m_passes[passType].get());
 				AddPass(eastl::make_unique<SE_G::LightPass>(
 					GetDevice(), GetDeviceContext(),
@@ -47,13 +47,13 @@ namespace SE_G {
 
 				break;
 			}
-			case (SE_G::RenderPass::PassType::Collider): {
+			case (SE_G::PassType::Collider): {
 				break;
 			}
-			case (SE_G::RenderPass::PassType::Icon): {
+			case (SE_G::PassType::Icon): {
 				break;
 			}
-			case (SE_G::RenderPass::PassType::Selection): {
+			case (SE_G::PassType::Selection): {
 				break;
 			}
 			}
@@ -63,11 +63,11 @@ namespace SE_G {
 	
 	void MiniViewRenderer::Pass()
 	{
-		for (UINT i = 0u; i < static_cast<UINT>(RenderPass::PassType::Count); i++)
+		for (UINT i = 0u; i < static_cast<UINT>(PassType::Count); i++)
 		{
-			if (m_passes.contains(static_cast<RenderPass::PassType>(i)))
+			if (m_passes.contains(static_cast<PassType>(i)))
 			{
-				auto pass = m_passes[static_cast<RenderPass::PassType>(i)].get();
+				auto pass = m_passes[static_cast<PassType>(i)].get();
 
 				if (!pass->IsEnabled())
 					continue;
@@ -76,7 +76,7 @@ namespace SE_G {
 
 				pass->StartFrame();
 				
-				auto parentPass = m_parentRenderer->m_passes[static_cast<RenderPass::PassType>(i)].get();
+				auto parentPass = m_parentRenderer->m_passes[static_cast<PassType>(i)].get();
 				parentPass->Pass();
 
 				pass->EndFrame();

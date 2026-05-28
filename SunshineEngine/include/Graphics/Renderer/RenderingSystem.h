@@ -4,16 +4,15 @@
 #include <d3d11_1.h>
 #include <wrl.h>
 #include <wrl/client.h>
-#include <directxmath.h>
 
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unordered_map.h>
-
-#include "Scene.h"
-#include <Graphics/Renderer/RenderGroup.h>
-#include <Graphics/Utils/Camera.h>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 namespace SE_G {
+	class RenderGroup;
+
 	class RenderingSystem
 	{
 	public:

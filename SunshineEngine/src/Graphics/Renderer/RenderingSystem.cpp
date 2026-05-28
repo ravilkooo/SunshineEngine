@@ -1,4 +1,5 @@
 #include "Graphics/Renderer/RenderingSystem.h"
+#include <Graphics/Renderer/RenderGroup.h>
 #include <iostream>
 
 namespace SE_G {

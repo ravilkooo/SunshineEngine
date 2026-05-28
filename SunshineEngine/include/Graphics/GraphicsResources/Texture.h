@@ -1,14 +1,10 @@
 #pragma once
 
-//#include <IResource.h>
-
 #include <DDSTextureLoader.h>
 #include <assimp/material.h>
 
-#include "Utils/StringHelper.h"
 #include <Graphics/Utils/Color.h>
 #include <Graphics/Bindable/Bindable.h>
-#include <Graphics/Bindable/Sampler.h>
 #include <ResourceManager/IResource.h>
 
 #include <Utils/AssetPath.h>

@@ -2,6 +2,7 @@
 
 #include <d3dcompiler.h>
 
+#include <ParticleSystem/Particle.h>
 #include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Graphics/Renderer/RenderingSystem.h>
@@ -12,6 +13,7 @@
 #include <Utils/AssetPath.h>
 
 #include <Component/TransformComponent.h>
+#include <Graphics/Utils/Camera.h>
 
 #include <cstdlib>
 #include <ctime>

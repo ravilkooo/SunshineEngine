@@ -5,10 +5,11 @@
 #include <stdexcept>
 
 #include <Graphics/Renderer/Pass/RenderPass.h>
-#include <Graphics/Renderer/GBuffer.h>
-#include <Graphics/Utils/Camera.h>
 
 namespace SE_G {
+    class GBuffer;
+    class Camera;
+    
     class GPass :
         public RenderPass
     {

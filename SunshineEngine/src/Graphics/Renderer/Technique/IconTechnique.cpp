@@ -1,5 +1,9 @@
 #include "Graphics/Renderer/Technique/IconTechnique.h"
-#include <Graphics/Bindable/DepthStencilState.h>
+
+#include <Graphics/Bindable/ConstantBuffer.h>
+#include "Graphics/Bindable/VertexBuffer.h"
+
+#include <Graphics/GraphicsResources/VertexShader.h>
 
 namespace SE_G {
 	IconTechnique::IconTechnique(ID3D11Device* device, TransformComponent* assignedTransform,

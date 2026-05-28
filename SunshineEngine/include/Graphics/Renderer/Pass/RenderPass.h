@@ -1,36 +1,42 @@
 #pragma once
 
 #include <EASTL/unordered_map.h>
+#include <EASTL/vector.h>
+#include <EASTL/string.h>
+#include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
 
 #include <d3d11.h>
 #include <wrl.h>
-#include <string>
-#include "Scene.h"
-#include <Graphics/Bindable/Bindable.h>
-#include <GameObject/GameObject.h>
-
-#include <Graphics/Renderer/Technique/RenderTechnique.h>
 
 #include <Utils/UUID.h>
 
 namespace SE_G {
+	class RenderTechnique;
+	class Camera;
+
+	namespace Bind {
+		class Bindable;
+	}
+
+	enum class PassType : UINT {
+		GPass,
+		Shadow,
+		Light,
+		Collider,
+		Trigger,
+		Emitter,
+		Icon,
+		Selection,
+		Perception,
+		Count
+	};
+
 	class RenderPass
 	{
-		friend class GameObject;
+		// friend class GameObject;
 
 	public:
-		enum class PassType : UINT {
-			GPass,
-			Shadow,
-			Light,
-			Collider,
-			Trigger,
-			Emitter,
-			Icon,
-			Selection,
-			Perception,
-			Count
-		};
 
 		RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context);
 		virtual ~RenderPass();

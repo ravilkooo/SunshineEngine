@@ -1,14 +1,18 @@
 #pragma once
 #include "RenderTechnique.h"
-#include <Graphics/Bindable/ConstantBuffer.h>
 #include <Utils/UUID.h>
-// forward declare MeshData to avoid including MeshComponent.h here
+
 class MeshData;
 
 #include <d3d11.h>
 
 
 namespace SE_G {
+    namespace Bind {
+        template <typename T>
+        class PixelConstantBuffer;
+    }
+
     class GPassTechnique :
         public RenderTechnique
     {

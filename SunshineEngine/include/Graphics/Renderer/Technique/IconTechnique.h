@@ -1,8 +1,5 @@
 #pragma once
 #include "RenderTechnique.h"
-#include <Graphics/Bindable/ConstantBuffer.h>
-#include <Graphics/GraphicsResources/VertexShader.h>
-#include "Graphics/Bindable/VertexBuffer.h"
 #include <Utils/UUID.h>
 
 #include <SimpleMath.h>
@@ -24,9 +21,17 @@ namespace SE_G {
         DXSM::Vector2 size = { 1.0f, 1.0f };
     };
 
+    namespace Bind {
+        class VertexBuffer;
+
+        template <typename T>
+        class PixelConstantBuffer;
+    }
+
     class IconTechnique :
         public RenderTechnique
     {
+
     public:
         IconTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             IconData iconData, float iconSizeX = 0.1f, float iconSizeY = 0.1f);

@@ -9,12 +9,16 @@
 #include <directxmath.h>
 
 #include <Graphics/Renderer/RenderGroup.h>
-#include <Graphics/Renderer/GBuffer.h>
-#include <Graphics/Utils/Camera.h>
 
 namespace SE
 {
     class ParticleSystem;
+}
+
+namespace SE_G
+{
+    class GBuffer;
+    class Camera;
 }
 
 

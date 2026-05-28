@@ -1,5 +1,6 @@
 #include <Physics/TriggerContactListener.h>
 #include <Scene.h>
+#include <GameObject/GameObject.h>
 #include <Component/TriggerComponent.h>
 #include <Component/PhysicsComponent.h>
 

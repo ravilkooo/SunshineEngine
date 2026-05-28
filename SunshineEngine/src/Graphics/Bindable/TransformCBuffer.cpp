@@ -1,5 +1,8 @@
-#include "Graphics/Bindable/TransformCBuffer.h"
+#include <Graphics/Bindable/ConstantBuffer.h>
+#include <Graphics/Bindable/TransformCBuffer.h>
+
 #include <Component/TransformComponent.h>
+
 #include <iostream>
 
 namespace SE_G {

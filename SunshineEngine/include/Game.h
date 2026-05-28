@@ -1,5 +1,6 @@
 #pragma once
 
+#include <d3d11.h>
 // ThirdPartyLibs
 #include <EASTL/algorithm.h>
 #include <EASTL/unique_ptr.h>
@@ -7,28 +8,23 @@
 
 #include <SunshineEngineAPI.h>
 
-#include <Graphics/Renderer/RenderingSystem.h>
-#include <Graphics/Renderer/DeferredRenderer.h>
-
-#include <GameObject/GameObjectFactory.h>
-#include <GameObject/GameObject.h>
+#include <Windows/InputDevice.h>
 
 #include <GameTimer.h>
 
-#include <Scene.h>
-
-#include <Physics/PhysicsSystem.h>
-
-#include <Windows/InputDevice.h>
-#include <Audio/AudioSystem.h>
-
 #include <Scripting/LuaManager.h>
-#include <Utils/ILogManager.h>
+
+// #include <Utils/ILogManager.h>
+// #include <GameObject/GameObjectFactory.h>
+// #include <GameObject/GameObject.h>
+
 
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
 
 class PlayerObject;
+class PhysicsSystem;
+class AudioSystem;
 
 namespace SE
 {
@@ -37,6 +33,9 @@ namespace SE
 
 namespace SE_G
 {
+    struct DirectionalLightData;
+    class RenderingSystem;
+    class DeferredRenderer;
     class ShadowMapPass;
     class GPass;
     class LightPass;
@@ -99,8 +98,5 @@ public:
     PlayerObject* m_playerObject;
 
     SE::ParticleSystem* m_particleSystem;
-
-    // GAI
-    void CreateGAIScene();
 };
 

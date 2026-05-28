@@ -3,7 +3,6 @@
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 #include <Component/MeshComponent.h>
-#include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <GameObject/Lighting/AmbientLight.h>
 #include <GameObject/Lighting/DirectionalLight.h>
@@ -11,8 +10,6 @@
 #include <GameObject/Lighting/SpotLight.h>
 #include <GameObject/Lighting/SkyBox.h>
 #include <GameObject/Shapes/ShapeData.h>
-
-#include <ParticleSystem/ParticleSystem.h>
 
 #include <Graphics/GraphicsResources/Mesh.h>
 
@@ -25,6 +22,11 @@
 #include <Graphics/Renderer/Technique/SpotLightTechnique.h>
 #include <Graphics/Renderer/Technique/SkyBoxTechnique.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+
+#include <Graphics/Utils/Camera.h>
+
+#include <ParticleSystem/ParticleEmitterComponent.h>
+#include <ParticleSystem/ParticleSystem.h>
 
 #include <Serialization/ShapeSerialization.h>
 

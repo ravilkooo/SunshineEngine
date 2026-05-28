@@ -5,13 +5,17 @@
 #include <EASTL/string.h>
 
 #include "RenderTechnique.h"
-#include <Graphics/Bindable/ConstantBuffer.h>
 
 #include <Physics/PhysicsEnums.h>
 #include <Physics/CollisionUtils.h>
 #include <Graphics/Utils/Color.h>
 
 namespace SE_G {
+    namespace Bind {
+        template <typename T>
+        class VertexConstantBuffer;
+    }
+
 
     class ColliderTechnique :
         public RenderTechnique

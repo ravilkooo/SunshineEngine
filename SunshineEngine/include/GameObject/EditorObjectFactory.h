@@ -3,19 +3,31 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 #include <Utils/StringUtils.h>
-#include <wrl.h>
-#include <d3d11.h>
-#include <Graphics/Utils/Camera.h>
 #include <Graphics/Lighting/LightData.h>
-
-#include <GameObject/GameObject.h>
-#include <GameObject/Lighting/LightCollection.h>
-#include <GameObject/Shapes/ShapeCollection.h>
 
 #include <Utils/AssetPath.h>
 
+#include <wrl.h>
+#include <d3d11.h>
+namespace DX = DirectX;
+
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
+
+class GameObject_Info;
+
+class BoxShapeObject_Info;
+class SphereShapeObject_Info;
+class GeosphereShapeObject_Info;
+class CylinderShapeObject_Info;
+class PlaneShapeObject_Info;
+
+class AmbientLight_Info;
+class DirectionalLight_Info;
+class PointLight_Info;
+class PointLightInstanced_Info;
+class SpotLight_Info;
+class SkyBox_Info;
 
 namespace SE
 {
@@ -24,6 +36,7 @@ namespace SE
 
 namespace SE_G {
 	class DeferredRenderer;
+	class Camera;
 }
 
 class EditorObjectFactory

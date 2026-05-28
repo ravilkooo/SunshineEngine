@@ -7,9 +7,6 @@
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
 
-#include <Graphics/Bindable/ConstantBuffer.h>
-#include <Graphics/Lighting/LightData.h>
-#include <Graphics/Utils/Camera.h>
 
 namespace DX = DirectX;
 namespace DXSM = DX::SimpleMath;

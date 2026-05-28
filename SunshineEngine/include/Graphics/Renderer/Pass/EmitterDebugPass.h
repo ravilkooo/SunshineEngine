@@ -3,6 +3,10 @@
 
 #include <d3d11.h>
 
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
+
 namespace SE_G {
     class Camera;
     class GBuffer;

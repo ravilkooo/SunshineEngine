@@ -8,8 +8,6 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
-#include <Scene.h>
-
 #include <Utils/UUID.h>
 
 #include <GameTimer.h>
@@ -21,8 +19,13 @@
 #include <Windows/InputManager.h>
 #include <Windows/InputDevice.h>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include <SimpleMath.h>
 namespace DXSM = DirectX::SimpleMath;
+
+class Scene_Info;
 
 namespace SE
 {

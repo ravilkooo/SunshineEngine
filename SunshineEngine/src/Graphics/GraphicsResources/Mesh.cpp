@@ -1,9 +1,16 @@
 #include <Graphics/GraphicsResources/Mesh.h>
+
+#include <Graphics/Bindable/VertexBuffer.h>
+#include <Graphics/Bindable/IndexBuffer.h>
+#include <Graphics/Bindable/Topology.h>
+
 #include <Utils/StringUtils.h>
 
 #include <SimpleMath.h>
 
 namespace SE_G {
+    Mesh::Mesh() {};
+
     Mesh::Mesh(ID3D11Device* device,
         AssetPath meshPath) : m_meshPath(meshPath)
     {

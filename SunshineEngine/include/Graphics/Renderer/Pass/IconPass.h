@@ -1,21 +1,32 @@
 #pragma once
+#include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
+
 #include "RenderPass.h"
-#include <Graphics/Renderer/GBuffer.h>
-#include <Graphics/Utils/Camera.h>
+
 #include <Utils/UUID.h>
-#include <GameObject/Lighting/LightCollection.h>
+
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 // forward declare bindable resources used by IconPass to reduce includes
-namespace SE_G { namespace Bind {
-    class VertexShader;
-    class GeometryShader;
-    class PixelShader;
-    class Texture;
-    class DepthStencilState;
-    class Sampler;
-    template<typename> class GeometryConstantBuffer;
-    template<typename> class PixelConstantBuffer;
-} }
+namespace SE_G {
+    class GBuffer;
+    class Camera;
+
+    namespace Bind {
+        class VertexShader;
+        class GeometryShader;
+        class PixelShader;
+        class Texture;
+        class DepthStencilState;
+        class Sampler;
+        template<typename> class GeometryConstantBuffer;
+        template<typename> class PixelConstantBuffer;
+        template<typename> class PixelConstantBuffer;
+    }
+}
 
 namespace SE_G {
     class IconPass :
@@ -33,7 +44,6 @@ namespace SE_G {
         void EndFrame() override;
 
         void OnResize(UINT resizeWidth, UINT resizeHeight) override;
-            //eastl::shared_ptr<GBuffer> pGBuffer);
 
         UINT m_screenWidth = 800u;
         UINT m_screenHeight = 800u;

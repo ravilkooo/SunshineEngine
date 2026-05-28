@@ -1,6 +1,7 @@
 #include <PlayerObject/PlayerObject.h>
 
 #include <Serialization/GraphicsSerialization.h>
+#include <Graphics/Utils/Camera.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;

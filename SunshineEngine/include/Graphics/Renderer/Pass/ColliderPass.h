@@ -1,6 +1,10 @@
 #pragma once
 #include "RenderPass.h"
 
+#include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
+#include <EASTL/unordered_map.h>
+
 class ID3D11Device;
 class ID3D11DeviceContext;
 

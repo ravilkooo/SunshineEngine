@@ -1,11 +1,13 @@
 #include "Graphics/GraphicsResources/Texture.h"
-#include <iostream>
+#include "Graphics/Utils/Color.h"
+
 #include <ResourceManager/Enums/ResourceType.h>
 #include <ResourceManager/ResourceHandle.h>
 
-#include <EASTL/internal/char_traits.h>
-#include "Graphics/Utils/Color.h"
+#include "Utils/StringHelper.h"
 
+#include <EASTL/internal/char_traits.h>
+#include <iostream>
 
 namespace SE_G {
 	namespace Bind

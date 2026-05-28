@@ -15,7 +15,15 @@
 #include <Graphics/Renderer/Pass/EmitterDebugPass.h>
 #include <Graphics/Renderer/Pass/PerceptionDebugPass.h>
 
+#include <Graphics/Renderer/GBuffer.h>
+
+#include <Graphics/Utils/Camera.h>
+
+#include <Scene.h>
+
 #include <GameObject/GameObject.h>
+#include <GameObject/Lighting/LightCollection.h>
+#include <GameObject/Shapes/ShapeCollection.h>
 #include <GameObject/EditorObjectFactory.h>
 
 #include <PlayerObject/PlayerObject.h>
@@ -39,7 +47,6 @@ WorldEditor::~WorldEditor()
 {
 	delete m_pixelUUIDHandler;
 }
-
 
 WorldEditor::PixelInfoHandler::PixelInfoHandler() {
 }
@@ -340,7 +347,7 @@ void WorldEditor::ClearScene() {
 	if (m_scene)
 		m_scene->ClearScene();
 	m_renderer->ClearAllTechniques();
-	m_renderer->RemovePass(SE_G::RenderPass::PassType::Shadow);
+	m_renderer->RemovePass(SE_G::PassType::Shadow);
 }
 
 void WorldEditor::OnResize(UINT resizeWidth, UINT resizeHeight) {

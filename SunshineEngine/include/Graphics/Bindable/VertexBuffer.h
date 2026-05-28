@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Bindable.h"
-#include <d3dcompiler.h>
 
 namespace SE_G {
     namespace Bind

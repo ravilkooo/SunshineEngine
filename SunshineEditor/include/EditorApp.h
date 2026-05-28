@@ -1,5 +1,9 @@
 #pragma once
 
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
+
 // ThirdPartyLibs
 #include <EASTL/algorithm.h>
 #include <EASTL/unique_ptr.h>

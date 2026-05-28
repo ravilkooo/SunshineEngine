@@ -1,6 +1,8 @@
 #include <Scene.h>
 #include <SceneHierarchy.h>
+#include <GameObject/GameObject.h>
 #include <Physics/PhysicsSystem.h>
+#include <Graphics/Utils/Camera.h>
 
 DeletionQueue::DeletionQueue()
     : queue(), head(0), tail(0), count(0)

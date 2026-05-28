@@ -1,5 +1,8 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
+#include <Graphics/Renderer/Pass/RenderPass.h>
+#include <Graphics/Renderer/GBuffer.h>
+#include <Graphics/Utils/Camera.h>
 
 #include <ParticleSystem/ParticleSystem.h>
 
@@ -75,11 +78,11 @@ namespace SE_G {
 	void DeferredRenderer::Pass()
 	{
 		// Passes
-		for (UINT i = 0u; i < static_cast<UINT>(RenderPass::PassType::Count); i++)
+		for (UINT i = 0u; i < static_cast<UINT>(PassType::Count); i++)
 		{
-			if (m_passes.contains(static_cast<RenderPass::PassType>(i)))
+			if (m_passes.contains(static_cast<PassType>(i)))
 			{
-				auto pass = m_passes[static_cast<RenderPass::PassType>(i)].get();
+				auto pass = m_passes[static_cast<PassType>(i)].get();
 
 				if (!pass->IsEnabled())
 					continue;

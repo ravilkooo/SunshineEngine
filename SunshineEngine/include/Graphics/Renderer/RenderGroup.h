@@ -1,10 +1,20 @@
 #pragma once
 
+#include <EASTL/unique_ptr.h>
+#include <EASTL/string.h>
+#include <EASTL/unordered_map.h>
+
 #include <d3d11.h>
 #include <wrl.h>
-#include <Graphics/Renderer/Pass/RenderPass.h>
+
+#include <Utils/UUID.h>
 
 namespace SE_G {
+	class RenderTechnique;
+	class RenderPass;
+
+	enum class PassType : UINT;
+
 	class RenderGroup {
 	public:
 		RenderGroup(
@@ -18,8 +28,8 @@ namespace SE_G {
 		// == void RenderScene();
 		virtual void Pass();
 		virtual RenderPass* AddPass(eastl::unique_ptr<RenderPass> pass);
-		virtual RenderPass* GetPass(RenderPass::PassType passType);
-		virtual void RemovePass(RenderPass::PassType passType);
+		virtual RenderPass* GetPass(PassType passType);
+		virtual void RemovePass(PassType passType);
 
 		RenderTechnique* AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech);
 		RenderTechnique* GetTechnique(SE::UUID uuid, eastl::string techniqueTag);
@@ -36,7 +46,7 @@ namespace SE_G {
 
 		eastl::string m_groupName;
 
-		eastl::unordered_map<RenderPass::PassType, eastl::unique_ptr<RenderPass>> m_passes;;
+		eastl::unordered_map<PassType, eastl::unique_ptr<RenderPass>> m_passes;
 	
 	protected:
 		bool m_enabled = true;

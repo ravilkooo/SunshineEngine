@@ -7,6 +7,9 @@
 #include <UI/PropertyPanel.h>
 #include <UI/FontStyles.h>
 
+#include <Graphics/Utils/Camera.h>
+#include <Graphics/Renderer/GBuffer.h>
+
 #include <PlayerObject/PlayerObject.h>
 #include <Utils/StringUtils.h>
 

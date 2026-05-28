@@ -1,13 +1,21 @@
+#include <Graphics/Renderer/Pass/IconPass.h>
+
+#include <Graphics/Renderer/GBuffer.h>
+#include <Graphics/Utils/Camera.h>
+
 #include <Graphics/Bindable/Bindable.h>
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/DepthStencilState.h>
+#include <Graphics/Bindable/ConstantBuffer.h>
 
+#include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/GeometryShader.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/Renderer/RenderingSystem.h>
-#include <Graphics/Renderer/Pass/IconPass.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+
+// #include <GameObject/Lighting/LightCollection.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 

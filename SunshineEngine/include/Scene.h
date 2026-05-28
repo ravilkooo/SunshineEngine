@@ -2,10 +2,10 @@
 
 #define DELETION_QUEUE_CAPACITY 16384
 
-#include "GameObject/GameObject.h"
 #include "Utils/UUID.h"
 #include <EASTL/hash_map.h>
 #include <EASTL/unique_ptr.h>
+#include <EASTL/shared_ptr.h>
 #include <EASTL/fixed_vector.h>
 
 #include <unordered_map>
@@ -16,6 +16,14 @@ using json = nlohmann::json;
 class PhysicsSystem;
 class SceneGraph;
 class PlayerObject;
+
+class GameObject;
+class GameObject_Info;
+
+namespace SE_G {
+    class Camera;
+    class DeferredRenderer;
+}
 
 class DeletionQueue {
     eastl::fixed_vector<SE::UUID, DELETION_QUEUE_CAPACITY> queue;

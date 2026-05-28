@@ -13,6 +13,8 @@
 #include <ResourceManager/ResourceManagerFacade.h>
 #include <Graphics/GraphicsResources/Mesh.h>
 
+#include <Scene.h>
+
 #include <Utils/AssetPath.h>
 #include <Utils/StringUtils.h>
 

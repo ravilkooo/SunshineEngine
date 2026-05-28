@@ -1,10 +1,17 @@
 #pragma once
 #include "RenderPass.h"
-#include <Graphics/Renderer/GBuffer.h>
-#include <Graphics/Utils/Camera.h>
+
+#include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
+
 #include <Utils/UUID.h>
 
+class Scene_Info;
+
 namespace SE_G {
+    class GBuffer;
+    class Camera;
+
     namespace Bind {
         class VertexShader;
         class GeometryShader;

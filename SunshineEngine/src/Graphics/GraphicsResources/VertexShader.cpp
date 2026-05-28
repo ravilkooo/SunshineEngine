@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Graphics/GraphicsResources/VertexShader.h"
+#include <d3dcompiler.h>
 
 namespace SE_G {
 	namespace Bind

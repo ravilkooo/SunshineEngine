@@ -1,5 +1,6 @@
 #include <Physics/PhysicsSystem.h>
 #include <Scene.h>
+#include <GameObject/GameObject.h>
 #include <Component/TransformComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <Component/TriggerComponent.h>

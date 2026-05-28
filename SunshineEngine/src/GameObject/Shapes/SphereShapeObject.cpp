@@ -4,6 +4,8 @@
 #include <Component/MeshComponent.h>
 
 #include <Serialization/GraphicsSerialization.h>
+#include <Serialization/ShapeSerialization.h>
+#include <Serialization/DXSMSerialization.h>
 
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Graphics/GraphicsResources/Texture.h>

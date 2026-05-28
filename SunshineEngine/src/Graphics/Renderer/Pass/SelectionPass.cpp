@@ -1,17 +1,28 @@
-#include <Graphics/Renderer/RenderingSystem.h>
-
-#include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
+
+#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/Renderer/Pass/PerceptionDebugPass.h>
 #include <Graphics/Renderer/Pass/IconPass.h>
+#include <Graphics/Renderer/GBuffer.h>
+
 #include <Graphics/GraphicsResources/GeometryShader.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
+#include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
+
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/BlendState.h>
+#include <Graphics/Bindable/ConstantBuffer.h>
+
+#include <Graphics/Utils/Camera.h>
 
 #include <Component/TransformComponent.h>
 #include <Component/RenderComponent.h>
+
+#include <GameObject/GameObject.h>
+
+#include <Scene.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 

@@ -1,9 +1,12 @@
+#include <Graphics/Renderer/GBuffer.h>
+
 #include <Graphics/Renderer/RenderingSystem.h>
+#include "Graphics/Renderer/Pass/GPass.h"
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
+
+#include <Graphics/Utils/Camera.h>
 
 #include <Component/TransformComponent.h>
-
-#include "Graphics/Renderer/Pass/GPass.h"
-
 
 namespace SE_G {
 	GPass::GPass(ID3D11Device* device, ID3D11DeviceContext* context,

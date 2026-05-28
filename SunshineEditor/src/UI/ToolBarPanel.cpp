@@ -3,6 +3,7 @@
 #include <ostream>
 #include <Utils/StringUtils.h>
 #include <EditorApp.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
 
 #include "Utils/FileDialogManager.h"
 

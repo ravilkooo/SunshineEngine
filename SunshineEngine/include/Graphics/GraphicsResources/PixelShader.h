@@ -3,7 +3,6 @@
 //#include <IResource.h>
 
 #include "Graphics/Bindable/Bindable.h"
-#include <d3dcompiler.h>
 #include <EASTL/string.h>
 #include <Graphics/GraphicsResources/IShader.h>
 

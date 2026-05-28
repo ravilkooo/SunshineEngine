@@ -1,5 +1,7 @@
 #include "Graphics/Renderer/Technique/EmitterTechnique.h"
 #include <Graphics/Renderer/Pass/EmitterDebugPass.h>
+
+#include <Graphics/Bindable/ConstantBuffer.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
 
 #include <ParticleSystem/ParticleEmitterComponent.h>

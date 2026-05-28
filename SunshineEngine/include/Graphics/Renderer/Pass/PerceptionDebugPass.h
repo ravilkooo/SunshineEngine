@@ -1,6 +1,8 @@
 #pragma once
 #include "RenderPass.h"
-#include <Graphics/Bindable/ConstantBuffer.h>
+
+#include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
 
 #include <SimpleMath.h>
 namespace DX = DirectX;
@@ -13,11 +15,15 @@ namespace SE_G {
     class GBuffer;
     namespace Bind {
         class DepthStencilState;
+        class VertexShader;
         class PixelShader;
         class Sampler;
         class Topology;
         class IndexBuffer;
         class VertexBuffer;
+
+        template <typename T>
+        class VertexConstantBuffer;
     }
 
     struct PerceptionSettings

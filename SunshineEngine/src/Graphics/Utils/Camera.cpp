@@ -1,9 +1,12 @@
 #include "Graphics/Utils/Camera.h"
-#include <iostream>
+#include "Graphics/Bindable/ConstantBuffer.h"
 
-#include <Scene.h>
-#include <PlayerObject/PlayerObject.h>
 #include <Component/TransformComponent.h>
+
+#include <PlayerObject/PlayerObject.h>
+
+#include <iostream>
+#include <Scene.h>
 
 namespace SE_G {
     Camera::Camera(ID3D11Device* device) : Camera(device, 1.0f) {
