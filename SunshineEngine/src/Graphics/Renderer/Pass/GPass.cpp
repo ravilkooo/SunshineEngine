@@ -1,5 +1,7 @@
 #include <Graphics/Renderer/RenderingSystem.h>
 
+#include <Component/TransformComponent.h>
+
 #include "Graphics/Renderer/Pass/GPass.h"
 
 
