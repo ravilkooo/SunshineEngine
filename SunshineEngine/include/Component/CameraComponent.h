@@ -1,8 +1,13 @@
 #pragma once
 #include <Component/Component.h>
-#include <Graphics/Utils/Camera.h>
 
 #include <EASTL/shared_ptr.h>
+#include <EASTL/unique_ptr.h>
+
+namespace SE_G
+{
+    class Camera;
+}
 
 class CameraComponent :
     public Component
@@ -29,6 +34,35 @@ public:
     SE_G::Camera* GetCamera();
 
     eastl::shared_ptr<SE_G::Camera> m_camera;
+};
+
+
+class CameraComponent_Info :
+    public Component_Info
+{
+public:
+    CameraComponent_Info() = default;
+    CameraComponent_Info(eastl::shared_ptr<SE_G::Camera> camera);
+    ~CameraComponent_Info() = default;
+
+    CameraComponent_Info(const CameraComponent_Info&) = delete;
+    CameraComponent_Info& operator=(const CameraComponent_Info&) = delete;
+
+    CameraComponent_Info(CameraComponent_Info&&) noexcept = default;
+    CameraComponent_Info& operator=(CameraComponent_Info&&) noexcept = default;
+
+    const std::type_info& getType() const override {
+        return typeid(CameraComponent_Info);
+    }
+    static const SE::ComponentType s_componentType = SE::ComponentType::CAMERA;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+
+    SE_G::Camera* GetCamera();
+
+    bool IsAssigned() override { return true; }
+    eastl::unique_ptr<CameraComponent> m_assignedComponent;
 };
 
 // Macro listing methods of CameraComponent to expose in Lua bindings
