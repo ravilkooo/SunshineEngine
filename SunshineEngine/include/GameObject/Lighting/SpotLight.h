@@ -14,7 +14,9 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-namespace DXSM = DirectX::SimpleMath;
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 class SpotLight :
     public LightObject<SE_G::SpotLightData>

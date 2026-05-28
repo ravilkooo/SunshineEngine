@@ -4,6 +4,7 @@
 #include <Graphics/GraphicsResources/Texture.h>
 
 #include <Component/PhysicsComponent.h>
+#include <Graphics/GraphicsResources/Mesh.h>
 #include <Component/MeshComponent.h>
 
 #include <Serialization/GraphicsSerialization.h>

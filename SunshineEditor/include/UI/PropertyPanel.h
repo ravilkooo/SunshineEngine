@@ -23,6 +23,10 @@ class LuaComponent;
 class WorldEditor;
 class AudioEditor;
 
+namespace SE {
+    class ColliderData;
+}
+
 namespace SE_G {
     namespace Bind {
         class Texture;

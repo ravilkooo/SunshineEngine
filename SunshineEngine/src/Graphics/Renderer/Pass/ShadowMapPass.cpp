@@ -8,6 +8,12 @@
 
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 
+#include <Component/TransformComponent.h>
+#include <Component/MeshComponent.h>
+#include <Graphics/GraphicsResources/Mesh.h>
+
+#include <ResourceManager/ResourceManagerFacade.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {

@@ -4,6 +4,8 @@
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
 
+class ID3D11Device;
+
 namespace SE_G
 {
     class Camera;
@@ -14,6 +16,7 @@ class CameraComponent :
 {
 public:
     CameraComponent() = default;
+    CameraComponent(ID3D11Device* device);
     CameraComponent(eastl::shared_ptr<SE_G::Camera> camera);
     ~CameraComponent() = default;
 
@@ -42,6 +45,7 @@ class CameraComponent_Info :
 {
 public:
     CameraComponent_Info() = default;
+    CameraComponent_Info(ID3D11Device* device);
     CameraComponent_Info(eastl::shared_ptr<SE_G::Camera> camera);
     ~CameraComponent_Info() = default;
 

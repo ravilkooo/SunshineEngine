@@ -1,10 +1,22 @@
 ﻿#include <Graphics/Renderer/RenderingSystem.h>
 
+#include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Renderer/Pass/EmitterDebugPass.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
+#include <Graphics/Renderer/Technique/EmitterTechnique.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
 
+#include <Graphics/Utils/Camera.h>
+
+#include <Graphics/Bindable/DepthStencilState.h>
+#include <Graphics/Bindable/IndexBuffer.h>
+#include <Graphics/Bindable/Topology.h>
 #include <Graphics/Bindable/Sampler.h>
+
+#include <Component/TransformComponent.h>
+
+#include <ResourceManager/ResourceManagerFacade.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {

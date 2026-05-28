@@ -1,5 +1,7 @@
 #include <WorldEditor.h>
 
+#include <d3dcompiler.h>
+
 #include <fstream>   // std::ofstream
 #include <EASTL/unique_ptr.h>
 

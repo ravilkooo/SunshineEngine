@@ -5,7 +5,6 @@
 #include <Scene.h>
 
 #include <ParticleSystem/ParticleSystem.h>
-//#include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
@@ -13,6 +12,10 @@
 
 #include "AI/Perception/PerceptionSystem.h"
 #include "AI/Behavior/BehaviorController.h"
+
+#include <Component/PhysicsComponent.h>
+#include <Component/TriggerComponent.h>
+#include <Component/TransformComponent.h>
 
 Game::Game()
 {

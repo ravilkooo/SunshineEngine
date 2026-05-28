@@ -5,6 +5,8 @@
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/BlendState.h>
 
+#include <Component/TransformComponent.h>
+
 #include <ParticleSystem/ParticleSystem.h>
 
 namespace SE_G {

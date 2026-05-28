@@ -10,8 +10,10 @@
 
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
+#include <Component/MeshComponent.h>
 
 #include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/GraphicsResources/Mesh.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <Graphics/Renderer/Technique/GPassTechnique.h>

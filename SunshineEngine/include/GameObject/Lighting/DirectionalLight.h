@@ -12,7 +12,9 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-namespace DXSM = DirectX::SimpleMath;
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 namespace SE_G
 {

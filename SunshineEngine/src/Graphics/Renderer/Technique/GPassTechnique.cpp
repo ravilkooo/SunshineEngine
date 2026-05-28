@@ -7,6 +7,7 @@
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/GraphicsResources/Mesh.h>
 #include <Component/MeshComponent.h>
 #include <Utils/StringUtils.h>
 #include <ResourceManager/ResourceManagerFacade.h>

@@ -30,6 +30,9 @@
 #include <Component/CharacterComponent.h>
 #include <Component/CharacterControllerComponent.h>
 
+#include "AI/Perception/PerceptionComponent.h"
+#include "AI/Behavior/BehaviorController.h"
+
 #include <SceneHierarchy.h>
 
 #include <UI/PropertyPanel.h>

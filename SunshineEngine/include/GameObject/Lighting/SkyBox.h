@@ -23,6 +23,10 @@ namespace SE_G {
     class Camera;
 
     class SkyBoxTechnique;
+
+    namespace Bind {
+        class Texture;
+    }
 };
 
 namespace DXSM = DirectX::SimpleMath;

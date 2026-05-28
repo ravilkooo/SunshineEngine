@@ -15,6 +15,11 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+class RenderComponent_Info;
+class TransformComponent_Info;
+class MeshComponent_Info;
+class PhysicsComponent_Info;
+
 namespace SE_G
 {
 	class IconTechnique;

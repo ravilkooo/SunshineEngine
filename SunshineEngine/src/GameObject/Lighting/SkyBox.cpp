@@ -4,6 +4,8 @@
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
+#include <Graphics/GraphicsResources/Texture.h>
+
 #include <Component/RenderComponent.h>
 #include <Component/TransformComponent.h>
 

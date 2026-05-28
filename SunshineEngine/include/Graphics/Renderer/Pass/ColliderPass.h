@@ -1,14 +1,27 @@
 #pragma once
 #include "RenderPass.h"
-#include <Graphics/Renderer/GBuffer.h>
-#include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
-#include <Graphics/Utils/Camera.h>
+class ID3D11Device;
+class ID3D11DeviceContext;
 
-#include <Graphics/Bindable/DepthStencilState.h>
+
+namespace SE {
+    struct ColliderBufferOffset;
+    enum class ColliderShapeType;
+}
 
 namespace SE_G {
-
+    class Camera;
+    class GBuffer;
+    class ColliderTechnique;
+    namespace Bind {
+        class DepthStencilState;
+        class PixelShader;
+        class Sampler;
+        class Topology;
+        class IndexBuffer;
+        class VertexBuffer;
+    }
 
     class ColliderPass :
         public RenderPass

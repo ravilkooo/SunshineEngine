@@ -8,9 +8,16 @@
 #include <Component/TransformComponent.h>
 #include <Component/RenderComponent.h>
 #include <Component/PhysicsComponent.h>
+#include <Component/TriggerComponent.h>
 #include <Component/LuaComponent.h>
+#include <Component/MeshComponent.h>
 #include <Component/CharacterComponent.h>
 #include <Component/CharacterControllerComponent.h>
+
+#include "AI/Perception/PerceptionComponent.h"
+#include "AI/Behavior/BehaviorController.h"
+
+#include <Graphics/GraphicsResources/Mesh.h>
 
 #include <Utils/StringUtils.h>
 
@@ -30,7 +37,6 @@
 #include <Graphics/GraphicsResources/Texture.h>
 
 #include <Serialization/GraphicsSerialization.h>
-
 
 #include <Physics/PhysicsSystem.h>
 

@@ -1,13 +1,19 @@
 #pragma once
 #include "RenderPass.h"
-#include <Graphics/Renderer/GBuffer.h>
-#include <Graphics/Renderer/Technique/EmitterTechnique.h>
 
-#include <Graphics/Utils/Camera.h>
-
-#include <Graphics/Bindable/DepthStencilState.h>
+#include <d3d11.h>
 
 namespace SE_G {
+    class Camera;
+    class GBuffer;
+    namespace Bind {
+        class DepthStencilState;
+        class PixelShader;
+        class Sampler;
+        class Topology;
+        class IndexBuffer;
+        class VertexBuffer;
+    }
 
     struct EmitterVertex {
         DXSM::Vector3 position = { 0.0f, 0.0f, 0.0f };

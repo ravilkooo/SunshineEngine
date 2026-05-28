@@ -4,6 +4,8 @@
 
 #include <ParticleSystem/ParticleEmitterComponent.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {

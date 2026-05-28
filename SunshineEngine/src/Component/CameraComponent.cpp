@@ -5,6 +5,11 @@
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>
 
+CameraComponent::CameraComponent(ID3D11Device* device)
+{
+    m_camera = eastl::make_shared<SE_G::Camera>(device);
+}
+
 CameraComponent::CameraComponent(eastl::shared_ptr<SE_G::Camera> camera)
 	: m_camera(camera)
 {
@@ -14,6 +19,11 @@ CameraComponent::CameraComponent(eastl::shared_ptr<SE_G::Camera> camera)
 SE_G::Camera* CameraComponent::GetCamera()
 {
 	return m_camera.get();
+}
+
+CameraComponent_Info::CameraComponent_Info(ID3D11Device* device)
+{
+    m_assignedComponent = eastl::make_unique<CameraComponent>(device);
 }
 
 CameraComponent_Info::CameraComponent_Info(eastl::shared_ptr<SE_G::Camera> camera)

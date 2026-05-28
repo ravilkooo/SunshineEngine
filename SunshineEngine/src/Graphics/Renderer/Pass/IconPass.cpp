@@ -9,6 +9,10 @@
 #include <Graphics/Renderer/Pass/IconPass.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
+#include <Component/TransformComponent.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {

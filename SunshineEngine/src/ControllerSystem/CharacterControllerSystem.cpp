@@ -5,6 +5,7 @@
 
 #include "ControllerSystem/CharacterControllerSystem.h"
 
+#include "Component/TransformComponent.h"
 #include "Component/CharacterComponent.h"
 #include "Component/CharacterControllerComponent.h"
 

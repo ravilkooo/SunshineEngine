@@ -1,15 +1,25 @@
 #pragma once
 #include "RenderPass.h"
-#include <Graphics/Renderer/GBuffer.h>
-
-#include <Graphics/Utils/Camera.h>
-
-#include <Graphics/Bindable/DepthStencilState.h>
 #include <Graphics/Bindable/ConstantBuffer.h>
+
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 class GameObject_Info;
 
 namespace SE_G {
+    class Camera;
+    class GBuffer;
+    namespace Bind {
+        class DepthStencilState;
+        class PixelShader;
+        class Sampler;
+        class Topology;
+        class IndexBuffer;
+        class VertexBuffer;
+    }
+
     struct PerceptionSettings
     {
         DXSM::Vector3 EyesOffset = DXSM::Vector3::Zero;

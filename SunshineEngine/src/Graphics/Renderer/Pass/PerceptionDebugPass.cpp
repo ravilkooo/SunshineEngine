@@ -3,12 +3,25 @@
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
-#include <Graphics/Bindable/Sampler.h>
 #include <GameObject/GameObject.h>
 
+#include <Component/TransformComponent.h>
 #include <AI/Perception/PerceptionComponent.h>
 
 #include <Utils/StringUtils.h>
+#include <Utils/MathUtils.h>
+
+#include <Graphics/Renderer/GBuffer.h>
+
+#include <Graphics/Utils/Camera.h>
+
+#include <Graphics/Bindable/DepthStencilState.h>
+#include <Graphics/Bindable/IndexBuffer.h>
+#include <Graphics/Bindable/VertexBuffer.h>
+#include <Graphics/Bindable/Sampler.h>
+#include <Graphics/Bindable/Topology.h>
+
+#include <ResourceManager/ResourceManagerFacade.h>
 
 namespace SE_G {
 

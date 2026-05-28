@@ -3,7 +3,7 @@
 
 #include <Scene.h>
 #include <PlayerObject/PlayerObject.h>
-
+#include <Component/TransformComponent.h>
 
 namespace SE_G {
     Camera::Camera(ID3D11Device* device) : Camera(device, 1.0f) {

@@ -1,4 +1,7 @@
 #include <ParticleSystem/ParticleSystem.h>
+
+#include <d3dcompiler.h>
+
 #include <ParticleSystem/ParticleEmitterComponent.h>
 
 #include <Graphics/Renderer/RenderingSystem.h>

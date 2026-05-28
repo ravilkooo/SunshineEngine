@@ -10,6 +10,11 @@
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/BlendState.h>
 
+#include <Component/TransformComponent.h>
+#include <Component/RenderComponent.h>
+
+#include <ResourceManager/ResourceManagerFacade.h>
+
 #include <Utils/StringUtils.h>
 
 namespace SE_G {

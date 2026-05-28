@@ -7,6 +7,7 @@
 
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/GraphicsResources/Mesh.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 

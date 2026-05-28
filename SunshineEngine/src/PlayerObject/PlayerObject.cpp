@@ -4,11 +4,14 @@
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 #include <Graphics/Utils/Camera.h>
 
+#include <Component/RenderComponent.h>
+#include <Component/PhysicsComponent.h>
 #include <Component/TransformComponent.h>
 #include <Component/MeshComponent.h>
 #include <Component/CameraComponent.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
+#include <Graphics/GraphicsResources/Mesh.h>
 
 #include <Utils/AssetPath.h>
 #include <Utils/StringUtils.h>

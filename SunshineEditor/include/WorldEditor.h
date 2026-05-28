@@ -1,5 +1,8 @@
 #pragma once
 
+#include <d3d11.h>
+#include <wrl.h>
+
 // ThirdPartyLibs
 #include <EASTL/algorithm.h>
 #include <EASTL/unique_ptr.h>
@@ -17,6 +20,9 @@
 
 #include <Windows/InputManager.h>
 #include <Windows/InputDevice.h>
+
+#include <SimpleMath.h>
+namespace DXSM = DirectX::SimpleMath;
 
 namespace SE
 {

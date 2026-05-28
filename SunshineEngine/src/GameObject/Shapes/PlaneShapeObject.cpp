@@ -2,6 +2,7 @@
 
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 #include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/GraphicsResources/Mesh.h>
 
 #include <Component/PhysicsComponent.h>
 #include <Component/MeshComponent.h>

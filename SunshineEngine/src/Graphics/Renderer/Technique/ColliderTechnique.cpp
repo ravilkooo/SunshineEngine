@@ -3,6 +3,8 @@
 #include <Graphics/Renderer/Pass/ColliderPass.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
 
+#include <ResourceManager/ResourceManagerFacade.h>
+
 namespace SE_G {
 	eastl::shared_ptr<Bind::VertexShader> ColliderTechnique::s_boxShader;
 	eastl::shared_ptr<Bind::VertexShader> ColliderTechnique::s_sphereShader;
