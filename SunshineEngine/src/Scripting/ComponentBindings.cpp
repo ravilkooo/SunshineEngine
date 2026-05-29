@@ -122,7 +122,14 @@ namespace ScriptingBindings
 			"getSpringArmLength", &SE_G::Camera::GetSpringArmLength,
 			"setSpringArmLength", &SE_G::Camera::SetSpringArmLength,
 			// Camera mode
-			"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode
+			"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode,
+
+			"setAsMainCamera", [](SE_G::Camera* camera) {
+				Scene::GetInstance().m_mainCameraUUID = camera->GetAssignedUUID();
+				Scene::GetInstance().m_renderer->SetMainCamera(
+					Scene::GetInstance().m_cameraManager->GetCameraByUUID(camera->GetAssignedUUID()));
+				return;
+			}
 
 			// // Update methods
 			// "Update", sol::overload(
