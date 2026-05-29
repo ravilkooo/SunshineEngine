@@ -1,8 +1,12 @@
 #include <Scene.h>
 #include <SceneHierarchy.h>
+
 #include <GameObject/GameObject.h>
 #include <Physics/PhysicsSystem.h>
+
 #include <Graphics/Utils/Camera.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
+
 #include <CameraManager.h>
 
 DeletionQueue::DeletionQueue()
@@ -182,6 +186,10 @@ void Scene::RestoreParents()
             pair.second->SetParent(pn);
         }
     }
+}
+
+void Scene::SetRenderer(SE_G::DeferredRenderer* renderer) {
+    m_renderer = renderer;
 }
 
 Scene_Info::Scene_Info()

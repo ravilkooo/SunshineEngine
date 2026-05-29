@@ -2053,6 +2053,11 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
     if (ImGui::TreeNodeEx("Camera Component", flags))
     {
         EditorUI::FontStyles::Pop();
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        ImGui::Text("View");
+        EditorUI::FontStyles::Pop();
+
         cameraInfo->m_assignedComponent->m_camera->SetUpCameraViewByAspectRatio(640.0f / 360.0f);
         m_WorldEditor->m_miniViewRenderer->SetMainCamera(cameraInfo->m_assignedComponent->m_camera);
         m_WorldEditor->m_miniViewRenderer->Enable();
@@ -2060,10 +2065,6 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
         avail.y = avail.x * 360.0f / 640.0f;
 
         ImGui::Image((ImTextureID) m_WorldEditor->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
-
-        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
-        ImGui::Text("Visualisation");
-        EditorUI::FontStyles::Pop();
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         ImGui::Text("Spring Arm Params");

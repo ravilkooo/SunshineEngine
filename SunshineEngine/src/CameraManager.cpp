@@ -16,12 +16,17 @@ bool CameraManager::HasCameraByUUID(SE::UUID uuid)
 
 void CameraManager::AddCamera(eastl::shared_ptr<SE_G::Camera> camera)
 {
-	auto uuid = camera->GetAssignedUUID();
-	if (HasCameraByUUID(uuid)) {
-		printSunshineMessage((std::string("Camera manager already has this camera: ") + uuid.ToString()).c_str());
+	const SE::UUID id = camera->GetAssignedUUID();
+	auto [it, inserted] = m_availableCameras.emplace(id, nullptr);
+	if (!inserted)
+	{
+		printSunshineMessage((std::string("Duplicate UUID in CameraManager::AddCamera: ") +
+			id.ToString()).c_str());
 		return;
 	}
-	m_availableCameras[uuid] = camera;
+	it->second = camera;
+	m_camerasUUID.push_back(id);
+	return;
 }
 
 eastl::shared_ptr<SE_G::Camera> CameraManager::GetCameraByUUID(SE::UUID uuid)
@@ -35,19 +40,28 @@ eastl::shared_ptr<SE_G::Camera> CameraManager::GetCameraByUUID(SE::UUID uuid)
 		return cameraIt->second;
 }
 
-eastl::shared_ptr<SE_G::Camera> CameraManager::RemoveCameraByUUID(SE::UUID uuid)
+void CameraManager::RemoveCameraByUUID(SE::UUID uuid)
 {
-	auto cameraIt = m_availableCameras.find(uuid);
-	if (cameraIt == m_availableCameras.end()) {
-		printSunshineMessage((std::string("Camera manager doesn't have this camera: ") + uuid.ToString()).c_str());
-		return nullptr;
-	}
-	else
-	{
-		eastl::shared_ptr<SE_G::Camera> camera = cameraIt->second;
-		m_availableCameras.erase(cameraIt);
-		return camera;
-	}
+    auto mapIt = m_availableCameras.find(uuid);
+    if (mapIt == m_availableCameras.end())
+        return;
+
+    // Remove camera
+    // Remove from map
+    m_availableCameras.erase(mapIt);
+
+    // Remove from cameras vector
+    for (size_t i = 0; i < m_camerasUUID.size(); ++i)
+    {
+        if (m_camerasUUID[i] == uuid)
+        {
+            eastl::swap(m_camerasUUID[i], m_camerasUUID.back());
+            m_camerasUUID.pop_back();
+            break;
+        }
+    }
+
+    return;
 }
 
 void CameraManager::Clear() {

@@ -52,7 +52,7 @@ public:
 
     void ShowProperties();
     void ShowGameObjectProperties();
-    void ShowPlayerProperties();
+    void ShowGameplayProperties();
 
     void ShowBottomPanel();
     void ShowOutputLog();
@@ -87,7 +87,7 @@ public:
     LogPanel m_GameLogPanel = LogPanel{"Game Output Log", LogManager::LogTarget::Game};
     BottomBarPanel m_BottomPanel;
     PropertyPanel m_PropertyPanel;
-	PlayerSettingPanel m_PlayerSettingPanel;
+	PlayerSettingPanel m_gameplaySettingPanel;
 
     SE::ProjectSelector m_ProjectSelector;
     bool m_ProjectSelected = false;

@@ -587,6 +587,8 @@ void Scene::FromJson(
     eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
+    GetInstance().SetRenderer(renderSystem);
+
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
             GameObjectGroup objGroup = objJ["m_group"];

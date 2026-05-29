@@ -92,6 +92,9 @@ public:
 
     SE::UUID m_mainCameraUUID = SE::UUID(0u);
     eastl::unique_ptr<CameraManager> m_cameraManager;
+
+    SE_G::DeferredRenderer* m_renderer;
+    void SetRenderer(SE_G::DeferredRenderer* renderer);
 private:
     Scene();
 };

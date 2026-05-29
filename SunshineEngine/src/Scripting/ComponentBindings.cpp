@@ -2,12 +2,19 @@
 #include <Scripting/AutoBindings.h>
 
 #include <SimpleMath.h>
+
 #include <Physics/PhysicsSystem.h>
 
 #include <Graphics/Utils/Camera.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
+
 #include <GameObject/GameObject.h>
 #include <PlayerObject/PlayerObject.h>
+
 #include <Component/CameraComponent.h>
+
+#include <CameraManager.h>
+
 #include <Scene.h>
 #include <Utils/UUID.h>
 #include <Utils/DebugUtils.h>
@@ -179,10 +186,27 @@ namespace ScriptingBindings
 			return Scene::GetInstance().m_playerObject;
 			});
 
-        //lua.new_usertype<PerceptionSystem>("PerceptionSystem",
-        //    sol::no_constructor, 
-        //    "registerTeam", &PerceptionSystem::RegisterTeam
-        //);
+		// Get MainCamera
+		lua.set_function("getMainCamera", []() {
+			return Scene::GetInstance().m_cameraManager->GetCameraByUUID(Scene::GetInstance().m_mainCameraUUID).get();
+			});
+
+		// Get Camera by UUID
+		lua.set_function("getCameraByUUID", [](SE::UUIDhilo uuidhilo) {
+			return Scene::GetInstance().m_cameraManager->GetCameraByUUID(SE::UUID::FromHilo(uuidhilo)).get();
+			});
+
+		// Get Camera by UUID
+		lua.set_function("setCameraByUUID", [](SE::UUIDhilo uuidhilo) {
+			auto camUUID = SE::UUID::FromHilo(uuidhilo);
+			if (Scene::GetInstance().m_cameraManager->HasCameraByUUID(camUUID)) {
+				Scene::GetInstance().m_mainCameraUUID = camUUID;
+
+				Scene::GetInstance().m_renderer->SetMainCamera(
+					Scene::GetInstance().m_cameraManager->GetCameraByUUID(camUUID));
+			}
+			return;
+			});
 
         lua.set_function("getPerceptionSystem", []() -> PerceptionSystem& {
             return PerceptionSystem::Get();

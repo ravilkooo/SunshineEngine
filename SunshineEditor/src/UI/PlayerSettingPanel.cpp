@@ -11,11 +11,17 @@
 #include <Graphics/Renderer/GBuffer.h>
 
 #include <PlayerObject/PlayerObject.h>
+
+#include <CameraManager.h>
+#include <WorldEditor.h>
+#include <Scene.h>
+#include <Graphics/Renderer/MiniViewRenderer.h>
+
 #include <Utils/StringUtils.h>
 
-void PlayerSettingPanel::OnImGuiRender()
+void PlayerSettingPanel::OnImGuiRender(WorldEditor* worldEditor)
 {
-    DrawPlayerObjectDetails();
+    DrawGameplayDetails(worldEditor);
 }
 
 void PlayerSettingPanel::SetPlayerObject(PlayerObject_Info* playerObj)
@@ -23,29 +29,76 @@ void PlayerSettingPanel::SetPlayerObject(PlayerObject_Info* playerObj)
     m_playerObject = playerObj;
 };
 
-void PlayerSettingPanel::DrawPlayerObjectDetails()
+void PlayerSettingPanel::DrawGameplayDetails(WorldEditor* worldEditor)
 {
-    DrawPlayerCameraDetails();
-    DrawPlayerControllerDetails();
+    DrawMainCameraDetails(worldEditor);
+    DrawControllerDetails();
 }
 
-void PlayerSettingPanel::DrawPlayerCameraDetails()
+void PlayerSettingPanel::DrawMainCameraDetails(WorldEditor* worldEditor)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
         ImGuiTreeNodeFlags_Framed |
         ImGuiTreeNodeFlags_SpanAvailWidth;
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
     
-    if (ImGui::TreeNodeEx("Camera Component", flags))
+    if (ImGui::TreeNodeEx("Main Camera", flags))
     {
         EditorUI::FontStyles::Pop();
 
-        /*
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("Main camera");
+        EditorUI::FontStyles::Pop();
+
+        SE::UUID currentUUID = worldEditor->m_scene->m_mainCameraUUID;
+        worldEditor->m_miniViewRenderer->SetMainCamera(
+            worldEditor->m_scene->m_cameraManager->GetCameraByUUID(currentUUID));
+
+        int currentIndex = 0;
+        int i = 0;
+        for (auto cam : worldEditor->m_scene->m_cameraManager->m_camerasUUID) {
+            if (currentUUID == cam.m_UUID) {
+                currentIndex = i;
+            }
+        }
+
+        ImGui::Text("Main camera:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(-FLT_MIN);
+
+        auto size = worldEditor->m_scene->m_cameraManager->m_camerasUUID.size();
+
+        std::string preview = size > 0 ?
+            worldEditor->m_scene->m_mainCameraUUID.ToString() : "None";
+
+        if (ImGui::BeginCombo("##ParentCombo", preview.c_str())) {
+            for (int i = 0; i < (int)size; ++i) {
+                bool selected = (i == currentIndex);
+                if (ImGui::Selectable(worldEditor->m_scene->m_cameraManager->m_camerasUUID[i].ToString().c_str(),
+                    selected)) {
+
+                    currentIndex = i;
+                    worldEditor->m_scene->m_mainCameraUUID =
+                        worldEditor->m_scene->m_cameraManager->m_camerasUUID[i];
+                    worldEditor->m_miniViewRenderer->SetMainCamera(
+                        worldEditor->m_scene->m_cameraManager->GetCameraByUUID(
+                            worldEditor->m_scene->m_mainCameraUUID));
+                }
+                if (selected) ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        ImGui::Text("View");
+        EditorUI::FontStyles::Pop();
+
         ImVec2 avail = ImGui::GetContentRegionAvail();
         avail.y = avail.x * 360.0f / 640.0f;
 
-        // ImGui::Image((ImTextureID) m_playerObject->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
+        ImGui::Image((ImTextureID) worldEditor->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
 
+        /*
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
         ImGui::Text("Spring Arm Params");
         EditorUI::FontStyles::Pop();
@@ -93,7 +146,7 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
 	return;
 }
 
-void PlayerSettingPanel::DrawPlayerControllerDetails()
+void PlayerSettingPanel::DrawControllerDetails()
 {
     static int selectedKey = 0;
     static bool keyUpdated = false;

@@ -25,6 +25,8 @@
 #include <Component/TransformComponent.h>
 #include <Component/CameraComponent.h>
 
+#include <CameraManager.h>
+
 Game::Game()
 {
 	// Initialize();
@@ -122,7 +124,18 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	m_playerObject = Scene::GetInstance().m_playerObject;
-	m_renderer->SetMainCamera(m_playerObject->GetComponent<CameraComponent>()->m_camera);
+
+	if (Scene::GetInstance().m_mainCameraUUID == SE::UUID(0u))
+	{
+		m_renderer->SetMainCamera(m_playerObject->GetComponent<CameraComponent>()->m_camera);
+	}
+	else
+	{
+		m_renderer->SetMainCamera(
+			Scene::GetInstance().m_cameraManager->GetCameraByUUID(
+				Scene::GetInstance().m_mainCameraUUID));
+	}
+
 
 	SetupPhysics();
 	m_luaManager.InitializeBehavior();

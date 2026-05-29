@@ -545,9 +545,6 @@ void ImguiEditorPass::ShowProperties()
 	ImGui::Begin("Properties");
 	if (ImGui::BeginTabBar("PropsTabBar"))
 	{
-		auto pObj = static_cast<PlayerObject_Info*>(
-			m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(m_editorApp->m_worldEditor->m_playerObject));
-
 		if (ImGui::BeginTabItem("Object Properties"))
 		{
 			ShowGameObjectProperties();
@@ -556,12 +553,9 @@ void ImguiEditorPass::ShowProperties()
 
 		if (ImGui::BeginTabItem("Player Settings"))
 		{
-			pObj->GetComponent<CameraComponent_Info>()->m_assignedComponent->GetCamera()->SetUpCameraViewByAspectRatio(640.0f / 360.0f);
-			m_editorApp->m_worldEditor->m_miniViewRenderer->SetMainCamera(
-				pObj->GetComponent<CameraComponent_Info>()->m_assignedComponent->m_camera);
 			m_editorApp->m_worldEditor->m_miniViewRenderer->Enable();
 
-			ShowPlayerProperties();
+			ShowGameplayProperties();
 
 			ImGui::EndTabItem();
 		}
@@ -594,14 +588,14 @@ void ImguiEditorPass::ShowGameObjectProperties()
 	m_PropertyPanel.OnImGuiRender();
 }
 
-void ImguiEditorPass::ShowPlayerProperties()
+void ImguiEditorPass::ShowGameplayProperties()
 {
-	m_PlayerSettingPanel.SetPlayerObject(
+	m_gameplaySettingPanel.SetPlayerObject(
 		static_cast<PlayerObject_Info*>(
 			m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(m_editorApp->m_worldEditor->m_playerObject)
 		)
 	);
-	m_PlayerSettingPanel.OnImGuiRender();
+	m_gameplaySettingPanel.OnImGuiRender(m_editorApp->m_worldEditor.get());
 }
 
 void ImguiEditorPass::ShowBottomPanel()

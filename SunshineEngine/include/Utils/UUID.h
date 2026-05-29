@@ -38,7 +38,7 @@ namespace SE
 
         uint64_t m_UUID;
 
-        std::string ToString()
+        std::string ToString() const
         {
             std::ostringstream ss;
             ss << m_UUID;

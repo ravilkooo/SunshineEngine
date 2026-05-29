@@ -10,6 +10,10 @@ function behavior:start()
     local perception = self.owner:getPerception()
 
     ps:addToTeam(teamB, perception)
+
+    local camera = self.owner:getCameraComponent():getCamera()
+    local customUUID = self.owner:getUUID()
+    setCameraByUUID(customUUID)
 end
 
 function behavior:update(dt)
