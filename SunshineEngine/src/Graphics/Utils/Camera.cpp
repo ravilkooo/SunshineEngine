@@ -31,6 +31,11 @@ namespace SE_G {
 
     }
 
+    SE::UUID Camera::GetAssignedUUID()
+    {
+        return m_assignedUUID;
+    }
+
     void Camera::InitBuffer(ID3D11Device* device)
     {
         //DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();

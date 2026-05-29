@@ -321,7 +321,7 @@ void PlayerLuaKeyActionsMapping::RegisterLuaBindings()
 		// 	return player->GetComponent<PhysicsComponent>().get();
 		// },
 		"getCamera", [](PlayerObject* player) {
-			return player->m_playerCamera.get();
+			return player->GetComponent<CameraComponent>()->GetCamera();
 		},
 		"getCameraComponent", [](PlayerObject* player) {
 			return player->GetComponent<CameraComponent>().get();

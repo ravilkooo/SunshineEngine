@@ -1,6 +1,7 @@
 #include <PlayerObject/PlayerController.h>
 #include <PlayerObject/PlayerObject.h>
 #include <Graphics/Utils/Camera.h>
+#include <Component/CameraComponent.h>
 
 void PlayerController::SetPlayerObject(PlayerObject* player)
 {
@@ -51,7 +52,7 @@ void PlayerController::HandleMouseMove(const InputDevice::MouseMoveEventArgs& ar
 	m_stickYawMoveDir = args.Offset.x * m_stickYawPitchSpeed;
 	m_stickPitchMoveDir = -args.Offset.y * m_stickYawPitchSpeed;
 		
-	m_player->m_playerCamera->RotateSpringArmYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
+	m_player->GetComponent<CameraComponent>()->GetCamera()->RotateSpringArmYawPitch(m_stickYawMoveDir, m_stickPitchMoveDir);
 
 	m_player->m_luaActionMapping.ExecuteMouseMoveAction(args);
 }

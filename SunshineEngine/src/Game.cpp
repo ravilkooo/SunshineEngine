@@ -23,6 +23,7 @@
 #include <Component/PhysicsComponent.h>
 #include <Component/TriggerComponent.h>
 #include <Component/TransformComponent.h>
+#include <Component/CameraComponent.h>
 
 Game::Game()
 {
@@ -121,6 +122,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
 	m_playerObject = Scene::GetInstance().m_playerObject;
+	m_renderer->SetMainCamera(m_playerObject->GetComponent<CameraComponent>()->m_camera);
 
 	SetupPhysics();
 	m_luaManager.InitializeBehavior();

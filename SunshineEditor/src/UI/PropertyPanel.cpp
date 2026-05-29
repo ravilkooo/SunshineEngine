@@ -39,11 +39,13 @@
 #include <Scene.h>
 #include <SceneHierarchy.h>
 
+#include <CameraManager.h>
+
 #include <UI/PropertyPanel.h>
 #include <UI/FontStyles.h>
+#include "UI/ContentBrowserPanel.h"
 #include "Audio/AudioEditor.h"
 #include "Audio/AudioSystem.h"
-#include "UI/ContentBrowserPanel.h"
 #include "Utils/FileDialogManager.h"
 
 #include <ResourceManager/ResourceManagerFacade.h>
@@ -1472,6 +1474,8 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             if (ImGui::MenuItem("Camera Component", nullptr, false, true))
             {
                 obj->AddDefaultComponent(SE::ComponentType::CAMERA);
+                m_WorldEditor->m_scene->m_cameraManager->AddCamera(
+                    obj->GetComponent<CameraComponent_Info>()->m_assignedComponent->m_camera);
             }
         }
         

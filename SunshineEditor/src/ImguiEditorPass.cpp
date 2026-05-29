@@ -16,6 +16,7 @@
 #include <PlayerObject/PlayerObject.h>
 
 #include <Component/LuaComponent.h>
+#include <Component/CameraComponent.h>
 
 #include <Utils/DebugUtils.h>
 #include <Utils/StringUtils.h>
@@ -555,8 +556,9 @@ void ImguiEditorPass::ShowProperties()
 
 		if (ImGui::BeginTabItem("Player Settings"))
 		{
-			pObj->m_playerCamera->SetUpCameraViewByAspectRatio(640.0f / 360.0f);
-			m_editorApp->m_worldEditor->m_miniViewRenderer->SetMainCamera(pObj->m_playerCamera);
+			pObj->GetComponent<CameraComponent_Info>()->m_assignedComponent->GetCamera()->SetUpCameraViewByAspectRatio(640.0f / 360.0f);
+			m_editorApp->m_worldEditor->m_miniViewRenderer->SetMainCamera(
+				pObj->GetComponent<CameraComponent_Info>()->m_assignedComponent->m_camera);
 			m_editorApp->m_worldEditor->m_miniViewRenderer->Enable();
 
 			ShowPlayerProperties();

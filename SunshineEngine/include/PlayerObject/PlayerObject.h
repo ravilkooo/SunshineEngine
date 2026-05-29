@@ -29,9 +29,6 @@ namespace SE_G
 class PlayerObject : public GameObject
 {
 public:
-	// camera settings
-	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
-
 	// Input
 	PlayerController m_playerController;
 
@@ -40,8 +37,6 @@ public:
 	PlayerObject(const json& j, SE_G::DeferredRenderer* renderSystem, eastl::shared_ptr<SE_G::Camera> camera);
 
 	void SettingsFromJson(const json& j);
-
-	void SetUpCamera(SE_G::DeferredRenderer* renderSystem);
 
 	void SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer);
 
@@ -57,7 +52,7 @@ class PlayerObject_Info : public GameObject_Info
 {
 public:
 	// camera settings
-	eastl::shared_ptr<SE_G::Camera> m_playerCamera;
+	//eastl::shared_ptr<SE_G::Camera> m_playerCamera;
 
 	// Lua script configuration
 	AssetPath m_luaScriptPath;
@@ -167,8 +162,6 @@ public:
 	void AddTransformComponent(ID3D11Device* device);
 	void AddMeshComponent();
 	void AddPhysicsComponent();
-
-	void SetUpCamera(SE_G::DeferredRenderer* defRenderer);
 
 public:
 

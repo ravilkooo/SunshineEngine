@@ -35,10 +35,12 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
         ImGuiTreeNodeFlags_Framed |
         ImGuiTreeNodeFlags_SpanAvailWidth;
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
+    
     if (ImGui::TreeNodeEx("Camera Component", flags))
     {
         EditorUI::FontStyles::Pop();
 
+        /*
         ImVec2 avail = ImGui::GetContentRegionAvail();
         avail.y = avail.x * 360.0f / 640.0f;
 
@@ -82,6 +84,7 @@ void PlayerSettingPanel::DrawPlayerCameraDetails()
             m_playerObject->m_playerCamera->cameraPitchYawRoll = cameraRotationDeg * (DirectX::XM_PI / 180.0f);
         }
 
+        */
         ImGui::TreePop();
     }
     else

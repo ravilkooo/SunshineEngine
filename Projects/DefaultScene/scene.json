@@ -1304,6 +1304,26 @@
         },
         {
             "components": {
+                "Camera": {
+                    "cameraPitchYawRoll": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_springArmParams": {
+                        "length": 10.0,
+                        "pitchYawRoll": [
+                            0.521504282951355,
+                            0.0,
+                            0.0
+                        ],
+                        "rootOffset": [
+                            -4.0,
+                            2.0,
+                            -0.800000011920929
+                        ]
+                    }
+                },
                 "Lua": {
                     "scriptLoaded": true,
                     "scriptPath": {
@@ -1427,26 +1447,6 @@
             "m_name": "PlayerBehaviour",
             "m_parent": null,
             "settings": {
-                "camera": {
-                    "cameraPitchYawRoll": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_springArmParams": {
-                        "length": 10.0,
-                        "pitchYawRoll": [
-                            0.521504282951355,
-                            0.0,
-                            0.0
-                        ],
-                        "rootOffset": [
-                            -4.0,
-                            2.0,
-                            -0.800000011920929
-                        ]
-                    }
-                },
                 "keyFunctionMappings": [
                     {
                         "functionName": "onStrafeLeft",
@@ -4769,5 +4769,6 @@
             },
             "m_type": "Cylinder"
         }
-    ]
+    ],
+    "mainCamera": 0
 }

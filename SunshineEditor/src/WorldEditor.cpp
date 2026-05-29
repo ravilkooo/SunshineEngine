@@ -32,6 +32,9 @@
 
 #include <Component/PhysicsComponent.h>
 #include <Component/LuaComponent.h>
+#include <Component/CameraComponent.h>
+
+#include <CameraManager.h>
 
 #include <ParticleSystem/ParticleSystem.h>
 // #include <ParticleSystem/ParticleEmitter.h>
@@ -453,11 +456,19 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 			go->AddMeshComponent();
 			go->AddPhysicsComponent();
 
+
+			auto c = go->AddComponent<CameraComponent_Info>(
+				m_renderer->GetDevice(),
+				go->GetComponent<TransformComponent_Info>()->m_assignedComponent.get(),
+				go->m_UUID);
+			m_scene->m_cameraManager->AddCamera(c->m_assignedComponent->m_camera);
+
 			json _empty;
 			go->SettingsFromJson(_empty, m_renderer.get());
 
 			m_playerObject = m_scene->AddGameObject(eastl::move(go));
 			m_scene->m_playerObject = m_playerObject;
+			//m_scene->m_mainCameraUUID = m_playerObject;
 		}
 		else
 		{

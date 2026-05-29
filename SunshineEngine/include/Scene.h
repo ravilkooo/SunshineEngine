@@ -14,6 +14,7 @@
 using json = nlohmann::json;
 
 class PhysicsSystem;
+class CameraManager;
 class SceneGraph;
 class PlayerObject;
 
@@ -88,6 +89,9 @@ public:
 
     DeletionQueue m_objectDestructionQueue;
     void FlushDestructionQueue();
+
+    SE::UUID m_mainCameraUUID = SE::UUID(0u);
+    eastl::unique_ptr<CameraManager> m_cameraManager;
 private:
     Scene();
 };
@@ -133,4 +137,7 @@ public:
 
     // PlayerObject
     SE::UUID m_playerObject = SE::UUID(0u);
+
+    SE::UUID m_mainCameraUUID = SE::UUID(0u);
+    eastl::unique_ptr<CameraManager> m_cameraManager;
 };

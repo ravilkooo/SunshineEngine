@@ -3,6 +3,7 @@
 #include <GameObject/GameObject.h>
 #include <Physics/PhysicsSystem.h>
 #include <Graphics/Utils/Camera.h>
+#include <CameraManager.h>
 
 DeletionQueue::DeletionQueue()
     : queue(), head(0), tail(0), count(0)
@@ -29,6 +30,7 @@ bool DeletionQueue::IsEmpty() const { return count == 0; }
 
 Scene::Scene()
 {
+    m_cameraManager = eastl::make_unique<CameraManager>();
 }
 
 Scene::~Scene()
@@ -55,6 +57,8 @@ void Scene::ClearScene() {
 
         uuidToObjectMap.erase(it);
     }
+    m_mainCameraUUID = SE::UUID(0u);
+    m_cameraManager->Clear();
     gameObjects.clear();
 
     m_playerObjectUUID = SE::UUID(0u);
@@ -140,6 +144,8 @@ eastl::unique_ptr<GameObject> Scene::RemoveGameObjectByUUID(SE::UUID uuid)
             }
         }
     }
+
+    m_cameraManager->RemoveCameraByUUID(uuid);
     
     return out;
 }
@@ -180,6 +186,7 @@ void Scene::RestoreParents()
 
 Scene_Info::Scene_Info()
 {
+    m_cameraManager = eastl::make_unique<CameraManager>();
 }
 
 Scene_Info::~Scene_Info()
@@ -207,6 +214,9 @@ void Scene_Info::ClearScene() {
 
     m_sceneGraph->Clear();
     m_playerObject = SE::UUID(0u);
+
+    m_mainCameraUUID = SE::UUID(0u);
+    m_cameraManager->Clear();
 }
 
 SE::UUID Scene_Info::AddGameObject(eastl::unique_ptr<GameObject_Info> gameObject)
@@ -252,6 +262,7 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::RemoveGameObjectByUUID(SE::UUID u
             break;
         }
     }
+    m_cameraManager->RemoveCameraByUUID(uuid);
     return out;
 }
 

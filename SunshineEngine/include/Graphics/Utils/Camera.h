@@ -43,6 +43,8 @@ namespace SE_G {
         Camera(ID3D11Device* device, float aspectRatio);
         ~Camera();
 
+        SE::UUID GetAssignedUUID();
+
         void InitBuffer(ID3D11Device* device);
         void UpdateBuffer(ID3D11DeviceContext* context);
         void BindBuffer(ID3D11DeviceContext* context);

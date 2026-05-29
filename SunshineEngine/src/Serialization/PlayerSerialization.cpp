@@ -9,6 +9,7 @@ using json = nlohmann::json;
 
 void PlayerObject::SettingsFromJson(const json& j)
 {
+	/*
 	if (j.contains("camera"))
 	{
 		if (j["camera"].contains("m_springArmParams"))
@@ -33,6 +34,7 @@ void PlayerObject::SettingsFromJson(const json& j)
 			m_playerCamera->cameraPitchYawRoll.z = j["camera"]["cameraPitchYawRoll"][2].get<float>();
 		}
 	}
+	*/
 
 	// Load Lua script
 	if (j.contains("luaScript") && j.contains("keyFunctionMappings"))
@@ -43,8 +45,6 @@ void PlayerObject::SettingsFromJson(const json& j)
 	{
 		SetDefaultLuaActionMapping();
 	}
-	m_playerCamera->AssignTransformComponent(GetComponent<TransformComponent>().get());
-	m_playerCamera->SetFollowUUID(m_UUID);
 }
 
 json PlayerObject_Info::ToJson() const {
@@ -58,6 +58,7 @@ json PlayerObject_Info::SettingsToJson() const
 	// j["settings"] = json::object();
 	json j;
 
+	/*
 	j["camera"] = json::object();
 	j["camera"]["cameraPitchYawRoll"] = {
 		m_playerCamera->cameraPitchYawRoll.x,
@@ -77,6 +78,7 @@ json PlayerObject_Info::SettingsToJson() const
 		m_playerCamera->m_springArmParams.rootOffset.y,
 		m_playerCamera->m_springArmParams.rootOffset.z
 	};
+	*/
 
 	// Serialize Lua script path
 	j["luaScript"] = m_luaScriptPath.ToJson();
@@ -94,6 +96,7 @@ json PlayerObject_Info::SettingsToJson() const
 
 void PlayerObject_Info::SettingsFromJson(const json& j, SE_G::DeferredRenderer* defRenderer)
 {
+	/*
 	SetUpCamera(defRenderer);
 
 	if (j.contains("camera"))
@@ -120,6 +123,7 @@ void PlayerObject_Info::SettingsFromJson(const json& j, SE_G::DeferredRenderer* 
 			m_playerCamera->cameraPitchYawRoll.z = j["camera"]["cameraPitchYawRoll"][2].get<float>();
 		}
 	}
+	*/
 
 	if (j.contains("fixedCamera")) {
 		m_fixedCamera = j["fixedCamera"].get<bool>();

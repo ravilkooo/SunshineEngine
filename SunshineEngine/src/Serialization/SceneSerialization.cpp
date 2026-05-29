@@ -20,6 +20,10 @@
 
 #include <Graphics/GraphicsResources/Mesh.h>
 
+#include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Utils/Camera.h>
+#include <Graphics/GraphicsResources/Texture.h>
+
 #include <Utils/StringUtils.h>
 
 #include <GameObject/GameObject.h>
@@ -33,13 +37,11 @@
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitterComponent.h>
 
-#include <Graphics/Renderer/DeferredRenderer.h>
-#include <Graphics/Utils/Camera.h>
-#include <Graphics/GraphicsResources/Texture.h>
-
 #include <Serialization/GraphicsSerialization.h>
 
 #include <Physics/PhysicsSystem.h>
+
+#include <CameraManager.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 
@@ -654,6 +656,7 @@ void Scene::FromJson(
                 go = eastl::make_unique<PlayerObject>(objJ, renderSystem, camera);
                 auto playerObj = static_cast<PlayerObject*>(go.get());
                 GetInstance().m_playerObjectUUID = playerObj->m_UUID;
+                // GetInstance().m_mainCameraUUID = playerObj->m_UUID;
                 break;
             }
             case GameObjectGroup::ParticleEmitter:
@@ -733,6 +736,7 @@ void Scene::FromJson(
                         go->GetComponent<TransformComponent>().get(),
                         go->m_UUID);
                     c->FromJson(objJ["components"]["Camera"]);
+                    GetInstance().m_cameraManager->AddCamera(c->m_camera);
                 }
                 
                 // Parentnes
@@ -753,6 +757,11 @@ void Scene::FromJson(
     }
     GetInstance().RestoreParents();
 
+    if (j.contains("mainCamera"))
+    {
+        GetInstance().m_mainCameraUUID = SE::UUID(j["mainCamera"].get<uint64_t>());
+    }
+
     GetInstance().FlushDestructionQueue();
 }
 
@@ -771,6 +780,7 @@ json Scene_Info::ToJson() const {
             j["gameObjects"].push_back(it->second->ToJson());
         }
     }
+    j["mainCamera"] = (uint64_t)m_mainCameraUUID;
     return j;
 }
 
@@ -853,8 +863,9 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         {
             go = eastl::make_unique<PlayerObject_Info>(objJ, renderSystem);
             auto playerObj = static_cast<PlayerObject_Info*>(go.get());
-            //playerObj->m_playerCamera->AssignTransformComponent(play)
             scene->m_playerObject = playerObj->m_UUID;
+            //playerObj->m_playerCamera->AssignTransformComponent(play)
+            //scene->m_mainCameraUUID = playerObj->m_UUID;
         }
         else
         {
@@ -943,6 +954,7 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
                 go->GetComponent<TransformComponent_Info>()->m_assignedComponent.get(),
                 go->m_UUID);
             c->FromJson(objJ["components"]["Camera"]);
+            scene->m_cameraManager->AddCamera(c->m_assignedComponent->m_camera);
         }
 
         // Parentnes
@@ -973,5 +985,11 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
         }
     }
     scene->RestoreParents();
+
+
+    if (j.contains("mainCamera"))
+    {
+        scene->m_mainCameraUUID = SE::UUID(j["mainCamera"].get<uint64_t>());
+    }
     return scene;
 }
