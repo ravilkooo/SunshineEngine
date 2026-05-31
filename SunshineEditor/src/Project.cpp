@@ -1,8 +1,10 @@
 #include <filesystem>
 #include <Project.h>
-#include <Utils/StringUtils.h>
 #include <WorldEditor.h>
+
+#include <Utils/StringUtils.h>
 #include <Utils/AssetPath.h>
+#include <Utils/DebugUtils.h>
 
 #include "EASTL/shared_ptr.h"
 
@@ -89,6 +91,19 @@ namespace SE
 		if (!s_worldEditor->LoadScene(scenePath.c_str()))
 		{
 			return "Failed to load scene from: " + WStringToUtf8(scenePath);
+		}
+
+		eastl::wstring inputMappingDir = GetFullPath() + L"/InputMapping/";
+		if (!std::filesystem::exists(inputMappingDir.c_str()))
+		{
+			printSunshineErrorMessage(L"Input mapping file not found: " + inputMappingDir);
+		}
+		else
+		{
+			if (!s_worldEditor->LoadInputMapping(inputMappingDir))
+			{
+				printSunshineErrorMessage(L"Failed to load Input mapping from: " + scenePath);
+			}
 		}
     
 		return "";

@@ -120,6 +120,7 @@ public:
     bool LoadScene(const wchar_t* scenePath);
 
     void SaveInputMapping(eastl::wstring inputMappingDir);
+    bool LoadInputMapping(eastl::wstring inputMappingDir);
 
     /*
     void SavePlayer(const wchar_t* playerPath);

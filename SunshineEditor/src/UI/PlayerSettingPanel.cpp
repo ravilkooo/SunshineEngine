@@ -36,7 +36,7 @@ void PlayerSettingPanel::SetPlayerObject(PlayerObject_Info* playerObj)
 void PlayerSettingPanel::DrawGameplayDetails(WorldEditor* worldEditor)
 {
     DrawMainCameraDetails(worldEditor);
-    DrawControllerDetails();
+    //DrawControllerDetails();
 
     DrawKeyMappingEditor(*worldEditor->m_scene->m_keyMapping.get());
 }
@@ -698,17 +698,21 @@ void PlayerSettingPanel::DrawActionBindings(PlayerInputSystem::KeyMapping_Info& 
         3,
         ImGuiTableFlags_RowBg |
         ImGuiTableFlags_Borders |
-        ImGuiTableFlags_SizingStretchProp))
+        ImGuiTableFlags_Resizable))
     {
         return;
     }
 
-    ImGui::TableSetupColumn("Key");
-    ImGui::TableSetupColumn("Action");
+    ImGui::TableSetupColumn("Key",
+        ImGuiTableColumnFlags_WidthFixed,
+        120.0f);
+    ImGui::TableSetupColumn(
+        "Action",
+        ImGuiTableColumnFlags_WidthStretch);
     ImGui::TableSetupColumn(
         "",
         ImGuiTableColumnFlags_WidthFixed,
-        80.0f);
+        70.0f);
 
     ImGui::TableHeadersRow();
 
@@ -722,13 +726,16 @@ void PlayerSettingPanel::DrawActionBindings(PlayerInputSystem::KeyMapping_Info& 
     };
     std::vector<PendingRename> renames;
 
+    auto cache =
+        BuildActionConflictCache(bindings);
+
     for (size_t i = 0; i < bindings.size(); ++i)
     {
         auto& binding =
             bindings[i];
 
-        ImGui::PushID(
-            static_cast<int>(binding.Key));
+        //ImGui::PushID((KeyToName(binding.Key) + binding.Action).c_str());
+        ImGui::PushID(i);
 
         ImGui::TableNextRow();
 
@@ -739,11 +746,36 @@ void PlayerSettingPanel::DrawActionBindings(PlayerInputSystem::KeyMapping_Info& 
         ImGui::TableSetColumnIndex(0);
 
         PendingRename ren = { i, binding.Key, binding.Key };
+        ImGui::SetNextItemWidth(-FLT_MIN);
         DrawKeyCombo(
             "##Key", ren.oldKey, ren.newKey);
 
         if (ren.oldKey != ren.newKey) {
             renames.push_back(ren);
+        }
+
+        bool conflict =
+            HasActionConflict(
+                cache,
+                binding.Key);
+        if (conflict)
+        {
+            ImGui::TableSetBgColor(
+                ImGuiTableBgTarget_RowBg0,
+                IM_COL32(255, 100, 100, 80));
+
+            /*
+            ImGui::TextColored(
+                ImVec4(1.f, 0.8f, 0.f, 1.f),
+                "Conflict");
+            */
+
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::BeginTooltip();
+                ImGui::Text("Key assigned with %d actions", cache.KeyUsage[binding.Key]);
+                ImGui::EndTooltip();
+            }
         }
 
         //
@@ -752,6 +784,7 @@ void PlayerSettingPanel::DrawActionBindings(PlayerInputSystem::KeyMapping_Info& 
 
         ImGui::TableSetColumnIndex(1);
 
+        ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::InputText(
             "##Action",
             &binding.Action);
@@ -762,6 +795,7 @@ void PlayerSettingPanel::DrawActionBindings(PlayerInputSystem::KeyMapping_Info& 
 
         ImGui::TableSetColumnIndex(2);
 
+        ImGui::SetNextItemWidth(-FLT_MIN);
         if (ImGui::SmallButton("Delete"))
         {
             removeIndex =
@@ -807,18 +841,26 @@ void PlayerSettingPanel::DrawAxisBindings(PlayerInputSystem::KeyMapping_Info& ma
         4,
         ImGuiTableFlags_RowBg |
         ImGuiTableFlags_Borders |
-        ImGuiTableFlags_SizingStretchProp))
+        ImGuiTableFlags_Resizable))
     {
         return;
     }
 
-    ImGui::TableSetupColumn("Key");
-    ImGui::TableSetupColumn("Axis");
-    ImGui::TableSetupColumn("Scale");
+    ImGui::TableSetupColumn(
+        "Key",
+        ImGuiTableColumnFlags_WidthFixed,
+        120.0f);
+    ImGui::TableSetupColumn(
+        "Axis",
+        ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn(
+        "Scale",
+        ImGuiTableColumnFlags_WidthFixed,
+        100.0f);
     ImGui::TableSetupColumn(
         "",
         ImGuiTableColumnFlags_WidthFixed,
-        80.0f);
+        70.0f);
 
     ImGui::TableHeadersRow();
 
@@ -832,13 +874,15 @@ void PlayerSettingPanel::DrawAxisBindings(PlayerInputSystem::KeyMapping_Info& ma
     };
     std::vector<PendingRename> renames;
 
+    auto cache = BuildAxisConflictCache(bindings);
+
     for (size_t i = 0; i < bindings.size(); ++i)
     {
         auto& binding =
             bindings[i];
 
-        ImGui::PushID(
-            static_cast<int>(binding.Key));
+        //ImGui::PushID((KeyToName(binding.Key) + binding.Name).c_str());
+        ImGui::PushID(i);
 
         ImGui::TableNextRow();
 
@@ -849,8 +893,30 @@ void PlayerSettingPanel::DrawAxisBindings(PlayerInputSystem::KeyMapping_Info& ma
         ImGui::TableSetColumnIndex(0);
 
         PendingRename ren = { i, binding.Key, binding.Key };
+        ImGui::SetNextItemWidth(-FLT_MIN);
         DrawKeyCombo(
             "##Key", ren.oldKey, ren.newKey);
+
+        bool conflict =
+            HasAxisConflict(
+                cache,
+                binding);
+        if (conflict)
+        {
+            ImGui::TableSetBgColor(
+                ImGuiTableBgTarget_RowBg0,
+                IM_COL32(255, 100, 100, 80));
+
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::BeginTooltip();
+                ImGui::Text("Key assigned with %d actions",
+                    cache.Usage[AxisConflictKey{ binding.Key, binding.Name }]
+                );
+                ImGui::EndTooltip();
+            }
+        }
+
 
         if (ren.oldKey != ren.newKey) {
             renames.push_back(ren);
@@ -862,6 +928,7 @@ void PlayerSettingPanel::DrawAxisBindings(PlayerInputSystem::KeyMapping_Info& ma
 
         ImGui::TableSetColumnIndex(1);
 
+        ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::InputText(
             "##Axis",
             &binding.Name);
@@ -872,6 +939,7 @@ void PlayerSettingPanel::DrawAxisBindings(PlayerInputSystem::KeyMapping_Info& ma
 
         ImGui::TableSetColumnIndex(2);
 
+        ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::DragFloat(
             "##Scale",
             &binding.Scale,
@@ -885,6 +953,7 @@ void PlayerSettingPanel::DrawAxisBindings(PlayerInputSystem::KeyMapping_Info& ma
 
         ImGui::TableSetColumnIndex(3);
 
+        ImGui::SetNextItemWidth(-FLT_MIN);
         if (ImGui::SmallButton("Delete"))
         {
             removeIndex =
@@ -913,10 +982,8 @@ bool PlayerSettingPanel::DrawKeyCombo(
     Keys& key, Keys& newKey)
 {
     bool changed = false;
-    const char* preview =
-        KeyToName(key).c_str();
 
-    if (ImGui::BeginCombo(label, preview))
+    if (ImGui::BeginCombo(label, KeyToName(key).c_str()))
     {
         for (const KeyInfo& info : g_AllKeys)
         {
@@ -935,3 +1002,143 @@ bool PlayerSettingPanel::DrawKeyCombo(
     }
     return changed;
 }
+
+PlayerSettingPanel::ActionConflictCache PlayerSettingPanel::BuildActionConflictCache(
+    const eastl::vector<PlayerInputSystem::ActionBinding>& bindings)
+{
+    ActionConflictCache cache;
+
+    cache.KeyUsage.reserve(bindings.size());
+
+    for (const auto& binding : bindings)
+    {
+        if (binding.Key == Keys::None)
+            continue;
+
+        ++cache.KeyUsage[binding.Key];
+    }
+
+    return cache;
+}
+
+bool PlayerSettingPanel::HasActionConflict(
+    const ActionConflictCache& cache,
+    Keys key)
+{
+    if (key == Keys::None)
+        return false;
+
+    auto it = cache.KeyUsage.find(key);
+
+    return it != cache.KeyUsage.end() &&
+        it->second > 1;
+}
+
+PlayerSettingPanel::AxisConflictCache PlayerSettingPanel::BuildAxisConflictCache(
+    const eastl::vector<PlayerInputSystem::AxisBinding>& bindings)
+{
+    AxisConflictCache cache;
+
+    cache.Usage.reserve(bindings.size());
+
+    for (const auto& binding : bindings)
+    {
+        if (binding.Key == Keys::None)
+            continue;
+
+        AxisConflictKey key
+        {
+            binding.Key,
+            binding.Name
+        };
+
+        ++cache.Usage[key];
+    }
+
+    return cache;
+}
+
+bool PlayerSettingPanel::HasAxisConflict(
+    const AxisConflictCache& cache,
+    const PlayerInputSystem::AxisBinding& binding)
+{
+    if (binding.Key == Keys::None)
+        return false;
+
+    AxisConflictKey key
+    {
+        binding.Key,
+        binding.Name
+    };
+
+    auto it = cache.Usage.find(key);
+
+    return it != cache.Usage.end() &&
+        it->second > 1;
+}
+
+
+
+/*
+
+bool PlayerSettingPanel::HasDuplicateActionKey(
+    const eastl::vector<PlayerInputSystem::ActionBinding>& bindings, size_t currentIndex)
+{
+    const Keys key = bindings[currentIndex].Key;
+
+    if (key == Keys::None)
+        return false;
+
+    int count = 0;
+
+    for (const auto& binding : bindings)
+    {
+        if (binding.Key == key)
+            ++count;
+    }
+
+    return count > 1;
+}
+
+std::vector<std::string> PlayerSettingPanel::GetConflictingActions(
+    const eastl::vector<PlayerInputSystem::ActionBinding>& bindings, Keys key)
+{
+    std::vector<std::string> result;
+    for (const auto& binding : bindings)
+    {
+        if (binding.Key == key)
+        {
+            result.push_back(binding.Action);
+        }
+    }
+    return result;
+}
+
+bool PlayerSettingPanel::HasAxisConflict(
+    const eastl::vector<PlayerInputSystem::AxisBinding>& bindings, size_t currentIndex)
+{
+    const auto& current =
+        bindings[currentIndex];
+
+    if (current.Key == Keys::None)
+        return false;
+
+    for (size_t i = 0; i < bindings.size(); ++i)
+    {
+        if (i == currentIndex)
+            continue;
+
+        const auto& other =
+            bindings[i];
+
+        if (other.Key != current.Key)
+            continue;
+
+        if (other.Name == current.Name)
+            return true;
+    }
+
+    return false;
+}
+
+*/

@@ -1,5 +1,8 @@
 #include "Graphics/Renderer/RenderingSystem.h"
 #include <Graphics/Renderer/RenderGroup.h>
+
+#include <Utils/DebugUtils.h>
+
 #include <iostream>
 
 namespace SE_G {
@@ -163,7 +166,7 @@ namespace SE_G {
 			}
 		}
 		// log << "RenderGroup not found in RenderingSystem";
-		printf("RenderGroup not found in RenderingSystem\n");
+		printSunshineMessage(groupName + " RenderGroup not found in RenderingSystem");
 	}
 
 	void RenderingSystem::PreResize()

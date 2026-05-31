@@ -205,7 +205,7 @@ static const eastl::vector<KeyInfo> g_AllKeys =
     { Keys::OemClear, "OEM Clear" },
 };
 
-static eastl::string KeyToName(Keys k)
+static std::string KeyToName(Keys k)
 {
     // Use static lookup map for O(1) access
     static const eastl::unordered_map<Keys, const char*> keyToStringMap = []
@@ -225,5 +225,5 @@ static eastl::string KeyToName(Keys k)
     }
 
     // Fallback for unknown keys
-    return eastl::string("Unknown(") + eastl::to_string(static_cast<int>(k)) + ")";
+    return std::string("Unknown(") + std::to_string(static_cast<int>(k)) + ")";
 }

@@ -428,19 +428,14 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	}
 	json j;
 	try {
-		file >> j; // ��������� json �� �����
+		file >> j;
 	}
 	catch (const std::exception& e) {
 		LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()).c_str());
 		return false;
 	}
 	m_scene = Scene_Info::FromJson(m_renderer.get(), m_renderer->GetMainCamera(), j);
-	/*
-	if (!loadedScene) {
-		LOG_EDITOR_ERROR("Scene load error\n");
-		return false;
-	}
-	*/
+	
 	LOG_EDITOR_INFO("Scene loaded");
 
 	m_selectionPass->m_scene = m_scene.get();
@@ -496,6 +491,30 @@ void WorldEditor::SaveInputMapping(eastl::wstring inputMappingDir)
 	}
 	else
 		LOG_EDITOR_ERROR("Input mapping file output error");
+}
+
+bool WorldEditor::LoadInputMapping(eastl::wstring inputMappingDir)
+{
+	auto fullPath = inputMappingDir + Utf8ToWString(m_scene->m_keyMapping->m_name.c_str()) + L".json";
+
+	std::ifstream file(fullPath.c_str());
+	if (!file) {
+		LOG_EDITOR_ERROR("File input error");
+		return false;
+	}
+	json j;
+	try {
+		file >> j;
+	}
+	catch (const std::exception& e) {
+		LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()).c_str());
+		return false;
+	}
+	m_scene->m_keyMapping->FromJson(j);
+
+	LOG_EDITOR_INFO("Input mapping loaded");
+
+	return true;
 }
 
 void WorldEditor::AddBoxShape(DXSM::Vector3 initPos)

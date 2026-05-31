@@ -4,6 +4,8 @@
 #include <InputSystem/KeyInfo.h>
 #include <InputSystem/PlayerInputSystem.h>
 
+#include <EASTL/unordered_map.h>
+
 class PlayerObject_Info;
 class WorldEditor;
 class CameraManager;
@@ -32,4 +34,75 @@ private:
 	static bool DrawKeyCombo(
 		const char* label,
 		Keys& key, Keys& newKey);
+
+	struct ActionConflictCache
+	{
+		eastl::unordered_map<Keys, uint32_t> KeyUsage;
+	};
+
+	static ActionConflictCache BuildActionConflictCache(
+		const eastl::vector<PlayerInputSystem::ActionBinding>& bindings);
+
+	static bool HasActionConflict(
+		const ActionConflictCache& cache,
+		Keys key);
+
+	struct AxisConflictKey
+	{
+		Keys Key;
+		std::string Name;
+
+		bool operator==(const AxisConflictKey& rhs) const
+		{
+			return Key == rhs.Key &&
+				Name == rhs.Name;
+		}
+	};
+
+	struct AxisConflictKeyHasher
+	{
+		size_t operator()(const AxisConflictKey& value) const
+		{
+			size_t h1 = std::hash<int>()(
+				static_cast<int>(value.Key));
+
+			size_t h2 = std::hash<std::string>()(
+				value.Name);
+
+			return h1 ^ (h2 << 1);
+		}
+	};
+
+	struct AxisConflictCache
+	{
+		eastl::unordered_map<
+			AxisConflictKey,
+			uint32_t,
+			AxisConflictKeyHasher> Usage;
+	};
+
+	static AxisConflictCache BuildAxisConflictCache(
+		const eastl::vector<PlayerInputSystem::AxisBinding>& bindings);
+
+	static bool HasAxisConflict(
+		const AxisConflictCache& cache,
+		const PlayerInputSystem::AxisBinding& binding);
+
+	/*
+	static bool HasDuplicateActionKey(
+		const eastl::vector<PlayerInputSystem::ActionBinding>& bindings,
+		size_t currentIndex);
+
+	static std::vector<std::string> GetConflictingActions(
+		const eastl::vector<PlayerInputSystem::ActionBinding>& bindings,
+		Keys key);
+
+	static bool HasAxisConflict(
+		const eastl::vector<PlayerInputSystem::AxisBinding>& bindings,
+		size_t currentIndex);
+
+	static std::vector<std::string> GetConflictingActions(
+		const eastl::vector<PlayerInputSystem::ActionBinding>& bindings,
+		Keys key);
+	*/
 };
