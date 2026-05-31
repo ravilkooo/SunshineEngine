@@ -8,6 +8,8 @@
 #include <EASTL/shared_ptr.h>
 #include <EASTL/fixed_vector.h>
 
+#include "InputSystem/PlayerInputSystem.h"
+
 #include <unordered_map>
 
 #include <nlohmann/json.hpp>
@@ -143,4 +145,6 @@ public:
 
     SE::UUID m_mainCameraUUID = SE::UUID(0u);
     eastl::unique_ptr<CameraManager> m_cameraManager;
+
+    eastl::unique_ptr<PlayerInputSystem::KeyMapping_Info> m_keyMapping;
 };

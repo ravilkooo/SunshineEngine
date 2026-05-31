@@ -14,6 +14,8 @@
 
 #include <Scripting/LuaManager.h>
 
+#include <InputSystem/PlayerInputSystem.h>
+
 // #include <Utils/ILogManager.h>
 // #include <GameObject/GameObjectFactory.h>
 // #include <GameObject/GameObject.h>
@@ -93,6 +95,9 @@ public:
     AudioSystem* m_audioSystem;
 
     float m_deltaTime = 0.0f;
+
+    // Input System
+    PlayerInputSystem m_playerInputSystem;
 
     // PlayerObject
     PlayerObject* m_playerObject;

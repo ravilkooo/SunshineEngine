@@ -44,6 +44,8 @@
 #include <UI/PropertyPanel.h>
 #include <UI/FontStyles.h>
 #include "UI/ContentBrowserPanel.h"
+#include <UI/ImguiUtils.h>
+
 #include "Audio/AudioEditor.h"
 #include "Audio/AudioSystem.h"
 #include "Utils/FileDialogManager.h"
@@ -261,44 +263,44 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        DrawVector3Control("Position", transform->m_position,
+        ImguiUtils::DrawVector3Control("Position", transform->m_position,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             0.0f);
-        
+
         DXSM::Vector3 rotationDeg = transform->m_rotation * (180.0f / DirectX::XM_PI);
-        if (DrawVector3Control("Rotation", rotationDeg,
+        if (ImguiUtils::DrawVector3Control("Rotation", rotationDeg,
             DXSM::Vector3(-360.0f, -360.0f, -360.0f),
             DXSM::Vector3(360.0f, 360.0f, 360.0f),
             0.0f))
         {
             transform->m_rotation = rotationDeg * (DirectX::XM_PI / 180.0f);
         }
-        
-        DrawVector3Control("Scale", transform->m_scaleFactor,
+
+        ImguiUtils::DrawVector3Control("Scale", transform->m_scaleFactor,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             1.0f);
 
-        DrawVector2Control("UV Multiplier", transform->m_uvMultiplier, 1.0f);
-        
+        ImguiUtils::DrawVector2Control("UV Multiplier", transform->m_uvMultiplier, 1.0f);
+
         /*
         if (ImGui::TreeNode("Local Transform"))
         {
-            DrawVector3Control("Local Position", transform->m_localPosition, 0.0f);
-            
+            ImguiUtils::DrawVector3Control("Local Position", transform->m_localPosition, 0.0f);
+
             DXSM::Vector3 localRotDeg = transform->m_localRotation * (180.0f / DirectX::XM_PI);
-            if (DrawVector3Control("Local Rotation", localRotDeg, 0.0f))
+            if (ImguiUtils::DrawVector3Control("Local Rotation", localRotDeg, 0.0f))
             {
                 transform->m_localRotation = localRotDeg * (DirectX::XM_PI / 180.0f);
             }
-            
-            DrawVector3Control("Local Scale", transform->m_localScaleFactor, 1.0f);
-            
+
+            ImguiUtils::DrawVector3Control("Local Scale", transform->m_localScaleFactor, 1.0f);
+
             ImGui::TreePop();
         }
         */
-        
+
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();
@@ -390,7 +392,7 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
                     DrawCylinderShapeDetails(shapeObj);
                 }
                 break;
-                
+
             default:
                 break;
             }
@@ -431,7 +433,7 @@ void PropertyPanel::DrawAmbientLightDetails(SE_G::AmbientLightData* lightData)
             ImGui::ColorEdit3("Light Color", &lightData->Ambient.x, ImGuiColorEditFlags_Float);
             ImGui::TreePop();
         }
-		else EditorUI::FontStyles::Pop();
+        else EditorUI::FontStyles::Pop();
 
     }
 }
@@ -465,7 +467,7 @@ void PropertyPanel::DrawDirectionalLightDetails(SE_G::DirectionalLightData* ligh
             }
             ImGui::TreePop();
         }
-		else EditorUI::FontStyles::Pop();
+        else EditorUI::FontStyles::Pop();
 
     }
 }
@@ -494,7 +496,7 @@ void PropertyPanel::DrawPointLightDetails(SE_G::PointLightData* lightData)
             ImGui::DragFloat("1/x2", &lightData->Att.z, 0.5f, 0.0f, 100.0f, "%.1f m");
             ImGui::TreePop();
         }
-		else EditorUI::FontStyles::Pop();
+        else EditorUI::FontStyles::Pop();
     }
 }
 
@@ -535,7 +537,7 @@ void PropertyPanel::DrawSpotLightDetails(SE_G::SpotLightData* lightData)
             */
             ImGui::TreePop();
         }
-		else EditorUI::FontStyles::Pop();
+        else EditorUI::FontStyles::Pop();
     }
 }
 
@@ -570,7 +572,7 @@ void PropertyPanel::DrawSkyBoxDetails(SkyBox_Info* skyBoxObj)
             ImGui::Separator();
             ImGui::TreePop();
         }
-		else EditorUI::FontStyles::Pop();
+        else EditorUI::FontStyles::Pop();
     }
 }
 
@@ -595,7 +597,7 @@ void PropertyPanel::DrawBoxShapeDetails(BoxShapeObject_Info* obj)
         }
         ImGui::TreePop();
     }
-	else EditorUI::FontStyles::Pop();
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawSphereShapeDetails(SphereShapeObject_Info* obj)
@@ -653,7 +655,7 @@ void PropertyPanel::DrawGeosphereShapeDetails(GeosphereShapeObject_Info* obj)
     }
     else EditorUI::FontStyles::Pop();
 }
-   
+
 void PropertyPanel::DrawCylinderShapeDetails(CylinderShapeObject_Info* obj)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
@@ -681,7 +683,7 @@ void PropertyPanel::DrawCylinderShapeDetails(CylinderShapeObject_Info* obj)
 
 void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
 {
-    if (!obj->HasComponent<PhysicsComponent_Info>()) 
+    if (!obj->HasComponent<PhysicsComponent_Info>())
         return;
     auto physicsInfo = obj->GetComponent<PhysicsComponent_Info>();
 
@@ -694,12 +696,12 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
     if (ImGui::TreeNodeEx("Physics Settings", flags))
     {
         EditorUI::FontStyles::Pop();
-        
+
         if (DrawComponentRemoveButton<PhysicsComponent_Info>(obj))
         {
             ImGui::TreePop();
             return;
-		}
+        }
 
         auto currentMotion = physicsInfo->GetMotion();
         if (ImGui::Combo("Motion Type", (int*)&currentMotion, "Static\0Kinematic\0Dynamic\0"))
@@ -714,15 +716,15 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
         }
 
         auto currentLayer = physicsInfo->GetCollisionLayer();
-        int layerIndex = currentLayer == "MOVING"? 1 : 0;
+        int layerIndex = currentLayer == "MOVING" ? 1 : 0;
         const char* layerItems = "Non Moving\0Moving\0";
-        
+
         if (ImGui::Combo("Collision Layer", &layerIndex, layerItems))
         {
             physicsInfo->SetCollisionLayer(layerIndex == 0 ? "NON_MOVING" : "MOVING");
         }
         ImGui::Separator();
-        
+
 
         if (auto colliderData = physicsInfo->m_colliderData)
         {
@@ -773,7 +775,7 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
                 "1.0 = Superball (perfect bounce)\n\n"
                 "Higher = more bounce on collision"
             );
-            
+
             ImGui::TreePop();
         }
         else EditorUI::FontStyles::Pop();
@@ -817,14 +819,14 @@ void PropertyPanel::DrawTriggerComponent(GameObject_Info* obj)
 
 void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
 {
-    if (!obj->HasComponent<LuaComponent_Info>()) 
+    if (!obj->HasComponent<LuaComponent_Info>())
         return;
 
     auto luaInfo = obj->GetComponent<LuaComponent_Info>();
-    
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | 
-                              ImGuiTreeNodeFlags_Framed |
-                              ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
 
     ImGui::Separator();
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
@@ -847,7 +849,7 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
             ImGui::Text(luaInfo->audioPath.c_str());
         }
         */
-        
+
         LuaComponent_Info::ScanLuaFiles();
         eastl::vector<eastl::string> comboItems;
         comboItems.reserve(LuaComponent_Info::luaFiles.size() + 1);
@@ -893,7 +895,7 @@ void PropertyPanel::DrawLuaComponent(GameObject_Info* obj)
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();
-    
+
 }
 
 void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
@@ -908,12 +910,12 @@ void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
         ImGui::TextDisabled("No functions found in script");
         return;
     }
-    
+
     ImGui::Text("Available Functions:");
-    
-    float comboWidth = ImGui::GetContentRegionAvail().x * 0.6f; 
+
+    float comboWidth = ImGui::GetContentRegionAvail().x * 0.6f;
     ImGui::SetNextItemWidth(comboWidth);
-    
+
     static int selectedFunctionIndex = 0;
     if (ImGui::BeginCombo("##Select Function", availableFunctions[selectedFunctionIndex].c_str()))
     {
@@ -923,8 +925,8 @@ void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
             if (ImGui::Selectable(availableFunctions[i].c_str(), isSelected))
             {
                 selectedFunctionIndex = i;
-                strncpy(luaComp->functionName, availableFunctions[i].c_str(), 
-                       sizeof(luaComp->functionName) - 1);
+                strncpy(luaComp->functionName, availableFunctions[i].c_str(),
+                    sizeof(luaComp->functionName) - 1);
                 luaComp->FindFunction();
             }
             if (isSelected)
@@ -945,25 +947,25 @@ void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
         ImGui::SameLine();
         ImGui::TextDisabled("(Choose from list above)");
     }
-    
+
     if (luaComp->foundFunction)
     {
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
-        
+
         ImGui::Text("Function Parameters:");
-        
+
         for (int i = 0; i < luaComp->params.size(); ++i)
         {
             auto& param = luaComp->params[i];
 
             ImGui::PushID(i);
-            
+
             ImGui::Text("%s:", param.name.c_str());
             ImGui::SameLine();
             ImGui::TextDisabled("(%s)", param.type.c_str());
-            
+
             if (EASTLStringEqualsChar(param.type, "userdata"))
             {
                 ImGui::TextDisabled("GameObject");
@@ -971,20 +973,20 @@ void PropertyPanel::DrawLuaFunctions(LuaComponent* luaComp)
             else
             {
                 ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.6f);
-                
-                ImGui::InputText(("##param_" + eastl::to_string(i)).c_str(), 
-                               param.value, sizeof(param.value));
+
+                ImGui::InputText(("##param_" + eastl::to_string(i)).c_str(),
+                    param.value, sizeof(param.value));
             }
 
             ImGui::PopID();
         }
-        
+
         ImGui::Spacing();
         if (ImGui::Button("Call Function", ImVec2(120, 30)))
         {
             luaComp->CallFunction();
         }
-        
+
         if (!luaComp->lastResult.empty())
         {
             ImGui::BeginGroup();
@@ -1001,7 +1003,7 @@ void PropertyPanel::DrawAudioPanel()
     if (!m_AudioEditor) {
         ImGui::TextColored(ImVec4(1, 0, 0, 1), "Error: Audio Editor is NULL");
         ImGui::TextDisabled("Check EditorApp initialization order");
-        return; 
+        return;
     }
     static float listWidth = 200.0f;
     static std::string newTrackPath = "";
@@ -1009,7 +1011,7 @@ void PropertyPanel::DrawAudioPanel()
     static float newVolume = 1.0f;
     static bool newLoop = false;
     static int newTagIndex = 0; // 0: sfx, 1: music, 2: ambient
-    
+
     ImGui::BeginGroup();
     {
         ImGui::Text("Tracks Library");
@@ -1173,17 +1175,17 @@ void PropertyPanel::DrawAudioPanel()
         //         m_AudioEditor->ScanAndSync(assetsPath);
         //     }
         // }
-        
+
         ImGui::BeginChild("TrackList", ImVec2(listWidth, -40), true);
 
         const auto& trackList = m_AudioEditor->GetTrackList();
         if (!trackList.empty())
         {
-            for (const auto& track : trackList) 
+            for (const auto& track : trackList)
             {
-                std::string itemLabel = track.name + "##" + track.name; 
+                std::string itemLabel = track.name + "##" + track.name;
                 bool isSelected = (m_selectedAudioName == track.name);
-    
+
                 if (ImGui::Selectable(itemLabel.c_str(), isSelected))
                 {
                     m_selectedAudioName = track.name;
@@ -1195,7 +1197,7 @@ void PropertyPanel::DrawAudioPanel()
             ImGui::TextDisabled("No tracks found");
             ImGui::TextDisabled("Click 'Add Audio Track' to import");
         }
-        
+
         ImGui::EndChild();
 
         // if (ImGui::Button("Import Audio", ImVec2(listWidth, 30)))
@@ -1255,117 +1257,117 @@ void PropertyPanel::DrawAudioPanel()
         if (selectedTrack != nullptr)
         {
             EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
-                ImGui::Text("%s", selectedTrack->name.c_str());
-                EditorUI::FontStyles::Pop();
-                
-                ImGui::Separator();
+            ImGui::Text("%s", selectedTrack->name.c_str());
+            EditorUI::FontStyles::Pop();
 
-                ImGui::TextDisabled("File: %s", WStringToUtf8(selectedTrack->filePath.GetFullPath()).c_str());
-                
-                ImGui::Spacing();
+            ImGui::Separator();
 
-                if (ImGui::Button("Play Preview", ImVec2(100, 0)))
-                {
-                    m_AudioEditor->PlayPreview(selectedTrack->name);
-                }
-                
-                ImGui::SameLine();
-                
-                if (ImGui::Button("Stop", ImVec2(100, 0)))
-                {
-                    m_AudioEditor->StopPreview();
-                }
+            ImGui::TextDisabled("File: %s", WStringToUtf8(selectedTrack->filePath.GetFullPath()).c_str());
 
-                ImGui::SameLine();
+            ImGui::Spacing();
 
-                if (ImGui::Button("3D Test", ImVec2(80, 0)))
-                {
-                    auto* audioSystem = m_AudioEditor->GetAudioSystem();
-                    if (audioSystem) {
-                        audioSystem->Play3D(selectedTrack->name, 0, 0, 0, selectedTrack->volume);
-                    }
-                }
+            if (ImGui::Button("Play Preview", ImVec2(100, 0)))
+            {
+                m_AudioEditor->PlayPreview(selectedTrack->name);
+            }
 
-                ImGui::Separator();
-                
-                ImGui::Text("Settings");
+            ImGui::SameLine();
 
-                static char editNameBuffer[256] = {0};
-                static std::string editingTrackname = "";
-                    
-                if (editingTrackname != selectedTrack->name) {
-                    strcpy(editNameBuffer, selectedTrack->name.c_str());
-                    editingTrackname = selectedTrack->name;
-                }
-                    
-                if (ImGui::InputText("Track Name", editNameBuffer, sizeof(editNameBuffer)))
-                {
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("Update Name"))
-                {
-                    std::string newName = editNameBuffer;
-                    if (!newName.empty() && newName != selectedTrack->name) {
-                        m_AudioEditor->RenameTrack(selectedTrack->name, newName);
-                        m_selectedAudioName = newName;
-                    }
-                }
+            if (ImGui::Button("Stop", ImVec2(100, 0)))
+            {
+                m_AudioEditor->StopPreview();
+            }
 
-                int currentTag = 0;
-                if (selectedTrack->tag == "music") currentTag = 1;
-                else if (selectedTrack->tag == "ambient") currentTag = 2;
-                    
-                if (ImGui::Combo("Category", &currentTag, "SFX\0Music\0Ambient\0"))
-                {
-                    switch (currentTag) {
-                    case 0: selectedTrack->tag = "sfx"; break;
-                    case 1: selectedTrack->tag = "music"; break;
-                    case 2: selectedTrack->tag = "ambient"; break;
-                    }
-                }
+            ImGui::SameLine();
 
-                float vol = selectedTrack->volume;
-                if (ImGui::SliderFloat("Volume", &vol, 0.0f, 1.0f))
-                {
-                    selectedTrack->volume = vol;
-                    m_AudioEditor->SetVolume(selectedTrack->name, vol);
+            if (ImGui::Button("3D Test", ImVec2(80, 0)))
+            {
+                auto* audioSystem = m_AudioEditor->GetAudioSystem();
+                if (audioSystem) {
+                    audioSystem->Play3D(selectedTrack->name, 0, 0, 0, selectedTrack->volume);
                 }
+            }
 
-                if (ImGui::Checkbox("Loop", &selectedTrack->loop))
-                {
-                    m_AudioEditor->SetLoop(selectedTrack->name, selectedTrack->loop);
-                    std::cout<< "selectedTrack->loop = " << selectedTrack->loop << std::endl;
-                }
-                
-                // static char tagBuf[64];
-                // strncpy(tagBuf, selectedTrack->tag.c_str(), sizeof(tagBuf));
-                // if (ImGui::InputText("Tag", tagBuf, sizeof(tagBuf)))
-                // {
-                //     selectedTrack->tag = std::string(tagBuf);
-                // }
+            ImGui::Separator();
 
-                ImGui::Spacing();
-                ImGui::Separator();
-                
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
-                if (ImGui::Button("Delete Track", ImVec2(-1, 30)))
-                {
-                    m_AudioEditor->RemoveTrack(selectedTrack->name);
-                    m_selectedAudioName = ""; 
+            ImGui::Text("Settings");
+
+            static char editNameBuffer[256] = { 0 };
+            static std::string editingTrackname = "";
+
+            if (editingTrackname != selectedTrack->name) {
+                strcpy(editNameBuffer, selectedTrack->name.c_str());
+                editingTrackname = selectedTrack->name;
+            }
+
+            if (ImGui::InputText("Track Name", editNameBuffer, sizeof(editNameBuffer)))
+            {
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Update Name"))
+            {
+                std::string newName = editNameBuffer;
+                if (!newName.empty() && newName != selectedTrack->name) {
+                    m_AudioEditor->RenameTrack(selectedTrack->name, newName);
+                    m_selectedAudioName = newName;
                 }
-                ImGui::PopStyleColor();
-                
-                if (ImGui::Button("Save Audio Config", ImVec2(-1, 30)))
-                {
-                    m_AudioEditor->SaveToJson();
+            }
+
+            int currentTag = 0;
+            if (selectedTrack->tag == "music") currentTag = 1;
+            else if (selectedTrack->tag == "ambient") currentTag = 2;
+
+            if (ImGui::Combo("Category", &currentTag, "SFX\0Music\0Ambient\0"))
+            {
+                switch (currentTag) {
+                case 0: selectedTrack->tag = "sfx"; break;
+                case 1: selectedTrack->tag = "music"; break;
+                case 2: selectedTrack->tag = "ambient"; break;
                 }
+            }
+
+            float vol = selectedTrack->volume;
+            if (ImGui::SliderFloat("Volume", &vol, 0.0f, 1.0f))
+            {
+                selectedTrack->volume = vol;
+                m_AudioEditor->SetVolume(selectedTrack->name, vol);
+            }
+
+            if (ImGui::Checkbox("Loop", &selectedTrack->loop))
+            {
+                m_AudioEditor->SetLoop(selectedTrack->name, selectedTrack->loop);
+                std::cout << "selectedTrack->loop = " << selectedTrack->loop << std::endl;
+            }
+
+            // static char tagBuf[64];
+            // strncpy(tagBuf, selectedTrack->tag.c_str(), sizeof(tagBuf));
+            // if (ImGui::InputText("Tag", tagBuf, sizeof(tagBuf)))
+            // {
+            //     selectedTrack->tag = std::string(tagBuf);
+            // }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+            if (ImGui::Button("Delete Track", ImVec2(-1, 30)))
+            {
+                m_AudioEditor->RemoveTrack(selectedTrack->name);
+                m_selectedAudioName = "";
+            }
+            ImGui::PopStyleColor();
+
+            if (ImGui::Button("Save Audio Config", ImVec2(-1, 30)))
+            {
+                m_AudioEditor->SaveToJson();
+            }
         }
         else
         {
             ImGui::TextDisabled("Select a track to edit details");
         }
         ImGui::EndChild();
-        
+
     }
     ImGui::EndGroup();
 }
@@ -1374,12 +1376,12 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
 {
 
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-    
+
     if (ImGui::Button("Add Component", ImVec2(-1, 30)))
     {
         ImGui::OpenPopup("AddComponentPopup");
     }
-    
+
     if (ImGui::BeginPopup("AddComponentPopup"))
     {
         bool HasAllComponents = true;
@@ -1446,7 +1448,7 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
                 obj->AddDefaultComponent(SE::ComponentType::BEHAVIOR);
             }
         }
-        
+
         if (!obj->HasComponent<LuaComponent_Info>())
         {
             HasAllComponents = false;
@@ -1478,7 +1480,7 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
                     obj->GetComponent<CameraComponent_Info>()->m_assignedComponent->m_camera);
             }
         }
-        
+
         if (!obj->HasComponent<CharacterControllerComponent_Info>())
         {
             HasAllComponents = false;
@@ -1497,239 +1499,19 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             else if (HasPhysicsComponent)
                 ImGui::SetItemTooltip("Can't have both Character Controller and Physics components");
         }
-        
+
         if (HasAllComponents)
         {
             ImGui::TextDisabled("All available components added");
         }
-        
+
         ImGui::EndPopup();
     }
 }
 
 bool PropertyPanel::DrawFloatControl(const char* label, float& value, float resetValue,
-                                   float speed, float min, float max, 
-                                   const char* format, float columnWidth)
-{
-    bool changed = false;
-    
-    ImGui::PushID(label);
-    
-    if (ImGui::BeginTable(label, 2, 
-                         ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV |
-                         ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoSavedSettings))
-    {
-        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
-        ImGui::TableSetupColumn("Control", ImGuiTableColumnFlags_WidthStretch);
-        
-        ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetFrameHeight());
-        ImGui::TableNextColumn();
-        
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s", label);
-        
-        ImGui::TableNextColumn();
-        
-        ImGui::AlignTextToFramePadding();
-        
-        float availableWidth = ImGui::GetContentRegionAvail().x;
-        float inputWidth = availableWidth - 30.0f;
-        
-        ImGui::SetNextItemWidth(inputWidth);
-        if (ImGui::DragFloat("##Value", &value, speed, min, max, format))
-            changed = true;
-        
-        ImGui::SameLine(0, 4);
-        
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.4f, 0.4f, 0.4f, 0.6f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.5f, 0.5f, 0.5f, 0.8f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.3f, 0.3f, 0.3f, 0.6f});
-        
-        if (ImGui::Button("R", ImVec2(25, ImGui::GetFrameHeight())))
-        {
-            value = resetValue;
-            changed = true;
-        }
-        
-        ImGui::PopStyleColor(3);
-        
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("Reset to default");
-        
-        ImGui::EndTable();
-    }
-    
-    ImGui::PopID();
-    
-    return changed;
-}
-
-bool PropertyPanel::DrawUIntControl(const char* label, uint32_t& value, uint32_t resetValue,
-                                  float speed, uint32_t min, uint32_t max,
-                                  const char* format, float columnWidth)
-{
-    bool changed = false;
-    
-    ImGui::PushID(label);
-    
-    if (ImGui::BeginTable(label, 2, 
-                         ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV |
-                         ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoSavedSettings))
-    {
-        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
-        ImGui::TableSetupColumn("Control", ImGuiTableColumnFlags_WidthStretch);
-        
-        ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetFrameHeight());
-        ImGui::TableNextColumn();
-        
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s", label);
-        
-        ImGui::TableNextColumn();
-        
-        ImGui::AlignTextToFramePadding();
-        
-        float availableWidth = ImGui::GetContentRegionAvail().x;
-        float inputWidth = availableWidth - 30.0f;
-        
-        ImGui::SetNextItemWidth(inputWidth);
-        if (ImGui::DragScalar("##Value", ImGuiDataType_U32, &value, speed, &min, &max, format))
-            changed = true;
-        
-        ImGui::SameLine(0, 4);
-        
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.4f, 0.4f, 0.4f, 0.6f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.5f, 0.5f, 0.5f, 0.8f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.3f, 0.3f, 0.3f, 0.6f});
-        
-        if (ImGui::Button("R", ImVec2(25, ImGui::GetFrameHeight())))
-        {
-            value = resetValue;
-            changed = true;
-        }
-        
-        ImGui::PopStyleColor(3);
-        
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("Reset to default");
-        
-        ImGui::EndTable();
-    }
-    
-    ImGui::PopID();
-    
-    return changed;
-}
-
-bool PropertyPanel::DrawVector3Control(const char* label, DirectX::SimpleMath::Vector3& values,
-    DXSM::Vector3 minValues, DXSM::Vector3 maxValues,
-    float resetValue, float columnWidth)
-{
-    bool changed = false;
-    
-    ImGui::PushID(label);
-    
-    if (ImGui::BeginTable(label, 2, 
-                         ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV |
-                         ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoSavedSettings))
-    {
-        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
-        ImGui::TableSetupColumn("Control", ImGuiTableColumnFlags_WidthStretch);
-        
-        ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetFrameHeight());
-        ImGui::TableNextColumn();
-        
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s", label);
-        
-        ImGui::TableNextColumn();
-        
-        ImGui::AlignTextToFramePadding();
-        
-        float totalWidth = ImGui::GetContentRegionAvail().x;
-        float itemWidth = (totalWidth - 60.0f) / 3.0f;
-        
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{2, 0});
-        
-        float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-        ImVec2 buttonSize = { 20.0f, lineHeight };
-        
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.9f, 0.2f, 0.2f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.8f, 0.1f, 0.15f, 1.0f});
-        if (ImGui::Button("X", buttonSize))
-        {
-            values.x = resetValue;
-            changed = true;
-        }
-        ImGui::PopStyleColor(3);
-        
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(itemWidth);
-        if (ImGui::DragFloat("##X", &values.x, 0.1f, minValues.x, maxValues.x, "%.2f", ImGuiSliderFlags_AlwaysClamp))
-            changed = true;
-        ImGui::SameLine();
-        
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.3f, 0.8f, 0.3f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.2f, 0.7f, 0.2f, 1.0f});
-        if (ImGui::Button("Y", buttonSize))
-        {
-            values.y = resetValue;
-            changed = true;
-        }
-        ImGui::PopStyleColor(3);
-        
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(itemWidth);
-        if (ImGui::DragFloat("##Y", &values.y, 0.1f, minValues.y, maxValues.y, "%.2f", ImGuiSliderFlags_AlwaysClamp))
-            changed = true;
-        ImGui::SameLine();
-        
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.2f, 0.35f, 0.9f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.1f, 0.25f, 0.8f, 1.0f});
-        if (ImGui::Button("Z", buttonSize))
-        {
-            values.z = resetValue;
-            changed = true;
-        }
-        ImGui::PopStyleColor(3);
-        
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(itemWidth);
-        if (ImGui::DragFloat("##Z", &values.z, 0.1f, minValues.z, maxValues.z, "%.2f", ImGuiSliderFlags_AlwaysClamp))
-            changed = true;
-        
-        ImGui::SameLine(0, 4);
-        
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.4f, 0.4f, 0.4f, 0.6f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.5f, 0.5f, 0.5f, 0.8f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.3f, 0.3f, 0.3f, 0.6f});
-        
-        if (ImGui::Button("R", ImVec2(25, ImGui::GetFrameHeight())))
-        {
-            values = DirectX::SimpleMath::Vector3(resetValue, resetValue, resetValue);
-            changed = true;
-        }
-        
-        ImGui::PopStyleColor(3);
-        
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("Reset to default");
-        
-        ImGui::PopStyleVar();
-        
-        ImGui::EndTable();
-    }
-    
-    ImGui::PopID();
-    
-    return changed;
-}
-
-bool PropertyPanel::DrawVector2Control(const char* label, DirectX::SimpleMath::Vector2& values,
-    float resetValue, float columnWidth)
+    float speed, float min, float max,
+    const char* format, float columnWidth)
 {
     bool changed = false;
 
@@ -1752,45 +1534,14 @@ bool PropertyPanel::DrawVector2Control(const char* label, DirectX::SimpleMath::V
 
         ImGui::AlignTextToFramePadding();
 
-        float totalWidth = ImGui::GetContentRegionAvail().x;
-        float itemWidth = (totalWidth - 60.0f) / 2.0f;
+        float availableWidth = ImGui::GetContentRegionAvail().x;
+        float inputWidth = availableWidth - 30.0f;
 
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 2, 0 });
-
-        float lineHeight = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-        ImVec2 buttonSize = { 20.0f, lineHeight };
-
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-        if (ImGui::Button("X", buttonSize))
-        {
-            values.x = resetValue;
+        ImGui::SetNextItemWidth(inputWidth);
+        if (ImGui::DragFloat("##Value", &value, speed, min, max, format))
             changed = true;
-        }
-        ImGui::PopStyleColor(3);
 
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(itemWidth);
-        if (ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f"))
-            changed = true;
-        ImGui::SameLine();
-
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-        if (ImGui::Button("Y", buttonSize))
-        {
-            values.y = resetValue;
-            changed = true;
-        }
-        ImGui::PopStyleColor(3);
-
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(itemWidth);
-        if (ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f"))
-            changed = true;
-        ImGui::SameLine();
+        ImGui::SameLine(0, 4);
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.4f, 0.4f, 0.4f, 0.6f });
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.5f, 0.5f, 0.5f, 0.8f });
@@ -1798,7 +1549,7 @@ bool PropertyPanel::DrawVector2Control(const char* label, DirectX::SimpleMath::V
 
         if (ImGui::Button("R", ImVec2(25, ImGui::GetFrameHeight())))
         {
-            values = DirectX::SimpleMath::Vector2(resetValue, resetValue);
+            value = resetValue;
             changed = true;
         }
 
@@ -1807,7 +1558,62 @@ bool PropertyPanel::DrawVector2Control(const char* label, DirectX::SimpleMath::V
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("Reset to default");
 
-        ImGui::PopStyleVar();
+        ImGui::EndTable();
+    }
+
+    ImGui::PopID();
+
+    return changed;
+}
+
+bool PropertyPanel::DrawUIntControl(const char* label, uint32_t& value, uint32_t resetValue,
+    float speed, uint32_t min, uint32_t max,
+    const char* format, float columnWidth)
+{
+    bool changed = false;
+
+    ImGui::PushID(label);
+
+    if (ImGui::BeginTable(label, 2,
+        ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV |
+        ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoSavedSettings))
+    {
+        ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, columnWidth);
+        ImGui::TableSetupColumn("Control", ImGuiTableColumnFlags_WidthStretch);
+
+        ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetFrameHeight());
+        ImGui::TableNextColumn();
+
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s", label);
+
+        ImGui::TableNextColumn();
+
+        ImGui::AlignTextToFramePadding();
+
+        float availableWidth = ImGui::GetContentRegionAvail().x;
+        float inputWidth = availableWidth - 30.0f;
+
+        ImGui::SetNextItemWidth(inputWidth);
+        if (ImGui::DragScalar("##Value", ImGuiDataType_U32, &value, speed, &min, &max, format))
+            changed = true;
+
+        ImGui::SameLine(0, 4);
+
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.4f, 0.4f, 0.4f, 0.6f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.5f, 0.5f, 0.5f, 0.8f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.3f, 0.3f, 0.3f, 0.6f });
+
+        if (ImGui::Button("R", ImVec2(25, ImGui::GetFrameHeight())))
+        {
+            value = resetValue;
+            changed = true;
+        }
+
+        ImGui::PopStyleColor(3);
+
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("Reset to default");
 
         ImGui::EndTable();
     }
@@ -1821,7 +1627,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
 {
     if (!obj->HasComponent<MeshComponent_Info>())
         return;
-    
+
     auto meshInfo = obj->GetComponent<MeshComponent_Info>();
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
@@ -1841,9 +1647,9 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
                 ImGui::TreePop();
 
                 auto tcInfo = obj->GetComponent<TransformComponent_Info>();
-				tcInfo->m_assignedComponent->m_localPosition = DXSM::Vector3::Zero;
-				tcInfo->m_assignedComponent->m_localRotation = DXSM::Vector3::Zero;
-				tcInfo->m_assignedComponent->m_localScaleFactor = DXSM::Vector3::One;
+                tcInfo->m_assignedComponent->m_localPosition = DXSM::Vector3::Zero;
+                tcInfo->m_assignedComponent->m_localRotation = DXSM::Vector3::Zero;
+                tcInfo->m_assignedComponent->m_localScaleFactor = DXSM::Vector3::One;
 
                 return;
             }
@@ -1870,13 +1676,13 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
             EditorUI::FontStyles::Pop();
             auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-            DrawVector3Control("Mesh Offset", transform->m_localPosition,
+            ImguiUtils::DrawVector3Control("Mesh Offset", transform->m_localPosition,
                 DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
                 DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
                 0.0f);
 
             DXSM::Vector3 localRotDeg = transform->m_localRotation * (180.0f / DirectX::XM_PI);
-            if (DrawVector3Control("Mesh Rotation", localRotDeg,
+            if (ImguiUtils::DrawVector3Control("Mesh Rotation", localRotDeg,
                 DXSM::Vector3(-360.0f, -360.0f, -360.0f),
                 DXSM::Vector3(360.0f, 360.0f, 360.0f),
                 0.0f))
@@ -1884,7 +1690,7 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
                 transform->m_localRotation = localRotDeg * (DirectX::XM_PI / 180.0f);
             }
 
-            DrawVector3Control("Mesh Scale", transform->m_localScaleFactor,
+            ImguiUtils::DrawVector3Control("Mesh Scale", transform->m_localScaleFactor,
                 DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
                 DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
                 1.0f);
@@ -2064,7 +1870,7 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
         ImVec2 avail = ImGui::GetContentRegionAvail();
         avail.y = avail.x * 360.0f / 640.0f;
 
-        ImGui::Image((ImTextureID) m_WorldEditor->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
+        ImGui::Image((ImTextureID)m_WorldEditor->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         ImGui::Text("Spring Arm Params");
@@ -2077,7 +1883,7 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
         }
 
         DXSM::Vector3 springArmRotationDeg = cameraInfo->m_assignedComponent->m_camera->m_springArmParams.pitchYawRoll * (180.0f / DirectX::XM_PI);
-        if (PropertyPanel::DrawVector3Control("Rotation", springArmRotationDeg,
+        if (ImguiUtils::DrawVector3Control("Rotation", springArmRotationDeg,
             DXSM::Vector3(-90.0f, -80.0f, -360.0f),
             DXSM::Vector3(90.0f, 80.0f, 360.0f),
             0.0f))
@@ -2085,7 +1891,7 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
             cameraInfo->m_assignedComponent->m_camera->m_springArmParams.pitchYawRoll = springArmRotationDeg * (DirectX::XM_PI / 180.0f);
         }
 
-        PropertyPanel::DrawVector3Control("Offset",
+        ImguiUtils::DrawVector3Control("Offset",
             cameraInfo->m_assignedComponent->m_camera->m_springArmParams.rootOffset,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
@@ -2096,7 +1902,7 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
         EditorUI::FontStyles::Pop();
 
         DXSM::Vector3 cameraRotationDeg = cameraInfo->m_assignedComponent->m_camera->cameraPitchYawRoll * (180.0f / DirectX::XM_PI);
-        if (PropertyPanel::DrawVector3Control("Rotation", cameraRotationDeg,
+        if (ImguiUtils::DrawVector3Control("Rotation", cameraRotationDeg,
             DXSM::Vector3(-90.0f, -80.0f, -360.0f),
             DXSM::Vector3(90.0f, 80.0f, 360.0f),
             0.0f))
@@ -2168,7 +1974,7 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
         }
 
         DXSM::Vector3 EyesOffset = percInfo->EyesOffset;
-        if (DrawVector3Control("Eyes Offset", EyesOffset,
+        if (ImguiUtils::DrawVector3Control("Eyes Offset", EyesOffset,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             0.0f));
@@ -2241,7 +2047,7 @@ void PropertyPanel::DrawEmitterDetails(
     SE::ParticleData::EmitterPointConstantBuffer* emitterPointBuffer,
     SE::ParticleData::SimulateParticlesConstantBuffer* simulateParticlesBuffer
     */
-    )
+)
 {
     if (!obj)
         return;
@@ -2252,7 +2058,7 @@ void PropertyPanel::DrawEmitterDetails(
 
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
         ImGuiTreeNodeFlags_Framed |
-		ImGuiTreeNodeFlags_SpanAvailWidth;
+        ImGuiTreeNodeFlags_SpanAvailWidth;
 
     ImGui::Separator();
     EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
@@ -2278,7 +2084,7 @@ void PropertyPanel::DrawEmitterDetails(
         }
 
 
-        DrawVector3Control("Position", emitterPointBuffer->position,
+        ImguiUtils::DrawVector3Control("Position", emitterPointBuffer->position,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             0.0f);
@@ -2357,14 +2163,14 @@ void PropertyPanel::DrawEmitterDetails(
         ImGui::Text("Particle force");
         EditorUI::FontStyles::Pop();
 
-        DrawVector3Control("Force vector", simulateParticlesBuffer->force,
+        ImguiUtils::DrawVector3Control("Force vector", simulateParticlesBuffer->force,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             0.0f);
 
         ImGui::Separator();
         // Texture
-        
+
         auto tex = emitterInfo->m_particleData->m_texture;
 
         auto newTexture = DrawTextureSettings(tex, "Emitter");
@@ -2626,7 +2432,7 @@ void PropertyPanel::DrawColliderSettings(eastl::shared_ptr<SE::ColliderData> col
         switch (colliderData->GetShapeType())
         {
         case SE::ColliderShapeType::Box:
-            if (DrawVector3Control("Box Size", settings.data.asBox.m_size,
+            if (ImguiUtils::DrawVector3Control("Box Size", settings.data.asBox.m_size,
                 DXSM::Vector3(0.0001f, 0.0001f, 0.0001f),
                 DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
                 1.0f))

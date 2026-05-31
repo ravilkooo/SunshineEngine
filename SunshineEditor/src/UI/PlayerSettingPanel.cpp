@@ -2,15 +2,19 @@
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_internal.h>
+#include <imgui_stdlib.h>
 
 #include <UI/PlayerSettingPanel.h>
 #include <UI/PropertyPanel.h>
 #include <UI/FontStyles.h>
+#include <UI/ImguiUtils.h>
 
 #include <Graphics/Utils/Camera.h>
 #include <Graphics/Renderer/GBuffer.h>
 
 #include <PlayerObject/PlayerObject.h>
+
+#include <InputSystem/KeyInfo.h>
 
 #include <CameraManager.h>
 #include <WorldEditor.h>
@@ -33,6 +37,8 @@ void PlayerSettingPanel::DrawGameplayDetails(WorldEditor* worldEditor)
 {
     DrawMainCameraDetails(worldEditor);
     DrawControllerDetails();
+
+    DrawKeyMappingEditor(*worldEditor->m_scene->m_keyMapping.get());
 }
 
 void PlayerSettingPanel::DrawMainCameraDetails(WorldEditor* worldEditor)
@@ -619,4 +625,313 @@ void PlayerSettingPanel::DrawControllerDetails()
     }
     else
         EditorUI::FontStyles::Pop();
+}
+
+void PlayerSettingPanel::DrawKeyMappingEditor(PlayerInputSystem::KeyMapping_Info& mapping)
+{
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
+
+    // KeyMapping settings
+    if (ImGui::TreeNodeEx("Key mapping settings", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        ImGui::PushID(&mapping);
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        if (ImGui::CollapsingHeader(
+            "Action Bindings",
+            ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            EditorUI::FontStyles::Pop();
+            DrawActionBindings(mapping);
+        }
+        else
+        {
+            EditorUI::FontStyles::Pop();
+        }
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+        if (ImGui::CollapsingHeader(
+            "Axis Bindings",
+            ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            EditorUI::FontStyles::Pop();
+            DrawAxisBindings(mapping);
+        }
+        else
+        {
+            EditorUI::FontStyles::Pop();
+        }
+
+        ImGui::PopID();
+        ImGui::TreePop();
+    }
+    else
+    {
+        ImGui::TreePop();
+        EditorUI::FontStyles::Pop();
+    }
+}
+
+void PlayerSettingPanel::DrawActionBindings(PlayerInputSystem::KeyMapping_Info& mapping)
+{
+    auto& bindings =
+        mapping.GetActionBindings();
+
+    if (ImGui::Button("+ Add Action"))
+    {
+        bindings.push_back(
+            {
+                Keys::None,
+                "NewAction"
+            });
+    }
+
+    ImGui::Separator();
+
+    if (!ImGui::BeginTable(
+        "ActionBindings",
+        3,
+        ImGuiTableFlags_RowBg |
+        ImGuiTableFlags_Borders |
+        ImGuiTableFlags_SizingStretchProp))
+    {
+        return;
+    }
+
+    ImGui::TableSetupColumn("Key");
+    ImGui::TableSetupColumn("Action");
+    ImGui::TableSetupColumn(
+        "",
+        ImGuiTableColumnFlags_WidthFixed,
+        80.0f);
+
+    ImGui::TableHeadersRow();
+
+    int removeIndex = -1;
+
+    struct PendingRename
+    {
+        size_t idx;
+        Keys oldKey;
+        Keys newKey;
+    };
+    std::vector<PendingRename> renames;
+
+    for (size_t i = 0; i < bindings.size(); ++i)
+    {
+        auto& binding =
+            bindings[i];
+
+        ImGui::PushID(
+            static_cast<int>(binding.Key));
+
+        ImGui::TableNextRow();
+
+        //
+        // Key
+        //
+
+        ImGui::TableSetColumnIndex(0);
+
+        PendingRename ren = { i, binding.Key, binding.Key };
+        DrawKeyCombo(
+            "##Key", ren.oldKey, ren.newKey);
+
+        if (ren.oldKey != ren.newKey) {
+            renames.push_back(ren);
+        }
+
+        //
+        // Action
+        //
+
+        ImGui::TableSetColumnIndex(1);
+
+        ImGui::InputText(
+            "##Action",
+            &binding.Action);
+
+        //
+        // Delete
+        //
+
+        ImGui::TableSetColumnIndex(2);
+
+        if (ImGui::SmallButton("Delete"))
+        {
+            removeIndex =
+                static_cast<int>(i);
+        }
+
+        ImGui::PopID();
+    }
+
+    ImGui::EndTable();
+
+    for (auto ren : renames) {
+        bindings[ren.idx].Key = ren.newKey;
+    }
+
+    if (removeIndex >= 0)
+    {
+        bindings.erase(
+            bindings.begin() +
+            removeIndex);
+    }
+}
+
+void PlayerSettingPanel::DrawAxisBindings(PlayerInputSystem::KeyMapping_Info& mapping)
+{
+    auto& bindings =
+        mapping.GetAxisBindings();
+
+    if (ImGui::Button("+ Add Axis"))
+    {
+        bindings.push_back(
+            {
+                Keys::None,
+                "NewAxis",
+                1.0f
+            });
+    }
+
+    ImGui::Separator();
+
+    if (!ImGui::BeginTable(
+        "AxisBindings",
+        4,
+        ImGuiTableFlags_RowBg |
+        ImGuiTableFlags_Borders |
+        ImGuiTableFlags_SizingStretchProp))
+    {
+        return;
+    }
+
+    ImGui::TableSetupColumn("Key");
+    ImGui::TableSetupColumn("Axis");
+    ImGui::TableSetupColumn("Scale");
+    ImGui::TableSetupColumn(
+        "",
+        ImGuiTableColumnFlags_WidthFixed,
+        80.0f);
+
+    ImGui::TableHeadersRow();
+
+    int removeIndex = -1;
+
+    struct PendingRename
+    {
+        size_t idx;
+        Keys oldKey;
+        Keys newKey;
+    };
+    std::vector<PendingRename> renames;
+
+    for (size_t i = 0; i < bindings.size(); ++i)
+    {
+        auto& binding =
+            bindings[i];
+
+        ImGui::PushID(
+            static_cast<int>(binding.Key));
+
+        ImGui::TableNextRow();
+
+        //
+        // Key
+        //
+
+        ImGui::TableSetColumnIndex(0);
+
+        PendingRename ren = { i, binding.Key, binding.Key };
+        DrawKeyCombo(
+            "##Key", ren.oldKey, ren.newKey);
+
+        if (ren.oldKey != ren.newKey) {
+            renames.push_back(ren);
+        }
+
+        //
+        // Axis name
+        //
+
+        ImGui::TableSetColumnIndex(1);
+
+        ImGui::InputText(
+            "##Axis",
+            &binding.Name);
+
+        //
+        // Scale
+        //
+
+        ImGui::TableSetColumnIndex(2);
+
+        ImGui::DragFloat(
+            "##Scale",
+            &binding.Scale,
+            0.1f,
+            -10.0f,
+            10.0f);
+
+        //
+        // Delete
+        //
+
+        ImGui::TableSetColumnIndex(3);
+
+        if (ImGui::SmallButton("Delete"))
+        {
+            removeIndex =
+                static_cast<int>(i);
+        }
+
+        ImGui::PopID();
+    }
+
+    ImGui::EndTable();
+
+    for (auto ren : renames) {
+        bindings[ren.idx].Key = ren.newKey;
+    }
+
+    if (removeIndex >= 0)
+    {
+        bindings.erase(
+            bindings.begin() +
+            removeIndex);
+    }
+}
+
+bool PlayerSettingPanel::DrawKeyCombo(
+    const char* label,
+    Keys& key, Keys& newKey)
+{
+    bool changed = false;
+    const char* preview =
+        KeyToName(key).c_str();
+
+    if (ImGui::BeginCombo(label, preview))
+    {
+        for (const KeyInfo& info : g_AllKeys)
+        {
+            bool selected = (info.Key == key);
+
+            if (ImGui::Selectable(info.Name, selected))
+            {
+                newKey = info.Key;
+                changed = true;
+            }
+
+            if (selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+    return changed;
 }

@@ -1,20 +1,14 @@
 #include <PlayerObject/PlayerLuaKeyActionsMapping.h>
-#include <Scripting/AutoBindings.h>
+#include <PlayerObject/PlayerObject.h>
 
-#include <Scene.h>
+#include <Scripting/AutoBindings.h>
 #include <Physics/PhysicsSystem.h>
 #include <AI/Perception/PerceptionSystem.h>
-#include <PlayerObject/PlayerObject.h>
 #include <Component/CameraComponent.h>
-// #include <Component/TransformComponent.h>
-// #include <Component/TriggerComponent.h>
-// #include <Component/PhysicsComponent.h>
-// #include <ParticleSystem/ParticleEmitterComponent.h>
+
+#include <Scene.h>
+
 #include <Graphics/Utils/Camera.h>
-
-// #include <Physics/PhysicsSystem.h>
-// #include <AI/Perception/PerceptionSystem.h>
-
 
 #include <iostream>
 

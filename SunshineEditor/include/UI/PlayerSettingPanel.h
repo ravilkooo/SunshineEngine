@@ -1,5 +1,9 @@
 #pragma once
 
+#include <Windows/Keys.h>
+#include <InputSystem/KeyInfo.h>
+#include <InputSystem/PlayerInputSystem.h>
+
 class PlayerObject_Info;
 class WorldEditor;
 class CameraManager;
@@ -20,4 +24,12 @@ private:
 	void DrawGameplayDetails(WorldEditor* worldEditor);
 	void DrawMainCameraDetails(WorldEditor* worldEditor);
 	void DrawControllerDetails();
+
+	void DrawKeyMappingEditor(PlayerInputSystem::KeyMapping_Info& mapping);
+	static void DrawActionBindings(PlayerInputSystem::KeyMapping_Info& mapping);
+	static void DrawAxisBindings(PlayerInputSystem::KeyMapping_Info& mapping);
+
+	static bool DrawKeyCombo(
+		const char* label,
+		Keys& key, Keys& newKey);
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 enum class InputActionPhase
 {
     None,
@@ -15,4 +17,10 @@ struct ActionState
     bool Held = false;
 
     float Value = 0.0f;
+};
+
+struct AxisMapping
+{
+    std::string Name;
+    float scale = 1.0f;
 };

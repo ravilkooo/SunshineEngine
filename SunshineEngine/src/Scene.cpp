@@ -7,6 +7,8 @@
 #include <Graphics/Utils/Camera.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
+#include <InputSystem/PlayerInputSystem.h>
+
 #include <CameraManager.h>
 
 DeletionQueue::DeletionQueue()
@@ -195,6 +197,7 @@ void Scene::SetRenderer(SE_G::DeferredRenderer* renderer) {
 Scene_Info::Scene_Info()
 {
     m_cameraManager = eastl::make_unique<CameraManager>();
+    m_keyMapping = eastl::make_unique<PlayerInputSystem::KeyMapping_Info>();
 }
 
 Scene_Info::~Scene_Info()
