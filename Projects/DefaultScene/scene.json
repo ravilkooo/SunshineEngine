@@ -4770,5 +4770,6 @@
             "m_type": "Cylinder"
         }
     ],
+    "inputMapping": "Default",
     "mainCamera": 3659096847568696043
 }

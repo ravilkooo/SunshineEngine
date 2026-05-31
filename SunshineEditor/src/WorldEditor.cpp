@@ -417,7 +417,7 @@ void WorldEditor::SaveScene(const wchar_t* scenePath)
 		LOG_EDITOR_INFO("Scene saved");
 	}
 	else
-		LOG_EDITOR_ERROR("File output error");
+		LOG_EDITOR_ERROR("Scene file output error");
 }
 
 bool WorldEditor::LoadScene(const wchar_t* scenePath) {
@@ -481,6 +481,21 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	}
 
 	return true;
+}
+
+void WorldEditor::SaveInputMapping(eastl::wstring inputMappingDir)
+{
+	json j = m_scene->m_keyMapping->ToJson();
+
+	auto fullPath = inputMappingDir + Utf8ToWString(m_scene->m_keyMapping->m_name.c_str()) + L".json";
+
+	std::ofstream file(fullPath.c_str());
+	if (file) {
+		file << j.dump(4);
+		LOG_EDITOR_INFO("Input mapping saved");
+	}
+	else
+		LOG_EDITOR_ERROR("Input mapping file output error");
 }
 
 void WorldEditor::AddBoxShape(DXSM::Vector3 initPos)

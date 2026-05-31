@@ -4,6 +4,7 @@
 #include <wrl.h>
 
 // ThirdPartyLibs
+#include <EASTL/string.h>
 #include <EASTL/algorithm.h>
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
@@ -117,6 +118,8 @@ public:
 
     void SaveScene(const wchar_t* scenePath);
     bool LoadScene(const wchar_t* scenePath);
+
+    void SaveInputMapping(eastl::wstring inputMappingDir);
 
     /*
     void SavePlayer(const wchar_t* playerPath);

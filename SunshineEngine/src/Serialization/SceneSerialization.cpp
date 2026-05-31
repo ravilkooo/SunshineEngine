@@ -783,6 +783,8 @@ json Scene_Info::ToJson() const {
         }
     }
     j["mainCamera"] = (uint64_t)m_mainCameraUUID;
+
+    j["inputMapping"] = m_keyMapping->m_name.c_str();
     return j;
 }
 

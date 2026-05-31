@@ -46,11 +46,11 @@ namespace SE
         newProject.SetCreationDate(std::chrono::system_clock::now());
         newProject.SetLastSavedTime(std::chrono::system_clock::now());
 		
-	    error = newProject.createDirectory();
+	    error = newProject.createProjectDirectory();
 	    if (!error.empty())
 	        return "Failed to create project directory: " + error;
 		
-		error = createInitialScene(newProject);
+		error = CreateInitialScene(newProject);
 		if (!error.empty())
 		{
 			newProject.deleteDirectory();
@@ -102,6 +102,9 @@ namespace SE
 		eastl::wstring scenePath = GetScenePath();
 		
 		s_worldEditor->SaveScene(scenePath.c_str());
+
+		eastl::wstring inputMappingDir = GetFullPath() + L"/InputMapping/";
+		s_worldEditor->SaveInputMapping(inputMappingDir);
 		
 		UpdateSaveTime();
 
@@ -217,7 +220,7 @@ namespace SE
 		return "";
 	}
 
-	eastl::string Project::createDirectory() const
+	eastl::string Project::createProjectDirectory() const
     {
         try
         {
@@ -234,28 +237,11 @@ namespace SE
         }
     }
 
-	eastl::string Project::createAudioDirectory() const
+	eastl::string Project::createProjectSubdirectory(eastl::wstring subdirName) const
 	{
 		try
 		{
-			eastl::wstring fullPath = JoinWchar_Wstring(GetFullPath().c_str(), L"Audio/");
-			std::filesystem::create_directories(fullPath.c_str());
-			if (std::filesystem::exists(fullPath.c_str()))
-				return "";
-			else
-				return "Failed to create directory: " + WStringToUtf8(fullPath);
-		}
-		catch (const std::exception& e)
-		{
-			return "Failed to create directory: " + eastl::string(e.what());
-		}
-	}
-
-	eastl::string Project::createScriptsDirectory() const
-	{
-		try
-		{
-			eastl::wstring fullPath = JoinWchar_Wstring(GetFullPath().c_str(), L"Scripts/");
+			eastl::wstring fullPath = JoinWchar_Wstring(GetFullPath().c_str(), subdirName.c_str());
 			std::filesystem::create_directories(fullPath.c_str());
 			if (std::filesystem::exists(fullPath.c_str()))
 				return "";
@@ -301,7 +287,7 @@ namespace SE
         }
     }
 
-	eastl::string Project::createInitialScene(const Project& project)
+	eastl::string Project::CreateInitialScene(const Project& project)
 	{
 	    try
 	    {
@@ -313,13 +299,15 @@ namespace SE
 	    	eastl::wstring sceneFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"scene.json");
 	    	std::filesystem::copy(templateFile.c_str(), sceneFile.c_str());
 	    	//std::rename("from.txt", "to.txt")
+
+			project.createProjectSubdirectory(L"InputMapping/");
 			
-			project.createScriptsDirectory();
+			project.createProjectSubdirectory(L"Scripts/");
 			eastl::wstring playerScriptTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/player_controller.lua");
 			eastl::wstring playerScriptFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Scripts/player_controller.lua");
 			std::filesystem::copy(playerScriptTemplateFile.c_str(), playerScriptFile.c_str());
-    		
-			project.createAudioDirectory();
+			
+			project.createProjectSubdirectory(L"Audio/");
 			eastl::wstring audioPreviewTemplateFile = JoinWchar_Wstring(PROJECTS_DIR, L"Templates/audio_preview.json");
 			eastl::wstring audioPreviewFile = JoinWchar_Wstring(project.GetFullPath().c_str(), L"Audio/audio_preview.json");
 			std::filesystem::copy(audioPreviewTemplateFile.c_str(), audioPreviewFile.c_str());

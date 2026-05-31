@@ -58,10 +58,9 @@ namespace SE
 		std::chrono::system_clock::time_point m_creationDate;
 		static WorldEditor* s_worldEditor;
 
-		eastl::string createDirectory() const;
-        eastl::string createScriptsDirectory() const;
-        eastl::string createAudioDirectory() const;
-		static eastl::string createInitialScene(const Project& project);
+		eastl::string createProjectDirectory() const;
+        eastl::string createProjectSubdirectory(eastl::wstring subdirName) const;
+		static eastl::string CreateInitialScene(const Project& project);
 		// eastl::string copyTemplateFile(SceneType sceneType) const;
 		eastl::string renameDirectory(const eastl::wstring& newPath) const;
 		eastl::string deleteDirectory() const;

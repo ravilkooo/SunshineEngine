@@ -1,11 +1,15 @@
 #pragma once
 
-#include <unordered_map>
-#include <string>
+#include <EASTL/unordered_map.h>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include <InputSystem/InputAction.h>
 #include <Windows/Keys.h>
 #include <Windows/InputDevice.h>
+
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class PlayerInputSystem
 {
@@ -26,40 +30,46 @@ public:
     class KeyMapping_Info
     {
     public:
+        std::string m_name = "Default";
+
         KeyMapping_Info();
 
-        std::vector<ActionBinding>& GetActionBindings()
+        eastl::vector<ActionBinding>& GetActionBindings()
         {
             return m_actionBindings;
         }
 
-        std::vector<AxisBinding>& GetAxisBindings()
+        eastl::vector<AxisBinding>& GetAxisBindings()
         {
             return m_axisBindings;
         }
 
-        const std::vector<ActionBinding>& GetActionBindings() const
+        const eastl::vector<ActionBinding>& GetActionBindings() const
         {
             return m_actionBindings;
         }
 
-        const std::vector<AxisBinding>& GetAxisBindings() const
+        const eastl::vector<AxisBinding>& GetAxisBindings() const
         {
             return m_axisBindings;
         }
+        
+        // Serialization
+        json ToJson() const;
+        bool FromJson(const json& j);
 
     private:
 
-        std::vector<ActionBinding> m_actionBindings;
-        std::vector<AxisBinding> m_axisBindings;
+        eastl::vector<ActionBinding> m_actionBindings;
+        eastl::vector<AxisBinding> m_axisBindings;
     };
 
     class KeyMapping
     {
         friend class PlayerInputSystem;
     public:
-        using ActionBindings = std::unordered_map<Keys, std::string>;
-        using AxisBindings = std::unordered_map<Keys, AxisMapping>;
+        using ActionBindings = eastl::unordered_map<Keys, eastl::string>;
+        using AxisBindings = eastl::unordered_map<Keys, AxisMapping>;
 
         const ActionBindings& GetActionBindings() const { return m_keyToAction; }
         const AxisBindings& GetAxisBindings() const { return m_keyToAxisAction; }
@@ -70,7 +80,7 @@ public:
         // Setup
         //
 
-        void BindAction(Keys key, const std::string& action);
+        void BindAction(Keys key, const eastl::string& action);
         void BindAxisAction(Keys key, const AxisMapping& axisAction);
 
         void RemoveActionByKey(Keys key);
@@ -123,11 +133,11 @@ public:
     // Query
     //
 
-    bool IsPressed(const std::string& action) const;
-    bool IsReleased(const std::string& action) const;
-    bool IsHeld(const std::string& action) const;
+    bool IsPressed(const eastl::string& action) const;
+    bool IsReleased(const eastl::string& action) const;
+    bool IsHeld(const eastl::string& action) const;
 
-    float GetValue(const std::string& action) const;
+    float GetValue(const eastl::string& action) const;
 
     //
     // Mouse
@@ -140,15 +150,15 @@ public:
     // Axis
     //
 
-    float GetAxis(const std::string& axis) const;
+    float GetAxis(const eastl::string& axis) const;
 
 private:
     //
     // Runtime states
     //
 
-    std::unordered_map<std::string, ActionState> m_actions;
-    std::unordered_map<std::string, float> m_axes;
+    eastl::unordered_map<eastl::string, ActionState> m_actions;
+    eastl::unordered_map<eastl::string, float> m_axes;
 
     //
     // Mouse
