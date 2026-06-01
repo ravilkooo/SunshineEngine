@@ -72,12 +72,15 @@ function behavior:update(dt)
     tr.m_rotation.y = tr.m_rotation.y + speed * inputSystem:getAxis("Forward")
 
     if (inputSystem:isPressed("RAction")) then
-        print("RACTION")
+        -- print("RACTION")
         tr.m_rotation.y = tr.m_rotation.y + 0.5
+    elseif (inputSystem:isReleased("RAction")) then
+        -- print("RACTION")
+        tr.m_rotation.y = tr.m_rotation.y - 0.5
     end
 
     if (inputSystem:isPressed("FAction")) then
-        print("FACTION")
+        -- print("FACTION")
         tr.m_rotation.y = tr.m_rotation.y - 0.5
     end
 

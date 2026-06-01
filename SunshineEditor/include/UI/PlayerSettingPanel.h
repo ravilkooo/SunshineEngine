@@ -85,22 +85,4 @@ private:
 	static bool HasAxisConflict(
 		const AxisConflictCache& cache,
 		const PlayerInputSystem::AxisBinding& binding);
-
-	/*
-	static bool HasDuplicateActionKey(
-		const eastl::vector<PlayerInputSystem::ActionBinding>& bindings,
-		size_t currentIndex);
-
-	static std::vector<std::string> GetConflictingActions(
-		const eastl::vector<PlayerInputSystem::ActionBinding>& bindings,
-		Keys key);
-
-	static bool HasAxisConflict(
-		const eastl::vector<PlayerInputSystem::AxisBinding>& bindings,
-		size_t currentIndex);
-
-	static std::vector<std::string> GetConflictingActions(
-		const eastl::vector<PlayerInputSystem::ActionBinding>& bindings,
-		Keys key);
-	*/
 };

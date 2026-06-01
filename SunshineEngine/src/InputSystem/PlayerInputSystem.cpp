@@ -95,7 +95,7 @@ bool PlayerInputSystem::KeyMapping_Info::FromJson(const json& j)
 PlayerInputSystem::KeyMapping::KeyMapping()
 {
     m_keyToAction = std::unordered_map<Keys, std::vector<std::string>>();
-    m_keyToAxisAction = std::unordered_map<Keys, std::vector<AxisMapping>>();
+    m_axesKeys = std::unordered_map<std::string, std::vector<AxisKey>>();
 }
 
 bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
@@ -104,7 +104,7 @@ bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
     {
         // Clear existing bindings
         m_keyToAction.clear();
-        m_keyToAxisAction.clear();
+        m_axesKeys.clear();
 
         if (j.contains("name"))
         {
@@ -120,11 +120,7 @@ bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
                 binding.Key = static_cast<Keys>(item.value("key", 0));
                 binding.Action = item.value("action", "");
 
-                if (!m_keyToAction.contains(binding.Key))
-                {
-                    m_keyToAction[binding.Key] = std::vector<std::string>();
-                }
-                m_keyToAction[binding.Key].push_back(binding.Action);
+                BindAction(binding);
             }
         }
 
@@ -138,13 +134,7 @@ bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
                 binding.Name = item.value("name", "");
                 binding.Scale = item.value("scale", 1.0f);
 
-                if (!m_keyToAction.contains(binding.Key))
-                {
-                    m_keyToAxisAction[binding.Key] = std::vector<AxisMapping>();
-                }
-                m_keyToAxisAction[binding.Key].push_back(
-                    AxisMapping{ binding.Name, binding.Scale }
-                );
+                BindAxisAction(binding);
             }
         }
 
@@ -156,27 +146,28 @@ bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
     }
 }
 
-void PlayerInputSystem::KeyMapping::BindAction(Keys key, const std::string& action)
+void PlayerInputSystem::KeyMapping::BindAction(ActionBinding binding)
 {
-    if (!m_keyToAction.contains(key))
+    if (!m_keyToAction.contains(binding.Key))
     {
-        m_keyToAction[key] = std::vector<std::string>();
+        m_keyToAction[binding.Key] = std::vector<std::string>();
     }
-    m_keyToAction[key].push_back(action);
+    m_keyToAction[binding.Key].push_back(binding.Action);
 }
 
-void PlayerInputSystem::KeyMapping::BindAxisAction(Keys key, const AxisMapping& axisAction)
+void PlayerInputSystem::KeyMapping::BindAxisAction(AxisBinding binding)
 {
-    if (!m_keyToAxisAction.contains(key))
+    if (!m_axesKeys.contains(binding.Name))
     {
-        m_keyToAxisAction[key] = std::vector<AxisMapping>();
+        m_axesKeys[binding.Name] = std::vector<AxisKey>();
     }
-    m_keyToAxisAction[key].push_back(axisAction);
+    m_axesKeys[binding.Name].push_back(AxisKey{ binding.Key, binding.Scale });
 }
 
 void PlayerInputSystem::KeyMapping::ClearBindings()
 {
     m_keyToAction.clear();
+    //m_keyToAxisAction.clear();
 }
 
 void PlayerInputSystem::KeyMapping::RemoveActionByKey(Keys key)
@@ -184,9 +175,9 @@ void PlayerInputSystem::KeyMapping::RemoveActionByKey(Keys key)
     m_keyToAction.erase(key);
 }
 
-void PlayerInputSystem::KeyMapping::RemoveAxisByKey(Keys key)
+void PlayerInputSystem::KeyMapping::RemoveAxisByName(std::string name)
 {
-    m_keyToAxisAction.erase(key);
+    m_axesKeys.erase(name);
 }
 
 bool PlayerInputSystem::KeyMapping::HasActionBinding(Keys key) const
@@ -194,9 +185,9 @@ bool PlayerInputSystem::KeyMapping::HasActionBinding(Keys key) const
     return m_keyToAction.find(key) != m_keyToAction.end();
 }
 
-bool PlayerInputSystem::KeyMapping::HasAxisBinding(Keys key) const
+bool PlayerInputSystem::KeyMapping::HasAxis(std::string name) const
 {
-    return m_keyToAxisAction.find(key) != m_keyToAxisAction.end();
+    return m_axesKeys.find(name) != m_axesKeys.end();
 }
 
 #pragma endregion Runtime side
@@ -219,15 +210,7 @@ bool PlayerInputSystem::FromJson(const json& j)
             m_actions[a.second[i]] = ActionState{};
         }
     }
-
-    for (auto& axis : m_keyMapping.m_keyToAxisAction)
-    {
-        for (size_t i = 0; i < axis.second.size(); i++)
-        {
-            m_actions[axis.second[i].Name] = ActionState{};
-        }
-    }
-
+    
     return true;
 }
 
@@ -278,17 +261,6 @@ void PlayerInputSystem::HandleKeyDown(Keys key)
         }
     }
 
-    auto axisIt =
-        m_keyMapping.m_keyToAxisAction.find(key);
-
-    if (axisIt != m_keyMapping.m_keyToAxisAction.end())
-    {
-        for (const auto& axis : axisIt->second)
-        {
-            PressAxis(axis);
-        }
-    }
-
     for (auto& [name, state] : m_actions)
     {
         printf("isPressed %s: P=%d, H=%d\n", name.c_str(), state.Pressed, state.Held);
@@ -310,17 +282,6 @@ void PlayerInputSystem::HandleKeyUp(Keys key)
         for (const auto& action : actionIt->second)
         {
             ReleaseAction(action);
-        }
-    }
-
-    auto axisIt =
-        m_keyMapping.m_keyToAxisAction.find(key);
-
-    if (axisIt != m_keyMapping.m_keyToAxisAction.end())
-    {
-        for (const auto& axis : axisIt->second)
-        {
-            ReleaseAxis(axis);
         }
     }
 }
@@ -368,6 +329,13 @@ bool PlayerInputSystem::IsHeld(const std::string& action) const
     return it != m_actions.end() && it->second.Held;
 }
 
+bool PlayerInputSystem::IsHeld(Keys key) const
+{
+    auto it = m_keys.find(key);
+
+    return it != m_keys.end() && it->second.Held;
+}
+
 InputActionPhase PlayerInputSystem::GetPhase(const std::string& action) const
 {
     auto it = m_actions.find(action);
@@ -391,12 +359,19 @@ InputActionPhase PlayerInputSystem::GetPhase(const std::string& action) const
 
 float PlayerInputSystem::GetAxis(const std::string& axisName) const
 {
-    auto it = m_axes.find(axisName);
+    float value = 0.0f;
 
-    if (it == m_axes.end())
+    auto it = m_keyMapping.m_axesKeys.find(axisName);
+    if (it == m_keyMapping.m_axesKeys.end())
         return 0.0f;
 
-    return it->second.Value;
+    for (auto& axisKey : it->second)
+    {
+        if (IsHeld(axisKey.Key))
+            value += axisKey.Scale;
+    }
+
+    return std::clamp(value, -1.0f, 1.0f);
 }
 
 DXSM::Vector2 PlayerInputSystem::GetAxis2D(
@@ -470,38 +445,6 @@ void PlayerInputSystem::ReleaseAction(
     }
 
     printf("Release action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
-}
-
-void PlayerInputSystem::PressAxis(const AxisMapping& mapping)
-{
-    auto& axis =
-        m_axes[mapping.Name];
-
-    axis.Value += mapping.Scale;
-
-    axis.Value =
-        eastl::clamp(
-            axis.Value,
-            -1.0f,
-            1.0f);
-
-    printf("Press axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
-}
-
-void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
-{
-    auto& axis =
-        m_axes[mapping.Name];
-
-    axis.Value -= mapping.Scale;
-
-    axis.Value =
-        eastl::clamp(
-            axis.Value,
-            -1.0f,
-            1.0f);
-
-    printf("Release axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
 }
 
 #pragma endregion PlayerInputSystem

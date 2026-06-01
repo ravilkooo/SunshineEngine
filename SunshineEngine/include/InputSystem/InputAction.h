@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <Windows/Keys.h>
 
 enum class InputActionPhase
 {
@@ -32,9 +33,10 @@ struct AxisMapping
     float Scale = 1.0f;
 };
 
-struct AxisState
+struct AxisKey
 {
-    float Value = 0.0f;
+    Keys Key;
+    float Scale = 1.0f;
 };
 
 struct MouseState

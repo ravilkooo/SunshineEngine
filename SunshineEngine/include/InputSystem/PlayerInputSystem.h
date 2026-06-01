@@ -74,13 +74,10 @@ public:
     public:
         using ActionBindings = std::unordered_map<Keys,
             std::vector<std::string>>;
-        using AxisBindings = std::unordered_map<Keys,
-            std::vector<AxisMapping>>;
 
         std::string m_name = "Default";
 
         const ActionBindings& GetActionBindings() const { return m_keyToAction; }
-        const AxisBindings& GetAxisBindings() const { return m_keyToAxisAction; }
 
         KeyMapping();
 
@@ -88,14 +85,14 @@ public:
         // Setup
         //
 
-        void BindAction(Keys key, const std::string& action);
-        void BindAxisAction(Keys key, const AxisMapping& axisAction);
+        void BindAction(ActionBinding binding);
+        void BindAxisAction(AxisBinding binding);
 
         void RemoveActionByKey(Keys key);
-        void RemoveAxisByKey(Keys key);
+        void RemoveAxisByName(std::string name);
 
         bool HasActionBinding(Keys key) const;
-        bool HasAxisBinding(Keys key) const;
+        bool HasAxis(std::string name) const;
 
         void ClearBindings();
 
@@ -110,10 +107,10 @@ public:
         ActionBindings m_keyToAction;
 
         //
-        // Key -> Axis
+        // Axis name -> Key
         //
 
-        AxisBindings   m_keyToAxisAction;
+        std::unordered_map<std::string, std::vector<AxisKey>> m_axesKeys;
     };
 
 public:
@@ -154,6 +151,7 @@ public:
     bool IsPressed(const std::string& action) const;
     bool IsReleased(const std::string& action) const;
     bool IsHeld(const std::string& action) const;
+    bool IsHeld(Keys key) const;
 
     InputActionPhase GetPhase(const std::string& action) const;
 
@@ -186,12 +184,6 @@ private:
     void ReleaseAction(
         const std::string& action);
 
-    void PressAxis(
-        const AxisMapping& mapping);
-
-    void ReleaseAxis(
-        const AxisMapping& mapping);
-
     //
     // Runtime states
     //
@@ -199,8 +191,6 @@ private:
     std::unordered_map<std::string, ActionState> m_actions;
 
     std::unordered_map<Keys, KeyState> m_keys;
-
-    std::unordered_map<std::string, AxisState> m_axes;
 
     MouseState m_mouse;
 };
