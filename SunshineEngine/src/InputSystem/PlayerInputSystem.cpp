@@ -1,5 +1,6 @@
 #include <InputSystem/PlayerInputSystem.h>
 #include <Utils/StringUtils.h>
+#include <Utils/DebugUtils.h>
 
 #pragma region KeyMapping_Info
 
@@ -429,6 +430,8 @@ void PlayerInputSystem::PressAction(
         state.Pressed = true;
         state.Held = true;
     }
+    
+    printf("Press action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
 }
 
 void PlayerInputSystem::ReleaseAction(
@@ -446,6 +449,8 @@ void PlayerInputSystem::ReleaseAction(
         state.Released = true;
         state.Held = false;
     }
+
+    printf("Release action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
 }
 
 void PlayerInputSystem::PressAxis(const AxisMapping& mapping)
@@ -460,6 +465,8 @@ void PlayerInputSystem::PressAxis(const AxisMapping& mapping)
             axis.Value,
             -1.0f,
             1.0f);
+
+    printf("Press axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
 }
 
 void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
@@ -474,6 +481,8 @@ void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
             axis.Value,
             -1.0f,
             1.0f);
+
+    printf("Release axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
 }
 
 #pragma endregion PlayerInputSystem

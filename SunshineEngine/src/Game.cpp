@@ -282,36 +282,37 @@ void Game::Update(float deltaTime) {
 
 	Scene::GetInstance().FlushDestructionQueue();
 
+	m_physicsSystem->FlushCommands();
+	m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
-	 m_physicsSystem->FlushCommands();
-	 m_luaManager.Update(&Scene::GetInstance(), deltaTime);
+	m_physicsSystem->Step(deltaTime);
+	m_physicsSystem->FlushCommands();
 
-	 m_physicsSystem->Step(deltaTime);
-	 m_physicsSystem->FlushCommands();
+	m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance());
 
-	 m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance());
+	if (m_particleSystem)
+		m_particleSystem->Update(deltaTime);
 
-	 if (m_particleSystem)
-		 m_particleSystem->Update(deltaTime);
+	m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
-	 m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+	// AI
+	PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
+	BehaviorStorage::Get().Update(deltaTime);
 
-	 // AI
-	 PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
-	 BehaviorStorage::Get().Update(deltaTime);
+	ClearCachedAbsoluteTransforms();
 
-	 ClearCachedAbsoluteTransforms();
-
-	 m_renderer->GetMainCamera()->Update(deltaTime);
+	m_renderer->GetMainCamera()->Update(deltaTime);
 
 	if (AudioSystem::IsInitialized()) {
 		AudioSystem::Get().Update();
-        
+
 		if (auto transform = m_playerObject->GetComponent<TransformComponent>()) {
 			auto pos = transform->m_position;
 			AudioSystem::Get().SetListenerPosition(pos.x, pos.y, pos.z);
 		}
 	}
+
+	m_playerInputSystem.EndFrame();
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
@@ -341,14 +342,17 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 void Game::HandleKeyDown(Keys key)
 {
 	m_playerObject->m_playerController.HandleKeyDown(key);
+	m_playerInputSystem.HandleKeyDown(key);
 }
 
 void Game::HandleKeyUp(Keys key)
 {
 	m_playerObject->m_playerController.HandleKeyUp(key);
+	m_playerInputSystem.HandleKeyUp(key);
 }
 
 void Game::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
 	m_playerObject->m_playerController.HandleMouseMove(args);
+	m_playerInputSystem.HandleMouseMove(args);
 }

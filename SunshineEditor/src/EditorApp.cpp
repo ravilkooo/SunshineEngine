@@ -137,6 +137,11 @@ void EditorApp::RunApp()
 	bool isExitRequested = false;
 	
 	while (!isExitRequested) {
+		if (m_runtimeMode == RuntimeMode::GAME_MODE)
+		{
+			m_currentGame->m_playerInputSystem.BeginFrame();
+		}
+
 		// Handle the windows messages.
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
@@ -215,6 +220,11 @@ void EditorApp::RunApp()
 		}
 		
 		Render();
+
+		if (m_runtimeMode == RuntimeMode::GAME_MODE)
+		{
+			m_currentGame->m_playerInputSystem.EndFrame();
+		}
 
 		if (!m_projectSelected && imguiEditorPass->IsProjectSelected()) {
 			if (OpenProject()) {
