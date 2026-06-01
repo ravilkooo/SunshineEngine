@@ -1,0 +1,29 @@
+{
+    "action_bindings": [
+        {
+            "action": "RAction",
+            "key": 82
+        },
+        {
+            "action": "FAction",
+            "key": 70
+        },
+        {
+            "action": "RAction",
+            "key": 84
+        }
+    ],
+    "axis_bindings": [
+        {
+            "key": 38,
+            "name": "Forward",
+            "scale": 1.0
+        },
+        {
+            "key": 40,
+            "name": "Forward",
+            "scale": -1.0
+        }
+    ],
+    "name": "Default"
+}
