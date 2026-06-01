@@ -1,8 +1,8 @@
 #pragma once
 
-#include <EASTL/unordered_map.h>
-#include <EASTL/string.h>
-#include <EASTL/vector.h>
+#include <unordered_map>
+#include <string>
+#include <vector>
 
 #include <InputSystem/InputAction.h>
 #include <Windows/Keys.h>
@@ -38,22 +38,22 @@ public:
 
         KeyMapping_Info();
 
-        eastl::vector<ActionBinding>& GetActionBindings()
+        std::vector<ActionBinding>& GetActionBindings()
         {
             return m_actionBindings;
         }
 
-        eastl::vector<AxisBinding>& GetAxisBindings()
+        std::vector<AxisBinding>& GetAxisBindings()
         {
             return m_axisBindings;
         }
 
-        const eastl::vector<ActionBinding>& GetActionBindings() const
+        const std::vector<ActionBinding>& GetActionBindings() const
         {
             return m_actionBindings;
         }
 
-        const eastl::vector<AxisBinding>& GetAxisBindings() const
+        const std::vector<AxisBinding>& GetAxisBindings() const
         {
             return m_axisBindings;
         }
@@ -64,18 +64,18 @@ public:
 
     private:
 
-        eastl::vector<ActionBinding> m_actionBindings;
-        eastl::vector<AxisBinding> m_axisBindings;
+        std::vector<ActionBinding> m_actionBindings;
+        std::vector<AxisBinding> m_axisBindings;
     };
 
     class KeyMapping
     {
         friend class PlayerInputSystem;
     public:
-        using ActionBindings = eastl::unordered_map<Keys,
-            eastl::vector<eastl::string>>;
-        using AxisBindings = eastl::unordered_map<Keys,
-            eastl::vector<AxisMapping>>;
+        using ActionBindings = std::unordered_map<Keys,
+            std::vector<std::string>>;
+        using AxisBindings = std::unordered_map<Keys,
+            std::vector<AxisMapping>>;
 
         std::string m_name = "Default";
 
@@ -88,7 +88,7 @@ public:
         // Setup
         //
 
-        void BindAction(Keys key, const eastl::string& action);
+        void BindAction(Keys key, const std::string& action);
         void BindAxisAction(Keys key, const AxisMapping& axisAction);
 
         void RemoveActionByKey(Keys key);
@@ -117,8 +117,11 @@ public:
     };
 
 public:
-
-    PlayerInputSystem();
+    static PlayerInputSystem& GetInstance()
+    {
+        static PlayerInputSystem instance;
+        return instance;
+    }
 
     // Serialization
     bool FromJson(const json& j);
@@ -148,20 +151,19 @@ public:
     // Query
     //
 
-    bool IsPressed(const eastl::string& action) const;
-    bool IsReleased(const eastl::string& action) const;
-    bool IsHeld(const eastl::string& action) const;
+    bool IsPressed(const std::string& action) const;
+    bool IsReleased(const std::string& action) const;
+    bool IsHeld(const std::string& action) const;
 
-    InputActionPhase GetPhase(const eastl::string& action) const;
+    InputActionPhase GetPhase(const std::string& action) const;
 
     //
     // Axis
     //
 
-    float GetAxis(const eastl::string& axisName) const;
-    DXSM::Vector2 GetAxis2D(const eastl::string& horizontalAxis,
-        const eastl::string& verticalAxis) const;
-    // float CalcAxisValue(const eastl::string& axis) const;
+    float GetAxis(const std::string& axisName) const;
+    DXSM::Vector2 GetAxis2D(const std::string& horizontalAxis,
+        const std::string& verticalAxis) const;
 
     //
     // Mouse
@@ -176,12 +178,13 @@ public:
     float GetMouseWheelDelta() const;
 
 private:
+    PlayerInputSystem();
 
     void PressAction(
-        const eastl::string& action);
+        const std::string& action);
 
     void ReleaseAction(
-        const eastl::string& action);
+        const std::string& action);
 
     void PressAxis(
         const AxisMapping& mapping);
@@ -193,23 +196,11 @@ private:
     // Runtime states
     //
 
-    eastl::unordered_map<eastl::string, ActionState> m_actions;
+    std::unordered_map<std::string, ActionState> m_actions;
 
-    eastl::unordered_map<Keys, KeyState> m_keys;
+    std::unordered_map<Keys, KeyState> m_keys;
 
-    eastl::unordered_map<eastl::string, AxisState> m_axes;
+    std::unordered_map<std::string, AxisState> m_axes;
 
     MouseState m_mouse;
-    
-    /*
-    struct RuntimeAxisBinding
-    {
-        Keys Key;
-        float Scale;
-    };
-
-    eastl::unordered_map<
-        eastl::string,
-        eastl::vector<RuntimeAxisBinding>> m_axisBindings;
-    */
 };

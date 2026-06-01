@@ -139,11 +139,11 @@ void EditorApp::RunApp()
 	while (!isExitRequested) {
 		if (m_runtimeMode == RuntimeMode::GAME_MODE)
 		{
-			m_currentGame->m_playerInputSystem.BeginFrame();
+			PlayerInputSystem::GetInstance().BeginFrame();
 		}
 
 		// Handle the windows messages.
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 
@@ -151,7 +151,6 @@ void EditorApp::RunApp()
 			if (msg.message == WM_QUIT) {
 				isExitRequested = true;
 			}
-			continue;
 		}
 
 		if (m_runtimeMode == RuntimeMode::WORLD_EDITOR_MODE)
@@ -223,7 +222,7 @@ void EditorApp::RunApp()
 
 		if (m_runtimeMode == RuntimeMode::GAME_MODE)
 		{
-			m_currentGame->m_playerInputSystem.EndFrame();
+			PlayerInputSystem::GetInstance().EndFrame();
 		}
 
 		if (!m_projectSelected && imguiEditorPass->IsProjectSelected()) {

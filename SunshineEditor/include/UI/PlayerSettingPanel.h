@@ -40,8 +40,7 @@ private:
 		eastl::unordered_map<Keys, uint32_t> KeyUsage;
 	};
 
-	static ActionConflictCache BuildActionConflictCache(
-		const eastl::vector<PlayerInputSystem::ActionBinding>& bindings);
+	static ActionConflictCache BuildActionConflictCache(const std::vector<PlayerInputSystem::ActionBinding>& bindings);
 
 	static bool HasActionConflict(
 		const ActionConflictCache& cache,
@@ -81,8 +80,7 @@ private:
 			AxisConflictKeyHasher> Usage;
 	};
 
-	static AxisConflictCache BuildAxisConflictCache(
-		const eastl::vector<PlayerInputSystem::AxisBinding>& bindings);
+	static AxisConflictCache BuildAxisConflictCache(const std::vector<PlayerInputSystem::AxisBinding>& bindings);
 
 	static bool HasAxisConflict(
 		const AxisConflictCache& cache,

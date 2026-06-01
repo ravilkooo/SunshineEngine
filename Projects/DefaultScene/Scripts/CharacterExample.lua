@@ -65,7 +65,22 @@ function behavior:start()
 end
 
 function behavior:update(dt)
-    
+    local tr = self.owner:getTransform()
+    local inputSystem = getInputSystem()
+    local speed = 0.1
+
+    tr.m_rotation.y = tr.m_rotation.y + speed * inputSystem:getAxis("Forward")
+
+    if (inputSystem:isPressed("RAction")) then
+        print("RACTION")
+        tr.m_rotation.y = tr.m_rotation.y + 0.5
+    end
+
+    if (inputSystem:isPressed("FAction")) then
+        print("FACTION")
+        tr.m_rotation.y = tr.m_rotation.y - 0.5
+    end
+
     if not collected then
 
         -- local currentTime = os.clock()

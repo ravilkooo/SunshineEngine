@@ -227,6 +227,28 @@ namespace ScriptingBindings
 		lua.set_function("setGlobalGravity", [](DXSM::Vector3 inVal) {
 			return Scene::GetInstance().m_physicsSystem->SetGravity(inVal);
 			});
+
+		// PlayerInputSystem
+		lua.new_usertype<PlayerInputSystem>("InputSystem",
+			sol::no_constructor,
+			"isPressed", [](PlayerInputSystem* self, std::string action) {
+				return self->IsPressed(action);
+			},
+			"isReleased", [](PlayerInputSystem* self, std::string action) { return self->IsReleased(action); },
+			"isHeld", [](PlayerInputSystem* self, std::string action) { return self->IsHeld(action); },
+			"getAxis", [](PlayerInputSystem* self, std::string axisName) { return self->GetAxis(axisName); },
+			"getAxis2D", [](PlayerInputSystem* self, std::string axisHorizontal, std::string axisVertical)
+			{ return self->GetAxis2D(axisHorizontal, axisVertical); },
+			"getMouseDeltaX", [](PlayerInputSystem* self) { return self->GetMouseDeltaX(); },
+			"getMouseDeltaY", [](PlayerInputSystem* self) { return self->GetMouseDeltaY(); },
+			"getMouseX", [](PlayerInputSystem* self) { return self->GetMouseX(); },
+			"getMouseY", [](PlayerInputSystem* self) { return self->GetMouseY(); },
+			"getMouseWheelDelta", [](PlayerInputSystem* self) { return self->GetMouseWheelDelta(); }
+		);
+
+		lua.set_function("getInputSystem", []() {
+			return PlayerInputSystem::GetInstance();
+			});
     }
 
 } // namespace ScriptingBindings

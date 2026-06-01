@@ -1,6 +1,6 @@
 #pragma once
 
-#include <EASTL/string.h>
+#include <string>
 
 enum class InputActionPhase
 {
@@ -28,7 +28,7 @@ struct KeyState
 
 struct AxisMapping
 {
-    eastl::string Name;
+    std::string Name;
     float Scale = 1.0f;
 };
 

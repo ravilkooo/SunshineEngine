@@ -23,6 +23,11 @@
             "key": 40,
             "name": "Forward",
             "scale": -1.0
+        },
+        {
+            "key": 37,
+            "name": "Forward",
+            "scale": 0.5
         }
     ],
     "name": "Default"

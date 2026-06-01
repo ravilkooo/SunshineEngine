@@ -6,8 +6,8 @@
 
 PlayerInputSystem::KeyMapping_Info::KeyMapping_Info()
 {
-    m_actionBindings = eastl::vector<ActionBinding>();
-    m_axisBindings = eastl::vector<AxisBinding>();
+    m_actionBindings = std::vector<ActionBinding>();
+    m_axisBindings = std::vector<AxisBinding>();
 }
 
 json PlayerInputSystem::KeyMapping_Info::ToJson() const
@@ -94,8 +94,8 @@ bool PlayerInputSystem::KeyMapping_Info::FromJson(const json& j)
 
 PlayerInputSystem::KeyMapping::KeyMapping()
 {
-    m_keyToAction = eastl::unordered_map<Keys, eastl::vector<eastl::string>>();
-    m_keyToAxisAction = eastl::unordered_map<Keys, eastl::vector<AxisMapping>>();
+    m_keyToAction = std::unordered_map<Keys, std::vector<std::string>>();
+    m_keyToAxisAction = std::unordered_map<Keys, std::vector<AxisMapping>>();
 }
 
 bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
@@ -122,9 +122,9 @@ bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
 
                 if (!m_keyToAction.contains(binding.Key))
                 {
-                    m_keyToAction[binding.Key] = eastl::vector<eastl::string>();
+                    m_keyToAction[binding.Key] = std::vector<std::string>();
                 }
-                m_keyToAction[binding.Key].push_back(StdToEASTLString(binding.Action));
+                m_keyToAction[binding.Key].push_back(binding.Action);
             }
         }
 
@@ -140,10 +140,10 @@ bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
 
                 if (!m_keyToAction.contains(binding.Key))
                 {
-                    m_keyToAxisAction[binding.Key] = eastl::vector<AxisMapping>();
+                    m_keyToAxisAction[binding.Key] = std::vector<AxisMapping>();
                 }
                 m_keyToAxisAction[binding.Key].push_back(
-                    AxisMapping{ StdToEASTLString(binding.Name), binding.Scale }
+                    AxisMapping{ binding.Name, binding.Scale }
                 );
             }
         }
@@ -156,11 +156,11 @@ bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
     }
 }
 
-void PlayerInputSystem::KeyMapping::BindAction(Keys key, const eastl::string& action)
+void PlayerInputSystem::KeyMapping::BindAction(Keys key, const std::string& action)
 {
     if (!m_keyToAction.contains(key))
     {
-        m_keyToAction[key] = eastl::vector<eastl::string>();
+        m_keyToAction[key] = std::vector<std::string>();
     }
     m_keyToAction[key].push_back(action);
 }
@@ -169,7 +169,7 @@ void PlayerInputSystem::KeyMapping::BindAxisAction(Keys key, const AxisMapping& 
 {
     if (!m_keyToAxisAction.contains(key))
     {
-        m_keyToAxisAction[key] = eastl::vector<AxisMapping>();
+        m_keyToAxisAction[key] = std::vector<AxisMapping>();
     }
     m_keyToAxisAction[key].push_back(axisAction);
 }
@@ -255,6 +255,8 @@ void PlayerInputSystem::EndFrame() {
     // To-do
 }
 
+#pragma region Handling keys
+
 void PlayerInputSystem::HandleKeyDown(Keys key)
 {
     auto& keyState = m_keys[key];
@@ -285,6 +287,11 @@ void PlayerInputSystem::HandleKeyDown(Keys key)
         {
             PressAxis(axis);
         }
+    }
+
+    for (auto& [name, state] : m_actions)
+    {
+        printf("isPressed %s: P=%d, H=%d\n", name.c_str(), state.Pressed, state.Held);
     }
 }
 
@@ -336,28 +343,32 @@ void PlayerInputSystem::HandleMouseMove(
     */
 }
 
-bool PlayerInputSystem::IsPressed(const eastl::string& action) const
+#pragma endregion
+
+#pragma region Getters
+
+bool PlayerInputSystem::IsPressed(const std::string& action) const
 {
     auto it = m_actions.find(action);
 
     return it != m_actions.end() && it->second.Pressed;
 }
 
-bool PlayerInputSystem::IsReleased(const eastl::string& action) const
+bool PlayerInputSystem::IsReleased(const std::string& action) const
 {
     auto it = m_actions.find(action);
 
     return it != m_actions.end() && it->second.Released;
 }
 
-bool PlayerInputSystem::IsHeld(const eastl::string& action) const
+bool PlayerInputSystem::IsHeld(const std::string& action) const
 {
     auto it = m_actions.find(action);
 
     return it != m_actions.end() && it->second.Held;
 }
 
-InputActionPhase PlayerInputSystem::GetPhase(const eastl::string& action) const
+InputActionPhase PlayerInputSystem::GetPhase(const std::string& action) const
 {
     auto it = m_actions.find(action);
 
@@ -378,7 +389,7 @@ InputActionPhase PlayerInputSystem::GetPhase(const eastl::string& action) const
     return InputActionPhase::None;
 }
 
-float PlayerInputSystem::GetAxis(const eastl::string& axisName) const
+float PlayerInputSystem::GetAxis(const std::string& axisName) const
 {
     auto it = m_axes.find(axisName);
 
@@ -389,8 +400,8 @@ float PlayerInputSystem::GetAxis(const eastl::string& axisName) const
 }
 
 DXSM::Vector2 PlayerInputSystem::GetAxis2D(
-    const eastl::string& horizontal,
-    const eastl::string& vertical) const
+    const std::string& horizontal,
+    const std::string& vertical) const
 {
     return
     {
@@ -424,8 +435,10 @@ float PlayerInputSystem::GetMouseWheelDelta() const
     return m_mouse.WheelDelta;
 }
 
+#pragma endregion
+
 void PlayerInputSystem::PressAction(
-    const eastl::string& action)
+    const std::string& action)
 {
     auto& state = m_actions[action];
 
@@ -437,11 +450,11 @@ void PlayerInputSystem::PressAction(
         state.Held = true;
     }
     
-    //printf("Press action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
+    printf("Press action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
 }
 
 void PlayerInputSystem::ReleaseAction(
-    const eastl::string& action)
+    const std::string& action)
 {
     auto& state = m_actions[action];
 
@@ -456,7 +469,7 @@ void PlayerInputSystem::ReleaseAction(
         state.Held = false;
     }
 
-    //printf("Release action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
+    printf("Release action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
 }
 
 void PlayerInputSystem::PressAxis(const AxisMapping& mapping)
@@ -472,7 +485,7 @@ void PlayerInputSystem::PressAxis(const AxisMapping& mapping)
             -1.0f,
             1.0f);
 
-    //printf("Press axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
+    printf("Press axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
 }
 
 void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
@@ -488,7 +501,7 @@ void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
             -1.0f,
             1.0f);
 
-    //printf("Release axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
+    printf("Release axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
 }
 
 #pragma endregion PlayerInputSystem

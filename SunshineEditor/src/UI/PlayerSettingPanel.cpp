@@ -1003,8 +1003,7 @@ bool PlayerSettingPanel::DrawKeyCombo(
     return changed;
 }
 
-PlayerSettingPanel::ActionConflictCache PlayerSettingPanel::BuildActionConflictCache(
-    const eastl::vector<PlayerInputSystem::ActionBinding>& bindings)
+PlayerSettingPanel::ActionConflictCache PlayerSettingPanel::BuildActionConflictCache(const std::vector<PlayerInputSystem::ActionBinding>& bindings)
 {
     ActionConflictCache cache;
 
@@ -1034,8 +1033,7 @@ bool PlayerSettingPanel::HasActionConflict(
         it->second > 1;
 }
 
-PlayerSettingPanel::AxisConflictCache PlayerSettingPanel::BuildAxisConflictCache(
-    const eastl::vector<PlayerInputSystem::AxisBinding>& bindings)
+PlayerSettingPanel::AxisConflictCache PlayerSettingPanel::BuildAxisConflictCache(const std::vector<PlayerInputSystem::AxisBinding>& bindings)
 {
     AxisConflictCache cache;
 

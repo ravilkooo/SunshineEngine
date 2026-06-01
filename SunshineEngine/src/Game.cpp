@@ -147,15 +147,13 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_physicsSystem->FinalizeScene();
 	
 	InitializeAudio();
-
-	m_playerInputSystem = PlayerInputSystem();
 	
 	return true;
 }
 
 bool Game::LoadInputMapping(eastl::wstring inputMappingDir)
 {
-	auto fullPath = inputMappingDir + Utf8ToWString(m_playerInputSystem.m_keyMapping.m_name.c_str()) + L".json";
+	auto fullPath = inputMappingDir + Utf8ToWString(PlayerInputSystem::GetInstance().m_keyMapping.m_name.c_str()) + L".json";
 
 	std::ifstream file(fullPath.c_str());
 	if (!file) {
@@ -172,7 +170,7 @@ bool Game::LoadInputMapping(eastl::wstring inputMappingDir)
 		// LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()).c_str());
 		return false;
 	}
-	m_playerInputSystem.FromJson(j);
+	PlayerInputSystem::GetInstance().FromJson(j);
 
 	printSunshineMessage("Input mapping loaded");
 	//LOG_EDITOR_INFO("Input mapping loaded");
@@ -293,7 +291,7 @@ void Game::Update(float deltaTime) {
 	if (m_particleSystem)
 		m_particleSystem->Update(deltaTime);
 
-	m_playerObject->m_playerController.UpdatePlayer(deltaTime);
+	// m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
 	// AI
 	PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
@@ -312,7 +310,7 @@ void Game::Update(float deltaTime) {
 		}
 	}
 
-	m_playerInputSystem.EndFrame();
+	PlayerInputSystem::GetInstance().EndFrame();
 }
 
 void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
@@ -341,18 +339,18 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 
 void Game::HandleKeyDown(Keys key)
 {
-	m_playerObject->m_playerController.HandleKeyDown(key);
-	m_playerInputSystem.HandleKeyDown(key);
+	//m_playerObject->m_playerController.HandleKeyDown(key);
+	PlayerInputSystem::GetInstance().HandleKeyDown(key);
 }
 
 void Game::HandleKeyUp(Keys key)
 {
-	m_playerObject->m_playerController.HandleKeyUp(key);
-	m_playerInputSystem.HandleKeyUp(key);
+	//m_playerObject->m_playerController.HandleKeyUp(key);
+	PlayerInputSystem::GetInstance().HandleKeyUp(key);
 }
 
 void Game::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
-	m_playerObject->m_playerController.HandleMouseMove(args);
-	m_playerInputSystem.HandleMouseMove(args);
+	//m_playerObject->m_playerController.HandleMouseMove(args);
+	PlayerInputSystem::GetInstance().HandleMouseMove(args);
 }

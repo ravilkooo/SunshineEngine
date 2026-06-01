@@ -2,6 +2,7 @@
 
 #include <d3d11.h>
 // ThirdPartyLibs
+#include <EASTL/string.h>
 #include <EASTL/algorithm.h>
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
@@ -13,8 +14,6 @@
 #include <GameTimer.h>
 
 #include <Scripting/LuaManager.h>
-
-#include <InputSystem/PlayerInputSystem.h>
 
 // #include <Utils/ILogManager.h>
 // #include <GameObject/GameObjectFactory.h>
@@ -96,9 +95,6 @@ public:
     AudioSystem* m_audioSystem;
 
     float m_deltaTime = 0.0f;
-
-    // Input System
-    PlayerInputSystem m_playerInputSystem;
 
     // PlayerObject
     PlayerObject* m_playerObject;
