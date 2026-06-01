@@ -32,8 +32,6 @@
 #include <GameObject/EditorObjectFactory.h>
 #include <GameObject/GameObjectFactory.h>
 
-#include <PlayerObject/PlayerObject.h>
-
 #include <ParticleSystem/ParticleSystem.h>
 #include <ParticleSystem/ParticleEmitterComponent.h>
 
@@ -540,10 +538,6 @@ json GameObject_Info::ToJson() const {
     {
         break;
     }
-    case GameObjectGroup::Player:
-    {
-        break;
-    }
     case GameObjectGroup::Other:
     {
         break;
@@ -651,14 +645,6 @@ void Scene::FromJson(
             {
                 go = GameObjectFactory::CreateCustomMesh(
                     renderSystem, objJ);
-            }
-                break;
-            case GameObjectGroup::Player:
-            {
-                go = eastl::make_unique<PlayerObject>(objJ, renderSystem, camera);
-                auto playerObj = static_cast<PlayerObject*>(go.get());
-                GetInstance().m_playerObjectUUID = playerObj->m_UUID;
-                // GetInstance().m_mainCameraUUID = playerObj->m_UUID;
                 break;
             }
             case GameObjectGroup::ParticleEmitter:
@@ -694,7 +680,6 @@ void Scene::FromJson(
                     auto c = go->AddComponent<PhysicsComponent>(
                         go->m_UUID, go->GetComponent<TransformComponent>().get());
                     c->FromJson(objJ["components"]["Physics"]);
-                    //physicsSystem->CreateAndBody(c);
                 }
 
                 if (objJ["components"].contains("Trigger")) {
@@ -748,12 +733,6 @@ void Scene::FromJson(
                 }
 
                 auto objUUID = GetInstance().AddGameObject(eastl::move(go));
-                if (objGroup == GameObjectGroup::Player)
-                {
-                    GetInstance().m_playerObject = static_cast<PlayerObject*>(
-                        GetInstance().GetGameObjectByUUID(objUUID)
-                        );
-                }
             }
         }
     }
@@ -860,23 +839,6 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         go = EditorObjectFactory::CreateCustomMesh(renderSystem, objJ);
     }
     break;
-
-    case GameObjectGroup::Player:
-    {
-        if (scene->m_playerObject == SE::UUID(0u))
-        {
-            go = eastl::make_unique<PlayerObject_Info>(objJ, renderSystem);
-            auto playerObj = static_cast<PlayerObject_Info*>(go.get());
-            scene->m_playerObject = playerObj->m_UUID;
-            //playerObj->m_playerCamera->AssignTransformComponent(play)
-            //scene->m_mainCameraUUID = playerObj->m_UUID;
-        }
-        else
-        {
-            printSunshineErrorMessage("Only one PlayerObject can exist in scene");
-        }
-    }
-    break;
     case GameObjectGroup::ParticleEmitter:
     {
         go = EditorObjectFactory::CreateParticleEmitter(
@@ -907,8 +869,7 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
                 go->m_UUID);
         }
 
-        if (objJ["components"].contains("Physics")
-            && objJ["m_group"] != GameObjectGroup::Player)
+        if (objJ["components"].contains("Physics"))
         {
             auto c = go->AddComponent<PhysicsComponent_Info>(
                 go->GetComponent<RenderComponent_Info>().get(),

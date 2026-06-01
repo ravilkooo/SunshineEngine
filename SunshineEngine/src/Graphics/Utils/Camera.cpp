@@ -3,8 +3,6 @@
 
 #include <Component/TransformComponent.h>
 
-#include <PlayerObject/PlayerObject.h>
-
 #include <iostream>
 
 namespace SE_G {

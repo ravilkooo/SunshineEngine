@@ -67,9 +67,6 @@ void Scene::ClearScene() {
     m_cameraManager->Clear();
     gameObjects.clear();
 
-    m_playerObjectUUID = SE::UUID(0u);
-    m_playerObject = nullptr;
-
     m_objectDestructionQueue.Flush();
 }
 
@@ -224,7 +221,6 @@ void Scene_Info::ClearScene() {
     uuidToObjectMap.clear();
 
     m_sceneGraph->Clear();
-    m_playerObject = SE::UUID(0u);
 
     m_mainCameraUUID = SE::UUID(0u);
     m_cameraManager->Clear();

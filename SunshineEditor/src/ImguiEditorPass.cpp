@@ -13,8 +13,6 @@
 #include <WorldEditor.h>
 #include <SceneHierarchy.h>
 
-#include <PlayerObject/PlayerObject.h>
-
 #include <Component/LuaComponent.h>
 #include <Component/CameraComponent.h>
 
@@ -590,11 +588,6 @@ void ImguiEditorPass::ShowGameObjectProperties()
 
 void ImguiEditorPass::ShowGameplayProperties()
 {
-	m_gameplaySettingPanel.SetPlayerObject(
-		static_cast<PlayerObject_Info*>(
-			m_editorApp->m_worldEditor->m_scene->GetGameObjectByUUID(m_editorApp->m_worldEditor->m_playerObject)
-		)
-	);
 	m_gameplaySettingPanel.OnImGuiRender(m_editorApp->m_worldEditor.get());
 }
 

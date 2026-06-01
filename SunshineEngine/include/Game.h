@@ -23,7 +23,6 @@
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
 
-class PlayerObject;
 class PhysicsSystem;
 class AudioSystem;
 
@@ -95,9 +94,6 @@ public:
     AudioSystem* m_audioSystem;
 
     float m_deltaTime = 0.0f;
-
-    // PlayerObject
-    PlayerObject* m_playerObject;
 
     SE::ParticleSystem* m_particleSystem;
 };

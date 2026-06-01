@@ -9,9 +9,11 @@ local angleOffet = 0.2
 
 function behavior:start()
     
-    playerObj = getPlayerObject()
-    playerUUID = playerObj:getUUID()
-    -- playerObj = getGameObjectByUUID(playerUUID)
+    playerUUID = UUID.new()
+    playerUUID.hi = 253145895
+    playerUUID.lo = 2320618671
+    playerObj = getGameObjectByUUID(playerUUID)
+    
     local trigger = self.owner:getTrigger()
     playerUUID:toString()
     print("Ground behavior started", self.id)

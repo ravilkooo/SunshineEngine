@@ -32,7 +32,6 @@ namespace AutoBindings {
                     lua.new_usertype<TYPE>(LuaTypeName, FieldsPairs MethodsPairs); \
                     /* Attach GameObject getter */ \
                     lua["GameObject"][GetterName] = &ScriptingBindings::GO_Get<TYPE>; \
-                    lua["PlayerObject"][GetterName] = &ScriptingBindings::PO_Get<TYPE>; \
                 }); \
             } \
         } TYPE##__LuaAutoReg_Instance; \

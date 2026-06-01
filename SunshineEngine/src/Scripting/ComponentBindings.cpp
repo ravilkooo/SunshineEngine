@@ -1,7 +1,7 @@
 #include <Scripting/ComponentBindings.h>
 #include <Scripting/AutoBindings.h>
 
-#include <SimpleMath.h>
+#include <string>
 
 #include <Physics/PhysicsSystem.h>
 
@@ -9,7 +9,6 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <GameObject/GameObject.h>
-#include <PlayerObject/PlayerObject.h>
 
 #include <Component/CameraComponent.h>
 
@@ -25,7 +24,9 @@
 
 #include "Audio/AudioSystem.h"
 
-namespace DXSM = DirectX::SimpleMath;
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 namespace ScriptingBindings
 {
@@ -147,29 +148,6 @@ namespace ScriptingBindings
 			}
 			);
 
-		// Register PlayerObject
-		lua.new_usertype<PlayerObject>("PlayerObject",
-			sol::no_constructor,
-			// "getTransform", [](PlayerObject* player) {
-			// 	return player->GetComponent<TransformComponent>().get();
-			// },
-			// "getPhysics", [](PlayerObject* player) {
-			// 	return player->GetComponent<PhysicsComponent>().get();
-			// },
-			"getCamera", [](PlayerObject* player) {
-				return player->GetComponent<CameraComponent>()->GetCamera();
-			},
-			"getCameraComponent", [](PlayerObject* player) {
-				return player->GetComponent<CameraComponent>().get();
-			},
-			"getName", [](PlayerObject* player) {
-				return player->m_name.c_str();
-			},
-			"getUUID", [](PlayerObject* self) {
-				return self->m_UUID.GetHilo();
-			}
-		);
-
     	// Register audio
     	lua.set_function("getAudioSystem", []() -> AudioSystem& {
 			return AudioSystem::Get();
@@ -186,11 +164,6 @@ namespace ScriptingBindings
 		// Get Object by UUID
 		lua.set_function("getGameObjectByUUID", [](SE::UUIDhilo uuidhilo) -> GameObject* {
 			return Scene::GetInstance().GetGameObjectByUUID(SE::UUID::FromHilo(uuidhilo));
-			});
-
-		// Get PlayerObject
-		lua.set_function("getPlayerObject", []() -> PlayerObject* {
-			return Scene::GetInstance().m_playerObject;
 			});
 
 		// Get MainCamera

@@ -1443,46 +1443,9 @@
             "m_UUID": 1087253342462268591,
             "m_UUID_hi": 253145895,
             "m_UUID_lo": 2320618671,
-            "m_group": "Player",
+            "m_group": "CustomMesh",
             "m_name": "PlayerBehaviour",
-            "m_parent": null,
-            "settings": {
-                "keyFunctionMappings": [
-                    {
-                        "functionName": "onStrafeLeft",
-                        "key": 65
-                    },
-                    {
-                        "functionName": "onStrafeRight",
-                        "key": 68
-                    },
-                    {
-                        "functionName": "onJump",
-                        "key": 32
-                    },
-                    {
-                        "functionName": "onAtack",
-                        "key": 69
-                    },
-                    {
-                        "functionName": "onUpGravity",
-                        "key": 81
-                    },
-                    {
-                        "functionName": "onMoveForward",
-                        "key": 87
-                    },
-                    {
-                        "functionName": "onMoveBackward",
-                        "key": 83
-                    }
-                ],
-                "luaScript": {
-                    "assetSource": 1,
-                    "relativePath": "Scripts/CrashPlayer.lua"
-                },
-                "mouseFunctionMapping": "onLookAround"
-            }
+            "m_parent": null
         },
         {
             "components": {

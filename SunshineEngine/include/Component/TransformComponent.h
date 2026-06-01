@@ -1,11 +1,12 @@
 #pragma once
 #include "SunshineEngineAPI.h"
 #include "Component.h"
-#include <SimpleMath.h>
 #include <d3d11.h>
 #include <EASTL/unique_ptr.h>
 
-namespace DXSM = DirectX::SimpleMath;
+#include <SimpleMath.h>
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 namespace SE_G {
     namespace Bind {
@@ -28,24 +29,6 @@ public:
     eastl::unique_ptr<SE_G::Bind::TransformCBuffer> transformBuffer;
 
     void BindToGraphicsPipeline(ID3D11DeviceContext* context);
-
-    /*
-    // ================
-    // To make SUNSHINE_ENGINE_API work
-
-    TransformComponent(TransformComponent&&) noexcept = default;
-    TransformComponent& operator=(TransformComponent&&) noexcept = default;
-
-    TransformComponent(const TransformComponent&) = delete;
-    TransformComponent& operator=(const TransformComponent&) = delete;
-    // ================
-    */
-
-    // Transforms - usual as in every engine: translate+rotate+scale
-    // ...Transfrom()
-    // +
-    // Additional local transforms only for object: translate+rotate+scale (for local corrections etc.)
-    // ...LocalTransfrom()
 
     // Transforms
     DXSM::Matrix GetTransalationMatrix() const;

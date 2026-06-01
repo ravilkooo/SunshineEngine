@@ -28,8 +28,6 @@
 #include <GameObject/Shapes/ShapeCollection.h>
 #include <GameObject/EditorObjectFactory.h>
 
-#include <PlayerObject/PlayerObject.h>
-
 #include <Component/PhysicsComponent.h>
 #include <Component/LuaComponent.h>
 #include <Component/CameraComponent.h>
@@ -439,41 +437,8 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 	LOG_EDITOR_INFO("Scene loaded");
 
 	m_selectionPass->m_scene = m_scene.get();
-  
-	// PlayerObject
-	{
-		if (m_scene->m_playerObject == SE::UUID(0u))
-		{
-			auto go = eastl::make_unique<PlayerObject_Info>();
-
-			go->AddTransformComponent(m_renderer->GetDevice());
-			go->AddRenderComponent(m_renderer.get());
-			go->AddMeshComponent();
-			go->AddPhysicsComponent();
-
-
-			auto c = go->AddComponent<CameraComponent_Info>(
-				m_renderer->GetDevice(),
-				go->GetComponent<TransformComponent_Info>()->m_assignedComponent.get(),
-				go->m_UUID);
-			m_scene->m_cameraManager->AddCamera(c->m_assignedComponent->m_camera);
-
-			json _empty;
-			go->SettingsFromJson(_empty, m_renderer.get());
-
-			m_playerObject = m_scene->AddGameObject(eastl::move(go));
-			m_scene->m_playerObject = m_playerObject;
-			//m_scene->m_mainCameraUUID = m_playerObject;
-		}
-		else
-		{
-			m_playerObject = m_scene->m_playerObject;
-		}
-
-		auto pObj = static_cast<PlayerObject_Info*>(m_scene->GetGameObjectByUUID(m_playerObject));
-
-		InitMiniViewport();
-	}
+ 
+	InitMiniViewport();
 
 	return true;
 }

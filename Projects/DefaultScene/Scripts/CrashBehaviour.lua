@@ -341,8 +341,10 @@ end
 -- =========================================================
 
 function behavior:start()
-    playerObj = getPlayerObject()
-    playerUUID = playerObj:getUUID()
+    playerUUID = UUID.new()
+    playerUUID.hi = 253145895
+    playerUUID.lo = 2320618671
+    playerObj = getGameObjectByUUID(playerUUID)
 
     InitPlayerBehavior(self)
 end

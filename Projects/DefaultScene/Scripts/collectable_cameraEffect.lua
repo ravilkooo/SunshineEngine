@@ -30,12 +30,15 @@ function behavior:start()
     newScale = Vector3.new(0.3, 0.3, 0.3)
     startPosition = Vector3.new(tr.m_position.x, tr.m_position.y, tr.m_position.z)
 
-    playerObj = getPlayerObject()
-    camera = playerObj:getCamera()
+    playerUUID = UUID.new()
+    playerUUID.hi = 253145895
+    playerUUID.lo = 2320618671
+    playerObj = getGameObjectByUUID(playerUUID)
+
+    camera = playerObj:getCameraComponent():getCamera()
     baseStickLength = camera:getSpringArmLength()
     stcikLenMaxDelta = math.min(stcikLenMaxDelta, baseStickLength * 0.95)
     
-    playerUUID = playerObj:getUUID()
     local trigger = self.owner:getTrigger()
 
     trigger:setLuaCallback(function(event, otherUUID)

@@ -4,14 +4,13 @@
 using json = nlohmann::json;
 
 enum class GameObjectGroup {
-    Lighting, Shapes, CustomMesh, Player, ParticleEmitter, Other
+    Lighting, Shapes, CustomMesh, ParticleEmitter, Other
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(GameObjectGroup, {
     {GameObjectGroup::Lighting, "Lighting"},
     {GameObjectGroup::Shapes, "Shapes"},
     {GameObjectGroup::CustomMesh, "CustomMesh"},
-    {GameObjectGroup::Player, "Player"},
     {GameObjectGroup::ParticleEmitter, "ParticleEmitter"},
     {GameObjectGroup::Other, "Other"},
     })

@@ -18,7 +18,6 @@ using json = nlohmann::json;
 class PhysicsSystem;
 class CameraManager;
 class SceneGraph;
-class PlayerObject;
 
 class GameObject;
 class GameObject_Info;
@@ -83,10 +82,6 @@ public:
 
     void RestoreParents();
 
-    // PlayerObject
-    SE::UUID m_playerObjectUUID = SE::UUID(0u);
-    PlayerObject* m_playerObject = nullptr;
-
     PhysicsSystem* m_physicsSystem = nullptr;
 
     DeletionQueue m_objectDestructionQueue;
@@ -139,9 +134,6 @@ public:
     // Hierarchy
     eastl::unique_ptr<SceneGraph> m_sceneGraph;
     void InitHierarchy();
-
-    // PlayerObject
-    SE::UUID m_playerObject = SE::UUID(0u);
 
     SE::UUID m_mainCameraUUID = SE::UUID(0u);
     eastl::unique_ptr<CameraManager> m_cameraManager;

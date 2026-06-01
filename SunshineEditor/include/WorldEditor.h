@@ -159,9 +159,6 @@ public:
     // Hierarchy
     Selection m_hierarchySelection;
 
-    // PlayerObject
-    SE::UUID m_playerObject = SE::UUID(0u);
-
     SE::ParticleSystem* m_particleSystem;
 
     // Robust input system for editor camera

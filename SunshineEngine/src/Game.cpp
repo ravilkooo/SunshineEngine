@@ -15,10 +15,10 @@
 
 #include <Graphics/Utils/Camera.h>
 
-#include <PlayerObject/PlayerObject.h>
-
 #include "AI/Perception/PerceptionSystem.h"
 #include "AI/Behavior/BehaviorController.h"
+
+#include <GameObject/GameObject.h>
 
 #include <Component/PhysicsComponent.h>
 #include <Component/TriggerComponent.h>
@@ -127,19 +127,10 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
 
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
-	m_playerObject = Scene::GetInstance().m_playerObject;
 
-	if (Scene::GetInstance().m_mainCameraUUID == SE::UUID(0u))
-	{
-		m_renderer->SetMainCamera(m_playerObject->GetComponent<CameraComponent>()->m_camera);
-	}
-	else
-	{
-		m_renderer->SetMainCamera(
-			Scene::GetInstance().m_cameraManager->GetCameraByUUID(
-				Scene::GetInstance().m_mainCameraUUID));
-	}
-
+	m_renderer->SetMainCamera(
+		Scene::GetInstance().m_cameraManager->GetCameraByUUID(
+			Scene::GetInstance().m_mainCameraUUID));
 
 	SetupPhysics();
 	m_luaManager.InitializeBehavior();
@@ -304,10 +295,11 @@ void Game::Update(float deltaTime) {
 	if (AudioSystem::IsInitialized()) {
 		AudioSystem::Get().Update();
 
-		if (auto transform = m_playerObject->GetComponent<TransformComponent>()) {
-			auto pos = transform->m_position;
-			AudioSystem::Get().SetListenerPosition(pos.x, pos.y, pos.z);
-		}
+
+		auto cam = Scene::GetInstance().m_cameraManager->GetCameraByUUID(Scene::GetInstance().m_mainCameraUUID);
+		auto pos = cam->GetPosition();
+		AudioSystem::Get().SetListenerPosition(pos.x, pos.y, pos.z);
+
 	}
 
 	PlayerInputSystem::GetInstance().EndFrame();
@@ -339,18 +331,15 @@ void Game::OnResize(UINT resizeWidth, UINT resizeHeight) {
 
 void Game::HandleKeyDown(Keys key)
 {
-	//m_playerObject->m_playerController.HandleKeyDown(key);
 	PlayerInputSystem::GetInstance().HandleKeyDown(key);
 }
 
 void Game::HandleKeyUp(Keys key)
 {
-	//m_playerObject->m_playerController.HandleKeyUp(key);
 	PlayerInputSystem::GetInstance().HandleKeyUp(key);
 }
 
 void Game::HandleMouseMove(const InputDevice::MouseMoveEventArgs& args)
 {
-	//m_playerObject->m_playerController.HandleMouseMove(args);
 	PlayerInputSystem::GetInstance().HandleMouseMove(args);
 }
