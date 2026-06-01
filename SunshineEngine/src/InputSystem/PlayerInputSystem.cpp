@@ -328,6 +328,12 @@ void PlayerInputSystem::HandleMouseMove(
     m_mouse.PositionY = args.Position.y;
 
     m_mouse.WheelDelta = args.WheelDelta;
+
+    /*
+    printf("Mouse move: Pos[%f,%f], D(%f,%f) W:%f\n",
+        m_mouse.PositionX, m_mouse.PositionY,
+        m_mouse.DeltaX, m_mouse.DeltaY, m_mouse.WheelDelta);
+    */
 }
 
 bool PlayerInputSystem::IsPressed(const eastl::string& action) const
@@ -431,7 +437,7 @@ void PlayerInputSystem::PressAction(
         state.Held = true;
     }
     
-    printf("Press action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
+    //printf("Press action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
 }
 
 void PlayerInputSystem::ReleaseAction(
@@ -450,7 +456,7 @@ void PlayerInputSystem::ReleaseAction(
         state.Held = false;
     }
 
-    printf("Release action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
+    //printf("Release action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
 }
 
 void PlayerInputSystem::PressAxis(const AxisMapping& mapping)
@@ -466,7 +472,7 @@ void PlayerInputSystem::PressAxis(const AxisMapping& mapping)
             -1.0f,
             1.0f);
 
-    printf("Press axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
+    //printf("Press axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
 }
 
 void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
@@ -482,7 +488,7 @@ void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
             -1.0f,
             1.0f);
 
-    printf("Release axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
+    //printf("Release axis '%s': %f\n", mapping.Name.c_str(), axis.Value);
 }
 
 #pragma endregion PlayerInputSystem
