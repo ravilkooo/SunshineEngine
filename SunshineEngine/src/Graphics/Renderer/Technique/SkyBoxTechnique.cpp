@@ -6,12 +6,12 @@
 #include <ResourceManager/ResourceManagerFacade.h>
 
 namespace SE_G {
-    SkyBoxTechnique::SkyBoxTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
+    SkyBoxTechnique::SkyBoxTechnique(DeferredRenderer* renderer, TransformComponent* assignedTransform,
         eastl::string technique,
-        eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<SkyBoxData> lightData,
         AssetPath assetPath)
-        : LightTechnique(device, assignedTransform, technique, camera, lightData) {
+        : LightTechnique(renderer, assignedTransform, technique, lightData) {
+        auto device = m_renderer->GetDevice();
 
         D3D11_BLEND_DESC blendDesc = {};
         blendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -85,58 +85,58 @@ namespace SE_G {
         );
     }
 
-    void SkyBoxTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    void SkyBoxTechnique::BindAll(ID3D11DeviceContext* context)
     {
         for (size_t i = 0; i < m_bindables.size(); i++)
         {
-            m_bindables[i]->Bind(context.Get());
+            m_bindables[i]->Bind(context);
         }
 
         if (m_vertexShader) {
-            m_vertexShader->Bind(context.Get());
+            m_vertexShader->Bind(context);
         }
 
         if (m_pixelShader) {
-            m_pixelShader->Bind(context.Get());
+            m_pixelShader->Bind(context);
         }
 
         if (m_texture) {
-            m_texture->Bind(context.Get(), 4u);
+            m_texture->Bind(context, 4u);
         }
 
         if (m_textureSampler) {
-            m_textureSampler->Bind(context.Get());
+            m_textureSampler->Bind(context);
         }
 
         if (m_lightDataPixelCBuffer) {
-            m_lightDataPixelCBuffer->Bind(context.Get());
+            m_lightDataPixelCBuffer->Bind(context);
         }
 
         if (m_blendState)
-            m_blendState->Bind(context.Get());
+            m_blendState->Bind(context);
 
         if (m_mesh)
-            m_mesh->Bind(context.Get());
+            m_mesh->Bind(context);
 
-        LightPosition lightPos = GetLightPositionInFrustum();
+        LightPosition lightPos = GetLightPositionInFrustum(m_renderer->GetMainCamera().get());
         // Choose rasterizer
-        ChooseRasterizer(context.Get(), lightPos);
+        ChooseRasterizer(context, lightPos);
         // Choose depthState
-        ChooseDepthStencilState(context.Get(), lightPos);
+        ChooseDepthStencilState(context, lightPos);
 
         // Bind rasterizer
         if (m_rasterizer)
-            m_rasterizer->Bind(context.Get());
+            m_rasterizer->Bind(context);
 
         // Bind depthState
         if (m_depthStencilState)
-            m_depthStencilState->Bind(context.Get());
+            m_depthStencilState->Bind(context);
     }
 
-    void SkyBoxTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    void SkyBoxTechnique::Pass(ID3D11DeviceContext* context)
     {
         // to-do: update only when changed
-        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataPixelCBuffer->Update(context, *m_lightData);
         BindAll(context);
         DrawTechnique(context);
     }
@@ -151,12 +151,12 @@ namespace SE_G {
         LightStaticData::rastCullFront->Bind(context);
     }
 
-    LightPosition SkyBoxTechnique::GetLightPositionInFrustum()
+    LightPosition SkyBoxTechnique::GetLightPositionInFrustum(Camera* camera)
     {
         return LightPosition::FILL;
     }
 
-    bool SkyBoxTechnique::IsFrustumInsideOfLight()
+    bool SkyBoxTechnique::IsFrustumInsideOfLight(Camera* camera)
     {
         return true;
     }

@@ -737,91 +737,81 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
 
 eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	AssetPath texturePath,
 	SE_G::SkyBoxData initData)
 {
-	auto obj = eastl::make_unique<SkyBox>(renderSystem, camera, texturePath, initData);
+	auto obj = eastl::make_unique<SkyBox>(renderSystem, texturePath, initData);
 	return obj;
 }
 
 eastl::unique_ptr<SkyBox> GameObjectFactory::CreateSkyBox(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
-	auto obj = eastl::make_unique<SkyBox>(renderSystem, camera, j);
+	auto obj = eastl::make_unique<SkyBox>(renderSystem, j);
 	return obj;
 }
 
 eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::AmbientLightData initData)
 {
-	auto obj = eastl::make_unique<AmbientLight>(renderSystem, camera, initData);
+	auto obj = eastl::make_unique<AmbientLight>(renderSystem, initData);
 	return obj;
 }
 
 eastl::unique_ptr<AmbientLight> GameObjectFactory::CreateAmbientLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
-	auto obj = eastl::make_unique<AmbientLight>(renderSystem, camera, j);
+	auto obj = eastl::make_unique<AmbientLight>(renderSystem, j);
 	return obj;
 }
 
 eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::DirectionalLightData initData)
 {
-	auto obj = eastl::make_unique<DirectionalLight>(renderSystem, camera, initData, true);
+	auto obj = eastl::make_unique<DirectionalLight>(renderSystem, initData, true);
 	return obj;
 }
 
 eastl::unique_ptr<DirectionalLight> GameObjectFactory::CreateDirectionalLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
-	auto obj = eastl::make_unique<DirectionalLight>(renderSystem, camera, j);
+	auto obj = eastl::make_unique<DirectionalLight>(renderSystem, j);
 	return obj;
 }
 
 eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::PointLightData initData)
 {
-	auto obj = eastl::make_unique<PointLight>(renderSystem, camera, initData);
+	auto obj = eastl::make_unique<PointLight>(renderSystem, initData);
 	return obj;
 }
 
 eastl::unique_ptr<PointLight> GameObjectFactory::CreatePointLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
-	auto obj = eastl::make_unique<PointLight>(renderSystem, camera, j);
+	auto obj = eastl::make_unique<PointLight>(renderSystem, j);
 	return obj;
 }
 
 eastl::unique_ptr<SpotLight> GameObjectFactory::CreateSpotLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::SpotLightData initData)
 {
-	auto obj = eastl::make_unique<SpotLight>(renderSystem, camera, initData);
+	auto obj = eastl::make_unique<SpotLight>(renderSystem, initData);
 	return obj;
 }
 
 eastl::unique_ptr<SpotLight> GameObjectFactory::CreateSpotLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
-	auto obj = eastl::make_unique<SpotLight>(renderSystem, camera, j);
+	auto obj = eastl::make_unique<SpotLight>(renderSystem, j);
 	return obj;
 }

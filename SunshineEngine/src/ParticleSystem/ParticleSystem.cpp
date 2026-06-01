@@ -64,7 +64,7 @@ namespace SE
 	}
 
 	ParticleSystem::ParticleSystem(SE_G::DeferredRenderer* renderer,
-		eastl::shared_ptr<SE_G::Camera> camera)
+		SE_G::Camera* camera)
 		: m_renderer(renderer), m_camera(camera)
 	{
 		// Seed random number generator for particle emission
@@ -478,10 +478,10 @@ namespace SE
 		m_renderer = renderer;
 
 		if (renderer)
-			m_camera = renderer->GetMainCamera();
+			m_camera = renderer->GetMainCamera().get();
 	}
 
-	void ParticleSystem::SetCamera(eastl::shared_ptr<SE_G::Camera> camera)
+	void ParticleSystem::SetCamera(SE_G::Camera* camera)
 	{
 		m_camera = camera;
 	}

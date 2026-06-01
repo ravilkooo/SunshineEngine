@@ -1,8 +1,8 @@
 {
     "action_bindings": [
         {
-            "action": "RAction",
-            "key": 82
+            "action": "Jump",
+            "key": 32
         },
         {
             "action": "FAction",
@@ -26,8 +26,13 @@
         },
         {
             "key": 37,
-            "name": "Forward",
-            "scale": 0.5
+            "name": "Right",
+            "scale": -1.0
+        },
+        {
+            "key": 39,
+            "name": "Right",
+            "scale": 1.0
         }
     ],
     "name": "Default"

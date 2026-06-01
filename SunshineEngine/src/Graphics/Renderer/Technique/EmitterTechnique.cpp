@@ -1,3 +1,5 @@
+#include <d3d11.h>
+
 #include "Graphics/Renderer/Technique/EmitterTechnique.h"
 #include <Graphics/Renderer/Pass/EmitterDebugPass.h>
 
@@ -38,32 +40,32 @@ namespace SE_G {
 			2u);
 	}
 
-	void EmitterTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void EmitterTechnique::Pass(ID3D11DeviceContext* context)
 	{
 		BindAll(context);
 		DrawTechnique(context);
 	}
 
-	void EmitterTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void EmitterTechnique::BindAll(ID3D11DeviceContext* context)
 	{
-		UpdateSettingsCB(context.Get());
+		UpdateSettingsCB(context);
 
-		m_settingsCB->Bind(context.Get());
+		m_settingsCB->Bind(context);
 
 
 		switch (m_emitterData.emitterType)
 		{
 		case SE::EmitterType::Point:
-			s_pointEmitterShader->Bind(context.Get());
+			s_pointEmitterShader->Bind(context);
 			break;
 
 		default:
-			s_pointEmitterShader->Bind(context.Get());
+			s_pointEmitterShader->Bind(context);
 			break;
 		}
 	}
 
-	void EmitterTechnique::DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void EmitterTechnique::DrawTechnique(ID3D11DeviceContext* context)
 	{
 		switch (m_emitterData.emitterType)
 		{
@@ -83,7 +85,7 @@ namespace SE_G {
 		}
 	}
 
-	void EmitterTechnique::UpdateSettingsCB(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void EmitterTechnique::UpdateSettingsCB(ID3D11DeviceContext* context)
 	{
 		switch (m_emitterData.emitterType)
 		{
@@ -99,7 +101,7 @@ namespace SE_G {
 		default:
 			break;
 		}
-		m_settingsCB->Update(context.Get(), m_emitterData.settings);
+		m_settingsCB->Update(context, m_emitterData.settings);
 	}
 
 	void EmitterTechnique::InitStaticData(ID3D11Device* device)
@@ -117,18 +119,7 @@ namespace SE_G {
 			[](SE_G::Bind::VertexShader*) {}
 		);
 		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
-		/*
-		UINT numInputElements = 1;
-		D3D11_INPUT_ELEMENT_DESC IALayoutInputElements[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-		};
 
-		s_pointEmitterShader = eastl::make_unique<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/EmitterDebugPass/PointEmitterVS.hlsl").c_str(),
-			numInputElements,
-			IALayoutInputElements);
-		*/
 		s_staticDataInitializated = true;
 	}
 }

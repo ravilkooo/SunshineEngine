@@ -78,7 +78,7 @@ public:
     static void FromJson(
         SE_G::DeferredRenderer* renderSystem,
         PhysicsSystem* m_physicsSystem,
-        eastl::shared_ptr<SE_G::Camera> camera, const json& j);
+        const json& j);
 
     void RestoreParents();
 
@@ -118,11 +118,10 @@ public:
     static eastl::unique_ptr<GameObject_Info> JsonToGameObject_Info(
         eastl::shared_ptr<Scene_Info> scene,
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera, const json& objJ);
+        const json& objJ);
     json ToJson() const;
     static eastl::shared_ptr<Scene_Info> FromJson(
-        SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera, const json& j);
+        SE_G::DeferredRenderer* renderSystem, const json& j);
 
     void RestoreParents();
 

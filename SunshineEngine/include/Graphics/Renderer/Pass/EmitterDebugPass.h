@@ -10,6 +10,7 @@ namespace DXSM = DX::SimpleMath;
 namespace SE_G {
     class Camera;
     class GBuffer;
+    class DeferredRenderer;
     namespace Bind {
         class DepthStencilState;
         class PixelShader;
@@ -27,9 +28,8 @@ namespace SE_G {
         public RenderPass
     {
     public:
-        EmitterDebugPass(ID3D11Device* device, ID3D11DeviceContext* context,
-            eastl::shared_ptr<GBuffer> pGBuffer,
-            eastl::shared_ptr<Camera> camera);
+        EmitterDebugPass(DeferredRenderer* renderer,
+            eastl::shared_ptr<GBuffer> pGBuffer);
         ~EmitterDebugPass();
 
         // Inherited via RenderPass

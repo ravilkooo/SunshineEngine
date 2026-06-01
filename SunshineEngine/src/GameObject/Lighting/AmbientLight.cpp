@@ -11,7 +11,6 @@
 
 AmbientLight::AmbientLight(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::AmbientLightData initData)
 {
     m_lightData = eastl::make_shared<SE_G::AmbientLightData>(initData);
@@ -27,8 +26,8 @@ AmbientLight::AmbientLight(
 
 	// LightPass - LightTechnique
 	auto lightTech = eastl::make_unique<SE_G::AmbientLightTechnique>(
-		device, tc.get(),
-		"LightPass", camera, m_lightData);
+		renderSystem, tc.get(),
+		"LightPass", m_lightData);
 
 	auto rc = eastl::make_shared<RenderComponent>(m_UUID, renderSystem);
 	rc->AddTechnique(eastl::move(lightTech));
@@ -36,7 +35,6 @@ AmbientLight::AmbientLight(
 
 AmbientLight::AmbientLight(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -56,7 +54,7 @@ AmbientLight::AmbientLight(
 
 	// LightPass - LightTechnique
 	auto lightTech = eastl::make_unique<SE_G::AmbientLightTechnique>(
-		device, tc.get(), "LightPass", camera, m_lightData);
+		renderSystem, tc.get(), "LightPass", m_lightData);
 	rc->AddTechnique(eastl::move(lightTech));
 
 }
@@ -64,7 +62,6 @@ AmbientLight::AmbientLight(
 
 AmbientLight_Info::AmbientLight_Info(
     SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera,
     SE_G::AmbientLightData initData)
 {
     m_lightData = eastl::make_shared<SE_G::AmbientLightData>(initData);
@@ -83,8 +80,8 @@ AmbientLight_Info::AmbientLight_Info(
 
 	// LightPass - LightTechnique
 	auto lightTech = eastl::make_unique<SE_G::AmbientLightTechnique>(
-		device, tc_info->m_assignedComponent.get(),
-		"LightPass", camera, m_lightData);
+		renderSystem, tc_info->m_assignedComponent.get(),
+		"LightPass", m_lightData);
 
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 	rc_info->AddTechnique(eastl::move(lightTech));
@@ -99,7 +96,6 @@ AmbientLight_Info::AmbientLight_Info(
 
 AmbientLight_Info::AmbientLight_Info(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -122,8 +118,8 @@ AmbientLight_Info::AmbientLight_Info(
 
 	// LightPass - LightTechnique
 	auto lightTech = eastl::make_unique<SE_G::AmbientLightTechnique>(
-		device, tc_info->m_assignedComponent.get(),
-		"LightPass", camera, m_lightData);
+		renderSystem, tc_info->m_assignedComponent.get(),
+		"LightPass", m_lightData);
 
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
 	rc_info->AddTechnique(eastl::move(lightTech));

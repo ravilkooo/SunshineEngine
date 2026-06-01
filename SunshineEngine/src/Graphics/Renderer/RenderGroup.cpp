@@ -1,6 +1,10 @@
+#include <d3d11.h>
+
+#include <Graphics/Utils/Camera.h>
 #include <Graphics/Renderer/RenderGroup.h>
 #include <Graphics/Renderer/Pass/RenderPass.h>
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
+
 
 namespace SE_G {
 	RenderGroup::RenderGroup(
@@ -134,5 +138,9 @@ namespace SE_G {
 
 	void RenderGroup::Enable() {
 		m_enabled = true;
+	}
+
+	eastl::shared_ptr<Camera> RenderGroup::GetMainCamera() {
+		return nullptr;
 	}
 }

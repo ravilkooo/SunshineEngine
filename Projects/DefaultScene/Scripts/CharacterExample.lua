@@ -67,24 +67,31 @@ function behavior:start()
 end
 
 function behavior:update(dt)
-    local tr = self.owner:getTransform()
+    -- local tr = self.owner:getTransform()
     local inputSystem = getInputSystem()
     local speed = 0.1
+    local char = self.owner:getCharacterComponent()
 
-    tr.m_rotation.y = tr.m_rotation.y + speed * inputSystem:getAxis("Forward")
+    local inputValue = inputSystem:getAxis2D("Forward", "Right")
+    char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
+    -- tr.m_rotation.y = tr.m_rotation.y + speed * inputSystem:getAxis("Forward")
+    
+    
+    -- if (inputSystem:isPressed("RAction")) then
+        -- print("RACTION")
+        -- tr.m_rotation.y = tr.m_rotation.y + 0.5
+    -- elseif (inputSystem:isReleased("RAction")) then
+        -- print("RACTION")
+        -- tr.m_rotation.y = tr.m_rotation.y - 0.5
+    -- end
 
-    if (inputSystem:isPressed("RAction")) then
-        -- print("RACTION")
-        tr.m_rotation.y = tr.m_rotation.y + 0.5
-    elseif (inputSystem:isReleased("RAction")) then
-        -- print("RACTION")
-        tr.m_rotation.y = tr.m_rotation.y - 0.5
+    if (inputSystem:isPressed("Jump")) then
+        print("== JUMP! ==")
+        char.m_jumpRequested = true
+        -- tr.m_rotation.y = tr.m_rotation.y - 0.5
     end
 
-    if (inputSystem:isPressed("FAction")) then
-        -- print("FACTION")
-        tr.m_rotation.y = tr.m_rotation.y - 0.5
-    end
+
 
     if not collected then
 

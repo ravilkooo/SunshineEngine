@@ -1,3 +1,5 @@
+#include <d3d11.h>
+
 #include "Graphics/Renderer/Technique/IconTechnique.h"
 
 #include <Graphics/Bindable/ConstantBuffer.h>
@@ -15,29 +17,24 @@ namespace SE_G {
 		m_iconBuffer = eastl::make_shared<Bind::PixelConstantBuffer<IconData>>(device, iconData, 1u);
 
 		CreateVertexBuffer(device, iconSizeX, iconSizeY);
-
-		//m_geometryCB = eastl::make_shared<Bind::GeometryConstantBuffer<DXSM::Vector3>>(device, 1u);
 	}
 
-	void IconTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void IconTechnique::Pass(ID3D11DeviceContext* context)
 	{
 		BindAll(context);
 		DrawTechnique(context);
 	}
 
-	void IconTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void IconTechnique::BindAll(ID3D11DeviceContext* context)
 	{
-		m_vertexBuffer->Bind(context.Get());
+		m_vertexBuffer->Bind(context);
 
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-		m_iconBuffer->Bind(context.Get());
-
-		//m_geometryCB->Update(context.Get(), )
-		//m_geometryCB->Bind(context.Get());
+		m_iconBuffer->Bind(context);
 	}
 
-	void IconTechnique::DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void IconTechnique::DrawTechnique(ID3D11DeviceContext* context)
 	{
 		context->Draw(1u, 0);
 	}

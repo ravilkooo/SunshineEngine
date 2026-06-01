@@ -1,4 +1,4 @@
-#include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/MiniViewRenderer.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 #include <Graphics/Renderer/GBuffer.h>
@@ -36,9 +36,10 @@ std::string toString(const T& t)
 
 ImguiEditorPass::ImguiEditorPass(
 	EditorApp* editorApp)
-	: RenderPass("LightPass", editorApp->m_renderingSystem->GetDevice(),
-		editorApp->m_renderingSystem->GetDeviceContext())
+	: RenderPass("ImGuiEditorPass", editorApp->m_imguiRenderGroup.get())
 {
+	auto device = m_renderer->GetDevice();
+
 	m_editorAppWidth = editorApp->m_winWidth;
 	m_editorAppHeight = editorApp->m_winHeight;
 	m_editorApp = editorApp;
@@ -100,6 +101,8 @@ void ImguiEditorPass::SetVieportGBuffer(
 void ImguiEditorPass::StartFrame()
 {
 	if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"ImguiEditor Pass");
+
+	auto context = m_renderer->GetDeviceContext();
 
 	context->OMSetRenderTargets(1u, m_renderTargetView.GetAddressOf(), m_pDSV.Get());
 	float color[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -380,8 +383,7 @@ void ImguiEditorPass::Pass()
 				j["m_UUID"] = (uint64_t)SE::UUID();
 
 				eastl::unique_ptr<GameObject_Info> go = Scene_Info::JsonToGameObject_Info(
-					m_editorApp->m_worldEditor->m_scene, m_editorApp->m_worldEditor->m_renderer.get(), m_camera,
-					j);
+					m_editorApp->m_worldEditor->m_scene, m_editorApp->m_worldEditor->m_renderer.get(), j);
 
 				if (go)
 				{
@@ -409,7 +411,7 @@ void ImguiEditorPass::Pass()
 				m_editorApp->m_worldEditor->m_copiedObjSerialized["m_UUID"] = (uint64_t)SE::UUID();
 
 				eastl::unique_ptr<GameObject_Info> go = Scene_Info::JsonToGameObject_Info(
-					m_editorApp->m_worldEditor->m_scene, m_editorApp->m_worldEditor->m_renderer.get(), m_camera,
+					m_editorApp->m_worldEditor->m_scene, m_editorApp->m_worldEditor->m_renderer.get(),
 					m_editorApp->m_worldEditor->m_copiedObjSerialized);
 
 				if (go)
@@ -459,6 +461,8 @@ void ImguiEditorPass::Pass()
 
 void ImguiEditorPass::EndFrame()
 {
+	auto context = m_renderer->GetDeviceContext();
+
 	ID3D11ShaderResourceView* nullSRVs[] = { nullptr };
 	context->PSSetShaderResources(0, 1, nullSRVs);
 	ID3D11RenderTargetView* nullRTVs[] = { nullptr };
@@ -624,6 +628,8 @@ void ImguiEditorPass::PreResize()
 
 void ImguiEditorPass::OnResize(UINT resizeWidth, UINT resizeHeight, ID3D11Texture2D* backBuffer)
 {
+	auto device = m_renderer->GetDevice();
+
 	m_editorAppWidth = resizeWidth;
 	m_editorAppHeight = resizeHeight;
 	m_backBuffer = backBuffer;

@@ -1,23 +1,23 @@
 #pragma once
 
-#include <EASTL/shared_ptr.h>
+#include <d3d11.h>
 
-#include <stdexcept>
+#include <EASTL/shared_ptr.h>
 
 #include <Graphics/Renderer/Pass/RenderPass.h>
 
 namespace SE_G {
     class GBuffer;
     class Camera;
+    class DeferredRenderer;
     
     class GPass :
         public RenderPass
     {
         friend class ShadowMapPass;
     public:
-        GPass(ID3D11Device* device, ID3D11DeviceContext* context,
-            eastl::shared_ptr<GBuffer> pGBuffer,
-            eastl::shared_ptr<Camera> camera);
+        GPass(DeferredRenderer* renderer,
+            eastl::shared_ptr<GBuffer> pGBuffer);
         ~GPass();
 
         // Inherited via RenderPass

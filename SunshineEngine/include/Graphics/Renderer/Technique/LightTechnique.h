@@ -1,12 +1,14 @@
 #pragma once
-#include "RenderTechnique.h"
+#include <d3d11.h>
 
-#include <Graphics/Bindable/ConstantBuffer.h>
+#include "RenderTechnique.h"
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
 #include <Graphics/GraphicsResources/Mesh.h>
 #include <Graphics/Bindable/Sampler.h>
+#include <Graphics/Bindable/ConstantBuffer.h>
 #include <Graphics/Bindable/BlendState.h>
 #include <Graphics/Bindable/Rasterizer.h>
 #include <Graphics/Bindable/DepthStencilState.h>
@@ -44,18 +46,17 @@ namespace SE_G {
         public RenderTechnique
     {
     public:
-
         eastl::shared_ptr<T> m_lightData;
         eastl::shared_ptr<Bind::VertexConstantBuffer<T>> m_lightDataVertexCBuffer;
         eastl::shared_ptr<Bind::PixelConstantBuffer<T>> m_lightDataPixelCBuffer;
-        eastl::shared_ptr<Camera> m_camera;
+		DeferredRenderer* m_renderer = nullptr;
 
-        LightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
-            eastl::shared_ptr<Camera> camera,
+        LightTechnique(DeferredRenderer* renderer, TransformComponent* assignedTransform, eastl::string technique,
             eastl::shared_ptr<T> lightData)
-			: RenderTechnique(device, assignedTransform, technique)
+			: RenderTechnique(renderer->GetDevice(), assignedTransform, technique)
 		{
-
+			m_renderer = renderer;
+			auto device = m_renderer->GetDevice();
 			if (!LightStaticData::s_staticDataInitializated)
 			{
 				LightStaticData::InitStaticData(device);
@@ -87,68 +88,66 @@ namespace SE_G {
 					*(lightData),
 					2u
 				);
-
-			m_camera = camera;
 		}
 
 		virtual ~LightTechnique() = default;
 
-        virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override
+        virtual void BindAll(ID3D11DeviceContext* context) override
 		{
 			for (size_t i = 0; i < m_bindables.size(); i++)
 			{
-				m_bindables[i]->Bind(context.Get());
+				m_bindables[i]->Bind(context);
 			}
 
 			if (m_vertexShader) {
-				m_vertexShader->Bind(context.Get());
+				m_vertexShader->Bind(context);
 			}
 
 			if (m_pixelShader) {
-				m_pixelShader->Bind(context.Get());
+				m_pixelShader->Bind(context);
 			}
 
 			if (m_texture) {
-				m_texture->Bind(context.Get());
+				m_texture->Bind(context);
 			}
 
 			if (m_textureSampler) {
-				m_textureSampler->Bind(context.Get());
+				m_textureSampler->Bind(context);
 			}
 
 			if (m_lightDataPixelCBuffer) {
-				m_lightDataPixelCBuffer->Bind(context.Get());
+				m_lightDataPixelCBuffer->Bind(context);
 			}
 
 			if (m_lightDataVertexCBuffer) {
-				m_lightDataVertexCBuffer->Bind(context.Get());
+				m_lightDataVertexCBuffer->Bind(context);
 			}
 
 			if (m_blendState)
-				m_blendState->Bind(context.Get());
+				m_blendState->Bind(context);
 
 			if (m_mesh)
-				m_mesh->Bind(context.Get());
+				m_mesh->Bind(context);
 
-			LightPosition lightPos = GetLightPositionInFrustum();
+			LightPosition lightPos = GetLightPositionInFrustum(m_renderer->GetMainCamera().get());
 			// Choose rasterizer
-			ChooseRasterizer(context.Get(), lightPos);
+			ChooseRasterizer(context, lightPos);
 			// Choose depthState
-			ChooseDepthStencilState(context.Get(), lightPos);
+			ChooseDepthStencilState(context, lightPos);
 
 			// Bind rasterizer
 			if (m_rasterizer)
-				m_rasterizer->Bind(context.Get());
+				m_rasterizer->Bind(context);
 
 			// Bind depthState
 			if (m_depthStencilState)
-				m_depthStencilState->Bind(context.Get());
+				m_depthStencilState->Bind(context);
 		}
 
         // Update right before draw
         // Need camera?
-        virtual LightPosition GetLightPositionInFrustum() { return LightPosition::FILL; };
-        virtual bool IsFrustumInsideOfLight() { return true; };
+        virtual LightPosition GetLightPositionInFrustum(Camera* camera) { return LightPosition::FILL; };
+        virtual bool IsFrustumInsideOfLight(Camera* camera) { return true; };
 
         virtual void ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos) = 0;
         virtual void ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos) = 0;

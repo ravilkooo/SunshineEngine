@@ -1,5 +1,6 @@
 ﻿#include <Graphics/Renderer/Pass/PerceptionDebugPass.h>
 #include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/GBuffer.h>
 
 #include <Graphics/Utils/Camera.h>
@@ -25,11 +26,10 @@
 
 namespace SE_G {
 
-	PerceptionDebugPass::PerceptionDebugPass(ID3D11Device* device, ID3D11DeviceContext* context,
-		eastl::shared_ptr<GBuffer> pGBuffer,
-		eastl::shared_ptr<Camera> camera)
+	PerceptionDebugPass::PerceptionDebugPass(DeferredRenderer* renderer,
+		eastl::shared_ptr<GBuffer> pGBuffer)
 		:
-		RenderPass("PerceptionDebugPass", device, context)
+		RenderPass("PerceptionDebugPass", renderer)
 	{
 		eastl::vector<SE_G::PerceptionVertex> vertices;
 		eastl::vector<UINT> indices;
@@ -37,7 +37,6 @@ namespace SE_G {
 		m_topology = eastl::make_unique<Bind::Topology>(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 		this->m_GBuffer = pGBuffer;
-		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
 		m_passType = PassType::Perception;
@@ -53,6 +52,8 @@ namespace SE_G {
 		m_viewport.TopLeftY = 0;
 		m_viewport.MinDepth = 0;
 		m_viewport.MaxDepth = 1.0f;
+
+		auto device = m_renderer->GetDevice();
 
 		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT{});
 		dsDesc.DepthEnable = TRUE;
@@ -132,19 +133,21 @@ namespace SE_G {
 	void PerceptionDebugPass::StartFrame()
 	{
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Perception Pass");
-
+		auto context = m_renderer->GetDeviceContext();
 		context->OMSetRenderTargets(2, m_bufferRTVs, m_GBuffer->pDepthDSV.Get());
 
 		context->RSSetViewports(1, &m_viewport);
 
-		m_camera->UpdateBuffer(context.Get());
-		m_camera->BindBuffer(context.Get());
+		m_renderer->GetMainCamera()->UpdateBuffer(context);
+		m_renderer->GetMainCamera()->BindBuffer(context);
 	}
 
 	void PerceptionDebugPass::Pass()
 	{
 		if (m_gameObject && m_gameObject->HasComponent<PerceptionComponent_Info>()) 
 		{
+			auto context = m_renderer->GetDeviceContext();
+
 			PerceptionComponent_Info* perceptionComp = m_gameObject->GetComponent<PerceptionComponent_Info>().get();
 
 			m_perceptionData.EyesOffset = perceptionComp->EyesOffset;
@@ -177,23 +180,23 @@ namespace SE_G {
             A._41 = 0; A._42 = 0; A._43 = 0; A._44 = 1;
             m_perceptionData.wMatNoLocalInvTranspose = (A.Invert()).Transpose();
 
-			m_settingsCB->Update(context.Get(), m_perceptionData);
-			m_settingsCB->Bind(context.Get());
+			m_settingsCB->Update(context, m_perceptionData);
+			m_settingsCB->Bind(context);
 
 			BindAllPerFrame();
 
 			// VertexBuffer with all default shapes
-			m_topology->Bind(context.Get());
-			m_depthStencilState->Bind(context.Get());
-			m_pixelShader->Bind(context.Get());
-			m_vertexShader->Bind(context.Get());
+			m_topology->Bind(context);
+			m_depthStencilState->Bind(context);
+			m_pixelShader->Bind(context);
+			m_vertexShader->Bind(context);
 
 			// Default shapes
-			m_vertexBuffer->Bind(context.Get());
-			m_indexBuffer->Bind(context.Get());
+			m_vertexBuffer->Bind(context);
+			m_indexBuffer->Bind(context);
 
 
-			tc->m_assignedComponent->BindToGraphicsPipeline(context.Get());
+			tc->m_assignedComponent->BindToGraphicsPipeline(context);
 			// tc->Pass(GetDeviceContext());
 
 			context->DrawIndexedInstanced(
@@ -215,7 +218,7 @@ namespace SE_G {
 	{
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
-		context->OMSetRenderTargets(1, nullRTVs, *nullDSVs);
+		m_renderer->GetDeviceContext()->OMSetRenderTargets(1, nullRTVs, *nullDSVs);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}

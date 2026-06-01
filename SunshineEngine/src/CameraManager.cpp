@@ -7,6 +7,7 @@
 CameraManager::CameraManager()
 {
 	m_availableCameras = eastl::unordered_map<SE::UUID, eastl::shared_ptr<SE_G::Camera>>();
+	m_camerasUUID = eastl::vector<SE::UUID>();
 }
 
 bool CameraManager::HasCameraByUUID(SE::UUID uuid)
@@ -66,4 +67,5 @@ void CameraManager::RemoveCameraByUUID(SE::UUID uuid)
 
 void CameraManager::Clear() {
 	m_availableCameras.clear();
+	m_camerasUUID.clear();
 }

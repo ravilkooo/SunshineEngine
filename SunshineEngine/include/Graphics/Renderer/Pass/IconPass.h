@@ -14,6 +14,7 @@ namespace DXSM = DX::SimpleMath;
 namespace SE_G {
     class GBuffer;
     class Camera;
+    class DeferredRenderer;
 
     namespace Bind {
         class VertexShader;
@@ -33,9 +34,8 @@ namespace SE_G {
         public RenderPass
     {
     public:
-        IconPass(ID3D11Device* device, ID3D11DeviceContext* context,
-            eastl::shared_ptr<GBuffer> pGBuffer,
-            eastl::shared_ptr<Camera> camera);
+        IconPass(DeferredRenderer* renderer,
+            eastl::shared_ptr<GBuffer> pGBuffer);
         ~IconPass();
 
         // Inherited via RenderPass

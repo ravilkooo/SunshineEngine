@@ -13,16 +13,15 @@ namespace SE_G {
     eastl::shared_ptr<Bind::PixelShader> DirectionalLightTechnique::s_shadowShader;
 
 
-    DirectionalLightTechnique::DirectionalLightTechnique(ID3D11Device* device,
+    DirectionalLightTechnique::DirectionalLightTechnique(DeferredRenderer* renderer,
         TransformComponent* assignedTransform,
         eastl::string technique,
-        eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<DirectionalLightData> lightData)
-        : LightTechnique(device, assignedTransform, technique, camera, lightData)
+        : LightTechnique(renderer, assignedTransform, technique, lightData)
     {
         if (!DirectionalLightTechnique::s_staticDataInitializated)
         {
-            DirectionalLightTechnique::InitStaticData(device);
+            DirectionalLightTechnique::InitStaticData(renderer->GetDevice());
         }
 
         AssetPath meshPath = AssetPath(L"ScreenAlignedQuad");
@@ -50,23 +49,23 @@ namespace SE_G {
         //     device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightVShader.hlsl").c_str());
     }
 
-    void DirectionalLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    void DirectionalLightTechnique::Pass(ID3D11DeviceContext* context)
     {
         // to-do: update only when changed
         auto wMat = m_assignedTransform->GetWorldMatrix();
         m_lightData->Position = DXSM::Vector3(wMat._41, wMat._42, wMat._43);
-        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataPixelCBuffer->Update(context, *m_lightData);
         BindAll(context);
 
         if (m_castsShadow)
         {
             m_shadowMapPass->BindForLightingPass();
-            s_shadowShader->Bind(context.Get());
+            s_shadowShader->Bind(context);
             DrawTechnique(context);
         }
         else
         {
-            s_noShadowShader->Bind(context.Get());
+            s_noShadowShader->Bind(context);
             DrawTechnique(context);
         }
     }
@@ -81,12 +80,12 @@ namespace SE_G {
         LightStaticData::rastCullNone->Bind(context);
     }
 
-    LightPosition DirectionalLightTechnique::GetLightPositionInFrustum()
+    LightPosition DirectionalLightTechnique::GetLightPositionInFrustum(Camera* camera)
     {
         return LightPosition::FILL;
     }
 
-    bool DirectionalLightTechnique::IsFrustumInsideOfLight()
+    bool DirectionalLightTechnique::IsFrustumInsideOfLight(Camera* camera)
     {
         return true;
     }
@@ -111,10 +110,6 @@ namespace SE_G {
 
     void DirectionalLightTechnique::InitStaticData(ID3D11Device* device)
     {
-        // s_noShadowShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
-        //     device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightPS.hlsl").c_str());
-        // s_shadowShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
-        //     device, MakeEngineAssetPath_Wstring(L"Shaders/LightPass/DirectionalLightShadowPS.hlsl").c_str());
         AssetPath shaderPath = AssetPath(L"Shaders/LightPass/DirectionalLightPS.hlsl", AssetPath::AssetSource::Engine);
         shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
         auto& rm = ResourceManagerFacade::Instance();

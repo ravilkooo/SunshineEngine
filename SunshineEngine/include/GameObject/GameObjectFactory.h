@@ -91,28 +91,23 @@ public:
 
 	static eastl::unique_ptr<SkyBox> CreateSkyBox(
 		SE_G::DeferredRenderer* m_renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		AssetPath texturePath = AssetPath(eastl::wstring(L"Textures/DefaultSkybox.dds"), AssetPath::AssetSource::Engine),
 		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f });
 
 	static eastl::unique_ptr<SkyBox> CreateSkyBox(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		const json& j);
 
 	static eastl::unique_ptr<AmbientLight> CreateAmbientLightObject(
 		SE_G::DeferredRenderer* m_renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::AmbientLightData initData = { DXSM::Vector3::One * 0.1f, 1.0f });
 
 	static eastl::unique_ptr<AmbientLight> CreateAmbientLightObject(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		const json& j);
 
 	static eastl::unique_ptr<DirectionalLight> CreateDirectionalLightObject(
 		SE_G::DeferredRenderer* m_renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::DirectionalLightData initData = {
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
@@ -122,12 +117,10 @@ public:
 
 	static eastl::unique_ptr<DirectionalLight> CreateDirectionalLightObject(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		const json& j);
 
 	static eastl::unique_ptr<PointLight> CreatePointLightObject(
 		SE_G::DeferredRenderer* m_renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::PointLightData initData = {
 			DXSM::Vector3::One, 1.0f,
 			DXSM::Vector3::One, 1.0f,
@@ -137,12 +130,10 @@ public:
 
 	static eastl::unique_ptr<PointLight> CreatePointLightObject(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		const json& j);
 
 	static eastl::unique_ptr<SpotLight> CreateSpotLightObject(
 		SE_G::DeferredRenderer* m_renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::SpotLightData initData = {
 			DXSM::Vector3::One, 1.0f,
 			DXSM::Vector3::One, 1.0f,
@@ -153,7 +144,6 @@ public:
 
 	static eastl::unique_ptr<SpotLight> CreateSpotLightObject(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		const json& j);
 
 };

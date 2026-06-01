@@ -1,19 +1,22 @@
 #pragma once
+#include <Windows.h> // UINT
 
 #include <EASTL/unique_ptr.h>
+#include <EASTL/shared_ptr.h>
 #include <EASTL/string.h>
 #include <EASTL/unordered_map.h>
 
-#include <d3d11.h>
-#include <wrl.h>
-
 #include <Utils/UUID.h>
+
+class ID3D11Device;
+class ID3D11DeviceContext;
 
 namespace SE_G {
 	class RenderTechnique;
 	class RenderPass;
+	class Camera;
 
-	enum class PassType : UINT;
+	enum class PassType : unsigned int;
 
 	class RenderGroup {
 	public:
@@ -40,6 +43,8 @@ namespace SE_G {
 		bool IsEnabled();
 		void Disable();
 		void Enable();
+
+		virtual eastl::shared_ptr<Camera> GetMainCamera();
 
 		ID3D11Device* m_device;
 		ID3D11DeviceContext* m_context;

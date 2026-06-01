@@ -311,46 +311,41 @@ eastl::unique_ptr<CylinderShapeObject_Info> EditorObjectFactory::CreateCylinderO
 
 eastl::unique_ptr<SkyBox_Info> EditorObjectFactory::CreateSkyBox(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	AssetPath assetPath,
 	SE_G::SkyBoxData initData)
 {
-	auto obj = eastl::make_unique<SkyBox_Info>(renderSystem, camera, assetPath, initData);
+	auto obj = eastl::make_unique<SkyBox_Info>(renderSystem, assetPath, initData);
 	return obj;
 }
 
 eastl::unique_ptr<AmbientLight_Info> EditorObjectFactory::CreateAmbientLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::AmbientLightData initData)
 {
-	auto obj = eastl::make_unique<AmbientLight_Info>(renderSystem, camera, initData);
+	auto obj = eastl::make_unique<AmbientLight_Info>(renderSystem, initData);
 	return obj;
 }
 
 eastl::unique_ptr<DirectionalLight_Info> EditorObjectFactory::CreateDirectionalLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::DirectionalLightData initData)
 {
-	auto obj = eastl::make_unique<DirectionalLight_Info>(renderSystem, camera, initData, true);
+	auto obj = eastl::make_unique<DirectionalLight_Info>(renderSystem, initData, true);
 	return obj;
 }
 
 eastl::unique_ptr<PointLight_Info> EditorObjectFactory::CreatePointLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::PointLightData initData)
 {
-	auto obj = eastl::make_unique<PointLight_Info>(renderSystem, camera, initData);
+	auto obj = eastl::make_unique<PointLight_Info>(renderSystem, initData);
 	return obj;
 }
 
 eastl::unique_ptr<SpotLight_Info> EditorObjectFactory::CreateSpotLightObject(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	SE_G::SpotLightData initData)
 {
-	auto obj = eastl::make_unique<SpotLight_Info>(renderSystem, camera, initData);
+	auto obj = eastl::make_unique<SpotLight_Info>(renderSystem, initData);
 	return obj;
 }

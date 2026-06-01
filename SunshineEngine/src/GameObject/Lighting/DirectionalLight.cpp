@@ -13,8 +13,7 @@
 #include <Serialization/LightDataSerialization.h>
 
 DirectionalLight::DirectionalLight(
-    SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera, SE_G::DirectionalLightData initData,
+    SE_G::DeferredRenderer* renderSystem, SE_G::DirectionalLightData initData,
 	bool castsShadow)
 {
     initData.Direction.Normalize();
@@ -33,7 +32,7 @@ DirectionalLight::DirectionalLight(
 	// LightPass - LightTechnique
 	auto lightTech =
 		eastl::make_unique<SE_G::DirectionalLightTechnique>(
-			device, tc.get(), "LightPass", camera, m_lightData);
+			renderSystem, tc.get(), "LightPass", m_lightData);
 
 	if (castsShadow)
 	{
@@ -42,7 +41,7 @@ DirectionalLight::DirectionalLight(
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
-				renderSystem->GetDevice(), renderSystem->GetDeviceContext(),
+				renderSystem,
 				gPass, m_lightData)));
 
 		lightTech->AssignShadowMapPass(m_shadowMapPass);
@@ -56,7 +55,6 @@ DirectionalLight::DirectionalLight(
 
 DirectionalLight::DirectionalLight(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -77,7 +75,7 @@ DirectionalLight::DirectionalLight(
 
 	// LightPass - LightTechnique
 	auto lightTech =
-		eastl::make_unique<SE_G::DirectionalLightTechnique>(device, tc.get(), "LightPass", camera, m_lightData);
+		eastl::make_unique<SE_G::DirectionalLightTechnique>(renderSystem, tc.get(), "LightPass", m_lightData);
 
 	bool castsShadow = j.contains("CastsShadow") && j["CastsShadow"];
 	if (castsShadow)
@@ -87,7 +85,7 @@ DirectionalLight::DirectionalLight(
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
-				renderSystem->GetDevice(), renderSystem->GetDeviceContext(),
+				renderSystem,
 				gPass, m_lightData)));
 		lightTech->AssignShadowMapPass(m_shadowMapPass);
 		lightTech->EnableShadow();
@@ -106,7 +104,7 @@ void DirectionalLight::EnableShadow(
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
-				renderSystem->GetDevice(), renderSystem->GetDeviceContext(),
+				renderSystem,
 				gPass, m_lightData)));
 		m_lightTech->AssignShadowMapPass(m_shadowMapPass);
 		m_lightTech->EnableShadow();
@@ -118,8 +116,7 @@ void DirectionalLight::DisableShadow() {
 }
 
 DirectionalLight_Info::DirectionalLight_Info(
-    SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera, SE_G::DirectionalLightData initData,
+    SE_G::DeferredRenderer* renderSystem, SE_G::DirectionalLightData initData,
 	bool castsShadow)
 {
 	initData.Direction.Normalize();
@@ -140,7 +137,7 @@ DirectionalLight_Info::DirectionalLight_Info(
 
 	// LightPass - LightTechnique
 	auto lightTech =
-		eastl::make_unique<SE_G::DirectionalLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+		eastl::make_unique<SE_G::DirectionalLightTechnique>(renderSystem, tc_info->m_assignedComponent.get(), "LightPass", m_lightData);
 
 	if (castsShadow)
 	{
@@ -149,7 +146,7 @@ DirectionalLight_Info::DirectionalLight_Info(
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
-				renderSystem->GetDevice(), renderSystem->GetDeviceContext(),
+				renderSystem,
 				gPass, m_lightData)));
 
 		lightTech->AssignShadowMapPass(m_shadowMapPass);
@@ -167,7 +164,6 @@ DirectionalLight_Info::DirectionalLight_Info(
 
 DirectionalLight_Info::DirectionalLight_Info(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -190,7 +186,7 @@ DirectionalLight_Info::DirectionalLight_Info(
 
 	// LightPass - LightTechnique
 	auto lightTech =
-		eastl::make_unique<SE_G::DirectionalLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+		eastl::make_unique<SE_G::DirectionalLightTechnique>(renderSystem, tc_info->m_assignedComponent.get(), "LightPass", m_lightData);
 
 	if (j.contains("CastsShadow") && j["CastsShadow"])
 	{
@@ -198,7 +194,7 @@ DirectionalLight_Info::DirectionalLight_Info(
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
-				renderSystem->GetDevice(), renderSystem->GetDeviceContext(),
+				renderSystem,
 				gPass, m_lightData)));
 		lightTech->AssignShadowMapPass(m_shadowMapPass);
 		lightTech->EnableShadow();
@@ -223,7 +219,7 @@ void DirectionalLight_Info::EnableShadow(
 
 		m_shadowMapPass = static_cast<SE_G::ShadowMapPass*>(
 			renderSystem->AddPass(eastl::make_unique<SE_G::ShadowMapPass>(
-				renderSystem->GetDevice(), renderSystem->GetDeviceContext(),
+				renderSystem,
 				gPass, m_lightData)));
 		m_lightTech->AssignShadowMapPass(m_shadowMapPass);
 		m_lightTech->EnableShadow();

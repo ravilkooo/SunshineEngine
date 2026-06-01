@@ -84,7 +84,8 @@ public:
     void SetIcon(HWND hwnd) override;
 
     eastl::shared_ptr<SE_G::RenderingSystem> m_renderingSystem;
-    
+    eastl::unique_ptr<SE_G::RenderGroup> m_imguiRenderGroup;
+
     eastl::shared_ptr<WorldEditor> m_worldEditor;
     SE::Project* m_openedProject = nullptr;
     eastl::unique_ptr<Game> m_currentGame;
@@ -116,7 +117,6 @@ private:
 
     bool is_layout_initialized = false;
 
-    eastl::unique_ptr<SE_G::RenderGroup> m_imguiRenderGroup;
     ImguiEditorPass* imguiEditorPass = nullptr;
     bool m_initialized = false;
 

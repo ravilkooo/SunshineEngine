@@ -1,13 +1,17 @@
-#include <Graphics/Renderer/Technique/RenderTechnique.h>
-#include <Graphics/Bindable/Bindable.h>
+#include <d3d11.h>
+
 #include <Graphics/GraphicsResources/Mesh.h>
 #include <Graphics/GraphicsResources/VertexShader.h>
 #include <Graphics/GraphicsResources/PixelShader.h>
 #include <Graphics/GraphicsResources/Texture.h>
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
+
+#include <Graphics/Bindable/Bindable.h>
 #include <Graphics/Bindable/BlendState.h>
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/Rasterizer.h>
 #include <Graphics/Bindable/DepthStencilState.h>
+
 #include <Component/TransformComponent.h>
 
 namespace SE_G {
@@ -30,52 +34,52 @@ namespace SE_G {
 		m_bindables.push_back(bind);
 	}
 
-	void RenderTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void RenderTechnique::Pass(ID3D11DeviceContext* context)
 	{
 		BindAll(context);
 		DrawTechnique(context);
 	}
 
-	void RenderTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void RenderTechnique::BindAll(ID3D11DeviceContext* context)
 	{
 		for (size_t i = 0; i < m_bindables.size(); i++)
 		{
-			m_bindables[i]->Bind(context.Get());
+			m_bindables[i]->Bind(context);
 		}
 
 		if (m_vertexShader)
-			m_vertexShader->Bind(context.Get());
+			m_vertexShader->Bind(context);
 
 		if (m_pixelShader)
-			m_pixelShader->Bind(context.Get());
+			m_pixelShader->Bind(context);
 
 		if (m_texture) {
-			m_texture->Bind(context.Get());
+			m_texture->Bind(context);
 		}
 
 		if (m_textureSampler) {
-			m_textureSampler->Bind(context.Get());
+			m_textureSampler->Bind(context);
 		}
 
 		// Bind rasterizer
 		if (m_rasterizer)
-			m_rasterizer->Bind(context.Get());
+			m_rasterizer->Bind(context);
 
 		// Bind depthState
 		if (m_depthStencilState)
-			m_depthStencilState->Bind(context.Get());
+			m_depthStencilState->Bind(context);
 
 		if (m_blendState)
-			m_blendState->Bind(context.Get());
+			m_blendState->Bind(context);
 
 		if (m_mesh)
-			m_mesh->Bind(context.Get());
+			m_mesh->Bind(context);
 	}
 
-	void RenderTechnique::DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void RenderTechnique::DrawTechnique(ID3D11DeviceContext* context)
 	{
 		if (m_mesh)
-			m_mesh->Draw(context.Get());
+			m_mesh->Draw(context);
 
 	}
 

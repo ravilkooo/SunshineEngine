@@ -176,15 +176,15 @@ void WorldEditor::SetupRendering(
 	{
 		m_gPass = static_cast<SE_G::GPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::GPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
 			);
 	}
 	{
 		m_lightPass = static_cast<SE_G::LightPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::LightPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
 			);
 
 		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
@@ -192,44 +192,44 @@ void WorldEditor::SetupRendering(
 	{
 		m_colliderPass = static_cast<SE_G::ColliderPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::ColliderPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
 			);
 	}
 	{
 		m_triggerPass = static_cast<SE_G::TriggerPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::TriggerPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
 			);
 	}
 	{
 		m_emitterPass = static_cast<SE_G::EmitterDebugPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::EmitterDebugPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
 			);
 	}
 	{
 		m_iconPass = static_cast<SE_G::IconPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::IconPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
 			);
 	}
 	{
 		m_selectionPass = static_cast<SE_G::SelectionPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::SelectionPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
 			);
 		m_selectionPass->m_iconPass = m_iconPass;
 	}
 	{
 		m_perceptionPass = static_cast<SE_G::PerceptionDebugPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::PerceptionDebugPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
 			);
 		m_selectionPass->m_perceptionPass = m_perceptionPass;
 	}
@@ -246,7 +246,7 @@ void WorldEditor::InitMiniViewport()
 	m_renderingSystem->RemoveRenderGroup("CharacterViewport");
 
 	m_miniViewRenderer = eastl::make_shared<SE_G::MiniViewRenderer>(
-		"CharacterViewport", m_renderer->GetDevice(), m_renderer->GetDeviceContext());
+		"CharacterViewport", m_renderer.get());
 	m_miniViewRenderer->SetParentRenderer(m_renderer.get());
 	m_miniViewRenderer->Disable();
 
@@ -432,7 +432,7 @@ bool WorldEditor::LoadScene(const wchar_t* scenePath) {
 		LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()).c_str());
 		return false;
 	}
-	m_scene = Scene_Info::FromJson(m_renderer.get(), m_renderer->GetMainCamera(), j);
+	m_scene = Scene_Info::FromJson(m_renderer.get(), j);
 	
 	LOG_EDITOR_INFO("Scene loaded");
 
@@ -544,7 +544,7 @@ void WorldEditor::AddCylinderShape(DXSM::Vector3 initPos)
 
 void WorldEditor::AddSkyBox(DXSM::Vector3 initPos)
 {
-	auto skyboxObject = EditorObjectFactory::CreateSkyBox(m_renderer.get(), m_renderer->GetMainCamera());
+	auto skyboxObject = EditorObjectFactory::CreateSkyBox(m_renderer.get());
 
 	if (skyboxObject)
 	{
@@ -556,7 +556,7 @@ void WorldEditor::AddSkyBox(DXSM::Vector3 initPos)
 
 void WorldEditor::AddAmbientLight(DXSM::Vector3 initPos)
 {
-	auto ambientLightObject = EditorObjectFactory::CreateAmbientLightObject(m_renderer.get(), m_renderer->GetMainCamera());
+	auto ambientLightObject = EditorObjectFactory::CreateAmbientLightObject(m_renderer.get());
 
 	if (ambientLightObject)
 	{
@@ -568,7 +568,7 @@ void WorldEditor::AddAmbientLight(DXSM::Vector3 initPos)
 
 void WorldEditor::AddDirectionalLight(DXSM::Vector3 initPos)
 {
-	auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
+	auto directionalLightObject = EditorObjectFactory::CreateDirectionalLightObject(m_renderer.get(),
 		{
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
@@ -586,7 +586,7 @@ void WorldEditor::AddDirectionalLight(DXSM::Vector3 initPos)
 
 void WorldEditor::AddPointLight(DXSM::Vector3 initPos)
 {
-	auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
+	auto pointLightObject = EditorObjectFactory::CreatePointLightObject(m_renderer.get(),
 		{
 			DXSM::Vector3::One, 1.0f,
 			DXSM::Vector3::One, 1.0f,
@@ -604,7 +604,7 @@ void WorldEditor::AddPointLight(DXSM::Vector3 initPos)
 
 void WorldEditor::AddSpotLight(DXSM::Vector3 initPos)
 {
-	auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer.get(), m_renderer->GetMainCamera(),
+	auto spotLightObject = EditorObjectFactory::CreateSpotLightObject(m_renderer.get(),
 		{
 			DXSM::Vector3::One, 1.0f,
 			DXSM::Vector3::One, 1.0f,

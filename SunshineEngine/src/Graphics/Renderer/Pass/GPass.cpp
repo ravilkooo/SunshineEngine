@@ -1,6 +1,6 @@
-#include <Graphics/Renderer/GBuffer.h>
-
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/RenderingSystem.h>
+#include <Graphics/Renderer/GBuffer.h>
 #include "Graphics/Renderer/Pass/GPass.h"
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 
@@ -9,16 +9,14 @@
 #include <Component/TransformComponent.h>
 
 namespace SE_G {
-	GPass::GPass(ID3D11Device* device, ID3D11DeviceContext* context,
-		eastl::shared_ptr<GBuffer> pGBuffer,
-		eastl::shared_ptr<Camera> camera)
+	GPass::GPass(DeferredRenderer* renderer,
+		eastl::shared_ptr<GBuffer> pGBuffer)
 		:
-		RenderPass("GPass", device, context)
+		RenderPass("GPass", renderer)
 	{
 		this->screenWidth = pGBuffer->m_screenWidth;
 		this->screenHeight = pGBuffer->m_screenHeight;
 		this->pGBuffer = pGBuffer;
-		this->m_camera = camera;
 		m_passType = PassType::GPass;
 
 		// Set RTVs
@@ -47,6 +45,7 @@ namespace SE_G {
 	void GPass::StartFrame()
 	{
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"GPass");
+		auto context = m_renderer->GetDeviceContext();
 
 		context->OMSetRenderTargets(5, gBufferRTVs, pGBuffer->pDepthDSV.Get());
 		float colorBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -62,29 +61,13 @@ namespace SE_G {
 		context->RSSetViewports(1, &viewport);
 
 		// Bind camera buffer to 1u slot
-		m_camera->UpdateBuffer(context.Get());
-		m_camera->BindBuffer(context.Get());
+		m_renderer->GetMainCamera()->UpdateBuffer(context);
+		m_renderer->GetMainCamera()->BindBuffer(context);
 	}
 
 	void GPass::Pass()
 	{
 		BindAllPerFrame();
-		/*
-		for (const auto& gameObjectUUID : scene.gameObjects) {
-			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
-			if (gameObject->HasComponent<RenderComponent>() &&
-				gameObject->HasComponent<TransformComponent>()) {
-
-				auto renderComponent = gameObject->GetComponent<RenderComponent>();
-
-				if (!renderComponent->HasTechnique(techniqueTag))
-					continue;
-
-				gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
-				renderComponent->PassTechnique(techniqueTag, GetDeviceContext()); // Bind + Draw
-			}
-		}
-		*/
 		for (auto& tech : m_techniques) {
 			tech.second->m_assignedTransform->EnableMeshTransformMode();
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
@@ -95,11 +78,9 @@ namespace SE_G {
 
 	void GPass::EndFrame()
 	{
-		//context->PSSetShaderResources(0, NULL, NULL);
-		//context->OMSetRenderTargets(0, NULL, NULL);
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
-		context->OMSetRenderTargets(5, nullRTVs, *nullDSVs);
+		m_renderer->GetDeviceContext()->OMSetRenderTargets(5, nullRTVs, *nullDSVs);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}

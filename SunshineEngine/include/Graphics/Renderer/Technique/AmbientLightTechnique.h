@@ -7,17 +7,16 @@ namespace SE_G {
         public LightTechnique<AmbientLightData>
     {
     public:
-        AmbientLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
-            eastl::shared_ptr<Camera> camera,
+        AmbientLightTechnique(DeferredRenderer* renderer, TransformComponent* assignedTransform,
+            eastl::string technique,
             eastl::shared_ptr<AmbientLightData> lightData);
 
-        //void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-        void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+        void Pass(ID3D11DeviceContext* context) override;
 
         void ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos) override;
         void ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos) override;
 
-        LightPosition GetLightPositionInFrustum() override;
-        bool IsFrustumInsideOfLight() override;
+        LightPosition GetLightPositionInFrustum(Camera* camera) override;
+        bool IsFrustumInsideOfLight(Camera* camera) override;
     };
 }

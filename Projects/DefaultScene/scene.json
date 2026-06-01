@@ -2874,18 +2874,18 @@
                     "cameraPitchYawRoll": [
                         0.0,
                         0.0,
-                        -0.33510321378707886
+                        -1.0559241771697998
                     ],
                     "m_springArmParams": {
-                        "length": 12.100000381469727,
+                        "length": 2.5,
                         "pitchYawRoll": [
-                            0.5215044021606445,
+                            0.4991641640663147,
                             0.0,
                             0.0
                         ],
                         "rootOffset": [
-                            5.800000190734863,
-                            -4.599999904632568,
+                            0.0,
+                            1.5,
                             0.0
                         ]
                     }
@@ -2923,7 +2923,7 @@
                     "m_jumpSpeed": 8.0,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
-                    "m_moveSpeed": 6.0,
+                    "m_moveSpeed": 10.119999885559082,
                     "m_stepHeight": 0.30000001192092896
                 },
                 "Lua": {
@@ -4731,6 +4731,109 @@
                 "SliceCount": 12
             },
             "m_type": "Cylinder"
+        },
+        {
+            "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/Box.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/box.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    2.0,
+                                    2.0,
+                                    2.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_friction": 0.0,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        2.0,
+                        2.0,
+                        2.0
+                    ],
+                    "m_position": [
+                        3.8300628662109375,
+                        8.117398262023926,
+                        15.440215110778809
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        -0.8409073352813721,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 14541272477798150626,
+            "m_UUID_hi": 3385653830,
+            "m_UUID_lo": 2371006946,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": true
+            },
+            "m_type": "Box"
         }
     ],
     "inputMapping": "Default",

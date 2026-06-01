@@ -12,6 +12,7 @@
 namespace SE_G {
     class GPass;
     class Camera;
+    class DeferredRenderer;
 
     namespace Bind {
         class Rasterizer;
@@ -43,7 +44,7 @@ namespace SE_G {
             DX::XMFLOAT4 distances;
         };
 
-        ShadowMapPass(ID3D11Device* device, ID3D11DeviceContext* context,
+        ShadowMapPass(DeferredRenderer* renderer,
             GPass* gPass,
             eastl::shared_ptr<SE_G::DirectionalLightData> lightData,
             UINT smSizeX = 1024,
@@ -99,7 +100,6 @@ namespace SE_G {
 
         struct FrustumPoints
         {
-            DXSM::Vector4 corners[8];
             // corner_mm0, float _pad_mm0;
             // corner_mm1, float _pad_mm1;
             // corner_mp0, float _pad_mp0;
@@ -108,28 +108,9 @@ namespace SE_G {
             // corner_pm1, float _pad_pm1;
             // corner_pp0, float _pad_pp0;
             // corner_pp1, float _pad_pp1;
+            DXSM::Vector4 corners[8];
             UINT idx = 0u;
         };
         FrustumPoints FillFrustumPoints(Camera* camera);
-
-        // temporary mesh for viewing frustums
-        /*
-        void DrawFrustums();
-    private:
-        eastl::shared_ptr<Mesh> m_frustumCube;
-
-        eastl::unique_ptr<Bind::VertexShader> m_frusumVS;
-        eastl::unique_ptr<Bind::PixelShader> m_frusumPS;
-        eastl::unique_ptr<Bind::Rasterizer> m_rasterizer;
-        eastl::unique_ptr<Bind::BlendState> m_blendFrust;
-
-        FrustumPoints fps[4];
-
-        eastl::unique_ptr<Bind::VertexConstantBuffer<FrustumPoints>> m_fpBuffer;
-
-        eastl::unique_ptr<Bind::DepthStencilState> m_depthStencilFrust;
-
-        void InitFrustumStuff(ID3D11Device* device, ID3D11DeviceContext* context);
-        */
     };
 }

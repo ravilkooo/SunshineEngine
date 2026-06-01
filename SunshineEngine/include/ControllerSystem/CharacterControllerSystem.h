@@ -19,7 +19,6 @@ public:
 
     explicit CharacterControllerSystem(Scene* scene, PhysicsSystem* physicsSystem);
 
-
     //
     // Scene
     //
@@ -27,13 +26,11 @@ public:
     void SetScene(Scene* scene);
     void SetPhysicsSystem(PhysicsSystem* physicsSystem);
 
-
     //
     // Update
     //
 
     void Update(float deltaTime);
-
 
 private:
 

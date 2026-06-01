@@ -25,6 +25,8 @@
 #include <Component/TransformComponent.h>
 #include <Component/CameraComponent.h>
 
+#include <ControllerSystem/CharacterControllerSystem.h>
+
 #include <CameraManager.h>
 
 #include <Utils/DebugUtils.h>
@@ -67,15 +69,13 @@ void Game::SetupRendering(
 	{
 		m_gPass = static_cast<SE_G::GPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::GPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(), m_renderer->m_GBuffer))
 			);
 	}
 	{
 		m_lightPass = static_cast<SE_G::LightPass*>(
 			m_renderer->AddPass(eastl::make_unique<SE_G::LightPass>(
-				m_renderer->GetDevice(), m_renderer->GetDeviceContext(),
-				m_renderer->m_GBuffer, m_renderer->GetMainCamera()))
+				m_renderer.get(), m_renderer->m_GBuffer))
 			);
 
 		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
@@ -126,7 +126,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
 
-	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), m_renderer->GetMainCamera(), j);
+	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), j);
 
 	m_renderer->SetMainCamera(
 		Scene::GetInstance().m_cameraManager->GetCameraByUUID(
@@ -138,6 +138,8 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_physicsSystem->FinalizeScene();
 	
 	InitializeAudio();
+
+	m_characterControllerSystem = eastl::make_unique<CharacterControllerSystem>(&Scene::GetInstance(), m_physicsSystem.get());
 	
 	return true;
 }
@@ -198,61 +200,7 @@ void Game::Stop() {
 
 void Game::Run()
 {
-	/*
-	float physicsUpdateFPS = 120.0f;
-	float physicsUpdateMs = 1.0f / physicsUpdateFPS;
-	float accumulator = 0.0f;
-	float accumulatorLimit = 4.0f * physicsUpdateMs;
-
-	MSG msg = {};
-	bool isExitRequested = false;
 	
-	// FPS statitistic
-	unsigned int frameCount = 0;
-	float FPSstatisticTimer = 0;
-
-	while (!isExitRequested) {
-		// Handle the windows messages.
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
-			// If windows signals to end the application then exit out.
-			if (msg.message == WM_QUIT) {
-				isExitRequested = true;
-			}
-			continue;
-		}
-
-
-		m_timer.Tick();
-		m_deltaTime = m_timer.GetDeltaTime();
-		accumulator += m_deltaTime;
-		accumulator = eastl::min(4.0f * physicsUpdateMs, accumulator);
-	
-		// FPS statistic
-		FPSstatisticTimer += m_deltaTime;
-		frameCount++;
-		if (FPSstatisticTimer > 1.0f) {
-			float fps = frameCount * 1.0f / FPSstatisticTimer;
-
-			FPSstatisticTimer -= 1.0f;
-
-			WCHAR text[256];
-			swprintf_s(text, TEXT("FPS: %f"), fps);
-			SetWindowText(m_displayWindow.m_hWnd, text);
-
-			frameCount = 0;
-		}
-
-
-		while (accumulator >= physicsUpdateMs) {
-			Update(physicsUpdateMs);
-			accumulator -= physicsUpdateMs;
-		}
-		Render();
-	}
-	*/
 }
 
 void Game::ClearCachedAbsoluteTransforms()
@@ -268,10 +216,11 @@ void Game::ClearCachedAbsoluteTransforms()
 }
 
 void Game::Update(float deltaTime) {
-
 	Scene::GetInstance().FlushDestructionQueue();
 
 	m_physicsSystem->FlushCommands();
+
+	m_characterControllerSystem->Update(deltaTime);
 	m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	m_physicsSystem->Step(deltaTime);

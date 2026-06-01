@@ -1,4 +1,6 @@
 #pragma once
+#include <d3d11.h>
+
 #include "RenderPass.h"
 
 #include <EASTL/shared_ptr.h>
@@ -13,6 +15,7 @@ class GameObject_Info;
 namespace SE_G {
     class Camera;
     class GBuffer;
+    class DeferredRenderer;
     namespace Bind {
         class DepthStencilState;
         class VertexShader;
@@ -56,9 +59,8 @@ namespace SE_G {
         public RenderPass
     {
     public:
-        PerceptionDebugPass(ID3D11Device* device, ID3D11DeviceContext* context,
-            eastl::shared_ptr<GBuffer> pGBuffer,
-            eastl::shared_ptr<Camera> camera);
+        PerceptionDebugPass(DeferredRenderer* renderer,
+            eastl::shared_ptr<GBuffer> pGBuffer);
         ~PerceptionDebugPass();
 
         // Inherited via RenderPass

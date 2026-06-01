@@ -1,7 +1,6 @@
-#include <Graphics/Renderer/Pass/IconPass.h>
-
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/GBuffer.h>
-#include <Graphics/Utils/Camera.h>
+#include <Graphics/Renderer/Pass/IconPass.h>
 
 #include <Graphics/Bindable/Bindable.h>
 #include <Graphics/Bindable/Sampler.h>
@@ -15,7 +14,7 @@
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
 
-// #include <GameObject/Lighting/LightCollection.h>
+#include <Graphics/Utils/Camera.h>
 
 #include <ResourceManager/ResourceManagerFacade.h>
 
@@ -24,17 +23,17 @@
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
-	IconPass::IconPass(ID3D11Device* device, ID3D11DeviceContext* context,
-		eastl::shared_ptr<GBuffer> pGBuffer,
-		eastl::shared_ptr<Camera> camera)
+	IconPass::IconPass(DeferredRenderer* renderer,
+		eastl::shared_ptr<GBuffer> pGBuffer)
 		:
-		RenderPass("IconPass", device, context)
+		RenderPass("IconPass", renderer)
 	{
 		this->m_GBuffer = pGBuffer;
-		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
 		m_passType = PassType::Icon;
+
+		auto device = m_renderer->GetDevice();
 
 		// Set RTVs
 		m_bufferRTVs[0] = pGBuffer->pLightRTV.Get();
@@ -150,6 +149,7 @@ namespace SE_G {
 
 	void IconPass::StartFrame()
 	{
+		auto context = m_renderer->GetDeviceContext();
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Icon Pass");
 
 		context->OMSetRenderTargets(2, m_bufferRTVs, m_GBuffer->pDepthDSV.Get());
@@ -160,38 +160,25 @@ namespace SE_G {
 	void IconPass::Pass()
 	{
 		BindAllPerFrame();
-		m_iconVertexShader->Bind(context.Get());
-		m_iconGeometryShader->Bind(context.Get());
-		m_iconPixelShader->Bind(context.Get());
-		m_iconSprites->Bind(context.Get());
-		m_depthStencilState->Bind(context.Get());
+		auto context = m_renderer->GetDeviceContext();
 
-		m_spritesheetInfoPCB->Bind(context.Get());
+		m_iconVertexShader->Bind(context);
+		m_iconGeometryShader->Bind(context);
+		m_iconPixelShader->Bind(context);
+		m_iconSprites->Bind(context);
+		m_depthStencilState->Bind(context);
+
+		m_spritesheetInfoPCB->Bind(context);
+
+		auto camera = m_renderer->GetMainCamera();
 
 		m_camGCB->Update(GetDeviceContext(), {
-			m_camera->GetViewMatrix(),
-			m_camera->GetProjectionMatrix(),
-			m_camera->GetPosition(), 0.0f });
-		m_camGCB->Bind(context.Get());
-		/*
-		for (const auto& gameObjectUUID : scene.gameObjects) {
-			const auto& gameObject = scene.GetGameObjectByUUID(gameObjectUUID);
-			if (gameObject->HasComponent<RenderComponent>() &&
-				gameObject->HasComponent<TransformComponent>()) {
+			camera->GetViewMatrix(),
+			camera->GetProjectionMatrix(),
+			camera->GetPosition(), 0.0f });
+		m_camGCB->Bind(context);
 
-				auto renderComponent = gameObject->GetComponent<RenderComponent>();
-
-				if (!renderComponent->HasTechnique(techniqueTag))
-					continue;
-
-				gameObject->GetComponent<TransformComponent>()->BindToGraphicsPipeline(GetDeviceContext());
-				renderComponent->PassTechnique(techniqueTag, GetDeviceContext()); // Bind + Draw
-			}
-		}
-		*/
 		for (auto& tech : m_techniques) {
-
-
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
 		}
@@ -201,7 +188,7 @@ namespace SE_G {
 	{
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr, nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
-		context->OMSetRenderTargets(2, nullRTVs, *nullDSVs);
+		m_renderer->GetDeviceContext()->OMSetRenderTargets(2, nullRTVs, *nullDSVs);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}

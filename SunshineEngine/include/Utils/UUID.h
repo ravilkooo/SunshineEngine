@@ -4,8 +4,6 @@
 #include <EASTL/hash_map.h>
 #include <sstream>
 
-
-
 namespace SE
 {
     struct UUIDhilo

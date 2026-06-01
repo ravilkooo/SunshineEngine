@@ -1,3 +1,5 @@
+#include <d3d11.h>
+
 #include "Graphics/Renderer/Technique/GPassTechnique.h"
 #include <Graphics/Renderer/DeferredRenderer.h>
 
@@ -63,19 +65,6 @@ namespace SE_G {
 			0u
 		);
 
-		//eastl::string vertexShaderPath = "Shaders/GPass/GPassShaderVS.hlsl";
-		//ResourceHandle vertexHandle = ResourceManagerFacade::Instance().LoadByPath(vertexShaderPath);
-		//SE_G::Bind::VertexShader* shader = ResourceManagerFacade::Instance().Get<SE_G::Bind::VertexShader>(vertexHandle);
-		//if (!shader)
-		//{
-		//	printSunshineErrorMessage("VertexShader not loaded (possibly wrong path or loader).");
-		//	// Задай m_vertexShader = nullptr и не вызывай Bind!
-		//}
-		//else
-		//{
-		//	m_vertexShader = eastl::shared_ptr<SE_G::Bind::VertexShader>(shader, {});
-		//}
-
 		AssetPath shaderPath = AssetPath(L"Shaders/GPass/GPassShaderVS.hlsl", AssetPath::AssetSource::Engine);
 		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
 		SE_G::Bind::VertexShader::FillStandartInputLayout(shaderPath.m_params.asShader.numInputElements,
@@ -88,12 +77,7 @@ namespace SE_G {
 			[](SE_G::Bind::VertexShader*) {}
 		);
 		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
-		// m_vertexShader = eastl::make_shared<SE_G::Bind::VertexShader>(
-		// 	device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassShaderVS.hlsl").c_str());
 
-		//m_colored = true;
-		// m_pixelShader = eastl::make_shared<SE_G::Bind::PixelShader>(
-		// 	device, MakeEngineAssetPath_Wstring(L"Shaders/GPass/GPassTextureShaderPS.hlsl").c_str());
 		shaderPath = AssetPath(L"Shaders/GPass/GPassTextureShaderPS.hlsl", AssetPath::AssetSource::Engine);
 		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
 		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
@@ -149,26 +133,23 @@ namespace SE_G {
 		m_rasterizer = eastl::make_unique<Bind::Rasterizer>(m_device, rastDesc);
 	}
 
-	void GPassTechnique::BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void GPassTechnique::BindAll(ID3D11DeviceContext* context)
 	{
 		RenderTechnique::BindAll(context);
-		m_uuidBuffer->Bind(context.Get());
-		m_meshData->m_mesh->Bind(context.Get());
-		m_meshData->m_texture->Bind(context.Get(), 0u);
-		m_meshData->m_textureSampler->Bind(context.Get());
+		m_uuidBuffer->Bind(context);
+		m_meshData->m_mesh->Bind(context);
+		m_meshData->m_texture->Bind(context, 0u);
+		m_meshData->m_textureSampler->Bind(context);
 	}
 
-	void GPassTechnique::DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void GPassTechnique::DrawTechnique(ID3D11DeviceContext* context)
 	{
-		m_meshData->m_mesh->Draw(context.Get());
+		m_meshData->m_mesh->Draw(context);
 	}
 
 	void GPassTechnique::InitByMeshData(eastl::shared_ptr<MeshData> meshData)
 	{
 		m_meshData = meshData;
-		// m_mesh = meshComponent->GetMesh();
-		// m_texture = meshComponent->GetTexture();
-		// m_textureSampler = meshComponent->GetTextureSamplerPreset();
 	}
 
 }

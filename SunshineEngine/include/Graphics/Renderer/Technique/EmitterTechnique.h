@@ -11,6 +11,10 @@
 
 namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
+#include <SimpleMath.h>
+
+class ID3D11Device;
+class ID3D11DeviceContext;
 
 namespace SE
 {
@@ -63,11 +67,11 @@ namespace SE_G {
         EmitterTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
             eastl::string technique, SE::ParticleData* particleData);
 
-        void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-        void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-        void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+        void Pass(ID3D11DeviceContext* context) override;
+        void BindAll(ID3D11DeviceContext* context) override;
+        void DrawTechnique(ID3D11DeviceContext* context) override;
 
-        void UpdateSettingsCB(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
+        void UpdateSettingsCB(ID3D11DeviceContext* context);
 
     private:
         SE::ParticleData* m_particleData;

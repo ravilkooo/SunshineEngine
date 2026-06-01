@@ -1,4 +1,5 @@
 #pragma once
+#include <Windows.h> // UINT
 
 #include <EASTL/unordered_map.h>
 #include <EASTL/vector.h>
@@ -6,12 +7,13 @@
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
 
-#include <d3d11.h>
-#include <wrl.h>
-
 #include <Utils/UUID.h>
 
+class ID3D11Device;
+class ID3D11DeviceContext;
+
 namespace SE_G {
+	class RenderGroup;
 	class RenderTechnique;
 	class Camera;
 
@@ -19,7 +21,7 @@ namespace SE_G {
 		class Bindable;
 	}
 
-	enum class PassType : UINT {
+	enum class PassType : unsigned int {
 		GPass,
 		Shadow,
 		Light,
@@ -38,7 +40,7 @@ namespace SE_G {
 
 	public:
 
-		RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context);
+		RenderPass(eastl::string techniqueTag, RenderGroup* renderer);
 		virtual ~RenderPass();
 
 		virtual void ClearTechniques();
@@ -64,20 +66,15 @@ namespace SE_G {
 
 		PassType m_passType;
 
-		eastl::shared_ptr<Camera> GetCamera();
-		virtual void SetCamera(eastl::shared_ptr<Camera> camera);
-		eastl::shared_ptr<Camera> m_camera;
+		Camera* GetCamera();
 
 	protected:
 		eastl::string techniqueTag;
 		eastl::vector<Bind::Bindable*> perFrameBindables;
 
-		Microsoft::WRL::ComPtr<ID3D11Device> device;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
+		RenderGroup* m_renderer;
 
-		// ������� ���������. ����� ����� ������ �������� �� UUID
 		eastl::unordered_map<SE::UUID, eastl::unique_ptr<SE_G::RenderTechnique>> m_techniques;
-
 
 		bool m_enabled = true;
 	};

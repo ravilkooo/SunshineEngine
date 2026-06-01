@@ -4,8 +4,9 @@
 #include <Graphics/Renderer/Pass/LightPass.h>
 
 namespace SE_G {
-	MiniViewRenderer::MiniViewRenderer(eastl::string name, ID3D11Device* device, ID3D11DeviceContext* context) :
-		DeferredRenderer(name, device, context, 640u, 360u)
+	MiniViewRenderer::MiniViewRenderer(eastl::string name, DeferredRenderer* parentRenderer) :
+		DeferredRenderer(name, parentRenderer->GetDevice(),
+			parentRenderer->GetDeviceContext(), 640u, 360u)
 	{
 
 	}
@@ -31,8 +32,7 @@ namespace SE_G {
 			case (SE_G::PassType::GPass): {
 				auto pass = static_cast<SE_G::GPass*>(parentRenderer->m_passes[passType].get());
 				this->AddPass(eastl::make_unique<SE_G::GPass>(
-					GetDevice(), GetDeviceContext(),
-					m_GBuffer, GetMainCamera()));
+					this, m_GBuffer));
 
 				break;
 			}
@@ -42,8 +42,7 @@ namespace SE_G {
 			case (SE_G::PassType::Light): {
 				auto pass = static_cast<SE_G::LightPass*>(parentRenderer->m_passes[passType].get());
 				AddPass(eastl::make_unique<SE_G::LightPass>(
-					GetDevice(), GetDeviceContext(),
-					m_GBuffer, GetMainCamera()));
+					this, m_GBuffer));
 
 				break;
 			}

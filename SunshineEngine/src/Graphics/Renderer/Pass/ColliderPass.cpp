@@ -1,6 +1,7 @@
 ﻿#include <Graphics/Renderer/Pass/ColliderPass.h>
 #include <Graphics/Renderer/Technique/ColliderTechnique.h>
 
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/RenderingSystem.h>
 #include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Renderer/Technique/IconTechnique.h>
@@ -30,19 +31,18 @@ namespace SE_G {
 
 	bool ColliderPass::s_staticDataInitializated = false;
 
-	ColliderPass::ColliderPass(ID3D11Device* device, ID3D11DeviceContext* context,
-		eastl::shared_ptr<GBuffer> pGBuffer,
-		eastl::shared_ptr<Camera> camera)
+	ColliderPass::ColliderPass(DeferredRenderer* renderer,
+		eastl::shared_ptr<GBuffer> pGBuffer)
 		:
-		RenderPass("ColliderPass", device, context)
+		RenderPass("ColliderPass", renderer)
 	{
+		auto device = m_renderer->GetDevice();
 		if (!s_staticDataInitializated)
 		{
 			ColliderPass::InitStaticData(device);
 		}
 
 		this->m_GBuffer = pGBuffer;
-		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
 		m_passType = PassType::Collider;
@@ -105,26 +105,29 @@ namespace SE_G {
 	{
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Collider Pass");
 
+		auto context = m_renderer->GetDeviceContext();
 		context->OMSetRenderTargets(2, m_bufferRTVs, m_GBuffer->pDepthDSV.Get());
 
 		context->RSSetViewports(1, &m_viewport);
 
-		m_camera->UpdateBuffer(context.Get());
-		m_camera->BindBuffer(context.Get());
+		m_renderer->GetMainCamera()->UpdateBuffer(context);
+		m_renderer->GetMainCamera()->BindBuffer(context);
 	}
 
 	void ColliderPass::Pass()
 	{
+		auto context = m_renderer->GetDeviceContext();
+
 		BindAllPerFrame();
 
 		// VertexBuffer with all default shapes
-		s_topology->Bind(context.Get());
-		m_depthStencilState->Bind(context.Get());
-		m_pixelShader->Bind(context.Get());
+		s_topology->Bind(context);
+		m_depthStencilState->Bind(context);
+		m_pixelShader->Bind(context);
 
 		// Default shapes
-		s_shapesVertexBuffer->Bind(context.Get());
-		s_shapesIndexBuffer->Bind(context.Get());
+		s_shapesVertexBuffer->Bind(context);
+		s_shapesIndexBuffer->Bind(context);
 		for (auto& tech : m_techniques)
 		{
 			DXSM::Vector3 old_localScaleFactor = tech.second->m_assignedTransform->m_localScaleFactor;
@@ -181,7 +184,7 @@ namespace SE_G {
 	{
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
-		context->OMSetRenderTargets(1, nullRTVs, *nullDSVs);
+		m_renderer->GetDeviceContext()->OMSetRenderTargets(1, nullRTVs, *nullDSVs);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
@@ -402,10 +405,9 @@ namespace SE_G {
 		s_staticDataInitializated = true;
 	}
 
-	TriggerPass::TriggerPass(ID3D11Device* device, ID3D11DeviceContext* context,
-		eastl::shared_ptr<GBuffer> pGBuffer,
-		eastl::shared_ptr<Camera> camera)
-		: ColliderPass(device, context, pGBuffer, camera)
+	TriggerPass::TriggerPass(DeferredRenderer* renderer,
+		eastl::shared_ptr<GBuffer> pGBuffer)
+		: ColliderPass(renderer, pGBuffer)
 	{
 		techniqueTag = "TriggerPass";
 		m_passType = PassType::Trigger;

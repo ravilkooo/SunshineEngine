@@ -94,19 +94,16 @@ public:
 
 	static eastl::unique_ptr<SkyBox_Info> CreateSkyBox(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		AssetPath assetPath = AssetPath(eastl::wstring(L"Textures/DefaultSkybox.dds"), AssetPath::AssetSource::Engine),
 		SE_G::SkyBoxData initData = { DXSM::Vector3::One, 0.0f }
 	);
 
 	static eastl::unique_ptr<AmbientLight_Info> CreateAmbientLightObject(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::AmbientLightData initData = { DXSM::Vector3::One * 0.1f, 1.0f });
 
 	static eastl::unique_ptr<DirectionalLight_Info> CreateDirectionalLightObject(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::DirectionalLightData initData = {
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
 			DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
@@ -116,7 +113,6 @@ public:
 
 	static eastl::unique_ptr<PointLight_Info> CreatePointLightObject(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::PointLightData initData = {
 			DXSM::Vector3::One, 1.0f,
 			DXSM::Vector3::One, 1.0f,
@@ -126,7 +122,6 @@ public:
 
 	static eastl::unique_ptr<SpotLight_Info> CreateSpotLightObject(
 		SE_G::DeferredRenderer* renderSystem,
-		eastl::shared_ptr<SE_G::Camera> camera,
 		SE_G::SpotLightData initData = {
 			DXSM::Vector3::One, 1.0f,
 			DXSM::Vector3::One, 1.0f,

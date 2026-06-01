@@ -15,7 +15,6 @@
 
 SkyBox::SkyBox(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	AssetPath assetPath,
 	SE_G::SkyBoxData initData)
 {
@@ -32,8 +31,8 @@ SkyBox::SkyBox(
 	// LightPass - LightTechnique
 	auto lightTech =
 		eastl::make_unique<SE_G::SkyBoxTechnique>(
-			device, tc.get(), "LightPass",
-			camera, m_lightData, assetPath);
+			renderSystem, tc.get(), "LightPass",
+			m_lightData, assetPath);
 	rc->AddTechnique(eastl::move(lightTech));
 
 	// IconPass
@@ -46,7 +45,6 @@ SkyBox::SkyBox(
 
 SkyBox::SkyBox(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -67,14 +65,13 @@ SkyBox::SkyBox(
 	// LightPass - LightTechnique
 	auto lightTech =
 		eastl::make_unique<SE_G::SkyBoxTechnique>(
-			device, tc.get(), "LightPass", camera, m_lightData);
+			renderSystem, tc.get(), "LightPass", m_lightData);
 	rc->AddTechnique(eastl::move(lightTech));
 }
 
 
 SkyBox_Info::SkyBox_Info(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	AssetPath assetPath,
 	SE_G::SkyBoxData initData)
 {
@@ -94,8 +91,8 @@ SkyBox_Info::SkyBox_Info(
 	// LightPass - LightTechnique
 	auto lightTech =
 		eastl::make_unique<SE_G::SkyBoxTechnique>(
-			device, tc_info->m_assignedComponent.get(), "LightPass",
-			camera, m_lightData, assetPath);
+			renderSystem, tc_info->m_assignedComponent.get(), "LightPass",
+			m_lightData, assetPath);
 	m_lightTech = static_cast<SE_G::SkyBoxTechnique*>(rc_info->AddTechnique(eastl::move(lightTech)));
 
 	// IconPass
@@ -107,7 +104,6 @@ SkyBox_Info::SkyBox_Info(
 
 SkyBox_Info::SkyBox_Info(
 	SE_G::DeferredRenderer* renderSystem,
-	eastl::shared_ptr<SE_G::Camera> camera,
 	const json& j)
 {
 	m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -130,8 +126,8 @@ SkyBox_Info::SkyBox_Info(
 	// LightPass - LightTechnique
 	auto lightTech =
 		eastl::make_unique<SE_G::SkyBoxTechnique>(
-			device, tc_info->m_assignedComponent.get(), "LightPass",
-			camera, m_lightData); // , texturePath);
+			renderSystem, tc_info->m_assignedComponent.get(), "LightPass",
+			m_lightData); // , texturePath);
 	m_lightTech = static_cast<SE_G::SkyBoxTechnique*>(rc_info->AddTechnique(eastl::move(lightTech)));
 
 	// IconPass

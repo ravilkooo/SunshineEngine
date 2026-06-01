@@ -57,7 +57,7 @@ namespace SE
 		eastl::unique_ptr<SE_G::Bind::Sampler> m_textureSampler;
 
 		SE_G::DeferredRenderer* m_renderer;
-		eastl::shared_ptr<SE_G::Camera> m_camera;
+		SE_G::Camera* m_camera;
 
 
 		struct SceneConstantBuffer
@@ -81,7 +81,7 @@ namespace SE
 		bool m_enabled = true;
 
 		ParticleSystem(SE_G::DeferredRenderer* renderer,
-			eastl::shared_ptr<SE_G::Camera> camera);
+			SE_G::Camera* camera);
 		~ParticleSystem();
 
 		void AddEmitter(SE::UUID uuid, eastl::shared_ptr<ParticleData> particleData);
@@ -100,7 +100,7 @@ namespace SE
 		void SetBlendState(eastl::unique_ptr<SE_G::Bind::BlendState> newBlendState);
 
 		void SetRenderer(SE_G::DeferredRenderer* renderer);
-		void SetCamera(eastl::shared_ptr<SE_G::Camera> camera);
+		void SetCamera(SE_G::Camera* camera);
 
 		void Enable();
 		void Disable();

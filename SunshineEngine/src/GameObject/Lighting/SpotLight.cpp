@@ -11,7 +11,6 @@
 
 SpotLight::SpotLight(
     SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera,
     SE_G::SpotLightData initData)
 {
     if (initData.Att.z < 0.0001) {
@@ -36,14 +35,13 @@ SpotLight::SpotLight(
 
     // LightPass - LightTechnique
     auto lightTech =
-        eastl::make_unique<SE_G::SpotLightTechnique>(device, tc.get(), "LightPass", camera, m_lightData);
+        eastl::make_unique<SE_G::SpotLightTechnique>(renderSystem, tc.get(), "LightPass", m_lightData);
     rc->AddTechnique(eastl::move(lightTech));
 
 }
 
 SpotLight::SpotLight(
     SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
     m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -64,13 +62,12 @@ SpotLight::SpotLight(
 
     // LightPass - LightTechnique
     auto lightTech =
-        eastl::make_unique<SE_G::SpotLightTechnique>(device, tc.get(), "LightPass", camera, m_lightData);
+        eastl::make_unique<SE_G::SpotLightTechnique>(renderSystem, tc.get(), "LightPass", m_lightData);
     rc->AddTechnique(eastl::move(lightTech));
 }
 
 SpotLight_Info::SpotLight_Info(
     SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera,
     SE_G::SpotLightData initData)
 {
     if (initData.Att.z < 0.0001) {
@@ -98,7 +95,7 @@ SpotLight_Info::SpotLight_Info(
 
     // LightPass - LightTechnique
     auto lightTech =
-        eastl::make_unique<SE_G::SpotLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+        eastl::make_unique<SE_G::SpotLightTechnique>(renderSystem, tc_info->m_assignedComponent.get(), "LightPass", m_lightData);
     rc_info->AddTechnique(eastl::move(lightTech));
 
     // IconPass
@@ -111,7 +108,6 @@ SpotLight_Info::SpotLight_Info(
 
 SpotLight_Info::SpotLight_Info(
     SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
     m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
@@ -134,7 +130,7 @@ SpotLight_Info::SpotLight_Info(
 
     // LightPass - LightTechnique
     auto lightTech =
-        eastl::make_unique<SE_G::SpotLightTechnique>(device, tc_info->m_assignedComponent.get(), "LightPass", camera, m_lightData);
+        eastl::make_unique<SE_G::SpotLightTechnique>(renderSystem, tc_info->m_assignedComponent.get(), "LightPass", m_lightData);
     rc_info->AddTechnique(eastl::move(lightTech));
 
     // IconPass

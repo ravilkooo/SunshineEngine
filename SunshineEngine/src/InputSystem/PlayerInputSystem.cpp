@@ -261,10 +261,12 @@ void PlayerInputSystem::HandleKeyDown(Keys key)
         }
     }
 
+    /*
     for (auto& [name, state] : m_actions)
     {
         printf("isPressed %s: P=%d, H=%d\n", name.c_str(), state.Pressed, state.Held);
     }
+    */
 }
 
 void PlayerInputSystem::HandleKeyUp(Keys key)
@@ -425,7 +427,7 @@ void PlayerInputSystem::PressAction(
         state.Held = true;
     }
     
-    printf("Press action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
+    //printf("Press action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
 }
 
 void PlayerInputSystem::ReleaseAction(
@@ -444,7 +446,7 @@ void PlayerInputSystem::ReleaseAction(
         state.Held = false;
     }
 
-    printf("Release action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
+    //printf("Release action '%s' : [%d]%d:%d:%d\n", action.c_str(), state.PressCount, state.Held, state.Pressed, state.Released);
 }
 
 #pragma endregion PlayerInputSystem

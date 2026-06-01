@@ -3,9 +3,11 @@
 #include <Utils/UUID.h>
 
 #include <SimpleMath.h>
-
 namespace DX = DirectX;
 namespace DXSM = DX::SimpleMath;
+
+class ID3D11Device;
+class ID3D11DeviceContext;
 
 namespace SE_G {
     struct IconData {
@@ -36,9 +38,9 @@ namespace SE_G {
         IconTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             IconData iconData, float iconSizeX = 0.1f, float iconSizeY = 0.1f);
 
-        void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-        void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-        void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+        void Pass(ID3D11DeviceContext* context) override;
+        void BindAll(ID3D11DeviceContext* context) override;
+        void DrawTechnique(ID3D11DeviceContext* context) override;
 
         //eastl::shared_ptr<Bind::GeometryConstantBuffer<DXSM::Vector3>> m_geometryCB;
 

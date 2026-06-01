@@ -1,3 +1,4 @@
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/RenderingSystem.h>
 
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
@@ -24,20 +25,21 @@
 
 namespace SE_G {
 
-	ShadowMapPass::ShadowMapPass(ID3D11Device* device, ID3D11DeviceContext* context,
+	ShadowMapPass::ShadowMapPass(DeferredRenderer* renderer,
 		GPass* gPass,
 		eastl::shared_ptr<SE_G::DirectionalLightData> lightData,
 		UINT smSizeX, UINT smSizeY)
 		:
-		RenderPass("ShadowMapPass", device, context),
-		m_shadowMap(ShadowMap(device, smSizeX, smSizeY)),
+		RenderPass("ShadowMapPass", renderer),
+		m_shadowMap(ShadowMap(m_renderer->GetDevice(), smSizeX, smSizeY)),
 		m_gPass(gPass),
 		m_lightData(lightData)
 	{
 		m_passType = PassType::Shadow;
 
-		m_playerCamera = gPass->m_camera.get();
+		m_playerCamera = gPass->m_renderer->GetMainCamera().get();
 
+		auto device = m_renderer->GetDevice();
 		m_lightViewCamera = eastl::make_unique<SE_G::Camera>(device,
 			m_shadowMap.m_mapWidth / m_shadowMap.m_mapHeight);
 		m_lightViewCamera->SetPosition(lightData->Position);
@@ -197,6 +199,7 @@ namespace SE_G {
 
 	void ShadowMapPass::Pass()
 	{
+		auto context = m_renderer->GetDeviceContext();
 		vertexShader->Bind(GetDeviceContext());
 		context->PSSetShader(nullptr, nullptr, 0u);
 		context->PSSetShaderResources(0u, 0u, nullptr);
@@ -249,7 +252,7 @@ namespace SE_G {
 				if (tech.second->GetTechniqueTag() == "GPass")
 				{
 					auto gTech = static_cast<GPassTechnique*>(tech.second.get());
-					gTech->m_meshData->m_mesh->Bind(context.Get());
+					gTech->m_meshData->m_mesh->Bind(context);
 				}
 
 				tech.second->DrawTechnique(GetDeviceContext());
@@ -263,7 +266,8 @@ namespace SE_G {
 
 	void ShadowMapPass::EndFrame()
 	{
-		m_cascadesConstantBuffer->Update(context.Get(), m_cascadesData);
+		auto context = m_renderer->GetDeviceContext();
+		m_cascadesConstantBuffer->Update(context, m_cascadesData);
 
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
@@ -293,7 +297,7 @@ namespace SE_G {
 		// всех остальных вдоль оси направления света, затем отмеряем назад значение nearZ
 		// и выбираем ровно посередине исходя из значений исполььзованных при расчёте SetViewWidth и SetViewHeight
 		// farestZ - макс расстояние от SetPosition до вершин фрустума вдоль направление света
-		m_playerCamera = m_gPass->m_camera.get();
+		m_playerCamera = m_gPass->GetCamera();
 
 		float playerNearZ = m_playerCamera->GetNearZ();
 		float playerFarZ = m_playerCamera->GetFarZ();
@@ -420,60 +424,4 @@ namespace SE_G {
 		}
 		return frustPoints;
 	}
-
-	/*
-	void ShadowMapPass::InitFrustumStuff(ID3D11Device* device, ID3D11DeviceContext* context)
-	{
-		D3D11_RASTERIZER_DESC rasterDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
-		rasterDesc.CullMode = D3D11_CULL_NONE;
-		rasterDesc.FillMode = D3D11_FILL_SOLID;
-
-		m_rasterizer = eastl::make_unique<Bind::Rasterizer>(device, rasterDesc);
-		m_frustumCube = Mesh::CreateUnwrappedBoxMesh(device);
-		m_frusumVS = eastl::make_unique<Bind::VertexShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/ShadowMapPass/FrustumVS.hlsl").c_str());
-		m_frusumPS = eastl::make_unique<Bind::PixelShader>(device,
-			MakeEngineAssetPath_Wstring(L"Shaders/ShadowMapPass/FrustumPS.hlsl").c_str());
-
-		m_fpBuffer = eastl::make_unique<Bind::VertexConstantBuffer<FrustumPoints>>(device, fps[0], 0u);
-
-		D3D11_BLEND_DESC blendDesc = CD3D11_BLEND_DESC(CD3D11_DEFAULT{});
-		blendDesc.RenderTarget[0].BlendEnable = TRUE;
-		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
-		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-		m_blendFrust = eastl::make_unique<Bind::BlendState>(device, blendDesc);
-
-		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT{});
-		dsDesc.DepthEnable = TRUE;
-		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-		m_depthStencilFrust = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
-	}
-
-	void ShadowMapPass::DrawFrustums()
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			// Get data for current cascade
-			m_fpBuffer->Update(GetDeviceContext(), fps[i]);
-			m_fpBuffer->Bind(GetDeviceContext());
-			m_shadowTransformsConstantBuffer->Bind(GetDeviceContext());
-			m_frusumVS->Bind(GetDeviceContext());
-			m_frusumPS->Bind(GetDeviceContext());
-			m_rasterizer->Bind(GetDeviceContext());
-			m_blendFrust->Bind(GetDeviceContext());
-			m_depthStencilFrust->Bind(GetDeviceContext());
-
-			m_frustumCube->Bind(GetDeviceContext());
-			m_frustumCube->Draw(GetDeviceContext());
-
-		}
-	}
-	*/
 }

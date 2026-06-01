@@ -1,4 +1,5 @@
-﻿#include <Graphics/Renderer/RenderingSystem.h>
+﻿#include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/RenderingSystem.h>
 
 #include <Graphics/Renderer/GBuffer.h>
 #include <Graphics/Renderer/Pass/EmitterDebugPass.h>
@@ -27,19 +28,19 @@ namespace SE_G {
 
 	bool EmitterDebugPass::s_staticDataInitializated = false;
 
-	EmitterDebugPass::EmitterDebugPass(ID3D11Device* device, ID3D11DeviceContext* context,
-		eastl::shared_ptr<GBuffer> pGBuffer,
-		eastl::shared_ptr<Camera> camera)
+	EmitterDebugPass::EmitterDebugPass(DeferredRenderer* renderer,
+		eastl::shared_ptr<GBuffer> pGBuffer)
 		:
-		RenderPass("EmitterDebugPass", device, context)
+		RenderPass("EmitterDebugPass", renderer)
 	{
+		auto device = m_renderer->GetDevice();
+
 		if (!s_staticDataInitializated)
 		{
 			EmitterDebugPass::InitStaticData(device);
 		}
 
 		this->m_GBuffer = pGBuffer;
-		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
 		m_passType = PassType::Emitter;
@@ -102,26 +103,29 @@ namespace SE_G {
 	{
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Emitter Pass");
 
+		auto context = m_renderer->GetDeviceContext();
 		context->OMSetRenderTargets(2, m_bufferRTVs, m_GBuffer->pDepthDSV.Get());
 
 		context->RSSetViewports(1, &m_viewport);
 
-		m_camera->UpdateBuffer(context.Get());
-		m_camera->BindBuffer(context.Get());
+		m_renderer->GetMainCamera()->UpdateBuffer(context);
+		m_renderer->GetMainCamera()->BindBuffer(context);
 	}
 
 	void EmitterDebugPass::Pass()
 	{
 		BindAllPerFrame();
 
+		auto context = m_renderer->GetDeviceContext();
+
 		// VertexBuffer with all default shapes
-		s_topology->Bind(context.Get());
-		m_depthStencilState->Bind(context.Get());
-		m_pixelShader->Bind(context.Get());
+		s_topology->Bind(context);
+		m_depthStencilState->Bind(context);
+		m_pixelShader->Bind(context);
 
 		// Default shapes
-		s_vertexBuffer->Bind(context.Get());
-		s_indexBuffer->Bind(context.Get());
+		s_vertexBuffer->Bind(context);
+		s_indexBuffer->Bind(context);
 		for (auto& tech : m_techniques)
 		{
 			DXSM::Vector3 old_scaleFactor = tech.second->m_assignedTransform->m_scaleFactor;
@@ -138,7 +142,7 @@ namespace SE_G {
 	{
 		ID3D11RenderTargetView* nullRTVs[] = { nullptr };
 		ID3D11DepthStencilView* nullDSVs[] = { nullptr };
-		context->OMSetRenderTargets(1, nullRTVs, *nullDSVs);
+		m_renderer->GetDeviceContext()->OMSetRenderTargets(1, nullRTVs, *nullDSVs);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}

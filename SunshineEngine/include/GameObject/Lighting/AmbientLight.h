@@ -21,12 +21,10 @@ class AmbientLight :
 public:
     AmbientLight(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         SE_G::AmbientLightData initData = { DXSM::Vector3::One * 0.1f, 1.0f });
 
     AmbientLight(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         const json& j);
 };
 
@@ -36,11 +34,9 @@ class AmbientLight_Info :
 public:
     AmbientLight_Info(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         SE_G::AmbientLightData initData = { DXSM::Vector3::One * 0.1f, 1.0f });
 
     AmbientLight_Info(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         const json& j);
 };

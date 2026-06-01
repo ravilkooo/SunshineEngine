@@ -11,6 +11,7 @@ class Scene_Info;
 namespace SE_G {
     class GBuffer;
     class Camera;
+    class DeferredRenderer;
 
     namespace Bind {
         class VertexShader;
@@ -31,9 +32,8 @@ namespace SE_G {
         public RenderPass
     {
     public:
-        SelectionPass(ID3D11Device* device, ID3D11DeviceContext* context,
-            eastl::shared_ptr<GBuffer> pGBuffer,
-            eastl::shared_ptr<Camera> camera);
+        SelectionPass(DeferredRenderer* renderer,
+            eastl::shared_ptr<GBuffer> pGBuffer);
         ~SelectionPass();
 
         // Inherited via RenderPass
@@ -69,12 +69,5 @@ namespace SE_G {
 		PerceptionDebugPass* m_perceptionPass = nullptr;
 
         Scene_Info* m_scene;
-
-        /*
-        struct ScreenInfoPCB {
-            DXSM::Vector2 screenSize;
-        } m_screenData;
-        Bind::PixelConstantBuffer<ScreenInfoPCB>* m_screenInfoPCB;
-        */
     };
 }

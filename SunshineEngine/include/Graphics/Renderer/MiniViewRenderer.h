@@ -18,7 +18,7 @@ namespace SE_G {
 		// 640*360
 
 		MiniViewRenderer(
-			eastl::string name, ID3D11Device* device, ID3D11DeviceContext* context);
+			eastl::string name, DeferredRenderer* parentRenderer);
 		~MiniViewRenderer();
 
 		void SetParentRenderer(DeferredRenderer* parentRenderer);

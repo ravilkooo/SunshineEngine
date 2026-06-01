@@ -29,7 +29,6 @@ public:
 
     DirectionalLight(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         SE_G::DirectionalLightData initData = {
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
@@ -39,7 +38,6 @@ public:
 
     DirectionalLight(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         const json& j);
 
     void EnableShadow(
@@ -58,7 +56,6 @@ public:
 
     DirectionalLight_Info(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         SE_G::DirectionalLightData initData = {
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
             DXSM::Vector3(250.0f / 255.0f, 222.0f / 255.0f, 133.0f / 255.0f), 1.0f,
@@ -68,7 +65,6 @@ public:
 
     DirectionalLight_Info(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         const json& j);
 
     void EnableShadow(

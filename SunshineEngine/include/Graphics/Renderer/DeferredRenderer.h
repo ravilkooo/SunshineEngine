@@ -1,14 +1,14 @@
 #pragma once
+#include <Windows.h> // UINT
 
 #include <EASTL/shared_ptr.h>
 #include <EASTL/unique_ptr.h>
 #include <EASTL/unordered_map.h>
 
-#include <d3d11.h>
-#include <wrl.h>
-#include <directxmath.h>
-
 #include <Graphics/Renderer/RenderGroup.h>
+
+class ID3D11Device;
+class ID3D11DeviceContext;
 
 namespace SE
 {
@@ -19,10 +19,7 @@ namespace SE_G
 {
     class GBuffer;
     class Camera;
-}
 
-
-namespace SE_G {
     class DeferredRenderer :
         public RenderGroup
     {
@@ -40,10 +37,10 @@ namespace SE_G {
         void SetParticleSystem(eastl::shared_ptr<SE::ParticleSystem> ps);
 
         void SetMainCamera(eastl::shared_ptr<Camera> camera);
-        eastl::shared_ptr<Camera> GetMainCamera();
+        eastl::shared_ptr<Camera> GetMainCamera() override;
 
         void OnResize(UINT resizeWidth, UINT resizeHeight);
-        
+
         virtual void Pass() override;
 
         eastl::shared_ptr<Camera> m_mainCamera;
@@ -54,9 +51,5 @@ namespace SE_G {
         UINT m_screenHeight = 800u;
 
         eastl::shared_ptr<SE::ParticleSystem> m_particleSystem;
-
-    protected:
-        ID3D11Device* m_device;
-        ID3D11DeviceContext* m_context;
     };
 }

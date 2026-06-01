@@ -578,7 +578,6 @@ json GameObject_Info::ToJson() const {
 void Scene::FromJson(
     SE_G::DeferredRenderer* renderSystem,
     PhysicsSystem* physicsSystem,
-    eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
     GetInstance().SetRenderer(renderSystem);
@@ -599,23 +598,23 @@ void Scene::FromJson(
                 {
                 case LightObjectType::SkyBox:
                     go = eastl::make_unique<SkyBox>(
-                        renderSystem, camera, objJ);
+                        renderSystem, objJ);
                     break;
                 case LightObjectType::AmbientLight:
                     go = eastl::make_unique<AmbientLight>(
-                        renderSystem, camera, objJ);
+                        renderSystem, objJ);
                     break;
                 case LightObjectType::PointLight:
                     go = eastl::make_unique<PointLight>(
-                        renderSystem, camera, objJ);
+                        renderSystem, objJ);
                     break;
                 case LightObjectType::SpotLight:
                     go = eastl::make_unique<SpotLight>(
-                        renderSystem, camera, objJ);
+                        renderSystem, objJ);
                     break;
                 case LightObjectType::DirectionalLight:
                     go = eastl::make_unique<DirectionalLight>(
-                        renderSystem, camera, objJ);
+                        renderSystem, objJ);
                     break;
                 }
                 break;
@@ -770,7 +769,7 @@ json Scene_Info::ToJson() const {
 eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
     eastl::shared_ptr<Scene_Info> scene,
     SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera, const json& objJ)
+    const json& objJ)
 {
     GameObjectGroup objGroup = objJ["m_group"];
     ObjectType objType;
@@ -785,23 +784,23 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         {
         case LightObjectType::SkyBox:
             go = eastl::make_unique<SkyBox_Info>(
-                renderSystem, camera, objJ);
+                renderSystem, objJ);
             break;
         case LightObjectType::AmbientLight:
             go = eastl::make_unique<AmbientLight_Info>(
-                renderSystem, camera, objJ);
+                renderSystem, objJ);
             break;
         case LightObjectType::PointLight:
             go = eastl::make_unique<PointLight_Info>(
-                renderSystem, camera, objJ);
+                renderSystem, objJ);
             break;
         case LightObjectType::DirectionalLight:
             go = eastl::make_unique<DirectionalLight_Info>(
-                renderSystem, camera, objJ);
+                renderSystem, objJ);
             break;
         case LightObjectType::SpotLight:
             go = eastl::make_unique<SpotLight_Info>(
-                renderSystem, camera, objJ);
+                renderSystem, objJ);
             break;
         }
         break;
@@ -934,7 +933,6 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
 
 eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
     SE_G::DeferredRenderer* renderSystem,
-    eastl::shared_ptr<SE_G::Camera> camera,
     const json& j)
 {
     auto scene = eastl::make_shared<Scene_Info>();
@@ -942,7 +940,7 @@ eastl::shared_ptr<Scene_Info> Scene_Info::FromJson(
     if (j.contains("gameObjects") && j["gameObjects"].is_array()) {
         for (const auto& objJ : j["gameObjects"]) {
             eastl::unique_ptr<GameObject_Info> go = JsonToGameObject_Info(
-                scene, renderSystem, camera, objJ);
+                scene, renderSystem, objJ);
             if (go)
             {
                 scene->AddGameObject(eastl::move(go));

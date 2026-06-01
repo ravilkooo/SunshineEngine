@@ -25,7 +25,6 @@ public:
 
     SpotLight(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         SE_G::SpotLightData initData = {
             DXSM::Vector3::One, 1.0f,
             DXSM::Vector3::One, 1.0f,
@@ -36,7 +35,6 @@ public:
 
     SpotLight(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         const json& j);
     // Unnecessary?
     //void UpdateLightBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
@@ -49,7 +47,6 @@ public:
 
     SpotLight_Info(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         SE_G::SpotLightData initData = {
             DXSM::Vector3::One, 1.0f,
             DXSM::Vector3::One, 1.0f,
@@ -60,7 +57,6 @@ public:
 
     SpotLight_Info(
         SE_G::DeferredRenderer* renderSystem,
-        eastl::shared_ptr<SE_G::Camera> camera,
         const json& j);
 
     // Unnecessary?

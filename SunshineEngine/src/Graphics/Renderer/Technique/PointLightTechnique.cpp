@@ -9,11 +9,10 @@
 #include <Utils/MathUtils.h>
 
 namespace SE_G {
-    PointLightTechnique::PointLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform,
+    PointLightTechnique::PointLightTechnique(DeferredRenderer* renderer, TransformComponent* assignedTransform,
         eastl::string technique,
-        eastl::shared_ptr<Camera> camera,
         eastl::shared_ptr<PointLightData> lightData)
-        : LightTechnique(device, assignedTransform, technique, camera, lightData)
+        : LightTechnique(renderer, assignedTransform, technique, lightData)
     {
         m_depthStencilState.reset(NULL);
         m_rasterizer.reset(NULL);
@@ -58,7 +57,7 @@ namespace SE_G {
 		// m_assignedTransform->m_localScaleFactor = DXSM::Vector3(m_lightData->Range, m_lightData->Range, m_lightData->Range);
     }
 
-    void PointLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    void PointLightTechnique::Pass(ID3D11DeviceContext* context)
     {
         DXSM::Vector3 old_localScaleFactor = m_assignedTransform->m_localScaleFactor;
         DXSM::Vector3 old_localRotation = m_assignedTransform->m_localRotation;
@@ -78,12 +77,12 @@ namespace SE_G {
             1.0f / scale.y,
             1.0f / scale.z
         );
-        m_assignedTransform->BindToGraphicsPipeline(context.Get());
+        m_assignedTransform->BindToGraphicsPipeline(context);
 
         // to-do: update only when changed
 		m_lightData->Position = DXSM::Vector3(fullTransform._41, fullTransform._42, fullTransform._43);
-        m_lightDataVertexCBuffer->Update(context.Get(), *m_lightData);
-        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataVertexCBuffer->Update(context, *m_lightData);
+        m_lightDataPixelCBuffer->Update(context, *m_lightData);
         BindAll(context);
         DrawTechnique(context);
 
@@ -125,12 +124,12 @@ namespace SE_G {
         }
     }
 
-    LightPosition PointLightTechnique::GetLightPositionInFrustum()
+    LightPosition PointLightTechnique::GetLightPositionInFrustum(Camera* camera)
     {
-        if (IsFrustumInsideOfLight())
+        if (IsFrustumInsideOfLight(camera))
             return LightPosition::FILL;
 
-        Camera::FrustumPlanes planes = m_camera->GetFrustumPlanes();
+        Camera::FrustumPlanes planes = camera->GetFrustumPlanes();
         DX::XMVECTOR lightPosition = DX::XMLoadFloat3(&(m_lightData->Position));
 
         bool isOutside = false;
@@ -176,9 +175,9 @@ namespace SE_G {
         return isOutside ? LightPosition::INSIDE : LightPosition::OUTSIDE;
     }
 
-    bool PointLightTechnique::IsFrustumInsideOfLight()
+    bool PointLightTechnique::IsFrustumInsideOfLight(Camera* camera)
     {
-        Camera::FrustumCorners frustum = m_camera->GetFrustumCorners();
+        Camera::FrustumCorners frustum = camera->GetFrustumCorners();
         for (int i = 0; i < 4; ++i) {
             DX::XMVECTOR vecToCorner = DX::XMVectorSubtract(frustum.Near[i], DXSM::Vector3(m_lightData->Position));
             float distance = DX::XMVectorGetX(DX::XMVector3Length(vecToCorner));

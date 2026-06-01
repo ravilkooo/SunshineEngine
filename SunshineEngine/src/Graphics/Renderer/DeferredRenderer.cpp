@@ -1,3 +1,5 @@
+#include <d3d11.h>
+
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Pass/RenderPass.h>
@@ -6,7 +8,6 @@
 
 #include <ParticleSystem/ParticleSystem.h>
 
-#include <iostream>
 
 namespace SE_G {
 	DeferredRenderer::DeferredRenderer(
@@ -38,23 +39,20 @@ namespace SE_G {
 	void DeferredRenderer::InitParticleSystem()
 	{
 		m_particleSystem = eastl::make_shared<SE::ParticleSystem>(
-			this, GetMainCamera());
+			this, GetMainCamera().get());
 	}
 
 	void DeferredRenderer::SetParticleSystem(eastl::shared_ptr<SE::ParticleSystem> ps)
 	{
 		m_particleSystem = ps;
 		m_particleSystem->SetRenderer(this);
-		m_particleSystem->SetCamera(this->GetMainCamera());
+		m_particleSystem->SetCamera(this->GetMainCamera().get());
 	}
 
 	void DeferredRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)
 	{ 
 		m_mainCamera = camera;
-		
-		for (auto& pass : m_passes) {
-			pass.second->SetCamera(m_mainCamera);
-		}
+		m_particleSystem->SetCamera(m_mainCamera.get());
 	}
 
 	eastl::shared_ptr<Camera> DeferredRenderer::GetMainCamera()

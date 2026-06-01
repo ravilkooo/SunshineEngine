@@ -1,4 +1,7 @@
-#include "Graphics/Renderer/Pass/RenderPass.h"
+#include <d3d11.h>
+
+#include <Graphics/Renderer/RenderGroup.h>
+#include <Graphics/Renderer/Pass/RenderPass.h>
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 #include <Graphics/Bindable/Bindable.h>
 
@@ -8,8 +11,8 @@
 #include <Component/TransformComponent.h>
 
 namespace SE_G {
-	RenderPass::RenderPass(eastl::string techniqueTag, ID3D11Device* device, ID3D11DeviceContext* context)
-		: techniqueTag(techniqueTag), device(device), context(context)
+	RenderPass::RenderPass(eastl::string techniqueTag, RenderGroup* renderer)
+		: techniqueTag(techniqueTag), m_renderer(renderer)
 	{
 	}
 
@@ -82,18 +85,18 @@ namespace SE_G {
 	{
 		for (size_t i = 0; i < perFrameBindables.size(); i++)
 		{
-			perFrameBindables[i]->Bind(context.Get());
+			perFrameBindables[i]->Bind(m_renderer->GetDeviceContext());
 		}
 	}
 
 	ID3D11Device* RenderPass::GetDevice()
 	{
-		return device.Get();
+		return m_renderer->GetDevice();
 	}
 
 	ID3D11DeviceContext* RenderPass::GetDeviceContext()
 	{
-		return context.Get();
+		return m_renderer->GetDeviceContext();
 	}
 
 	bool RenderPass::IsEnabled() {
@@ -108,14 +111,8 @@ namespace SE_G {
 		m_enabled = true;
 	}
 
-	eastl::shared_ptr<Camera> RenderPass::GetCamera()
+	Camera* RenderPass::GetCamera()
 	{
-		return m_camera;
+		return m_renderer->GetMainCamera().get();
 	}
-
-	void RenderPass::SetCamera(eastl::shared_ptr<Camera> camera)
-	{
-		this->m_camera = camera;
-	}
-
 }

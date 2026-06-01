@@ -24,6 +24,7 @@
 //#include <Scripting/LuaManager.h>
 
 class PhysicsSystem;
+class CharacterControllerSystem;
 class AudioSystem;
 
 namespace SE
@@ -96,5 +97,7 @@ public:
     float m_deltaTime = 0.0f;
 
     SE::ParticleSystem* m_particleSystem;
+
+    eastl::unique_ptr<CharacterControllerSystem> m_characterControllerSystem;
 };
 

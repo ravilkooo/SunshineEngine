@@ -6,10 +6,11 @@
 #include <Utils/StringUtils.h>
 
 namespace SE_G {
-    AmbientLightTechnique::AmbientLightTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
-        eastl::shared_ptr<Camera> camera,
+    AmbientLightTechnique::AmbientLightTechnique(DeferredRenderer* renderer, TransformComponent* assignedTransform,
+        eastl::string technique,
         eastl::shared_ptr<AmbientLightData> lightData)
-        : LightTechnique(device, assignedTransform, technique, camera, lightData) {
+        : LightTechnique(renderer, assignedTransform, technique, lightData) {
+        auto device = m_renderer->GetDevice();
 
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
         dsDesc.DepthEnable = TRUE;
@@ -59,10 +60,10 @@ namespace SE_G {
         );
     }
 
-    void AmbientLightTechnique::Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+    void AmbientLightTechnique::Pass(ID3D11DeviceContext* context)
     {
         // to-do: update only when changed
-        m_lightDataPixelCBuffer->Update(context.Get(), *m_lightData);
+        m_lightDataPixelCBuffer->Update(context, *m_lightData);
         BindAll(context);
         DrawTechnique(context);
     }
@@ -77,12 +78,12 @@ namespace SE_G {
         return;
     }
 
-    LightPosition AmbientLightTechnique::GetLightPositionInFrustum()
+    LightPosition AmbientLightTechnique::GetLightPositionInFrustum(Camera* camera)
     {
         return LightPosition::FILL;
     }
 
-    bool AmbientLightTechnique::IsFrustumInsideOfLight()
+    bool AmbientLightTechnique::IsFrustumInsideOfLight(Camera* camera)
     {
         return true;
     }

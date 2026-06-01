@@ -1,8 +1,9 @@
 #include <Graphics/Renderer/Pass/LightPass.h>
 #include <Graphics/Renderer/RenderingSystem.h>
-#include <Graphics/Renderer/Technique/RenderTechnique.h>
-
+#include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/Renderer/GBuffer.h>
+
+#include <Graphics/Renderer/Technique/RenderTechnique.h>
 
 #include <Graphics/Bindable/Bindable.h>
 #include <Graphics/Bindable/Sampler.h>
@@ -18,14 +19,12 @@
 #include <ParticleSystem/ParticleSystem.h>
 
 namespace SE_G {
-	LightPass::LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
-		eastl::shared_ptr<GBuffer> pGBuffer,
-		eastl::shared_ptr<Camera> camera)
+	LightPass::LightPass(DeferredRenderer* renderer,
+		eastl::shared_ptr<GBuffer> pGBuffer)
 		:
-		RenderPass("LightPass", device, context)
+		RenderPass("LightPass", renderer)
 	{
 		this->m_GBuffer = pGBuffer;
-		this->m_camera = camera;
 		this->m_screenWidth = pGBuffer->m_screenWidth;
 		this->m_screenHeight = pGBuffer->m_screenHeight;
 		m_passType = PassType::Light;
@@ -39,10 +38,11 @@ namespace SE_G {
 		m_viewport.MinDepth = 0;
 		m_viewport.MaxDepth = 1.0f;
 
+		auto device = renderer->GetDevice();
 		m_camPCB = eastl::make_unique<Bind::PixelConstantBuffer<CamPCB>>(
 			device,
 			CamPCB{ DX::XMMatrixIdentity(), DX::XMMatrixIdentity(),
-			(DX::XMFLOAT3)camera->GetPosition(), 0 },
+			(DX::XMFLOAT3)m_renderer->GetMainCamera()->GetPosition(), 0 },
 			0u);
 		AddPerFrameBind(m_camPCB.get());
 
@@ -106,17 +106,17 @@ namespace SE_G {
 	{
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Light Pass");
 
+		auto context = m_renderer->GetDeviceContext();
 		context->OMSetRenderTargets(1, m_GBuffer->pLightRTV.GetAddressOf(), m_GBuffer->pDepthDSV.Get());
 		float colorBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		context->ClearRenderTargetView(m_GBuffer->pLightRTV.Get(), colorBlack);
-		//context->ClearDepthStencilView(pGBuffer->pDepthDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 		context->RSSetViewports(1, &m_viewport);
 
-		DX::XMFLOAT3 camPos = m_camera->GetPosition();
-		DX::XMMATRIX viewMat = m_camera->GetViewMatrix();
-			//DX::XMMatrixTranspose(DX::XMMatrixInverse(nullptr, m_camera->GetViewMatrix()));
+		auto camera = m_renderer->GetMainCamera();
+		DX::XMFLOAT3 camPos = camera->GetPosition();
+		DX::XMMATRIX viewMat = camera->GetViewMatrix();
 		DX::XMMATRIX pMatInverse = DX::XMMatrixTranspose(DX::XMMatrixInverse(nullptr,
-			m_camera->GetProjectionMatrix()));
+			camera->GetProjectionMatrix()));
 		// camera->GetProjectionMatrix()
 		m_camPCB->Update(GetDeviceContext(), { viewMat, pMatInverse, camPos, 0 });
 		m_screenInfoPCB->Update(GetDeviceContext(), { DXSM::Vector2(
@@ -124,8 +124,8 @@ namespace SE_G {
 				static_cast<float>(m_screenHeight)) });
 
 		BindAllPerFrame();
-		m_camera->UpdateBuffer(context.Get());
-		m_camera->BindBuffer(context.Get());
+		camera->UpdateBuffer(context);
+		camera->BindBuffer(context);
 	}
 
 	void LightPass::Pass()
@@ -136,6 +136,7 @@ namespace SE_G {
 			tech.second->Pass(GetDeviceContext());
 		}
 
+		auto context = m_renderer->GetDeviceContext();
 		if (m_particleSystem)
 		{
 			context->ClearState();
@@ -150,7 +151,7 @@ namespace SE_G {
 
 	void LightPass::EndFrame()
 	{
-		context->OMSetRenderTargets(0, NULL, NULL);
+		m_renderer->GetDeviceContext()->OMSetRenderTargets(0, NULL, NULL);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}

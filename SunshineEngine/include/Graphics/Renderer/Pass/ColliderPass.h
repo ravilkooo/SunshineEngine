@@ -1,4 +1,6 @@
 #pragma once
+#include <d3d11.h>
+
 #include "RenderPass.h"
 
 #include <EASTL/shared_ptr.h>
@@ -7,7 +9,6 @@
 
 class ID3D11Device;
 class ID3D11DeviceContext;
-
 
 namespace SE {
     struct ColliderBufferOffset;
@@ -18,6 +19,7 @@ namespace SE_G {
     class Camera;
     class GBuffer;
     class ColliderTechnique;
+    class DeferredRenderer;
     namespace Bind {
         class DepthStencilState;
         class PixelShader;
@@ -31,9 +33,8 @@ namespace SE_G {
         public RenderPass
     {
     public:
-        ColliderPass(ID3D11Device* device, ID3D11DeviceContext* context,
-            eastl::shared_ptr<GBuffer> pGBuffer,
-            eastl::shared_ptr<Camera> camera);
+        ColliderPass(DeferredRenderer* renderer,
+            eastl::shared_ptr<GBuffer> pGBuffer);
         ~ColliderPass();
 
         // Inherited via RenderPass
@@ -68,33 +69,12 @@ namespace SE_G {
         static eastl::unique_ptr<Bind::IndexBuffer> s_shapesIndexBuffer;
         static eastl::unique_ptr<Bind::VertexBuffer> s_shapesVertexBuffer;
         static eastl::unordered_map<SE::ColliderShapeType, SE::ColliderBufferOffset> s_shapeBufferOffsets;
-
-        /*
-        struct CamGCB {
-            DX::XMMATRIX viewMat;
-            DX::XMMATRIX projMat;
-            DX::XMFLOAT3 camPos;
-            float pad;
-        };
-        eastl::unique_ptr<Bind::GeometryConstantBuffer<CamGCB>> m_camGCB;
-
-        struct SpritesheetInfoPCB {
-            UINT width = 1024u;
-            UINT height = 1024u;
-            UINT uStep = 128u;
-            UINT vStep = 128u;
-            UINT uSteps = 8u;
-            UINT vSteps = 8u;
-        } m_spritesheetData;
-        eastl::unique_ptr<Bind::PixelConstantBuffer<SpritesheetInfoPCB>> m_spritesheetInfoPCB;
-        */
     };
 
     class TriggerPass : public ColliderPass
     {
     public:
-        TriggerPass(ID3D11Device* device, ID3D11DeviceContext* context,
-            eastl::shared_ptr<GBuffer> pGBuffer,
-            eastl::shared_ptr<Camera> camera);
+        TriggerPass(DeferredRenderer* renderer,
+            eastl::shared_ptr<GBuffer> pGBuffer);
     };
 }

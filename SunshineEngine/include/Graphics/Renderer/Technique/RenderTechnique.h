@@ -1,14 +1,13 @@
 #pragma once
 
-#include <wrl.h>
-#include <d3d11.h>
-
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 #include <EASTL/shared_ptr.h>
 #include <EASTL/weak_ptr.h>
 
-// forward-declare heavy graphics types to reduce header dependencies
+class ID3D11Device;
+class ID3D11DeviceContext;
+
 namespace SE_G {
     class Mesh;
     namespace Bind {
@@ -22,10 +21,6 @@ namespace SE_G {
         class Bindable;
     }
 }
-
-#include <EASTL/string.h>
-#include <EASTL/vector.h>
-#include <EASTL/shared_ptr.h>
 
 class TransformComponent;
 
@@ -45,9 +40,9 @@ namespace SE_G {
 
         void AddBind(eastl::shared_ptr<Bind::Bindable> bind);
 
-        virtual void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
-        virtual void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
-        virtual void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
+        virtual void Pass(ID3D11DeviceContext* context);
+        virtual void BindAll(ID3D11DeviceContext* context);
+        virtual void DrawTechnique(ID3D11DeviceContext* context);
 
         virtual eastl::string GetTechniqueTag();
 

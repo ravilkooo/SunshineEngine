@@ -1,10 +1,11 @@
 #pragma once
 
-#include <stdexcept>
+#include <d3d11.h>
+
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
-#include "RenderPass.h"
+#include <Graphics/Renderer/Pass/RenderPass.h>
 
 #include <SimpleMath.h>
 namespace DX = DirectX;
@@ -16,6 +17,7 @@ namespace SE {
 }
 
 namespace SE_G {
+    class DeferredRenderer;
     class GBuffer;
     class Camera;
 
@@ -32,9 +34,8 @@ namespace SE_G {
         public RenderPass
     {
     public:
-        LightPass(ID3D11Device* device, ID3D11DeviceContext* context,
-            eastl::shared_ptr<GBuffer> pGBuffer,
-            eastl::shared_ptr<Camera> camera);
+        LightPass(DeferredRenderer* renderer,
+            eastl::shared_ptr<GBuffer> pGBuffer);
         ~LightPass();
 
         void StartFrame() override;
@@ -48,7 +49,6 @@ namespace SE_G {
         UINT m_screenHeight = 800u;
 
         eastl::shared_ptr<GBuffer> m_GBuffer;
-
         D3D11_VIEWPORT m_viewport;
 
         eastl::unique_ptr<Bind::BlendState> m_defaultBlendState;
@@ -59,7 +59,7 @@ namespace SE_G {
             DX::XMMATRIX projMatInverse;
             DX::XMFLOAT3 camPos;
             float pad;
-        } m_cameraData;
+        };
         eastl::unique_ptr<Bind::PixelConstantBuffer<CamPCB>> m_camPCB;
 
         struct ScreenInfoPCB {

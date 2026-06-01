@@ -2,6 +2,8 @@
 #include "RenderTechnique.h"
 #include <Utils/UUID.h>
 
+class ID3D11Device;
+class ID3D11DeviceContext;
 class MeshData;
 
 #include <d3d11.h>
@@ -29,31 +31,8 @@ namespace SE_G {
 
         void SetRasterizer(D3D11_RASTERIZER_DESC rastDesc);
 
-        void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-        void DrawTechnique(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-
-        /*
-        // To-do: it should:
-        // 1) forget about old texture OBJECT
-        // 2) Assign NEW texture OBJECT
-        void SetTexture(const eastl::wstring& filePath,
-            SE_G::Bind::SamplerPreset samplerPreset = SE_G::Bind::SamplerPreset::Wrap);
-        */
-
-        /*
-        // To-do: it should:
-        // 1) forget about old mesh OBJECT
-        // 2) Assign NEW mesh OBJECT
-        void SetMesh(const eastl::string& filePath);
-        void SetMesh(eastl::shared_ptr<SE_G::Mesh> newMesh);
-        */
-
-        /*
-        // To-do: it should:
-        // 1) forget about old texture OBJECT
-        // 2) Assign NEW texture OBJECT
-        void SetColor(SE_G::Color color);
-        */
+        void BindAll(ID3D11DeviceContext* context) override;
+        void DrawTechnique(ID3D11DeviceContext* context) override;
 
         // Associate this technique with a MeshData so the mesh can be shared
         // with other systems and modified externally.
@@ -61,16 +40,5 @@ namespace SE_G {
         eastl::shared_ptr<MeshData> m_meshData;
 
         ID3D11Device* m_device;
-
-        // otherwise textured
-        //bool m_colored = true;
-    private:
-        // To-do: it should:
-        // 1) forget about old texture OBJECT
-        // 2) Assign NEW texture OBJECT
-        //void ClearTexture();
-        /*
-        void ClearMesh();
-        */
     };
 }

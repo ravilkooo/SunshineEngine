@@ -8,19 +8,18 @@ namespace SE_G {
         public LightTechnique<SkyBoxData>
     {
     public:
-        SkyBoxTechnique(ID3D11Device* device,
+        SkyBoxTechnique(DeferredRenderer* renderer,
             TransformComponent* assignedTransform, eastl::string technique,
-            eastl::shared_ptr<Camera> camera,
             eastl::shared_ptr<SkyBoxData> lightData,
             AssetPath assetPath = AssetPath(eastl::wstring(L"Textures/DefaultSkybox.dds"), AssetPath::AssetSource::Engine));
 
-        void BindAll(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
-        void Pass(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context) override;
+        void BindAll(ID3D11DeviceContext* context) override;
+        void Pass(ID3D11DeviceContext* context) override;
 
         void ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos) override;
         void ChooseRasterizer(ID3D11DeviceContext* context, LightPosition lightPos) override;
 
-        LightPosition GetLightPositionInFrustum() override;
-        bool IsFrustumInsideOfLight() override;
+        LightPosition GetLightPositionInFrustum(Camera* camera) override;
+        bool IsFrustumInsideOfLight(Camera* camera) override;
     };
 }
