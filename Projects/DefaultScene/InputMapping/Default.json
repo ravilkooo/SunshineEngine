@@ -33,6 +33,26 @@
             "key": 39,
             "name": "Right",
             "scale": 1.0
+        },
+        {
+            "key": 87,
+            "name": "Forward",
+            "scale": 1.0
+        },
+        {
+            "key": 83,
+            "name": "Forward",
+            "scale": -1.0
+        },
+        {
+            "key": 65,
+            "name": "Right",
+            "scale": -1.0
+        },
+        {
+            "key": 68,
+            "name": "Right",
+            "scale": 1.0
         }
     ],
     "name": "Default"

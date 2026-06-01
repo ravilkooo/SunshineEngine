@@ -21,18 +21,20 @@ function behavior:start()
 
     local trigger = self.owner:getTrigger()
 
-    trigger:setLuaCallback(function(event, otherUUID)
-        if not collected then
-            if event == "enter" then
-                if otherUUID:isEqual(playerUUID) then
-                    collected = true
-                    local audio = getAudioSystem()
-                    audio:play("pause")
-                    removeGameObjectByUUID(self.owner:getUUID())
+    if (trigger) then
+        trigger:setLuaCallback(function(event, otherUUID)
+            if not collected then
+                if event == "enter" then
+                    if otherUUID:isEqual(playerUUID) then
+                        collected = true
+                        local audio = getAudioSystem()
+                        audio:play("pause")
+                        removeGameObjectByUUID(self.owner:getUUID())
+                    end
                 end
             end
-        end
-    end)
+        end)
+    end
     -- print("Behavior started", self.id
 end
 

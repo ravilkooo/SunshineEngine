@@ -153,9 +153,9 @@ void CharacterControllerSystem::UpdatePhysics(
 
     controller->m_character->SetLinearVelocity(
         JPH::Vec3(
-            controller->m_velocity.x,
+            controller->m_velocity.x * cos(character->m_yaw) + controller->m_velocity.z * sin(character->m_yaw),
             controller->m_velocity.y,
-            controller->m_velocity.z
+            controller->m_velocity.z * cos(character->m_yaw) - controller->m_velocity.x * sin(character->m_yaw)
         )
     );
 
@@ -223,15 +223,18 @@ void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)
     JPH::RVec3 charPos = charContrComp->m_character->GetPosition();
     transformComp->m_position = DXSM::Vector3(charPos.GetX(), charPos.GetY(), charPos.GetZ());
 
-    DXSM::Quaternion _quat = transformComp->GetAbsoluteWorldRotation_quat();
-    const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
-
     charContrComp->m_character->SetRotation(
         JPH::Quat::sRotation(
             JPH::Vec3::sAxisY(),
             charComp->m_yaw
         )
     );
+
+
+    JPH::Quat quatRot = charContrComp->m_character->GetRotation();
+    transformComp->m_rotation =
+        DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
+        );
 }
 
 

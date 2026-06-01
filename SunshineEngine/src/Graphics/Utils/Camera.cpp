@@ -255,9 +255,15 @@ namespace SE_G {
             DXSM::Matrix cameraRot = DXSM::Matrix::CreateFromYawPitchRoll(
                 cameraPitchYawRoll.y, cameraPitchYawRoll.x, cameraPitchYawRoll.z);
 
-            right = DXSM::Vector3(1.0f, 0.0f, 0.0f); right = DXSM::Vector3::Transform(right, cameraRot);
-            up = DXSM::Vector3(0.0f, 1.0f, 0.0f); up = DXSM::Vector3::Transform(up, cameraRot);
-            forward = DXSM::Vector3(0.0f, 0.0f, 1.0f); forward = DXSM::Vector3::Transform(forward, cameraRot);
+
+            right = DXSM::Vector3(1.0f, 0.0f, 0.0f);
+            right = DXSM::Vector3::Transform(right, cameraRot);
+
+            up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
+            up = DXSM::Vector3::Transform(up, cameraRot);
+
+            forward = DXSM::Vector3(0.0f, 0.0f, 1.0f);
+            forward = DXSM::Vector3::Transform(forward, cameraRot);
 
             DXSM::Vector3 final_position = m_springArmParams.rootOffset + DXSM::Vector3{ 0,0,-m_springArmParams.length };
 
@@ -269,6 +275,17 @@ namespace SE_G {
             right = DXSM::Vector3::Transform(right, springArmRot);
             up = DXSM::Vector3::Transform(up, springArmRot);
             forward = DXSM::Vector3::Transform(forward, springArmRot);
+
+            auto assignedTransform = m_assignedTransform->GetWorldMatrix_noLocal();
+            assignedTransform._41 = 0;
+            assignedTransform._42 = 0;
+            assignedTransform._43 = 0;
+            assignedTransform._44 = 1;
+
+            right = DXSM::Vector3::Transform(right, assignedTransform);
+            up = DXSM::Vector3::Transform(up, assignedTransform);
+            forward = DXSM::Vector3::Transform(forward, assignedTransform);
+            final_position = DXSM::Vector3::Transform(final_position, assignedTransform);
 
             final_position = targetPoistion + final_position;
             position = final_position;

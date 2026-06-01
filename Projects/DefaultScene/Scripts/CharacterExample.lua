@@ -74,6 +74,12 @@ function behavior:update(dt)
 
     local inputValue = inputSystem:getAxis2D("Forward", "Right")
     char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
+
+    -- local mouseMove = Vector2.new(, inputSystem:getMouseDeltaY())
+    char.m_yaw = char.m_yaw + 0.004 * inputSystem:getMouseDeltaX()
+    -- print(inputSystem:getMouseDeltaX())
+    -- char.m_pitch = char.m_pitch + inputSystem:getMouseDeltaY()
+    
     -- tr.m_rotation.y = tr.m_rotation.y + speed * inputSystem:getAxis("Forward")
     
     
