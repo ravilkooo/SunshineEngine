@@ -200,7 +200,35 @@ bool PlayerInputSystem::KeyMapping::HasAxisBinding(Keys key) const
 
 #pragma endregion Runtime side
 
+#pragma region PlayerInputSystem
 
+PlayerInputSystem::PlayerInputSystem()
+{
+    m_keyMapping = KeyMapping();
+}
+
+bool PlayerInputSystem::FromJson(const json& j)
+{
+    m_keyMapping.FromJson(j);
+
+    for (auto& a : m_keyMapping.m_keyToAction)
+    {
+        for (size_t i = 0; i < a.second.size(); i++)
+        {
+            m_actions[a.second[i]] = ActionState{};
+        }
+    }
+
+    for (auto& axis : m_keyMapping.m_keyToAxisAction)
+    {
+        for (size_t i = 0; i < axis.second.size(); i++)
+        {
+            m_actions[axis.second[i].Name] = ActionState{};
+        }
+    }
+
+    return true;
+}
 
 void PlayerInputSystem::BeginFrame()
 {
@@ -447,3 +475,5 @@ void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
             -1.0f,
             1.0f);
 }
+
+#pragma endregion PlayerInputSystem

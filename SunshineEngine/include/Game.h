@@ -69,6 +69,7 @@ public:
     void ClearScene();
 
     bool LoadScene(const wchar_t* scenePath);
+    bool LoadInputMapping(eastl::wstring inputMappingDir);
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 

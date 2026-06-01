@@ -27,6 +27,8 @@
 
 #include <CameraManager.h>
 
+#include <Utils/DebugUtils.h>
+
 Game::Game()
 {
 	// Initialize();
@@ -108,6 +110,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 {
 	std::ifstream file(scenePath);
 	if (!file) {
+		printSunshineErrorMessage("Scene file input error");
 		//LOG_EDITOR_ERROR("File input error");
 		return false;
 	}
@@ -116,6 +119,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		file >> j; // ��������� json �� �����
 	}
 	catch (const std::exception& e) {
+		printSunshineErrorMessage(JoinChar_String("Scene JSON parse error: ", e.what()));
 		//LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()));
 		return false;
 	}
@@ -143,7 +147,36 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_physicsSystem->FinalizeScene();
 	
 	InitializeAudio();
+
+	m_playerInputSystem = PlayerInputSystem();
 	
+	return true;
+}
+
+bool Game::LoadInputMapping(eastl::wstring inputMappingDir)
+{
+	auto fullPath = inputMappingDir + Utf8ToWString(m_playerInputSystem.m_keyMapping.m_name.c_str()) + L".json";
+
+	std::ifstream file(fullPath.c_str());
+	if (!file) {
+		printSunshineErrorMessage("InputMapping file input error");
+		// LOG_EDITOR_ERROR("File input error");
+		return false;
+	}
+	json j;
+	try {
+		file >> j;
+	}
+	catch (const std::exception& e) {
+		printSunshineErrorMessage(JoinChar_String("InputMapping JSON parse error: ", e.what()));
+		// LOG_EDITOR_ERROR(JoinChar_String("JSON parse error: ", e.what()).c_str());
+		return false;
+	}
+	m_playerInputSystem.FromJson(j);
+
+	printSunshineMessage("Input mapping loaded");
+	//LOG_EDITOR_INFO("Input mapping loaded");
+
 	return true;
 }
 

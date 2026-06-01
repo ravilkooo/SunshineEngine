@@ -425,6 +425,20 @@ void EditorApp::RunGame()
 	{
 		eastl::wstring scenePath = m_openedProject->GetScenePath();
 		m_currentGame->LoadScene(scenePath.c_str());
+
+
+		eastl::wstring inputMappingDir = m_openedProject->GetFullPath() + L"/InputMapping/";
+		if (!std::filesystem::exists(inputMappingDir.c_str()))
+		{
+			printSunshineErrorMessage(L"Input mapping file not found: " + inputMappingDir);
+		}
+		else
+		{
+			if (!m_currentGame->LoadInputMapping(inputMappingDir))
+			{
+				printSunshineErrorMessage(L"Failed to load Input mapping from: " + scenePath);
+			}
+		}
 	}
 
 	m_renderingSystem->AddRenderGroup(m_currentGame->m_renderer.get());

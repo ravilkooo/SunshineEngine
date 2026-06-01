@@ -116,8 +116,13 @@ public:
         AxisBindings   m_keyToAxisAction;
     };
 
-
 public:
+
+    PlayerInputSystem();
+
+    // Serialization
+    bool FromJson(const json& j);
+
     //
     //  Key -> Action/Axis mapping
     //
@@ -157,7 +162,6 @@ public:
     DXSM::Vector2 GetAxis2D(const eastl::string& horizontalAxis,
         const eastl::string& verticalAxis) const;
     // float CalcAxisValue(const eastl::string& axis) const;
-    
 
     //
     // Mouse
@@ -184,6 +188,7 @@ private:
 
     void ReleaseAxis(
         const AxisMapping& mapping);
+
     //
     // Runtime states
     //
