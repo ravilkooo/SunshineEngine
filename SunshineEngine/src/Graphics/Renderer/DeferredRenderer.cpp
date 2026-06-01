@@ -52,7 +52,8 @@ namespace SE_G {
 	void DeferredRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)
 	{ 
 		m_mainCamera = camera;
-		m_particleSystem->SetCamera(m_mainCamera.get());
+		if (m_particleSystem)
+			m_particleSystem->SetCamera(m_mainCamera.get());
 	}
 
 	eastl::shared_ptr<Camera> DeferredRenderer::GetMainCamera()

@@ -11,8 +11,8 @@ function behavior:start()
 
     ps:addToTeam(teamB, perception)
 
-    local camera = self.owner:getCameraComponent():getCamera()
-    camera:setAsMainCamera()
+    -- local camera = self.owner:getCameraComponent():getCamera()
+    -- camera:setAsMainCamera()
 end
 
 function behavior:update(dt)
