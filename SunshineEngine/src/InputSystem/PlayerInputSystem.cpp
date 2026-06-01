@@ -1,6 +1,8 @@
 #include <InputSystem/PlayerInputSystem.h>
 #include <Utils/StringUtils.h>
 
+#pragma region KeyMapping_Info
+
 PlayerInputSystem::KeyMapping_Info::KeyMapping_Info()
 {
     m_actionBindings = eastl::vector<ActionBinding>();
@@ -85,20 +87,90 @@ bool PlayerInputSystem::KeyMapping_Info::FromJson(const json& j)
     }
 }
 
+#pragma endregion Editor side
+
+#pragma region KeyMapping
+
 PlayerInputSystem::KeyMapping::KeyMapping()
 {
-    m_keyToAction = eastl::unordered_map<Keys, eastl::string>();
-    m_keyToAxisAction = eastl::unordered_map<Keys, AxisMapping>();
+    m_keyToAction = eastl::unordered_map<Keys, eastl::vector<eastl::string>>();
+    m_keyToAxisAction = eastl::unordered_map<Keys, eastl::vector<AxisMapping>>();
+}
+
+bool PlayerInputSystem::KeyMapping::FromJson(const json& j)
+{
+    try
+    {
+        // Clear existing bindings
+        m_keyToAction.clear();
+        m_keyToAxisAction.clear();
+
+        if (j.contains("name"))
+        {
+            m_name = j["name"].get<std::string>();
+        }
+
+        // Deserialize action bindings
+        if (j.contains("action_bindings") && j["action_bindings"].is_array())
+        {
+            for (const auto& item : j["action_bindings"])
+            {
+                ActionBinding binding;
+                binding.Key = static_cast<Keys>(item.value("key", 0));
+                binding.Action = item.value("action", "");
+
+                if (!m_keyToAction.contains(binding.Key))
+                {
+                    m_keyToAction[binding.Key] = eastl::vector<eastl::string>();
+                }
+                m_keyToAction[binding.Key].push_back(StdToEASTLString(binding.Action));
+            }
+        }
+
+        // Deserialize axis bindings
+        if (j.contains("axis_bindings") && j["axis_bindings"].is_array())
+        {
+            for (const auto& item : j["axis_bindings"])
+            {
+                AxisBinding binding;
+                binding.Key = static_cast<Keys>(item.value("key", 0));
+                binding.Name = item.value("name", "");
+                binding.Scale = item.value("scale", 1.0f);
+
+                if (!m_keyToAction.contains(binding.Key))
+                {
+                    m_keyToAxisAction[binding.Key] = eastl::vector<AxisMapping>();
+                }
+                m_keyToAxisAction[binding.Key].push_back(
+                    AxisMapping{ StdToEASTLString(binding.Name), binding.Scale }
+                );
+            }
+        }
+
+        return true;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 void PlayerInputSystem::KeyMapping::BindAction(Keys key, const eastl::string& action)
 {
-    m_keyToAction[key] = action;
+    if (!m_keyToAction.contains(key))
+    {
+        m_keyToAction[key] = eastl::vector<eastl::string>();
+    }
+    m_keyToAction[key].push_back(action);
 }
 
 void PlayerInputSystem::KeyMapping::BindAxisAction(Keys key, const AxisMapping& axisAction)
 {
-    m_keyToAxisAction[key] = axisAction;
+    if (!m_keyToAxisAction.contains(key))
+    {
+        m_keyToAxisAction[key] = eastl::vector<AxisMapping>();
+    }
+    m_keyToAxisAction[key].push_back(axisAction);
 }
 
 void PlayerInputSystem::KeyMapping::ClearBindings()
@@ -111,7 +183,7 @@ void PlayerInputSystem::KeyMapping::RemoveActionByKey(Keys key)
     m_keyToAction.erase(key);
 }
 
-void PlayerInputSystem::KeyMapping::RemoveAxisActionByKey(Keys key)
+void PlayerInputSystem::KeyMapping::RemoveAxisByKey(Keys key)
 {
     m_keyToAxisAction.erase(key);
 }
@@ -126,45 +198,107 @@ bool PlayerInputSystem::KeyMapping::HasAxisBinding(Keys key) const
     return m_keyToAxisAction.find(key) != m_keyToAxisAction.end();
 }
 
+#pragma endregion Runtime side
+
+
+
 void PlayerInputSystem::BeginFrame()
 {
-    for (auto& [name, state] : m_actions)
+    for (auto& [key, state] : m_keys)
     {
         state.Pressed = false;
         state.Released = false;
     }
+
+    for (auto& [action, state] : m_actions)
+    {
+        state.Pressed = false;
+        state.Released = false;
+    }
+
+    m_mouse.DeltaX = 0.0f;
+    m_mouse.DeltaY = 0.0f;
+
+    m_mouse.WheelDelta = 0.0f;
+}
+
+void PlayerInputSystem::EndFrame() {
+    // To-do
 }
 
 void PlayerInputSystem::HandleKeyDown(Keys key)
 {
-    auto it = m_keyMapping.m_keyToAction.find(key);
+    auto& keyState = m_keys[key];
 
-    if (it == m_keyMapping.m_keyToAction.end())
+    if (keyState.Held)
         return;
 
-    auto& state = m_actions[it->second];
+    keyState.Held = true;
+    keyState.Pressed = true;
 
-    if (!state.Held)
+    auto actionIt =
+        m_keyMapping.m_keyToAction.find(key);
+
+    if (actionIt != m_keyMapping.m_keyToAction.end())
     {
-        state.Pressed = true;
+        for (const auto& action : actionIt->second)
+        {
+            PressAction(action);
+        }
     }
 
-    state.Held = true;
-    state.Value = 1.0f;
+    auto axisIt =
+        m_keyMapping.m_keyToAxisAction.find(key);
+
+    if (axisIt != m_keyMapping.m_keyToAxisAction.end())
+    {
+        for (const auto& axis : axisIt->second)
+        {
+            PressAxis(axis);
+        }
+    }
 }
 
 void PlayerInputSystem::HandleKeyUp(Keys key)
 {
-    auto it = m_keyMapping.m_keyToAction.find(key);
+    auto& keyState = m_keys[key];
 
-    if (it == m_keyMapping.m_keyToAction.end())
-        return;
+    keyState.Held = false;
+    keyState.Released = true;
 
-    auto& state = m_actions[it->second];
+    auto actionIt =
+        m_keyMapping.m_keyToAction.find(key);
 
-    state.Released = true;
-    state.Held = false;
-    state.Value = 0.0f;
+    if (actionIt != m_keyMapping.m_keyToAction.end())
+    {
+        for (const auto& action : actionIt->second)
+        {
+            ReleaseAction(action);
+        }
+    }
+
+    auto axisIt =
+        m_keyMapping.m_keyToAxisAction.find(key);
+
+    if (axisIt != m_keyMapping.m_keyToAxisAction.end())
+    {
+        for (const auto& axis : axisIt->second)
+        {
+            ReleaseAxis(axis);
+        }
+    }
+}
+
+void PlayerInputSystem::HandleMouseMove(
+    const InputDevice::MouseMoveEventArgs& args)
+{
+    m_mouse.DeltaX += args.Offset.x;
+    m_mouse.DeltaY += args.Offset.y;
+
+    m_mouse.PositionX = args.Position.x;
+    m_mouse.PositionY = args.Position.y;
+
+    m_mouse.WheelDelta = args.WheelDelta;
 }
 
 bool PlayerInputSystem::IsPressed(const eastl::string& action) const
@@ -174,13 +308,6 @@ bool PlayerInputSystem::IsPressed(const eastl::string& action) const
     return it != m_actions.end() && it->second.Pressed;
 }
 
-bool PlayerInputSystem::IsHeld(const eastl::string& action) const
-{
-    auto it = m_actions.find(action);
-
-    return it != m_actions.end() && it->second.Held;
-}
-
 bool PlayerInputSystem::IsReleased(const eastl::string& action) const
 {
     auto it = m_actions.find(action);
@@ -188,45 +315,135 @@ bool PlayerInputSystem::IsReleased(const eastl::string& action) const
     return it != m_actions.end() && it->second.Released;
 }
 
-float PlayerInputSystem::GetValue(const eastl::string& action) const
+bool PlayerInputSystem::IsHeld(const eastl::string& action) const
+{
+    auto it = m_actions.find(action);
+
+    return it != m_actions.end() && it->second.Held;
+}
+
+InputActionPhase PlayerInputSystem::GetPhase(const eastl::string& action) const
 {
     auto it = m_actions.find(action);
 
     if (it == m_actions.end())
+        return InputActionPhase::None;
+
+    const auto& state = it->second;
+
+    if (state.Pressed)
+        return InputActionPhase::Pressed;
+
+    if (state.Released)
+        return InputActionPhase::Released;
+
+    if (state.Held)
+        return InputActionPhase::Held;
+
+    return InputActionPhase::None;
+}
+
+float PlayerInputSystem::GetAxis(const eastl::string& axisName) const
+{
+    auto it = m_axes.find(axisName);
+
+    if (it == m_axes.end())
         return 0.0f;
 
     return it->second.Value;
 }
 
+DXSM::Vector2 PlayerInputSystem::GetAxis2D(
+    const eastl::string& horizontal,
+    const eastl::string& vertical) const
+{
+    return
+    {
+        GetAxis(horizontal),
+        GetAxis(vertical)
+    };
+}
+
 float PlayerInputSystem::GetMouseDeltaX() const
 {
-    return m_mouseDeltaX;
+    return m_mouse.DeltaX;
 }
 
 float PlayerInputSystem::GetMouseDeltaY() const
 {
-    return m_mouseDeltaY;
+    return m_mouse.DeltaY;
 }
 
-float PlayerInputSystem::GetAxis(const eastl::string& axis) const
+float PlayerInputSystem::GetMouseX() const
 {
-    auto it = m_axes.find(axis);
-
-    if (it == m_axes.end())
-        return 0.0f;
-
-    return it->second;
+    return m_mouse.PositionX;
 }
 
-void PlayerInputSystem::HandleMouseMove(
-    const InputDevice::MouseMoveEventArgs& args)
+float PlayerInputSystem::GetMouseY() const
 {
-    m_mouseDeltaX += args.Offset.x;
-    m_mouseDeltaY += args.Offset.y;
+    return m_mouse.PositionY;
+}
 
+float PlayerInputSystem::GetMouseWheelDelta() const
+{
+    return m_mouse.WheelDelta;
+}
 
-    m_mouseX = args.Position.x;
-    m_mouseY = args.Position.y;
+void PlayerInputSystem::PressAction(
+    const eastl::string& action)
+{
+    auto& state = m_actions[action];
 
-    m_wheelDelta = args.WheelDelta;
+    state.PressCount++;
+
+    if (state.PressCount == 1)
+    {
+        state.Pressed = true;
+        state.Held = true;
+    }
+}
+
+void PlayerInputSystem::ReleaseAction(
+    const eastl::string& action)
+{
+    auto& state = m_actions[action];
+
+    if (state.PressCount > 0)
+    {
+        state.PressCount--;
+    }
+
+    if (state.PressCount == 0)
+    {
+        state.Released = true;
+        state.Held = false;
+    }
+}
+
+void PlayerInputSystem::PressAxis(const AxisMapping& mapping)
+{
+    auto& axis =
+        m_axes[mapping.Name];
+
+    axis.Value += mapping.Scale;
+
+    axis.Value =
+        eastl::clamp(
+            axis.Value,
+            -1.0f,
+            1.0f);
+}
+
+void PlayerInputSystem::ReleaseAxis(const AxisMapping& mapping)
+{
+    auto& axis =
+        m_axes[mapping.Name];
+
+    axis.Value -= mapping.Scale;
+
+    axis.Value =
+        eastl::clamp(
+            axis.Value,
+            -1.0f,
+            1.0f);
 }

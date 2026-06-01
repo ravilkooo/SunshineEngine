@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <EASTL/string.h>
 
 enum class InputActionPhase
 {
@@ -16,11 +16,34 @@ struct ActionState
     bool Released = false;
     bool Held = false;
 
-    float Value = 0.0f;
+    uint32_t PressCount = 0;
+};
+
+struct KeyState
+{
+    bool Pressed = false;
+    bool Released = false;
+    bool Held = false;
 };
 
 struct AxisMapping
 {
-    std::string Name;
-    float scale = 1.0f;
+    eastl::string Name;
+    float Scale = 1.0f;
+};
+
+struct AxisState
+{
+    float Value = 0.0f;
+};
+
+struct MouseState
+{
+    float DeltaX = 0.0f;
+    float DeltaY = 0.0f;
+
+    float PositionX = 0.0f;
+    float PositionY = 0.0f;
+
+    float WheelDelta = 0.0f;
 };
