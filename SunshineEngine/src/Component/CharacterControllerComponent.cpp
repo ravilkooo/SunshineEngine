@@ -51,6 +51,7 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 	settings.mMaxStrength = 100.0f;
 	settings.mCharacterPadding = 0.02f;
 	settings.mPenetrationRecoverySpeed = 1.0f;
+	settings.mInnerBodyShape = m_shape;
 	settings.mInnerBodyLayer = SE::Layers::MOVING;
 
 	DXSM::Quaternion _quat = transformComp->GetAbsoluteWorldRotation_quat();
@@ -63,9 +64,10 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 			transformComp->m_position.z),
 		targetRot, m_uuid.m_UUID, &physSystem);
 
+	//m_character->SetListener();
+
 	Initialized = true;
 }
-
 
 void CharacterControllerComponent::DestroyCharacter()
 {
@@ -113,3 +115,17 @@ LUA_REGISTER_COMPONENT(CharacterControllerComponent, "CharacterControllerCompone
 
 #undef CHARCONTR_ADD_FIELD
 #undef CHARCONTR_METHOD_PAIRS
+
+bool SECharacterContactListener::OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2)
+{
+	return true;
+}
+
+void SECharacterContactListener::OnContactAdded(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2, JPH::RVec3Arg inContactPosition, JPH::Vec3Arg inContactNormal, JPH::CharacterContactSettings& ioSettings)
+{
+
+}
+
+void SECharacterContactListener::OnContactRemoved(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2)
+{
+}

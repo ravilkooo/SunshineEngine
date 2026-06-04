@@ -1,6 +1,10 @@
 #pragma once
 
+#include <vector>
+#include <unordered_set>
+
 #include <Jolt/Jolt.h>
+#include <Jolt/Physics/Collision/CollideShape.h>
 #include <Jolt/Physics/Character/CharacterVirtual.h>
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 
@@ -10,6 +14,18 @@
 #include <SimpleMath.h>
 
 namespace DXSM = DirectX::SimpleMath;
+
+
+class SECharacterContactListener : public JPH::CharacterContactListener
+{
+public:
+    bool OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2) override;
+
+    void OnContactAdded(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2,
+        JPH::RVec3Arg inContactPosition, JPH::Vec3Arg inContactNormal, JPH::CharacterContactSettings& ioSettings) override;
+
+    void OnContactRemoved(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2) override;
+};
 
 class PhysicsSystem;
 class TransformComponent;

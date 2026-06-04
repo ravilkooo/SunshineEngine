@@ -46,7 +46,6 @@ PhysicsSystem::PhysicsSystem() :
         maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
         *m_bpInterface, *m_objectVsBpFilter, *m_objectPairFilter);
     m_physicsSystem->SetBodyActivationListener(&m_bodyActivationListener);
-    // m_physicsSystem->SetContactListener(&m_contactListener);
     m_physicsSystem->SetGravity(JPH::Vec3(0, -9.81f, 0));
     m_bodyInterface = &m_physicsSystem->GetBodyInterface();
 
@@ -437,6 +436,21 @@ JPH::BodyInterface& PhysicsSystem::Bodies() { return *m_bodyInterface; }
 
 void PhysicsSystem::UpdateTriggerOverlaps()
 {
+    eastl::vector<TriggerExitEvent> enterEvents;
+    m_triggerContactListener.FetchEnterEvents(enterEvents);
+    for (const TriggerExitEvent& e : enterEvents)
+    {
+        auto triggerGO = Scene::GetInstance().GetGameObjectByUUID(e.Trigger);
+        if (!triggerGO)
+            continue;
+
+        auto triggerComp = triggerGO->GetComponent<TriggerComponent>();
+        if (!triggerComp)
+            continue;
+
+        triggerComp->OnEnter(e.Other);
+    }
+
     eastl::vector<TriggerExitEvent> exitEvents;
     m_triggerContactListener.FetchExitEvents(exitEvents);
 

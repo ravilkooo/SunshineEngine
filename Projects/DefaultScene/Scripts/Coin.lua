@@ -15,14 +15,15 @@ local angleOffet = 0.2
 function behavior:start()
     
     playerUUID = UUID.new()
-    playerUUID.hi = 253145895
-    playerUUID.lo = 2320618671
+    playerUUID.hi = 1059773118
+    playerUUID.lo = 2947720027
     playerObj = getGameObjectByUUID(playerUUID)
     local trigger = self.owner:getTrigger()
 
     trigger:setLuaCallback(function(event, otherUUID)
         if not collected then
             if event == "enter" then
+                print("OI HUE!")
                 if otherUUID:isEqual(playerUUID) then
                     collected = true
                     local audio = getAudioSystem()

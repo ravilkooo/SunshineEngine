@@ -325,6 +325,7 @@ void PhysicsComponent::FromJson(const json& j) {
     if (info.m_collisionLayer == "NON_MOVING")  m_objectLayer = SE::Layers::NON_MOVING;
     else if (info.m_collisionLayer == "MOVING")      m_objectLayer = SE::Layers::MOVING;
     else if (info.m_collisionLayer == "TRIGGER")      m_objectLayer = SE::Layers::TRIGGER;
+    else if (info.m_collisionLayer == "CHARACTER")      m_objectLayer = SE::Layers::CHARACTER;
     else                                         m_objectLayer = SE::Layers::NON_MOVING;
     
     // m_objectLayer = SE::Layers::MOVING;

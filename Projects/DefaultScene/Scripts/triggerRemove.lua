@@ -9,8 +9,8 @@ local playerStartPos
 function behavior:start()
 
     playerUUID = UUID.new()
-    playerUUID.hi = 253145895
-    playerUUID.lo = 2320618671
+    playerUUID.hi = 851949874
+    playerUUID.lo = 907375339
     playerObj = getGameObjectByUUID(playerUUID)
     playerStartPos = playerObj:getTransform():getAbsolutePosition()
 

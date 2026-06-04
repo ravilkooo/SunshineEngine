@@ -31,8 +31,8 @@ function behavior:start()
     startPosition = Vector3.new(tr.m_position.x, tr.m_position.y, tr.m_position.z)
 
     playerUUID = UUID.new()
-    playerUUID.hi = 253145895
-    playerUUID.lo = 2320618671
+    playerUUID.hi = 851949874
+    playerUUID.lo = 907375339
     playerObj = getGameObjectByUUID(playerUUID)
 
     camera = playerObj:getCameraComponent():getCamera()

@@ -123,46 +123,6 @@ static void TraceImpl(const char* inFMT, ...)
     std::cout << buffer << std::endl;
 }
 
-// An example contact listener
-class MyContactListener : public JPH::ContactListener
-{
-public:
-    // See: ContactListener
-    virtual JPH::ValidateResult	OnContactValidate(
-        const JPH::Body& inBody1, const JPH::Body& inBody2,
-        JPH::RVec3Arg inBaseOffset,
-        const JPH::CollideShapeResult& inCollisionResult) override
-    {
-        //std::cout << "Contact validate callback" << std::endl;
-
-        // Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
-        return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
-    }
-
-    virtual void OnContactAdded(
-        const JPH::Body& inBody1, const JPH::Body& inBody2,
-        const JPH::ContactManifold& inManifold,
-        JPH::ContactSettings& ioSettings) override
-    {
-        //std::cout << "A contact was added" << std::endl;
-    }
-
-    virtual void OnContactPersisted(
-        const JPH::Body& inBody1,
-        const JPH::Body& inBody2,
-        const JPH::ContactManifold& inManifold,
-        JPH::ContactSettings& ioSettings) override
-    {
-        //std::cout << "A contact was persisted" << std::endl;
-    }
-
-    virtual void OnContactRemoved(
-        const JPH::SubShapeIDPair& inSubShapePair) override
-    {
-        //std::cout << "A contact was removed" << std::endl;
-    }
-};
-
 // An example activation listener
 class MyBodyActivationListener : public JPH::BodyActivationListener
 {
@@ -191,17 +151,28 @@ public:
         switch (inObject1)
         {
         case SE::Layers::NON_MOVING:
-            // Non-moving only collides with moving
-            return inObject2 == SE::Layers::MOVING;
+            // Non-moving collides with moving and character
+            return inObject2 == SE::Layers::MOVING ||
+                inObject2 == SE::Layers::CHARACTER;;
 
         case SE::Layers::MOVING:
-            // Moving collides with non-moving and triggers
-            return inObject2 == SE::Layers::NON_MOVING || 
-                   inObject2 == SE::Layers::MOVING;
+            // Moving collides with non-moving, moving and character
+            return inObject2 == SE::Layers::NON_MOVING ||
+                inObject2 == SE::Layers::MOVING ||
+                inObject2 == SE::Layers::TRIGGER ||
+                inObject2 == SE::Layers::CHARACTER;
 
         case SE::Layers::TRIGGER:
-            // Triggers ONLY collide with TRIGGER bodies
-            return inObject2 == SE::Layers::TRIGGER;
+            return inObject2 == SE::Layers::CHARACTER ||
+                inObject2 == SE::Layers::MOVING;
+
+
+        case SE::Layers::CHARACTER:
+            // Moving character with non-moving, moving and character
+            return inObject2 == SE::Layers::NON_MOVING ||
+                inObject2 == SE::Layers::MOVING ||
+                inObject2 == SE::Layers::CHARACTER ||
+                inObject2 == SE::Layers::TRIGGER;
 
         default:
             JPH_ASSERT(false);
@@ -221,6 +192,7 @@ public:
         mObjectToBroadPhase[SE::Layers::NON_MOVING] = SE::BroadPhaseLayers::NON_MOVING;
         mObjectToBroadPhase[SE::Layers::MOVING] = SE::BroadPhaseLayers::MOVING;
         mObjectToBroadPhase[SE::Layers::TRIGGER] = SE::BroadPhaseLayers::TRIGGER;
+        mObjectToBroadPhase[SE::Layers::CHARACTER] = SE::BroadPhaseLayers::MOVING;
     }
 
     virtual UINT GetNumBroadPhaseLayers() const override
@@ -269,7 +241,13 @@ public:
                    inLayer2 == SE::BroadPhaseLayers::MOVING;
 
         case SE::Layers::TRIGGER:
-            return inLayer2 == SE::BroadPhaseLayers::TRIGGER;
+            return inLayer2 == SE::BroadPhaseLayers::TRIGGER ||
+                inLayer2 == SE::BroadPhaseLayers::MOVING;
+
+        case SE::Layers::CHARACTER:
+            return inLayer2 == SE::BroadPhaseLayers::NON_MOVING ||
+                inLayer2 == SE::BroadPhaseLayers::MOVING ||
+                inLayer2 == SE::BroadPhaseLayers::TRIGGER;
 
         default:
             JPH_ASSERT(false);
@@ -348,7 +326,6 @@ private:
     eastl::unique_ptr<JPH::PhysicsSystem> m_physicsSystem;
     JPH::BodyInterface* m_bodyInterface = nullptr;
     MyBodyActivationListener m_bodyActivationListener;
-    // MyContactListener m_contactListener;
 
     eastl::vector<PhysicsBodyEntry> m_bodyEntries;
 

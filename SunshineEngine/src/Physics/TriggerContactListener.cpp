@@ -20,7 +20,7 @@ void TriggerContactListener::OnContactAdded(
     const JPH::ContactManifold& inManifold,
     JPH::ContactSettings& ioSettings)
 {
-    HandleTriggerContact(inBody1, inBody2, true);  // Enter
+    // HandleTriggerContact(inBody1, inBody2, true);  // Enter
 
     const bool b1Trigger = inBody1.IsSensor();
     const bool b2Trigger = inBody2.IsSensor();
@@ -38,12 +38,17 @@ void TriggerContactListener::OnContactAdded(
     ev.Trigger = SE::UUID((uint64_t)triggerBody.GetUserData());
     ev.Other = SE::UUID((uint64_t)otherBody.GetUserData());
 
+    {
+        std::lock_guard<std::mutex> lock(m_enterMutex);
+        m_enterQueue.push_back(ev);
+    }
+
     TriggerOverlapKey key;
     key.TriggerBody = triggerBody.GetID();
     key.OtherBody = otherBody.GetID();
 
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_exitMutex);
         m_activeOverlaps[key] = ev;
     }
 }
@@ -54,7 +59,7 @@ void TriggerContactListener::OnContactRemoved(
     const JPH::BodyID a = inSubShapePair.GetBody1ID();
     const JPH::BodyID b = inSubShapePair.GetBody2ID();
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_exitMutex);
 
     // пробуем оба направления (мы не знаем кто trigger)
     TriggerOverlapKey key1{ a, b };
@@ -76,10 +81,18 @@ void TriggerContactListener::OnContactRemoved(
 
 void TriggerContactListener::FetchExitEvents(eastl::vector<TriggerExitEvent>& outEvents)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_exitMutex);
 
     outEvents.insert(outEvents.end(), m_exitQueue.begin(), m_exitQueue.end());
     m_exitQueue.clear();
+}
+
+void TriggerContactListener::FetchEnterEvents(eastl::vector<TriggerExitEvent>& outEvents)
+{
+    std::lock_guard<std::mutex> lock(m_enterMutex);
+
+    outEvents.insert(outEvents.end(), m_enterQueue.begin(), m_enterQueue.end());
+    m_enterQueue.clear();
 }
 
 void TriggerContactListener::HandleTriggerContact(

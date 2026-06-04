@@ -57,7 +57,7 @@ public:
     virtual void OnContactRemoved(
         const JPH::SubShapeIDPair& inSubShapePair) override;
 
-    void FetchRemovedPairs(eastl::vector<JPH::SubShapeIDPair>& outPairs);
+    //void FetchRemovedPairs(eastl::vector<JPH::SubShapeIDPair>& outPairs);
 
 private:
     void HandleTriggerContact(const JPH::Body& body1, const JPH::Body& body2, bool entered);
@@ -65,11 +65,18 @@ private:
 
 public:
     void FetchExitEvents(eastl::vector<TriggerExitEvent>& outEvents);
+    void FetchEnterEvents(eastl::vector<TriggerExitEvent>& outEvents);
 
 private:
-    std::mutex m_mutex;
+    std::mutex m_exitMutex;
+    std::mutex m_enterMutex;
 
     std::unordered_map<TriggerOverlapKey, TriggerExitEvent, TriggerOverlapKeyHash> m_activeOverlaps;
+    
+    eastl::vector<TriggerExitEvent> m_enterQueue;
+
     eastl::vector<TriggerExitEvent> m_exitQueue;
+
+
 
 };
