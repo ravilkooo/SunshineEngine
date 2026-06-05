@@ -11,27 +11,31 @@
         {
             "action": "RAction",
             "key": 84
+        },
+        {
+            "action": "Jump2",
+            "key": 13
         }
     ],
     "axis_bindings": [
         {
             "key": 38,
-            "name": "Forward",
+            "name": "Forward2",
             "scale": 1.0
         },
         {
             "key": 40,
-            "name": "Forward",
+            "name": "Forward2",
             "scale": -1.0
         },
         {
             "key": 37,
-            "name": "Right",
+            "name": "Right2",
             "scale": -1.0
         },
         {
             "key": 39,
-            "name": "Right",
+            "name": "Right2",
             "scale": 1.0
         },
         {

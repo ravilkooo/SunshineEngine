@@ -15,8 +15,8 @@ local angleOffet = 0.2
 function behavior:start()
     
     playerUUID = UUID.new()
-    playerUUID.hi = 1059773118
-    playerUUID.lo = 2947720027
+    playerUUID.hi = 851949874
+    playerUUID.lo = 907375339
     playerObj = getGameObjectByUUID(playerUUID)
     local trigger = self.owner:getTrigger()
 
@@ -24,12 +24,12 @@ function behavior:start()
         if not collected then
             if event == "enter" then
                 print("OI HUE!")
-                if otherUUID:isEqual(playerUUID) then
+                -- if otherUUID:isEqual(playerUUID) then
                     collected = true
                     local audio = getAudioSystem()
                     audio:play("pause")
                     removeGameObjectByUUID(self.owner:getUUID())
-                end
+                -- end
             end
         end
     end)

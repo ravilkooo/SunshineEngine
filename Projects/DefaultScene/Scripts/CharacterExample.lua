@@ -57,13 +57,7 @@ local function TestCharacterFields(self)
 end
 
 function behavior:start()
-    
-    playerUUID = UUID.new()
-    playerUUID.hi = 253145895
-    playerUUID.lo = 2320618671
-    playerObj = getGameObjectByUUID(playerUUID)
-
-    TestCharacterFields(self)
+    -- TestCharacterFields(self)
 end
 
 function behavior:update(dt)

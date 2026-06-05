@@ -3116,6 +3116,49 @@
         },
         {
             "components": {
+                "Character": {
+                    "m_isPlayerControlled": false
+                },
+                "CharacterController": {
+                    "collider": {
+                        "settings": {
+                            "capsule": {
+                                "height": 0.6000000238418579,
+                                "radius": 0.3499999940395355
+                            }
+                        },
+                        "shapeType": "Capsule",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_acceleration": 30.0,
+                    "m_airAcceleration": 8.0,
+                    "m_enableStickToFloor": false,
+                    "m_enableWalkStairs": false,
+                    "m_gravity": -24.0,
+                    "m_jumpSpeed": 8.0,
+                    "m_maxFallSpeed": -24.0,
+                    "m_maxSlopeAngle": 45.0,
+                    "m_moveSpeed": 6.0,
+                    "m_stepHeight": 0.30000001192092896
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/SecondCharacter.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 1,
@@ -3132,7 +3175,7 @@
                 "Transform": {
                     "m_localPosition": [
                         0.0,
-                        0.0,
+                        -1.2000000476837158,
                         0.0
                     ],
                     "m_localRotation": [
@@ -3146,14 +3189,14 @@
                         1.0
                     ],
                     "m_position": [
-                        35.384498596191406,
-                        8.48291015625,
-                        24.43642807006836
+                        14.429478645324707,
+                        8.709381103515625,
+                        22.050121307373047
                     ],
                     "m_rotation": [
                         -0.0,
-                        -0.961676299571991,
-                        0.0
+                        0.0,
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         0.9999998211860657,
