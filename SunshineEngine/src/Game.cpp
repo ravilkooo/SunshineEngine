@@ -140,7 +140,8 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	InitializeAudio();
 
 	m_characterControllerSystem = eastl::make_unique<CharacterControllerSystem>(&Scene::GetInstance(), m_physicsSystem.get());
-	
+	m_characterControllerSystem->InitCharacters();
+
 	return true;
 }
 

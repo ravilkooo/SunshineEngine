@@ -38,7 +38,8 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 	float Height = m_colliderData->m_settings.data.asCapsule.m_height;
 
 	m_shape = new JPH::CapsuleShape(
-		Height * 0.5f - Radius,
+		//Height * 0.5f - Radius,
+		Height * 0.5f,
 		Radius
 	);
 
@@ -52,7 +53,7 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 	settings.mCharacterPadding = 0.02f;
 	settings.mPenetrationRecoverySpeed = 1.0f;
 	settings.mInnerBodyShape = m_shape;
-	settings.mInnerBodyLayer = SE::Layers::MOVING;
+	settings.mInnerBodyLayer = SE::Layers::CHARACTER;
 
 	DXSM::Quaternion _quat = transformComp->GetAbsoluteWorldRotation_quat();
 	const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
@@ -64,7 +65,6 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 			transformComp->m_position.z),
 		targetRot, m_uuid.m_UUID, &physSystem);
 
-	//m_character->SetListener();
 
 	Initialized = true;
 }
@@ -115,17 +115,3 @@ LUA_REGISTER_COMPONENT(CharacterControllerComponent, "CharacterControllerCompone
 
 #undef CHARCONTR_ADD_FIELD
 #undef CHARCONTR_METHOD_PAIRS
-
-bool SECharacterContactListener::OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2)
-{
-	return true;
-}
-
-void SECharacterContactListener::OnContactAdded(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2, JPH::RVec3Arg inContactPosition, JPH::Vec3Arg inContactNormal, JPH::CharacterContactSettings& ioSettings)
-{
-
-}
-
-void SECharacterContactListener::OnContactRemoved(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2)
-{
-}

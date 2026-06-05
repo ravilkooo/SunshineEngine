@@ -6,6 +6,7 @@
 #include "ControllerSystem/CharacterControllerSystem.h"
 
 #include "Component/TransformComponent.h"
+#include "Component/TriggerComponent.h"
 #include "Component/CharacterComponent.h"
 #include "Component/CharacterControllerComponent.h"
 
@@ -15,9 +16,92 @@
 
 namespace DXSM = DirectX::SimpleMath;
 
-CharacterControllerSystem::CharacterControllerSystem(Scene* scene, PhysicsSystem* physicsSystem)
-    : m_scene(scene), m_PhysicsSystem(physicsSystem)
+
+bool SECharacterContactListener::OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2)
 {
+    return true;
+}
+
+void SECharacterContactListener::OnContactAdded(const JPH::CharacterVirtual* inCharacter,
+    const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2,
+    JPH::RVec3Arg inContactPosition, JPH::Vec3Arg inContactNormal, JPH::CharacterContactSettings& ioSettings)
+{
+    auto layer = m_bodyInterface->GetObjectLayer(inBodyID2);
+
+    if (layer != SE::Layers::TRIGGER)
+    {
+        return;
+    }
+
+    // Add check isSensor?
+    // if (not sensor) return;
+
+    TriggerCharacterExitEvent ev;
+    ev.Trigger = SE::UUID((uint64_t)m_bodyInterface->GetUserData(inBodyID2));
+    ev.Character = SE::UUID((uint64_t)inCharacter->GetUserData());
+
+    {
+        std::lock_guard<std::mutex> lock(m_enterMutex);
+        m_enterQueue.push_back(ev);
+    }
+
+    TriggerCharacterOverlapKey key;
+    key.TriggerBody = inBodyID2;
+    key.Character = inCharacter->GetID();
+
+    {
+        std::lock_guard<std::mutex> lock(m_exitMutex);
+        m_activeOverlaps[key] = ev;
+    }
+}
+
+void SECharacterContactListener::OnContactRemoved(const JPH::CharacterVirtual* inCharacter,
+    const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2)
+{
+    const JPH::CharacterID a = inCharacter->GetID();
+
+    std::lock_guard<std::mutex> lock(m_exitMutex);
+
+    TriggerCharacterOverlapKey key1{ inBodyID2, a };
+
+    auto it = m_activeOverlaps.find(key1);
+
+    if (it == m_activeOverlaps.end())
+        return;
+
+    // кидаем exit-событие
+    m_exitQueue.push_back(it->second);
+
+    // удаляем активное пересечение
+    m_activeOverlaps.erase(it);
+}
+
+void SECharacterContactListener::SetBodyInterface(JPH::BodyInterface* bodyInterface)
+{
+    m_bodyInterface = bodyInterface;
+}
+
+void SECharacterContactListener::FetchExitEvents(eastl::vector<TriggerCharacterExitEvent>& outEvents)
+{
+    std::lock_guard<std::mutex> lock(m_exitMutex);
+
+    outEvents.insert(outEvents.end(), m_exitQueue.begin(), m_exitQueue.end());
+    m_exitQueue.clear();
+}
+
+void SECharacterContactListener::FetchEnterEvents(eastl::vector<TriggerCharacterExitEvent>& outEvents)
+{
+    std::lock_guard<std::mutex> lock(m_enterMutex);
+
+    outEvents.insert(outEvents.end(), m_enterQueue.begin(), m_enterQueue.end());
+    m_enterQueue.clear();
+}
+
+CharacterControllerSystem::CharacterControllerSystem(Scene* scene, PhysicsSystem* physicsSystem)
+    : m_scene(scene), m_physicsSystem(physicsSystem)
+{
+    m_characterContactListener = eastl::make_unique<SECharacterContactListener>();
+    m_characterContactListener->SetBodyInterface(&m_physicsSystem->Bodies());
 }
 
 void CharacterControllerSystem::SetScene(Scene* scene)
@@ -27,7 +111,21 @@ void CharacterControllerSystem::SetScene(Scene* scene)
 
 void CharacterControllerSystem::SetPhysicsSystem(PhysicsSystem* physicsSystem)
 {
-    m_PhysicsSystem = physicsSystem;
+    m_physicsSystem = physicsSystem;
+    m_characterContactListener->SetBodyInterface(&m_physicsSystem->Bodies());
+}
+
+void CharacterControllerSystem::InitCharacters()
+{
+    for (auto& pair : m_scene->uuidToObjectMap)
+    {
+        auto gameObj = pair.second.get();
+        if (gameObj->HasComponent<CharacterControllerComponent>())
+        {
+            auto charContrComp = gameObj->GetComponent<CharacterControllerComponent>();
+            charContrComp->m_character->SetListener(m_characterContactListener.get());
+        }
+    }
 }
 
 void CharacterControllerSystem::Update(float deltaTime)
@@ -35,6 +133,40 @@ void CharacterControllerSystem::Update(float deltaTime)
     for (auto& pair : m_scene->uuidToObjectMap)
     {
         UpdateCharacter(pair.second.get(), deltaTime);
+    }
+    UpdateTriggerOverlaps();
+}
+
+void CharacterControllerSystem::UpdateTriggerOverlaps() {
+    eastl::vector<TriggerCharacterExitEvent> enterEvents;
+    m_characterContactListener->FetchEnterEvents(enterEvents);
+    for (const TriggerCharacterExitEvent& e : enterEvents)
+    {
+        auto triggerGO = Scene::GetInstance().GetGameObjectByUUID(e.Trigger);
+        if (!triggerGO)
+            continue;
+
+        auto triggerComp = triggerGO->GetComponent<TriggerComponent>();
+        if (!triggerComp)
+            continue;
+
+        triggerComp->OnEnter(e.Character);
+    }
+
+    eastl::vector<TriggerCharacterExitEvent> exitEvents;
+    m_characterContactListener->FetchExitEvents(exitEvents);
+
+    for (const TriggerCharacterExitEvent& e : exitEvents)
+    {
+        auto triggerGO = Scene::GetInstance().GetGameObjectByUUID(e.Trigger);
+        if (!triggerGO)
+            continue;
+
+        auto triggerComp = triggerGO->GetComponent<TriggerComponent>();
+        if (!triggerComp)
+            continue;
+
+        triggerComp->OnExit(e.Character);
     }
 }
 
@@ -180,7 +312,7 @@ void CharacterControllerSystem::UpdatePhysics(
         update_settings.mWalkStairsStepUp = joltUpVector * update_settings.mWalkStairsStepUp.Length();
     }
 
-    JPH::PhysicsSystem& physSystem = m_PhysicsSystem->GetWorld();
+    JPH::PhysicsSystem& physSystem = m_physicsSystem->GetWorld();
 
     controller->m_character->ExtendedUpdate(
         deltaTime,
@@ -189,7 +321,7 @@ void CharacterControllerSystem::UpdatePhysics(
         physSystem.GetDefaultLayerFilter(SE::Layers::MOVING), // SE::Layers
         {},
         {},
-        m_PhysicsSystem->GetAllocator()
+        m_physicsSystem->GetAllocator()
     );
 }
 

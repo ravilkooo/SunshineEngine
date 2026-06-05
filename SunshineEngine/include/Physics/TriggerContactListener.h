@@ -60,7 +60,6 @@ public:
     //void FetchRemovedPairs(eastl::vector<JPH::SubShapeIDPair>& outPairs);
 
 private:
-    void HandleTriggerContact(const JPH::Body& body1, const JPH::Body& body2, bool entered);
     bool IsTrigger(const JPH::Body& body) const;
 
 public:
@@ -74,9 +73,5 @@ private:
     std::unordered_map<TriggerOverlapKey, TriggerExitEvent, TriggerOverlapKeyHash> m_activeOverlaps;
     
     eastl::vector<TriggerExitEvent> m_enterQueue;
-
     eastl::vector<TriggerExitEvent> m_exitQueue;
-
-
-
 };
