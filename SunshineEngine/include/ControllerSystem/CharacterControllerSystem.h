@@ -51,12 +51,13 @@ public:
 
     void OnContactRemoved(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, const JPH::SubShapeID& inSubShapeID2) override;
 
-    void SetBodyInterface(JPH::BodyInterface* bodyInterface);
+    void SetBodyInterface(PhysicsSystem* physicsSystem);
 
     void FetchExitEvents(eastl::vector<TriggerCharacterExitEvent>& outEvents);
     void FetchEnterEvents(eastl::vector<TriggerCharacterExitEvent>& outEvents);
 private:
     JPH::BodyInterface* m_bodyInterface = nullptr;
+    PhysicsSystem* m_physicsSystem = nullptr;
 
     std::mutex m_enterMutex;
     std::mutex m_exitMutex;

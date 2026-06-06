@@ -6,6 +6,7 @@
 #include "ControllerSystem/CharacterControllerSystem.h"
 
 #include "Component/TransformComponent.h"
+#include "Component/PhysicsComponent.h"
 #include "Component/TriggerComponent.h"
 #include "Component/CharacterComponent.h"
 #include "Component/CharacterControllerComponent.h"
@@ -28,30 +29,34 @@ void SECharacterContactListener::OnContactAdded(const JPH::CharacterVirtual* inC
 {
     auto layer = m_bodyInterface->GetObjectLayer(inBodyID2);
 
-    if (layer != SE::Layers::TRIGGER)
+    if (layer == SE::Layers::MOVING)
     {
+        // Handle pushing moving objects
         return;
     }
-
-    // Add check isSensor?
-    // if (not sensor) return;
-
-    TriggerCharacterExitEvent ev;
-    ev.Trigger = SE::UUID((uint64_t)m_bodyInterface->GetUserData(inBodyID2));
-    ev.Character = SE::UUID((uint64_t)inCharacter->GetUserData());
-
+    if (layer == SE::Layers::TRIGGER)
     {
-        std::lock_guard<std::mutex> lock(m_enterMutex);
-        m_enterQueue.push_back(ev);
-    }
+        // Add check isSensor?
+        // if (not sensor) return;
 
-    TriggerCharacterOverlapKey key;
-    key.TriggerBody = inBodyID2;
-    key.Character = inCharacter->GetID();
+        TriggerCharacterExitEvent ev;
+        ev.Trigger = SE::UUID((uint64_t)m_bodyInterface->GetUserData(inBodyID2));
+        ev.Character = SE::UUID((uint64_t)inCharacter->GetUserData());
 
-    {
-        std::lock_guard<std::mutex> lock(m_exitMutex);
-        m_activeOverlaps[key] = ev;
+        {
+            std::lock_guard<std::mutex> lock(m_enterMutex);
+            m_enterQueue.push_back(ev);
+        }
+
+        TriggerCharacterOverlapKey key;
+        key.TriggerBody = inBodyID2;
+        key.Character = inCharacter->GetID();
+
+        {
+            std::lock_guard<std::mutex> lock(m_exitMutex);
+            m_activeOverlaps[key] = ev;
+        }
+        return;
     }
 }
 
@@ -76,9 +81,10 @@ void SECharacterContactListener::OnContactRemoved(const JPH::CharacterVirtual* i
     m_activeOverlaps.erase(it);
 }
 
-void SECharacterContactListener::SetBodyInterface(JPH::BodyInterface* bodyInterface)
+void SECharacterContactListener::SetBodyInterface(PhysicsSystem* physicsSystem)
 {
-    m_bodyInterface = bodyInterface;
+    m_physicsSystem = physicsSystem;
+    m_bodyInterface = &physicsSystem->Bodies();
 }
 
 void SECharacterContactListener::FetchExitEvents(eastl::vector<TriggerCharacterExitEvent>& outEvents)
@@ -101,7 +107,7 @@ CharacterControllerSystem::CharacterControllerSystem(Scene* scene, PhysicsSystem
     : m_scene(scene), m_physicsSystem(physicsSystem)
 {
     m_characterContactListener = eastl::make_unique<SECharacterContactListener>();
-    m_characterContactListener->SetBodyInterface(&m_physicsSystem->Bodies());
+    m_characterContactListener->SetBodyInterface(m_physicsSystem);
 }
 
 void CharacterControllerSystem::SetScene(Scene* scene)
@@ -112,7 +118,7 @@ void CharacterControllerSystem::SetScene(Scene* scene)
 void CharacterControllerSystem::SetPhysicsSystem(PhysicsSystem* physicsSystem)
 {
     m_physicsSystem = physicsSystem;
-    m_characterContactListener->SetBodyInterface(&m_physicsSystem->Bodies());
+    m_characterContactListener->SetBodyInterface(m_physicsSystem);
 }
 
 void CharacterControllerSystem::InitCharacters()

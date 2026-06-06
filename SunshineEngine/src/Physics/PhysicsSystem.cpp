@@ -374,12 +374,6 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
 }
 
 void PhysicsSystem::Step(float dt) {
-    /*
-    // Output current position and velocity of the sphere
-    JPH::RVec3 position = bodyInterface->GetCenterOfMassPosition(sphere_id);
-    JPH::Vec3 velocity = bodyInterface->GetLinearVelocity(sphere_id);
-    //std::cout << " :: Position = (" << position.GetX() << ", " << position.GetY() << ", " << position.GetZ() << "), Velocity = (" << velocity.GetX() << ", " << velocity.GetY() << ", " << velocity.GetZ() << ")" << std::endl;
-    */
     // FlushCommands();
 
     m_physicsSystem->Update(
@@ -408,26 +402,6 @@ void PhysicsSystem::ClearAllBodies()
         m_bodyInterface->DestroyBody(it.second->m_joltBodyId);
     }
     m_activeTriggers.clear();
-
-    /*
-    for (body in physicsScene)
-    {
-        bodyInterface->RemoveBody(body->GetID());
-        bodyInterface->DestroyBody(body->GetID());
-    }
-    */
-
-    /*
-    // Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any time.
-    bodyInterface->RemoveBody(sphere_id);
-
-    // Destroy the sphere. After this the sphere ID is no longer valid.
-    bodyInterface->DestroyBody(sphere_id);
-
-    // Remove and destroy the floor
-    bodyInterface->RemoveBody(floor->GetID());
-    bodyInterface->DestroyBody(floor->GetID());
-    */
 }
 
 JPH::PhysicsSystem& PhysicsSystem::GetWorld() { return *m_physicsSystem; }
