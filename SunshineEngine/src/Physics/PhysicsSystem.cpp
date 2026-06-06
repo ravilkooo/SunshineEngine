@@ -50,6 +50,8 @@ PhysicsSystem::PhysicsSystem() :
     m_bodyInterface = &m_physicsSystem->GetBodyInterface();
 
     m_physicsSystem->SetContactListener(&m_triggerContactListener);
+
+    m_activeTriggers = eastl::unordered_map<SE::UUID, TriggerComponent*>();
 }
 
 PhysicsSystem::~PhysicsSystem()
@@ -313,19 +315,19 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
         }
     }
 
-    for (auto triggerJoltId : m_activeTriggers) {
+    for (auto it : m_activeTriggers) {
 
-        SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(triggerJoltId));
+        SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(it.second->m_joltBodyId));
         auto objPtr = scene->GetGameObjectByUUID(objectUUID);
         if (!objPtr)
             continue;
 
-        if (m_bodyInterface->GetMotionType(triggerJoltId) == JPH::EMotionType::Dynamic)
+        if (m_bodyInterface->GetMotionType(it.second->m_joltBodyId) == JPH::EMotionType::Dynamic)
         {
-            //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(triggerJoltId);
+            //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(it);
 
-            JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(triggerJoltId);
-            JPH::Quat quatRot = m_bodyInterface->GetRotation(triggerJoltId);
+            JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(it.second->m_joltBodyId);
+            JPH::Quat quatRot = m_bodyInterface->GetRotation(it.second->m_joltBodyId);
 
 
             auto tc = objPtr->GetComponent<TransformComponent>();
@@ -337,9 +339,9 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
                 DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
                 );
         }
-        else if (m_bodyInterface->GetMotionType(triggerJoltId) == JPH::EMotionType::Kinematic)
+        else if (m_bodyInterface->GetMotionType(it.second->m_joltBodyId) == JPH::EMotionType::Kinematic)
         {
-            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(triggerJoltId));
+            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(it.second->m_joltBodyId));
 
             auto gameObject = scene->GetGameObjectByUUID(objectUUID);
             if (!gameObject)
@@ -363,7 +365,7 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
             m_bodyInterface->SetPositionAndRotation(
-                triggerJoltId,
+                it.second->m_joltBodyId,
                 targetPos,
                 targetRot,
                 JPH::EActivation::Activate);
@@ -400,10 +402,10 @@ void PhysicsSystem::ClearAllBodies()
     m_bodyEntries.clear();
 
     // eastl::vector<JPH::BodyID> m_activeTriggers;
-    for (auto body : m_activeTriggers)
+    for (auto it : m_activeTriggers)
     {
-        m_bodyInterface->RemoveBody(body);
-        m_bodyInterface->DestroyBody(body);
+        m_bodyInterface->RemoveBody(it.second->m_joltBodyId);
+        m_bodyInterface->DestroyBody(it.second->m_joltBodyId);
     }
     m_activeTriggers.clear();
 
@@ -440,15 +442,12 @@ void PhysicsSystem::UpdateTriggerOverlaps()
     m_triggerContactListener.FetchEnterEvents(enterEvents);
     for (const TriggerExitEvent& e : enterEvents)
     {
-        auto triggerGO = Scene::GetInstance().GetGameObjectByUUID(e.Trigger);
-        if (!triggerGO)
+        // to-do: change GetGameObject to Get Trigger (stored in physics system)
+        auto triggerComp = m_activeTriggers.find(e.Trigger);
+        if (triggerComp == m_activeTriggers.end())
             continue;
 
-        auto triggerComp = triggerGO->GetComponent<TriggerComponent>();
-        if (!triggerComp)
-            continue;
-
-        triggerComp->OnEnter(e.Other);
+        triggerComp->second->OnEnter(e.Other);
     }
 
     eastl::vector<TriggerExitEvent> exitEvents;
@@ -456,15 +455,12 @@ void PhysicsSystem::UpdateTriggerOverlaps()
 
     for (const TriggerExitEvent& e : exitEvents)
     {
-        auto triggerGO = Scene::GetInstance().GetGameObjectByUUID(e.Trigger);
-        if (!triggerGO)
+        // to-do: change GetGameObject to Get Trigger (stored in physics system)
+        auto triggerComp = m_activeTriggers.find(e.Trigger);
+        if (triggerComp == m_activeTriggers.end())
             continue;
 
-        auto triggerComp = triggerGO->GetComponent<TriggerComponent>();
-        if (!triggerComp)
-            continue;
-
-        triggerComp->OnExit(e.Other);
+        triggerComp->second->OnExit(e.Other);
     }
 }
 
@@ -491,15 +487,15 @@ void PhysicsSystem::CreateAndAddTrigger(TriggerComponent* triggerComp) {
     settings.mAllowSleeping = (triggerComp->s_triggerActivation != JPH::EActivation::DontActivate);
     settings.mIsSensor = true;
 
-    triggerComp->m_joltBody = bodyInterface.CreateBody(settings);
-    triggerComp->m_joltBodyId = triggerComp->m_joltBody->GetID();
-    triggerComp->m_joltBody->SetUserData(triggerComp->m_objectUUID.m_UUID);
+    JPH::Body* joltBody = bodyInterface.CreateBody(settings);
+    triggerComp->m_joltBodyId = joltBody->GetID();
+    joltBody->SetUserData(triggerComp->m_objectUUID.m_UUID);
     triggerComp->m_physicsSystem = this;
 
     //m_bodyEntries.push_back({ triggerComp->m_joltBodyId });
     m_bodyInterface->AddBody(triggerComp->m_joltBodyId, triggerComp->s_triggerActivation);
 
-    m_activeTriggers.push_back(triggerComp->m_joltBodyId);
+    m_activeTriggers[triggerComp->m_objectUUID] = triggerComp;
 }
 
 void PhysicsSystem::RemoveTrigger(TriggerComponent* triggerComp)
@@ -507,17 +503,15 @@ void PhysicsSystem::RemoveTrigger(TriggerComponent* triggerComp)
     if (!triggerComp || !m_bodyInterface)
         return;
 
-    JPH::BodyID bodyId = triggerComp->m_joltBodyId;
+    SE::UUID bodyUUID = triggerComp->m_objectUUID;
 
     // Remove from body entries
-    auto it = eastl::find_if(m_activeTriggers.begin(), m_activeTriggers.end(),
-        [bodyId](const PhysicsBodyEntry& entry) {
-            return entry.m_joltBodyId == bodyId;
-        });
+    auto it = m_activeTriggers.find(bodyUUID);
     if (it != m_activeTriggers.end())
     {
         m_activeTriggers.erase(it);
     }
+    JPH::BodyID bodyId = triggerComp->m_joltBodyId;
 
     // Remove from physics world
     if (m_bodyInterface->IsAdded(bodyId))
@@ -529,7 +523,6 @@ void PhysicsSystem::RemoveTrigger(TriggerComponent* triggerComp)
     m_bodyInterface->DestroyBody(bodyId);
 
     // Clear component references
-    triggerComp->m_joltBody = nullptr;
     triggerComp->m_joltBodyId = JPH::BodyID();
     triggerComp->m_physicsSystem = nullptr;
 }

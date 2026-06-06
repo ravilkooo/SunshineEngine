@@ -65,7 +65,6 @@ public:
 
     void InitTransforms();
 
-    JPH::Body* GetBody() const;
     JPH::BodyID GetBodyID() const;
 
     void FromJson(const json& j) override;
@@ -81,7 +80,6 @@ private:
     SE::ColliderData m_colliderData;    
 
     SE::UUID m_objectUUID;
-    JPH::Body* m_joltBody;
     JPH::BodyID m_joltBodyId;
 
     JPH::RVec3 m_position = JPH::RVec3::sZero();

@@ -116,6 +116,7 @@ private:
     TransformComponent* transformComp;
 
     SE::UUID m_objectUUID;
+    // to-do: remove pointer (not safe?)
     JPH::Body* m_joltBody;
     JPH::BodyID m_joltBodyId;
 

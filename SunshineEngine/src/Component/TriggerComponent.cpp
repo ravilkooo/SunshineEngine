@@ -115,11 +115,6 @@ void TriggerComponent::InitTransforms()
         transformComp->m_cachedAbsoluteWorldRotation_quat.w);
 }
 
-JPH::Body* TriggerComponent::GetBody() const
-{
-    return m_joltBody;
-}
-
 JPH::BodyID TriggerComponent::GetBodyID() const
 {
     return m_joltBodyId;

@@ -14,7 +14,7 @@ local angleOffet = 0.2
 
 
 function behavior:start()
-    TestCharacterFields(self)
+    -- TestCharacterFields(self)
 end
 
 function behavior:update(dt)

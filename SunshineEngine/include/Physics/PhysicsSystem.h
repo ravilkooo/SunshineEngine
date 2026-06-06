@@ -37,6 +37,8 @@
 #include <Physics/CollisionLayerVsGroupTable.h>
 #include <Physics/TriggerContactListener.h>
 
+#include <EASTL/unordered_map.h>
+
 
 #include <Utils/UUID.h>
 
@@ -328,7 +330,7 @@ private:
     eastl::vector<PhysicsBodyEntry> m_bodyEntries;
 
     TriggerContactListener m_triggerContactListener;
-    eastl::vector<JPH::BodyID> m_activeTriggers;
+    eastl::unordered_map<SE::UUID, TriggerComponent*> m_activeTriggers;
 
     bool m_isValid = false;
     
