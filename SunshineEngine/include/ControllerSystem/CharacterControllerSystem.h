@@ -30,6 +30,13 @@ struct TriggerCharacterOverlapKey
     }
 };
 
+struct CharacterPushEvent
+{
+    JPH::BodyID inBodyID2;
+    JPH::RVec3Arg inContactPosition;
+    JPH::Vec3Arg inContactNormal;
+};
+
 struct TriggerCharacterOverlapKeyHash
 {
     size_t operator()(const TriggerCharacterOverlapKey& k) const noexcept
@@ -53,8 +60,8 @@ public:
 
     void SetBodyInterface(PhysicsSystem* physicsSystem);
 
-    void FetchExitEvents(eastl::vector<TriggerCharacterExitEvent>& outEvents);
     void FetchEnterEvents(eastl::vector<TriggerCharacterExitEvent>& outEvents);
+    void FetchExitEvents(eastl::vector<TriggerCharacterExitEvent>& outEvents);
 private:
     JPH::BodyInterface* m_bodyInterface = nullptr;
     PhysicsSystem* m_physicsSystem = nullptr;
@@ -90,8 +97,9 @@ public:
     // Update
     //
 
-    void Update(float deltaTime);
+    void UpdateCharacters(float deltaTime);
     void UpdateTriggerOverlaps();
+    void UpdatePhysicsInteractions();
 
 private:
 

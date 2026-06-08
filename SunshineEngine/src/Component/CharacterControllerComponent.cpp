@@ -49,7 +49,7 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 		JPH::DegreesToRadians(
 			m_maxSlopeAngle
 		);
-	settings.mMaxStrength = 100.0f;
+	settings.mMaxStrength = 10000.0f;
 	settings.mCharacterPadding = 0.02f;
 	settings.mPenetrationRecoverySpeed = 1.0f;
 	settings.mInnerBodyShape = m_shape;

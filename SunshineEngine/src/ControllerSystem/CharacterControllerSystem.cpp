@@ -134,13 +134,12 @@ void CharacterControllerSystem::InitCharacters()
     }
 }
 
-void CharacterControllerSystem::Update(float deltaTime)
+void CharacterControllerSystem::UpdateCharacters(float deltaTime)
 {
     for (auto& pair : m_scene->uuidToObjectMap)
     {
         UpdateCharacter(pair.second.get(), deltaTime);
     }
-    UpdateTriggerOverlaps();
 }
 
 void CharacterControllerSystem::UpdateTriggerOverlaps() {

@@ -262,7 +262,7 @@ namespace SE {
             m_settings = settings;
         }
 
-        JPH::ShapeSettings::ShapeResult CreateShape()
+        JPH::ShapeSettings::ShapeResult CreateShape(float density = 1000.0f)
         {
             JPH::ShapeSettings::ShapeResult shapeResult;
             switch (m_shapeType) {
@@ -274,6 +274,7 @@ namespace SE {
                         m_settings.data.asBox.m_size.z * 0.5f
                     )
                 );
+                boxSettings.SetDensity(density);
                 shapeResult = boxSettings.Create();
                 break;
             }
@@ -287,6 +288,7 @@ namespace SE {
                     m_settings.data.asCapsule.m_height * 0.5f,
                     m_settings.data.asCapsule.m_radius
                 );
+                capsuleSettings.SetDensity(density);
                 shapeResult = capsuleSettings.Create();
                 break;
             }
@@ -296,12 +298,14 @@ namespace SE {
                     m_settings.data.asTaperedCapsule.m_topRadius,
                     m_settings.data.asTaperedCapsule.m_bottomRadius
                 );
+                taperedCapsuleSettings.SetDensity(density);
                 shapeResult = taperedCapsuleSettings.Create();
                 break;
             }
             default:
                 // Fallback to box if shape type is not recognized
                 JPH::BoxShapeSettings defaultBoxSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
+                defaultBoxSettings.SetDensity(density);
                 shapeResult = defaultBoxSettings.Create();
                 break;
             }

@@ -729,6 +729,14 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
             DrawColliderSettings(colliderData);
         }
 
+        DrawFloatControl("Obejct density", physicsInfo->m_density, 1000.0f, 1.0f, 0.1f, 1'000'000.0f, "%.1f");
+        ImGui::SetItemTooltip(
+            "1.2 = Air\n"
+            "900 = Ice\n"
+            "1000 = Water\n"
+            "2700 = Aluminium\n"
+            "7900 = Iron\n\n"
+        );
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         if (ImGui::TreeNodeEx("Additional Forces", flags))

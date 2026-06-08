@@ -282,6 +282,7 @@ json PhysicsComponent_Info::ToJson() const {
         {"m_linearDamping", m_linearDamping},
         {"m_angularDamping", m_angularDamping},
         {"m_restitution", m_restitution},
+        {"m_density", m_density},
     };
 
     if (m_colliderData) {
@@ -316,6 +317,7 @@ void PhysicsComponent_Info::FromJson(const json& j) {
     m_linearDamping = j.contains("m_linearDamping") ? j["m_linearDamping"].get<float>() : 0.05f;
     m_angularDamping = j.contains("m_angularDamping") ? j["m_angularDamping"].get<float>() : 0.05f;
     m_restitution = j.contains("m_restitution") ? j["m_restitution"].get<float>() : 0.0f;
+    m_density = j.contains("m_density") ? j["m_density"].get<float>() : 1000.0f;
 }
 
 void PhysicsComponent::FromJson(const json& j) {
@@ -350,6 +352,7 @@ void PhysicsComponent::FromJson(const json& j) {
     m_linearDamping = j.contains("m_linearDamping") ? j["m_linearDamping"].get<float>() : 0.05f;
     m_angularDamping = j.contains("m_angularDamping") ? j["m_angularDamping"].get<float>() : 0.05f;
     m_restitution = j.contains("m_restitution") ? j["m_restitution"].get<float>() : 0.0f;
+    m_density = j.contains("m_density") ? j["m_density"].get<float>() : 1000.0f;
 }
 
 // ----------------- LuaComponent -----------------

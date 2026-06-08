@@ -152,7 +152,7 @@ bool PhysicsSystem::PerceptionTrace(const JPH::RVec3& begin,
 void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {
     physComp->InitTransforms();
 
-    JPH::ShapeSettings::ShapeResult shapeResult = physComp->m_colliderData.CreateShape();
+    JPH::ShapeSettings::ShapeResult shapeResult = physComp->m_colliderData.CreateShape(physComp->m_density);
 
     if (shapeResult.IsValid()) {
         physComp->m_shape = shapeResult.Get();

@@ -155,7 +155,7 @@ public:
         case SE::Layers::NON_MOVING:
             // Non-moving collides with moving and character
             return inObject2 == SE::Layers::MOVING ||
-                inObject2 == SE::Layers::CHARACTER;;
+                inObject2 == SE::Layers::CHARACTER;
 
         case SE::Layers::MOVING:
             // Moving collides with non-moving, moving and character

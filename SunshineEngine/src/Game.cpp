@@ -221,7 +221,8 @@ void Game::Update(float deltaTime) {
 
 	m_physicsSystem->FlushCommands();
 
-	m_characterControllerSystem->Update(deltaTime);
+	m_characterControllerSystem->UpdateCharacters(deltaTime);
+	m_characterControllerSystem->UpdateTriggerOverlaps();
 	m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	m_physicsSystem->Step(deltaTime);

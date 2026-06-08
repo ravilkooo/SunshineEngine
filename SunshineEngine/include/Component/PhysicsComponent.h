@@ -126,6 +126,7 @@ private:
     JPH::EMotionType m_motionType = JPH::EMotionType::Static;
     JPH::EActivation m_activation = JPH::EActivation::Activate;
     JPH::ObjectLayer m_objectLayer = SE::Layers::MOVING; // default layer
+    float m_density = 1000.0f;
     JPH::ShapeRefC m_shape = nullptr;
 
     // Friction and damping
@@ -212,6 +213,9 @@ public:
     
     // Restitution
     float m_restitution = 0.0f;
+
+    // Density
+    float m_density = 1000.0f;
 
     SE::CollisionLayer m_collisionLayer = "MOVING";
 };
