@@ -1,0 +1,72 @@
+#include <Component/Component.h>
+#include <Utils/UUID.h>
+
+class CharacterComponent;
+
+class BouncePadComponent : public Component
+{
+public:
+    BouncePadComponent() = default;
+    ~BouncePadComponent() = default;
+
+    BouncePadComponent(const BouncePadComponent&) = delete;
+    BouncePadComponent& operator=(const BouncePadComponent&) = delete;
+
+    BouncePadComponent(BouncePadComponent&&) noexcept = default;
+    BouncePadComponent& operator=(BouncePadComponent&&) noexcept = default;
+
+    float m_bounceVelocity = 15.0f;
+
+    void BounceCharacter(SE::UUID characterUUID);
+
+    // Inherited via Component
+    const std::type_info& getType() const override {
+        return typeid(BouncePadComponent);
+    }
+    static const SE::ComponentType s_componentType = SE::ComponentType::BOUNCE_PAD;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+
+    void FromJson(const json& j) override;
+};
+
+class BouncePadComponent_Info : public Component_Info
+{
+public:
+    BouncePadComponent_Info() = default;
+    ~BouncePadComponent_Info() = default;
+
+    BouncePadComponent_Info(const BouncePadComponent_Info&) = delete;
+    BouncePadComponent_Info& operator=(const BouncePadComponent_Info&) = delete;
+
+    BouncePadComponent_Info(BouncePadComponent_Info&&) noexcept = default;
+    BouncePadComponent_Info& operator=(BouncePadComponent_Info&&) noexcept = default;
+
+    float m_bounceVelocity = 15.0f;
+
+    // Inherited via Component
+    const std::type_info& getType() const override {
+        return typeid(BouncePadComponent_Info);
+    }
+    static const SE::ComponentType s_componentType = SE::ComponentType::BOUNCE_PAD;
+    const SE::ComponentType ComponentType() const override {
+        return s_componentType;
+    }
+
+    bool IsAssigned() override { return false; }
+
+    // Serialization
+    json ToJson() const override;
+    void FromJson(const json& j) override;
+};
+
+#ifndef BOUNCEPADCOMPONENT_LUA_FIELDS_APPLY
+#define BOUNCEPADCOMPONENT_LUA_FIELDS_APPLY(F) \
+    F(m_bounceVelocity)
+#endif
+
+#ifndef BOUNCEPADCOMPONENT_LUA_METHODS_APPLY
+#define BOUNCEPADCOMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("bounceCharacter", [](BouncePadComponent* self, SE::UUIDhilo characterUUID){ return self->BounceCharacter(SE::UUID::FromHilo(characterUUID)); })
+#endif

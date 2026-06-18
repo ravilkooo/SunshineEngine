@@ -189,6 +189,8 @@ void CharacterControllerSystem::UpdateCharacter(
 
     ApplyMovementInput(charComp, charContrComp, deltaTime);
 
+    ApplyBounce(charComp, charContrComp);
+
     ApplyGravity(charComp, charContrComp, deltaTime);
 
     ApplyJump(charComp, charContrComp);
@@ -255,6 +257,23 @@ void CharacterControllerSystem::ApplyGravity(
     {
         controller->m_velocity.y =
             controller->m_maxFallSpeed;
+    }
+}
+
+void CharacterControllerSystem::ApplyBounce(
+    eastl::shared_ptr<CharacterComponent> character,
+    eastl::shared_ptr<CharacterControllerComponent> controller)
+{
+    if (!character->m_bounced)
+        return;
+
+    if (controller->m_velocity.y <= 0.0f)
+    {
+        controller->m_velocity.y = character->m_bounceSpeed;
+
+        controller->m_grounded = false;
+
+        character->m_bounced = false;
     }
 }
 

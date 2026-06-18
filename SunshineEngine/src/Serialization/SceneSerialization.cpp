@@ -14,6 +14,7 @@
 #include <Component/CameraComponent.h>
 #include <Component/CharacterComponent.h>
 #include <Component/CharacterControllerComponent.h>
+#include <Component/BouncePadComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -512,6 +513,32 @@ void CharacterControllerComponent::FromJson(const json& j, PhysicsSystem* physic
     Initialize(physicsSystem, transformComp, uuid);
 }
 
+// ----------------- BouncePadComponent -----------------
+
+json BouncePadComponent_Info::ToJson() const
+{
+    json j;
+    j = nlohmann::json{
+        {"m_bounceVelocity", m_bounceVelocity}
+    };
+    return j;
+}
+
+void BouncePadComponent_Info::FromJson(const json& j)
+{
+    if (j.contains("m_bounceVelocity") && j["m_bounceVelocity"].is_number_float()) {
+        m_bounceVelocity = j["m_bounceVelocity"].get<float>();
+    }
+}
+
+void BouncePadComponent::FromJson(const json& j)
+{
+    if (j.contains("m_bounceVelocity") && j["m_bounceVelocity"].is_number_float()) {
+        m_bounceVelocity = j["m_bounceVelocity"].get<float>();
+    }
+}
+
+
 // ----------------- GameObject_Info -----------------
 
 
@@ -570,6 +597,7 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::CHARACTER_CONTROLLER:   key = "CharacterController"; break;
             case SE::ComponentType::CHARACTER:              key = "Character"; break;
             case SE::ComponentType::CAMERA:              key = "Camera"; break;
+            case SE::ComponentType::BOUNCE_PAD:              key = "BouncePad"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -727,6 +755,11 @@ void Scene::FromJson(
                         go->m_UUID);
                     c->FromJson(objJ["components"]["Camera"]);
                     GetInstance().m_cameraManager->AddCamera(c->m_camera);
+                }
+
+                if (objJ["components"].contains("BouncePad")) {
+                    auto bouncePadComp = go->AddComponent<BouncePadComponent>();
+                    bouncePadComp->FromJson(objJ["components"]["BouncePad"]);
                 }
                 
                 // Parentnes
@@ -923,6 +956,11 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
                 go->m_UUID);
             c->FromJson(objJ["components"]["Camera"]);
             scene->m_cameraManager->AddCamera(c->m_assignedComponent->m_camera);
+        }
+
+        if (objJ["components"].contains("BouncePad")) {
+            auto c = go->AddComponent<BouncePadComponent_Info>();
+            c->FromJson(objJ["components"]["BouncePad"]);
         }
 
         // Parentnes

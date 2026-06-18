@@ -30,6 +30,7 @@
 #include <Component/CharacterComponent.h>
 #include <Component/CameraComponent.h>
 #include <Component/CharacterControllerComponent.h>
+#include <Component/BouncePadComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -409,6 +410,7 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         DrawPerceptionComponent(obj);
         DrawBehaviorController(obj);
         DrawLuaComponent(obj);
+        DrawBouncePadComponent(obj);
 
         ImGui::TreePop();
     }
@@ -1506,6 +1508,16 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
                 ImGui::SetItemTooltip("Can't have both Character Controller and Physics components");
         }
 
+        if (!obj->HasComponent<BouncePadComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Bounce pad component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::BOUNCE_PAD);
+            }
+        }
+
         if (HasAllComponents)
         {
             ImGui::TextDisabled("All available components added");
@@ -1928,6 +1940,35 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
     }
+}
+
+void PropertyPanel::DrawBouncePadComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<BouncePadComponent_Info>())
+        return;
+    auto bouncePadInfo = obj->GetComponent<BouncePadComponent_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Bounce pad settings", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        if (DrawComponentRemoveButton<BouncePadComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
+
+        DrawFloatControl("Bounce speed", bouncePadInfo->m_bounceVelocity, 1.0f, 1.0f, 0.0f, 1000.0f, "%.2f");
+
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)

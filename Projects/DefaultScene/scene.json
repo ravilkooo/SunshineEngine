@@ -248,9 +248,9 @@
                         60.0
                     ],
                     "m_position": [
-                        13.083739280700684,
+                        11.420831680297852,
                         6.0,
-                        32.0
+                        29.057302474975586
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1285,9 +1285,9 @@
                         2.4000000953674316
                     ],
                     "m_position": [
-                        8.486446380615234,
-                        46.193824768066406,
-                        19.68305206298828
+                        4.91426944732666,
+                        32.42379379272461,
+                        32.72905731201172
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1295,9 +1295,9 @@
                         0.0
                     ],
                     "m_scaleFactor": [
-                        0.9999995827674866,
+                        0.9999991059303284,
                         1.0,
-                        0.9999995827674866
+                        0.9999991059303284
                     ],
                     "m_uvMultiplier": [
                         1.0,
@@ -4833,6 +4833,139 @@
                 "SliceCount": 12
             },
             "m_type": "Cylinder"
+        },
+        {
+            "components": {
+                "BouncePad": {
+                    "m_bounceVelocity": 20.0
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/BouncePad.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    2.700000047683716,
+                                    0.4000000059604645,
+                                    2.700000047683716
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "NON_MOVING",
+                    "m_density": 1000.0,
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Static",
+                    "m_restitution": 1.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        2.700000047683716,
+                        0.4000000059604645,
+                        2.700000047683716
+                    ],
+                    "m_position": [
+                        5.227898597717285,
+                        7.069076061248779,
+                        33.74170684814453
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    2.700000047683716,
+                                    1.0499999523162842,
+                                    2.700000047683716
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    }
+                }
+            },
+            "m_UUID": 18396376531357425538,
+            "m_UUID_hi": 4283240188,
+            "m_UUID_lo": 2984533890,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
         }
     ],
     "inputMapping": "Default",

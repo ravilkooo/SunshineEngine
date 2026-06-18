@@ -6,12 +6,14 @@
 class TransformComponent;
 class RenderComponent;
 class PhysicsComponent;
+class TriggerComponent;
 class PerceptionComponent;
 class BehaviorController;
 class ParticleEmitterComponent;
 class CameraComponent;
 class CharacterComponent;
 class CharacterControllerComponent;
+class BouncePadComponent;
 
 namespace ScriptingBindings {
     // Registers all engine types and GameObject accessors to the given Lua state.
@@ -28,11 +30,12 @@ namespace ScriptingBindings {
     F(TransformComponent, "getTransform") , \
     F(RenderComponent, "getRender") , \
     F(PhysicsComponent, "getPhysics") , \
-    F(PhysicsComponent, "getTrigger") , \
+    F(TriggerComponent, "getTrigger") , \
     F(BehaviorController, "getBehavior") , \
     F(PerceptionComponent, "getPerception"), \
+    F(BouncePadComponent, "getBouncePad"), \
     F(ParticleEmitterComponent, "getParticleEmitter"), \
-    F(CameraComponent, "getCameraComponent") \
-    F(CharacterComponent, "getCharacterComponent") \
+    F(CameraComponent, "getCameraComponent"), \
+    F(CharacterComponent, "getCharacterComponent"), \
     F(CharacterControllerComponent, "getCharacterController")
 #endif

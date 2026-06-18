@@ -49,6 +49,11 @@ public:
     bool m_jumpRequested = false;
     bool m_attackRequested = false;
 
+    // Interactions
+
+    bool m_bounced = false;
+    float m_bounceSpeed = 0.0f;
+
     //
     // View rotation
     //

@@ -9,6 +9,7 @@
 #include <Component/CharacterComponent.h>
 #include <Component/CameraComponent.h>
 #include <Component/CharacterControllerComponent.h>
+#include <Component/BouncePadComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -271,6 +272,14 @@ void GameObject_Info::AddDefaultComponent(SE::ComponentType compType)
             // Add CharacterComponent with default values
         {
             auto ch_info = AddComponent<CharacterComponent_Info>();
+        }
+        break;
+
+        case SE::ComponentType::BOUNCE_PAD:
+
+            // Add BouncePadComponent with default values
+        {
+            auto bp_info = AddComponent<BouncePadComponent_Info>();
         }
         break;
 

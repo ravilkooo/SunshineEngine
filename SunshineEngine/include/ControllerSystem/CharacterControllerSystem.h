@@ -121,6 +121,11 @@ private:
         float deltaTime
     );
 
+    void ApplyBounce(
+        eastl::shared_ptr<CharacterComponent> character,
+        eastl::shared_ptr<CharacterControllerComponent> controller
+    );
+
     void ApplyJump(
         eastl::shared_ptr<CharacterComponent> character,
         eastl::shared_ptr<CharacterControllerComponent> controller

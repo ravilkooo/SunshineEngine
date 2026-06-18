@@ -27,7 +27,7 @@ function behavior:start()
                 -- if otherUUID:isEqual(playerUUID) then
                     collected = true
                     local audio = getAudioSystem()
-                    audio:play("pause")
+                    -- audio:play("pause")
                     removeGameObjectByUUID(self.owner:getUUID())
                 -- end
             end

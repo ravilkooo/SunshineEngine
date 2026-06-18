@@ -3,6 +3,8 @@
 
 #include <string>
 
+void RegisterBouncePadComponentLuaBindings();
+
 #include <Physics/PhysicsSystem.h>
 
 #include <Graphics/Utils/Camera.h>
@@ -154,6 +156,7 @@ namespace ScriptingBindings
 		});
 
         // Execute all component binders registered via LUA_REGISTER_COMPONENT
+		RegisterBouncePadComponentLuaBindings();
         AutoBindings::RegisterAll(lua);
 		
 		// Remove object from scene

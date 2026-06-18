@@ -21,21 +21,19 @@ function behavior:start()
 
     local trigger = self.owner:getTrigger()
 
+
     if (trigger) then
         trigger:setLuaCallback(function(event, otherUUID)
             if not collected then
                 if event == "enter" then
                     if otherUUID:isEqual(playerUUID) then
-                        collected = true
-                        local audio = getAudioSystem()
-                        audio:play("pause")
-                        removeGameObjectByUUID(self.owner:getUUID())
+                        local bounce = self.owner:getBouncePad()
+                        bounce:bounceCharacter(playerUUID)
                     end
                 end
             end
         end)
     end
-    -- print("Behavior started", self.id
 end
 
 function behavior:update(dt)
