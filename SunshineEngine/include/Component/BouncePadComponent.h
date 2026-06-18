@@ -18,6 +18,7 @@ public:
     float m_minBounceVelocity = 15.0f;
 
     void BounceCharacter(SE::UUID characterUUID);
+    void BounceCharacter(CharacterComponent* character);
 
     // Inherited via Component
     const std::type_info& getType() const override {
@@ -68,5 +69,6 @@ public:
 
 #ifndef BOUNCEPADCOMPONENT_LUA_METHODS_APPLY
 #define BOUNCEPADCOMPONENT_LUA_METHODS_APPLY(FM) \
-    FM("bounceCharacter", [](BouncePadComponent* self, SE::UUIDhilo characterUUID){ return self->BounceCharacter(SE::UUID::FromHilo(characterUUID)); })
+    FM("bounceCharacter", [](BouncePadComponent* self, CharacterComponent* character){ return self->BounceCharacter(character); }) \
+    FM("bounceCharacterByUUID", [](BouncePadComponent* self, SE::UUIDhilo characterUUID){ return self->BounceCharacter(SE::UUID::FromHilo(characterUUID)); })
 #endif

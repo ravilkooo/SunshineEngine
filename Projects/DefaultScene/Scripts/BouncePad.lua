@@ -28,7 +28,7 @@ function behavior:start()
                 if event == "enter" then
                     if otherUUID:isEqual(playerUUID) then
                         local bounce = self.owner:getBouncePad()
-                        bounce:bounceCharacter(playerUUID)
+                        bounce:bounceCharacterByUUID(otherUUID)
                     end
                 end
             end

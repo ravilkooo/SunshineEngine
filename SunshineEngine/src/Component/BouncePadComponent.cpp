@@ -9,11 +9,20 @@
 void BouncePadComponent::BounceCharacter(SE::UUID characterUUID)
 {
     auto character = Scene::GetInstance().GetGameObjectByUUID(characterUUID)->GetComponent<CharacterComponent>();
+    BounceCharacter(character.get());
+}
+
+void BouncePadComponent::BounceCharacter(CharacterComponent* character)
+{
     if (character)
     {
         character->m_bounced = true;
         character->m_bounceSpeed = m_minBounceVelocity;
     }
+}
+
+void RegisterBouncePadComponentLuaBindings()
+{
 }
 
 #define BPC_ADD_FIELD(name) #name, &BouncePadComponent::name
@@ -25,7 +34,3 @@ void BouncePadComponent::BounceCharacter(SE::UUID characterUUID)
 LUA_REGISTER_COMPONENT(BouncePadComponent, "BouncePadComponent", BPC_FIELD_PAIRS, BPC_METHOD_PAIRS, "getBouncePad")
 #undef BPC_ADD_FIELD
 #undef  BPC_ADD_METHOD_WITH_LEAD
-
-void RegisterBouncePadComponentLuaBindings()
-{
-}
