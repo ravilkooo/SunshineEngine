@@ -25,7 +25,6 @@ void BouncePadComponent::BounceCharacter(CharacterComponent* character)
         character->m_bounced = true;
         character->m_bounceSpeed = m_minBounceVelocity;
 
-        /*
         if (m_assignedTransform)
         {
             const auto wMat = m_assignedTransform->GetWorldMatrix();
@@ -39,7 +38,6 @@ void BouncePadComponent::BounceCharacter(CharacterComponent* character)
             const auto wMatInvTranspose = (A.Invert()).Transpose();
             character->m_bounceNormal = DXSM::Vector3::Transform(DXSM::Vector3(0, 1, 0), wMatInvTranspose);
         }
-        */
     }
 }
 

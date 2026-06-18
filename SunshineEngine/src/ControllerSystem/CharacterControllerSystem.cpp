@@ -218,7 +218,7 @@ void CharacterControllerSystem::ApplyMovementInput(
 
     DXSM::Vector3 desiredVelocity(
         input.x * controller->m_moveSpeed,
-        controller->m_velocity.y,
+        controller->m_inputVelocity.y,
         input.y * controller->m_moveSpeed
     );
 
@@ -227,13 +227,13 @@ void CharacterControllerSystem::ApplyMovementInput(
         ? controller->m_acceleration
         : controller->m_airAcceleration;
 
-    controller->m_velocity.x = std::lerp(
-        controller->m_velocity.x,
+    controller->m_inputVelocity.x = std::lerp(
+        controller->m_inputVelocity.x,
         desiredVelocity.x,
         accel * deltaTime);
 
-    controller->m_velocity.z = std::lerp(
-        controller->m_velocity.z,
+    controller->m_inputVelocity.z = std::lerp(
+        controller->m_inputVelocity.z,
         desiredVelocity.z,
         accel * deltaTime
     );
@@ -316,9 +316,9 @@ void CharacterControllerSystem::UpdatePhysics(
 
     controller->m_character->SetLinearVelocity(
         JPH::Vec3(
-            controller->m_velocity.x * cos(character->m_yaw) + controller->m_velocity.z * sin(character->m_yaw),
-            controller->m_velocity.y,
-            controller->m_velocity.z * cos(character->m_yaw) - controller->m_velocity.x * sin(character->m_yaw)
+            controller->m_velocity.x + controller->m_inputVelocity.x * cos(character->m_yaw) + controller->m_inputVelocity.z * sin(character->m_yaw),
+            controller->m_velocity.y + controller->m_inputVelocity.y,
+            controller->m_velocity.z + controller->m_inputVelocity.z * cos(character->m_yaw) - controller->m_inputVelocity.x * sin(character->m_yaw)
         )
     );
 
@@ -360,9 +360,17 @@ void CharacterControllerSystem::UpdateGroundState(
     eastl::shared_ptr<CharacterComponent> character,
     eastl::shared_ptr<CharacterControllerComponent> controller)
 {
+    bool wasGrounded = controller->m_grounded;
+
     controller->m_grounded =
         controller->m_character->GetGroundState() ==
         JPH::CharacterBase::EGroundState::OnGround;
+
+    if (!wasGrounded && controller->m_grounded)
+    {
+        controller->m_velocity.x = 0;
+        controller->m_velocity.z = 0;
+    }
 }
 
 void CharacterControllerSystem::ClearFrameState(
