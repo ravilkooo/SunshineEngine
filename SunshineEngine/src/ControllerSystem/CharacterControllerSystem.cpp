@@ -278,8 +278,6 @@ void CharacterControllerSystem::ApplyBounce(
             controller->m_velocity = DXSM::Vector3::Reflect(controller->m_velocity, character->m_bounceNormal);
         }
 
-        // controller->m_velocity.y = std::max(-controller->m_velocity.y, character->m_bounceSpeed);
-
         controller->m_grounded = false;
 
         character->m_bounced = false;

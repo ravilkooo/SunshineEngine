@@ -1,10 +1,16 @@
 #include "Component/BouncePadComponent.h"
 #include "Component/CharacterComponent.h"
+#include "Component/TransformComponent.h"
 
 #include <Scene.h>
 
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>
+
+BouncePadComponent::BouncePadComponent(TransformComponent* tc)
+{
+    m_assignedTransform = tc;
+}
 
 void BouncePadComponent::BounceCharacter(SE::UUID characterUUID)
 {
@@ -18,6 +24,22 @@ void BouncePadComponent::BounceCharacter(CharacterComponent* character)
     {
         character->m_bounced = true;
         character->m_bounceSpeed = m_minBounceVelocity;
+
+        /*
+        if (m_assignedTransform)
+        {
+            const auto wMat = m_assignedTransform->GetWorldMatrix();
+            DXSM::Matrix A = wMat;
+            // Correct ?
+            A._41 = 0;
+            A._42 = 0;
+            A._43 = 0;
+            A._44 = 1;
+
+            const auto wMatInvTranspose = (A.Invert()).Transpose();
+            character->m_bounceNormal = DXSM::Vector3::Transform(DXSM::Vector3(0, 1, 0), wMatInvTranspose);
+        }
+        */
     }
 }
 

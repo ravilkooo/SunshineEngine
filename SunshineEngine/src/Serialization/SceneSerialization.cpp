@@ -538,6 +538,12 @@ void BouncePadComponent::FromJson(const json& j)
     }
 }
 
+void BouncePadComponent::FromJson(const json& j, TransformComponent* tc)
+{
+    FromJson(j);
+    m_assignedTransform = tc;
+}
+
 
 // ----------------- GameObject_Info -----------------
 
@@ -759,7 +765,8 @@ void Scene::FromJson(
 
                 if (objJ["components"].contains("BouncePad")) {
                     auto bouncePadComp = go->AddComponent<BouncePadComponent>();
-                    bouncePadComp->FromJson(objJ["components"]["BouncePad"]);
+                    bouncePadComp->FromJson(objJ["components"]["BouncePad"],
+                        go->GetComponent<TransformComponent>().get());
                 }
                 
                 // Parentnes

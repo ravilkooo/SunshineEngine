@@ -2,11 +2,13 @@
 #include <Utils/UUID.h>
 
 class CharacterComponent;
+class TransformComponent;
 
 class BouncePadComponent : public Component
 {
 public:
     BouncePadComponent() = default;
+    BouncePadComponent(TransformComponent* tc);
     ~BouncePadComponent() = default;
 
     BouncePadComponent(const BouncePadComponent&) = delete;
@@ -30,6 +32,9 @@ public:
     }
 
     void FromJson(const json& j) override;
+    void FromJson(const json& j, TransformComponent* tc);
+
+    TransformComponent* m_assignedTransform = nullptr;
 };
 
 class BouncePadComponent_Info : public Component_Info
