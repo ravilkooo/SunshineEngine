@@ -1964,7 +1964,7 @@ void PropertyPanel::DrawBouncePadComponent(GameObject_Info* obj)
             return;
         }
 
-        DrawFloatControl("Bounce speed", bouncePadInfo->m_bounceVelocity, 1.0f, 1.0f, 0.0f, 1000.0f, "%.2f");
+        DrawFloatControl("Min bounce speed", bouncePadInfo->m_minBounceVelocity, 1.0f, 1.0f, 0.0f, 1000.0f, "%.2f");
 
         ImGui::TreePop();
     }

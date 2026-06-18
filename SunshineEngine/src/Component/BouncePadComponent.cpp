@@ -12,7 +12,7 @@ void BouncePadComponent::BounceCharacter(SE::UUID characterUUID)
     if (character)
     {
         character->m_bounced = true;
-        character->m_bounceSpeed = m_bounceVelocity;
+        character->m_bounceSpeed = m_minBounceVelocity;
     }
 }
 

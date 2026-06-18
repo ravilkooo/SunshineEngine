@@ -269,7 +269,7 @@ void CharacterControllerSystem::ApplyBounce(
 
     if (controller->m_velocity.y <= 0.0f)
     {
-        controller->m_velocity.y = character->m_bounceSpeed;
+        controller->m_velocity.y = std::max(-controller->m_velocity.y, character->m_bounceSpeed);
 
         controller->m_grounded = false;
 

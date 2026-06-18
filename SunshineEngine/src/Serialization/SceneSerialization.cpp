@@ -519,22 +519,22 @@ json BouncePadComponent_Info::ToJson() const
 {
     json j;
     j = nlohmann::json{
-        {"m_bounceVelocity", m_bounceVelocity}
+        {"m_minBounceVelocity", m_minBounceVelocity}
     };
     return j;
 }
 
 void BouncePadComponent_Info::FromJson(const json& j)
 {
-    if (j.contains("m_bounceVelocity") && j["m_bounceVelocity"].is_number_float()) {
-        m_bounceVelocity = j["m_bounceVelocity"].get<float>();
+    if (j.contains("m_minBounceVelocity") && j["m_minBounceVelocity"].is_number_float()) {
+        m_minBounceVelocity = j["m_minBounceVelocity"].get<float>();
     }
 }
 
 void BouncePadComponent::FromJson(const json& j)
 {
-    if (j.contains("m_bounceVelocity") && j["m_bounceVelocity"].is_number_float()) {
-        m_bounceVelocity = j["m_bounceVelocity"].get<float>();
+    if (j.contains("m_minBounceVelocity") && j["m_minBounceVelocity"].is_number_float()) {
+        m_minBounceVelocity = j["m_minBounceVelocity"].get<float>();
     }
 }
 

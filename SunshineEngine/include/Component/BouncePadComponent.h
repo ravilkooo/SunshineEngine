@@ -15,7 +15,7 @@ public:
     BouncePadComponent(BouncePadComponent&&) noexcept = default;
     BouncePadComponent& operator=(BouncePadComponent&&) noexcept = default;
 
-    float m_bounceVelocity = 15.0f;
+    float m_minBounceVelocity = 15.0f;
 
     void BounceCharacter(SE::UUID characterUUID);
 
@@ -43,7 +43,7 @@ public:
     BouncePadComponent_Info(BouncePadComponent_Info&&) noexcept = default;
     BouncePadComponent_Info& operator=(BouncePadComponent_Info&&) noexcept = default;
 
-    float m_bounceVelocity = 15.0f;
+    float m_minBounceVelocity = 15.0f;
 
     // Inherited via Component
     const std::type_info& getType() const override {
@@ -63,7 +63,7 @@ public:
 
 #ifndef BOUNCEPADCOMPONENT_LUA_FIELDS_APPLY
 #define BOUNCEPADCOMPONENT_LUA_FIELDS_APPLY(F) \
-    F(m_bounceVelocity)
+    F(m_minBounceVelocity)
 #endif
 
 #ifndef BOUNCEPADCOMPONENT_LUA_METHODS_APPLY
