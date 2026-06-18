@@ -53,6 +53,7 @@ public:
 
     bool m_bounced = false;
     float m_bounceSpeed = 0.0f;
+    DXSM::Vector3 m_bounceNormal = DXSM::Vector3(0, 1, 0);
 
     //
     // View rotation

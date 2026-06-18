@@ -267,9 +267,18 @@ void CharacterControllerSystem::ApplyBounce(
     if (!character->m_bounced)
         return;
 
-    if (controller->m_velocity.y <= 0.0f)
+    if (controller->m_velocity.Dot(character->m_bounceNormal) <= 0.0f)
     {
-        controller->m_velocity.y = std::max(-controller->m_velocity.y, character->m_bounceSpeed);
+        if (controller->m_velocity.Dot(character->m_bounceNormal) >= -character->m_bounceSpeed)
+        {
+            controller->m_velocity += character->m_bounceNormal * (-controller->m_velocity.Dot(character->m_bounceNormal) + character->m_bounceSpeed);
+        }
+        else
+        {
+            controller->m_velocity = DXSM::Vector3::Reflect(controller->m_velocity, character->m_bounceNormal);
+        }
+
+        // controller->m_velocity.y = std::max(-controller->m_velocity.y, character->m_bounceSpeed);
 
         controller->m_grounded = false;
 

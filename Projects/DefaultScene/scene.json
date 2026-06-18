@@ -4837,7 +4837,7 @@
         {
             "components": {
                 "BouncePad": {
-                    "m_minBounceVelocity": 15.0
+                    "m_minBounceVelocity": 20.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -4970,7 +4970,7 @@
         {
             "components": {
                 "BouncePad": {
-                    "m_minBounceVelocity": 15.0
+                    "m_minBounceVelocity": 10.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
