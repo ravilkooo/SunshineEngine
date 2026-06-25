@@ -1,0 +1,63 @@
+{
+    "action_bindings": [
+        {
+            "action": "Jump",
+            "key": 32
+        },
+        {
+            "action": "FAction",
+            "key": 70
+        },
+        {
+            "action": "RAction",
+            "key": 84
+        },
+        {
+            "action": "Jump2",
+            "key": 13
+        }
+    ],
+    "axis_bindings": [
+        {
+            "key": 38,
+            "name": "Forward2",
+            "scale": 1.0
+        },
+        {
+            "key": 40,
+            "name": "Forward2",
+            "scale": -1.0
+        },
+        {
+            "key": 37,
+            "name": "Right2",
+            "scale": -1.0
+        },
+        {
+            "key": 39,
+            "name": "Right2",
+            "scale": 1.0
+        },
+        {
+            "key": 87,
+            "name": "Forward",
+            "scale": 1.0
+        },
+        {
+            "key": 83,
+            "name": "Forward",
+            "scale": -1.0
+        },
+        {
+            "key": 65,
+            "name": "Right",
+            "scale": -1.0
+        },
+        {
+            "key": 68,
+            "name": "Right",
+            "scale": 1.0
+        }
+    ],
+    "name": "Default"
+}

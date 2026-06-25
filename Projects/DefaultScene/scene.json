@@ -5238,7 +5238,7 @@
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 1,
-                        "relativePath": "Meshes/mail_box.obj"
+                        "relativePath": "Meshes/delivery_bot_no_flag.obj"
                     },
                     "Sampler": 0,
                     "Texture": {
@@ -5265,9 +5265,9 @@
                         1.0
                     ],
                     "m_position": [
-                        7.437004089355469,
-                        8.482749938964844,
-                        10.51350212097168
+                        27.923044204711914,
+                        -1.6629120111465454,
+                        -14.741567611694336
                     ],
                     "m_rotation": [
                         -0.0,
@@ -5289,8 +5289,70 @@
             "m_UUID_hi": 4011023819,
             "m_UUID_lo": 3110370002,
             "m_group": "CustomMesh",
-            "m_name": "CustomObject",
+            "m_name": "DeliveryBot",
             "m_parent": null
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/delivery_bot_flag.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/mail_bot.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -1.0596599578857422,
+                        -0.49395525455474854,
+                        1.0693168640136719
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 18442486632668735247,
+            "m_UUID_hi": 4293976033,
+            "m_UUID_lo": 1125918479,
+            "m_group": "CustomMesh",
+            "m_name": "Flag",
+            "m_parent": {
+                "attached": true,
+                "uuid": 17227216129192393426
+            }
         }
     ],
     "inputMapping": "Default",
