@@ -810,7 +810,7 @@ namespace SE_G {
 
         Assimp::Importer importer;
         const aiScene* pModel = importer.ReadFile(WStringToUtf8(meshPath.GetFullPath()).c_str(),
-            aiProcess_Triangulate | aiProcess_FlipUVs
+            aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder
             | (((attrFlags & VertexAttributesFlags::NORMAL) != 0) ? aiProcess_GenNormals : 0x0)
         );
 
