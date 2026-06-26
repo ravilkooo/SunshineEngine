@@ -217,6 +217,21 @@ void CharacterControllerSystem::ApplyMovementInput(
         input.Normalize();
     }
 
+
+    if ((input.x != 0 || input.y != 0) && controller->m_syncronizeYawWithCameraForwardDir)
+    {
+        auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
+        float camYaw = 0.0f;
+        if (camera)
+        {
+            camYaw = camera->m_springArmParams.pitchYawRoll.y;
+        }
+        // float desiredYaw = character->m_yaw + camYaw;
+        character->m_yaw += camYaw;
+        camera->m_springArmParams.pitchYawRoll.y = 0.0f;
+    }
+
+    /*
     auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
     float camYaw = 0.0f;
     if (camera)
@@ -236,11 +251,12 @@ void CharacterControllerSystem::ApplyMovementInput(
 
     if (moveDir.Length() > 1.0f)
         moveDir.Normalize();
+    */
 
     DXSM::Vector3 desiredVelocity(
-        moveDir.x * controller->m_moveSpeed,
+        input.x * controller->m_moveSpeed,
         controller->m_inputVelocity.y,
-        moveDir.z * controller->m_moveSpeed
+        input.y * controller->m_moveSpeed
     );
 
     float accel =
