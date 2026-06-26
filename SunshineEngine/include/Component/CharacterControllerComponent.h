@@ -66,6 +66,7 @@ public:
     // Movement tuning
     //
 
+    bool m_syncronizeYawWithCameraForwardDir = false;
     float m_moveSpeed = 6.0f;
 
     float m_acceleration = 30.0f;

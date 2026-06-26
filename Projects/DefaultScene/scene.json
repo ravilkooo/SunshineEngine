@@ -2943,7 +2943,8 @@
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 10.119999885559082,
-                    "m_stepHeight": 0.30000001192092896
+                    "m_stepHeight": 0.30000001192092896,
+                    "m_syncronizeYawWithCameraForwardDir": false
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -3169,7 +3170,8 @@
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 6.0,
-                    "m_stepHeight": 0.30000001192092896
+                    "m_stepHeight": 0.30000001192092896,
+                    "m_syncronizeYawWithCameraForwardDir": false
                 },
                 "Lua": {
                     "scriptLoaded": true,

@@ -427,6 +427,8 @@ json CharacterControllerComponent_Info::ToJson() const
     json j;
     if (m_assignedComponent) {
         j = nlohmann::json{
+            {"m_syncronizeYawWithCameraForwardDir", m_assignedComponent->m_syncronizeYawWithCameraForwardDir},
+
             {"m_moveSpeed", m_assignedComponent->m_moveSpeed},
             {"m_acceleration", m_assignedComponent->m_acceleration},
             {"m_airAcceleration", m_assignedComponent->m_airAcceleration},
@@ -456,6 +458,10 @@ void CharacterControllerComponent_Info::FromJson(const json& j)
 
 void CharacterControllerComponent::FromJson(const json& j)
 {
+    if (j.contains("m_syncronizeYawWithCameraForwardDir") && j["m_syncronizeYawWithCameraForwardDir"].is_boolean()) {
+        m_syncronizeYawWithCameraForwardDir = j["m_syncronizeYawWithCameraForwardDir"].get<bool>();
+    }
+
     if (j.contains("m_moveSpeed") && j["m_moveSpeed"].is_number_float()) {
         m_moveSpeed = j["m_moveSpeed"].get<float>();
     }
@@ -474,11 +480,11 @@ void CharacterControllerComponent::FromJson(const json& j)
     if (j.contains("m_maxFallSpeed") && j["m_maxFallSpeed"].is_number_float()) {
         m_maxFallSpeed = j["m_maxFallSpeed"].get<float>();
     }
-    if (j.contains("m_enableStickToFloor") && j["m_enableStickToFloor"].is_number_float()) {
-        m_enableStickToFloor = j["m_enableStickToFloor"].get<float>();
+    if (j.contains("m_enableStickToFloor") && j["m_enableStickToFloor"].is_boolean()) {
+        m_enableStickToFloor = j["m_enableStickToFloor"].get<bool>();
     }
-    if (j.contains("m_enableWalkStairs") && j["m_enableWalkStairs"].is_number_float()) {
-        m_enableWalkStairs = j["m_enableWalkStairs"].get<float>();
+    if (j.contains("m_enableWalkStairs") && j["m_enableWalkStairs"].is_boolean()) {
+        m_enableWalkStairs = j["m_enableWalkStairs"].get<bool>();
     }
     if (j.contains("m_stepHeight") && j["m_stepHeight"].is_number_float()) {
         m_stepHeight = j["m_stepHeight"].get<float>();

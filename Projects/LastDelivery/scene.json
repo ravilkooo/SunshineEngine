@@ -216,7 +216,7 @@
                         0.0
                     ],
                     "m_springArmParams": {
-                        "length": 4.5,
+                        "length": 9.300000190734863,
                         "pitchYawRoll": [
                             0.4991641640663147,
                             0.0,
@@ -263,7 +263,8 @@
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 10.119999885559082,
-                    "m_stepHeight": 0.30000001192092896
+                    "m_stepHeight": 0.30000001192092896,
+                    "m_syncronizeYawWithCameraForwardDir": true
                 },
                 "Lua": {
                     "scriptLoaded": true,

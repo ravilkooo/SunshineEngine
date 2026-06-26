@@ -11,7 +11,9 @@
 #include "Component/CharacterComponent.h"
 #include "Component/CharacterControllerComponent.h"
 
-#include "Scene.h"
+#include <Scene.h>
+#include <CameraManager.h>
+#include <Graphics/Utils/Camera.h>
 
 #include <SimpleMath.h>
 
@@ -210,16 +212,35 @@ void CharacterControllerSystem::ApplyMovementInput(
     float deltaTime)
 {
     DXSM::Vector2 input = character->m_moveInput;
-
     if (input.Length() > 1.0f)
     {
         input.Normalize();
     }
 
+    auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
+    float camYaw = 0.0f;
+    if (camera)
+    {
+        // Use only the yaw (Y axis rotation) for movement direction
+        camYaw = camera->m_springArmParams.pitchYawRoll.y;
+    }
+
+    // Convert input to world space using camera yaw
+    float sinYaw = sinf(camYaw);
+    float cosYaw = cosf(camYaw);
+
+    DXSM::Vector3 moveDir;
+    moveDir.x = input.x * cosYaw + input.y * sinYaw;
+    moveDir.z = input.y * cosYaw - input.x * sinYaw;
+    moveDir.y = controller->m_inputVelocity.y;
+
+    if (moveDir.Length() > 1.0f)
+        moveDir.Normalize();
+
     DXSM::Vector3 desiredVelocity(
-        input.x * controller->m_moveSpeed,
+        moveDir.x * controller->m_moveSpeed,
         controller->m_inputVelocity.y,
-        input.y * controller->m_moveSpeed
+        moveDir.z * controller->m_moveSpeed
     );
 
     float accel =

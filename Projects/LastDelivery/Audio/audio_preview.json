@@ -1,2 +1,14 @@
 {
+    "tracks": [
+        {
+            "filePath": {
+                "assetSource": 0,
+                "relativePath": ""
+            },
+            "loop": false,
+            "name": "drumloop",
+            "tag": "sfx",
+            "volume": 1.0
+        }
+    ]
 }

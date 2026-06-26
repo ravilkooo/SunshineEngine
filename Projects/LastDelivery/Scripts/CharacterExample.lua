@@ -65,25 +65,14 @@ function behavior:update(dt)
     local inputSystem = getInputSystem()
     local speed = 0.1
     local char = self.owner:getCharacterComponent()
+    local camera = self.owner:getCameraComponent()
 
     local inputValue = inputSystem:getAxis2D("Forward", "Right")
     char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
-
-    -- local mouseMove = Vector2.new(, inputSystem:getMouseDeltaY())
-    char.m_yaw = char.m_yaw + 0.004 * inputSystem:getMouseDeltaX()
-    -- print(inputSystem:getMouseDeltaX())
-    -- char.m_pitch = char.m_pitch + inputSystem:getMouseDeltaY()
+    camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
     
-    -- tr.m_rotation.y = tr.m_rotation.y + speed * inputSystem:getAxis("Forward")
+    -- char.m_yaw = char.m_yaw + 0.004 * inputSystem:getMouseDeltaX()
     
-    
-    -- if (inputSystem:isPressed("RAction")) then
-        -- print("RACTION")
-        -- tr.m_rotation.y = tr.m_rotation.y + 0.5
-    -- elseif (inputSystem:isReleased("RAction")) then
-        -- print("RACTION")
-        -- tr.m_rotation.y = tr.m_rotation.y - 0.5
-    -- end
 
     if (inputSystem:isPressed("Jump")) then
         print("== JUMP! ==")

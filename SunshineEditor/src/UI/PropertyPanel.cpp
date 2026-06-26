@@ -1840,6 +1840,8 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
         if (ImGui::TreeNodeEx("Additional Forces", flags))
         {
             EditorUI::FontStyles::Pop();
+            ImGui::Checkbox("Syncronize yaw with camera\nforward direction", &charContrInfo->m_assignedComponent->m_syncronizeYawWithCameraForwardDir);
+
             DrawFloatControl("Move speed", charContrInfo->m_assignedComponent->m_moveSpeed, 6.0f, 0.01f, 0.0f, 100.0f, "%.2f");
             DrawFloatControl("m_acceleration", charContrInfo->m_assignedComponent->m_acceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");
             DrawFloatControl("Air acceleration", charContrInfo->m_assignedComponent->m_airAcceleration, 8.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
