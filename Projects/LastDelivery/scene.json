@@ -264,7 +264,7 @@
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 10.119999885559082,
                     "m_stepHeight": 0.30000001192092896,
-                    "m_syncronizeYawWithCameraForwardDir": false,
+                    "m_syncronizeYawWithCameraForwardDir": true,
                     "m_turnAcceleration": 40.0
                 },
                 "Lua": {
@@ -333,6 +333,13 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/Flag.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 1,

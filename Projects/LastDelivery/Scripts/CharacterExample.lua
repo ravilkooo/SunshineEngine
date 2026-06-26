@@ -80,6 +80,12 @@ function behavior:update(dt)
         -- tr.m_rotation.y = tr.m_rotation.y - 0.5
     end
 
+    if (inputSystem:isPressed("Jump")) then
+        print("== JUMP! ==")
+        char.m_jumpRequested = true
+        -- tr.m_rotation.y = tr.m_rotation.y - 0.5
+    end
+
 
 
     if not collected then
