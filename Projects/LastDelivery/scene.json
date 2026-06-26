@@ -236,8 +236,8 @@
                     "collider": {
                         "settings": {
                             "capsule": {
-                                "height": 1.7999999523162842,
-                                "radius": 0.3499999940395355
+                                "height": 0.8999999761581421,
+                                "radius": 2.049999952316284
                             }
                         },
                         "shapeType": "Capsule",
@@ -264,7 +264,8 @@
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 10.119999885559082,
                     "m_stepHeight": 0.30000001192092896,
-                    "m_syncronizeYawWithCameraForwardDir": true
+                    "m_syncronizeYawWithCameraForwardDir": false,
+                    "m_turnAcceleration": 40.0
                 },
                 "Lua": {
                     "scriptLoaded": true,

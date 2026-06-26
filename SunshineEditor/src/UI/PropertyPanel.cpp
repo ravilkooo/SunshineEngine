@@ -1841,19 +1841,20 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
         {
             EditorUI::FontStyles::Pop();
             ImGui::Checkbox("Syncronize yaw with camera\nforward direction", &charContrInfo->m_assignedComponent->m_syncronizeYawWithCameraForwardDir);
+            DrawFloatControl("Turn around acceleration", charContrInfo->m_assignedComponent->m_turnAcceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");
 
             DrawFloatControl("Move speed", charContrInfo->m_assignedComponent->m_moveSpeed, 6.0f, 0.01f, 0.0f, 100.0f, "%.2f");
-            DrawFloatControl("m_acceleration", charContrInfo->m_assignedComponent->m_acceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");
+            DrawFloatControl("Move acceleration", charContrInfo->m_assignedComponent->m_acceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");
             DrawFloatControl("Air acceleration", charContrInfo->m_assignedComponent->m_airAcceleration, 8.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
             DrawFloatControl("Jump speed", charContrInfo->m_assignedComponent->m_jumpSpeed, 8.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
-            DrawFloatControl("m_gravity", charContrInfo->m_assignedComponent->m_gravity, -24.0f, 0.01f, -1000.0f, 1000.0f, "%.2f");
-            DrawFloatControl("m_maxFallSpeed", charContrInfo->m_assignedComponent->m_maxFallSpeed, -24.0f, 0.01f, -1000.0f, 1000.0f, "%.2f");
+            DrawFloatControl("Gravity", charContrInfo->m_assignedComponent->m_gravity, -24.0f, 0.01f, -1000.0f, 1000.0f, "%.2f");
+            DrawFloatControl("Max fall speed", charContrInfo->m_assignedComponent->m_maxFallSpeed, -24.0f, 0.01f, -1000.0f, 1000.0f, "%.2f");
 
-            ImGui::Checkbox("m_enableStickToFloor", &charContrInfo->m_assignedComponent->m_enableStickToFloor);
-            ImGui::Checkbox("m_enableWalkStairs", &charContrInfo->m_assignedComponent->m_enableWalkStairs);
+            ImGui::Checkbox("Enable stick to floor", &charContrInfo->m_assignedComponent->m_enableStickToFloor);
+            ImGui::Checkbox("Enable walk stairs", &charContrInfo->m_assignedComponent->m_enableWalkStairs);
 
-            DrawFloatControl("m_stepHeight", charContrInfo->m_assignedComponent->m_stepHeight, 0.3f, 0.001f, 0.0f, 10.0f, "%.3f");
-            DrawFloatControl("m_maxSlopeAngle", charContrInfo->m_assignedComponent->m_maxSlopeAngle, 45.0f, 0.01f, 0.0f, 90.0f, "%.2f");
+            DrawFloatControl("Step height", charContrInfo->m_assignedComponent->m_stepHeight, 0.3f, 0.001f, 0.0f, 10.0f, "%.3f");
+            DrawFloatControl("Max slope angle", charContrInfo->m_assignedComponent->m_maxSlopeAngle, 45.0f, 0.01f, 0.0f, 90.0f, "%.2f");
 
             ImGui::TreePop();
         }

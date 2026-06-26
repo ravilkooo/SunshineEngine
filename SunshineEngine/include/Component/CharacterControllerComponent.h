@@ -67,6 +67,8 @@ public:
     //
 
     bool m_syncronizeYawWithCameraForwardDir = false;
+    float m_turnAcceleration = 30.0f;
+
     float m_moveSpeed = 6.0f;
 
     float m_acceleration = 30.0f;

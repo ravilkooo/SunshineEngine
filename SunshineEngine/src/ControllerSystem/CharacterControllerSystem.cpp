@@ -226,9 +226,21 @@ void CharacterControllerSystem::ApplyMovementInput(
         {
             camYaw = camera->m_springArmParams.pitchYawRoll.y;
         }
-        // float desiredYaw = character->m_yaw + camYaw;
-        character->m_yaw += camYaw;
-        camera->m_springArmParams.pitchYawRoll.y = 0.0f;
+        // character->m_yaw += camYaw;
+        float desiredYaw = character->m_yaw + camYaw;
+        if (controller->m_inputVelocity.x == 0 && controller->m_inputVelocity.z == 0)
+        {
+            character->m_yaw = desiredYaw;
+        }
+        else
+        {
+            character->m_yaw = std::lerp(
+                character->m_yaw,
+                desiredYaw,
+                controller->m_turnAcceleration * deltaTime);
+		}
+
+        camera->m_springArmParams.pitchYawRoll.y = (desiredYaw - character->m_yaw);
     }
 
     /*

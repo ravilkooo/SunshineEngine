@@ -428,6 +428,7 @@ json CharacterControllerComponent_Info::ToJson() const
     if (m_assignedComponent) {
         j = nlohmann::json{
             {"m_syncronizeYawWithCameraForwardDir", m_assignedComponent->m_syncronizeYawWithCameraForwardDir},
+            {"m_turnAcceleration", m_assignedComponent->m_turnAcceleration},
 
             {"m_moveSpeed", m_assignedComponent->m_moveSpeed},
             {"m_acceleration", m_assignedComponent->m_acceleration},
@@ -460,6 +461,9 @@ void CharacterControllerComponent::FromJson(const json& j)
 {
     if (j.contains("m_syncronizeYawWithCameraForwardDir") && j["m_syncronizeYawWithCameraForwardDir"].is_boolean()) {
         m_syncronizeYawWithCameraForwardDir = j["m_syncronizeYawWithCameraForwardDir"].get<bool>();
+    }
+    if (j.contains("m_turnAcceleration") && j["m_turnAcceleration"].is_number_float()) {
+        m_turnAcceleration = j["m_turnAcceleration"].get<float>();
     }
 
     if (j.contains("m_moveSpeed") && j["m_moveSpeed"].is_number_float()) {
