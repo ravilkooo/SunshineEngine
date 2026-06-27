@@ -55,7 +55,7 @@ public:
     //
 
     // Local velocity
-    DXSM::Vector3 m_inputVelocity = DXSM::Vector3::Zero;
+    float m_inputVelocity = 0.0f;
     DXSM::Vector3 m_velocity = DXSM::Vector3::Zero;
 
     bool m_grounded = false;

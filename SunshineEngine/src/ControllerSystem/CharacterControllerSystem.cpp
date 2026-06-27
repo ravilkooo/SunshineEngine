@@ -232,7 +232,7 @@ void CharacterControllerSystem::ApplyMovementInput(
         if (desiredYaw > DX::XM_PI) { desiredYaw -= DX::XM_2PI; }
         else if (desiredYaw < -DX::XM_PI) { desiredYaw += DX::XM_2PI; }
 
-        if (controller->m_inputVelocity.x == 0 && controller->m_inputVelocity.z == 0)
+        if (controller->m_inputVelocity == 0)
         {
             character->m_yaw = desiredYaw;
         }
@@ -259,51 +259,16 @@ void CharacterControllerSystem::ApplyMovementInput(
         else if (camera->m_springArmParams.pitchYawRoll.y < -DX::XM_PI) { camera->m_springArmParams.pitchYawRoll.y += DX::XM_2PI; }
     }
 
-    /*
-    auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
-    float camYaw = 0.0f;
-    if (camera)
-    {
-        // Use only the yaw (Y axis rotation) for movement direction
-        camYaw = camera->m_springArmParams.pitchYawRoll.y;
-    }
-
-    // Convert input to world space using camera yaw
-    float sinYaw = sinf(camYaw);
-    float cosYaw = cosf(camYaw);
-
-    DXSM::Vector3 moveDir;
-    moveDir.x = input.x * cosYaw + input.y * sinYaw;
-    moveDir.z = input.y * cosYaw - input.x * sinYaw;
-    moveDir.y = controller->m_inputVelocity.y;
-
-    if (moveDir.Length() > 1.0f)
-        moveDir.Normalize();
-    */
-
-    DXSM::Vector3 desiredVelocity(
-        0, // input.x * controller->m_moveSpeed,
-        controller->m_inputVelocity.y,
-        input.Length() * controller->m_moveSpeed
-    );
+    float desiredVelocity = input.Length() * controller->m_moveSpeed;
 
     float accel =
         controller->m_grounded
         ? controller->m_acceleration
         : controller->m_airAcceleration;
 
-    /*
-    controller->m_inputVelocity.x = std::lerp(
-        controller->m_inputVelocity.x,
-        desiredVelocity.x,
-        accel * deltaTime);
-    */
-
-    controller->m_inputVelocity.x = 0;
-
-    controller->m_inputVelocity.z = std::lerp(
-        controller->m_inputVelocity.z,
-        desiredVelocity.z,
+    controller->m_inputVelocity = std::lerp(
+        controller->m_inputVelocity,
+        desiredVelocity,
         accel * deltaTime
     );
 }
@@ -385,9 +350,9 @@ void CharacterControllerSystem::UpdatePhysics(
 
     controller->m_character->SetLinearVelocity(
         JPH::Vec3(
-            controller->m_velocity.x + controller->m_inputVelocity.x * cos(character->m_yaw) + controller->m_inputVelocity.z * sin(character->m_yaw),
-            controller->m_velocity.y + controller->m_inputVelocity.y,
-            controller->m_velocity.z + controller->m_inputVelocity.z * cos(character->m_yaw) - controller->m_inputVelocity.x * sin(character->m_yaw)
+            controller->m_velocity.x + controller->m_inputVelocity * sin(character->m_yaw),
+            controller->m_velocity.y,
+            controller->m_velocity.z + controller->m_inputVelocity * cos(character->m_yaw)
         )
     );
 

@@ -7,6 +7,9 @@ local rotSpeed = 10
 local radius = 3
 local upOffset = 0.6
 local scale = 0.1
+local floatingSpeed = 4
+local floatingAmp = 0.1
+local yMidLevel
 
 -- can be made unique for every object
 -- for example: based on initial position of object or time
@@ -58,10 +61,14 @@ end
 
 function behavior:start()
     -- TestCharacterFields(self)
+    local tr = self.owner:getTransform()
+    yMidLevel = tr.m_localPosition.y
 end
 
 function behavior:update(dt)
-    -- local tr = self.owner:getTransform()
+    local tr = self.owner:getTransform()
+    tr.m_localPosition.y = yMidLevel +  floatingAmp * math.sin(os.clock() * floatingSpeed)
+
     local inputSystem = getInputSystem()
     local speed = 0.1
     local char = self.owner:getCharacterComponent()
