@@ -77,6 +77,7 @@ function behavior:update(dt)
     local inputValue = inputSystem:getAxis2D("Forward", "Right")
     char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
     camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
+    camera:getCamera():rotateSpringArmPitch(0.4 * inputSystem:getMouseDeltaY())
     
     -- char.m_yaw = char.m_yaw + 0.004 * inputSystem:getMouseDeltaX()
     
