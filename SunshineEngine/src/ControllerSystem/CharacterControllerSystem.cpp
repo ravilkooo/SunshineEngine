@@ -217,9 +217,10 @@ void CharacterControllerSystem::ApplyMovementInput(
         input.Normalize();
     }
 
-
     if ((input.x != 0 || input.y != 0) && controller->m_syncronizeYawWithCameraForwardDir)
     {
+		float inputAngle = atan2(input.x, input.y);
+
         auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
         float camYaw = 0.0f;
         if (camera)
@@ -227,7 +228,7 @@ void CharacterControllerSystem::ApplyMovementInput(
             camYaw = camera->m_springArmParams.pitchYawRoll.y;
         }
         // character->m_yaw += camYaw;
-        float desiredYaw = character->m_yaw + camYaw;
+        float desiredYaw = character->m_yaw + camYaw + inputAngle;
         if (controller->m_inputVelocity.x == 0 && controller->m_inputVelocity.z == 0)
         {
             character->m_yaw = desiredYaw;
@@ -239,8 +240,9 @@ void CharacterControllerSystem::ApplyMovementInput(
                 desiredYaw,
                 controller->m_turnAcceleration * deltaTime);
 		}
+        // character->m_yaw = std::clamp(character->m_yaw, -DX::XM_PI, DX::XM_PI);
 
-        camera->m_springArmParams.pitchYawRoll.y = (desiredYaw - character->m_yaw);
+        camera->m_springArmParams.pitchYawRoll.y = (desiredYaw - character->m_yaw - inputAngle);
     }
 
     /*
@@ -266,9 +268,9 @@ void CharacterControllerSystem::ApplyMovementInput(
     */
 
     DXSM::Vector3 desiredVelocity(
-        input.x * controller->m_moveSpeed,
+        0, // input.x * controller->m_moveSpeed,
         controller->m_inputVelocity.y,
-        input.y * controller->m_moveSpeed
+        input.Length() * controller->m_moveSpeed
     );
 
     float accel =
@@ -276,10 +278,14 @@ void CharacterControllerSystem::ApplyMovementInput(
         ? controller->m_acceleration
         : controller->m_airAcceleration;
 
+    /*
     controller->m_inputVelocity.x = std::lerp(
         controller->m_inputVelocity.x,
         desiredVelocity.x,
         accel * deltaTime);
+    */
+
+    controller->m_inputVelocity.x = 0;
 
     controller->m_inputVelocity.z = std::lerp(
         controller->m_inputVelocity.z,
