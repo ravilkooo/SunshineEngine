@@ -229,12 +229,24 @@ void CharacterControllerSystem::ApplyMovementInput(
         }
         // character->m_yaw += camYaw;
         float desiredYaw = character->m_yaw + camYaw + inputAngle;
+        if (desiredYaw > DX::XM_PI) { desiredYaw -= DX::XM_2PI; }
+        else if (desiredYaw < -DX::XM_PI) { desiredYaw += DX::XM_2PI; }
+
         if (controller->m_inputVelocity.x == 0 && controller->m_inputVelocity.z == 0)
         {
             character->m_yaw = desiredYaw;
         }
         else
         {
+            if ((character->m_yaw - desiredYaw) > DX::XM_PI)
+            {
+                character->m_yaw -= DX::XM_2PI;
+            }
+            else if ((character->m_yaw - desiredYaw) < -DX::XM_PI)
+            {
+                character->m_yaw += DX::XM_2PI;
+            }
+
             character->m_yaw = std::lerp(
                 character->m_yaw,
                 desiredYaw,
@@ -243,6 +255,8 @@ void CharacterControllerSystem::ApplyMovementInput(
         // character->m_yaw = std::clamp(character->m_yaw, -DX::XM_PI, DX::XM_PI);
 
         camera->m_springArmParams.pitchYawRoll.y = (desiredYaw - character->m_yaw - inputAngle);
+        if (camera->m_springArmParams.pitchYawRoll.y > DX::XM_PI) { camera->m_springArmParams.pitchYawRoll.y -= DX::XM_2PI; }
+        else if (camera->m_springArmParams.pitchYawRoll.y < -DX::XM_PI) { camera->m_springArmParams.pitchYawRoll.y += DX::XM_2PI; }
     }
 
     /*
