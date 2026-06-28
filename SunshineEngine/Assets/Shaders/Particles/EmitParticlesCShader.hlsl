@@ -36,8 +36,8 @@ cbuffer sceneConstantBuffer : register(b1)
     float4 camPosition;
     float dt;
     float rngSeed;
-    
-    float2 padding;
+    float rngSeed2;
+    float rngSeed3;
 };
 
 cbuffer deadListCountConstantBuffer : register(b2)
@@ -71,7 +71,7 @@ cbuffer emitterPointConstantBuffer : register(b3)
     float latitudeMax;
     
     uint emitterMaxSpawn;
-    float3 emitterPadding;
+    float3 emitterSize;
 };
 
 ConsumeStructuredBuffer<uint> deadListBuffer : register(u0);
@@ -95,6 +95,15 @@ void main(uint3 id : SV_DispatchThreadID)
         emitterPos = emitterPos / emitterPos.w;
         
         p.position = emitterPos + float4(emitterPositionOffset, 0.0f);
+        
+        uint3 rng_state_pos = uint3(
+            wang_hash(id.x + asuint(rngSeed2)),
+            wang_hash(id.x + 3 * asuint(rngSeed2)),
+            wang_hash(id.x + asuint(rngSeed3)));
+        
+        p.position.x = p.position.x + emitterSize.x * (-0.5 + rand_xorshift_normalized(rng_state_pos.x));
+        p.position.y = p.position.y + emitterSize.y * (-0.5 + rand_xorshift_normalized(rng_state_pos.y));
+        p.position.z = p.position.z + emitterSize.z * (-0.5 + rand_xorshift_normalized(rng_state_pos.z));
 
         float colatitude = latitudeMin
             + (latitudeMax - latitudeMin) * rand_xorshift_normalized(rng_state); // 3.1415

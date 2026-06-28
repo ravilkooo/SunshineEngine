@@ -65,7 +65,8 @@ namespace SE
 			DXSM::Vector4 camPosition;
 			float dt;
 			float rngSeed;
-			UINT padding[2];
+			float rngSeed2;
+			float rngSeed3;
 		};
 		SceneConstantBuffer m_sceneConstantBufferData;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_sceneConstantBuffer;

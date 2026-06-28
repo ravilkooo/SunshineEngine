@@ -2,18 +2,9 @@ behavior = {}
 
 local playerUUID
 local playerObj
-local collected = false
-local rotSpeed = 10
-local radius = 3
-local upOffset = 0.6
-local scale = 0.1
 local floatingSpeed = 4
 local floatingAmp = 0.1
 local yMidLevel
-
--- can be made unique for every object
--- for example: based on initial position of object or time
-local angleOffet = 0.2
 
 local function TestCharacterFields(self)
     local char = self.owner:getCharacterComponent()
@@ -78,29 +69,10 @@ function behavior:update(dt)
     char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
     camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
     camera:getCamera():rotateSpringArmPitch(0.4 * inputSystem:getMouseDeltaY())
-    
-    -- char.m_yaw = char.m_yaw + 0.004 * inputSystem:getMouseDeltaX()
-    
 
     if (inputSystem:isPressed("Jump")) then
         print("== JUMP! ==")
         char.m_jumpRequested = true
-        -- tr.m_rotation.y = tr.m_rotation.y - 0.5
-    end
-
-    if (inputSystem:isPressed("Jump")) then
-        print("== JUMP! ==")
-        char.m_jumpRequested = true
-        -- tr.m_rotation.y = tr.m_rotation.y - 0.5
-    end
-
-
-
-    if not collected then
-
-        -- local currentTime = os.clock()
-        -- self.owner:getTransform().m_rotation = Vector3.new(0, rotSpeed * currentTime, 0)
-        
     end
 
     return "success"

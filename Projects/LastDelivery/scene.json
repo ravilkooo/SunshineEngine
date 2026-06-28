@@ -127,9 +127,9 @@
                         0.0
                     ],
                     "m_rotation": [
+                        -0.0,
                         0.0,
-                        0.0,
-                        0.0
+                        -0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -473,6 +473,510 @@
             "m_name": "DirectionalLight",
             "m_parent": null,
             "m_type": "DirectionalLight"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_density": 1000.0,
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        1.3446303606033325,
+                        1.4903427362442017,
+                        -3.3733181953430176
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 13347465222810346852,
+            "m_UUID_hi": 3107698918,
+            "m_UUID_lo": 4185761124,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_density": 1000.0,
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        1.4578559398651123,
+                        2.6406664848327637,
+                        -3.2101519107818604
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 15441559032591140575,
+            "m_UUID_hi": 3595268128,
+            "m_UUID_lo": 2479998687,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_density": 1000.0,
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        2.5898895263671875,
+                        1.5614535808563232,
+                        -2.566737651824951
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 12301464645548464765,
+            "m_UUID_hi": 2864157931,
+            "m_UUID_lo": 1324440189,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_density": 1000.0,
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        2.1198441982269287,
+                        4.412981033325195,
+                        -3.411789894104004
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 3029392449473454877,
+            "m_UUID_hi": 705335393,
+            "m_UUID_lo": 3827147549,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
+        },
+        {
+            "components": {
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 5.0,
+                        "Emitter": {
+                            "alphaEnd": 1.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "emitterSize": [
+                                30.0,
+                                30.0,
+                                30.0
+                            ],
+                            "latitudeMax": 0.3141592741012573,
+                            "latitudeMin": -0.3141592741012573,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 100,
+                            "particleSizeEnd": 0.5,
+                            "particleSizeStart": 0.20000000298023224,
+                            "particlesBaseSpeed": 0.0,
+                            "particlesLifeSpan": 3.0,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                -5.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 0,
+                            "relativePath": "Textures/DefaultTexture.dds"
+                        }
+                    }
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -3.10546875,
+                        3.2672228813171387,
+                        2.1484375
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 5904667521623653014,
+            "m_UUID_hi": 1374787539,
+            "m_UUID_lo": 2670328470,
+            "m_group": "ParticleEmitter",
+            "m_name": "ParticleEmitter",
+            "m_parent": null
         }
     ],
     "inputMapping": "Default",

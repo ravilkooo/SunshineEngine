@@ -2139,6 +2139,11 @@ void PropertyPanel::DrawEmitterDetails(
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             0.0f);
 
+        ImguiUtils::DrawVector3Control("Emitter volume size", emitterPointBuffer->emitterSize,
+            DXSM::Vector3(0.0f, 0.0f, 0.0f),
+            DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
+            0.0f);
+
         ImGui::ColorEdit3("Color start", &emitterPointBuffer->colorStart.x, ImGuiColorEditFlags_Float);
         ImGui::ColorEdit3("Color end", &emitterPointBuffer->colorEnd.x, ImGuiColorEditFlags_Float);
 
