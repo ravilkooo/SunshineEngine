@@ -161,10 +161,12 @@ public:
             // Moving collides with non-moving, moving and character
             return inObject2 == SE::Layers::NON_MOVING ||
                 inObject2 == SE::Layers::MOVING ||
-                inObject2 == SE::Layers::CHARACTER;
+                inObject2 == SE::Layers::CHARACTER ||
+                inObject2 == SE::Layers::TRIGGER;
 
         case SE::Layers::TRIGGER:
-            return inObject2 == SE::Layers::CHARACTER;
+            return inObject2 == SE::Layers::CHARACTER ||
+                inObject2 == SE::Layers::MOVING;
 
 
         case SE::Layers::CHARACTER:
@@ -238,7 +240,8 @@ public:
 
         case SE::Layers::MOVING:
             return inLayer2 == SE::BroadPhaseLayers::NON_MOVING || 
-                   inLayer2 == SE::BroadPhaseLayers::MOVING;
+                   inLayer2 == SE::BroadPhaseLayers::MOVING ||
+                inLayer2 == SE::BroadPhaseLayers::TRIGGER;
 
         case SE::Layers::TRIGGER:
             return inLayer2 == SE::BroadPhaseLayers::TRIGGER ||
