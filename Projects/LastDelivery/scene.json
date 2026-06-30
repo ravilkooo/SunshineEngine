@@ -230,7 +230,7 @@
                     }
                 },
                 "Character": {
-                    "m_isPlayerControlled": false
+                    "m_isPlayerControlled": true
                 },
                 "CharacterController": {
                     "collider": {
@@ -839,7 +839,7 @@
                     "m_jumpSpeed": 8.0,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
-                    "m_moveSpeed": 4.0,
+                    "m_moveSpeed": 15.0,
                     "m_stepHeight": 0.30000001192092896,
                     "m_syncronizeYawWithCameraForwardDir": false,
                     "m_turnAcceleration": 30.0
@@ -1205,6 +1205,126 @@
                 "StackCount": 10
             },
             "m_type": "Sphere"
+        },
+        {
+            "components": {
+                "Character": {
+                    "m_isPlayerControlled": false
+                },
+                "CharacterController": {
+                    "collider": {
+                        "settings": {
+                            "capsule": {
+                                "height": 0.009999999776482582,
+                                "radius": 2.049999952316284
+                            }
+                        },
+                        "shapeType": "Capsule",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_acceleration": 0.0,
+                    "m_airAcceleration": 8.0,
+                    "m_enableStickToFloor": false,
+                    "m_enableWalkStairs": false,
+                    "m_gravity": -24.0,
+                    "m_jumpSpeed": 8.0,
+                    "m_maxFallSpeed": -24.0,
+                    "m_maxSlopeAngle": 45.0,
+                    "m_moveSpeed": 0.0,
+                    "m_stepHeight": 0.30000001192092896,
+                    "m_syncronizeYawWithCameraForwardDir": false,
+                    "m_turnAcceleration": 30.0
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/StaringExample.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 1,
+                        "relativePath": "Meshes/cannon.obj"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/cannon.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Perception": {
+                    "CanHear": false,
+                    "CanSee": true,
+                    "CanSeeThroughObjects": false,
+                    "EyesOffset": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "FieldOfView": 90.0,
+                    "HearingRadius": 0.0,
+                    "LoseRadius": 25.0,
+                    "Sensitivity": 1.0,
+                    "SightRadius": 20.0,
+                    "Threshold": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        -1.5707963705062866,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        2.0,
+                        2.0,
+                        2.0
+                    ],
+                    "m_position": [
+                        -10.5234375,
+                        1.7000000476837158,
+                        16.68000030517578
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 17730720569560390012,
+            "m_UUID_hi": 4128255082,
+            "m_UUID_lo": 2824591740,
+            "m_group": "CustomMesh",
+            "m_name": "CustomObject",
+            "m_parent": null
         }
     ],
     "inputMapping": "Default",
