@@ -1335,7 +1335,7 @@
                     "scriptLoaded": true,
                     "scriptPath": {
                         "assetSource": 1,
-                        "relativePath": "Scripts/ForceField.lua"
+                        "relativePath": "Scripts/MagnetFieldExample.lua"
                     }
                 },
                 "Mesh": {
@@ -1430,6 +1430,13 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/MagnetPlatformExample.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -1471,7 +1478,7 @@
                     "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
-                    "m_friction": 0.20000000298023224,
+                    "m_friction": 2.0,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Kinematic",
                     "m_restitution": 0.0
@@ -1494,8 +1501,8 @@
                         5.0
                     ],
                     "m_position": [
-                        4.765625,
-                        8.636075973510742,
+                        13.030298233032227,
+                        7.9101738929748535,
                         16.78125
                     ],
                     "m_rotation": [
