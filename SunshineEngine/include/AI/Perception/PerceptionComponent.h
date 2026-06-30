@@ -108,7 +108,7 @@ public:
 
 private:
     //
-    void ChangeInSight(SE::UUID GOID, bool NewCondition);
+    void ChangeInSight(SE::UUID GOID, bool NewCondition, float InYaw = 0.0f);
 
     // Notify listeners that a sound was heard
     void Heard(SE::UUID GOID, float Loudness);

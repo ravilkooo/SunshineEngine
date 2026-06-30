@@ -6,6 +6,26 @@ local floatingSpeed = 4
 local floatingAmp = 0.1
 local yMidLevel
 
+local function TestPerceptionSystem(self)
+    local ps = getPerceptionSystem()
+
+    local teamPlayer = 1
+    local teamEnemy = 2
+    local invalidTeam = 0xFFFFFFFF
+
+    -- =========================
+    -- REGISTER
+    -- =========================
+
+    ps:registerTeam(teamPlayer)
+    ps:registerTeam(teamEnemy)
+    ps:registerTeam(invalidTeam)
+    
+    ps:addSightTargetTeamIDsInTeam(teamEnemy, teamPlayer)
+    local perception = self.owner:getPerception()
+    ps:addToTeam(teamPlayer, perception)
+end
+
 local function TestCharacterFields(self)
     local char = self.owner:getCharacterComponent()
 
@@ -51,7 +71,8 @@ local function TestCharacterFields(self)
 end
 
 function behavior:start()
-    -- TestCharacterFields(self)
+    TestPerceptionSystem(self)
+    
     local tr = self.owner:getTransform()
     yMidLevel = tr.m_localPosition.y
 end

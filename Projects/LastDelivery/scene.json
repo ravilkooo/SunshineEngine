@@ -262,7 +262,7 @@
                     "m_jumpSpeed": 8.0,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
-                    "m_moveSpeed": 10.119999885559082,
+                    "m_moveSpeed": 20.0,
                     "m_stepHeight": 0.30000001192092896,
                     "m_syncronizeYawWithCameraForwardDir": true,
                     "m_turnAcceleration": 40.0
@@ -285,6 +285,22 @@
                         "relativePath": "Textures/mail_bot.dds"
                     },
                     "m_cullMode": "CULL_BACK"
+                },
+                "Perception": {
+                    "CanHear": false,
+                    "CanSee": false,
+                    "CanSeeThroughObjects": false,
+                    "EyesOffset": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "FieldOfView": 90.0,
+                    "HearingRadius": 0.0,
+                    "LoseRadius": 0.0,
+                    "Sensitivity": 1.0,
+                    "SightRadius": 0.0,
+                    "Threshold": 0.0
                 },
                 "Render": null,
                 "Transform": {
@@ -573,6 +589,13 @@
         },
         {
             "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/TargetExample.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -584,6 +607,22 @@
                         "relativePath": "Textures/DefaultTexture.dds"
                     },
                     "m_cullMode": "CULL_BACK"
+                },
+                "Perception": {
+                    "CanHear": false,
+                    "CanSee": false,
+                    "CanSeeThroughObjects": false,
+                    "EyesOffset": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "FieldOfView": 90.0,
+                    "HearingRadius": 0.0,
+                    "LoseRadius": 0.0,
+                    "Sensitivity": 1.0,
+                    "SightRadius": 0.0,
+                    "Threshold": 0.0
                 },
                 "Physics": {
                     "collider": {
@@ -637,9 +676,9 @@
                         1.0
                     ],
                     "m_position": [
-                        1.4578559398651123,
-                        2.6406664848327637,
-                        -3.2101519107818604
+                        -0.12468898296356201,
+                        4.791903495788574,
+                        22.706096649169922
                     ],
                     "m_rotation": [
                         -0.0,
@@ -767,30 +806,18 @@
         },
         {
             "components": {
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Box_repeat"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Textures/DefaultTexture.dds"
-                    },
-                    "m_cullMode": "CULL_BACK"
+                "Character": {
+                    "m_isPlayerControlled": false
                 },
-                "Physics": {
+                "CharacterController": {
                     "collider": {
                         "settings": {
-                            "box": {
-                                "size": [
-                                    1.0,
-                                    1.0,
-                                    1.0
-                                ]
+                            "capsule": {
+                                "height": 1.7999999523162842,
+                                "radius": 0.3499999940395355
                             }
                         },
-                        "shapeType": "Box",
+                        "shapeType": "Capsule",
                         "transforms": {
                             "offset": [
                                 0.0,
@@ -804,21 +831,60 @@
                             ]
                         }
                     },
-                    "m_activation": "Activate",
-                    "m_angularDamping": 0.05000000074505806,
-                    "m_collisionLayer": "MOVING",
-                    "m_density": 1000.0,
-                    "m_friction": 0.20000000298023224,
-                    "m_linearDamping": 0.05000000074505806,
-                    "m_motion": "Dynamic",
-                    "m_restitution": 0.0
+                    "m_acceleration": 30.0,
+                    "m_airAcceleration": 8.0,
+                    "m_enableStickToFloor": false,
+                    "m_enableWalkStairs": false,
+                    "m_gravity": -24.0,
+                    "m_jumpSpeed": 8.0,
+                    "m_maxFallSpeed": -24.0,
+                    "m_maxSlopeAngle": 45.0,
+                    "m_moveSpeed": 4.0,
+                    "m_stepHeight": 0.30000001192092896,
+                    "m_syncronizeYawWithCameraForwardDir": false,
+                    "m_turnAcceleration": 30.0
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/ChasingExample.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Perception": {
+                    "CanHear": false,
+                    "CanSee": true,
+                    "CanSeeThroughObjects": false,
+                    "EyesOffset": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "FieldOfView": 180.0,
+                    "HearingRadius": 0.0,
+                    "LoseRadius": 25.0,
+                    "Sensitivity": 1.0,
+                    "SightRadius": 20.0,
+                    "Threshold": 0.0
                 },
                 "Render": null,
                 "Transform": {
                     "m_localPosition": [
                         0.0,
                         0.0,
-                        0.0
+                        1.0
                     ],
                     "m_localRotation": [
                         0.0,
@@ -826,18 +892,18 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
+                        0.699999988079071,
+                        0.699999988079071,
+                        3.0
                     ],
                     "m_position": [
-                        2.1198441982269287,
-                        4.412981033325195,
-                        -3.411789894104004
+                        -0.2718088626861572,
+                        3.855077028274536,
+                        34.4504280090332
                     ],
                     "m_rotation": [
                         -0.0,
-                        0.0,
+                        -2.8867745399475098,
                         -0.0
                     ],
                     "m_scaleFactor": [
@@ -855,7 +921,7 @@
             "m_UUID_hi": 705335393,
             "m_UUID_lo": 3827147549,
             "m_group": "Shapes",
-            "m_name": "Box",
+            "m_name": "ChasingExample",
             "m_parent": null,
             "m_shapeData": {
                 "UvCubeMapMode": false
@@ -977,6 +1043,168 @@
             "m_group": "ParticleEmitter",
             "m_name": "ParticleEmitter",
             "m_parent": null
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:0,0,0,255.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    50.0,
+                                    1.0,
+                                    50.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "NON_MOVING",
+                    "m_density": 1000.0,
+                    "m_friction": 0.20000000298023224,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Static",
+                    "m_restitution": 0.0
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.5,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        50.0,
+                        1.0,
+                        50.0
+                    ],
+                    "m_position": [
+                        0.0,
+                        0.0,
+                        50.2088623046875
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 17871473676164304335,
+            "m_UUID_hi": 4161026719,
+            "m_UUID_lo": 277122511,
+            "m_group": "Shapes",
+            "m_name": "TestFloor",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Sphere"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultSphereTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        0.4000000059604645,
+                        0.4000000059604645,
+                        0.4000000059604645
+                    ],
+                    "m_position": [
+                        -0.040982604026794434,
+                        0.34804797172546387,
+                        0.2034240961074829
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        2.8867745399475098,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 6019199201868580812,
+            "m_UUID_hi": 1401454024,
+            "m_UUID_lo": 1940981708,
+            "m_group": "Shapes",
+            "m_name": "Sphere",
+            "m_parent": {
+                "attached": true,
+                "uuid": 3029392449473454877
+            },
+            "m_shapeData": {
+                "SliceCount": 10,
+                "StackCount": 10
+            },
+            "m_type": "Sphere"
         }
     ],
     "inputMapping": "Default",

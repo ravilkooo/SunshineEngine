@@ -55,7 +55,19 @@ namespace ScriptingBindings
 			[](DXSM::Vector3* self) {
 				return self->Normalize();
 			},
-			"length", &DXSM::Vector3::Length
+			"length", &DXSM::Vector3::Length,
+			sol::meta_function::addition, [](const DXSM::Vector3& a, const DXSM::Vector3& b) {
+				return a + b;
+			},
+			sol::meta_function::subtraction, [](const DXSM::Vector3& a, const DXSM::Vector3& b) {
+				return a - b;
+			},
+			sol::meta_function::multiplication, [](const DXSM::Vector3& a, const DXSM::Vector3& b) {
+				return a * b;
+			},
+			sol::meta_function::multiplication, [](const DXSM::Vector3& a, float s) {
+				return a * s;
+			}
         );
 
 		lua.new_usertype<DXSM::Vector2>("Vector2",
@@ -66,7 +78,19 @@ namespace ScriptingBindings
 			[](DXSM::Vector2* self) {
 				return self->Normalize();
 			},
-			"length", &DXSM::Vector2::Length
+			"length", &DXSM::Vector2::Length,
+			sol::meta_function::addition, [](const DXSM::Vector2& a, const DXSM::Vector2& b) {
+				return a + b;
+			},
+			sol::meta_function::subtraction, [](const DXSM::Vector2& a, const DXSM::Vector2& b) {
+				return a - b;
+			},
+			sol::meta_function::multiplication, [](const DXSM::Vector2& a, const DXSM::Vector2& b) {
+				return a * b;
+			},
+			sol::meta_function::multiplication, [](const DXSM::Vector2& a, float s) {
+				return a * s;
+			}
 		);
 
 		// Register Camera type
