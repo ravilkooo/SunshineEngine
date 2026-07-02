@@ -701,7 +701,7 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
 
         bool HasMovingPlatform = obj->HasComponent<MovingPlatformComponent_Info>();
         ImGui::BeginDisabled(HasMovingPlatform);
-        if (DrawComponentRemoveButton<MovingPlatformComponent_Info>(obj))
+        if (DrawComponentRemoveButton<PhysicsComponent_Info>(obj))
         {
             ImGui::TreePop();
             ImGui::EndDisabled();
@@ -2033,6 +2033,12 @@ void PropertyPanel::DrawMovingPlatformComponent(GameObject_Info* obj)
     if (ImGui::TreeNodeEx("Moving platform", flags))
     {
         EditorUI::FontStyles::Pop();
+
+        if (DrawComponentRemoveButton<MovingPlatformComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
 
         ImGui::Checkbox("Affect characters", &platform->m_affectCharacters);
 

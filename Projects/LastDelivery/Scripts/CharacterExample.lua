@@ -84,16 +84,19 @@ function behavior:update(dt)
     local inputSystem = getInputSystem()
     local speed = 0.1
     local char = self.owner:getCharacterComponent()
-    local camera = self.owner:getCameraComponent()
 
-    local inputValue = inputSystem:getAxis2D("Forward", "Right")
-    char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
-    camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
-    camera:getCamera():rotateSpringArmPitch(0.4 * inputSystem:getMouseDeltaY())
+    if (char.m_isPlayerControlled) then
+        local camera = self.owner:getCameraComponent()
 
-    if (inputSystem:isPressed("Jump")) then
-        print("== JUMP! ==")
-        char.m_jumpRequested = true
+        local inputValue = inputSystem:getAxis2D("Forward", "Right")
+        char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
+        camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
+        camera:getCamera():rotateSpringArmPitch(0.4 * inputSystem:getMouseDeltaY())
+
+        if (inputSystem:isPressed("Jump")) then
+            print("== JUMP! ==")
+            char.m_jumpRequested = true
+        end
     end
 
     return "success"

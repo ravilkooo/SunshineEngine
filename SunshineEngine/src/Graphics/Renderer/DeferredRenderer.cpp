@@ -52,6 +52,7 @@ namespace SE_G {
 	void DeferredRenderer::SetMainCamera(eastl::shared_ptr<Camera> camera)
 	{ 
 		m_mainCamera = camera;
+		m_mainCamera->ResetCameraView(m_screenWidth * 1.0f / m_screenHeight);
 		if (m_particleSystem)
 			m_particleSystem->SetCamera(m_mainCamera.get());
 	}

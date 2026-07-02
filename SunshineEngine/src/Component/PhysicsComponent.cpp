@@ -381,6 +381,14 @@ void PhysicsComponent::MoveKinematic(DXSM::Vector3 inPosition, DXSM::Vector3 inR
                 JPH::Quat(rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w),
                 deltaTime);
         });
+
+
+    m_physicsSystem->EnqueuePreNextFrameCommand([this]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            bodyInterface.SetLinearVelocity(m_joltBodyId, JPH::Vec3::sZero());
+            return bodyInterface.SetAngularVelocity(m_joltBodyId, JPH::Vec3::sZero());
+        });
 }
 
 void PhysicsComponent::MoveKinematicPosition(DXSM::Vector3 inPosition, float deltaTime)
@@ -423,6 +431,13 @@ void PhysicsComponent::MoveKinematicRotation(DXSM::Vector3 inRotation, float del
                 pos,
                 JPH::Quat(rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w),
                 deltaTime);
+        });
+
+
+    m_physicsSystem->EnqueuePreNextFrameCommand([this]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.SetAngularVelocity(m_joltBodyId, JPH::Vec3::sZero());
         });
 }
 

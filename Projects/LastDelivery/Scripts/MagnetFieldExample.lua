@@ -1,5 +1,5 @@
 behavior = {}
-magnetSpeed = 1
+local magnetForce = 1000000
 local innerObjects = {}
 
 function behavior:start()
@@ -30,7 +30,7 @@ function behavior:update(dt)
     local turnMagnet = inputSystem:getAxis("TurnMagnet")
 
     for hi, phys in pairs(innerObjects) do
-        phys:addForce(Vector3.new(0,100000 * turnMagnet,0))
+        phys:addForce(Vector3.new(0, magnetForce * turnMagnet,0))
     end
 
     return "success"

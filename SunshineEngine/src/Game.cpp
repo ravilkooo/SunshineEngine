@@ -136,6 +136,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_renderer->SetMainCamera(
 		Scene::GetInstance().m_cameraManager->GetCameraByUUID(
 			Scene::GetInstance().m_mainCameraUUID));
+	m_renderer->GetMainCamera()->ResetCameraView(m_screenWidth * 1.0f / m_screenHeight);
 
 	SetupPhysics();
 	m_luaManager.InitializeBehavior();

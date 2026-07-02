@@ -48,7 +48,7 @@ namespace ScriptingBindings
 
         // Math/value types
         lua.new_usertype<DXSM::Vector3>("Vector3",
-            sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float)>(),
+			sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float), DXSM::Vector3(const DXSM::Vector3&)>(),
             "x", &DXSM::Vector3::x,
             "y", &DXSM::Vector3::y,
             "z", &DXSM::Vector3::z,
@@ -72,7 +72,7 @@ namespace ScriptingBindings
         );
 
 		lua.new_usertype<DXSM::Vector2>("Vector2",
-			sol::constructors<DXSM::Vector2(), DXSM::Vector2(float, float)>(),
+			sol::constructors<DXSM::Vector2(), DXSM::Vector2(float, float), DXSM::Vector2(const DXSM::Vector2&)>(),
 			"x", &DXSM::Vector2::x,
 			"y", &DXSM::Vector2::y,
 			"normalize",
