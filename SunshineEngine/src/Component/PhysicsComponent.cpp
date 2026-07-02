@@ -11,6 +11,8 @@
 #include <Scripting/ComponentBindings.h>
 #include <SimpleMath.h>
 
+#define MOVE_KINEMATICS_DELTA 0.001f
+
 PhysicsComponent::PhysicsComponent(SE::UUID objectUUID, TransformComponent* tc)
 {
     transformComp = tc;
@@ -363,38 +365,64 @@ float PhysicsComponent::GetGravityFactor()
     return bodyInterface.GetGravityFactor(m_joltBodyId);
 }
 
-// Set position
-void PhysicsComponent::SetPosition(DXSM::Vector3 inPosition)
+void PhysicsComponent::MoveKinematic(DXSM::Vector3 inPosition, DXSM::Vector3 inRotation, float deltaTime)
 {
     if (!m_physicsSystem)
         return;
 
-    m_physicsSystem->EnqueueCommand([this, inPosition]()
+    m_physicsSystem->EnqueueCommand([this, inPosition, inRotation, deltaTime]()
         {
             JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
-            return bodyInterface.SetPosition(
-                m_joltBodyId,
+
+            auto rotQuat = DXSM::Quaternion::CreateFromYawPitchRoll(inRotation.y, inRotation.x, inRotation.z);
+            
+            return bodyInterface.MoveKinematic(m_joltBodyId,
                 JPH::Vec3(inPosition.x, inPosition.y, inPosition.z),
-                JPH::EActivation::Activate);
+                JPH::Quat(rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w),
+                deltaTime);
         });
 }
 
-// Set rotation
-void PhysicsComponent::SetRotation(DXSM::Vector3 inRotation)
+void PhysicsComponent::MoveKinematicPosition(DXSM::Vector3 inPosition, float deltaTime)
 {
     if (!m_physicsSystem)
         return;
 
-
-    m_physicsSystem->EnqueueCommand([this, inRotation]()
+    m_physicsSystem->EnqueueCommand([this, inPosition, deltaTime]()
         {
-            auto quatRot = DXSM::Quaternion::CreateFromYawPitchRoll(inRotation.y, inRotation.x, inRotation.z);
-
             JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
-            return bodyInterface.SetRotation(
-                m_joltBodyId,
-                JPH::Quat(quatRot.x, quatRot.y, quatRot.z, quatRot.w),
-                JPH::EActivation::Activate);
+            JPH::Quat q = bodyInterface.GetRotation(m_joltBodyId);
+            JPH::Vec3 pos = JPH::Vec3(inPosition.x, inPosition.y, inPosition.z);
+
+            return bodyInterface.MoveKinematic(m_joltBodyId,
+                pos,
+                q,
+                deltaTime);
+        });
+
+    m_physicsSystem->EnqueuePreNextFrameCommand([this]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.SetLinearVelocity(m_joltBodyId, JPH::Vec3::sZero());
+        });
+}
+
+void PhysicsComponent::MoveKinematicRotation(DXSM::Vector3 inRotation, float deltaTime)
+{
+    if (!m_physicsSystem)
+        return;
+
+    m_physicsSystem->EnqueueCommand([this, inRotation, deltaTime]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+
+            JPH::RVec3 pos = bodyInterface.GetPosition(m_joltBodyId);
+            auto rotQuat = DXSM::Quaternion::CreateFromYawPitchRoll(inRotation.y, inRotation.x, inRotation.z);
+
+            return bodyInterface.MoveKinematic(m_joltBodyId,
+                pos,
+                JPH::Quat(rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w),
+                deltaTime);
         });
 }
 

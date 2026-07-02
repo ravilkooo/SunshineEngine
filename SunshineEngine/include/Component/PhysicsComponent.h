@@ -99,9 +99,14 @@ public:
     float GetGravityFactor();
 
     // Set position
-    void SetPosition(DXSM::Vector3 inPosition);
+    // void SetPosition(DXSM::Vector3 inPosition);
     // Set rotation
-    void SetRotation(DXSM::Vector3 inRotation);
+    // void SetRotation(DXSM::Vector3 inRotation);
+
+    // Move kinematic
+    void MoveKinematic(DXSM::Vector3 inPosition, DXSM::Vector3 inRotation, float deltaTime);
+    void MoveKinematicPosition(DXSM::Vector3 inPosition, float deltaTime);
+    void MoveKinematicRotation(DXSM::Vector3 inRotation, float deltaTime);
 
     void InitTransforms();
 
@@ -233,9 +238,10 @@ public:
     FM("getLinearVelocity", [](PhysicsComponent* self){ return self->GetLinearVelocity(); }), \
     FM("getPointVelocity", [](PhysicsComponent* self, const DXSM::Vector3& pt){ return self->GetPointVelocity(pt); }), \
     FM("getPosition", [](PhysicsComponent* self){ return self->GetPosition(); }), \
-    FM("setPosition", [](PhysicsComponent* self, DXSM::Vector3 inVal){ return self->SetPosition(inVal); }), \
     FM("getRotation", [](PhysicsComponent* self){ return self->GetRotation(); }), \
-    FM("setRotation", [](PhysicsComponent* self, DXSM::Vector3 inVal){ return self->SetRotation(inVal); }), \
+    FM("moveKinematic", [](PhysicsComponent* self, DXSM::Vector3 inPos, DXSM::Vector3 inRot, float deltaTime) { return self->MoveKinematic(inPos, inRot, deltaTime); }), \
+    FM("moveKinematicPosition", [](PhysicsComponent* self, DXSM::Vector3 inPos, float deltaTime) { return self->MoveKinematicPosition(inPos, deltaTime); }), \
+    FM("moveKinematicRotation", [](PhysicsComponent* self, DXSM::Vector3 inRot, float deltaTime) { return self->MoveKinematicRotation(inRot, deltaTime); }), \
     FM("getGravityFactor", [](PhysicsComponent* self){ return self->GetGravityFactor(); }), \
     FM("setGravityFactor", [](PhysicsComponent* self, float inVal){ return self->SetGravityFactor(inVal); }), \
     FM("resetForce", [](PhysicsComponent* self){ self->ResetForce(); }), \
@@ -245,3 +251,8 @@ public:
     FM("setActive", [](PhysicsComponent* self, bool active){ self->SetActive(active); }), \
     FM("isActive", [](PhysicsComponent* self){ return self->IsActive(); })
 #endif
+
+/*
+    FM("setPosition", [](PhysicsComponent* self, DXSM::Vector3 inVal){ return self->SetPosition(inVal); }), \
+    FM("setRotation", [](PhysicsComponent* self, DXSM::Vector3 inVal){ return self->SetRotation(inVal); }), \
+*/

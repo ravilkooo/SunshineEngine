@@ -219,16 +219,15 @@ void Game::ClearCachedAbsoluteTransforms()
 void Game::Update(float deltaTime) {
 	Scene::GetInstance().FlushDestructionQueue();
 
-	m_physicsSystem->FlushCommands();
-
 	m_characterControllerSystem->UpdateCharacters(deltaTime);
 	m_characterControllerSystem->UpdateTriggerOverlaps();
 	m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
-	m_physicsSystem->Step(deltaTime);
 	m_physicsSystem->FlushCommands();
+	m_physicsSystem->Step(deltaTime);
+	m_physicsSystem->FlushPreNextFrameCommands();
 
-	m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance());
+	m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance(), deltaTime);
 
 	if (m_particleSystem)
 		m_particleSystem->Update(deltaTime);

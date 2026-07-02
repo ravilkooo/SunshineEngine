@@ -293,7 +293,7 @@ public:
     // Add objects before this step
     void FinalizeScene();
 
-    void SyncronizeTransforms(Scene* scene);
+    void SyncronizeTransforms(Scene* scene, float deltaTime);
 
     void Step(float dt);
 
@@ -341,9 +341,16 @@ public:
     void EnqueueCommand(std::function<void()> fn);
 
     void FlushCommands(); // вызвать в безопасной точке
+
+    void EnqueuePreNextFrameCommand(std::function<void()> fn);
+
+    void FlushPreNextFrameCommands(); // вызвать в безопасной точке
 private:
 
     std::mutex m_cmdMutex;
     std::vector<std::function<void()>> m_cmds;
+
+    std::mutex m_preNextFrameCmdMutex;
+    std::vector<std::function<void()>> m_preNextFrameCmds;
 };
 
