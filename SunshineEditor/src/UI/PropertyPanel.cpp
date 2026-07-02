@@ -31,6 +31,7 @@
 #include <Component/CameraComponent.h>
 #include <Component/CharacterControllerComponent.h>
 #include <Component/BouncePadComponent.h>
+#include <Component/MovingPlatformComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -402,15 +403,16 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         }
 
         DrawMeshComponent(obj);
+        DrawPhysicsComponent(obj);
+        DrawTriggerComponent(obj);
         DrawCharacterComponent(obj);
         DrawCharacterControllerComponent(obj);
         DrawCameraComponent(obj);
-        DrawPhysicsComponent(obj);
-        DrawTriggerComponent(obj);
         DrawPerceptionComponent(obj);
         DrawBehaviorController(obj);
-        DrawLuaComponent(obj);
         DrawBouncePadComponent(obj);
+        DrawMovingPlatformComponent(obj);
+        DrawLuaComponent(obj);
 
         ImGui::TreePop();
     }
@@ -697,11 +699,17 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        if (DrawComponentRemoveButton<PhysicsComponent_Info>(obj))
+        bool HasMovingPlatform = obj->HasComponent<MovingPlatformComponent_Info>();
+        ImGui::BeginDisabled(HasMovingPlatform);
+        if (DrawComponentRemoveButton<MovingPlatformComponent_Info>(obj))
         {
             ImGui::TreePop();
+            ImGui::EndDisabled();
             return;
         }
+        if (HasMovingPlatform)
+            ImGui::SetItemTooltip("Can't delete Physics Component before Moving Platform");
+        ImGui::EndDisabled();
 
         auto currentMotion = physicsInfo->GetMotion();
         if (ImGui::Combo("Motion Type", (int*)&currentMotion, "Static\0Kinematic\0Dynamic\0"))
@@ -1394,6 +1402,7 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
     {
         bool HasAllComponents = true;
         bool HasPhysicsComponent = obj->HasComponent<PhysicsComponent_Info>();
+        bool HasTriggerComponent = obj->HasComponent<TriggerComponent_Info>();
         bool HasCharacterComponent = obj->HasComponent<CharacterComponent_Info>();
         bool HasCharacterControllerComponent = obj->HasComponent<CharacterControllerComponent_Info>();
 
@@ -1414,26 +1423,84 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
         {
             HasAllComponents = false;
 
-            ImGui::BeginDisabled(HasCharacterControllerComponent);
+            ImGui::BeginDisabled(HasCharacterControllerComponent || HasTriggerComponent);
 
             if (ImGui::MenuItem("Physics Component", nullptr, false, true))
             {
                 obj->AddDefaultComponent(SE::ComponentType::PHYSICS);
+                HasPhysicsComponent = true;
             }
 
             ImGui::EndDisabled();
 
             if (HasCharacterControllerComponent)
                 ImGui::SetItemTooltip("Can't have both Character Controller and Physics components");
+            else if (HasTriggerComponent)
+                ImGui::SetItemTooltip("Can't have both Trigger and Physics components");
         }
 
         if (!obj->HasComponent<TriggerComponent_Info>())
         {
             HasAllComponents = false;
 
+            ImGui::BeginDisabled(HasCharacterControllerComponent || HasPhysicsComponent);
+
             if (ImGui::MenuItem("Trigger Component", nullptr, false, true))
             {
                 obj->AddDefaultComponent(SE::ComponentType::TRIGGER);
+                HasTriggerComponent = true;
+            }
+
+            ImGui::EndDisabled();
+            
+            if (HasCharacterControllerComponent)
+                ImGui::SetItemTooltip("Can't have both Character Controller and Trigger components");
+            else if (HasPhysicsComponent)
+                ImGui::SetItemTooltip("Can't have both Trigger and Physics components");
+
+        }
+
+        if (!obj->HasComponent<CharacterComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Character Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::CHARACTER);
+                HasCharacterComponent = true;
+            }
+        }
+
+        if (!obj->HasComponent<CharacterControllerComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            ImGui::BeginDisabled(HasTriggerComponent || HasPhysicsComponent || !HasCharacterComponent);
+
+            if (ImGui::MenuItem("Character Controller", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::CHARACTER_CONTROLLER);
+            }
+
+            ImGui::EndDisabled();
+
+            if (!HasCharacterComponent)
+                ImGui::SetItemTooltip("Can't have Character Controller without Character component");
+            else if (HasPhysicsComponent)
+                ImGui::SetItemTooltip("Can't have both Character Controller and Physics components");
+            else if (HasTriggerComponent)
+                ImGui::SetItemTooltip("Can't have both Character Controller and Trigger components");
+        }
+
+        if (!obj->HasComponent<CameraComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Camera Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::CAMERA);
+                m_WorldEditor->m_scene->m_cameraManager->AddCamera(
+                    obj->GetComponent<CameraComponent_Info>()->m_assignedComponent->m_camera);
             }
         }
 
@@ -1457,57 +1524,6 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             }
         }
 
-        if (!obj->HasComponent<LuaComponent_Info>())
-        {
-            HasAllComponents = false;
-
-            if (ImGui::MenuItem("Lua Script", nullptr, false, true))
-            {
-                obj->AddDefaultComponent(SE::ComponentType::LUA);
-            }
-        }
-
-        if (!obj->HasComponent<CharacterComponent_Info>())
-        {
-            HasAllComponents = false;
-
-            if (ImGui::MenuItem("Character Component", nullptr, false, true))
-            {
-                obj->AddDefaultComponent(SE::ComponentType::CHARACTER);
-            }
-        }
-
-        if (!obj->HasComponent<CameraComponent_Info>())
-        {
-            HasAllComponents = false;
-
-            if (ImGui::MenuItem("Camera Component", nullptr, false, true))
-            {
-                obj->AddDefaultComponent(SE::ComponentType::CAMERA);
-                m_WorldEditor->m_scene->m_cameraManager->AddCamera(
-                    obj->GetComponent<CameraComponent_Info>()->m_assignedComponent->m_camera);
-            }
-        }
-
-        if (!obj->HasComponent<CharacterControllerComponent_Info>())
-        {
-            HasAllComponents = false;
-
-            ImGui::BeginDisabled(HasPhysicsComponent || !HasCharacterComponent);
-
-            if (ImGui::MenuItem("Character Controller", nullptr, false, true))
-            {
-                obj->AddDefaultComponent(SE::ComponentType::CHARACTER_CONTROLLER);
-            }
-
-            ImGui::EndDisabled();
-
-            if (!HasCharacterComponent)
-                ImGui::SetItemTooltip("Can't have Character Controller without Character component");
-            else if (HasPhysicsComponent)
-                ImGui::SetItemTooltip("Can't have both Character Controller and Physics components");
-        }
-
         if (!obj->HasComponent<BouncePadComponent_Info>())
         {
             HasAllComponents = false;
@@ -1515,6 +1531,34 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             if (ImGui::MenuItem("Bounce pad component", nullptr, false, true))
             {
                 obj->AddDefaultComponent(SE::ComponentType::BOUNCE_PAD);
+            }
+        }
+
+        if (!obj->HasComponent<MovingPlatformComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            ImGui::BeginDisabled(!HasPhysicsComponent);
+
+            if (ImGui::MenuItem("Moving platform component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::MOVING_PLATFORM);
+            }
+
+            ImGui::EndDisabled();
+
+            if (!HasPhysicsComponent)
+                ImGui::SetItemTooltip("Can't have Moving platform component without Physics component");
+
+        }
+
+        if (!obj->HasComponent<LuaComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Lua Script", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::LUA);
             }
         }
 
@@ -1968,6 +2012,29 @@ void PropertyPanel::DrawBouncePadComponent(GameObject_Info* obj)
         }
 
         DrawFloatControl("Min bounce speed", bouncePadInfo->m_minBounceVelocity, 1.0f, 1.0f, 0.0f, 1000.0f, "%.2f");
+
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawMovingPlatformComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<MovingPlatformComponent_Info>())
+        return;
+    auto platform = obj->GetComponent<MovingPlatformComponent_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Moving platform", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        ImGui::Checkbox("Affect characters", &platform->m_affectCharacters);
 
         ImGui::TreePop();
     }

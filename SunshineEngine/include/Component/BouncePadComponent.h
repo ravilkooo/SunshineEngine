@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Component/Component.h>
 #include <Utils/UUID.h>
 

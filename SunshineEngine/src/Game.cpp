@@ -24,6 +24,7 @@
 #include <Component/TriggerComponent.h>
 #include <Component/TransformComponent.h>
 #include <Component/CameraComponent.h>
+#include <Component/MovingPlatformComponent.h>
 
 #include <ControllerSystem/CharacterControllerSystem.h>
 
@@ -100,6 +101,10 @@ void Game::SetupPhysics()
 		auto trigc = it.second->GetComponent<TriggerComponent>();
 		if (trigc)
 			m_physicsSystem->CreateAndAddTrigger(trigc.get());
+
+		auto movpl = it.second->GetComponent<MovingPlatformComponent>();
+		if (movpl)
+			m_physicsSystem->AddMovingPlatform(movpl.get());
 	}
 	m_physicsSystem->FinalizeScene();
 
@@ -219,15 +224,18 @@ void Game::ClearCachedAbsoluteTransforms()
 void Game::Update(float deltaTime) {
 	Scene::GetInstance().FlushDestructionQueue();
 
-	m_characterControllerSystem->UpdateCharacters(deltaTime);
-	m_characterControllerSystem->UpdateTriggerOverlaps();
 	m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
 	m_physicsSystem->FlushCommands();
-	m_physicsSystem->Step(deltaTime);
-	m_physicsSystem->FlushPreNextFrameCommands();
 
 	m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance(), deltaTime);
+	m_characterControllerSystem->UpdateCharacters(deltaTime);
+	m_characterControllerSystem->UpdateTriggerOverlaps();
+
+	m_physicsSystem->Step(deltaTime);
+
+	m_physicsSystem->FlushPreNextFrameCommands();
+
 
 	if (m_particleSystem)
 		m_particleSystem->Update(deltaTime);

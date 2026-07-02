@@ -44,6 +44,7 @@
 
 class PhysicsComponent;
 class TriggerComponent;
+class MovingPlatformComponent;
 
 class PhysicsSystem_Info {
 public:
@@ -316,6 +317,9 @@ public:
     void SetGravity(DXSM::Vector3 inGravity);
     DXSM::Vector3 GetGravity();
 
+    void AddMovingPlatform(MovingPlatformComponent* platformComp);
+    MovingPlatformComponent* GetMovingPlatform(SE::UUID platformUUID);
+
 private:
 
     void ClearAllBodies();
@@ -334,6 +338,8 @@ private:
 
     TriggerContactListener m_triggerContactListener;
     eastl::unordered_map<SE::UUID, TriggerComponent*> m_activeTriggers;
+
+    eastl::unordered_map<SE::UUID, MovingPlatformComponent*> m_movingPlatforms;
 
     bool m_isValid = false;
     

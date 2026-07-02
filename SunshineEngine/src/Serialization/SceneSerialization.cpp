@@ -15,6 +15,7 @@
 #include <Component/CharacterComponent.h>
 #include <Component/CharacterControllerComponent.h>
 #include <Component/BouncePadComponent.h>
+#include <Component/MovingPlatformComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -554,6 +555,30 @@ void BouncePadComponent::FromJson(const json& j, TransformComponent* tc)
     m_assignedTransform = tc;
 }
 
+// ----------------- MovingPlatformComponent -----------------
+
+json MovingPlatformComponent_Info::ToJson() const
+{
+    json j;
+    j = nlohmann::json{
+        {"m_affectCharacters", m_affectCharacters}
+    };
+    return j;
+}
+
+void MovingPlatformComponent_Info::FromJson(const json& j)
+{
+    if (j.contains("m_affectCharacters") && j["m_affectCharacters"].is_boolean()) {
+        m_affectCharacters = j["m_affectCharacters"].get<bool>();
+    }
+}
+
+void MovingPlatformComponent::FromJson(const json& j)
+{
+    if (j.contains("m_affectCharacters") && j["m_affectCharacters"].is_boolean()) {
+        m_affectCharacters = j["m_affectCharacters"].get<bool>();
+    }
+}
 
 // ----------------- GameObject_Info -----------------
 
@@ -614,6 +639,7 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::CHARACTER:              key = "Character"; break;
             case SE::ComponentType::CAMERA:              key = "Camera"; break;
             case SE::ComponentType::BOUNCE_PAD:              key = "BouncePad"; break;
+            case SE::ComponentType::MOVING_PLATFORM:              key = "MovingPlatform"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -777,6 +803,12 @@ void Scene::FromJson(
                     auto bouncePadComp = go->AddComponent<BouncePadComponent>();
                     bouncePadComp->FromJson(objJ["components"]["BouncePad"],
                         go->GetComponent<TransformComponent>().get());
+                }
+
+                if (objJ["components"].contains("MovingPlatform")) {
+                    auto c = go->AddComponent<MovingPlatformComponent>();
+                    c->FromJson(objJ["components"]["MovingPlatform"]);
+                    c->m_objectUUID = go->m_UUID;
                 }
                 
                 // Parentnes
@@ -978,6 +1010,11 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         if (objJ["components"].contains("BouncePad")) {
             auto c = go->AddComponent<BouncePadComponent_Info>();
             c->FromJson(objJ["components"]["BouncePad"]);
+        }
+
+        if (objJ["components"].contains("MovingPlatform")) {
+            auto c = go->AddComponent<MovingPlatformComponent_Info>();
+            c->FromJson(objJ["components"]["MovingPlatform"]);
         }
 
         // Parentnes

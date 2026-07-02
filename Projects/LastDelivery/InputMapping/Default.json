@@ -66,12 +66,12 @@
         {
             "key": 89,
             "name": "UpMagnet",
-            "scale": 1.0
+            "scale": -1.0
         },
         {
             "key": 85,
             "name": "UpMagnet",
-            "scale": -1.0
+            "scale": 1.0
         }
     ],
     "name": "Default"

@@ -8,6 +8,7 @@
 #include "Component/TransformComponent.h"
 #include "Component/PhysicsComponent.h"
 #include "Component/TriggerComponent.h"
+#include "Component/MovingPlatformComponent.h"
 #include "Component/CharacterComponent.h"
 #include "Component/CharacterControllerComponent.h"
 
@@ -353,7 +354,7 @@ void CharacterControllerSystem::UpdatePhysics(
             controller->m_velocity.x + controller->m_inputVelocity * sin(character->m_yaw),
             controller->m_velocity.y,
             controller->m_velocity.z + controller->m_inputVelocity * cos(character->m_yaw)
-        )
+        ) + controller->m_groundSpeed
     );
 
     JPH::CharacterVirtual::ExtendedUpdateSettings update_settings;
@@ -400,11 +401,37 @@ void CharacterControllerSystem::UpdateGroundState(
         controller->m_character->GetGroundState() ==
         JPH::CharacterBase::EGroundState::OnGround;
 
-    if (!wasGrounded && controller->m_grounded)
+    if (controller->m_grounded)
     {
-        controller->m_velocity.x = 0;
-        controller->m_velocity.z = 0;
+        auto movingPlatformUUID = SE::UUID(controller->m_character->GetGroundUserData());
+        /*
+        JPH::PhysicsSystem& physSystem = m_physicsSystem->GetWorld();
+        physSystem.GetBodyInterface().GetLinearVelocity(;
+        */
+        auto platform = m_physicsSystem->GetMovingPlatform(movingPlatformUUID);
+        if (platform && platform->m_affectCharacters)
+        {
+            controller->m_groundSpeed = platform->m_velocity;
+        }
+        else
+        {
+            controller->m_groundSpeed = JPH::Vec3::sZero();
+        }
+
+        if (!wasGrounded)
+        {
+            controller->m_velocity.x = 0;
+            controller->m_velocity.z = 0;
+        }
     }
+    else
+    {
+        if (!wasGrounded)
+        {
+            controller->m_groundSpeed = JPH::Vec3::sZero();
+        }
+    }
+
 }
 
 void CharacterControllerSystem::ClearFrameState(

@@ -4,6 +4,7 @@
 #include <Component/TransformComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <Component/TriggerComponent.h>
+#include <Component/MovingPlatformComponent.h>
 
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
@@ -52,6 +53,8 @@ PhysicsSystem::PhysicsSystem() :
     m_physicsSystem->SetContactListener(&m_triggerContactListener);
 
     m_activeTriggers = eastl::unordered_map<SE::UUID, TriggerComponent*>();
+
+    m_movingPlatforms = eastl::unordered_map<SE::UUID, MovingPlatformComponent*>();
 }
 
 PhysicsSystem::~PhysicsSystem()
@@ -294,6 +297,11 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene, float deltaTime) {
                 targetRot,
                 deltaTime);
         }
+
+        auto movingPlatform = objPtr->GetComponent<MovingPlatformComponent>();
+        if (movingPlatform) {
+            movingPlatform->m_velocity = m_bodyInterface->GetLinearVelocity(bodyEntry.m_joltBodyId);
+        }
     }
 
     for (auto it : m_activeTriggers) {
@@ -366,6 +374,8 @@ void PhysicsSystem::ClearAllBodies()
         m_bodyInterface->DestroyBody(it.second->m_joltBodyId);
     }
     m_activeTriggers.clear();
+
+    m_movingPlatforms.clear();
 }
 
 JPH::PhysicsSystem& PhysicsSystem::GetWorld() { return *m_physicsSystem; }
@@ -478,6 +488,20 @@ DXSM::Vector3 PhysicsSystem::GetGravity()
 {
     auto currGrav = m_physicsSystem->GetGravity();
     return DXSM::Vector3(currGrav.GetX(), currGrav.GetY(), currGrav.GetZ());
+}
+
+void PhysicsSystem::AddMovingPlatform(MovingPlatformComponent* platformComp)
+{
+    m_movingPlatforms[platformComp->m_objectUUID] = platformComp;
+}
+
+MovingPlatformComponent* PhysicsSystem::GetMovingPlatform(SE::UUID platformUUID)
+{
+    auto res = m_movingPlatforms.find(platformUUID);
+    if (res != m_movingPlatforms.end())
+        return res->second;
+    else
+        return nullptr;
 }
 
 void PhysicsSystem::EnqueueCommand(std::function<void()> fn)

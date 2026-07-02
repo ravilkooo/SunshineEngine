@@ -59,6 +59,7 @@ public:
     DXSM::Vector3 m_velocity = DXSM::Vector3::Zero;
 
     bool m_grounded = false;
+    JPH::Vec3 m_groundSpeed = DXSM::Vector3::Zero;
 
     DXSM::Vector3 m_groundNormal = DXSM::Vector3(0, 1, 0);
 
