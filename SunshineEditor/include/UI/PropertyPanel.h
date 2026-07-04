@@ -82,6 +82,7 @@ private:
 
     void DrawParentnes(GameObject_Info* obj);
 
+    void DrawGraphicsSettings(GameObject_Info* obj);
     void DrawTransformComponent(GameObject_Info* obj);
     void DrawDetails(GameObject_Info* obj);
     void DrawComponentAddPopup(GameObject_Info* obj);

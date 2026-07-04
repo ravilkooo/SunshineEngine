@@ -85,6 +85,8 @@ void PropertyPanel::OnImGuiRender()
     DrawParentnes(obj);
     ImGui::Separator();
 
+    DrawGraphicsSettings(obj);
+
     DrawTransformComponent(obj);
     DrawDetails(obj);
     
@@ -245,6 +247,43 @@ void PropertyPanel::DrawParentnes(GameObject_Info* obj)
         }
     }
 
+}
+
+void PropertyPanel::DrawGraphicsSettings(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<RenderComponent_Info>())
+        return;
+
+	auto renderComp = obj->GetComponent<RenderComponent_Info>().get();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header1);
+    if (ImGui::TreeNodeEx("Graphics settings", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        bool prevVisible = renderComp->m_isVisible;
+        if (ImGui::Checkbox("Is visible", &renderComp->m_isVisible))
+        {
+			// to-do: Update visibility in all techniques
+            // change visible GPass shader to hidden Gpass shader?
+            // or viseverse
+        }
+
+        bool prevTransparent = renderComp->m_isTransparent;
+        if (ImGui::Checkbox("Is transparent", &renderComp->m_isTransparent))
+        {
+            // to-do: Update transparency in all techniques
+            // remove GPass technique and add Transparency tech
+            // or viseverse
+        }
+
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
 }
 
 void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)

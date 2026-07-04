@@ -29,6 +29,23 @@ void RenderComponent::RemoveTechnique(eastl::string technique)
 ID3D11Device* RenderComponent::GetDevice() { return m_renderSystem->GetDevice(); }
 ID3D11DeviceContext* RenderComponent::GetDeviceContext() { return m_renderSystem->GetDeviceContext(); }
 
+bool RenderComponent::GetVisibility()
+{
+	return m_isVisible;
+}
+
+void RenderComponent::SetVisibility(bool newVisibilty)
+{
+	m_isVisible = newVisibilty;
+	// to-do: Set vivsibility in all techniques
+}
+
+void RenderComponent::ToggleVisibility()
+{
+	m_isVisible = !m_isVisible;
+	// to-do: Set vivsibility in all techniques
+}
+
 RenderComponent_Info::RenderComponent_Info(SE::UUID uuid, SE_G::DeferredRenderer* renderSystem)
 {
 	m_assignedComponent = eastl::make_unique<RenderComponent>(uuid, renderSystem);

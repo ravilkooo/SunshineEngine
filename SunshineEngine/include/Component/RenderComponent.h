@@ -52,7 +52,15 @@ public:
     ID3D11Device* GetDevice();
     ID3D11DeviceContext* GetDeviceContext();
 
+    bool GetVisibility();
+    void SetVisibility(bool newVisibilty);
+    void ToggleVisibility();
+
+    void FromJson(const json& j) override;
+
 private:
+    bool m_isVisible = true;
+    bool m_isTransparent = false;
     SE_G::DeferredRenderer* m_renderSystem;
     SE::UUID m_objectUUID;
 };
@@ -97,6 +105,9 @@ public:
 
     ID3D11Device* GetDevice() { return m_assignedComponent->GetDevice(); }
     ID3D11DeviceContext* GetDeviceContext() { return m_assignedComponent->GetDeviceContext(); }
+
+    bool m_isVisible = true;
+    bool m_isTransparent = false;
 
 private:
     SE_G::GPassTechnique* m_gPassTech;

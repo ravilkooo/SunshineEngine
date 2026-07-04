@@ -127,14 +127,30 @@ void TransformComponent::FromJson(const json& j)
 }
 
 // ----------------- RenderComponent -----------------
+
+void RenderComponent::FromJson(const json& j) {
+    if (j.contains("m_isVisible") && j["m_isVisible"].is_boolean()) {
+        m_isVisible = j.at("m_isVisible").get<bool>();
+    }
+    if (j.contains("m_isTransparent") && j["m_isTransparent"].is_boolean()) {
+        m_isTransparent = j.at("m_isTransparent").get<bool>();
+    }
+}
+
 json RenderComponent_Info::ToJson() const {
     json j;
-
+    j["m_isVisible"] = m_isVisible;
+    j["m_isTransparent"] = m_isTransparent;
     return j;
 }
 
 void RenderComponent_Info::FromJson(const json& j) {
-
+    if (j.contains("m_isVisible") && j["m_isVisible"].is_boolean()) {
+        m_isVisible = j.at("m_isVisible").get<bool>();
+    }
+    if (j.contains("m_isTransparent") && j["m_isTransparent"].is_boolean()) {
+        m_isTransparent = j.at("m_isTransparent").get<bool>();
+    }
 }
 
 // ----------------- MeshComponent -----------------
@@ -739,6 +755,16 @@ void Scene::FromJson(
                     go->m_name = objJ["m_name"].get<std::string>().c_str();
                 }
 
+                if (objJ["components"].contains("Render"))
+                {
+                    eastl::shared_ptr<RenderComponent> render;
+                    if (go->HasComponent<RenderComponent>())
+                        render = go->GetComponent<RenderComponent>();
+                    else
+                        render = go->AddComponent<RenderComponent>(go->m_UUID, renderSystem);
+                    render->FromJson(objJ["components"]["Render"]);
+                }
+
                 if (objJ["components"].contains("Mesh") &&
                     !go->HasComponent<MeshComponent>()) {
                     auto c = go->AddComponent<MeshComponent>();
@@ -942,6 +968,16 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         if (objJ.contains("m_name"))
         {
             go->m_name = objJ["m_name"].get<std::string>().c_str();
+        }
+
+        if (objJ["components"].contains("Render"))
+        {
+			eastl::shared_ptr<RenderComponent_Info> render;
+            if (go->HasComponent<RenderComponent_Info>())
+                render = go->GetComponent<RenderComponent_Info>();
+            else
+                render = go->AddComponent<RenderComponent_Info>(go->m_UUID, renderSystem);
+            render->FromJson(objJ["components"]["Render"]);
         }
 
         if (objJ["components"].contains("Mesh") &&
