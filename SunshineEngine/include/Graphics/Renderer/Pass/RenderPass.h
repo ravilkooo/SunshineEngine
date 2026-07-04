@@ -54,6 +54,8 @@ namespace SE_G {
 		RenderTechnique* AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech);
 		RenderTechnique* GetTechnique(SE::UUID uuid);
 		void RemoveTechnique(SE::UUID uuid);
+		void DisableTechnique(SE::UUID uuid);
+		void EnableTechnique(SE::UUID uuid);
 
 		void AddPerFrameBind(Bind::Bindable* bind);
 		void BindAllPerFrame();

@@ -843,6 +843,9 @@ void Scene::FromJson(
                     go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
                 }
 
+                auto rc = go->GetComponent<RenderComponent>();
+                rc->ApplyVisibility();
+
                 auto objUUID = GetInstance().AddGameObject(eastl::move(go));
             }
         }
@@ -1059,6 +1062,7 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
             go->SetParent(ParentNode<GameObject_Info>::FromJson(objJ["m_parent"]));
         }
 
+        go->GetComponent<RenderComponent_Info>()->ApplyVisibility();
     }
     return go;
 }

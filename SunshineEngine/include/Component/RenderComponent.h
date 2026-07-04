@@ -52,6 +52,7 @@ public:
     ID3D11Device* GetDevice();
     ID3D11DeviceContext* GetDeviceContext();
 
+    void ApplyVisibility();
     bool GetVisibility();
     void SetVisibility(bool newVisibilty);
     void ToggleVisibility();
@@ -106,6 +107,7 @@ public:
     ID3D11Device* GetDevice() { return m_assignedComponent->GetDevice(); }
     ID3D11DeviceContext* GetDeviceContext() { return m_assignedComponent->GetDeviceContext(); }
 
+    void ApplyVisibility();
     bool GetVisibility();
     void SetVisibility(bool newVisibilty);
     void ToggleVisibility();
@@ -114,6 +116,6 @@ public:
     bool m_isTransparent = false;
 
 private:
-    SE_G::GPassTechnique* m_gPassTech;
+    SE_G::GPassTechnique* m_gPassTech = nullptr;
     bool m_hasGPassMesh = false;
 };

@@ -38,6 +38,8 @@ namespace SE_G {
 		RenderTechnique* GetTechnique(SE::UUID uuid, eastl::string techniqueTag);
 		void RemoveTechnique(SE::UUID uuid, eastl::string techniqueTag);
 		void RemoveAllTechniques(SE::UUID uuid);
+		void DisableAllTechniques(SE::UUID uuid);
+		void EnableAllTechniques(SE::UUID uuid);
 		void ClearAllTechniques();
 
 		bool IsEnabled();

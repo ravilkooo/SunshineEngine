@@ -29,21 +29,35 @@ void RenderComponent::RemoveTechnique(eastl::string technique)
 ID3D11Device* RenderComponent::GetDevice() { return m_renderSystem->GetDevice(); }
 ID3D11DeviceContext* RenderComponent::GetDeviceContext() { return m_renderSystem->GetDeviceContext(); }
 
+void RenderComponent::ApplyVisibility()
+{
+	if (!m_isVisible)
+		m_renderSystem->DisableAllTechniques(m_objectUUID);
+}
+
 bool RenderComponent::GetVisibility()
 {
 	return m_isVisible;
 }
 
-void RenderComponent::SetVisibility(bool newVisibilty)
+void RenderComponent::SetVisibility(bool newVisibiilty)
 {
-	m_isVisible = newVisibilty;
-	// to-do: Set vivsibility in all techniques
+	if (m_isVisible && !newVisibiilty)
+		m_renderSystem->DisableAllTechniques(m_objectUUID);
+	else if (!m_isVisible && newVisibiilty)
+		m_renderSystem->EnableAllTechniques(m_objectUUID);
+
+	m_isVisible = newVisibiilty;
 }
 
 void RenderComponent::ToggleVisibility()
 {
 	m_isVisible = !m_isVisible;
-	// to-do: Set vivsibility in all techniques
+
+	if (!m_isVisible)
+		m_renderSystem->DisableAllTechniques(m_objectUUID);
+	else
+		m_renderSystem->EnableAllTechniques(m_objectUUID);
 }
 
 RenderComponent_Info::RenderComponent_Info(SE::UUID uuid, SE_G::DeferredRenderer* renderSystem)
@@ -73,6 +87,7 @@ void RenderComponent_Info::AddTechnique_Info(SE_G::RenderTechnique* tech)
 		m_selectionTechnique = tech;
 		m_hasGPassMesh = true;
 		m_gPassTech = static_cast<SE_G::GPassTechnique*>(tech);
+		m_gPassTech->m_isHiddenInEditor - !m_isVisible;
 	}
 
 	techniques.insert(tech->GetTechniqueTag());
@@ -105,6 +120,12 @@ void RenderComponent_Info::RemoveTechnique(eastl::string technique) {
 	}
 }
 
+void RenderComponent_Info::ApplyVisibility()
+{
+	if (m_gPassTech)
+		m_gPassTech->m_isHiddenInEditor = !m_isVisible;
+}
+
 bool RenderComponent_Info::GetVisibility()
 {
 	return m_isVisible;
@@ -113,12 +134,14 @@ bool RenderComponent_Info::GetVisibility()
 void RenderComponent_Info::SetVisibility(bool newVisibilty)
 {
 	m_isVisible = newVisibilty;
-	m_gPassTech->m_isHiddenInEditor = !m_isVisible;
+	if (m_gPassTech)
+		m_gPassTech->m_isHiddenInEditor = !m_isVisible;
 }
 
 void RenderComponent_Info::ToggleVisibility()
 {
 	m_isVisible = !m_isVisible;
-	m_gPassTech->m_isHiddenInEditor = !m_isVisible;
+	if (m_gPassTech)
+		m_gPassTech->m_isHiddenInEditor = !m_isVisible;
 	// to-do: Set vivsibility in all techniques
 }

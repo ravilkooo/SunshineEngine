@@ -132,6 +132,8 @@ namespace SE_G {
 	{
 
 		for (auto& tech : m_techniques) {
+			if (!tech.second->IsEnabled())
+				continue;
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
 		}

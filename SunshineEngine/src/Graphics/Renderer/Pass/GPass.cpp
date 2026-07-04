@@ -69,6 +69,8 @@ namespace SE_G {
 	{
 		BindAllPerFrame();
 		for (auto& tech : m_techniques) {
+			if (!tech.second->IsEnabled())
+				continue;
 			tech.second->m_assignedTransform->EnableMeshTransformMode();
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
