@@ -106,6 +106,10 @@ public:
     ID3D11Device* GetDevice() { return m_assignedComponent->GetDevice(); }
     ID3D11DeviceContext* GetDeviceContext() { return m_assignedComponent->GetDeviceContext(); }
 
+    bool GetVisibility();
+    void SetVisibility(bool newVisibilty);
+    void ToggleVisibility();
+
     bool m_isVisible = true;
     bool m_isTransparent = false;
 

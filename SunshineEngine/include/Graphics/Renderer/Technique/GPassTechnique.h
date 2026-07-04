@@ -40,5 +40,14 @@ namespace SE_G {
         eastl::shared_ptr<MeshData> m_meshData;
 
         ID3D11Device* m_device;
+
+		bool m_isHiddenInEditor = false;
+
+    private:
+        static void InitStaticData(ID3D11Device* device);
+
+        static bool s_staticDataInitializated;
+        static eastl::shared_ptr<Bind::PixelShader> s_defaultShader;
+        static eastl::shared_ptr<Bind::PixelShader> s_hiddenEditorShader;
     };
 }

@@ -24,10 +24,18 @@
 
 
 namespace SE_G {
+	eastl::shared_ptr<Bind::PixelShader> GPassTechnique::s_defaultShader;
+	eastl::shared_ptr<Bind::PixelShader> GPassTechnique::s_hiddenEditorShader;
+	bool GPassTechnique::s_staticDataInitializated = false;
+
 	GPassTechnique::GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
 		SE::UUID uuid)
 		: RenderTechnique(device, assignedTransform, technique)
 	{
+		if (!s_staticDataInitializated) {
+			GPassTechnique::InitStaticData(device);
+		}
+
 		m_device = device;
 		
 		D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
@@ -78,15 +86,6 @@ namespace SE_G {
 		);
 		delete[] shaderPath.m_params.asShader.IALayoutInputElements;
 
-		shaderPath = AssetPath(L"Shaders/GPass/GPassTextureShaderPS.hlsl", AssetPath::AssetSource::Engine);
-		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
-		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
-		SE_G::Bind::PixelShader* pshaderRes = rm.Get<SE_G::Bind::PixelShader>(pshaderHandle);
-		m_pixelShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
-			pshaderRes,
-			[](SE_G::Bind::PixelShader*) {}
-		);
-
 		auto ap = AssetPath(
 			SE_G::Bind::Texture::ColorToPath(SE_G::Colors::UnloadedTextureColor),
 			AssetPath::AssetSource::Engine);
@@ -136,6 +135,11 @@ namespace SE_G {
 	void GPassTechnique::BindAll(ID3D11DeviceContext* context)
 	{
 		RenderTechnique::BindAll(context);
+		if (m_isHiddenInEditor)
+			s_hiddenEditorShader->Bind(context);
+		else
+			s_defaultShader->Bind(context);
+
 		m_uuidBuffer->Bind(context);
 		m_meshData->m_mesh->Bind(context);
 		m_meshData->m_texture->Bind(context, 0u);
@@ -152,4 +156,26 @@ namespace SE_G {
 		m_meshData = meshData;
 	}
 
+	void GPassTechnique::InitStaticData(ID3D11Device* device)
+	{
+		AssetPath shaderPath = AssetPath(L"Shaders/GPass/GPassTextureShaderPS.hlsl", AssetPath::AssetSource::Engine);
+		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
+		auto& rm = ResourceManagerFacade::Instance();
+		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::PixelShader* pshaderRes = rm.Get<SE_G::Bind::PixelShader>(pshaderHandle);
+		s_defaultShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+			pshaderRes,
+			[](SE_G::Bind::PixelShader*) {}
+		);
+
+		shaderPath.m_assetRelativePath = L"Shaders/GPass/GPassTextureShaderHiddenEditorPS.hlsl";
+		ResourceHandle hiddenPshaderHandle = rm.LoadByPath(shaderPath);
+		SE_G::Bind::PixelShader* hiddenPshaderRes = rm.Get<SE_G::Bind::PixelShader>(hiddenPshaderHandle);
+		s_hiddenEditorShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(
+			hiddenPshaderRes,
+			[](SE_G::Bind::PixelShader*) {}
+		);
+
+		s_staticDataInitializated = true;
+	}
 }

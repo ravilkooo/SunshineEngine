@@ -265,9 +265,10 @@ void PropertyPanel::DrawGraphicsSettings(GameObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        bool prevVisible = renderComp->m_isVisible;
-        if (ImGui::Checkbox("Is visible", &renderComp->m_isVisible))
+        bool visibility = renderComp->GetVisibility();
+        if (ImGui::Checkbox("Is visible", &visibility))
         {
+			renderComp->SetVisibility(visibility);
 			// to-do: Update visibility in all techniques
             // change visible GPass shader to hidden Gpass shader?
             // or viseverse

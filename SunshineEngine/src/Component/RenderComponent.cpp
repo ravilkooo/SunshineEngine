@@ -105,3 +105,20 @@ void RenderComponent_Info::RemoveTechnique(eastl::string technique) {
 	}
 }
 
+bool RenderComponent_Info::GetVisibility()
+{
+	return m_isVisible;
+}
+
+void RenderComponent_Info::SetVisibility(bool newVisibilty)
+{
+	m_isVisible = newVisibilty;
+	m_gPassTech->m_isHiddenInEditor = !m_isVisible;
+}
+
+void RenderComponent_Info::ToggleVisibility()
+{
+	m_isVisible = !m_isVisible;
+	m_gPassTech->m_isHiddenInEditor = !m_isVisible;
+	// to-do: Set vivsibility in all techniques
+}
