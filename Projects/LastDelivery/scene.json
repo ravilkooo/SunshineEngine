@@ -569,11 +569,14 @@
         },
         {
             "components": {
+                "Behavior": {
+                    "IsEnabled": true
+                },
                 "Lua": {
                     "scriptLoaded": true,
                     "scriptPath": {
                         "assetSource": 1,
-                        "relativePath": "Scripts/TargetExample.lua"
+                        "relativePath": "Scripts/SortableCube1.lua"
                     }
                 },
                 "Mesh": {
@@ -587,22 +590,6 @@
                         "relativePath": "Textures/DefaultTexture.dds"
                     },
                     "m_cullMode": "CULL_BACK"
-                },
-                "Perception": {
-                    "CanHear": false,
-                    "CanSee": false,
-                    "CanSeeThroughObjects": false,
-                    "EyesOffset": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "FieldOfView": 90.0,
-                    "HearingRadius": 0.0,
-                    "LoseRadius": 0.0,
-                    "Sensitivity": 1.0,
-                    "SightRadius": 0.0,
-                    "Threshold": 0.0
                 },
                 "Physics": {
                     "collider": {
@@ -657,7 +644,7 @@
                     ],
                     "m_position": [
                         -19.103649139404297,
-                        3.120586395263672,
+                        7.463678359985352,
                         2.664740562438965
                     ],
                     "m_rotation": [
@@ -689,6 +676,16 @@
         },
         {
             "components": {
+                "Behavior": {
+                    "IsEnabled": true
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/SortableCube2.lua"
+                    }
+                },
                 "Mesh": {
                     "Mesh": {
                         "assetSource": 0,
@@ -754,7 +751,7 @@
                     ],
                     "m_position": [
                         -20.622051239013672,
-                        1.5614535808563232,
+                        4.994833946228027,
                         3.3536200523376465
                     ],
                     "m_rotation": [
@@ -910,11 +907,14 @@
         },
         {
             "components": {
+                "Behavior": {
+                    "IsEnabled": true
+                },
                 "Lua": {
                     "scriptLoaded": true,
                     "scriptPath": {
                         "assetSource": 1,
-                        "relativePath": "Scripts/TargetExample.lua"
+                        "relativePath": "Scripts/SortableCube3.lua"
                     }
                 },
                 "Mesh": {
@@ -928,22 +928,6 @@
                         "relativePath": "Textures/DefaultTexture.dds"
                     },
                     "m_cullMode": "CULL_BACK"
-                },
-                "Perception": {
-                    "CanHear": false,
-                    "CanSee": false,
-                    "CanSeeThroughObjects": false,
-                    "EyesOffset": {
-                        "x": 0.0,
-                        "y": 0.0,
-                        "z": 0.0
-                    },
-                    "FieldOfView": 90.0,
-                    "HearingRadius": 0.0,
-                    "LoseRadius": 0.0,
-                    "Sensitivity": 1.0,
-                    "SightRadius": 0.0,
-                    "Threshold": 0.0
                 },
                 "Physics": {
                     "collider": {
@@ -998,7 +982,7 @@
                     ],
                     "m_position": [
                         -18.248199462890625,
-                        2.281836986541748,
+                        4.478931427001953,
                         3.7991890907287598
                     ],
                     "m_rotation": [
@@ -2186,7 +2170,7 @@
                     "scriptLoaded": true,
                     "scriptPath": {
                         "assetSource": 1,
-                        "relativePath": "Scripts/TransportTube.lua"
+                        "relativePath": "Scripts/SortZone.lua"
                     }
                 },
                 "Mesh": {
@@ -2197,7 +2181,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
-                        "relativePath": "Textures/DefaultTexture.dds"
+                        "relativePath": "Color:255,0,0,255.dds"
                     },
                     "m_cullMode": "CULL_BACK"
                 },
@@ -2205,7 +2189,7 @@
                 "Transform": {
                     "m_localPosition": [
                         0.0,
-                        0.0,
+                        -0.8999999761581421,
                         0.0
                     ],
                     "m_localRotation": [
@@ -2214,14 +2198,14 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
+                        3.0,
                         1.0,
-                        1.0,
-                        1.0
+                        3.0
                     ],
                     "m_position": [
-                        -19.10132598876953,
-                        5.567744731903076,
-                        3.521209716796875
+                        -19.35784912109375,
+                        1.960673451423645,
+                        2.3579773902893066
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2244,7 +2228,7 @@
                             "box": {
                                 "size": [
                                     4.0,
-                                    10.0,
+                                    2.0,
                                     4.0
                                 ]
                             }
@@ -2265,346 +2249,14 @@
                     }
                 }
             },
-            "m_UUID": 4799040658051945448,
-            "m_UUID_hi": 1117363725,
-            "m_UUID_lo": 1440207848,
+            "m_UUID": 11130932358406658119,
+            "m_UUID_hi": 2591622145,
+            "m_UUID_lo": 2042288199,
             "m_group": "Shapes",
-            "m_name": "Tube1",
+            "m_name": "Plane",
             "m_parent": null,
             "m_shapeData": null,
             "m_type": "Plane"
-        },
-        {
-            "components": {
-                "Lua": {
-                    "scriptLoaded": true,
-                    "scriptPath": {
-                        "assetSource": 1,
-                        "relativePath": "Scripts/TransportTube.lua"
-                    }
-                },
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Plane"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Textures/DefaultTexture.dds"
-                    },
-                    "m_cullMode": "CULL_BACK"
-                },
-                "Render": null,
-                "Transform": {
-                    "m_localPosition": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localRotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_position": [
-                        -16.0850830078125,
-                        12.648988723754883,
-                        3.521209716796875
-                    ],
-                    "m_rotation": [
-                        -0.0,
-                        0.0,
-                        -1.5707963705062866
-                    ],
-                    "m_scaleFactor": [
-                        0.9999998807907104,
-                        0.9999998807907104,
-                        1.0
-                    ],
-                    "m_uvMultiplier": [
-                        1.0,
-                        1.0
-                    ]
-                },
-                "Trigger": {
-                    "collider": {
-                        "settings": {
-                            "box": {
-                                "size": [
-                                    4.0,
-                                    10.0,
-                                    4.0
-                                ]
-                            }
-                        },
-                        "shapeType": "Box",
-                        "transforms": {
-                            "offset": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotation": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ]
-                        }
-                    }
-                }
-            },
-            "m_UUID": 10494422511820253455,
-            "m_UUID_hi": 2443423148,
-            "m_UUID_lo": 870885647,
-            "m_group": "Shapes",
-            "m_name": "Tube2",
-            "m_parent": null,
-            "m_shapeData": null,
-            "m_type": "Plane"
-        },
-        {
-            "components": {
-                "ParticleEmitter": {
-                    "emitterData": {
-                        "EmissionRate": 5.0,
-                        "Emitter": {
-                            "alphaEnd": 1.0,
-                            "alphaStart": 1.0,
-                            "colorEnd": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "colorStart": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "emitterSize": [
-                                4.0,
-                                10.0,
-                                4.0
-                            ],
-                            "latitudeMax": 1.5707963705062866,
-                            "latitudeMin": 1.5707963705062866,
-                            "longitudeMax": 6.2831854820251465,
-                            "longitudeMin": 0.0,
-                            "maxSpawn": 100,
-                            "particleSizeEnd": 0.20000000298023224,
-                            "particleSizeStart": 0.20000000298023224,
-                            "particlesBaseSpeed": 8.0,
-                            "particlesLifeSpan": 2.0,
-                            "particlesMass": 1.0,
-                            "position": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotMatrix": [
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0
-                            ]
-                        },
-                        "MaxParticles": 256,
-                        "Simulate": {
-                            "force": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ]
-                        },
-                        "Texture": {
-                            "assetSource": 0,
-                            "relativePath": "Textures/DefaultTexture.dds"
-                        }
-                    }
-                },
-                "Render": null,
-                "Transform": {
-                    "m_localPosition": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localRotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_position": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_rotation": [
-                        -0.0,
-                        0.0,
-                        -0.0
-                    ],
-                    "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_uvMultiplier": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            "m_UUID": 3885478986158257110,
-            "m_UUID_hi": 904658573,
-            "m_UUID_lo": 1077228502,
-            "m_group": "ParticleEmitter",
-            "m_name": "ParticleEmitter",
-            "m_parent": {
-                "attached": true,
-                "uuid": 4799040658051945448
-            }
-        },
-        {
-            "components": {
-                "ParticleEmitter": {
-                    "emitterData": {
-                        "EmissionRate": 5.0,
-                        "Emitter": {
-                            "alphaEnd": 1.0,
-                            "alphaStart": 1.0,
-                            "colorEnd": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "colorStart": [
-                                1.0,
-                                1.0,
-                                1.0
-                            ],
-                            "emitterSize": [
-                                4.0,
-                                10.0,
-                                4.0
-                            ],
-                            "latitudeMax": 1.5707963705062866,
-                            "latitudeMin": 1.5707963705062866,
-                            "longitudeMax": 6.2831854820251465,
-                            "longitudeMin": 0.0,
-                            "maxSpawn": 100,
-                            "particleSizeEnd": 0.20000000298023224,
-                            "particleSizeStart": 0.20000000298023224,
-                            "particlesBaseSpeed": 8.0,
-                            "particlesLifeSpan": 2.0,
-                            "particlesMass": 1.0,
-                            "position": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ],
-                            "rotMatrix": [
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                0.0,
-                                1.0
-                            ]
-                        },
-                        "MaxParticles": 256,
-                        "Simulate": {
-                            "force": [
-                                0.0,
-                                0.0,
-                                0.0
-                            ]
-                        },
-                        "Texture": {
-                            "assetSource": 0,
-                            "relativePath": "Textures/DefaultTexture.dds"
-                        }
-                    }
-                },
-                "Render": null,
-                "Transform": {
-                    "m_localPosition": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localRotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localScaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_position": [
-                        9.5367431640625e-07,
-                        0.0,
-                        0.0
-                    ],
-                    "m_rotation": [
-                        -0.0,
-                        0.0,
-                        3.614246895473558e-14
-                    ],
-                    "m_scaleFactor": [
-                        1.0000001192092896,
-                        1.0000001192092896,
-                        1.0
-                    ],
-                    "m_uvMultiplier": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            "m_UUID": 13466264755143916169,
-            "m_UUID_hi": 3135359090,
-            "m_UUID_lo": 2377595529,
-            "m_group": "ParticleEmitter",
-            "m_name": "ParticleEmitter",
-            "m_parent": {
-                "attached": true,
-                "uuid": 10494422511820253455
-            }
         }
     ],
     "inputMapping": "Default",
