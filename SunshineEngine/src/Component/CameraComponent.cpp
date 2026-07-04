@@ -50,6 +50,9 @@ void CameraComponent::FromJson(const json& j)
 		m_camera->cameraPitchYawRoll.y = j["cameraPitchYawRoll"][1].get<float>();
 		m_camera->cameraPitchYawRoll.z = j["cameraPitchYawRoll"][2].get<float>();
 	}
+	if (j.contains("m_zoomAccelerations")) {
+		m_camera->m_zoomAcceleration = j["m_zoomAccelerations"].get<float>();
+	}
 }
 
 void CameraComponent::FromJson(const json& j, ID3D11Device* device, TransformComponent* trComp, SE::UUID uuid)
@@ -95,6 +98,7 @@ json CameraComponent_Info::ToJson() const
 		m_assignedComponent->m_camera->m_springArmParams.rootOffset.y,
 		m_assignedComponent->m_camera->m_springArmParams.rootOffset.z
 	};
+	j["m_zoomAccelerations"] = m_assignedComponent->m_camera->m_zoomAcceleration;
 
     return j;
 }

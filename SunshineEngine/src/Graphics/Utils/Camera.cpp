@@ -618,6 +618,12 @@ namespace SE_G {
         m_springArmParams.pitchYawRoll = newRotation;
     }
 
+    void Camera::ZoomSpringArm(float zoomSpeed)
+    {
+        float desiredLength = std::clamp(0.001f, m_springArmParams.length + zoomSpeed * m_deltaTime, 10000.0f);
+		m_springArmParams.length = std::lerp(m_springArmParams.length, desiredLength, m_zoomAcceleration * m_deltaTime);
+    }
+
     DXSM::Vector3 Camera::GetSpringArmRootOffset()
     {
         return m_springArmParams.rootOffset;

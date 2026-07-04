@@ -149,6 +149,7 @@ namespace ScriptingBindings
 			"setSpringArmRootOffset", &SE_G::Camera::SetSpringArmRootOffset,
 			"getSpringArmLength", &SE_G::Camera::GetSpringArmLength,
 			"setSpringArmLength", &SE_G::Camera::SetSpringArmLength,
+			"zoomSpringArm", &SE_G::Camera::ZoomSpringArm,
 			// Camera mode
 			"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode,
 

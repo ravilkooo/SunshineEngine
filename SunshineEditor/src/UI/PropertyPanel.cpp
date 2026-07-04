@@ -1962,6 +1962,8 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
             0.0f);
 
+        DrawFloatControl("Zoom acceleration", cameraInfo->m_assignedComponent->m_camera->m_zoomAcceleration, 1.0f, 0.1f, 0.0f, 1000.0f, "%.1f");
+
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         ImGui::Text("Camera Params");
         EditorUI::FontStyles::Pop();

@@ -99,7 +99,7 @@
                     "m_angularDamping": 0.05000000074505806,
                     "m_collisionLayer": "NON_MOVING",
                     "m_density": 1000.0,
-                    "m_friction": 0.20000000298023224,
+                    "m_friction": 0.699999988079071,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -227,7 +227,8 @@
                             1.5,
                             0.0
                         ]
-                    }
+                    },
+                    "m_zoomAccelerations": 30.0
                 },
                 "Character": {
                     "m_isPlayerControlled": true
@@ -1712,7 +1713,8 @@
                             0.0,
                             0.0
                         ]
-                    }
+                    },
+                    "m_zoomAccelerations": 1.0
                 },
                 "Mesh": {
                     "Mesh": {

@@ -141,6 +141,7 @@ namespace SE_G {
             DXSM::Vector3 pitchYawRoll = DXSM::Vector3::Zero;
             DXSM::Vector3 rootOffset = DXSM::Vector3::Zero;
         } m_springArmParams;
+        float m_zoomAcceleration = 1.0f;
         // camera options
         DXSM::Vector3 cameraPitchYawRoll = DXSM::Vector3::Zero;
 
@@ -159,6 +160,7 @@ namespace SE_G {
         void SetSpringArmRotation(DXSM::Vector3 newRotation);
 
         float GetSpringArmLength() { return m_springArmParams.length; };
+        void ZoomSpringArm(float zoomSpeed = 1.0f);
         void SetSpringArmLength(float newLen) { m_springArmParams.length = fmin(fmax(0.0f, newLen), 1000.0f); };
 
         void RotateSpringArmYaw(float yawSpeed);

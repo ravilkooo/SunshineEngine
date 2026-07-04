@@ -93,6 +93,11 @@ function behavior:update(dt)
         camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
         camera:getCamera():rotateSpringArmPitch(0.4 * inputSystem:getMouseDeltaY())
 
+        local mouseWheelDelta = inputSystem:getMouseWheelDelta()
+        if (mouseWheelDelta ~= 0) then
+            camera:getCamera():zoomSpringArm(-1 * mouseWheelDelta)
+        end
+
         if (inputSystem:isPressed("Jump")) then
             print("== JUMP! ==")
             char.m_jumpRequested = true
