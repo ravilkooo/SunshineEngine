@@ -13,6 +13,7 @@
 namespace SE_G {
     class DeferredRenderer;
     class GPassTechnique;
+    class TransparentTechnique;
     class RenderTechnique;
 }
 
@@ -57,6 +58,8 @@ public:
     void SetVisibility(bool newVisibilty);
     void ToggleVisibility();
 
+	bool GetIsTransparent() { return m_isTransparent; }
+
     void FromJson(const json& j) override;
 
 private:
@@ -88,6 +91,7 @@ public:
 
     // Also add in Info component
     SE_G::RenderTechnique* AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> tech);
+    SE_G::RenderTechnique* GetTechnique(eastl::string technique);
     
     bool HasTechnique(eastl::string technique);
 
@@ -117,5 +121,6 @@ public:
 
 private:
     SE_G::GPassTechnique* m_gPassTech = nullptr;
+    SE_G::TransparentTechnique* m_transparentTech = nullptr;
     bool m_hasGPassMesh = false;
 };

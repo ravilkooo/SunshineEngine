@@ -91,6 +91,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateParticleEmitter(
 
 	// RenderComponent
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, particleSystem->m_renderer);
+	if (j["components"].contains("Render")) {
+		rc->FromJson(j["components"]["Render"]);
+	}
 
 	// ParticleEmitterComponent
 	if (j["components"].contains("ParticleEmitter"))
@@ -153,6 +156,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCustomMesh(
 
 	// RenderComponent and technique
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc->FromJson(j["components"]["Render"]);
+	}
 
 	auto mc = obj->AddComponent<MeshComponent>();
 	mc->FromJson(j["components"]["Mesh"], device, rc.get(), tc.get(), obj->m_UUID);
@@ -284,6 +290,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateBoxObject(
 
 	// RenderComponent and technique
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc->FromJson(j["components"]["Render"]);
+	}
 
 	auto shapeData = eastl::make_shared<BoxShapeData>(j["m_shapeData"].get<BoxShapeData>());
 
@@ -381,6 +390,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreatePlaneObject(
 
 	// RenderComponent and technique
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc->FromJson(j["components"]["Render"]);
+	}
 
 	auto shapeData = eastl::make_shared<PlaneShapeData>(j["m_shapeData"].get<PlaneShapeData>());
 	
@@ -484,6 +496,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateSphereObject(
 
 	// RenderComponent and technique
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc->FromJson(j["components"]["Render"]);
+	}
 
 	auto shapeData = eastl::make_shared<SphereShapeData>(j["m_shapeData"].get<SphereShapeData>());
 
@@ -593,6 +608,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateGeosphereObject(
 
 	// RenderComponent and technique
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc->FromJson(j["components"]["Render"]);
+	}
 
 	auto shapeData = eastl::make_shared<GeosphereShapeData>(j["m_shapeData"].get<GeosphereShapeData>());
 
@@ -691,6 +709,9 @@ eastl::unique_ptr<GameObject> GameObjectFactory::CreateCylinderObject(
 
 	// RenderComponent and technique
 	auto rc = obj->AddComponent<RenderComponent>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc->FromJson(j["components"]["Render"]);
+	}
 
 	auto shapeData = eastl::make_shared<CylinderShapeData>(j["m_shapeData"].get<CylinderShapeData>());
 

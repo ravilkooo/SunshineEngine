@@ -2255,13 +2255,13 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
-                        "relativePath": "Color:255,0,0,255.dds"
+                        "relativePath": "Color:0,240,240,205.dds"
                     },
                     "m_cullMode": "CULL_BACK"
                 },
                 "Render": {
-                    "m_isTransparent": false,
-                    "m_isVisible": false
+                    "m_isTransparent": true,
+                    "m_isVisible": true
                 },
                 "Transform": {
                     "m_localPosition": [
@@ -2275,7 +2275,7 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        3.0,
+                        20.0,
                         1.0,
                         3.0
                     ],

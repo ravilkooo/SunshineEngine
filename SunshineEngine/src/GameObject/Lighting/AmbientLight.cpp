@@ -51,6 +51,9 @@ AmbientLight::AmbientLight(
 
 	// RenderComponent and Passes
 	auto rc = AddComponent<RenderComponent>(m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc->FromJson(j["components"]["Render"]);
+	}
 
 	// LightPass - LightTechnique
 	auto lightTech = eastl::make_unique<SE_G::AmbientLightTechnique>(
@@ -122,6 +125,9 @@ AmbientLight_Info::AmbientLight_Info(
 		"LightPass", m_lightData);
 
 	auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc_info->FromJson(j["components"]["Render"]);
+	}
 	rc_info->AddTechnique(eastl::move(lightTech));
 
 	// IconPass

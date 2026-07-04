@@ -205,7 +205,7 @@ namespace SE_G {
 			auto renderComp_info = gameObject_info->GetComponent<RenderComponent_Info>();
 			auto transformComponent = gameObject_info->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-			if (!renderComp_info->HasTechnique("GPass") && !renderComp_info->HasTechnique("IconPass")
+			if (!renderComp_info->HasTechnique("GPass") && !renderComp_info->HasTechnique("Transparent") && !renderComp_info->HasTechnique("IconPass")
 				|| !(renderComp_info->m_selectionTechnique))
 			{
 				return;
@@ -232,14 +232,11 @@ namespace SE_G {
 				GetDeviceContext()
 			);
 
-			if (renderComp_info->HasTechnique("GPass")) {
-				//renderComp_info->techniques["GPass"]->mesh->Bind(context);
+			if (renderComp_info->HasTechnique("GPass") || renderComp_info->HasTechnique("Transparent")) {
 
 				m_meshVertexShader->Bind(context);
 				context->PSSetShader(nullptr, nullptr, 0u);
-				//context->RSSetState(nullptr, 0u);
 
-				//renderComp_info->techniques["GPass"]->mesh->Draw(context);
 				renderComp_info->m_selectionTechnique->DrawTechnique(context);
 
 				// Step2 (draw color and mask out)
@@ -256,7 +253,6 @@ namespace SE_G {
 					GetDeviceContext()
 				);
 
-				//renderComp_info->techniques["GPass"]->mesh->Draw(context);
 				m_blendState->Bind(context);
 				renderComp_info->m_selectionTechnique->DrawTechnique(context);
 

@@ -40,6 +40,7 @@ namespace SE_G
     class MiniViewRenderer;
 
     class GPass;
+    class TransparentPass;
     class GBuffer;
     class LightPass;
     class SelectionPass;
@@ -146,6 +147,7 @@ public:
     UINT m_screenHeight = 800u;
 
     SE_G::GPass* m_gPass = nullptr;
+    SE_G::TransparentPass* m_transparentPass = nullptr;
     SE_G::LightPass* m_lightPass = nullptr;
     SE_G::SelectionPass* m_selectionPass = nullptr;
     SE_G::IconPass* m_iconPass = nullptr;

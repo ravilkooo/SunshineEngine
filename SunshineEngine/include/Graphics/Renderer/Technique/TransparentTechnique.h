@@ -5,6 +5,7 @@
 class ID3D11Device;
 class ID3D11DeviceContext;
 class MeshData;
+class TransformComponent;
 
 #include <d3d11.h>
 
@@ -15,23 +16,23 @@ namespace SE_G {
         class PixelConstantBuffer;
     }
 
-    class TransparentTechnique;
+	class GPassTechnique;
 
-    class GPassTechnique :
+    class TransparentTechnique :
         public RenderTechnique
     {
     public:
         eastl::unique_ptr<Bind::PixelConstantBuffer<SE::UUIDhilo>> m_uuidBuffer;
 
-        GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
+        TransparentTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             SE::UUID uuid);
-        ~GPassTechnique();
-        
-        GPassTechnique(TransparentTechnique* transpTech);
+        ~TransparentTechnique();
+
+        TransparentTechnique(GPassTechnique* gPassTech);
 
         // move
-        GPassTechnique(GPassTechnique&& other) noexcept;
-        GPassTechnique& operator=(GPassTechnique&& other) noexcept;
+        TransparentTechnique(TransparentTechnique&& other) noexcept;
+        TransparentTechnique& operator=(TransparentTechnique&& other) noexcept;
 
         void SetRasterizer(D3D11_RASTERIZER_DESC rastDesc);
 
@@ -46,7 +47,9 @@ namespace SE_G {
         ID3D11Device* m_device;
 
 		bool m_isHiddenInEditor = false;
-		SE::UUID m_objectUUID = SE::UUID(0u);
+        SE::UUID m_objectUUID = SE::UUID(0u);
+
+        TransformComponent* m_transform = nullptr;
 
     private:
         static void InitStaticData(ID3D11Device* device);

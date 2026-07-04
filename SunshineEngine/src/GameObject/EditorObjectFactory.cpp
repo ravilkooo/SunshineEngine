@@ -107,6 +107,9 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateParticleEmitter(
 	// RenderComponent and techniques
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(
 		obj->m_UUID, particleSystem->m_renderer);
+	if (j["components"].contains("Render")) {
+		rc_info->FromJson(j["components"]["Render"]);
+	}
 
 	// IconPass
 	auto iconTech = eastl::make_unique<SE_G::IconTechnique>(
@@ -223,6 +226,9 @@ eastl::unique_ptr<GameObject_Info> EditorObjectFactory::CreateCustomMesh(
 
 	// RenderComponent and techniques
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc_info->FromJson(j["components"]["Render"]);
+	}
 
 	auto mc_info = obj->AddComponent<MeshComponent_Info>();
 	mc_info->FromJson(j["components"]["Mesh"],

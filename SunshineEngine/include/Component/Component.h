@@ -49,5 +49,5 @@ public:
     virtual json ToJson() const { return json::object(); }
     virtual void FromJson(const json& /*j*/) { }
 
-    eastl::shared_ptr<Component> m_assignedComponent;
+    // eastl::shared_ptr<Component> m_assignedComponent;
 };

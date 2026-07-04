@@ -59,6 +59,9 @@ PointLight::PointLight(
 
     // RenderComponent and Passes
     auto rc = AddComponent<RenderComponent>(m_UUID, renderSystem);
+    if (j["components"].contains("Render")) {
+        rc->FromJson(j["components"]["Render"]);
+    }
 
     // LightPass - LightTechnique
     auto lightTech =
@@ -127,6 +130,9 @@ PointLight_Info::PointLight_Info(
 
     // RenderComponent and Passes
     auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
+    if (j["components"].contains("Render")) {
+        rc_info->FromJson(j["components"]["Render"]);
+    }
 
     // LightPass - LightTechnique
     auto lightTech =

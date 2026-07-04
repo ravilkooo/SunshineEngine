@@ -31,6 +31,7 @@ namespace SE_G {
 		Icon,
 		Selection,
 		Perception,
+		Transparent,
 		Count
 	};
 

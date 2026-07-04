@@ -3,6 +3,7 @@
 #include <Component/TransformComponent.h>
 
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
+#include <Graphics/Renderer/Technique/TransparentTechnique.h>
 
 #include <Graphics/GraphicsResources/Mesh.h>
 #include <Graphics/GraphicsResources/Texture.h>
@@ -41,11 +42,20 @@ MeshComponent::MeshComponent(RenderComponent* rc, TransformComponent* tc,
         rc->GetDevice(),
         SE_G::Bind::SamplerPreset::Wrap);
 
-    auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-        rc->GetDevice(), tc, "GPass", uuid);
-    m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
-
-    m_gBufferTech->InitByMeshData(m_meshData);
+    if (!rc->GetIsTransparent())
+    {
+        auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
+            rc->GetDevice(), tc, "GPass", uuid);
+        m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
+        m_gBufferTech->InitByMeshData(m_meshData);
+    }
+    else
+    {
+        auto transparentTech = eastl::make_unique<SE_G::TransparentTechnique>(
+            rc->GetDevice(), tc, "Transparent", uuid);
+        m_transparentTech = static_cast<SE_G::TransparentTechnique*>(rc->AddTechnique(eastl::move(transparentTech)));
+        m_transparentTech->InitByMeshData(m_meshData);
+    }
 }
 
 MeshComponent::MeshComponent(RenderComponent* rc, TransformComponent* tc,
@@ -62,26 +72,24 @@ MeshComponent::MeshComponent(RenderComponent* rc, TransformComponent* tc,
         rc->GetDevice(),
         SE_G::Bind::SamplerPreset::Wrap);
 
-    auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-        rc->GetDevice(), tc, "GPass", uuid);
-    m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
-
-    m_gBufferTech->InitByMeshData(m_meshData);
+    if (!rc->GetIsTransparent())
+    {
+        auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
+            rc->GetDevice(), tc, "GPass", uuid);
+        m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
+        m_gBufferTech->InitByMeshData(m_meshData);
+    }
+    else
+    {
+        auto transparentTech = eastl::make_unique<SE_G::TransparentTechnique>(
+            rc->GetDevice(), tc, "Transparent", uuid);
+        m_transparentTech = static_cast<SE_G::TransparentTechnique*>(rc->AddTechnique(eastl::move(transparentTech)));
+        m_transparentTech->InitByMeshData(m_meshData);
+    }
 }
 
 MeshComponent::~MeshComponent()
 {
-    /*
-    if (m_gBufferTech)
-    {
-        if (m_gBufferTech->m_assignedTransform)
-        {
-            m_gBufferTech->m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
-            m_gBufferTech->m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
-            m_gBufferTech->m_assignedTransform->m_localScaleFactor = DXSM::Vector3::One;
-        }
-    }
-    */
 }
 
 MeshComponent::MeshComponent(MeshComponent&& other) noexcept
@@ -109,7 +117,14 @@ void MeshComponent::SetCullMode(D3D11_CULL_MODE cullMode)
     D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT{});
     rastDesc.CullMode = m_cullMode;
     rastDesc.FillMode = m_fillMode;
-    m_gBufferTech->SetRasterizer(rastDesc);
+    if (m_gBufferTech)
+    {
+        m_gBufferTech->SetRasterizer(rastDesc);
+    }
+    else if (m_transparentTech)
+    {
+        m_transparentTech->SetRasterizer(rastDesc);
+    }
 }
 
 /*
@@ -129,7 +144,14 @@ MeshComponent_Info::MeshComponent_Info(
         rc_info->m_assignedComponent.get(),
         tc_info->m_assignedComponent.get(), uuid, meshPath);
     
-    rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+    if (!rc_info->m_isTransparent)
+    {
+        rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+    }
+    else
+    {
+        rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("Transparent"));
+    }
 
     m_rc_info = rc_info;
 }
@@ -143,22 +165,28 @@ MeshComponent_Info::MeshComponent_Info(
         tc_info->m_assignedComponent.get(),
         uuid, mesh);
 
-    rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+    if (!rc_info->m_isTransparent)
+    {
+        rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+    }
+    else
+    {
+        rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("Transparent"));
+    }
 
     m_rc_info = rc_info;
 }
 
 MeshComponent_Info::~MeshComponent_Info()
 {
-    /*
-    if (m_assignedComponent->m_gBufferTech && m_assignedComponent->m_gBufferTech->m_assignedTransform)
+    if (!m_rc_info->m_isTransparent)
     {
-        m_assignedComponent->m_gBufferTech->m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
-        m_assignedComponent->m_gBufferTech->m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
-        m_assignedComponent->m_gBufferTech->m_assignedTransform->m_localScaleFactor = DXSM::Vector3::One;
+        m_rc_info->RemoveTechnique("GPass");
     }
-    */
-    m_rc_info->RemoveTechnique("GPass");
+    else
+    {
+        m_rc_info->RemoveTechnique("Transparent");
+    }
 }
 
 MeshComponent_Info::MeshComponent_Info(MeshComponent_Info&& other) noexcept
@@ -174,7 +202,14 @@ MeshComponent_Info& MeshComponent_Info::operator=(MeshComponent_Info&& other) no
     if (this != &other) {
         // If this currently manages a technique, remove it before overwriting
         if (m_rc_info) {
-            m_rc_info->RemoveTechnique("GPass");
+            if (!m_rc_info->m_isTransparent)
+            {
+                m_rc_info->RemoveTechnique("GPass");
+            }
+            else
+            {
+                m_rc_info->RemoveTechnique("Transparent");
+            }
         }
 
         m_assignedComponent = eastl::move(other.m_assignedComponent);

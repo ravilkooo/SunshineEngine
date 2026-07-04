@@ -12,6 +12,7 @@
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
+#include <Graphics/Renderer/Pass/TransparentPass.h>
 
 #include <Graphics/Utils/Camera.h>
 
@@ -80,6 +81,13 @@ void Game::SetupRendering(
 			);
 
 		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
+	}
+	{
+		m_transparentPass = static_cast<SE_G::TransparentPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::TransparentPass>(
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
+			);
 	}
 }
 

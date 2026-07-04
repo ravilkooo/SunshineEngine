@@ -40,6 +40,7 @@ namespace SE_G
     class ShadowMapPass;
     class GPass;
     class LightPass;
+    class TransparentPass;
 }
 
 class SUNSHINE_ENGINE_API Game
@@ -91,6 +92,7 @@ public:
     SE_G::ShadowMapPass* m_shadowMapPass;
     SE_G::GPass* m_gPass;
     SE_G::LightPass* m_lightPass;
+    SE_G::TransparentPass* m_transparentPass = nullptr;
 
     AudioSystem* m_audioSystem;
 

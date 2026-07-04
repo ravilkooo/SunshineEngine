@@ -7,7 +7,6 @@
 #include <Graphics/Bindable/Sampler.h>
 #include <Graphics/Bindable/DepthStencilState.h>
 #include <Graphics/Bindable/Rasterizer.h>
-#include <Graphics/Bindable/BlendState.h>
 #include <Graphics/Bindable/ConstantBuffer.h>
 
 #include <Graphics/GraphicsResources/PixelShader.h>
@@ -16,6 +15,7 @@
 #include <Graphics/GraphicsResources/Mesh.h>
 
 #include <Component/MeshComponent.h>
+
 #include <ResourceManager/ResourceManagerFacade.h>
 
 #include <EASTL/shared_ptr.h>
@@ -25,16 +25,16 @@
 
 
 namespace SE_G {
-	eastl::shared_ptr<Bind::PixelShader> GPassTechnique::s_defaultShader;
-	eastl::shared_ptr<Bind::PixelShader> GPassTechnique::s_hiddenEditorShader;
-	bool GPassTechnique::s_staticDataInitializated = false;
+	eastl::shared_ptr<Bind::PixelShader> TransparentTechnique::s_defaultShader;
+	eastl::shared_ptr<Bind::PixelShader> TransparentTechnique::s_hiddenEditorShader;
+	bool TransparentTechnique::s_staticDataInitializated = false;
 
-	GPassTechnique::GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
+	TransparentTechnique::TransparentTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
 		SE::UUID uuid)
 		: RenderTechnique(device, assignedTransform, technique)
 	{
 		if (!s_staticDataInitializated) {
-			GPassTechnique::InitStaticData(device);
+			TransparentTechnique::InitStaticData(device);
 		}
 
 		m_device = device;
@@ -51,31 +51,13 @@ namespace SE_G {
 		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 		m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
 
-		D3D11_BLEND_DESC blendDesc = {};
-		blendDesc.IndependentBlendEnable = TRUE;
-		for (size_t i = 0; i < 4; i++)
-		{
-			blendDesc.RenderTarget[i].BlendEnable = TRUE;
-			blendDesc.RenderTarget[i].BlendOp = D3D11_BLEND_OP_ADD;
-			blendDesc.RenderTarget[i].SrcBlend = D3D11_BLEND_ONE;
-			blendDesc.RenderTarget[i].DestBlend = D3D11_BLEND_ZERO;
-			blendDesc.RenderTarget[i].SrcBlendAlpha = D3D11_BLEND_ONE;
-			blendDesc.RenderTarget[i].DestBlendAlpha = D3D11_BLEND_ZERO;
-			blendDesc.RenderTarget[i].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-			blendDesc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		}
-		blendDesc.RenderTarget[4].BlendEnable = FALSE;
-		blendDesc.RenderTarget[4].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
-		m_blendState = eastl::make_unique<Bind::BlendState>(device, blendDesc);
-
 		m_uuidBuffer = eastl::make_unique<Bind::PixelConstantBuffer<SE::UUIDhilo>>(
 			device,
 			uuid.GetHilo(),
 			0u
 		);
 
-		AssetPath shaderPath = AssetPath(L"Shaders/GPass/GPassShaderVS.hlsl", AssetPath::AssetSource::Engine);
+		AssetPath shaderPath = AssetPath(L"Shaders/TransparentPass/TransparentShaderVS.hlsl", AssetPath::AssetSource::Engine);
 		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::VERTEX_SHADER;
 		SE_G::Bind::VertexShader::FillStandartInputLayout(shaderPath.m_params.asShader.numInputElements,
 			shaderPath.m_params.asShader.IALayoutInputElements);
@@ -106,26 +88,26 @@ namespace SE_G {
 			SE_G::Bind::SamplerPreset::Wrap);
 	}
 
-	GPassTechnique::~GPassTechnique()
+	TransparentTechnique::~TransparentTechnique()
 	{
 	}
 
-	GPassTechnique::GPassTechnique(TransparentTechnique* transpTech)
-		: GPassTechnique(transpTech->m_device, transpTech->m_assignedTransform, "GPass", transpTech->m_objectUUID)
+	TransparentTechnique::TransparentTechnique(GPassTechnique* gPassTech)
+		: TransparentTechnique(gPassTech->m_device, gPassTech->m_assignedTransform, "Transparent", gPassTech->m_objectUUID)
 	{
-		// "Cast" TransparentTechnique to GPassTechnique
-		InitByMeshData(transpTech->m_meshData);
+		// "Cast" GPassTechnique to TransparentTechnique
+		InitByMeshData(gPassTech->m_meshData);
 	}
 
-	GPassTechnique::GPassTechnique(GPassTechnique&& other) noexcept
+	TransparentTechnique::TransparentTechnique(TransparentTechnique&& other) noexcept
 		: RenderTechnique(eastl::move(other)),
-		  m_uuidBuffer(eastl::move(other.m_uuidBuffer)),
-		  m_device(other.m_device)
+		m_uuidBuffer(eastl::move(other.m_uuidBuffer)),
+		m_device(other.m_device)
 	{
 		other.m_device = nullptr;
 	}
 
-	GPassTechnique& GPassTechnique::operator=(GPassTechnique&& other) noexcept
+	TransparentTechnique& TransparentTechnique::operator=(TransparentTechnique&& other) noexcept
 	{
 		if (this != &other) {
 			RenderTechnique::operator=(eastl::move(other));
@@ -136,12 +118,12 @@ namespace SE_G {
 		return *this;
 	}
 
-	void GPassTechnique::SetRasterizer(D3D11_RASTERIZER_DESC rastDesc)
+	void TransparentTechnique::SetRasterizer(D3D11_RASTERIZER_DESC rastDesc)
 	{
 		m_rasterizer = eastl::make_unique<Bind::Rasterizer>(m_device, rastDesc);
 	}
 
-	void GPassTechnique::BindAll(ID3D11DeviceContext* context)
+	void TransparentTechnique::BindAll(ID3D11DeviceContext* context)
 	{
 		RenderTechnique::BindAll(context);
 		if (m_isHiddenInEditor)
@@ -155,19 +137,19 @@ namespace SE_G {
 		m_meshData->m_textureSampler->Bind(context);
 	}
 
-	void GPassTechnique::DrawTechnique(ID3D11DeviceContext* context)
+	void TransparentTechnique::DrawTechnique(ID3D11DeviceContext* context)
 	{
 		m_meshData->m_mesh->Draw(context);
 	}
 
-	void GPassTechnique::InitByMeshData(eastl::shared_ptr<MeshData> meshData)
+	void TransparentTechnique::InitByMeshData(eastl::shared_ptr<MeshData> meshData)
 	{
 		m_meshData = meshData;
 	}
 
-	void GPassTechnique::InitStaticData(ID3D11Device* device)
+	void TransparentTechnique::InitStaticData(ID3D11Device* device)
 	{
-		AssetPath shaderPath = AssetPath(L"Shaders/GPass/GPassTextureShaderPS.hlsl", AssetPath::AssetSource::Engine);
+		AssetPath shaderPath = AssetPath(L"Shaders/TransparentPass/TransparentTextureShaderPS.hlsl", AssetPath::AssetSource::Engine);
 		shaderPath.m_params.asShader.shaderType = SE_G::Bind::PipelineStage::PIXEL_SHADER;
 		auto& rm = ResourceManagerFacade::Instance();
 		ResourceHandle pshaderHandle = rm.LoadByPath(shaderPath);
@@ -177,7 +159,7 @@ namespace SE_G {
 			[](SE_G::Bind::PixelShader*) {}
 		);
 
-		shaderPath.m_assetRelativePath = L"Shaders/GPass/GPassTextureShaderHiddenEditorPS.hlsl";
+		shaderPath.m_assetRelativePath = L"Shaders/TransparentPass/TransparentTextureShaderHiddenEditorPS.hlsl";
 		ResourceHandle hiddenPshaderHandle = rm.LoadByPath(shaderPath);
 		SE_G::Bind::PixelShader* hiddenPshaderRes = rm.Get<SE_G::Bind::PixelShader>(hiddenPshaderHandle);
 		s_hiddenEditorShader = eastl::shared_ptr<SE_G::Bind::PixelShader>(

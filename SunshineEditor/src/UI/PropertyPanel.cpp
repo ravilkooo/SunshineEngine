@@ -10,6 +10,8 @@
 #include <Graphics/Lighting/LightData.h>
 #include <Graphics/Renderer/Technique/PointLightTechnique.h>
 #include <Graphics/Renderer/Technique/SkyBoxTechnique.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
+#include <Graphics/Renderer/Technique/TransparentTechnique.h>
 #include <Graphics/Renderer/Pass/SelectionPass.h>
 
 #include <GameObject/GameObject.h>
@@ -277,9 +279,20 @@ void PropertyPanel::DrawGraphicsSettings(GameObject_Info* obj)
         bool prevTransparent = renderComp->m_isTransparent;
         if (ImGui::Checkbox("Is transparent", &renderComp->m_isTransparent))
         {
-            // to-do: Update transparency in all techniques
-            // remove GPass technique and add Transparency tech
-            // or viseverse
+            if (renderComp->m_isTransparent)
+            {
+				auto gtech = renderComp->GetTechnique("GPass");
+				renderComp->AddTechnique(eastl::make_unique<SE_G::TransparentTechnique>(
+                    static_cast<SE_G::GPassTechnique*>(gtech)));
+				renderComp->RemoveTechnique("GPass");
+            }
+            else
+            {
+                auto transptech = renderComp->GetTechnique("Transparent");
+                renderComp->AddTechnique(eastl::make_unique<SE_G::GPassTechnique>(
+                    static_cast<SE_G::TransparentTechnique*>(transptech)));
+                renderComp->RemoveTechnique("Transparent");
+            }
         }
 
         ImGui::TreePop();

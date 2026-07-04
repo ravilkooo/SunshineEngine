@@ -3,6 +3,7 @@
 #include <Scripting/ComponentBindings.h>
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
+#include <Graphics/Renderer/Technique/TransparentTechnique.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
 
@@ -87,7 +88,13 @@ void RenderComponent_Info::AddTechnique_Info(SE_G::RenderTechnique* tech)
 		m_selectionTechnique = tech;
 		m_hasGPassMesh = true;
 		m_gPassTech = static_cast<SE_G::GPassTechnique*>(tech);
-		m_gPassTech->m_isHiddenInEditor - !m_isVisible;
+		m_gPassTech->m_isHiddenInEditor = !m_isVisible;
+	}
+	else if (tech->GetTechniqueTag() == "Transparent") {
+		m_selectionTechnique = tech;
+		m_hasGPassMesh = true;
+		m_transparentTech = static_cast<SE_G::TransparentTechnique*>(tech);
+		m_transparentTech->m_isHiddenInEditor = !m_isVisible;
 	}
 
 	techniques.insert(tech->GetTechniqueTag());
@@ -97,6 +104,18 @@ SE_G::RenderTechnique* RenderComponent_Info::AddTechnique(eastl::unique_ptr<SE_G
 {
 	AddTechnique_Info(tech.get());
 	return m_assignedComponent->AddTechnique(eastl::move(tech));
+}
+
+SE_G::RenderTechnique* RenderComponent_Info::GetTechnique(eastl::string technique)
+{
+	auto res = techniques.find(technique);
+	if (res != techniques.end())
+	{
+		auto tech = m_assignedComponent->GetTechnique(technique);
+		return tech;
+	}
+	else
+		return nullptr;
 }
 
 bool RenderComponent_Info::HasTechnique(eastl::string technique) {
@@ -114,6 +133,14 @@ void RenderComponent_Info::RemoveTechnique(eastl::string technique) {
 				m_selectionTechnique = m_assignedComponent->GetTechnique("IconPass");
 			}
 		}
+		else if (technique == "Transparent")
+		{
+			m_selectionTechnique = nullptr;
+			if (HasTechnique("IconPass"))
+			{
+				m_selectionTechnique = m_assignedComponent->GetTechnique("IconPass");
+			}
+		}
 
 		techniques.erase(technique);
 		m_assignedComponent->RemoveTechnique(technique);
@@ -124,6 +151,8 @@ void RenderComponent_Info::ApplyVisibility()
 {
 	if (m_gPassTech)
 		m_gPassTech->m_isHiddenInEditor = !m_isVisible;
+	else if (m_transparentTech)
+		m_transparentTech->m_isHiddenInEditor = !m_isVisible;
 }
 
 bool RenderComponent_Info::GetVisibility()
@@ -136,6 +165,8 @@ void RenderComponent_Info::SetVisibility(bool newVisibilty)
 	m_isVisible = newVisibilty;
 	if (m_gPassTech)
 		m_gPassTech->m_isHiddenInEditor = !m_isVisible;
+	else if (m_transparentTech)
+		m_transparentTech->m_isHiddenInEditor = !m_isVisible;
 }
 
 void RenderComponent_Info::ToggleVisibility()
@@ -143,5 +174,6 @@ void RenderComponent_Info::ToggleVisibility()
 	m_isVisible = !m_isVisible;
 	if (m_gPassTech)
 		m_gPassTech->m_isHiddenInEditor = !m_isVisible;
-	// to-do: Set vivsibility in all techniques
+	else if (m_transparentTech)
+		m_transparentTech->m_isHiddenInEditor = !m_isVisible;
 }

@@ -23,8 +23,11 @@
 #include <Graphics/GraphicsResources/Mesh.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Technique/TransparentTechnique.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Utils/Camera.h>
 #include <Graphics/GraphicsResources/Texture.h>
+
 
 #include <Utils/StringUtils.h>
 
@@ -151,6 +154,7 @@ void RenderComponent_Info::FromJson(const json& j) {
     if (j.contains("m_isTransparent") && j["m_isTransparent"].is_boolean()) {
         m_isTransparent = j.at("m_isTransparent").get<bool>();
     }
+	m_assignedComponent->FromJson(j);
 }
 
 // ----------------- MeshComponent -----------------
@@ -246,11 +250,23 @@ void MeshComponent::FromJson(const json& j, ID3D11Device* device,
         if (j.contains("m_cullMode"))
             j.at("m_cullMode").get_to(m_cullMode);
 
-        auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-            rc->GetDevice(), tc, "GPass", uuid);
-        m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
+        if (!rc->GetIsTransparent())
+        {
+            auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
+                rc->GetDevice(), tc, "GPass", uuid);
+            m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
+            m_gBufferTech->InitByMeshData(m_meshData);
+        }
+        else
+        {
+            auto transparentTech = eastl::make_unique<SE_G::TransparentTechnique>(
+                rc->GetDevice(), tc, "Transparent", uuid);
+            m_transparentTech = static_cast<SE_G::TransparentTechnique*>(rc->AddTechnique(eastl::move(transparentTech)));
+            m_transparentTech->InitByMeshData(m_meshData);
+        }
+        
 
-        m_gBufferTech->InitByMeshData(m_meshData);
+
         SetCullMode(m_cullMode);
     }
 }
@@ -278,8 +294,14 @@ void MeshComponent_Info::FromJson(const json& j, ID3D11Device* device,
         m_assignedComponent->FromJson(j, device, rc_info->m_assignedComponent.get(),
             tc_info->m_assignedComponent.get(), uuid);
 
-
-        rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+        if (!rc_info->m_isTransparent)
+        {
+            rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+        }
+        else
+        {
+            rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("Transparent"));
+        }
 
         m_rc_info = rc_info;
 
