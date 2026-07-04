@@ -1,8 +1,8 @@
 behavior = {}
-local waitTime = 4.5
-local dissapearTime = 2.0
+local waitTime = 1.0
+local dissapearTime = 1.0
 local moveSpeed = 3.0
-local moveTime = 5
+local moveTime = 1
 local currTime
 local startTime
 local playerObj

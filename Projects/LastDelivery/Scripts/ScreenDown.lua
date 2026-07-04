@@ -1,7 +1,7 @@
 behavior = {}
-local waitTime = 4.5
+local waitTime = 1.0
 local moveSpeed = 0.5
-local dissapearTime = 2
+local dissapearTime = 1.0
 local currTime
 local startTime
 

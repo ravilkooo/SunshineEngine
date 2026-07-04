@@ -5,7 +5,7 @@ local playerObj
 local floatingSpeed = 6.0
 local floatingAmp = 0.1
 local moveSpeed = 0.5
-local animationDuration = 4.0
+local animationDuration = 1.0
 local yMidLevel
 local startX = -4.0
 local startTime
