@@ -3,17 +3,10 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
-#include "sol/sol.hpp"
-#include "ScriptComponent.h"
+#include <sol/sol.hpp>
 #include <Utils/AssetPath.h>
 
 class GameObject;
-
-struct ParamEntry {
-    eastl::string name;
-    eastl::string type;
-    char value[128] = {};
-};
 
 class LuaComponent : public Component
 {
@@ -33,29 +26,14 @@ public:
     void Cleanup();
 
     void LoadScript();
-    bool FindFunction();
-    bool CallFunction();
-
-    bool IsScriptLoaded() const { return scriptLoaded; }
-    bool IsFunctionFound() const { return foundFunction; }
-    eastl::string GetLastResult() const { return lastResult; }
-    const eastl::vector<ParamEntry>& GetParams() const { return params; }
-    eastl::vector<ParamEntry>& GetParams() { return params; }
-
-    eastl::vector<eastl::string> GetAvailableFunctions() const;
-
+    
     //runtime
     void FromJson(const json& j, GameObject* obj);
     void LuaUpdate(float deltaTime);
 
     AssetPath scriptPath;
-    // eastl::string assetsPath;
     bool scriptLoaded;
-    char functionName[128] = "";
-    bool foundFunction;
-    eastl::string lastResult;
-    eastl::vector<ParamEntry> params;
-
+    
     const std::type_info& getType() const override {
         return typeid(LuaComponent);
     }
@@ -65,15 +43,20 @@ public:
     }
 
 private:
-    eastl::unique_ptr<sol::state> lua;
     GameObject* obj;
 
-    ScriptComponent scriptComponent;
+    struct
+    {
+        sol::table self;
+        sol::protected_function start;
+        sol::protected_function update;
+        sol::protected_function destroy;
+    } scriptData;
+
     bool behaviorInitialized;
 
-    void registerComponents();
     void ClearState();
-    void LoadParamsFromLua();
+    //void LoadParamsFromLua();
 
     //runtime
     void InitializeBehavior();
@@ -107,6 +90,5 @@ public:
     void InitLuaFile();
     AssetPath scriptPath;
     bool scriptLoaded;
-    // int selectedLuaFile = 0;
 
 };

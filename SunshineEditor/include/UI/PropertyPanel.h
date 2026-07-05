@@ -123,7 +123,6 @@ private:
     void DrawBehaviorController(GameObject_Info* obj);
 
     void DrawLuaComponent(GameObject_Info* obj);
-    void DrawLuaFunctions(LuaComponent* luaComp);
     
     bool DrawFloatControl(const char* label, float& value, float resetValue = 0.0f,
                        float speed = 0.1f, float min = 0.0f, float max = 0.0f,

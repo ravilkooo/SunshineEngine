@@ -13,8 +13,6 @@
 
 #include <GameTimer.h>
 
-#include <Scripting/LuaManager.h>
-
 // #include <Utils/ILogManager.h>
 // #include <GameObject/GameObjectFactory.h>
 // #include <GameObject/GameObject.h>
@@ -85,8 +83,6 @@ public:
     //eastl::shared_ptr<Scene> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
     eastl::unique_ptr<PhysicsSystem> m_physicsSystem;
-
-    LuaManager m_luaManager;
 
     eastl::shared_ptr<SE_G::DirectionalLightData> lightData;
     SE_G::ShadowMapPass* m_shadowMapPass;
