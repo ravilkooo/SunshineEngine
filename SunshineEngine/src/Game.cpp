@@ -12,6 +12,7 @@
 #include <Graphics/Renderer/Pass/GPass.h>
 #include <Graphics/Renderer/Pass/LightPass.h>
 #include <Graphics/Renderer/Pass/ShadowMapPass.h>
+#include <Graphics/Renderer/Pass/TransparentPass.h>
 
 #include <Graphics/Utils/Camera.h>
 
@@ -24,6 +25,7 @@
 #include <Component/TriggerComponent.h>
 #include <Component/TransformComponent.h>
 #include <Component/CameraComponent.h>
+#include <Component/MovingPlatformComponent.h>
 
 #include <ControllerSystem/CharacterControllerSystem.h>
 
@@ -80,6 +82,13 @@ void Game::SetupRendering(
 
 		m_lightPass->m_particleSystem = m_renderer->m_particleSystem.get();
 	}
+	{
+		m_transparentPass = static_cast<SE_G::TransparentPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::TransparentPass>(
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
+			);
+	}
 }
 
 void Game::SetParticleSystem(eastl::shared_ptr <SE::ParticleSystem> ps)
@@ -100,6 +109,10 @@ void Game::SetupPhysics()
 		auto trigc = it.second->GetComponent<TriggerComponent>();
 		if (trigc)
 			m_physicsSystem->CreateAndAddTrigger(trigc.get());
+
+		auto movpl = it.second->GetComponent<MovingPlatformComponent>();
+		if (movpl)
+			m_physicsSystem->AddMovingPlatform(movpl.get());
 	}
 	m_physicsSystem->FinalizeScene();
 
@@ -131,6 +144,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_renderer->SetMainCamera(
 		Scene::GetInstance().m_cameraManager->GetCameraByUUID(
 			Scene::GetInstance().m_mainCameraUUID));
+	m_renderer->GetMainCamera()->ResetCameraView(m_screenWidth * 1.0f / m_screenHeight);
 
 	SetupPhysics();
 	m_luaManager.InitializeBehavior();
@@ -219,16 +233,18 @@ void Game::ClearCachedAbsoluteTransforms()
 void Game::Update(float deltaTime) {
 	Scene::GetInstance().FlushDestructionQueue();
 
-	m_physicsSystem->FlushCommands();
-
-	m_characterControllerSystem->UpdateCharacters(deltaTime);
-	m_characterControllerSystem->UpdateTriggerOverlaps();
 	m_luaManager.Update(&Scene::GetInstance(), deltaTime);
 
-	m_physicsSystem->Step(deltaTime);
 	m_physicsSystem->FlushCommands();
 
-	m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance());
+	m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance(), deltaTime);
+	m_characterControllerSystem->UpdateCharacters(deltaTime);
+	m_characterControllerSystem->UpdateTriggerOverlaps();
+
+	m_physicsSystem->Step(deltaTime);
+
+	m_physicsSystem->FlushPreNextFrameCommands();
+
 
 	if (m_particleSystem)
 		m_particleSystem->Update(deltaTime);

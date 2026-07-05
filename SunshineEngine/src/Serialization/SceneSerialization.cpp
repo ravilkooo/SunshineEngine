@@ -15,6 +15,7 @@
 #include <Component/CharacterComponent.h>
 #include <Component/CharacterControllerComponent.h>
 #include <Component/BouncePadComponent.h>
+#include <Component/MovingPlatformComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -22,8 +23,11 @@
 #include <Graphics/GraphicsResources/Mesh.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
+#include <Graphics/Renderer/Technique/TransparentTechnique.h>
+#include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Utils/Camera.h>
 #include <Graphics/GraphicsResources/Texture.h>
+
 
 #include <Utils/StringUtils.h>
 
@@ -126,14 +130,31 @@ void TransformComponent::FromJson(const json& j)
 }
 
 // ----------------- RenderComponent -----------------
+
+void RenderComponent::FromJson(const json& j) {
+    if (j.contains("m_isVisible") && j["m_isVisible"].is_boolean()) {
+        m_isVisible = j.at("m_isVisible").get<bool>();
+    }
+    if (j.contains("m_isTransparent") && j["m_isTransparent"].is_boolean()) {
+        m_isTransparent = j.at("m_isTransparent").get<bool>();
+    }
+}
+
 json RenderComponent_Info::ToJson() const {
     json j;
-
+    j["m_isVisible"] = m_isVisible;
+    j["m_isTransparent"] = m_isTransparent;
     return j;
 }
 
 void RenderComponent_Info::FromJson(const json& j) {
-
+    if (j.contains("m_isVisible") && j["m_isVisible"].is_boolean()) {
+        m_isVisible = j.at("m_isVisible").get<bool>();
+    }
+    if (j.contains("m_isTransparent") && j["m_isTransparent"].is_boolean()) {
+        m_isTransparent = j.at("m_isTransparent").get<bool>();
+    }
+	m_assignedComponent->FromJson(j);
 }
 
 // ----------------- MeshComponent -----------------
@@ -229,11 +250,23 @@ void MeshComponent::FromJson(const json& j, ID3D11Device* device,
         if (j.contains("m_cullMode"))
             j.at("m_cullMode").get_to(m_cullMode);
 
-        auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
-            rc->GetDevice(), tc, "GPass", uuid);
-        m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
+        if (!rc->GetIsTransparent())
+        {
+            auto gBufferTech = eastl::make_unique<SE_G::GPassTechnique>(
+                rc->GetDevice(), tc, "GPass", uuid);
+            m_gBufferTech = static_cast<SE_G::GPassTechnique*>(rc->AddTechnique(eastl::move(gBufferTech)));
+            m_gBufferTech->InitByMeshData(m_meshData);
+        }
+        else
+        {
+            auto transparentTech = eastl::make_unique<SE_G::TransparentTechnique>(
+                rc->GetDevice(), tc, "Transparent", uuid);
+            m_transparentTech = static_cast<SE_G::TransparentTechnique*>(rc->AddTechnique(eastl::move(transparentTech)));
+            m_transparentTech->InitByMeshData(m_meshData);
+        }
+        
 
-        m_gBufferTech->InitByMeshData(m_meshData);
+
         SetCullMode(m_cullMode);
     }
 }
@@ -261,8 +294,14 @@ void MeshComponent_Info::FromJson(const json& j, ID3D11Device* device,
         m_assignedComponent->FromJson(j, device, rc_info->m_assignedComponent.get(),
             tc_info->m_assignedComponent.get(), uuid);
 
-
-        rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+        if (!rc_info->m_isTransparent)
+        {
+            rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("GPass"));
+        }
+        else
+        {
+            rc_info->AddTechnique_Info(rc_info->m_assignedComponent->GetTechnique("Transparent"));
+        }
 
         m_rc_info = rc_info;
 
@@ -427,6 +466,9 @@ json CharacterControllerComponent_Info::ToJson() const
     json j;
     if (m_assignedComponent) {
         j = nlohmann::json{
+            {"m_syncronizeYawWithCameraForwardDir", m_assignedComponent->m_syncronizeYawWithCameraForwardDir},
+            {"m_turnAcceleration", m_assignedComponent->m_turnAcceleration},
+
             {"m_moveSpeed", m_assignedComponent->m_moveSpeed},
             {"m_acceleration", m_assignedComponent->m_acceleration},
             {"m_airAcceleration", m_assignedComponent->m_airAcceleration},
@@ -456,6 +498,13 @@ void CharacterControllerComponent_Info::FromJson(const json& j)
 
 void CharacterControllerComponent::FromJson(const json& j)
 {
+    if (j.contains("m_syncronizeYawWithCameraForwardDir") && j["m_syncronizeYawWithCameraForwardDir"].is_boolean()) {
+        m_syncronizeYawWithCameraForwardDir = j["m_syncronizeYawWithCameraForwardDir"].get<bool>();
+    }
+    if (j.contains("m_turnAcceleration") && j["m_turnAcceleration"].is_number_float()) {
+        m_turnAcceleration = j["m_turnAcceleration"].get<float>();
+    }
+
     if (j.contains("m_moveSpeed") && j["m_moveSpeed"].is_number_float()) {
         m_moveSpeed = j["m_moveSpeed"].get<float>();
     }
@@ -474,11 +523,11 @@ void CharacterControllerComponent::FromJson(const json& j)
     if (j.contains("m_maxFallSpeed") && j["m_maxFallSpeed"].is_number_float()) {
         m_maxFallSpeed = j["m_maxFallSpeed"].get<float>();
     }
-    if (j.contains("m_enableStickToFloor") && j["m_enableStickToFloor"].is_number_float()) {
-        m_enableStickToFloor = j["m_enableStickToFloor"].get<float>();
+    if (j.contains("m_enableStickToFloor") && j["m_enableStickToFloor"].is_boolean()) {
+        m_enableStickToFloor = j["m_enableStickToFloor"].get<bool>();
     }
-    if (j.contains("m_enableWalkStairs") && j["m_enableWalkStairs"].is_number_float()) {
-        m_enableWalkStairs = j["m_enableWalkStairs"].get<float>();
+    if (j.contains("m_enableWalkStairs") && j["m_enableWalkStairs"].is_boolean()) {
+        m_enableWalkStairs = j["m_enableWalkStairs"].get<bool>();
     }
     if (j.contains("m_stepHeight") && j["m_stepHeight"].is_number_float()) {
         m_stepHeight = j["m_stepHeight"].get<float>();
@@ -544,6 +593,30 @@ void BouncePadComponent::FromJson(const json& j, TransformComponent* tc)
     m_assignedTransform = tc;
 }
 
+// ----------------- MovingPlatformComponent -----------------
+
+json MovingPlatformComponent_Info::ToJson() const
+{
+    json j;
+    j = nlohmann::json{
+        {"m_affectCharacters", m_affectCharacters}
+    };
+    return j;
+}
+
+void MovingPlatformComponent_Info::FromJson(const json& j)
+{
+    if (j.contains("m_affectCharacters") && j["m_affectCharacters"].is_boolean()) {
+        m_affectCharacters = j["m_affectCharacters"].get<bool>();
+    }
+}
+
+void MovingPlatformComponent::FromJson(const json& j)
+{
+    if (j.contains("m_affectCharacters") && j["m_affectCharacters"].is_boolean()) {
+        m_affectCharacters = j["m_affectCharacters"].get<bool>();
+    }
+}
 
 // ----------------- GameObject_Info -----------------
 
@@ -604,6 +677,7 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::CHARACTER:              key = "Character"; break;
             case SE::ComponentType::CAMERA:              key = "Camera"; break;
             case SE::ComponentType::BOUNCE_PAD:              key = "BouncePad"; break;
+            case SE::ComponentType::MOVING_PLATFORM:              key = "MovingPlatform"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -703,6 +777,16 @@ void Scene::FromJson(
                     go->m_name = objJ["m_name"].get<std::string>().c_str();
                 }
 
+                if (objJ["components"].contains("Render"))
+                {
+                    eastl::shared_ptr<RenderComponent> render;
+                    if (go->HasComponent<RenderComponent>())
+                        render = go->GetComponent<RenderComponent>();
+                    else
+                        render = go->AddComponent<RenderComponent>(go->m_UUID, renderSystem);
+                    render->FromJson(objJ["components"]["Render"]);
+                }
+
                 if (objJ["components"].contains("Mesh") &&
                     !go->HasComponent<MeshComponent>()) {
                     auto c = go->AddComponent<MeshComponent>();
@@ -768,12 +852,21 @@ void Scene::FromJson(
                     bouncePadComp->FromJson(objJ["components"]["BouncePad"],
                         go->GetComponent<TransformComponent>().get());
                 }
+
+                if (objJ["components"].contains("MovingPlatform")) {
+                    auto c = go->AddComponent<MovingPlatformComponent>();
+                    c->FromJson(objJ["components"]["MovingPlatform"]);
+                    c->m_objectUUID = go->m_UUID;
+                }
                 
                 // Parentnes
                 if (objJ.contains("m_parent"))
                 {
                     go->SetParent(ParentNode<GameObject>::FromJson(objJ["m_parent"]));
                 }
+
+                auto rc = go->GetComponent<RenderComponent>();
+                rc->ApplyVisibility();
 
                 auto objUUID = GetInstance().AddGameObject(eastl::move(go));
             }
@@ -902,6 +995,16 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
             go->m_name = objJ["m_name"].get<std::string>().c_str();
         }
 
+        if (objJ["components"].contains("Render"))
+        {
+			eastl::shared_ptr<RenderComponent_Info> render;
+            if (go->HasComponent<RenderComponent_Info>())
+                render = go->GetComponent<RenderComponent_Info>();
+            else
+                render = go->AddComponent<RenderComponent_Info>(go->m_UUID, renderSystem);
+            render->FromJson(objJ["components"]["Render"]);
+        }
+
         if (objJ["components"].contains("Mesh") &&
             !go->HasComponent<MeshComponent_Info>()) {
             auto c = go->AddComponent<MeshComponent_Info>();
@@ -970,12 +1073,18 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
             c->FromJson(objJ["components"]["BouncePad"]);
         }
 
+        if (objJ["components"].contains("MovingPlatform")) {
+            auto c = go->AddComponent<MovingPlatformComponent_Info>();
+            c->FromJson(objJ["components"]["MovingPlatform"]);
+        }
+
         // Parentnes
         if (objJ.contains("m_parent"))
         {
             go->SetParent(ParentNode<GameObject_Info>::FromJson(objJ["m_parent"]));
         }
 
+        go->GetComponent<RenderComponent_Info>()->ApplyVisibility();
     }
     return go;
 }

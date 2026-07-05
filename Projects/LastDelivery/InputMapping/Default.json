@@ -20,22 +20,22 @@
     "axis_bindings": [
         {
             "key": 38,
-            "name": "Forward2",
+            "name": "ForwardMagnet",
             "scale": 1.0
         },
         {
             "key": 40,
-            "name": "Forward2",
-            "scale": -1.0
-        },
-        {
-            "key": 37,
-            "name": "Right2",
+            "name": "ForwardMagnet",
             "scale": -1.0
         },
         {
             "key": 39,
-            "name": "Right2",
+            "name": "RightMagnet",
+            "scale": -1.0
+        },
+        {
+            "key": 37,
+            "name": "RightMagnet",
             "scale": 1.0
         },
         {
@@ -57,6 +57,26 @@
             "key": 68,
             "name": "Right",
             "scale": 1.0
+        },
+        {
+            "key": 77,
+            "name": "TurnMagnet",
+            "scale": 1.0
+        },
+        {
+            "key": 89,
+            "name": "UpMagnet",
+            "scale": -1.0
+        },
+        {
+            "key": 85,
+            "name": "UpMagnet",
+            "scale": 1.0
+        },
+        {
+            "key": 78,
+            "name": "TurnMagnet",
+            "scale": -1.0
         }
     ],
     "name": "Default"

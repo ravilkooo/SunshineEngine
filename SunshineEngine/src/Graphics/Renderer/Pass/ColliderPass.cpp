@@ -130,6 +130,8 @@ namespace SE_G {
 		s_shapesIndexBuffer->Bind(context);
 		for (auto& tech : m_techniques)
 		{
+			if (!tech.second->IsEnabled())
+				continue;
 			DXSM::Vector3 old_localScaleFactor = tech.second->m_assignedTransform->m_localScaleFactor;
 			DXSM::Vector3 old_localRotation = tech.second->m_assignedTransform->m_localRotation;
 			DXSM::Vector3 old_localPosition = tech.second->m_assignedTransform->m_localPosition;

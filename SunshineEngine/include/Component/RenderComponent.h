@@ -13,6 +13,7 @@
 namespace SE_G {
     class DeferredRenderer;
     class GPassTechnique;
+    class TransparentTechnique;
     class RenderTechnique;
 }
 
@@ -52,7 +53,18 @@ public:
     ID3D11Device* GetDevice();
     ID3D11DeviceContext* GetDeviceContext();
 
+    void ApplyVisibility();
+    bool GetVisibility();
+    void SetVisibility(bool newVisibilty);
+    void ToggleVisibility();
+
+	bool GetIsTransparent() { return m_isTransparent; }
+
+    void FromJson(const json& j) override;
+
 private:
+    bool m_isVisible = true;
+    bool m_isTransparent = false;
     SE_G::DeferredRenderer* m_renderSystem;
     SE::UUID m_objectUUID;
 };
@@ -79,6 +91,7 @@ public:
 
     // Also add in Info component
     SE_G::RenderTechnique* AddTechnique(eastl::unique_ptr<SE_G::RenderTechnique> tech);
+    SE_G::RenderTechnique* GetTechnique(eastl::string technique);
     
     bool HasTechnique(eastl::string technique);
 
@@ -98,7 +111,16 @@ public:
     ID3D11Device* GetDevice() { return m_assignedComponent->GetDevice(); }
     ID3D11DeviceContext* GetDeviceContext() { return m_assignedComponent->GetDeviceContext(); }
 
+    void ApplyVisibility();
+    bool GetVisibility();
+    void SetVisibility(bool newVisibilty);
+    void ToggleVisibility();
+
+    bool m_isVisible = true;
+    bool m_isTransparent = false;
+
 private:
-    SE_G::GPassTechnique* m_gPassTech;
+    SE_G::GPassTechnique* m_gPassTech = nullptr;
+    SE_G::TransparentTechnique* m_transparentTech = nullptr;
     bool m_hasGPassMesh = false;
 };

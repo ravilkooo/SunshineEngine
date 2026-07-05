@@ -16,6 +16,7 @@
 #include <Graphics/Renderer/Pass/ColliderPass.h>
 #include <Graphics/Renderer/Pass/EmitterDebugPass.h>
 #include <Graphics/Renderer/Pass/PerceptionDebugPass.h>
+#include <Graphics/Renderer/Pass/TransparentPass.h>
 
 #include <Graphics/Renderer/GBuffer.h>
 
@@ -232,6 +233,13 @@ void WorldEditor::SetupRendering(
 				m_renderer->m_GBuffer))
 			);
 		m_selectionPass->m_perceptionPass = m_perceptionPass;
+	}
+	{
+		m_transparentPass = static_cast<SE_G::TransparentPass*>(
+			m_renderer->AddPass(eastl::make_unique<SE_G::TransparentPass>(
+				m_renderer.get(),
+				m_renderer->m_GBuffer))
+			);
 	}
 	m_particleSystem->Enable();
 

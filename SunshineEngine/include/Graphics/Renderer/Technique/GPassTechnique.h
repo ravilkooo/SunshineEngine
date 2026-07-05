@@ -15,6 +15,8 @@ namespace SE_G {
         class PixelConstantBuffer;
     }
 
+    class TransparentTechnique;
+
     class GPassTechnique :
         public RenderTechnique
     {
@@ -24,6 +26,8 @@ namespace SE_G {
         GPassTechnique(ID3D11Device* device, TransformComponent* assignedTransform, eastl::string technique,
             SE::UUID uuid);
         ~GPassTechnique();
+        
+        GPassTechnique(TransparentTechnique* transpTech);
 
         // move
         GPassTechnique(GPassTechnique&& other) noexcept;
@@ -40,5 +44,15 @@ namespace SE_G {
         eastl::shared_ptr<MeshData> m_meshData;
 
         ID3D11Device* m_device;
+
+		bool m_isHiddenInEditor = false;
+		SE::UUID m_objectUUID = SE::UUID(0u);
+
+    private:
+        static void InitStaticData(ID3D11Device* device);
+
+        static bool s_staticDataInitializated;
+        static eastl::shared_ptr<Bind::PixelShader> s_defaultShader;
+        static eastl::shared_ptr<Bind::PixelShader> s_hiddenEditorShader;
     };
 }

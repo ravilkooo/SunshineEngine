@@ -4,6 +4,7 @@
 #include <string>
 
 void RegisterBouncePadComponentLuaBindings();
+void RegisterMovingPlatformComponentLuaBindings();
 
 #include <Physics/PhysicsSystem.h>
 
@@ -47,7 +48,7 @@ namespace ScriptingBindings
 
         // Math/value types
         lua.new_usertype<DXSM::Vector3>("Vector3",
-            sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float)>(),
+			sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float), DXSM::Vector3(const DXSM::Vector3&)>(),
             "x", &DXSM::Vector3::x,
             "y", &DXSM::Vector3::y,
             "z", &DXSM::Vector3::z,
@@ -55,18 +56,42 @@ namespace ScriptingBindings
 			[](DXSM::Vector3* self) {
 				return self->Normalize();
 			},
-			"length", &DXSM::Vector3::Length
+			"length", &DXSM::Vector3::Length,
+			sol::meta_function::addition, [](const DXSM::Vector3& a, const DXSM::Vector3& b) {
+				return a + b;
+			},
+			sol::meta_function::subtraction, [](const DXSM::Vector3& a, const DXSM::Vector3& b) {
+				return a - b;
+			},
+			sol::meta_function::multiplication, [](const DXSM::Vector3& a, const DXSM::Vector3& b) {
+				return a * b;
+			},
+			sol::meta_function::multiplication, [](const DXSM::Vector3& a, float s) {
+				return a * s;
+			}
         );
 
 		lua.new_usertype<DXSM::Vector2>("Vector2",
-			sol::constructors<DXSM::Vector2(), DXSM::Vector2(float, float)>(),
+			sol::constructors<DXSM::Vector2(), DXSM::Vector2(float, float), DXSM::Vector2(const DXSM::Vector2&)>(),
 			"x", &DXSM::Vector2::x,
 			"y", &DXSM::Vector2::y,
 			"normalize",
 			[](DXSM::Vector2* self) {
 				return self->Normalize();
 			},
-			"length", &DXSM::Vector2::Length
+			"length", &DXSM::Vector2::Length,
+			sol::meta_function::addition, [](const DXSM::Vector2& a, const DXSM::Vector2& b) {
+				return a + b;
+			},
+			sol::meta_function::subtraction, [](const DXSM::Vector2& a, const DXSM::Vector2& b) {
+				return a - b;
+			},
+			sol::meta_function::multiplication, [](const DXSM::Vector2& a, const DXSM::Vector2& b) {
+				return a * b;
+			},
+			sol::meta_function::multiplication, [](const DXSM::Vector2& a, float s) {
+				return a * s;
+			}
 		);
 
 		// Register Camera type
@@ -124,6 +149,7 @@ namespace ScriptingBindings
 			"setSpringArmRootOffset", &SE_G::Camera::SetSpringArmRootOffset,
 			"getSpringArmLength", &SE_G::Camera::GetSpringArmLength,
 			"setSpringArmLength", &SE_G::Camera::SetSpringArmLength,
+			"zoomSpringArm", &SE_G::Camera::ZoomSpringArm,
 			// Camera mode
 			"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode,
 
@@ -157,6 +183,7 @@ namespace ScriptingBindings
 
         // Execute all component binders registered via LUA_REGISTER_COMPONENT
 		RegisterBouncePadComponentLuaBindings();
+		RegisterMovingPlatformComponentLuaBindings();
         AutoBindings::RegisterAll(lua);
 		
 		// Remove object from scene

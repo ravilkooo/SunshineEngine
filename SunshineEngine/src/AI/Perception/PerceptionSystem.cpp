@@ -401,6 +401,9 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
 
                     DXSM::Vector3 DirNorm = Dir;
                     DirNorm.Normalize();
+
+                    float ViewYaw = std::acosf(ViewerForward.Dot(DirNorm));
+                    ViewYaw = ViewYaw * (ViewerForward.Cross(DirNorm).y > 0 ? 1 : -1);
                     
 					// printf("ViewFwd: %.2f, %.2f, %.2f\t Direction: %.2f, %.2f, %.2f\n",
                     //     ViewerForward.x, ViewerForward.y, ViewerForward.z,
@@ -422,7 +425,7 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
                         {
                             if (Dist <= ViewerPC->SightRadius && acosf(ViewerForward.Dot(DirNorm)) * 57.2958f <= ViewerPC->FieldOfView * 0.5f)
                             {
-                                ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
+                                ViewerPC->ChangeInSight(TargetPC->OwnerID, true, ViewYaw);
                             }
                         }
                     }
@@ -462,7 +465,7 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
                         {
                             if (!WasVisible)
                             {
-                                ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
+                                ViewerPC->ChangeInSight(TargetPC->OwnerID, true, ViewYaw);
                             }
 						}
                         else
@@ -471,14 +474,14 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
                             {
                                 if (!WasVisible)
                                 {
-                                    ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
+                                    ViewerPC->ChangeInSight(TargetPC->OwnerID, true, ViewYaw);
                                 }
                             }
                             else if (HitUUID == TargetPC->OwnerID)
                             {
                                 if (!WasVisible)
                                 {
-                                    ViewerPC->ChangeInSight(TargetPC->OwnerID, true);
+                                    ViewerPC->ChangeInSight(TargetPC->OwnerID, true, ViewYaw);
                                 }
                             }
 							else

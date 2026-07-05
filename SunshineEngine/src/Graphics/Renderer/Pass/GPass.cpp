@@ -50,8 +50,12 @@ namespace SE_G {
 		context->OMSetRenderTargets(5, gBufferRTVs, pGBuffer->pDepthDSV.Get());
 		float colorBlack[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		float colorNone[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		float colorFar[] = { 10000.0f, 10000.0f, 10000.0f, 1.0f };
-		uint32_t UUIDNone[] = { 0u, 0u };
+		// uint32_t UUIDNone[] = { 0u, 0u };
+		auto camPos = m_renderer->GetMainCamera()->GetPosition();
+		auto camDir = m_renderer->GetMainCamera()->GetForward();
+		float farZ = m_renderer->GetMainCamera()->GetFarZ();
+		auto farPoint = camPos + camDir * farZ;
+		float colorFar[] = { farPoint.x, farPoint.y, farPoint.z, 1.0f };
 		context->ClearRenderTargetView(gBufferRTVs[0], colorBlack);
 		context->ClearRenderTargetView(gBufferRTVs[1], colorBlack);
 		context->ClearRenderTargetView(gBufferRTVs[2], colorNone);
@@ -69,6 +73,8 @@ namespace SE_G {
 	{
 		BindAllPerFrame();
 		for (auto& tech : m_techniques) {
+			if (!tech.second->IsEnabled())
+				continue;
 			tech.second->m_assignedTransform->EnableMeshTransformMode();
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());

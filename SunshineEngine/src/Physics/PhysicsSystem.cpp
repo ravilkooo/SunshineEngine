@@ -4,6 +4,7 @@
 #include <Component/TransformComponent.h>
 #include <Component/PhysicsComponent.h>
 #include <Component/TriggerComponent.h>
+#include <Component/MovingPlatformComponent.h>
 
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
@@ -52,6 +53,8 @@ PhysicsSystem::PhysicsSystem() :
     m_physicsSystem->SetContactListener(&m_triggerContactListener);
 
     m_activeTriggers = eastl::unordered_map<SE::UUID, TriggerComponent*>();
+
+    m_movingPlatforms = eastl::unordered_map<SE::UUID, MovingPlatformComponent*>();
 }
 
 PhysicsSystem::~PhysicsSystem()
@@ -257,7 +260,7 @@ void PhysicsSystem::FinalizeScene() {
     m_isValid = true;
 }
 
-void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
+void PhysicsSystem::SyncronizeTransforms(Scene* scene, float deltaTime) {
     for (auto bodyEntry : m_bodyEntries) {
 
         SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
@@ -265,15 +268,13 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
         if (!objPtr)
 			continue;
 
-        if (m_bodyInterface->GetMotionType(bodyEntry.m_joltBodyId) == JPH::EMotionType::Dynamic)
-        {
-            //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(bodyEntry.m_joltBodyId);
+        auto motionType = m_bodyInterface->GetMotionType(bodyEntry.m_joltBodyId);
+        auto tc = objPtr->GetComponent<TransformComponent>();
 
+        if (motionType == JPH::EMotionType::Dynamic || (motionType == JPH::EMotionType::Kinematic && !tc->m_parentTransform))
+        {
             JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
             JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);
-
-
-            auto tc = objPtr->GetComponent<TransformComponent>();
 
             tc->m_position =
                 DXSM::Vector3(position.mF32
@@ -282,24 +283,8 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
                 DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
                 );
         }
-        else if (m_bodyInterface->GetMotionType(bodyEntry.m_joltBodyId) == JPH::EMotionType::Kinematic)
+        else if (motionType == JPH::EMotionType::Kinematic && tc->m_parentTransform)
         {
-            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(bodyEntry.m_joltBodyId));
-
-            auto gameObject = scene->GetGameObjectByUUID(objectUUID);
-            if (!gameObject)
-                continue;
-
-            auto tc = gameObject->GetComponent<TransformComponent>();
-            if (!tc)
-                continue;
-            /*
-            auto wMat = tc->GetWorldMatrix_noLocal();
-
-            DX::XMVECTOR scale, rotation, translation;
-            DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
-            */
-
             DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
             DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
 
@@ -307,30 +292,34 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
             const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
-            m_bodyInterface->SetPositionAndRotation(
-                bodyEntry.m_joltBodyId,
+            m_bodyInterface->MoveKinematic(bodyEntry.m_joltBodyId,
                 targetPos,
                 targetRot,
-                JPH::EActivation::Activate);
+                deltaTime);
+        }
+
+        auto movingPlatform = objPtr->GetComponent<MovingPlatformComponent>();
+        if (movingPlatform) {
+            movingPlatform->m_velocity = m_bodyInterface->GetLinearVelocity(bodyEntry.m_joltBodyId);
         }
     }
 
     for (auto it : m_activeTriggers) {
 
-        SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(it.second->m_joltBodyId));
+        auto joltId = it.second->m_joltBodyId;
+
+        SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(joltId));
         auto objPtr = scene->GetGameObjectByUUID(objectUUID);
         if (!objPtr)
             continue;
 
-        if (m_bodyInterface->GetMotionType(it.second->m_joltBodyId) == JPH::EMotionType::Dynamic)
+        auto motionType = m_bodyInterface->GetMotionType(joltId);
+        auto tc = objPtr->GetComponent<TransformComponent>();
+
+        if (motionType == JPH::EMotionType::Dynamic || (motionType == JPH::EMotionType::Kinematic && !tc->m_parentTransform))
         {
-            //JPH::RMat44 bodyTransform = m_bodyInterface->GetWorldTransform(it);
-
-            JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(it.second->m_joltBodyId);
-            JPH::Quat quatRot = m_bodyInterface->GetRotation(it.second->m_joltBodyId);
-
-
-            auto tc = objPtr->GetComponent<TransformComponent>();
+            JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(joltId);
+            JPH::Quat quatRot = m_bodyInterface->GetRotation(joltId);
 
             tc->m_position =
                 DXSM::Vector3(position.mF32
@@ -339,24 +328,8 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
                 DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
                 );
         }
-        else if (m_bodyInterface->GetMotionType(it.second->m_joltBodyId) == JPH::EMotionType::Kinematic)
+        else if (motionType == JPH::EMotionType::Kinematic && tc->m_parentTransform)
         {
-            SE::UUID objectUUID = SE::UUID((std::uint64_t)m_bodyInterface->GetUserData(it.second->m_joltBodyId));
-
-            auto gameObject = scene->GetGameObjectByUUID(objectUUID);
-            if (!gameObject)
-                continue;
-
-            auto tc = gameObject->GetComponent<TransformComponent>();
-            if (!tc)
-                continue;
-            /*
-            auto wMat = tc->GetWorldMatrix_noLocal();
-
-            DX::XMVECTOR scale, rotation, translation;
-            DX::XMMatrixDecompose(&scale, &rotation, &translation, DX::XMLoadFloat4x4(&wMat));
-            */
-
             DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
             DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
 
@@ -364,11 +337,10 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene) {
             const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
             const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
-            m_bodyInterface->SetPositionAndRotation(
-                it.second->m_joltBodyId,
+            m_bodyInterface->MoveKinematic(joltId,
                 targetPos,
                 targetRot,
-                JPH::EActivation::Activate);
+                deltaTime);
         }
     }
 }
@@ -402,6 +374,8 @@ void PhysicsSystem::ClearAllBodies()
         m_bodyInterface->DestroyBody(it.second->m_joltBodyId);
     }
     m_activeTriggers.clear();
+
+    m_movingPlatforms.clear();
 }
 
 JPH::PhysicsSystem& PhysicsSystem::GetWorld() { return *m_physicsSystem; }
@@ -516,6 +490,20 @@ DXSM::Vector3 PhysicsSystem::GetGravity()
     return DXSM::Vector3(currGrav.GetX(), currGrav.GetY(), currGrav.GetZ());
 }
 
+void PhysicsSystem::AddMovingPlatform(MovingPlatformComponent* platformComp)
+{
+    m_movingPlatforms[platformComp->m_objectUUID] = platformComp;
+}
+
+MovingPlatformComponent* PhysicsSystem::GetMovingPlatform(SE::UUID platformUUID)
+{
+    auto res = m_movingPlatforms.find(platformUUID);
+    if (res != m_movingPlatforms.end())
+        return res->second;
+    else
+        return nullptr;
+}
+
 void PhysicsSystem::EnqueueCommand(std::function<void()> fn)
 {
     std::lock_guard<std::mutex> l(m_cmdMutex);
@@ -528,6 +516,23 @@ void PhysicsSystem::FlushCommands()
     {
         std::lock_guard<std::mutex> l(m_cmdMutex);
         local.swap(m_cmds);
+    }
+    for (auto& fn : local)
+        fn();
+}
+
+void PhysicsSystem::EnqueuePreNextFrameCommand(std::function<void()> fn)
+{
+    std::lock_guard<std::mutex> l(m_preNextFrameCmdMutex);
+    m_preNextFrameCmds.push_back(std::move(fn));
+}
+
+void PhysicsSystem::FlushPreNextFrameCommands()
+{
+    std::vector<std::function<void()>> local;
+    {
+        std::lock_guard<std::mutex> l(m_preNextFrameCmdMutex);
+        local.swap(m_preNextFrameCmds);
     }
     for (auto& fn : local)
         fn();

@@ -128,6 +128,8 @@ namespace SE_G {
 		s_indexBuffer->Bind(context);
 		for (auto& tech : m_techniques)
 		{
+			if (!tech.second->IsEnabled())
+				continue;
 			DXSM::Vector3 old_scaleFactor = tech.second->m_assignedTransform->m_scaleFactor;
 			tech.second->m_assignedTransform->m_scaleFactor = DXSM::Vector3::One;
 

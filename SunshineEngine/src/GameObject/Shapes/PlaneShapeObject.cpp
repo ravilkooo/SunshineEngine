@@ -79,6 +79,9 @@ eastl::unique_ptr<PlaneShapeObject_Info> PlaneShapeObject_Info::FromJson(
 
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc_info->FromJson(j["components"]["Render"]);
+	}
 
 	// MeshComponent (holds shared mesh resource)
 	eastl::shared_ptr<SE_G::Mesh> newMesh;

@@ -310,7 +310,7 @@ namespace SE
 			return;
 
 		auto context = m_renderer->GetDeviceContext();
-		context->ClearState();
+		// context->ClearState();
 
 		// Emitter Pass
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->BeginEvent(L"Emitter Compute Pass");
@@ -324,7 +324,7 @@ namespace SE
 		}
 
 		context->CSSetShader(nullptr, nullptr, 0);
-		context->ClearState();
+		// context->ClearState();
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 
 		// Init simulate dispatch args
@@ -338,7 +338,7 @@ namespace SE
 		}
 
 		context->CSSetShader(nullptr, nullptr, 0);
-		context->ClearState();
+		// context->ClearState();
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 
 		// Simulate Pass
@@ -353,7 +353,7 @@ namespace SE
 		}
 
 		context->CSSetShader(nullptr, nullptr, 0);
-		context->ClearState();
+		// context->ClearState();
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 	}
 
@@ -370,6 +370,8 @@ namespace SE
 		m_sceneConstantBufferData.dt = deltaTime;
 
 		m_sceneConstantBufferData.rngSeed = (float)std::rand();
+		m_sceneConstantBufferData.rngSeed2 = (float)std::rand();
+		m_sceneConstantBufferData.rngSeed3 = (float)std::rand();
 
 		auto context = m_renderer->GetDeviceContext();
 
@@ -380,9 +382,9 @@ namespace SE
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
 
-		context->ClearState();
+		// context->ClearState();
 		ComputePassForAllEmitters();
-		context->ClearState();
+		// context->ClearState();
 	}
 
 	void ParticleSystem::UpdateAllEmitters(float deltaTime)

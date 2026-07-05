@@ -224,7 +224,7 @@ bool PerceptionComponent::MakeNoise(float Loudness)
 	return PerceptionSystem::Get().ReportNoise(this, Loudness);
 };
 
-void PerceptionComponent::ChangeInSight(SE::UUID GOID, bool NewCondition)
+void PerceptionComponent::ChangeInSight(SE::UUID GOID, bool NewCondition, float InYaw)
 {
 	if (NewCondition)
 	{
@@ -244,7 +244,7 @@ void PerceptionComponent::ChangeInSight(SE::UUID GOID, bool NewCondition)
 
 		if (CB.valid()) [[likely]]
 		{
-			CB(GOID.GetHilo(), NewCondition);
+			CB(GOID.GetHilo(), NewCondition, InYaw);
 		}
 	}
 }

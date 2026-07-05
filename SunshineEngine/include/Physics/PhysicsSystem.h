@@ -44,6 +44,7 @@
 
 class PhysicsComponent;
 class TriggerComponent;
+class MovingPlatformComponent;
 
 class PhysicsSystem_Info {
 public:
@@ -161,10 +162,12 @@ public:
             // Moving collides with non-moving, moving and character
             return inObject2 == SE::Layers::NON_MOVING ||
                 inObject2 == SE::Layers::MOVING ||
-                inObject2 == SE::Layers::CHARACTER;
+                inObject2 == SE::Layers::CHARACTER ||
+                inObject2 == SE::Layers::TRIGGER;
 
         case SE::Layers::TRIGGER:
-            return inObject2 == SE::Layers::CHARACTER;
+            return inObject2 == SE::Layers::CHARACTER ||
+                inObject2 == SE::Layers::MOVING;
 
 
         case SE::Layers::CHARACTER:
@@ -238,7 +241,8 @@ public:
 
         case SE::Layers::MOVING:
             return inLayer2 == SE::BroadPhaseLayers::NON_MOVING || 
-                   inLayer2 == SE::BroadPhaseLayers::MOVING;
+                   inLayer2 == SE::BroadPhaseLayers::MOVING ||
+                inLayer2 == SE::BroadPhaseLayers::TRIGGER;
 
         case SE::Layers::TRIGGER:
             return inLayer2 == SE::BroadPhaseLayers::TRIGGER ||
@@ -290,7 +294,7 @@ public:
     // Add objects before this step
     void FinalizeScene();
 
-    void SyncronizeTransforms(Scene* scene);
+    void SyncronizeTransforms(Scene* scene, float deltaTime);
 
     void Step(float dt);
 
@@ -313,6 +317,9 @@ public:
     void SetGravity(DXSM::Vector3 inGravity);
     DXSM::Vector3 GetGravity();
 
+    void AddMovingPlatform(MovingPlatformComponent* platformComp);
+    MovingPlatformComponent* GetMovingPlatform(SE::UUID platformUUID);
+
 private:
 
     void ClearAllBodies();
@@ -332,15 +339,24 @@ private:
     TriggerContactListener m_triggerContactListener;
     eastl::unordered_map<SE::UUID, TriggerComponent*> m_activeTriggers;
 
+    eastl::unordered_map<SE::UUID, MovingPlatformComponent*> m_movingPlatforms;
+
     bool m_isValid = false;
     
 public:
     void EnqueueCommand(std::function<void()> fn);
 
     void FlushCommands(); // вызвать в безопасной точке
+
+    void EnqueuePreNextFrameCommand(std::function<void()> fn);
+
+    void FlushPreNextFrameCommands(); // вызвать в безопасной точке
 private:
 
     std::mutex m_cmdMutex;
     std::vector<std::function<void()>> m_cmds;
+
+    std::mutex m_preNextFrameCmdMutex;
+    std::vector<std::function<void()>> m_preNextFrameCmds;
 };
 

@@ -24,6 +24,7 @@ class TransformComponent_Info;
 namespace SE_G
 {
     class GPassTechnique;
+    class TransparentTechnique;
 }
 
 class MeshData
@@ -81,7 +82,8 @@ public:
 
 private:
     eastl::shared_ptr<MeshData> m_meshData;
-    SE_G::GPassTechnique* m_gBufferTech;
+    SE_G::GPassTechnique* m_gBufferTech = nullptr;
+    SE_G::TransparentTechnique* m_transparentTech = nullptr;
 
     D3D11_CULL_MODE m_cullMode = D3D11_CULL_BACK;
     D3D11_FILL_MODE m_fillMode = D3D11_FILL_SOLID;

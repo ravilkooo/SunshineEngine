@@ -2,15 +2,29 @@ behavior = {}
 
 local playerUUID
 local playerObj
-local collected = false
-local rotSpeed = 10
-local radius = 3
-local upOffset = 0.6
-local scale = 0.1
+local floatingSpeed = 4
+local floatingAmp = 0.1
+local yMidLevel
 
--- can be made unique for every object
--- for example: based on initial position of object or time
-local angleOffet = 0.2
+local function TestPerceptionSystem(self)
+    local ps = getPerceptionSystem()
+
+    local teamPlayer = 1
+    local teamEnemy = 2
+    local invalidTeam = 0xFFFFFFFF
+
+    -- =========================
+    -- REGISTER
+    -- =========================
+
+    ps:registerTeam(teamPlayer)
+    ps:registerTeam(teamEnemy)
+    ps:registerTeam(invalidTeam)
+    
+    ps:addSightTargetTeamIDsInTeam(teamEnemy, teamPlayer)
+    local perception = self.owner:getPerception()
+    ps:addToTeam(teamPlayer, perception)
+end
 
 local function TestCharacterFields(self)
     local char = self.owner:getCharacterComponent()
@@ -57,47 +71,37 @@ local function TestCharacterFields(self)
 end
 
 function behavior:start()
-    -- TestCharacterFields(self)
+    TestPerceptionSystem(self)
+    
+    local tr = self.owner:getTransform()
+    yMidLevel = tr.m_localPosition.y
 end
 
 function behavior:update(dt)
-    -- local tr = self.owner:getTransform()
+    local tr = self.owner:getTransform()
+    tr.m_localPosition.y = yMidLevel +  floatingAmp * math.sin(os.clock() * floatingSpeed)
+
     local inputSystem = getInputSystem()
     local speed = 0.1
     local char = self.owner:getCharacterComponent()
 
-    local inputValue = inputSystem:getAxis2D("Forward", "Right")
-    char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
+    if (char.m_isPlayerControlled) then
+        local camera = self.owner:getCameraComponent()
 
-    -- local mouseMove = Vector2.new(, inputSystem:getMouseDeltaY())
-    char.m_yaw = char.m_yaw + 0.004 * inputSystem:getMouseDeltaX()
-    -- print(inputSystem:getMouseDeltaX())
-    -- char.m_pitch = char.m_pitch + inputSystem:getMouseDeltaY()
-    
-    -- tr.m_rotation.y = tr.m_rotation.y + speed * inputSystem:getAxis("Forward")
-    
-    
-    -- if (inputSystem:isPressed("RAction")) then
-        -- print("RACTION")
-        -- tr.m_rotation.y = tr.m_rotation.y + 0.5
-    -- elseif (inputSystem:isReleased("RAction")) then
-        -- print("RACTION")
-        -- tr.m_rotation.y = tr.m_rotation.y - 0.5
-    -- end
+        local inputValue = inputSystem:getAxis2D("Forward", "Right")
+        char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
+        camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
+        camera:getCamera():rotateSpringArmPitch(0.4 * inputSystem:getMouseDeltaY())
 
-    if (inputSystem:isPressed("Jump")) then
-        print("== JUMP! ==")
-        char.m_jumpRequested = true
-        -- tr.m_rotation.y = tr.m_rotation.y - 0.5
-    end
+        local mouseWheelDelta = inputSystem:getMouseWheelDelta()
+        if (mouseWheelDelta ~= 0) then
+            camera:getCamera():zoomSpringArm(-1 * mouseWheelDelta)
+        end
 
-
-
-    if not collected then
-
-        -- local currentTime = os.clock()
-        -- self.owner:getTransform().m_rotation = Vector3.new(0, rotSpeed * currentTime, 0)
-        
+        if (inputSystem:isPressed("Jump")) then
+            print("== JUMP! ==")
+            char.m_jumpRequested = true
+        end
     end
 
     return "success"

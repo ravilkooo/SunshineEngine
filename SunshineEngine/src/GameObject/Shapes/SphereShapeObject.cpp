@@ -82,6 +82,9 @@ eastl::unique_ptr<SphereShapeObject_Info> SphereShapeObject_Info::FromJson(
 
 	// RenderComponent and technique
 	auto rc_info = obj->AddComponent<RenderComponent_Info>(obj->m_UUID, renderSystem);
+	if (j["components"].contains("Render")) {
+		rc_info->FromJson(j["components"]["Render"]);
+	}
 
 	eastl::shared_ptr<SE_G::Mesh> newMesh;
 	AssetPath meshPath = AssetPath(L"Sphere");

@@ -55,16 +55,20 @@ public:
     //
 
     // Local velocity
-    DXSM::Vector3 m_inputVelocity = DXSM::Vector3::Zero;
+    float m_inputVelocity = 0.0f;
     DXSM::Vector3 m_velocity = DXSM::Vector3::Zero;
 
     bool m_grounded = false;
+    JPH::Vec3 m_groundSpeed = DXSM::Vector3::Zero;
 
     DXSM::Vector3 m_groundNormal = DXSM::Vector3(0, 1, 0);
 
     //
     // Movement tuning
     //
+
+    bool m_syncronizeYawWithCameraForwardDir = false;
+    float m_turnAcceleration = 30.0f;
 
     float m_moveSpeed = 6.0f;
 

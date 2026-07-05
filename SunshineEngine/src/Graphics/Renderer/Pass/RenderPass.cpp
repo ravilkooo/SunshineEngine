@@ -40,6 +40,8 @@ namespace SE_G {
 		BindAllPerFrame();
 
 		for (auto& tech : m_techniques) {
+			if (!tech.second->IsEnabled())
+				continue;
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
 		}
@@ -74,6 +76,24 @@ namespace SE_G {
 			return;
 
 		m_techniques.erase(it);
+	}
+
+	void RenderPass::DisableTechnique(SE::UUID uuid)
+	{
+		auto it = m_techniques.find(uuid);
+		if (it == m_techniques.end())
+			return;
+
+		it->second->Disable();
+	}
+
+	void RenderPass::EnableTechnique(SE::UUID uuid)
+	{
+		auto it = m_techniques.find(uuid);
+		if (it == m_techniques.end())
+			return;
+
+		it->second->Enable();
 	}
 
 	void RenderPass::AddPerFrameBind(Bind::Bindable* bind)

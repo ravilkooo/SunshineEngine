@@ -105,7 +105,7 @@ namespace SE
             float latitudeMax;
 
             uint32_t maxSpawn;
-            DXSM::Vector3 emitterPadding;
+            DXSM::Vector3 emitterSize = DXSM::Vector3::Zero;
 
             /*
             float particleScreenSpinSpeed;

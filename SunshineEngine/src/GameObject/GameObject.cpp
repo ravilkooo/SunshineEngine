@@ -10,6 +10,7 @@
 #include <Component/CameraComponent.h>
 #include <Component/CharacterControllerComponent.h>
 #include <Component/BouncePadComponent.h>
+#include <Component/MovingPlatformComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -283,6 +284,13 @@ void GameObject_Info::AddDefaultComponent(SE::ComponentType compType)
         }
         break;
 
+        case SE::ComponentType::MOVING_PLATFORM:
+
+            // Add MovingPlatformComponent with default values
+        {
+            auto mp_info = AddComponent<MovingPlatformComponent_Info>();
+        }
+        break;
 
         case SE::ComponentType::CHARACTER_CONTROLLER:
 

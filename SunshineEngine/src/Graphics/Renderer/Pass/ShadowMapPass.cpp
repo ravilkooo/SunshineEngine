@@ -243,6 +243,9 @@ namespace SE_G {
 			m_shadowMapRasterizer->Bind(GetDeviceContext());
 
 			for (auto& tech : m_gPass->m_techniques) {
+				if (!tech.second->IsEnabled())
+					continue;
+
 				if (tech.second->GetTechniqueTag() == "GPass")
 					tech.second->m_assignedTransform->EnableMeshTransformMode();
 

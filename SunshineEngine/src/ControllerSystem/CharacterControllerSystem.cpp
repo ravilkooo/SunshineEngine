@@ -8,10 +8,13 @@
 #include "Component/TransformComponent.h"
 #include "Component/PhysicsComponent.h"
 #include "Component/TriggerComponent.h"
+#include "Component/MovingPlatformComponent.h"
 #include "Component/CharacterComponent.h"
 #include "Component/CharacterControllerComponent.h"
 
-#include "Scene.h"
+#include <Scene.h>
+#include <CameraManager.h>
+#include <Graphics/Utils/Camera.h>
 
 #include <SimpleMath.h>
 
@@ -210,31 +213,63 @@ void CharacterControllerSystem::ApplyMovementInput(
     float deltaTime)
 {
     DXSM::Vector2 input = character->m_moveInput;
-
     if (input.Length() > 1.0f)
     {
         input.Normalize();
     }
 
-    DXSM::Vector3 desiredVelocity(
-        input.x * controller->m_moveSpeed,
-        controller->m_inputVelocity.y,
-        input.y * controller->m_moveSpeed
-    );
+    if ((input.x != 0 || input.y != 0) && controller->m_syncronizeYawWithCameraForwardDir)
+    {
+		float inputAngle = atan2(input.x, input.y);
+
+        auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
+        float camYaw = 0.0f;
+        if (camera)
+        {
+            camYaw = camera->m_springArmParams.pitchYawRoll.y;
+        }
+        // character->m_yaw += camYaw;
+        float desiredYaw = character->m_yaw + camYaw + inputAngle;
+        if (desiredYaw > DX::XM_PI) { desiredYaw -= DX::XM_2PI; }
+        else if (desiredYaw < -DX::XM_PI) { desiredYaw += DX::XM_2PI; }
+
+        if (controller->m_inputVelocity == 0)
+        {
+            character->m_yaw = desiredYaw;
+        }
+        else
+        {
+            if ((character->m_yaw - desiredYaw) > DX::XM_PI)
+            {
+                character->m_yaw -= DX::XM_2PI;
+            }
+            else if ((character->m_yaw - desiredYaw) < -DX::XM_PI)
+            {
+                character->m_yaw += DX::XM_2PI;
+            }
+
+            character->m_yaw = std::lerp(
+                character->m_yaw,
+                desiredYaw,
+                controller->m_turnAcceleration * deltaTime);
+		}
+        // character->m_yaw = std::clamp(character->m_yaw, -DX::XM_PI, DX::XM_PI);
+
+        camera->m_springArmParams.pitchYawRoll.y = (desiredYaw - character->m_yaw - inputAngle);
+        if (camera->m_springArmParams.pitchYawRoll.y > DX::XM_PI) { camera->m_springArmParams.pitchYawRoll.y -= DX::XM_2PI; }
+        else if (camera->m_springArmParams.pitchYawRoll.y < -DX::XM_PI) { camera->m_springArmParams.pitchYawRoll.y += DX::XM_2PI; }
+    }
+
+    float desiredVelocity = input.Length() * controller->m_moveSpeed;
 
     float accel =
         controller->m_grounded
         ? controller->m_acceleration
         : controller->m_airAcceleration;
 
-    controller->m_inputVelocity.x = std::lerp(
-        controller->m_inputVelocity.x,
-        desiredVelocity.x,
-        accel * deltaTime);
-
-    controller->m_inputVelocity.z = std::lerp(
-        controller->m_inputVelocity.z,
-        desiredVelocity.z,
+    controller->m_inputVelocity = std::lerp(
+        controller->m_inputVelocity,
+        desiredVelocity,
         accel * deltaTime
     );
 }
@@ -316,10 +351,10 @@ void CharacterControllerSystem::UpdatePhysics(
 
     controller->m_character->SetLinearVelocity(
         JPH::Vec3(
-            controller->m_velocity.x + controller->m_inputVelocity.x * cos(character->m_yaw) + controller->m_inputVelocity.z * sin(character->m_yaw),
-            controller->m_velocity.y + controller->m_inputVelocity.y,
-            controller->m_velocity.z + controller->m_inputVelocity.z * cos(character->m_yaw) - controller->m_inputVelocity.x * sin(character->m_yaw)
-        )
+            controller->m_velocity.x + controller->m_inputVelocity * sin(character->m_yaw),
+            controller->m_velocity.y,
+            controller->m_velocity.z + controller->m_inputVelocity * cos(character->m_yaw)
+        ) + controller->m_groundSpeed
     );
 
     JPH::CharacterVirtual::ExtendedUpdateSettings update_settings;
@@ -366,11 +401,37 @@ void CharacterControllerSystem::UpdateGroundState(
         controller->m_character->GetGroundState() ==
         JPH::CharacterBase::EGroundState::OnGround;
 
-    if (!wasGrounded && controller->m_grounded)
+    if (controller->m_grounded)
     {
-        controller->m_velocity.x = 0;
-        controller->m_velocity.z = 0;
+        auto movingPlatformUUID = SE::UUID(controller->m_character->GetGroundUserData());
+        /*
+        JPH::PhysicsSystem& physSystem = m_physicsSystem->GetWorld();
+        physSystem.GetBodyInterface().GetLinearVelocity(;
+        */
+        auto platform = m_physicsSystem->GetMovingPlatform(movingPlatformUUID);
+        if (platform && platform->m_affectCharacters)
+        {
+            controller->m_groundSpeed = platform->m_velocity;
+        }
+        else
+        {
+            controller->m_groundSpeed = JPH::Vec3::sZero();
+        }
+
+        if (!wasGrounded)
+        {
+            controller->m_velocity.x = 0;
+            controller->m_velocity.z = 0;
+        }
     }
+    else
+    {
+        if (!wasGrounded)
+        {
+            controller->m_groundSpeed = JPH::Vec3::sZero();
+        }
+    }
+
 }
 
 void CharacterControllerSystem::ClearFrameState(

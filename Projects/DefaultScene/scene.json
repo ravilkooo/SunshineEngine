@@ -1838,6 +1838,11 @@
                                 1.0,
                                 1.0
                             ],
+                            "emitterSize": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
                             "latitudeMax": 1.5707963705062866,
                             "latitudeMin": 1.3665928840637207,
                             "longitudeMax": 6.2831854820251465,
@@ -2943,7 +2948,9 @@
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 10.119999885559082,
-                    "m_stepHeight": 0.30000001192092896
+                    "m_stepHeight": 0.30000001192092896,
+                    "m_syncronizeYawWithCameraForwardDir": true,
+                    "m_turnAcceleration": 30.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -3169,7 +3176,9 @@
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 6.0,
-                    "m_stepHeight": 0.30000001192092896
+                    "m_stepHeight": 0.30000001192092896,
+                    "m_syncronizeYawWithCameraForwardDir": false,
+                    "m_turnAcceleration": 30.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -5353,6 +5362,69 @@
                 "attached": true,
                 "uuid": 17227216129192393426
             }
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": null,
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -9.3515625,
+                        -4.94921875,
+                        -17.296875
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 11995970141844958199,
+            "m_UUID_hi": 2793029449,
+            "m_UUID_lo": 1625058295,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
         }
     ],
     "inputMapping": "Default",

@@ -615,6 +615,11 @@ namespace SE
                 particleData->m_emitterConstantBufferData.position.y = je["position"][1].get<float>();
                 particleData->m_emitterConstantBufferData.position.z = je["position"][2].get<float>();
             }
+            if (je.contains("emitterSize") && je["emitterSize"].is_array() && je["emitterSize"].size() >= 3) {
+                particleData->m_emitterConstantBufferData.emitterSize.x = je["emitterSize"][0].get<float>();
+                particleData->m_emitterConstantBufferData.emitterSize.y = je["emitterSize"][1].get<float>();
+                particleData->m_emitterConstantBufferData.emitterSize.z = je["emitterSize"][2].get<float>();
+            }
             if (je.contains("particlesLifeSpan") && je["particlesLifeSpan"].is_number())
                 particleData->m_emitterConstantBufferData.particlesLifeSpan = je["particlesLifeSpan"].get<float>();
 
@@ -739,6 +744,7 @@ namespace SE
         const auto& E = m_emitterConstantBufferData;
         json je;
         je["position"] = { E.position.x, E.position.y, E.position.z };
+        je["emitterSize"] = { E.emitterSize.x, E.emitterSize.y, E.emitterSize.z };
         je["colorStart"] = { E.colorStart.x, E.colorStart.y, E.colorStart.z };
         je["colorEnd"] = { E.colorEnd.x, E.colorEnd.y, E.colorEnd.z };
 

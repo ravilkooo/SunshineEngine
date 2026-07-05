@@ -6,7 +6,6 @@
 #include <Component/TransformComponent.h>
 #include <Component/RenderComponent.h>
 
-#include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/DeferredRenderer.h>
 
 #include <GameObject/GameObject.h>
