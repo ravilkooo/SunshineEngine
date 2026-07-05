@@ -30,40 +30,40 @@ local function TestCharacterFields(self)
     local char = self.owner:getCharacterComponent()
 
     print(" == Character fields == ")
-    print("m_isPlayerControlled = " .. (char.m_isPlayerControlled and "true" or "false"))
-    print("m_isDead = " .. (char.m_isDead and "true" or "false"))
-    print("m_isAttacking = " .. (char.m_isAttacking and "true" or "false"))
-    print("m_moveInput = " .. char.m_moveInput.x .. ", " .. char.m_moveInput.y)
-    print("m_jumpRequested = " .. (char.m_jumpRequested and "true" or "false"))
-    print("m_attackRequested = " .. (char.m_attackRequested and "true" or "false"))
-    print("m_yaw = " .. char.m_yaw)
-    print("m_pitch = " .. char.m_pitch)
+    print("isPlayerControlled = " .. (char.isPlayerControlled and "true" or "false"))
+    print("isDead = " .. (char.isDead and "true" or "false"))
+    print("isAttacking = " .. (char.isAttacking and "true" or "false"))
+    print("moveInput = " .. char.moveInput.x .. ", " .. char.moveInput.y)
+    print("jumpRequested = " .. (char.jumpRequested and "true" or "false"))
+    print("attackRequested = " .. (char.attackRequested and "true" or "false"))
+    print("yaw = " .. char.yaw)
+    print("pitch = " .. char.pitch)
 
     local charContr = self.owner:getCharacterController()
     print("")
     print(" == Controller fields == ")
-    print("m_velocity = " .. charContr.m_velocity.x .. ", " .. charContr.m_velocity.y .. ", " .. charContr.m_velocity.z)
-    print("m_grounded = " .. (charContr.m_grounded and "true" or "false"))
-    print("m_groundNormal = " .. charContr.m_groundNormal.x .. ", " .. charContr.m_groundNormal.y .. ", " .. charContr.m_groundNormal.z)
-    print("m_moveSpeed = " .. charContr.m_moveSpeed)
-    print("m_acceleration = " .. charContr.m_acceleration)
-    print("m_airAcceleration = " .. charContr.m_airAcceleration)
-    print("m_jumpSpeed = " .. charContr.m_jumpSpeed)
-    print("m_gravity = " .. charContr.m_gravity)
-    print("m_maxFallSpeed = " .. charContr.m_maxFallSpeed)
-    print("m_enableStickToFloor = " .. (charContr.m_enableStickToFloor and "true" or "false"))
-    print("m_stepHeight = " .. charContr.m_stepHeight)
-    print("m_maxSlopeAngle = " .. charContr.m_maxSlopeAngle)
+    print("velocity = " .. charContr.velocityVector.x .. ", " .. charContr.velocityVector.y .. ", " .. charContr.velocityVector.z)
+    print("grounded = " .. (charContr.grounded and "true" or "false"))
+    print("groundNormal = " .. charContr.groundNormal.x .. ", " .. charContr.groundNormal.y .. ", " .. charContr.groundNormal.z)
+    print("moveSpeed = " .. charContr.moveSpeed)
+    print("acceleration = " .. charContr.acceleration)
+    print("airAcceleration = " .. charContr.airAcceleration)
+    print("jumpSpeed = " .. charContr.jumpSpeed)
+    print("gravity = " .. charContr.gravity)
+    print("maxFallSpeed = " .. charContr.maxFallSpeed)
+    print("enableStickToFloor = " .. (charContr.enableStickToFloor and "true" or "false"))
+    print("stepHeight = " .. charContr.stepHeight)
+    print("maxSlopeAngle = " .. charContr.maxSlopeAngle)
 
     local cam = self.owner:getCameraComponent():getCamera()
     print("")
     print(" == Controller fields == ")
-    print("armLen = " .. cam:getSpringArmLength())
-    local armRot = cam:getSpringArmRotation()
+    print("armLen = " .. cam.springArmLength)
+    local armRot = cam.springArmRotation
     print("armRot = " .. armRot.x .. ", " .. armRot.y .. ", " .. armRot.z)
-    local armOff = cam:getSpringArmRootOffset()
+    local armOff = cam.springArmRootOffset
     print("armOff = " .. armOff.x .. ", " .. armOff.y .. ", " .. armOff.z)
-    local camRot = cam:getCameraRotation()
+    local camRot = cam.cameraRotation
     print("camRot = " .. camRot.x .. ", " .. camRot.y .. ", " .. camRot.z)
 
 
@@ -72,24 +72,25 @@ end
 
 function behavior:start()
     TestPerceptionSystem(self)
+    TestCharacterFields(self)
     
     local tr = self.owner:getTransform()
-    yMidLevel = tr.m_localPosition.y
+    yMidLevel = tr.localPosition.y
 end
 
 function behavior:update(dt)
     local tr = self.owner:getTransform()
-    tr.m_localPosition.y = yMidLevel +  floatingAmp * math.sin(os.clock() * floatingSpeed)
+    tr.localPosition = Vector3.new(tr.localPosition.x, yMidLevel + floatingAmp * math.sin(os.clock() * floatingSpeed), tr.localPosition.z)
 
     local inputSystem = getInputSystem()
     local speed = 0.1
     local char = self.owner:getCharacterComponent()
 
-    if (char.m_isPlayerControlled) then
+    if (char.isPlayerControlled) then
         local camera = self.owner:getCameraComponent()
 
         local inputValue = inputSystem:getAxis2D("Forward", "Right")
-        char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
+        char.moveInput = Vector2.new(inputValue.y, inputValue.x)
         camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
         camera:getCamera():rotateSpringArmPitch(0.4 * inputSystem:getMouseDeltaY())
 
@@ -100,7 +101,7 @@ function behavior:update(dt)
 
         if (inputSystem:isPressed("Jump")) then
             print("== JUMP! ==")
-            char.m_jumpRequested = true
+            char.jumpRequested = true
         end
     end
 

@@ -173,12 +173,19 @@ void TransformComponent_Info::SetParentTransform(TransformComponent_Info* parent
         m_assignedComponent->SetParentTransform(nullptr);
 }
 
-#define TC_ADD_FIELD(name) #name, &TransformComponent::name
-#define TC_FIELD_PAIRS TRANSFORMCOMPONENT_LUA_FIELDS_APPLY(TC_ADD_FIELD)
+#define TC_ADD_PROPERTY(name, getter, setter) #name, sol::property(getter, setter)
+#define TC_PROPERTY_PAIRS TRANSFORMCOMPONENT_LUA_PROPERTIES_APPLY(TC_ADD_PROPERTY)
 
 #define TC_ADD_METHOD_WITH_LEAD(k, fn) , k, fn
 #define TC_METHOD_PAIRS TRANSFORMCOMPONENT_LUA_METHODS_APPLY(TC_ADD_METHOD_WITH_LEAD)
 
-LUA_REGISTER_COMPONENT(TransformComponent, "TransformComponent", TC_FIELD_PAIRS, TC_METHOD_PAIRS, "getTransform")
-#undef TC_ADD_FIELD
-#undef  TC_ADD_METHOD_WITH_LEAD
+LUA_REGISTER_COMPONENT(
+    TransformComponent,
+    "TransformComponent",
+    /* no fields */,
+    TC_PROPERTY_PAIRS,
+    TC_METHOD_PAIRS,
+    "getTransform")
+
+#undef TC_ADD_PROPERTY
+#undef TC_ADD_METHOD_WITH_LEAD

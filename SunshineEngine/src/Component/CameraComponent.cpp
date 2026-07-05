@@ -122,6 +122,7 @@ LUA_REGISTER_COMPONENT(
     CameraComponent,
     "CameraComponent",
     /* no fields */,
+	/* no properties */,
     CAMERACOMPONENT_LUA_METHODS_APPLY(CC_ADD_METHOD),
     "getCameraComponent")
 #undef CC_ADD_METHOD

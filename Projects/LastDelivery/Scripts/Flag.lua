@@ -25,10 +25,10 @@ function behavior:update(dt)
     if rotationEnabled then
         local currentTime = (os.clock() - startTime) / rotationDuration
         if currentTime < 1 then
-            self.owner:getTransform().m_rotation = Vector3.new(math.pi * 0.5 * math.sin(math.pi * currentTime), 0, 0)
+            self.owner:getTransform().rotation = Vector3.new(math.pi * 0.5 * math.sin(math.pi * currentTime), 0, 0)
         else
             rotationEnabled = false
-            self.owner:getTransform().m_rotation = Vector3.new(0, 0, 0)
+            self.owner:getTransform().rotation = Vector3.new(0, 0, 0)
         end
     end
 

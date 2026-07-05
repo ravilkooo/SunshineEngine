@@ -62,6 +62,31 @@ public:
     float m_yaw = 0.0f;
     float m_pitch = 0.0f;
 
+
+    bool GetIsPlayerControlled() const { return m_isPlayerControlled; };
+    void SetIsPlayerControlled(bool isPlayerControlled) { m_isPlayerControlled = isPlayerControlled; };
+
+    bool GetIsDead() const { return m_isDead; };
+    void SetIsDead(bool isDead) { m_isDead = isDead; };
+
+    bool GetIsAttacking() const { return m_isAttacking; };
+    void SetIsAttacking(bool isAttacking) { m_isAttacking = isAttacking; };
+
+    const DXSM::Vector2& GetMoveInput() const { return m_moveInput; };
+    void SetMoveInput(const DXSM::Vector2& moveInput) { m_moveInput = moveInput; };
+
+    bool GetJumpRequested() const { return m_jumpRequested; };
+    void SetJumpRequested(bool jumpRequested) { m_jumpRequested = jumpRequested; };
+
+    bool GetAttackRequested() const { return m_attackRequested; };
+    void SetAttackRequested(bool attackRequested) { m_attackRequested = attackRequested; };
+
+    float GetYaw() const { return m_yaw; };
+    void SetYaw(float yaw) { m_yaw = yaw; };
+
+    float GetPitch() const { return m_pitch; };
+    void SetPitch(float pitch) { m_pitch = pitch; };
+
     // Inherited via Component
     const std::type_info& getType() const override {
         return typeid(CharacterComponent);
@@ -104,15 +129,14 @@ public:
     void FromJson(const json& j) override;
 };
 
-// Macro listing fields of CharacterComponent to expose in Lua bindings
-#ifndef CHARACTERCOMPONENT_LUA_FIELDS_APPLY
-#define CHARACTERCOMPONENT_LUA_FIELDS_APPLY(F) \
-    F(m_isPlayerControlled) ,   \
-    F(m_isDead) ,               \
-    F(m_isAttacking) ,          \
-    F(m_moveInput) ,            \
-    F(m_jumpRequested) ,        \
-    F(m_attackRequested) ,      \
-    F(m_yaw) ,                  \
-    F(m_pitch)
+#ifndef CHARACTERCOMPONENT_LUA_PROPERTIES_APPLY
+#define CHARACTERCOMPONENT_LUA_PROPERTIES_APPLY(FP) \
+    FP(isPlayerControlled, &CharacterComponent::GetIsPlayerControlled, &CharacterComponent::SetIsPlayerControlled), \
+    FP(isDead, &CharacterComponent::GetIsDead, &CharacterComponent::SetIsDead), \
+    FP(isAttacking, &CharacterComponent::GetIsAttacking, &CharacterComponent::SetIsAttacking), \
+    FP(moveInput, &CharacterComponent::GetMoveInput, &CharacterComponent::SetMoveInput), \
+    FP(jumpRequested, &CharacterComponent::GetJumpRequested, &CharacterComponent::SetJumpRequested), \
+    FP(attackRequested, &CharacterComponent::GetAttackRequested, &CharacterComponent::SetAttackRequested), \
+    FP(yaw, &CharacterComponent::GetYaw, &CharacterComponent::SetYaw), \
+    FP(pitch, &CharacterComponent::GetPitch, &CharacterComponent::SetPitch)
 #endif

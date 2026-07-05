@@ -31,7 +31,7 @@ end
 function behavior:update(dt)
     local char = self.owner:getCharacterComponent()
 
-    -- char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
+    -- char.moveInput = Vector2.new(inputValue.y, inputValue.x)
 
     return "success"
 end

@@ -126,7 +126,7 @@ DXSM::Vector3 PhysicsComponent::GetAccumulatedTorque()
     return DXSM::Vector3::Zero;
 }
 
-DXSM::Vector3 PhysicsComponent::GetAngularVelocity()
+DXSM::Vector3 PhysicsComponent::GetAngularVelocity() const
 {
     if (m_physicsSystem)
     {
@@ -140,7 +140,7 @@ DXSM::Vector3 PhysicsComponent::GetAngularVelocity()
     return DXSM::Vector3::Zero;
 }
 
-DXSM::Vector3 PhysicsComponent::GetLinearVelocity()
+DXSM::Vector3 PhysicsComponent::GetLinearVelocity() const
 {
     if (m_physicsSystem)
     {
@@ -356,7 +356,7 @@ void PhysicsComponent::SetGravityFactor(float inGravityFactor)
         });
 }
 
-float PhysicsComponent::GetGravityFactor()
+float PhysicsComponent::GetGravityFactor() const
 {
     if (!m_physicsSystem)
         return 1.0f;
@@ -514,12 +514,17 @@ const SE::CollisionLayer& PhysicsComponent_Info::GetCollisionLayer() const { ret
 void PhysicsComponent_Info::SetCollisionLayer(const SE::CollisionLayer& layer) { m_collisionLayer = layer; }
 void PhysicsComponent_Info::SetCollisionLayer(SE::CollisionLayer&& layer) { m_collisionLayer = eastl::move(layer); }
 
-#define PC_ADD_METHOD(k, fn) k, fn
+#define PC_ADD_PROPERTY(name, getter, setter) #name, sol::property(getter, setter)
+#define PC_PROPERTY_PAIRS PHYSICSCOMPONENT_LUA_PROPERTIES_APPLY(PC_ADD_PROPERTY)
+
+#define PC_ADD_METHOD(k, fn) , k, fn
 
 LUA_REGISTER_COMPONENT(
     PhysicsComponent,
     "PhysicsComponent",
     /* no fields */,
+    PC_PROPERTY_PAIRS,
     PHYSICSCOMPONENT_LUA_METHODS_APPLY(PC_ADD_METHOD),
     "getPhysics")
 #undef PC_ADD_METHOD
+#undef PC_ADD_PROPERTY

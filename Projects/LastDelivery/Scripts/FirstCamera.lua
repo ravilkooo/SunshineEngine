@@ -25,9 +25,9 @@ function behavior:start()
     playerUUID.lo = 3110370002
     playerObj = getGameObjectByUUID(playerUUID)
     local tr = playerObj:getTransform()
-    playerPos = Vector3.new(tr.m_position)
+    playerPos = Vector3.new(tr.position)
     print("Player pos: " .. playerPos.x .. " " .. playerPos.y .. " " .. playerPos.z)
-    startPos = Vector3.new(self.owner:getTransform().m_position)
+    startPos = Vector3.new(self.owner:getTransform().position)
     print("Camera pos: " .. startPos.x .. " " .. startPos.y .. " " .. startPos.z)
 
     local firstCam = self.owner:getCameraComponent():getCamera()
@@ -57,7 +57,7 @@ function behavior:update(dt)
     if (currTime - startTime > waitTime + dissapearTime) and (currTime - startTime < waitTime + dissapearTime + moveTime) then
         local t = (currTime - startTime - waitTime - dissapearTime) / moveTime
         print(t)
-        tr.m_position = startPos + (playerPos - startPos) * t
+        tr.position = startPos + (playerPos - startPos) * t
         firstCam:setSpringArmLength(startLen + (finalLen - startLen) * t)
         firstCam:setSpringArmRootOffset(startOffset + (finalOffset - startOffset) * t)
         firstCam:setSpringArmRotation(startRotation + (finalRotation - startRotation) * t)
@@ -67,7 +67,7 @@ function behavior:update(dt)
         setCameraByUUID(playerUUID)
         removeGameObjectByUUID(self.owner:getUUID())
         local char = playerObj:getCharacterComponent()
-        char.m_isPlayerControlled = true
+        char.isPlayerControlled = true
     end
 
     return "success"

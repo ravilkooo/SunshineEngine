@@ -97,6 +97,45 @@ public:
 
     float m_maxSlopeAngle = 45.0f;
 
+    const DXSM::Vector3& GetVelocityVec() const { return m_velocity; }
+    void SetVelocityVec(const DXSM::Vector3& velocity) { m_velocity = velocity; }
+
+    bool IsGrounded() const { return m_grounded; }
+    void SetGrounded(bool grounded) { m_grounded = grounded; }
+
+    const DXSM::Vector3& GetGroundNormal() const { return m_groundNormal; }
+    void SetGroundNormal(const DXSM::Vector3& groundNormal) { m_groundNormal = groundNormal; }
+
+    float GetMoveSpeed() const { return m_moveSpeed; }
+    void SetMoveSpeed(float moveSpeed) { m_moveSpeed = moveSpeed; }
+
+    float GetAcceleration() const { return m_acceleration; }
+    void SetAcceleration(float acceleration) { m_acceleration = acceleration; }
+
+    float GetAirAcceleration() const { return m_airAcceleration; }
+    void SetAirAcceleration(float airAcceleration) { m_airAcceleration = airAcceleration; }
+
+    float GetJumpSpeed() const { return m_jumpSpeed; }
+    void SetJumpSpeed(float jumpSpeed) { m_jumpSpeed = jumpSpeed; }
+
+    float GetGravity() const { return m_gravity; }
+    void SetGravity(float gravity) { m_gravity = gravity; }
+
+    float GetMaxFallSpeed() const { return m_maxFallSpeed; }
+    void SetMaxFallSpeed(float maxFallSpeed) { m_maxFallSpeed = maxFallSpeed; }
+
+    bool GetEnableStickToFloor() const { return m_enableStickToFloor; }
+    void SetEnableStickToFloor(bool enableStickToFloor) { m_enableStickToFloor = enableStickToFloor; }
+
+    bool GetEnableWalkStairs() const { return m_enableWalkStairs; }
+    void SetEnableWalkStairs(bool enableWalkStairs) { m_enableWalkStairs = enableWalkStairs; }
+
+    float GetStepHeight() const { return m_stepHeight; }
+    void SetStepHeight(float stepHeight) { m_stepHeight = stepHeight; }
+
+    float GetMaxSlopeAngle() const { return m_maxSlopeAngle; }
+    void SetMaxSlopeAngle(float maxSlopeAngle) { m_maxSlopeAngle = maxSlopeAngle; }
+
     // Inherited via Component
     const std::type_info& getType() const override {
         return typeid(CharacterControllerComponent);
@@ -153,20 +192,20 @@ public:
     RenderComponent_Info* m_rc_info;
 };
 
-// Macro listing fields of CharacterControllerComponent to expose in Lua bindings
-#ifndef CHARACTERCONTROLLER_LUA_FIELDS_APPLY
-#define CHARACTERCONTROLLER_LUA_FIELDS_APPLY(F) \
-    F(m_velocity) ,             \
-    F(m_grounded) ,             \
-    F(m_groundNormal) ,         \
-    F(m_moveSpeed) ,            \
-    F(m_acceleration) ,         \
-    F(m_airAcceleration) ,      \
-    F(m_jumpSpeed) ,            \
-    F(m_gravity) ,              \
-    F(m_maxFallSpeed) ,         \
-    F(m_enableStickToFloor) ,   \
-    F(m_enableWalkStairs) ,     \
-    F(m_stepHeight) ,           \
-    F(m_maxSlopeAngle)
+// Macro listing properties of CharacterControllerComponent to expose in Lua bindings
+#ifndef CHARACTERCONTROLLER_LUA_PROPERTIES_APPLY
+#define CHARACTERCONTROLLER_LUA_PROPERTIES_APPLY(FP) \
+    FP(velocityVector, &CharacterControllerComponent::GetVelocityVec, &CharacterControllerComponent::SetVelocityVec) , \
+    FP(grounded, &CharacterControllerComponent::IsGrounded, &CharacterControllerComponent::SetGrounded) , \
+    FP(groundNormal, &CharacterControllerComponent::GetGroundNormal, &CharacterControllerComponent::SetGroundNormal) , \
+    FP(moveSpeed, &CharacterControllerComponent::GetMoveSpeed, &CharacterControllerComponent::SetMoveSpeed) , \
+    FP(acceleration, &CharacterControllerComponent::GetAcceleration, &CharacterControllerComponent::SetAcceleration) , \
+    FP(airAcceleration, &CharacterControllerComponent::GetAirAcceleration, &CharacterControllerComponent::SetAirAcceleration) , \
+    FP(jumpSpeed, &CharacterControllerComponent::GetJumpSpeed, &CharacterControllerComponent::SetJumpSpeed) , \
+    FP(gravity, &CharacterControllerComponent::GetGravity, &CharacterControllerComponent::SetGravity) , \
+    FP(maxFallSpeed, &CharacterControllerComponent::GetMaxFallSpeed, &CharacterControllerComponent::SetMaxFallSpeed) , \
+    FP(enableStickToFloor, &CharacterControllerComponent::GetEnableStickToFloor, &CharacterControllerComponent::SetEnableStickToFloor) , \
+    FP(enableWalkStairs, &CharacterControllerComponent::GetEnableWalkStairs, &CharacterControllerComponent::SetEnableWalkStairs) , \
+    FP(stepHeight, &CharacterControllerComponent::GetStepHeight, &CharacterControllerComponent::SetStepHeight) , \
+    FP(maxSlopeAngle, &CharacterControllerComponent::GetMaxSlopeAngle, &CharacterControllerComponent::SetMaxSlopeAngle)
 #endif

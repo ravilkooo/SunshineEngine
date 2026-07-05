@@ -12,8 +12,8 @@ local startTime
 
 function behavior:start()
     local tr = self.owner:getTransform()
-    yMidLevel = tr.m_localPosition.y
-    tr.m_position.x = startX
+    yMidLevel = tr.localPosition.y
+    tr.position.x = startX
     moveSpeed = -2.0 * startX / animationDuration
 
     startTime = os.clock()
@@ -21,8 +21,8 @@ end
 
 function behavior:update(dt)
     local tr = self.owner:getTransform()
-    tr.m_localPosition.y = yMidLevel +  floatingAmp * math.sin(os.clock() * floatingSpeed)
-    tr.m_position.x = tr.m_position.x + moveSpeed * dt
+    tr.localPosition = Vector3.new(tr.localPosition.x, yMidLevel + floatingAmp * math.sin(os.clock() * floatingSpeed), tr.localPosition.z)
+    tr.position = Vector3.new(tr.position.x + moveSpeed * dt, tr.position.y, tr.position.z)
 
     local currTime = os.clock()
     if (currTime - startTime > animationDuration) then

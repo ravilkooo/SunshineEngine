@@ -38,7 +38,7 @@ local function TestPerceptionSystem(self)
                 chasedPlayer = newObj
                 chasedPlayerUUID = targetId
                 local char = self.owner:getCharacterComponent()                       
-                char.m_yaw = char.m_yaw + inYaw
+                char.yaw = char.yaw + inYaw
             end
         end)
 end
@@ -52,11 +52,11 @@ function behavior:update(dt)
 
     local char = self.owner:getCharacterComponent()
     if (stareAtPlayer) then
-        -- print(char.m_yaw)
-        local chasedPlayerPos = chasedPlayer:getTransform().m_position
-        local dir = chasedPlayerPos - self.owner:getTransform().m_position
+        -- print(char.yaw)
+        local chasedPlayerPos = chasedPlayer:getTransform().position
+        local dir = chasedPlayerPos - self.owner:getTransform().position
         local absoluteYaw = math.atan(dir.x, dir.z)
-        char.m_yaw = absoluteYaw
+        char.yaw = absoluteYaw
         -- float ViewYaw = std::acosf(ViewerForward.Dot(DirNorm));
         -- ViewYaw = ViewYaw * (ViewerForward.Cross(DirNorm).y > 0 ? 1 : -1);
 
@@ -64,7 +64,7 @@ function behavior:update(dt)
         -- local char = self.owner:getCharacterComponent()
     end
 
-    -- char.m_moveInput = Vector2.new(inputValue.y, inputValue.x)
+    -- char.moveInput = Vector2.new(inputValue.y, inputValue.x)
 
     return "success"
 end

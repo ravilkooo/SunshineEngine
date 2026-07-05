@@ -99,6 +99,7 @@ LUA_REGISTER_COMPONENT(
     AudioComponent,
     "AudioComponent",
     AUDIOCOMP_FIELD_PAIRS,
+    /* no properties */,
     AUDIOCOMP_METHOD_PAIRS,
     "getAudio")
 

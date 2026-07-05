@@ -45,12 +45,19 @@ void RegisterBouncePadComponentLuaBindings()
 {
 }
 
-#define BPC_ADD_FIELD(name) #name, &BouncePadComponent::name
-#define BPC_FIELD_PAIRS BOUNCEPADCOMPONENT_LUA_FIELDS_APPLY(BPC_ADD_FIELD)
+#define BPC_ADD_PROPERTY(name, getter, setter) #name, sol::property(getter, setter)
+#define BPC_PROPERTY_PAIRS BOUNCEPADCOMPONENT_LUA_PROPERTIES_APPLY(BPC_ADD_PROPERTY)
 
 #define BPC_ADD_METHOD_WITH_LEAD(k, fn) , k, fn
 #define BPC_METHOD_PAIRS BOUNCEPADCOMPONENT_LUA_METHODS_APPLY(BPC_ADD_METHOD_WITH_LEAD)
 
-LUA_REGISTER_COMPONENT(BouncePadComponent, "BouncePadComponent", BPC_FIELD_PAIRS, BPC_METHOD_PAIRS, "getBouncePad")
-#undef BPC_ADD_FIELD
+LUA_REGISTER_COMPONENT(
+    BouncePadComponent,
+    "BouncePadComponent",
+    /* no fields */,
+    BPC_PROPERTY_PAIRS,
+    BPC_METHOD_PAIRS,
+    "getBouncePad")
+    
+#undef BPC_ADD_PROPERTY
 #undef  BPC_ADD_METHOD_WITH_LEAD

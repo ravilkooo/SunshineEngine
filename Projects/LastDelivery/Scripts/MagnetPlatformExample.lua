@@ -18,9 +18,6 @@ function behavior:update(dt)
 
     ph:moveKinematicPosition(pos + deltaPos, dt)
 
-    -- local tr = self.owner:getTransform()
-    -- tr.m_position = tr.m_position + Vector3.new(inputValue.x, upMagnet, inputValue.y) * magnetSpeed
-
     return "success"
 end
 
