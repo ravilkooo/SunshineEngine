@@ -13,8 +13,6 @@
 
 #include <GameTimer.h>
 
-#include <Scripting/LuaManager.h>
-
 #include <LogManager.h>
 
 #include <Windows/InputManager.h>
@@ -141,7 +139,6 @@ public:
     eastl::shared_ptr<Scene_Info> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
     eastl::shared_ptr<SE_G::MiniViewRenderer> m_miniViewRenderer;
-    LuaManager m_luaManager;
 
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;

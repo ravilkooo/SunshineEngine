@@ -3,8 +3,7 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 #include <EASTL/memory.h>
-#include "sol/sol.hpp"
-#include "ScriptComponent.h"
+#include <sol/sol.hpp>
 #include <Utils/AssetPath.h>
 
 class GameObject;
@@ -44,10 +43,16 @@ public:
     }
 
 private:
-    eastl::unique_ptr<sol::state> lua;
     GameObject* obj;
 
-    ScriptComponent scriptComponent;
+    struct
+    {
+        sol::table self;
+        sol::function start;
+        sol::function update;
+        sol::function destroy;
+    } scriptData;
+
     bool behaviorInitialized;
 
     void registerComponents();

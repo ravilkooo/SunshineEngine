@@ -27,6 +27,8 @@
 #include <Component/CameraComponent.h>
 #include <Component/MovingPlatformComponent.h>
 
+#include <Scripting/LuaManager.h>
+
 #include <ControllerSystem/CharacterControllerSystem.h>
 
 #include <CameraManager.h>
@@ -147,7 +149,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	m_renderer->GetMainCamera()->ResetCameraView(m_screenWidth * 1.0f / m_screenHeight);
 
 	SetupPhysics();
-	m_luaManager.InitializeBehavior();
+	LuaManager::GetInstance().InitializeBehavior();
 
 	m_physicsSystem->FinalizeScene();
 	
@@ -233,7 +235,7 @@ void Game::ClearCachedAbsoluteTransforms()
 void Game::Update(float deltaTime) {
 	Scene::GetInstance().FlushDestructionQueue();
 
-	m_luaManager.Update(&Scene::GetInstance(), deltaTime);
+	LuaManager::GetInstance().Update(&Scene::GetInstance(), deltaTime);
 
 	m_physicsSystem->FlushCommands();
 

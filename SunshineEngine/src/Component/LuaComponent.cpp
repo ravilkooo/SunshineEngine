@@ -1,18 +1,20 @@
 #include "Component/LuaComponent.h"
+#include "Component/TransformComponent.h"
+
+#include <Utils/DebugUtils.h>
+#include "Utils/StringUtils.h"
+#include "Utils/FileSystemWrapper.h"
+#include <Utils/StringHelper.h>
+
+#include "Scripting/ComponentBindings.h"
+#include <Scripting/LuaManager.h>
+
+#include <GameObject/GameObject.h>
 
 #include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <EASTL/string.h>
-
-#include "../../../SunshineEditor/include/LogManager.h"
-#include "Component/TransformComponent.h"
-#include "Utils/StringUtils.h"
-#include "Utils/DebugUtils.h"
-#include "Utils/FileSystemWrapper.h"
-#include "Scripting/ComponentBindings.h"
-#include <GameObject/GameObject.h>
-#include <Utils/StringHelper.h>
 
 eastl::vector<AssetPath> LuaComponent_Info::luaFiles;
 
@@ -58,7 +60,7 @@ void LuaComponent_Info::InitLuaFile()
 }
 
 LuaComponent::LuaComponent()
-	: lua(nullptr), scriptLoaded(false) {
+	: scriptLoaded(false) {
 }
 
 LuaComponent::~LuaComponent() {
@@ -69,25 +71,14 @@ void LuaComponent::Init(GameObject* obj, AssetPath inScriptPath) {
 
 	this->obj = obj;
 	scriptPath = inScriptPath;
-
-	//InitLuaFile();
-	LoadScript();
-}
-
-void LuaComponent::registerComponents()
-{
-    ScriptingBindings::RegisterAll(*lua);
 }
 
 void LuaComponent::Cleanup() {
-	if (behaviorInitialized && scriptComponent.destroy.valid())
+	if (behaviorInitialized && scriptData.destroy.valid())
 	{
-		scriptComponent.destroy(scriptComponent.self);
+		scriptData.destroy(scriptData.self);
 	}
 
-	if (lua) {
-		lua = nullptr;
-	}
 	ClearState();
 }
 
@@ -99,40 +90,19 @@ void LuaComponent::LoadScript() {
 
 	Cleanup();
 
-	//InitLuaFile();
-
-	lua = eastl::make_unique<sol::state>();
-	lua->open_libraries(
-		sol::lib::base,
-		sol::lib::package,
-		sol::lib::math,
-		sol::lib::string,
-		sol::lib::table,
-		sol::lib::os
-	);
-
-	registerComponents();
-
-	auto result = lua->script_file(WStringToUtf8(scriptPath.GetFullPath()).c_str());
-	if (!result.valid()) 
-	{
-		sol::error err = result;
-		printSunshineErrorMessage((eastl::string("Error running Lua script: ") + err.what()));
+	scriptData.self = LuaManager::GetInstance().LoadScript(scriptPath);
+	if (!scriptData.self.valid()) {
+		printSunshineErrorMessage((eastl::string("Failed to load Lua script: ") + WStringToUtf8(scriptPath.GetFullPath())));
 		return;
 	}
-
+	
 	scriptLoaded = true;
-
-	// InitializeBehavior();
-
-	//scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
-	//printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
 }
 
 void LuaComponent::LuaUpdate(float deltaTime)
 {
-	if (!behaviorInitialized || !scriptComponent.update.valid()){return;}
-	auto result = scriptComponent.update(scriptComponent.self, deltaTime);
+	if (!behaviorInitialized || !scriptData.update.valid()) { return; }
+	auto result = scriptData.update(scriptData.self, deltaTime);
 	if (!result.valid())
 	{
 		sol::error err = result;
@@ -142,8 +112,9 @@ void LuaComponent::LuaUpdate(float deltaTime)
 
 void LuaComponent::InitializeBehavior()
 {
+	LoadScript();
 	if (!scriptLoaded) {
-		wprintf(L"%ls: InitializeBehavior: scriptLoaded is false!", scriptPath.GetFullPath().c_str());
+		printSunshineErrorMessage(L"InitializeBehavior: scriptLoaded is false! " + scriptPath.GetFullPath());
 		return;
 	}
 
@@ -151,35 +122,20 @@ void LuaComponent::InitializeBehavior()
 		printSunshineErrorMessage("InitializeBehavior: obj is nullptr!");
 		return;
 	}
+	
+	LoadScript();
+	
+	//scriptData.self = behaviorObj.as<sol::table>();
+	scriptData.self["id"] = reinterpret_cast<uintptr_t>(obj);
+	scriptData.self["owner"] = obj;
 
-	if (!lua) {
-		printSunshineErrorMessage("InitializeBehavior: lua is nullptr!");
-		return;
-	}
+	scriptData.start = scriptData.self["start"];
+	scriptData.update = scriptData.self["update"];
+	scriptData.destroy = scriptData.self["destroy"];
 
-	sol::object behaviorObj = (*lua)["behavior"];
-	if (!behaviorObj.valid()) {
-		printSunshineErrorMessage("InitializeBehavior: behaviorObj is not valid!");
-		return;
-	}
-
-	if (behaviorObj.get_type() != sol::type::table) {
-		//printSunshineErrorMessage(eastl::string("InitializeBehavior: behavior is not a table, it's ") +
-		//	std::to_string((int)behaviorObj.get_type()));
-		return;
-	}
-
-	scriptComponent.self = behaviorObj.as<sol::table>();
-	scriptComponent.self["id"] = reinterpret_cast<uintptr_t>(obj);
-	scriptComponent.self["owner"] = obj;
-
-	scriptComponent.start = scriptComponent.self["start"];
-	scriptComponent.update = scriptComponent.self["update"];
-	scriptComponent.destroy = scriptComponent.self["destroy"];
-
-	if (scriptComponent.start.valid())
+	if (scriptData.start.valid())
 	{
-		auto result = scriptComponent.start(scriptComponent.self);
+		auto result = scriptData.start(scriptData.self);
 		if (!result.valid())
 		{
 			sol::error err = result;
