@@ -24,6 +24,9 @@ public:
     void BounceCharacter(SE::UUID characterUUID);
     void BounceCharacter(CharacterComponent* character);
 
+    float GetMinBounceVelocity() const { return m_minBounceVelocity; }
+    void SetMinBounceVelocity(float value) { m_minBounceVelocity = value; }
+
     // Inherited via Component
     const std::type_info& getType() const override {
         return typeid(BouncePadComponent);
@@ -69,9 +72,9 @@ public:
     void FromJson(const json& j) override;
 };
 
-#ifndef BOUNCEPADCOMPONENT_LUA_FIELDS_APPLY
-#define BOUNCEPADCOMPONENT_LUA_FIELDS_APPLY(F) \
-    F(m_minBounceVelocity)
+#ifndef BOUNCEPADCOMPONENT_LUA_PROPERTIES_APPLY
+#define BOUNCEPADCOMPONENT_LUA_PROPERTIES_APPLY(FP) \
+    FP(minBounceVelocity, &BouncePadComponent::GetMinBounceVelocity, &BouncePadComponent::SetMinBounceVelocity)
 #endif
 
 #ifndef BOUNCEPADCOMPONENT_LUA_METHODS_APPLY

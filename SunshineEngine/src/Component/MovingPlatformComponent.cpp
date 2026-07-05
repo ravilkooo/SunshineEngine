@@ -10,19 +10,18 @@ void RegisterMovingPlatformComponentLuaBindings()
 {
 }
 
-#define MOV_PLAT_ADD_FIELD(name) #name, &MovingPlatformComponent::name
-#define MOV_PLAT_FIELD_PAIRS MOVING_PLATFORM_COMPONENT_LUA_FIELDS_APPLY(MOV_PLAT_ADD_FIELD)
+#define MOV_PLAT_ADD_PROPERTY(name, getter, setter) #name, sol::property(getter, setter)
+#define MOV_PLAT_PROPERTY_PAIRS MOVING_PLATFORM_COMPONENT_LUA_PROPERTIES_APPLY(MOV_PLAT_ADD_PROPERTY)
 
 #define MOV_PLAT_METHOD_PAIRS
 
 LUA_REGISTER_COMPONENT(
 	MovingPlatformComponent,
 	"MovingPlatformComponent",
-	MOV_PLAT_FIELD_PAIRS,
-	/* no properties */,
+	/* no fields */,
+	MOV_PLAT_PROPERTY_PAIRS,
 	MOV_PLAT_METHOD_PAIRS,
 	"getMovingPlatform")
 
-#undef MOV_PLAT_ADD_FIELD
+#undef MOV_PLAT_PROPERTY_PAIRS
 #undef MOV_PLAT_METHOD_PAIRS
-

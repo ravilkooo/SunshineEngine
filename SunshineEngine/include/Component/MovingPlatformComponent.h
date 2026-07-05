@@ -28,6 +28,9 @@ public:
     JPH::Vec3 m_velocity = JPH::Vec3::sZero();
     SE::UUID m_objectUUID;
 
+    bool GetAffectCharacters() const { return m_affectCharacters; }
+    void SetAffectCharacters(bool value) { m_affectCharacters = value; }
+
     // Inherited via Component
     const std::type_info& getType() const override {
         return typeid(MovingPlatformComponent);
@@ -71,9 +74,9 @@ public:
     void FromJson(const json& j) override;
 };
 
-#ifndef MOVING_PLATFORM_COMPONENT_LUA_FIELDS_APPLY
-#define MOVING_PLATFORM_COMPONENT_LUA_FIELDS_APPLY(F) \
-    F(m_affectCharacters)
+#ifndef MOVING_PLATFORM_COMPONENT_LUA_PROPERTIES_APPLY
+#define MOVING_PLATFORM_COMPONENT_LUA_PROPERTIES_APPLY(FP) \
+    FP(affectCharacters, &MovingPlatformComponent::GetAffectCharacters, &MovingPlatformComponent::SetAffectCharacters)
 #endif
 
 #ifndef BOUNCEPADCOMPONENT_LUA_METHODS_APPLY
