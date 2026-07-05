@@ -43,14 +43,6 @@ void LuaComponent_Info::ScanLuaFiles()
 	{
 		wprintf(L"Lua dir not found: %ls\n", scriptDirPath.GetFullPath().c_str());
 	}
-	
-	/*
-	std::error_code ec;
-	if (!std::filesystem::exists(scriptPath.GetFullPath().c_str()))
-	{
-		wprintf(L"Lua file not found: %ls\n", scriptPath.GetFullPath().c_str());
-	}
-	*/
 }
 
 void LuaComponent_Info::InitLuaFile()

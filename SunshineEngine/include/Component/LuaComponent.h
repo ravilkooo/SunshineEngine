@@ -48,14 +48,13 @@ private:
     struct
     {
         sol::table self;
-        sol::function start;
-        sol::function update;
-        sol::function destroy;
+        sol::protected_function start;
+        sol::protected_function update;
+        sol::protected_function destroy;
     } scriptData;
 
     bool behaviorInitialized;
 
-    void registerComponents();
     void ClearState();
     //void LoadParamsFromLua();
 
