@@ -63,28 +63,28 @@ public:
     float m_pitch = 0.0f;
 
 
-    bool GetIsPlayerControlled() { return m_isPlayerControlled; };
+    bool GetIsPlayerControlled() const { return m_isPlayerControlled; };
     void SetIsPlayerControlled(bool isPlayerControlled) { m_isPlayerControlled = isPlayerControlled; };
 
-    bool GetIsDead() { return m_isDead; };
+    bool GetIsDead() const { return m_isDead; };
     void SetIsDead(bool isDead) { m_isDead = isDead; };
 
-    bool GetIsAttacking() { return m_isAttacking; };
+    bool GetIsAttacking() const { return m_isAttacking; };
     void SetIsAttacking(bool isAttacking) { m_isAttacking = isAttacking; };
 
     const DXSM::Vector2& GetMoveInput() const { return m_moveInput; };
-    void SetMoveInput(DXSM::Vector2 moveInput) { m_moveInput = moveInput; };
+    void SetMoveInput(const DXSM::Vector2& moveInput) { m_moveInput = moveInput; };
 
-    bool GetJumpRequested() { return m_jumpRequested; };
+    bool GetJumpRequested() const { return m_jumpRequested; };
     void SetJumpRequested(bool jumpRequested) { m_jumpRequested = jumpRequested; };
 
-    bool GetAttackRequested() { return m_attackRequested; };
+    bool GetAttackRequested() const { return m_attackRequested; };
     void SetAttackRequested(bool attackRequested) { m_attackRequested = attackRequested; };
 
-    float GetYaw() { return m_yaw; };
+    float GetYaw() const { return m_yaw; };
     void SetYaw(float yaw) { m_yaw = yaw; };
 
-    float GetPitch() { return m_pitch; };
+    float GetPitch() const { return m_pitch; };
     void SetPitch(float pitch) { m_pitch = pitch; };
 
     // Inherited via Component

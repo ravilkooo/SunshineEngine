@@ -126,7 +126,7 @@ DXSM::Vector3 PhysicsComponent::GetAccumulatedTorque()
     return DXSM::Vector3::Zero;
 }
 
-DXSM::Vector3 PhysicsComponent::GetAngularVelocity()
+DXSM::Vector3 PhysicsComponent::GetAngularVelocity() const
 {
     if (m_physicsSystem)
     {
@@ -140,7 +140,7 @@ DXSM::Vector3 PhysicsComponent::GetAngularVelocity()
     return DXSM::Vector3::Zero;
 }
 
-DXSM::Vector3 PhysicsComponent::GetLinearVelocity()
+DXSM::Vector3 PhysicsComponent::GetLinearVelocity() const
 {
     if (m_physicsSystem)
     {
@@ -356,7 +356,7 @@ void PhysicsComponent::SetGravityFactor(float inGravityFactor)
         });
 }
 
-float PhysicsComponent::GetGravityFactor()
+float PhysicsComponent::GetGravityFactor() const
 {
     if (!m_physicsSystem)
         return 1.0f;

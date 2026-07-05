@@ -106,18 +106,18 @@ CharacterControllerComponent_Info::~CharacterControllerComponent_Info() {
 		m_rc_info->RemoveTechnique("ColliderPass");
 }
 
-#define CHARCONTR_ADD_FIELD(name) #name, &CharacterControllerComponent::name
-#define CHARCONTR_FIELD_PAIRS CHARACTERCONTROLLER_LUA_FIELDS_APPLY(CHARCONTR_ADD_FIELD)
+#define CHARCONTR_ADD_PROPERTIES(name, getter, setter) #name, sol::property(getter, setter)
+#define CHARCONTR_PROPERTIES_PAIRS CHARACTERCONTROLLER_LUA_PROPERTIES_APPLY(CHARCONTR_ADD_PROPERTIES)
 
 #define CHARCONTR_METHOD_PAIRS
 
 LUA_REGISTER_COMPONENT(
 	CharacterControllerComponent,
 	"CharacterControllerComponent",
-	CHARCONTR_FIELD_PAIRS,
-	/* no properties */,
+	/* no fields */,
+	CHARCONTR_PROPERTIES_PAIRS,
 	CHARCONTR_METHOD_PAIRS,
 	"getCharacterController")
 
-#undef CHARCONTR_ADD_FIELD
+#undef CHARCONTR_ADD_PROPERTIES
 #undef CHARCONTR_METHOD_PAIRS

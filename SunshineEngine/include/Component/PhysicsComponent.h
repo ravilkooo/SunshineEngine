@@ -59,8 +59,8 @@ public:
     // Query accumulated forces/torques and velocities
     DXSM::Vector3 GetAccumulatedForce();
     DXSM::Vector3 GetAccumulatedTorque();
-    DXSM::Vector3 GetAngularVelocity();
-    DXSM::Vector3 GetLinearVelocity();
+    DXSM::Vector3 GetAngularVelocity() const;
+    DXSM::Vector3 GetLinearVelocity() const;
     DXSM::Vector3 GetPointVelocity(const DXSM::Vector3& inPoint);
     DXSM::Vector3 GetPosition();
     DXSM::Vector3 GetRotation();
@@ -96,7 +96,7 @@ public:
 
     // GravityFactor
     void SetGravityFactor(float inGravityFactor);
-    float GetGravityFactor();
+    float GetGravityFactor() const;
 
     // Set position
     // void SetPosition(DXSM::Vector3 inPosition);

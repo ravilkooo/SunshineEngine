@@ -42,7 +42,7 @@ local function TestCharacterFields(self)
     local charContr = self.owner:getCharacterController()
     print("")
     print(" == Controller fields == ")
-    print("velocity = " .. charContr.velocity.x .. ", " .. charContr.velocity.y .. ", " .. charContr.velocity.z)
+    print("velocity = " .. charContr.velocityVector.x .. ", " .. charContr.velocityVector.y .. ", " .. charContr.velocityVector.z)
     print("grounded = " .. (charContr.grounded and "true" or "false"))
     print("groundNormal = " .. charContr.groundNormal.x .. ", " .. charContr.groundNormal.y .. ", " .. charContr.groundNormal.z)
     print("moveSpeed = " .. charContr.moveSpeed)
@@ -58,12 +58,12 @@ local function TestCharacterFields(self)
     local cam = self.owner:getCameraComponent():getCamera()
     print("")
     print(" == Controller fields == ")
-    print("armLen = " .. cam:getSpringArmLength())
-    local armRot = cam:getSpringArmRotation()
+    print("armLen = " .. cam.springArmLength)
+    local armRot = cam.springArmRotation
     print("armRot = " .. armRot.x .. ", " .. armRot.y .. ", " .. armRot.z)
-    local armOff = cam:getSpringArmRootOffset()
+    local armOff = cam.springArmRootOffset
     print("armOff = " .. armOff.x .. ", " .. armOff.y .. ", " .. armOff.z)
-    local camRot = cam:getCameraRotation()
+    local camRot = cam.cameraRotation
     print("camRot = " .. camRot.x .. ", " .. camRot.y .. ", " .. camRot.z)
 
 
@@ -72,6 +72,7 @@ end
 
 function behavior:start()
     TestPerceptionSystem(self)
+    TestCharacterFields(self)
     
     local tr = self.owner:getTransform()
     yMidLevel = tr.localPosition.y
