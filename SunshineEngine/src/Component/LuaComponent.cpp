@@ -58,7 +58,7 @@ void LuaComponent_Info::InitLuaFile()
 }
 
 LuaComponent::LuaComponent()
-	: lua(nullptr), scriptLoaded(false), foundFunction(false) {
+	: lua(nullptr), scriptLoaded(false) {
 }
 
 LuaComponent::~LuaComponent() {
@@ -93,9 +93,6 @@ void LuaComponent::Cleanup() {
 
 void LuaComponent::ClearState() {
 	scriptLoaded = false;
-	foundFunction = false;
-	params.clear();
-	lastResult.clear();
 }
 
 void LuaComponent::LoadScript() {
@@ -130,10 +127,6 @@ void LuaComponent::LoadScript() {
 
 	//scriptPath = assetsPath + "/" + luaFiles[selectedLuaFile];
 	//printSunshineMessage(("%s is loaded!\n", scriptPath.c_str()));
-
-	foundFunction = false;
-	params.clear();
-	lastResult.clear();
 }
 
 void LuaComponent::LuaUpdate(float deltaTime)
@@ -144,45 +137,6 @@ void LuaComponent::LuaUpdate(float deltaTime)
 	{
 		sol::error err = result;
 		printSunshineErrorMessage((eastl::string("Error in update hook: ") + err.what()));
-	}
-}
-
-bool LuaComponent::FindFunction() {
-	if (!scriptLoaded) { //|| functionName.empty()
-		printSunshineErrorMessage("Lua not initialized or function name empty!");
-		return false;
-	}
-
-	//callSolFunction(functionName, 2, 3);
-
-	foundFunction = false;
-	params.clear();
-
-	sol::function func = (*lua)[functionName];
-	if (func.valid()) {
-		foundFunction = true;
-		LoadParamsFromLua();
-		return true;
-	}
-	else {
-		printSunshineErrorMessage("No such function");
-		return false;
-	}
-}
-
-void LuaComponent::LoadParamsFromLua() {
-	params.clear();
-	sol::object paramTable = (*lua)[(eastl::string(functionName) + "_params").c_str()];
-	if (paramTable.valid() && paramTable.get_type() == sol::type::table)
-	{
-		sol::table tbl = paramTable;
-		for (auto& pair : tbl) {
-			ParamEntry entry;
-			sol::table paramEntry = pair.second.as<sol::table>();
-			entry.name = eastl::string(paramEntry["name"].get<std::string>().c_str());
-			entry.type = eastl::string(paramEntry["type"].get<std::string>().c_str());
-			params.push_back(entry);
-		}
 	}
 }
 
@@ -233,81 +187,4 @@ void LuaComponent::InitializeBehavior()
 		}
 	}
 	behaviorInitialized = true;
-}
-
-bool LuaComponent::CallFunction() {
-
-	sol::function func = (*lua)[functionName];
-	if (!func.valid())
-	{
-		printSunshineErrorMessage("No such function");
-		return false;
-	}
-
-	eastl::vector<sol::object> args;
-	for (const ParamEntry& p : params) {
-		eastl::string val(p.value);
-		if (EASTLStringEqualsChar(p.type, "userdata")) {
-			args.push_back(sol::make_object(*lua, obj));
-		}
-		else if (EASTLStringEqualsChar(p.type, "number")) {
-			double valDbl = strtod(val.c_str(), nullptr);
-			args.push_back(sol::make_object(*lua, valDbl));
-		}
-		else if (EASTLStringEqualsChar(p.type, "bool")) {
-			args.push_back(sol::make_object(*lua, EASTLStringEqualsChar(val, "true") || EASTLStringEqualsChar(val, "1")));
-		}
-		else {
-			args.push_back(sol::make_object(*lua, EASTLToStdString(val)));
-		}
-	}
-
-	sol::protected_function_result result = func(sol::as_args(args));
-	if (!result.valid()) {
-		sol::error err = result;
-		printSunshineErrorMessage(("Lua error: " + eastl::string(err.what())));
-		return false;
-	}
-
-	sol::object res = result.get<sol::object>();
-	if (!res.valid() || res.is<sol::nil_t>()) lastResult = "";
-	else if (res.is<std::string>()) lastResult = eastl::string(res.as<std::string>().c_str());
-	else if (res.is<double>()) lastResult = eastl::to_string(res.as<double>());
-	else if (res.is<bool>()) lastResult = res.as<bool>() ? "true" : "false";
-	else lastResult = "<unsupported return type>";
-	return true;
-}
-
-eastl::vector<eastl::string> LuaComponent::GetAvailableFunctions() const
-{
-	eastl::vector<eastl::string> functions;
-    
-	if (scriptPath.m_assetRelativePath.empty()) return functions;
-        
-	std::ifstream file(scriptPath.GetFullPath().c_str());
-	if (!file.is_open()) return functions;
-
-	std::string stdLine;
-	while (std::getline(file, stdLine)) 
-	{
-		eastl::string line = stdLine.c_str();
-		size_t funcPos = line.find("function");
-		if (funcPos == eastl::string::npos) continue;
-        
-		size_t parenPos = line.find('(', funcPos + 8);
-		if (parenPos == eastl::string::npos) continue;
-		
-		eastl::string funcName = line.substr(funcPos + 8, parenPos - funcPos - 8);
-		
-		funcName.erase(0, funcName.find_first_not_of(" \t"));
-		funcName.erase(funcName.find_last_not_of(" \t") + 1);
-        
-		if (!funcName.empty()) 
-		{
-			functions.push_back(funcName);
-		}
-	}
-    
-	file.close();
-	return functions;
 }
