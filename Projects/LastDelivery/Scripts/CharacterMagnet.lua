@@ -36,7 +36,7 @@ function behavior:update(dt)
     local turnMagnet = inputSystem:getAxis("TurnMagnet")
 
     if takenObject then
-        local playerYaw = playerChar.m_yaw
+        local playerYaw = playerChar.yaw
         local forceDir = Vector3.new(math.sin(playerYaw), 0, math.cos(playerYaw))
         takenObject:addForce(forceDir * magnetForce * turnMagnet)
     end

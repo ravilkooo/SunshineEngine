@@ -8,18 +8,18 @@ CharacterComponent_Info::CharacterComponent_Info()
 	m_assignedComponent = eastl::make_unique<CharacterComponent>();
 }
 
-#define CHARC_ADD_FIELD(name) #name, &CharacterComponent::name
-#define CHARC_FIELD_PAIRS CHARACTERCOMPONENT_LUA_FIELDS_APPLY(CHARC_ADD_FIELD)
+#define CHARC_ADD_PROPERTY(name, getter, setter) #name, sol::property(getter, setter)
+#define CHARC_PROPERTY_PAIRS CHARACTERCOMPONENT_LUA_PROPERTIES_APPLY(CHARC_ADD_PROPERTY)
 
 #define CHARC_METHOD_PAIRS
 
 LUA_REGISTER_COMPONENT(
 	CharacterComponent,
 	"CharacterComponent",
-	CHARC_FIELD_PAIRS,
-	/* no properties */,
+	/* no fields */,
+	CHARC_PROPERTY_PAIRS,
 	CHARC_METHOD_PAIRS,
 	"getCharacterComponent")
 
-#undef CHARC_ADD_FIELD
+#undef CHARC_PROPERTY_PAIRS
 #undef CHARC_METHOD_PAIRS

@@ -67,7 +67,7 @@ function behavior:update(dt)
         setCameraByUUID(playerUUID)
         removeGameObjectByUUID(self.owner:getUUID())
         local char = playerObj:getCharacterComponent()
-        char.m_isPlayerControlled = true
+        char.isPlayerControlled = true
     end
 
     return "success"

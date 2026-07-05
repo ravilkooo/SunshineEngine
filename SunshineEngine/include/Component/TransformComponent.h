@@ -35,27 +35,10 @@ public:
     DXSM::Matrix GetRotationMatrix() const;
     DXSM::Matrix GetScaleMatrix() const;
 
-    const DXSM::Vector3& GetPosition() const;
-    void SetPosition(DXSM::Vector3 newPos);
-    const DXSM::Vector3& GetRotation() const;
-    void SetRotation(DXSM::Vector3 newRot);
-    const DXSM::Vector3& GetScaleFactor() const;
-    void SetScaleFactor(DXSM::Vector3 newScaleFactor);
-
     // Additional Transforms
     DXSM::Matrix GetLocalTransalationMatrix() const;
     DXSM::Matrix GetLocalRotationMatrix() const;
     DXSM::Matrix GetLocalScaleMatrix() const;
-
-    const DXSM::Vector3& GetLocalPosition() const;
-    void SetLocalPosition(DXSM::Vector3 newPos);
-    const DXSM::Vector3& GetLocalRotation() const;
-    void SetLocalRotation(DXSM::Vector3 newRot);
-    const DXSM::Vector3& GetLocalScaleFactor() const;
-    void SetLocalScaleFactor(DXSM::Vector3 newScaleFactor);
-
-    const DXSM::Vector2& GetUVMultiplier() const;
-    void SetUVMultiplier(DXSM::Vector2 uvMultiplier);
 
     DXSM::Matrix GetLocalTransformMatrix() const;
     DXSM::Matrix GetWorldMatrix_noLocal() const;
@@ -87,6 +70,23 @@ public:
     DXSM::Vector2 m_uvMultiplier = { 1, 1 };
 
     DXSM::Matrix localTransfrom = DXSM::Matrix::Identity;
+
+    const DXSM::Vector3& GetPosition() const { return m_position; }
+    void SetPosition(DXSM::Vector3 newPos) { m_position = newPos; }
+    const DXSM::Vector3& GetRotation() const { return m_rotation; }
+    void SetRotation(DXSM::Vector3 newRot) { m_rotation = newRot; }
+    const DXSM::Vector3& GetScaleFactor() const { return m_scaleFactor; }
+    void SetScaleFactor(DXSM::Vector3 newScaleFactor) { m_scaleFactor = newScaleFactor; }
+
+    const DXSM::Vector3& GetLocalPosition() const { return m_localPosition; }
+    void SetLocalPosition(DXSM::Vector3 newPos) { m_localPosition = newPos; }
+    const DXSM::Vector3& GetLocalRotation() const { return m_localRotation; }
+    void SetLocalRotation(DXSM::Vector3 newRot) { m_localRotation = newRot; }
+    const DXSM::Vector3& GetLocalScaleFactor() const { return m_localScaleFactor; }
+    void SetLocalScaleFactor(DXSM::Vector3 newScaleFactor) { m_localScaleFactor = newScaleFactor; }
+
+    const DXSM::Vector2& GetUVMultiplier() const { return m_uvMultiplier; }
+    void SetUVMultiplier(DXSM::Vector2 uvMultiplier) { m_uvMultiplier = uvMultiplier; }
 
     const std::type_info& getType() const override {
         return typeid(TransformComponent);
