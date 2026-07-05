@@ -35,10 +35,27 @@ public:
     DXSM::Matrix GetRotationMatrix() const;
     DXSM::Matrix GetScaleMatrix() const;
 
+    const DXSM::Vector3& GetPosition() const;
+    void SetPosition(DXSM::Vector3 newPos);
+    const DXSM::Vector3& GetRotation() const;
+    void SetRotation(DXSM::Vector3 newRot);
+    const DXSM::Vector3& GetScaleFactor() const;
+    void SetScaleFactor(DXSM::Vector3 newScaleFactor);
+
     // Additional Transforms
     DXSM::Matrix GetLocalTransalationMatrix() const;
     DXSM::Matrix GetLocalRotationMatrix() const;
     DXSM::Matrix GetLocalScaleMatrix() const;
+
+    const DXSM::Vector3& GetLocalPosition() const;
+    void SetLocalPosition(DXSM::Vector3 newPos);
+    const DXSM::Vector3& GetLocalRotation() const;
+    void SetLocalRotation(DXSM::Vector3 newRot);
+    const DXSM::Vector3& GetLocalScaleFactor() const;
+    void SetLocalScaleFactor(DXSM::Vector3 newScaleFactor);
+
+    const DXSM::Vector2& GetUVMultiplier() const;
+    void SetUVMultiplier(DXSM::Vector2 uvMultiplier);
 
     DXSM::Matrix GetLocalTransformMatrix() const;
     DXSM::Matrix GetWorldMatrix_noLocal() const;
@@ -124,15 +141,15 @@ public:
     void SetParentTransform(TransformComponent_Info* parentTransform_Info);
 };
 
-// Macro listing fields of TransformComponent to expose in Lua bindings
-#ifndef TRANSFORMCOMPONENT_LUA_FIELDS_APPLY
-#define TRANSFORMCOMPONENT_LUA_FIELDS_APPLY(F) \
-    F(m_position) ,                         \
-    F(m_rotation) ,                         \
-    F(m_scaleFactor) ,                      \
-    F(m_localPosition) ,                    \
-    F(m_localRotation) ,                    \
-    F(m_localScaleFactor)
+#ifndef TRANSFORMCOMPONENT_LUA_PROPERTIES_APPLY
+#define TRANSFORMCOMPONENT_LUA_PROPERTIES_APPLY(FP) \
+    FP(position, &TransformComponent::GetPosition, &TransformComponent::SetPosition), \
+    FP(rotation, &TransformComponent::GetRotation, &TransformComponent::SetRotation), \
+    FP(scaleFactor, &TransformComponent::GetScaleFactor, &TransformComponent::SetScaleFactor), \
+    FP(localPosition, &TransformComponent::GetLocalPosition, &TransformComponent::SetLocalPosition), \
+    FP(localRotation, &TransformComponent::GetLocalRotation, &TransformComponent::SetLocalRotation), \
+    FP(localScaleFactor, &TransformComponent::GetLocalScaleFactor, &TransformComponent::SetLocalScaleFactor), \
+    FP(uvMultiplier, &TransformComponent::GetUVMultiplier, &TransformComponent::SetUVMultiplier)
 #endif
 
 #ifndef TRANSFORMCOMPONENT_LUA_METHODS_APPLY

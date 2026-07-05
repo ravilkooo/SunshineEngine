@@ -16,7 +16,7 @@ function behavior:update(dt)
     if (currTime - startTime < waitTime) then
         -- just wait
     elseif (currTime - startTime < waitTime + dissapearTime) then
-        tr.m_localPosition.z = tr.m_localPosition.z + moveSpeed * (currTime - startTime - waitTime)
+        tr.localPosition = Vector3.new(tr.localPosition.x, tr.localPosition.y, tr.localPosition.z + moveSpeed * (currTime - startTime - waitTime))
     else
         removeGameObjectByUUID(self.owner:getUUID())
     end

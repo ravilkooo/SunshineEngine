@@ -1461,7 +1461,7 @@
                     "m_cullMode": "CULL_BACK"
                 },
                 "MovingPlatform": {
-                    "m_affectCharacters": false
+                    "m_affectCharacters": true
                 },
                 "Physics": {
                     "collider": {

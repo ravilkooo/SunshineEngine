@@ -111,7 +111,13 @@ CharacterControllerComponent_Info::~CharacterControllerComponent_Info() {
 
 #define CHARCONTR_METHOD_PAIRS
 
-LUA_REGISTER_COMPONENT(CharacterControllerComponent, "CharacterControllerComponent", CHARCONTR_FIELD_PAIRS, CHARCONTR_METHOD_PAIRS, "getCharacterController")
+LUA_REGISTER_COMPONENT(
+	CharacterControllerComponent,
+	"CharacterControllerComponent",
+	CHARCONTR_FIELD_PAIRS,
+	/* no properties */,
+	CHARCONTR_METHOD_PAIRS,
+	"getCharacterController")
 
 #undef CHARCONTR_ADD_FIELD
 #undef CHARCONTR_METHOD_PAIRS

@@ -13,7 +13,13 @@ CharacterComponent_Info::CharacterComponent_Info()
 
 #define CHARC_METHOD_PAIRS
 
-LUA_REGISTER_COMPONENT(CharacterComponent, "CharacterComponent", CHARC_FIELD_PAIRS, CHARC_METHOD_PAIRS, "getCharacterComponent")
+LUA_REGISTER_COMPONENT(
+	CharacterComponent,
+	"CharacterComponent",
+	CHARC_FIELD_PAIRS,
+	/* no properties */,
+	CHARC_METHOD_PAIRS,
+	"getCharacterComponent")
 
 #undef CHARC_ADD_FIELD
 #undef CHARC_METHOD_PAIRS

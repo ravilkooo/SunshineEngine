@@ -74,12 +74,12 @@ function behavior:start()
     TestPerceptionSystem(self)
     
     local tr = self.owner:getTransform()
-    yMidLevel = tr.m_localPosition.y
+    yMidLevel = tr.localPosition.y
 end
 
 function behavior:update(dt)
     local tr = self.owner:getTransform()
-    tr.m_localPosition.y = yMidLevel +  floatingAmp * math.sin(os.clock() * floatingSpeed)
+    tr.localPosition = Vector3.new(tr.localPosition.x, yMidLevel + floatingAmp * math.sin(os.clock() * floatingSpeed), tr.localPosition.z)
 
     local inputSystem = getInputSystem()
     local speed = 0.1

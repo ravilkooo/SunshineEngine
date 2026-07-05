@@ -789,6 +789,7 @@ LUA_REGISTER_COMPONENT(
     ParticleEmitterComponent,
     "ParticleEmitterComponent",
     /* no fields */,
+    /* no properties */,
     PARTICLE_EMITTER_COMPONENT_LUA_METHODS_APPLY(PEC_ADD_METHOD),
     "getParticleEmitter")
 #undef PEC_ADD_METHOD

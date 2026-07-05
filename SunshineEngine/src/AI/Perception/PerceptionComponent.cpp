@@ -420,6 +420,7 @@ LUA_REGISTER_COMPONENT(
 	PerceptionComponent,
 	"PerceptionComponent",
 	/* no fields */,
+	/* no properties */,
 	PERCEPTIONCOMPONENT_LUA_METHODS_APPLY(ADD_METHOD),
 	"getPerception"
 )

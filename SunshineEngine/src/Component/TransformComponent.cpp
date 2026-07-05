@@ -22,6 +22,65 @@ void TransformComponent::BindToGraphicsPipeline(ID3D11DeviceContext* context) {
     transformBuffer->Bind(context);
 }
 
+const DXSM::Vector3& TransformComponent::GetPosition() const
+{
+    return m_position;
+}
+void TransformComponent::SetPosition(DXSM::Vector3 newPos)
+{
+    m_position = newPos;
+}
+const DXSM::Vector3& TransformComponent::GetRotation() const
+{
+    return m_rotation;
+}
+void TransformComponent::SetRotation(DXSM::Vector3 newRot)
+{
+    m_rotation = newRot;
+}
+const DXSM::Vector3& TransformComponent::GetScaleFactor() const
+{
+    return m_scaleFactor;
+}
+void TransformComponent::SetScaleFactor(DXSM::Vector3 newScaleFactor)
+{
+    m_scaleFactor = newScaleFactor;
+}
+
+const DXSM::Vector3& TransformComponent::GetLocalPosition() const
+{
+    return m_localPosition;
+}
+void TransformComponent::SetLocalPosition(DXSM::Vector3 newPos)
+{
+    m_localPosition = newPos;
+}
+const DXSM::Vector3& TransformComponent::GetLocalRotation() const
+{
+    return m_localRotation;
+}
+void TransformComponent::SetLocalRotation(DXSM::Vector3 newRot)
+{
+    m_localRotation = newRot;
+}
+const DXSM::Vector3& TransformComponent::GetLocalScaleFactor() const
+{
+    return m_localScaleFactor;
+}
+void TransformComponent::SetLocalScaleFactor(DXSM::Vector3 newScaleFactor)
+{
+    m_localScaleFactor = newScaleFactor;
+}
+
+const DXSM::Vector2& TransformComponent::GetUVMultiplier() const
+{
+    return m_uvMultiplier;
+}
+void TransformComponent::SetUVMultiplier(DXSM::Vector2 uvMultiplier)
+{
+    m_uvMultiplier = uvMultiplier;
+}
+
 DXSM::Matrix TransformComponent::GetLocalTransalationMatrix() const
 {
     return DXSM::Matrix::CreateTranslation(m_localPosition);
@@ -173,12 +232,19 @@ void TransformComponent_Info::SetParentTransform(TransformComponent_Info* parent
         m_assignedComponent->SetParentTransform(nullptr);
 }
 
-#define TC_ADD_FIELD(name) #name, &TransformComponent::name
-#define TC_FIELD_PAIRS TRANSFORMCOMPONENT_LUA_FIELDS_APPLY(TC_ADD_FIELD)
+#define TC_ADD_PROPERTY(name, getter, setter) #name, sol::property(getter, setter)
+#define TC_PROPERTY_PAIRS TRANSFORMCOMPONENT_LUA_PROPERTIES_APPLY(TC_ADD_PROPERTY)
 
 #define TC_ADD_METHOD_WITH_LEAD(k, fn) , k, fn
 #define TC_METHOD_PAIRS TRANSFORMCOMPONENT_LUA_METHODS_APPLY(TC_ADD_METHOD_WITH_LEAD)
 
-LUA_REGISTER_COMPONENT(TransformComponent, "TransformComponent", TC_FIELD_PAIRS, TC_METHOD_PAIRS, "getTransform")
-#undef TC_ADD_FIELD
-#undef  TC_ADD_METHOD_WITH_LEAD
+LUA_REGISTER_COMPONENT(
+    TransformComponent,
+    "TransformComponent",
+    /* no fields */,
+    TC_PROPERTY_PAIRS,
+    TC_METHOD_PAIRS,
+    "getTransform")
+
+#undef TC_ADD_PROPERTY
+#undef TC_ADD_METHOD_WITH_LEAD

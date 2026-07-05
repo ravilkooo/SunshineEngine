@@ -23,13 +23,13 @@ namespace AutoBindings {
 // FieldsPairs: macro that expands to comma-separated pairs "name, &TYPE::member" (or empty)
 // MethodsPairs: macro that expands to comma-separated pairs "luaName, callable" (or empty)
 // GetterName: the name of the getter on GameObject (e.g., "getTransform")
-#define LUA_REGISTER_COMPONENT(TYPE, LuaTypeName, FieldsPairs, MethodsPairs, GetterName) \
+#define LUA_REGISTER_COMPONENT(TYPE, LuaTypeName, FieldsPairs, PropertiesPairs, MethodsPairs, GetterName) \
     namespace { \
         struct TYPE##__LuaAutoReg { \
             TYPE##__LuaAutoReg() { \
                 AutoBindings::AddBinder([](sol::state& lua){ \
                     /* Register usertype with fields and methods */ \
-                    lua.new_usertype<TYPE>(LuaTypeName, FieldsPairs MethodsPairs); \
+                    lua.new_usertype<TYPE>(LuaTypeName, FieldsPairs PropertiesPairs MethodsPairs); \
                     /* Attach GameObject getter */ \
                     lua["GameObject"][GetterName] = &ScriptingBindings::GO_Get<TYPE>; \
                 }); \

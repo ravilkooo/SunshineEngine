@@ -1307,6 +1307,7 @@ LUA_REGISTER_COMPONENT(
 	BehaviorController,
 	"BehaviorController",
 	/* no fields */,
+	/* no properties */,
 	BEHAVIORCONTROLLER_LUA_METHODS_APPLY(ADD_METHOD),
 	"getBehavior"
 )

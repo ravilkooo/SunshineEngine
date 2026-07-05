@@ -54,8 +54,8 @@ function behavior:update(dt)
     if (stareAtPlayer) then
         char.m_moveInput = Vector2.new(1, 0)
         -- print(char.m_yaw)
-        local chasedPlayerPos = chasedPlayer:getTransform().m_position
-        local dir = chasedPlayerPos - self.owner:getTransform().m_position
+        local chasedPlayerPos = chasedPlayer:getTransform().position
+        local dir = chasedPlayerPos - self.owner:getTransform().position
         local absoluteYaw = math.atan(dir.x, dir.z)
         char.m_yaw = absoluteYaw
         -- float ViewYaw = std::acosf(ViewerForward.Dot(DirNorm));

@@ -206,6 +206,7 @@ LUA_REGISTER_COMPONENT(
     TriggerComponent,
     "TriggerComponent",
     /* no fields */,
+    /* no properties */,
     TRIGGER_LUA_METHODS_APPLY(TRIGGER_ADD_METHOD),
     "getTrigger")
 #undef TRIGGER_ADD_METHOD

@@ -51,6 +51,12 @@ void RegisterBouncePadComponentLuaBindings()
 #define BPC_ADD_METHOD_WITH_LEAD(k, fn) , k, fn
 #define BPC_METHOD_PAIRS BOUNCEPADCOMPONENT_LUA_METHODS_APPLY(BPC_ADD_METHOD_WITH_LEAD)
 
-LUA_REGISTER_COMPONENT(BouncePadComponent, "BouncePadComponent", BPC_FIELD_PAIRS, BPC_METHOD_PAIRS, "getBouncePad")
+LUA_REGISTER_COMPONENT(
+    BouncePadComponent,
+    "BouncePadComponent",
+    BPC_FIELD_PAIRS,
+    /* no properties */,
+    BPC_METHOD_PAIRS,
+    "getBouncePad")
 #undef BPC_ADD_FIELD
 #undef  BPC_ADD_METHOD_WITH_LEAD

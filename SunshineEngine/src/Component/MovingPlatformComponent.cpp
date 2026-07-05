@@ -15,7 +15,13 @@ void RegisterMovingPlatformComponentLuaBindings()
 
 #define MOV_PLAT_METHOD_PAIRS
 
-LUA_REGISTER_COMPONENT(MovingPlatformComponent, "MovingPlatformComponent", MOV_PLAT_FIELD_PAIRS, MOV_PLAT_METHOD_PAIRS, "getMovingPlatform")
+LUA_REGISTER_COMPONENT(
+	MovingPlatformComponent,
+	"MovingPlatformComponent",
+	MOV_PLAT_FIELD_PAIRS,
+	/* no properties */,
+	MOV_PLAT_METHOD_PAIRS,
+	"getMovingPlatform")
 
 #undef MOV_PLAT_ADD_FIELD
 #undef MOV_PLAT_METHOD_PAIRS
