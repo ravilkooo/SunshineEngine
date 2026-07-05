@@ -110,7 +110,6 @@ namespace SE_G {
 
 		context->RSSetViewports(1, &m_viewport);
 
-		m_renderer->GetMainCamera()->UpdateBuffer(context);
 		m_renderer->GetMainCamera()->BindBuffer(context);
 	}
 

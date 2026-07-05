@@ -93,7 +93,6 @@ namespace SE_G {
 		m_blendState->Bind(context);
 
 		// Bind camera buffer to 1u slot
-		m_renderer->GetMainCamera()->UpdateBuffer(context);
 		m_renderer->GetMainCamera()->BindBuffer(context);
 
 		// temporary solution to sort objects every frame, until we have a proper system to detect when an object is moved
