@@ -24,7 +24,7 @@ namespace SE_G {
 		this->pGBuffer = pGBuffer;
 		m_passType = PassType::Transparent;
 
-		m_objectsOrder = eastl::vector<SE::UUID>();
+		m_objectsOrder = eastl::vector<TransparentPassData>();
 
 		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 		dsDesc.DepthEnable = TRUE;
@@ -95,18 +95,31 @@ namespace SE_G {
 		// Bind camera buffer to 1u slot
 		m_renderer->GetMainCamera()->UpdateBuffer(context);
 		m_renderer->GetMainCamera()->BindBuffer(context);
+
+		// temporary solution to sort objects every frame, until we have a proper system to detect when an object is moved
+		m_isDirty = true;
+		if (m_isDirty)
+		{
+			SortObjects();
+			m_isDirty = false;
+		}
 	}
 
 	void TransparentPass::Pass()
 	{
 		BindAllPerFrame();
-		for (auto& tech : m_techniques) {
-			if (!tech.second->IsEnabled())
-				continue;
-			tech.second->m_assignedTransform->EnableMeshTransformMode();
-			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-			tech.second->Pass(GetDeviceContext());
-			tech.second->m_assignedTransform->DisableMeshTransformMode();
+
+		for (auto& objData : m_objectsOrder) {
+			auto it = m_techniques.find(objData.objectUUID);
+			if (it != m_techniques.end()) {
+				auto& tech = it->second;
+				if (!tech->IsEnabled())
+					continue;
+				tech->m_assignedTransform->EnableMeshTransformMode();
+				tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+				tech->Pass(GetDeviceContext());
+				tech->m_assignedTransform->DisableMeshTransformMode();
+			}
 		}
 	}
 
@@ -117,6 +130,25 @@ namespace SE_G {
 		m_renderer->GetDeviceContext()->OMSetRenderTargets(4, nullRTVs, *nullDSVs);
 
 		if (SE_G::RenderingSystem::gAnn) SE_G::RenderingSystem::gAnn->EndEvent();
+	}
+
+	void TransparentPass::SortObjects()
+	{
+		m_objectsOrder.clear();
+
+		for (auto& tech : m_techniques) {
+			if (!tech.second->IsEnabled())
+				continue;
+			TransparentPassData data;
+			data.objectUUID = tech.first;
+			data.pos = tech.second->m_assignedTransform->GetAbsoluteWorldPosition();
+			m_objectsOrder.push_back(data);
+		}
+
+		std::sort(m_objectsOrder.begin(), m_objectsOrder.end(),
+			[](const TransparentPassData& a, const TransparentPassData& b) {
+				return a.pos.z > b.pos.z; // Sort by z position in descending order
+			});
 	}
 
 	// GBuffer should be resized before this method

@@ -52,9 +52,9 @@ namespace SE_G {
 		virtual void EndFrame() = 0;
 		virtual void OnResize(UINT resizeWidth, UINT resizeHeight) {};
 
-		RenderTechnique* AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech);
+		virtual RenderTechnique* AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech);
 		RenderTechnique* GetTechnique(SE::UUID uuid);
-		void RemoveTechnique(SE::UUID uuid);
+		virtual void RemoveTechnique(SE::UUID uuid);
 		void DisableTechnique(SE::UUID uuid);
 		void EnableTechnique(SE::UUID uuid);
 

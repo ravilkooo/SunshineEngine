@@ -1,11 +1,15 @@
 #pragma once
 
 #include <d3d11.h>
+#include <SimpleMath.h>
 
 #include <EASTL/shared_ptr.h>
 
 #include <Utils/UUID.h>
 #include <Graphics/Renderer/Pass/RenderPass.h>
+
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
 
 namespace SE_G {
     class GBuffer;
@@ -26,6 +30,9 @@ namespace SE_G {
             eastl::shared_ptr<GBuffer> pGBuffer);
         ~TransparentPass();
 
+        // RenderTechnique* AddTechnique(SE::UUID uuid, eastl::unique_ptr<RenderTechnique> tech) override;
+        // void RemoveTechnique(SE::UUID uuid) override;
+
         // Inherited via RenderPass
         void StartFrame() override;
         void Pass() override;
@@ -45,6 +52,13 @@ namespace SE_G {
         eastl::unique_ptr<Bind::DepthStencilState> m_depthStencilState;
         eastl::unique_ptr<Bind::BlendState> m_blendState;
 
-        eastl::vector<SE::UUID> m_objectsOrder;
+        struct TransparentPassData
+        {
+            SE::UUID objectUUID;
+            DXSM::Vector3 pos;
+		};
+        eastl::vector<TransparentPassData> m_objectsOrder;
+
+        bool m_isDirty = true;
     };
 }
