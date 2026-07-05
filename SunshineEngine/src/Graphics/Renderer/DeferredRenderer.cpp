@@ -77,6 +77,7 @@ namespace SE_G {
 
 	void DeferredRenderer::Pass()
 	{
+		GetMainCamera()->UpdateBuffer(GetDeviceContext());
 		// Passes
 		for (UINT i = 0u; i < static_cast<UINT>(PassType::Count); i++)
 		{

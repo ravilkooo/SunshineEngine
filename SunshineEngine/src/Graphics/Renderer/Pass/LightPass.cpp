@@ -124,7 +124,6 @@ namespace SE_G {
 				static_cast<float>(m_screenHeight)) });
 
 		BindAllPerFrame();
-		camera->UpdateBuffer(context);
 		camera->BindBuffer(context);
 	}
 

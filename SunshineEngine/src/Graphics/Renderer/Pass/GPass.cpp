@@ -65,7 +65,6 @@ namespace SE_G {
 		context->RSSetViewports(1, &viewport);
 
 		// Bind camera buffer to 1u slot
-		m_renderer->GetMainCamera()->UpdateBuffer(context);
 		m_renderer->GetMainCamera()->BindBuffer(context);
 	}
 
