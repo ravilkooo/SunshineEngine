@@ -97,32 +97,20 @@ namespace ScriptingBindings
 		// Register Camera type
 		lua.new_usertype<SE_G::Camera>("Camera",
 			sol::no_constructor,
-			// Properties (read-only)
-			"forward", sol::readonly(&SE_G::Camera::forward),
-			"up", sol::readonly(&SE_G::Camera::up),
-			"right", sol::readonly(&SE_G::Camera::right),
-			"position", sol::readonly(&SE_G::Camera::position),
-			// delta time
-			"deltaTime", sol::readonly(&SE_G::Camera::m_deltaTime),
-			// Position methods
-			"setPosition", &SE_G::Camera::SetPosition,
-			"getPosition", &SE_G::Camera::GetPosition,
-			// Target methods
-			"setTarget", &SE_G::Camera::SetTarget,
-			"getTarget", &SE_G::Camera::GetTarget,
-			// Up/right/forward vector methods
-			"setUp", &SE_G::Camera::SetUp,
-			"getUp", &SE_G::Camera::GetUp,
+			// Properties
+			"up", sol::property(&SE_G::Camera::GetUp, &SE_G::Camera::SetUp),
+			"position", sol::property(&SE_G::Camera::GetPosition, &SE_G::Camera::SetPosition),
+			"target", sol::property(&SE_G::Camera::GetTarget, &SE_G::Camera::SetTarget),
+			"nearZ", sol::property(&SE_G::Camera::GetNearZ, &SE_G::Camera::SetNearZ),
+			"farZ", sol::property(&SE_G::Camera::GetFarZ, &SE_G::Camera::SetFarZ),
+			"referenceLen", sol::property(&SE_G::Camera::GetReferenceLen, &SE_G::Camera::SetReferenceLen),
+			"cameraRotation", sol::property(&SE_G::Camera::GetCameraRotation, &SE_G::Camera::SetCameraRotation),
+			"springArmRotation", sol::property(&SE_G::Camera::GetSpringArmRotation, &SE_G::Camera::SetSpringArmRotation),
+			"springArmRootOffset", sol::property(&SE_G::Camera::GetSpringArmRootOffset, &SE_G::Camera::SetSpringArmRootOffset),
+			"springArmLength", sol::property(&SE_G::Camera::GetSpringArmLength, &SE_G::Camera::SetSpringArmLength),
+			// Vector methods
 			"getRight", &SE_G::Camera::GetRight,
 			"getForward", &SE_G::Camera::GetForward,
-			// Near/Far Z methods
-			"setNearZ", &SE_G::Camera::SetNearZ,
-			"getNearZ", &SE_G::Camera::GetNearZ,
-			"setFarZ", &SE_G::Camera::SetFarZ,
-			"getFarZ", &SE_G::Camera::GetFarZ,
-			// Reference length
-			"setReferenceLen", &SE_G::Camera::SetReferenceLen,
-			"getReferenceLen", &SE_G::Camera::GetReferenceLen,
 			// View dimensions
 			"getViewWidth", &SE_G::Camera::GetViewWidth,
 			"getViewHeight", &SE_G::Camera::GetViewHeight,
@@ -139,32 +127,17 @@ namespace ScriptingBindings
 			"rollSpringArm", &SE_G::Camera::RollSpringArm,
 			"rotateSpringArmYawPitch", &SE_G::Camera::RotateSpringArmYawPitch,
 			"rotateSpringArm", &SE_G::Camera::RotateSpringArm,
-			// Camera Properties
-			"getCameraRotation", &SE_G::Camera::GetCameraRotation,
-			"setCameraRotation", &SE_G::Camera::SetCameraRotation,
 			// SpringArm Properties
-			"getSpringArmRotation", &SE_G::Camera::GetSpringArmRotation,
-			"setSpringArmRotation", &SE_G::Camera::SetSpringArmRotation,
-			"getSpringArmRootOffset", &SE_G::Camera::GetSpringArmRootOffset,
-			"setSpringArmRootOffset", &SE_G::Camera::SetSpringArmRootOffset,
-			"getSpringArmLength", &SE_G::Camera::GetSpringArmLength,
-			"setSpringArmLength", &SE_G::Camera::SetSpringArmLength,
 			"zoomSpringArm", &SE_G::Camera::ZoomSpringArm,
 			// Camera mode
 			"switchToFPSMode", &SE_G::Camera::SwitchToFPSMode,
-
+			//
 			"setAsMainCamera", [](SE_G::Camera* camera) {
 				Scene::GetInstance().m_mainCameraUUID = camera->GetAssignedUUID();
 				Scene::GetInstance().m_renderer->SetMainCamera(
 					Scene::GetInstance().m_cameraManager->GetCameraByUUID(camera->GetAssignedUUID()));
 				return;
 			}
-
-			// // Update methods
-			// "Update", sol::overload(
-			// 	static_cast<void (SE_G::Camera::*)()>(&SE_G::Camera::Update),
-			// 	static_cast<void (SE_G::Camera::*)(const DXSM::Vector3)>(&SE_G::Camera::Update)
-			// )
 		);
 
         // Base GameObject type; component binders will append getters
