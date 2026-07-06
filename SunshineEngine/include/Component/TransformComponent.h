@@ -34,6 +34,15 @@ public:
 
     void MarkAsNotCached();
 
+    enum DirtyFlags : uint32_t
+    {
+        None = 0,
+        GPU = 1 << 0,
+        Physics = 1 << 1,
+
+        All = GPU | Physics,
+    };
+
 private:
     // Transform
     DXSM::Vector3 m_position = { 0, 0, 0 };
@@ -54,6 +63,8 @@ private:
     DXSM::Vector3 m_cachedAbsoluteWorldPosition;
     DXSM::Quaternion m_cachedAbsoluteWorldRotation_quat;
     DXSM::Vector3 m_cachedAbsoluteWorldRotation;
+
+    uint32_t m_isDirty = DirtyFlags::All;
 
 public:
 
@@ -81,21 +92,54 @@ public:
     DXSM::Matrix GetWorldMatrix() const; // include LocalTransfrom
 
     const DXSM::Vector3& GetPosition() const { return m_position; }
-    void SetPosition(const DXSM::Vector3& newPos) { m_position = newPos; }
+    void SetPosition(const DXSM::Vector3& newPos) {
+        m_position = newPos;
+        m_isDirty |= DirtyFlags::All;
+        m_isAbsoluteTransformCached = false;
+    }
+
     const DXSM::Vector3& GetRotation() const { return m_rotation; }
-    void SetRotation(const DXSM::Vector3& newRot) { m_rotation = newRot; }
+    void SetRotation(const DXSM::Vector3& newRot) {
+        m_rotation = newRot;
+        m_isDirty |= DirtyFlags::All;
+        m_isAbsoluteTransformCached = false;
+    }
+
     const DXSM::Vector3& GetScaleFactor() const { return m_scaleFactor; }
-    void SetScaleFactor(const DXSM::Vector3& newScaleFactor) { m_scaleFactor = newScaleFactor; }
+    void SetScaleFactor(const DXSM::Vector3& newScaleFactor) {
+        m_scaleFactor = newScaleFactor; m_isDirty |= DirtyFlags::All;
+        m_isAbsoluteTransformCached = false;
+    }
 
     const DXSM::Vector3& GetLocalPosition() const { return m_localPosition; }
-    void SetLocalPosition(const DXSM::Vector3& newPos) { m_localPosition = newPos; }
+    void SetLocalPosition(const DXSM::Vector3& newPos) {
+        m_localPosition = newPos; m_isDirty |= DirtyFlags::All;
+        m_isAbsoluteTransformCached = false;
+    }
+
     const DXSM::Vector3& GetLocalRotation() const { return m_localRotation; }
-    void SetLocalRotation(const DXSM::Vector3& newRot) { m_localRotation = newRot; }
+    void SetLocalRotation(const DXSM::Vector3& newRot) {
+        m_localRotation = newRot; m_isDirty |= DirtyFlags::All;
+        m_isAbsoluteTransformCached = false;
+    }
+
     const DXSM::Vector3& GetLocalScaleFactor() const { return m_localScaleFactor; }
-    void SetLocalScaleFactor(const DXSM::Vector3& newScaleFactor) { m_localScaleFactor = newScaleFactor; }
+    void SetLocalScaleFactor(const DXSM::Vector3& newScaleFactor) {
+        m_localScaleFactor = newScaleFactor; m_isDirty |= DirtyFlags::All;
+        m_isAbsoluteTransformCached = false;
+    }
 
     const DXSM::Vector2& GetUVMultiplier() const { return m_uvMultiplier; }
-    void SetUVMultiplier(const DXSM::Vector2& uvMultiplier) { m_uvMultiplier = uvMultiplier; }
+    void SetUVMultiplier(const DXSM::Vector2& uvMultiplier) {
+        m_uvMultiplier = uvMultiplier; m_isDirty |= DirtyFlags::GPU;
+    }
+
+    uint32_t IsDirty() const { return (m_isDirty | (m_parentTransform ? m_parentTransform->IsDirty() : DirtyFlags::None)); }
+	void MarkAsDirty() {
+        m_isDirty = DirtyFlags::All;
+        m_isAbsoluteTransformCached = false;
+    }
+    void ClearFlag(DirtyFlags flag) { m_isDirty &= ~flag; }
 
     const std::type_info& getType() const override {
         return typeid(TransformComponent);
