@@ -48,7 +48,10 @@ namespace ScriptingBindings
 
         // Math/value types
         lua.new_usertype<DXSM::Vector3>("Vector3",
-			sol::constructors<DXSM::Vector3(), DXSM::Vector3(float, float, float), DXSM::Vector3(const DXSM::Vector3&)>(),
+			sol::constructors<
+				DXSM::Vector3(),
+				DXSM::Vector3(float, float, float),
+				DXSM::Vector3(const DXSM::Vector3&)>(),
             "x", &DXSM::Vector3::x,
             "y", &DXSM::Vector3::y,
             "z", &DXSM::Vector3::z,
@@ -207,19 +210,16 @@ namespace ScriptingBindings
 		// PlayerInputSystem
 		lua.new_usertype<PlayerInputSystem>("InputSystem",
 			sol::no_constructor,
-			"isPressed", [](PlayerInputSystem* self, std::string action) {
-				return self->IsPressed(action);
-			},
-			"isReleased", [](PlayerInputSystem* self, std::string action) { return self->IsReleased(action); },
-			"isHeld", [](PlayerInputSystem* self, std::string action) { return self->IsHeld(action); },
-			"getAxis", [](PlayerInputSystem* self, std::string axisName) { return self->GetAxis(axisName); },
-			"getAxis2D", [](PlayerInputSystem* self, std::string axisHorizontal, std::string axisVertical)
-			{ return self->GetAxis2D(axisHorizontal, axisVertical); },
-			"getMouseDeltaX", [](PlayerInputSystem* self) { return self->GetMouseDeltaX(); },
-			"getMouseDeltaY", [](PlayerInputSystem* self) { return self->GetMouseDeltaY(); },
-			"getMouseX", [](PlayerInputSystem* self) { return self->GetMouseX(); },
-			"getMouseY", [](PlayerInputSystem* self) { return self->GetMouseY(); },
-			"getMouseWheelDelta", [](PlayerInputSystem* self) { return self->GetMouseWheelDelta(); }
+			"isPressed", &PlayerInputSystem::IsPressed,
+			"isReleased", &PlayerInputSystem::IsReleased,
+			"isHeld", &PlayerInputSystem::IsHeld,
+			"getAxis", &PlayerInputSystem::GetAxis,
+			"getAxis2D", &PlayerInputSystem::GetAxis2D,
+			"getMouseDeltaX", &PlayerInputSystem::GetMouseDeltaX,
+			"getMouseDeltaY", &PlayerInputSystem::GetMouseDeltaY,
+			"getMouseX", &PlayerInputSystem::GetMouseX,
+			"getMouseY", &PlayerInputSystem::GetMouseY,
+			"getMouseWheelDelta", &PlayerInputSystem::GetMouseWheelDelta
 		);
 
 		lua.set_function("getInputSystem", []() {

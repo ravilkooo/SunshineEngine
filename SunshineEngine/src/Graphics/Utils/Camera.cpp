@@ -29,11 +29,6 @@ namespace SE_G {
 
     }
 
-    SE::UUID Camera::GetAssignedUUID()
-    {
-        return m_assignedUUID;
-    }
-
     void Camera::InitBuffer(ID3D11Device* device)
     {
         //DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
@@ -52,76 +47,6 @@ namespace SE_G {
     void Camera::BindBuffer(ID3D11DeviceContext* context)
     {
         cameraBuffer->Bind(context);
-    }
-
-    void Camera::SetPosition(DXSM::Vector3 position)
-    {
-        this->position = position;
-    }
-
-    DXSM::Vector3 Camera::GetPosition()
-    {
-        return this->position;
-    }
-
-    void Camera::SetTarget(DXSM::Vector3 target)
-    {
-        this->target = target;
-    }
-
-    DXSM::Vector3 Camera::GetTarget()
-    {
-        return target;
-    }
-
-    void Camera::SetUp(DXSM::Vector3 up)
-    {
-        this->up = up;
-    }
-
-    DXSM::Vector3 Camera::GetUp()
-    {
-        return up;
-    }
-
-    DXSM::Vector3 Camera::GetRight()
-    {
-        return right;
-    }
-
-    DXSM::Vector3 Camera::GetForward()
-    {
-        return forward;
-    }
-
-    void Camera::SetFOV(float fov)
-    {
-        this->fov = fov;
-    }
-
-    void Camera::SetAspectRatio(float aspectRatio)
-    {
-        this->aspectRatio = aspectRatio;
-    }
-
-    void Camera::SetNearZ(float nearZ)
-    {
-        this->nearZ = nearZ;
-    }
-
-    float Camera::GetNearZ()
-    {
-        return nearZ;
-    }
-
-    void Camera::SetFarZ(float farZ)
-    {
-        this->farZ = farZ;
-    }
-
-    float Camera::GetFarZ()
-    {
-        return farZ;
     }
 
     void Camera::SetUpCameraViewByAspectRatio(float newAspectRatio)
@@ -192,39 +117,9 @@ namespace SE_G {
         */
     }
 
-    void Camera::SetViewWidth(float viewWidth)
-    {
-        this->viewWidth = viewWidth;
-    }
-
-    float Camera::GetViewWidth()
-    {
-        return viewWidth;
-    }
-
-    void Camera::SetViewHeight(float viewHeight)
-    {
-        this->viewHeight = viewHeight;
-    }
-
     void Camera::AssignTransformComponent(TransformComponent* trComp)
     {
         m_assignedTransform = trComp;
-    }
-
-    float Camera::GetViewHeight()
-    {
-        return viewHeight;
-    }
-
-    void Camera::SetReferenceLen(float referenceLen)
-    {
-        this->referenceLen = eastl::min(eastl::max(0.2f, referenceLen), 100.0f);
-    }
-
-    float Camera::GetReferenceLen()
-    {
-        return referenceLen;
     }
 
     void Camera::Update(float deltaTime)
@@ -248,7 +143,7 @@ namespace SE_G {
         }
     }
 
-    void Camera::UpdateTargetPoistion(const DXSM::Vector3 targetPoistion)
+    void Camera::UpdateTargetPoistion(const DXSM::Vector3& targetPoistion)
     {
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
@@ -395,20 +290,6 @@ namespace SE_G {
         cameraMode = CAMERA_MODE::FPS;
     }
 
-    /*
-    void Camera::AssignScene(Scene* scene)
-    {
-        m_playerAsObject = true;
-        m_scene.asScene = scene;
-    }
-
-    void Camera::AssignScene(Scene_Info* scene)
-    {
-        m_playerAsObject = false;
-        m_scene.asInfo = scene;
-    }
-    */
-
     void Camera::SetFollowUUID(SE::UUID followUUID)
     {
         m_assignedUUID = followUUID;
@@ -554,16 +435,6 @@ namespace SE_G {
         RollSpringArm(rollSpeed);
     }
 
-    DXSM::Vector3 Camera::GetCameraRotation()
-    {
-        return cameraPitchYawRoll;
-    }
-
-    void Camera::SetCameraRotation(DXSM::Vector3 newRotation)
-    {
-        cameraPitchYawRoll = newRotation;
-    }
-
     void Camera::RotateCameraYaw(float yawSpeed)
     {
         float deltaYaw = yawSpeed * m_deltaTime;
@@ -608,34 +479,9 @@ namespace SE_G {
         RollCamera(rollSpeed);
     }
 
-    DXSM::Vector3 Camera::GetSpringArmRotation()
-    {
-        return m_springArmParams.pitchYawRoll;
-    }
-
-    void Camera::SetSpringArmRotation(DXSM::Vector3 newRotation)
-    {
-        m_springArmParams.pitchYawRoll = newRotation;
-    }
-
     void Camera::ZoomSpringArm(float zoomSpeed)
     {
         float desiredLength = std::clamp(0.001f, m_springArmParams.length + zoomSpeed * m_deltaTime, 10000.0f);
 		m_springArmParams.length = std::lerp(m_springArmParams.length, desiredLength, m_zoomAcceleration * m_deltaTime);
     }
-
-    DXSM::Vector3 Camera::GetSpringArmRootOffset()
-    {
-        return m_springArmParams.rootOffset;
-    }
-
-    void Camera::SetSpringArmRootOffset(DXSM::Vector3 newRootOffset)
-    {
-        m_springArmParams.rootOffset = newRootOffset;
-    }
-
-    bool Camera::IsPerspectiveCamera()
-    {
-        return isPerspective;
-	}
 }

@@ -28,7 +28,7 @@ SpotLight::SpotLight(
 
     // TransformComponent
     auto tc = eastl::make_shared<TransformComponent>(device);
-    tc->m_position = initData.Position;
+    tc->SetPosition(initData.Position);
 
     // RenderComponent and Passes
     auto rc = eastl::make_shared<RenderComponent>(m_UUID, renderSystem);
@@ -55,7 +55,7 @@ SpotLight::SpotLight(
     if (j["components"].contains("Transform")) {
         tc->FromJson(j["components"]["Transform"]);
     }
-    tc->m_position = m_lightData->Position;
+    tc->SetPosition(m_lightData->Position);
 
     // RenderComponent and Passes
     auto rc = AddComponent<RenderComponent>(m_UUID, renderSystem);
@@ -91,7 +91,7 @@ SpotLight_Info::SpotLight_Info(
 
     // TransformComponent
     auto tc_info = AddComponent<TransformComponent_Info>(device);
-    tc_info->m_assignedComponent->m_position = initData.Position;
+    tc_info->m_assignedComponent->SetPosition(initData.Position);
 
     // RenderComponent and Passes
     auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);
@@ -126,7 +126,7 @@ SpotLight_Info::SpotLight_Info(
     if (j["components"].contains("Transform")) {
         tc_info->FromJson(j["components"]["Transform"], device);
     }
-    tc_info->m_assignedComponent->m_position = m_lightData->Position;
+    tc_info->m_assignedComponent->SetPosition(m_lightData->Position);
 
     // RenderComponent and Passes
     auto rc_info = AddComponent<RenderComponent_Info>(m_UUID, renderSystem);

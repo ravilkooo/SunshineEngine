@@ -35,7 +35,7 @@ namespace SE_G {
 			const auto wMatInvTranspose = (A.Invert()).Transpose();
 
 			const Transforms tf = {
-				wMat, wMatInvTranspose, pParent->m_uvMultiplier.x, pParent->m_uvMultiplier.y
+				wMat, wMatInvTranspose, pParent->GetUVMultiplier().x, pParent->GetUVMultiplier().y
 			};
 			pVcbuf->Update(context, tf);
 		}

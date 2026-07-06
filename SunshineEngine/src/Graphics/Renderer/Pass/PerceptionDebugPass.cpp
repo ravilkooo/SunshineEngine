@@ -143,7 +143,7 @@ namespace SE_G {
 
 	void PerceptionDebugPass::Pass()
 	{
-		if (m_gameObject && m_gameObject->HasComponent<PerceptionComponent_Info>()) 
+		if (m_gameObject && m_gameObject->HasComponent<PerceptionComponent_Info>())
 		{
 			auto context = m_renderer->GetDeviceContext();
 
@@ -156,9 +156,9 @@ namespace SE_G {
 			m_perceptionData.HearingRadius = perceptionComp->HearingRadius;
 
 			auto tc = m_gameObject->GetComponent<TransformComponent_Info>();
-			DXSM::Vector3 old_localScaleFactor = tc->m_assignedComponent->m_localScaleFactor;
-			DXSM::Vector3 old_localRotation = tc->m_assignedComponent->m_localRotation;
-			DXSM::Vector3 old_localPosition = tc->m_assignedComponent->m_localPosition;
+			DXSM::Vector3 old_localScaleFactor = tc->m_assignedComponent->GetLocalScaleFactor();
+			DXSM::Vector3 old_localRotation = tc->m_assignedComponent->GetLocalRotation();
+			DXSM::Vector3 old_localPosition = tc->m_assignedComponent->GetLocalPosition();
 
 			tc->m_assignedComponent->EnableMeshTransformMode();
 			DXSM::Matrix fullTransform = tc->m_assignedComponent->GetWorldMatrix_noLocal();
@@ -166,18 +166,18 @@ namespace SE_G {
 			DXSM::Vector3 rotate;
 			DXSM::Vector3 translation;
 			DecomposeTransform(fullTransform, scale, rotate, translation);
-			tc->m_assignedComponent->m_localPosition = DXSM::Vector3::Zero;
-			tc->m_assignedComponent->m_localRotation = DXSM::Vector3::Zero;
-			tc->m_assignedComponent->m_localScaleFactor = DXSM::Vector3(
+			tc->m_assignedComponent->SetLocalScaleFactor(DXSM::Vector3::Zero);
+			tc->m_assignedComponent->SetLocalRotation(DXSM::Vector3::Zero);
+			tc->m_assignedComponent->SetLocalPosition(DXSM::Vector3(
 				1.0f / scale.x,
 				1.0f / scale.y,
 				1.0f / scale.z
-			);
+			));
 
-            const auto wMat = tc->m_assignedComponent->GetWorldMatrix_noLocal();
-            DXSM::Matrix A = wMat;
-            A._41 = 0; A._42 = 0; A._43 = 0; A._44 = 1;
-            m_perceptionData.wMatNoLocalInvTranspose = (A.Invert()).Transpose();
+			const auto wMat = tc->m_assignedComponent->GetWorldMatrix_noLocal();
+			DXSM::Matrix A = wMat;
+			A._41 = 0; A._42 = 0; A._43 = 0; A._44 = 1;
+			m_perceptionData.wMatNoLocalInvTranspose = (A.Invert()).Transpose();
 
 			m_settingsCB->Update(context, m_perceptionData);
 			m_settingsCB->Bind(context);
@@ -207,9 +207,9 @@ namespace SE_G {
 			);
 
 			tc->m_assignedComponent->DisableMeshTransformMode();
-			tc->m_assignedComponent->m_localScaleFactor = old_localScaleFactor;
-			tc->m_assignedComponent->m_localRotation = old_localRotation;
-			tc->m_assignedComponent->m_localPosition = old_localPosition;
+			tc->m_assignedComponent->SetLocalScaleFactor(old_localScaleFactor);
+			tc->m_assignedComponent->SetLocalRotation(old_localRotation);
+			tc->m_assignedComponent->SetLocalPosition(old_localPosition);
 		}
 	}
 

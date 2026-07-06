@@ -370,9 +370,9 @@ namespace SE
 
             context->CSSetUnorderedAccessViews(0, 4, uavs, initialCounts);
 
-            m_transformComp->transformBuffer->Update(context);
+            m_transformComp->UpdateBuffer(context);
             context->CSSetConstantBuffers(0u, 1u,
-                m_transformComp->transformBuffer->pVcbuf->pConstantBuffer.GetAddressOf());
+                m_transformComp->GetConstantBufferAddress());
 
             //copy the deadList counter to a constantBuffer
             context->CopyStructureCount(m_deadListCountConstantBuffer.Get(), 0, m_deadListUAV.Get());

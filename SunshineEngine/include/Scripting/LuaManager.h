@@ -16,7 +16,7 @@ public:
     LuaManager(LuaManager&&) = delete;
     LuaManager& operator=(LuaManager&&) = delete;
 
-    eastl::unique_ptr<sol::state> luaState = nullptr;
+    sol::state luaState;
 
     void InitializeBehavior();
     void Update(Scene* scene, float deltaTime);

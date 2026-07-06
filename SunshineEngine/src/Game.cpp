@@ -227,7 +227,7 @@ void Game::ClearCachedAbsoluteTransforms()
 		auto tc = it.second->GetComponent<TransformComponent>();
 		if (tc)
 		{
-			tc->m_isAbsoluteTransformCached = false;
+			tc->MarkAsNotCached();
 		}
 	}
 }

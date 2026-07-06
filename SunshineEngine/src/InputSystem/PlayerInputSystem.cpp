@@ -331,7 +331,7 @@ bool PlayerInputSystem::IsHeld(const std::string& action) const
     return it != m_actions.end() && it->second.Held;
 }
 
-bool PlayerInputSystem::IsHeld(Keys key) const
+bool PlayerInputSystem::IsKeyHeld(Keys key) const
 {
     auto it = m_keys.find(key);
 
@@ -369,7 +369,7 @@ float PlayerInputSystem::GetAxis(const std::string& axisName) const
 
     for (auto& axisKey : it->second)
     {
-        if (IsHeld(axisKey.Key))
+        if (IsKeyHeld(axisKey.Key))
             value += axisKey.Scale;
     }
 
@@ -381,7 +381,7 @@ DXSM::Vector2 PlayerInputSystem::GetAxis2D(
     const std::string& vertical) const
 {
     return
-    {
+    DXSM::Vector2{
         GetAxis(horizontal),
         GetAxis(vertical)
     };

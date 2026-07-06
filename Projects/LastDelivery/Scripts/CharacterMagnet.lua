@@ -32,8 +32,7 @@ end
 
 function behavior:update(dt)
 
-    local inputSystem = getInputSystem()
-    local turnMagnet = inputSystem:getAxis("TurnMagnet")
+    local turnMagnet = InputSystem:getAxis("TurnMagnet")
 
     if takenObject then
         local playerYaw = playerChar.yaw

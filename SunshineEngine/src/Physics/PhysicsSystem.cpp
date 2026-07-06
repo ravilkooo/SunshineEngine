@@ -276,12 +276,10 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene, float deltaTime) {
             JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
             JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);
 
-            tc->m_position =
-                DXSM::Vector3(position.mF32
-                );
-            tc->m_rotation =
+            tc->SetPosition(DXSM::Vector3(position.mF32));
+            tc->SetRotation(
                 DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
-                );
+                ));
         }
         else if (motionType == JPH::EMotionType::Kinematic && tc->m_parentTransform)
         {
@@ -321,12 +319,10 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene, float deltaTime) {
             JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(joltId);
             JPH::Quat quatRot = m_bodyInterface->GetRotation(joltId);
 
-            tc->m_position =
-                DXSM::Vector3(position.mF32
-                );
-            tc->m_rotation =
+            tc->SetPosition(DXSM::Vector3(position.mF32));
+            tc->SetRotation(
                 DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
-                );
+                ));
         }
         else if (motionType == JPH::EMotionType::Kinematic && tc->m_parentTransform)
         {

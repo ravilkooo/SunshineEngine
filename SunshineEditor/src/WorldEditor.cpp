@@ -496,7 +496,7 @@ void WorldEditor::AddBoxShape(DXSM::Vector3 initPos)
 
 	if (boxObject)
 	{
-		boxObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		boxObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(boxObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -508,7 +508,7 @@ void WorldEditor::AddPlaneShape(DXSM::Vector3 initPos)
 
 	if (planeObject)
 	{
-		planeObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		planeObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(planeObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -520,7 +520,7 @@ void WorldEditor::AddSphereShape(DXSM::Vector3 initPos)
 
 	if (sphereObject)
 	{
-		sphereObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		sphereObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(sphereObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -532,7 +532,7 @@ void WorldEditor::AddGeosphereShape(DXSM::Vector3 initPos)
 
 	if (geosphereObject)
 	{
-		geosphereObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		geosphereObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(geosphereObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -544,7 +544,7 @@ void WorldEditor::AddCylinderShape(DXSM::Vector3 initPos)
 
 	if (cylinderObject)
 	{
-		cylinderObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		cylinderObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(cylinderObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -556,7 +556,7 @@ void WorldEditor::AddSkyBox(DXSM::Vector3 initPos)
 
 	if (skyboxObject)
 	{
-		skyboxObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		skyboxObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(skyboxObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -568,7 +568,7 @@ void WorldEditor::AddAmbientLight(DXSM::Vector3 initPos)
 
 	if (ambientLightObject)
 	{
-		ambientLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		ambientLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(ambientLightObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -586,7 +586,7 @@ void WorldEditor::AddDirectionalLight(DXSM::Vector3 initPos)
 
 	if (directionalLightObject)
 	{
-		directionalLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		directionalLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(directionalLightObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -604,7 +604,7 @@ void WorldEditor::AddPointLight(DXSM::Vector3 initPos)
 
 	if (pointLightObject)
 	{
-		pointLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		pointLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(pointLightObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -623,7 +623,7 @@ void WorldEditor::AddSpotLight(DXSM::Vector3 initPos)
 
 	if (spotLightObject)
 	{
-		spotLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		spotLightObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(spotLightObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -637,7 +637,7 @@ void WorldEditor::AddCustomMesh(DXSM::Vector3 initPos)
 
 	if (customMeshObject)
 	{
-		customMeshObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+		customMeshObject->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 		auto uuid = m_scene->AddGameObject(std::move(customMeshObject));
 		m_scene->m_sceneGraph->Add(uuid);
 	}
@@ -653,7 +653,7 @@ void WorldEditor::AddParticleEmitter(DXSM::Vector3 initPos)
 
 		if (particleEmitter)
 		{
-			particleEmitter->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = initPos;
+			particleEmitter->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
 			auto uuid = m_scene->AddGameObject(std::move(particleEmitter));
 			m_scene->m_sceneGraph->Add(uuid);
 		}

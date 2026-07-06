@@ -14,6 +14,8 @@ namespace SE_G {
     }
 }
 
+class ID3D11Buffer;
+
 class SUNSHINE_ENGINE_API TransformComponent :
     public Component
 {
@@ -26,9 +28,34 @@ public:
 
     void SetupBuffer(ID3D11Device* device);
 
-    eastl::unique_ptr<SE_G::Bind::TransformCBuffer> transformBuffer;
-
     void BindToGraphicsPipeline(ID3D11DeviceContext* context);
+    void UpdateBuffer(ID3D11DeviceContext* context);
+    ID3D11Buffer** GetConstantBufferAddress();
+
+    void MarkAsNotCached();
+
+private:
+    // Transform
+    DXSM::Vector3 m_position = { 0, 0, 0 };
+    DXSM::Vector3 m_rotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
+    DXSM::Vector3 m_scaleFactor = { 1, 1, 1 };
+
+    // Local Transform
+    DXSM::Vector3 m_localPosition = { 0, 0, 0 };
+    DXSM::Vector3 m_localRotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
+    DXSM::Vector3 m_localScaleFactor = { 1, 1, 1 };
+
+    DXSM::Vector2 m_uvMultiplier = { 1, 1 };
+
+    DXSM::Matrix localTransfrom = DXSM::Matrix::Identity;
+
+    // Full World Position
+    bool m_isAbsoluteTransformCached = false;
+    DXSM::Vector3 m_cachedAbsoluteWorldPosition;
+    DXSM::Quaternion m_cachedAbsoluteWorldRotation_quat;
+    DXSM::Vector3 m_cachedAbsoluteWorldRotation;
+
+public:
 
     // Transforms
     DXSM::Matrix GetTransalationMatrix() const;
@@ -44,10 +71,6 @@ public:
     DXSM::Matrix GetWorldMatrix_noLocal() const;
 
     // Full World Position
-    bool m_isAbsoluteTransformCached = false;
-    DXSM::Vector3 m_cachedAbsoluteWorldPosition;
-    DXSM::Quaternion m_cachedAbsoluteWorldRotation_quat;
-    DXSM::Vector3 m_cachedAbsoluteWorldRotation;
     void CalcAbsoluteTransform();
 
     DXSM::Vector3 GetAbsoluteWorldPosition();
@@ -56,20 +79,6 @@ public:
 
     // World Transform
     DXSM::Matrix GetWorldMatrix() const; // include LocalTransfrom
-
-    // Transform
-    DXSM::Vector3 m_position = { 0, 0, 0 };
-    DXSM::Vector3 m_rotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
-    DXSM::Vector3 m_scaleFactor = { 1, 1, 1 };
-
-    // Local Transform
-    DXSM::Vector3 m_localPosition = { 0, 0, 0 };
-    DXSM::Vector3 m_localRotation = { 0, 0, 0 }; // Pitch (x-axis), Yaw (y-axis), Roll (z-axis)
-    DXSM::Vector3 m_localScaleFactor = { 1, 1, 1 };
-
-    DXSM::Vector2 m_uvMultiplier = { 1, 1 };
-
-    DXSM::Matrix localTransfrom = DXSM::Matrix::Identity;
 
     const DXSM::Vector3& GetPosition() const { return m_position; }
     void SetPosition(const DXSM::Vector3& newPos) { m_position = newPos; }
@@ -109,6 +118,7 @@ public:
 
     TransformComponent* m_parentTransform = nullptr;
 private:
+    eastl::unique_ptr<SE_G::Bind::TransformCBuffer> transformBuffer;
 
 	bool m_meshTransformMode = false;
 };

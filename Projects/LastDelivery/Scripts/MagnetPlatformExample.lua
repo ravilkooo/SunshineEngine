@@ -7,9 +7,8 @@ end
 
 function behavior:update(dt)
 
-    local inputSystem = getInputSystem()
-    local inputValue = inputSystem:getAxis2D("ForwardMagnet", "RightMagnet")
-    local upMagnet = inputSystem:getAxis("UpMagnet")
+    local inputValue = InputSystem:getAxis2D("ForwardMagnet", "RightMagnet")
+    local upMagnet = InputSystem:getAxis("UpMagnet")
     local deltaPos = Vector3.new(inputValue.x, upMagnet, inputValue.y) * magnetSpeed * dt
     -- print(deltaPos.x .. " " .. deltaPos.y .. " " .. deltaPos.z)
 
