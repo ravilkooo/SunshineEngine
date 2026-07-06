@@ -247,6 +247,9 @@ namespace SE_G {
 				context->OMSetDepthStencilState(m_depthStencilReadMask.Get(), 1);
 				m_pixelShader->Bind(context);
 
+				// Save dirty flags, cause mesh editing marks dirty
+				uint32_t dirtyFlags = transformComponent->IsDirty();
+
 				transformComponent->SetLocalScaleFactor(transformComponent->GetLocalScaleFactor() * 1.08f);
 				transformComponent->BindToGraphicsPipeline(
 					GetDeviceContext()
@@ -256,6 +259,8 @@ namespace SE_G {
 				renderComp_info->m_selectionTechnique->DrawTechnique(context);
 
 				transformComponent->SetLocalScaleFactor(actualLocalScaleFactor);
+
+				transformComponent->SetDirty(dirtyFlags | TransformComponent::DirtyFlags::GPU);
 			}
 			else if (renderComp_info->HasTechnique("IconPass")) {
 
@@ -287,7 +292,7 @@ namespace SE_G {
 				m_blendState->Bind(context);
 				renderComp_info->m_selectionTechnique->DrawTechnique(context);
 
-				transformComponent->SetLocalScaleFactor(actualLocalScaleFactor);
+				// transformComponent->SetLocalScaleFactor(actualLocalScaleFactor);
 			}
 			transformComponent->DisableMeshTransformMode();
 		}

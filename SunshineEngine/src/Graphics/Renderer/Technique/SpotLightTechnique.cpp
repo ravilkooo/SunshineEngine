@@ -63,18 +63,24 @@ namespace SE_G {
     void SpotLightTechnique::Pass(ID3D11DeviceContext* context)
     {
         // to-do: update only when changed
-        auto wMat = m_assignedTransform->GetWorldMatrix();
-        m_lightData->Position = DXSM::Vector3(wMat._41, wMat._42, wMat._43);
 
-        DXSM::Matrix rot = m_assignedTransform->GetRotationMatrix();
-        DXSM::Vector3 dir = DXSM::Vector3::Transform(DXSM::Vector3::Down, rot);
-        float h = asinf(dir.y);
-        float eps = 0.001f;
-        float az = (h > (1.0f - eps)) ? atan2f(dir.z, dir.x) : 0.0f;
-        m_lightData->Direction = { az, h };
+        if (m_assignedTransform->IsDirty() | TransformComponent::DirtyFlags::LightPos)
+        {
+            auto wMat = m_assignedTransform->GetWorldMatrix();
+            m_lightData->Position = DXSM::Vector3(wMat._41, wMat._42, wMat._43);
 
-        m_lightDataVertexCBuffer->Update(context, *m_lightData);
-        m_lightDataPixelCBuffer->Update(context, *m_lightData);
+            DXSM::Matrix rot = m_assignedTransform->GetRotationMatrix();
+            DXSM::Vector3 dir = DXSM::Vector3::Transform(DXSM::Vector3::Down, rot);
+            float h = asinf(dir.y);
+            float eps = 0.001f;
+            float az = (h > (1.0f - eps)) ? atan2f(dir.z, dir.x) : 0.0f;
+            m_lightData->Direction = { az, h };
+
+            m_lightDataVertexCBuffer->Update(context, *m_lightData);
+            m_lightDataPixelCBuffer->Update(context, *m_lightData);
+
+            m_assignedTransform->ClearFlag(TransformComponent::DirtyFlags::LightPos);
+        }
         BindAll(context);
         DrawTechnique(context);
     }

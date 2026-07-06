@@ -59,6 +59,9 @@ namespace SE_G {
 
     void PointLightTechnique::Pass(ID3D11DeviceContext* context)
     {
+        // Save dirty flags, cause mesh editing marks dirty
+        uint32_t dirtyFlags = m_assignedTransform->IsDirty();
+
         DXSM::Vector3 old_localScaleFactor = m_assignedTransform->GetLocalScaleFactor();
         DXSM::Vector3 old_localRotation = m_assignedTransform->GetLocalRotation();
         DXSM::Vector3 old_localPosition = m_assignedTransform->GetLocalPosition();
@@ -79,10 +82,16 @@ namespace SE_G {
         ));
         m_assignedTransform->BindToGraphicsPipeline(context);
 
-        // to-do: update only when changed
-        m_lightData->Position = DXSM::Vector3(fullTransform._41, fullTransform._42, fullTransform._43);
-        m_lightDataVertexCBuffer->Update(context, *m_lightData);
-        m_lightDataPixelCBuffer->Update(context, *m_lightData);
+        if (dirtyFlags | TransformComponent::DirtyFlags::LightPos)
+        {
+            // to-do: update only when changed
+            m_lightData->Position = DXSM::Vector3(fullTransform._41, fullTransform._42, fullTransform._43);
+            m_lightDataVertexCBuffer->Update(context, *m_lightData);
+            m_lightDataPixelCBuffer->Update(context, *m_lightData);
+
+            dirtyFlags = dirtyFlags & ~TransformComponent::DirtyFlags::LightPos;
+        }
+
         BindAll(context);
         DrawTechnique(context);
 
@@ -90,6 +99,9 @@ namespace SE_G {
         m_assignedTransform->SetLocalPosition(old_localPosition);
         m_assignedTransform->SetLocalRotation(old_localRotation);
         m_assignedTransform->SetLocalScaleFactor(old_localScaleFactor);
+
+        // Restore dirty flags
+        m_assignedTransform->SetDirty(dirtyFlags | TransformComponent::DirtyFlags::GPU);
     }
     
     void PointLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)

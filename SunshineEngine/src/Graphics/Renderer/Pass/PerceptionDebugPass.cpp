@@ -156,6 +156,9 @@ namespace SE_G {
 			m_perceptionData.HearingRadius = perceptionComp->HearingRadius;
 
 			auto tc = m_gameObject->GetComponent<TransformComponent_Info>();
+			// Save dirty flags, cause mesh editing marks dirty
+			uint32_t dirtyFlags = tc->m_assignedComponent->IsDirty();
+
 			DXSM::Vector3 old_localScaleFactor = tc->m_assignedComponent->GetLocalScaleFactor();
 			DXSM::Vector3 old_localRotation = tc->m_assignedComponent->GetLocalRotation();
 			DXSM::Vector3 old_localPosition = tc->m_assignedComponent->GetLocalPosition();
@@ -210,6 +213,9 @@ namespace SE_G {
 			tc->m_assignedComponent->SetLocalScaleFactor(old_localScaleFactor);
 			tc->m_assignedComponent->SetLocalRotation(old_localRotation);
 			tc->m_assignedComponent->SetLocalPosition(old_localPosition);
+
+			// Restore dirty flags
+			tc->m_assignedComponent->SetDirty(dirtyFlags | TransformComponent::DirtyFlags::GPU);
 		}
 	}
 

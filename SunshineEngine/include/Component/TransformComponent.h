@@ -39,8 +39,9 @@ public:
         None = 0,
         GPU = 1 << 0,
         Physics = 1 << 1,
+        LightPos = 1 << 2,
 
-        All = GPU | Physics,
+        All = GPU | Physics | LightPos,
     };
 
 private:
@@ -140,6 +141,7 @@ public:
         m_isAbsoluteTransformCached = false;
     }
     void ClearFlag(DirtyFlags flag) { m_isDirty &= ~flag; }
+    void SetDirty(uint32_t flag) { m_isDirty = flag; }
 
     const std::type_info& getType() const override {
         return typeid(TransformComponent);
