@@ -51,10 +51,16 @@ namespace SE_G {
 
     void DirectionalLightTechnique::Pass(ID3D11DeviceContext* context)
     {
-        // to-do: update only when changed
-        auto wMat = m_assignedTransform->GetWorldMatrix();
-        m_lightData->Position = DXSM::Vector3(wMat._41, wMat._42, wMat._43);
-        m_lightDataPixelCBuffer->Update(context, *m_lightData);
+        // Save dirty flags, cause mesh editing marks dirty
+        uint32_t dirtyFlags = m_assignedTransform->IsDirty();
+        if (dirtyFlags | TransformComponent::DirtyFlags::LightPos)
+        {
+            m_lightData->Position = m_assignedTransform->GetAbsoluteWorldPosition();
+            m_lightDataPixelCBuffer->Update(context, *m_lightData);
+
+            dirtyFlags = dirtyFlags & ~TransformComponent::DirtyFlags::LightPos;
+        }
+
         BindAll(context);
 
         if (m_castsShadow)
@@ -68,6 +74,8 @@ namespace SE_G {
             s_noShadowShader->Bind(context);
             DrawTechnique(context);
         }
+
+        m_assignedTransform->SetDirty(dirtyFlags | TransformComponent::DirtyFlags::GPU);
     }
 
     void DirectionalLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)

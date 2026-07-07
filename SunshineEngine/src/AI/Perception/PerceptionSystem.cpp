@@ -362,7 +362,7 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
             DXSM::Vector3 ViewerPos = ViewerTC->GetPosition() + ViewerPC->EyesOffset;
 
             DXSM::Vector3 z_plus = DXSM::Vector3(0.0f, 0.0f, 1.0f);
-            const auto wMat = ViewerTC->GetWorldMatrix_noLocal();
+            const auto wMat = ViewerTC->GetWorldMatrix();
             DXSM::Matrix A = wMat;
             A._41 = 0; A._42 = 0; A._43 = 0; A._44 = 1;
             const auto wMatInvTranspose = (A.Invert()).Transpose();

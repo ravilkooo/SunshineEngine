@@ -27,16 +27,16 @@ void BouncePadComponent::BounceCharacter(CharacterComponent* character)
 
         if (m_assignedTransform)
         {
-            const auto wMat = m_assignedTransform->GetWorldMatrix();
-            DXSM::Matrix A = wMat;
-            // Correct ?
-            A._41 = 0;
-            A._42 = 0;
-            A._43 = 0;
-            A._44 = 1;
+            DXSM::Matrix lwMat = m_assignedTransform->GetLocalTransformMatrix()
+                * m_assignedTransform->GetWorldMatrix();
+            
+            lwMat._41 = 0;
+            lwMat._42 = 0;
+            lwMat._43 = 0;
+            lwMat._44 = 1;
 
-            const auto wMatInvTranspose = (A.Invert()).Transpose();
-            character->m_bounceNormal = DXSM::Vector3::Transform(DXSM::Vector3(0, 1, 0), wMatInvTranspose);
+            const auto lwMatInvTranspose = (lwMat.Invert()).Transpose();
+            character->m_bounceNormal = DXSM::Vector3::Transform(DXSM::Vector3(0, 1, 0), lwMatInvTranspose);
         }
     }
 }

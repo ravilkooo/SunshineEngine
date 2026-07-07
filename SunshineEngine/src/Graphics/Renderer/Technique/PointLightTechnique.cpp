@@ -66,8 +66,8 @@ namespace SE_G {
         DXSM::Vector3 old_localRotation = m_assignedTransform->GetLocalRotation();
         DXSM::Vector3 old_localPosition = m_assignedTransform->GetLocalPosition();
 
-        m_assignedTransform->EnableMeshTransformMode();
-        DXSM::Matrix fullTransform = m_assignedTransform->GetWorldMatrix_noLocal();
+        //m_assignedTransform->EnableMeshTransformMode();
+        DXSM::Matrix fullTransform = m_assignedTransform->GetWorldMatrix();
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
         DXSM::Vector3 translation;
@@ -95,7 +95,7 @@ namespace SE_G {
         BindAll(context);
         DrawTechnique(context);
 
-        m_assignedTransform->DisableMeshTransformMode();
+        //m_assignedTransform->DisableMeshTransformMode();
         m_assignedTransform->SetLocalPosition(old_localPosition);
         m_assignedTransform->SetLocalRotation(old_localRotation);
         m_assignedTransform->SetLocalScaleFactor(old_localScaleFactor);

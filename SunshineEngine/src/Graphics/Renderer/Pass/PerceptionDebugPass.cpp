@@ -163,8 +163,8 @@ namespace SE_G {
 			DXSM::Vector3 old_localRotation = tc->m_assignedComponent->GetLocalRotation();
 			DXSM::Vector3 old_localPosition = tc->m_assignedComponent->GetLocalPosition();
 
-			tc->m_assignedComponent->EnableMeshTransformMode();
-			DXSM::Matrix fullTransform = tc->m_assignedComponent->GetWorldMatrix_noLocal();
+			//tc->m_assignedComponent->EnableMeshTransformMode();
+			DXSM::Matrix fullTransform = tc->m_assignedComponent->GetWorldMatrix();
 			DXSM::Vector3 scale;
 			DXSM::Vector3 rotate;
 			DXSM::Vector3 translation;
@@ -177,7 +177,7 @@ namespace SE_G {
 				1.0f / scale.z
 			));
 
-			const auto wMat = tc->m_assignedComponent->GetWorldMatrix_noLocal();
+			const auto wMat = tc->m_assignedComponent->GetWorldMatrix();
 			DXSM::Matrix A = wMat;
 			A._41 = 0; A._42 = 0; A._43 = 0; A._44 = 1;
 			m_perceptionData.wMatNoLocalInvTranspose = (A.Invert()).Transpose();
@@ -209,7 +209,7 @@ namespace SE_G {
 				0u
 			);
 
-			tc->m_assignedComponent->DisableMeshTransformMode();
+			//tc->m_assignedComponent->DisableMeshTransformMode();
 			tc->m_assignedComponent->SetLocalScaleFactor(old_localScaleFactor);
 			tc->m_assignedComponent->SetLocalRotation(old_localRotation);
 			tc->m_assignedComponent->SetLocalPosition(old_localPosition);

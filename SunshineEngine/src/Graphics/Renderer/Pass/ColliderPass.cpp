@@ -139,8 +139,8 @@ namespace SE_G {
 			DXSM::Vector3 old_localRotation = tech.second->m_assignedTransform->GetLocalRotation();
 			DXSM::Vector3 old_localPosition = tech.second->m_assignedTransform->GetLocalPosition();
 
-			tech.second->m_assignedTransform->EnableMeshTransformMode();
-			DXSM::Matrix fullTransform = tech.second->m_assignedTransform->GetWorldMatrix_noLocal();
+			// tech.second->m_assignedTransform->EnableMeshTransformMode();
+			DXSM::Matrix fullTransform = tech.second->m_assignedTransform->GetWorldMatrix();
 			DXSM::Vector3 scale;
 			DXSM::Vector3 rotate;
 			DXSM::Vector3 translation;
@@ -159,7 +159,7 @@ namespace SE_G {
 
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
-			tech.second->m_assignedTransform->DisableMeshTransformMode();
+			// tech.second->m_assignedTransform->DisableMeshTransformMode();
 
 			tech.second->m_assignedTransform->SetLocalPosition(old_localPosition);
 			tech.second->m_assignedTransform->SetLocalRotation(old_localRotation);
@@ -175,7 +175,7 @@ namespace SE_G {
 			// Save dirty flags, cause mesh editing marks dirty
 			uint32_t dirtyFlags = tech->m_assignedTransform->IsDirty();
 
-			DXSM::Matrix fullTransform = tech->m_assignedTransform->GetWorldMatrix_noLocal();
+			DXSM::Matrix fullTransform = tech->m_assignedTransform->GetWorldMatrix();
 			DXSM::Vector3 scale;
 			DXSM::Vector3 rotate;
 			DXSM::Vector3 translation;

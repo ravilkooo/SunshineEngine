@@ -28,7 +28,7 @@ namespace SE_G {
 			{
 				const auto wMat = pParent->GetWorldMatrix();
 				DXSM::Matrix A = wMat;
-				// Correct ?
+				
 				A._41 = 0;
 				A._42 = 0;
 				A._43 = 0;
@@ -36,8 +36,17 @@ namespace SE_G {
 
 				const auto wMatInvTranspose = (A.Invert()).Transpose();
 
+				DXSM::Matrix lMat = pParent->GetLocalTransformMatrix();
+				DXSM::Matrix lMatInvTranspose = lMat;
+				lMatInvTranspose._41 = 0;
+				lMatInvTranspose._42 = 0;
+				lMatInvTranspose._43 = 0;
+				lMatInvTranspose._44 = 1;
+				lMatInvTranspose = (lMatInvTranspose.Invert()).Transpose();
+
 				const Transforms tf = {
-					wMat, wMatInvTranspose, pParent->GetUVMultiplier().x, pParent->GetUVMultiplier().y
+					wMat, wMatInvTranspose, lMat, lMatInvTranspose,
+					pParent->GetUVMultiplier().x, pParent->GetUVMultiplier().y
 				};
 				pVcbuf->Update(context, tf);
 				pParent->ClearFlag(TransformComponent::DirtyFlags::GPU);

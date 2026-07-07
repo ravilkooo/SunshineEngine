@@ -92,7 +92,7 @@ void GameObject::AttachToParent(bool alreadyLocalTransform)
         auto tc = GetComponent<TransformComponent>();
         auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix_noLocal().Invert();
+        DXSM::Matrix newTransform = tc->GetWorldMatrix() * tc_parent->GetWorldMatrix().Invert();
 
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
@@ -132,7 +132,7 @@ void GameObject::DetachFromParent()
     auto tc = GetComponent<TransformComponent>();
     auto tc_parent = m_parent.ptr->GetComponent<TransformComponent>();
 
-    DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal();
+    DXSM::Matrix newTransform = tc->GetWorldMatrix();
 
     DXSM::Vector3 scale;
     DXSM::Vector3 rotate;
@@ -383,7 +383,7 @@ void GameObject_Info::AttachToParent(bool alreadyLocalTransform)
         auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
         auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-        DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal() * tc_parent->GetWorldMatrix_noLocal().Invert();
+        DXSM::Matrix newTransform = tc->GetWorldMatrix() * tc_parent->GetWorldMatrix().Invert();
 
         DXSM::Vector3 scale;
         DXSM::Vector3 rotate;
@@ -416,7 +416,7 @@ void GameObject_Info::DetachFromParent()
     auto tc = GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
     auto tc_parent = m_parent.ptr->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-    DXSM::Matrix newTransform = tc->GetWorldMatrix_noLocal();
+    DXSM::Matrix newTransform = tc->GetWorldMatrix();
 
     DXSM::Vector3 scale;
     DXSM::Vector3 rotate;

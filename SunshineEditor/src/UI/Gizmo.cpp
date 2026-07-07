@@ -136,7 +136,7 @@ void Gizmo::Draw()
 
     if (transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
     {
-        DXSM::Matrix worldMatrix = transformComp->m_assignedComponent->GetWorldMatrix_noLocal();
+        DXSM::Matrix worldMatrix = transformComp->m_assignedComponent->GetWorldMatrix();
         DXSM::Matrix localMatrix;
         memcpy(&localMatrix, m_objectMatrix, sizeof(float) * 16);
         DXSM::Matrix fullMatrix = localMatrix * worldMatrix;
@@ -166,7 +166,7 @@ void Gizmo::Draw()
     }
     else if (transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings)
     {
-        DXSM::Matrix parentMatrix = transformComp->m_assignedComponent->GetParentTransform()->GetWorldMatrix_noLocal();
+        DXSM::Matrix parentMatrix = transformComp->m_assignedComponent->GetParentTransform()->GetWorldMatrix();
         DXSM::Matrix worldMatrix;
         memcpy(&worldMatrix, m_objectMatrix, sizeof(float) * 16);
         DXSM::Matrix fullMatrix = worldMatrix * parentMatrix;
@@ -197,7 +197,7 @@ void Gizmo::Draw()
     else if (!transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
     {
         //DXSM::Matrix m_fullMatrix = DXSM::Matrix::Identity;
-        DXSM::Matrix worldMatrix = transformComp->m_assignedComponent->GetWorldMatrix_noLocal();
+        DXSM::Matrix worldMatrix = transformComp->m_assignedComponent->GetWorldMatrix();
         DXSM::Matrix localMatrix;
         memcpy(&localMatrix, m_objectMatrix, sizeof(float) * 16);
         DXSM::Matrix fullMatrix = localMatrix * worldMatrix;

@@ -13,6 +13,7 @@ cbuffer TransformCBuf : register(b0)
 {
     row_major float4x4 wMat;
     row_major float4x4 wInvTransposeMat;
+    row_major float4x4 lMat;
 }
 
 cbuffer CameraCBuf : register(b1)
@@ -36,6 +37,7 @@ PS_IN VSMain(VS_IN input)
 {
     PS_IN output = (PS_IN) 0;
     output.col = colliderColor;
+    
     output.pos = float4(input.pos, 1.0);
     
     // Collider settings
@@ -56,7 +58,7 @@ PS_IN VSMain(VS_IN input)
     output.pos = mul(output.pos, colliderTransformMat);
     
     // Parent body transforms
-    output.pos = mul(output.pos, wMat);
+    output.pos = mul(mul(output.pos, lMat), wMat);
     output.pos = output.pos.xyzw / output.pos.w;
     output.pos = mul(output.pos, viewProjMat);
 	
