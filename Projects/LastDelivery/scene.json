@@ -2345,7 +2345,7 @@
                     "Sampler": 0,
                     "Texture": {
                         "assetSource": 0,
-                        "relativePath": "Color:205,0,240,20.dds"
+                        "relativePath": "Color:0,0,0,10.dds"
                     },
                     "m_cullMode": "CULL_BACK"
                 },
@@ -2393,6 +2393,70 @@
             "m_UUID": 15038837568598535099,
             "m_UUID_hi": 3501502230,
             "m_UUID_lo": 3877465019,
+            "m_group": "Shapes",
+            "m_name": "Plane",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:205,0,240,105.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": {
+                    "m_isTransparent": true,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        -0.8999999761581421,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        10.0,
+                        1.0,
+                        3.0
+                    ],
+                    "m_position": [
+                        -25.659181594848633,
+                        -1.6834144592285156,
+                        1.3956916332244873
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 5328354593799603003,
+            "m_UUID_hi": 1240604229,
+            "m_UUID_lo": 2965308219,
             "m_group": "Shapes",
             "m_name": "Plane",
             "m_parent": null,
