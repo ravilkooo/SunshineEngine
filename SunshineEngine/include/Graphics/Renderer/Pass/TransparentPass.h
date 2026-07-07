@@ -55,10 +55,13 @@ namespace SE_G {
         struct TransparentPassData
         {
             SE::UUID objectUUID;
-            DXSM::Vector3 pos;
+            float zValue;
 		};
         eastl::vector<TransparentPassData> m_objectsOrder;
 
-        bool m_isDirty = true;
+    private:
+        bool CheckCameraDirty();
+
+        bool CheckObjectsTransformDirty();
     };
 }

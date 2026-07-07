@@ -1,5 +1,6 @@
 #include <Component/TransformComponent.h>
 #include <Graphics/Bindable/TransformCBuffer.h>
+#include <Graphics/Bindable/ConstantBuffer.h>
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>
 
@@ -20,6 +21,21 @@ void TransformComponent::SetupBuffer(ID3D11Device* device)
 
 void TransformComponent::BindToGraphicsPipeline(ID3D11DeviceContext* context) {
     transformBuffer->Bind(context);
+}
+
+void TransformComponent::UpdateBuffer(ID3D11DeviceContext* context)
+{
+    transformBuffer->Update(context);
+}
+
+ID3D11Buffer** TransformComponent::GetConstantBufferAddress()
+{
+    return transformBuffer->pVcbuf->pConstantBuffer.GetAddressOf();
+}
+
+void TransformComponent::MarkAsNotCached()
+{
+    m_isAbsoluteTransformCached = false;
 }
 
 DXSM::Matrix TransformComponent::GetLocalTransalationMatrix() const
@@ -71,7 +87,7 @@ DXSM::Matrix TransformComponent::GetWorldMatrix_noLocal() const
 
 void TransformComponent::CalcAbsoluteTransform()
 {
-    if (!m_isAbsoluteTransformCached)
+    if (!m_isAbsoluteTransformCached || (m_parentTransform && m_parentTransform->m_isAbsoluteTransformCached))
     {
         auto wMat = GetWorldMatrix_noLocal();
 

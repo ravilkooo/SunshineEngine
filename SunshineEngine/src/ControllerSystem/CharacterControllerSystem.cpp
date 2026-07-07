@@ -226,7 +226,7 @@ void CharacterControllerSystem::ApplyMovementInput(
         float camYaw = 0.0f;
         if (camera)
         {
-            camYaw = camera->m_springArmParams.pitchYawRoll.y;
+            camYaw = camera->GetSpringArmRotation().y;
         }
         // character->m_yaw += camYaw;
         float desiredYaw = character->m_yaw + camYaw + inputAngle;
@@ -255,9 +255,11 @@ void CharacterControllerSystem::ApplyMovementInput(
 		}
         // character->m_yaw = std::clamp(character->m_yaw, -DX::XM_PI, DX::XM_PI);
 
-        camera->m_springArmParams.pitchYawRoll.y = (desiredYaw - character->m_yaw - inputAngle);
-        if (camera->m_springArmParams.pitchYawRoll.y > DX::XM_PI) { camera->m_springArmParams.pitchYawRoll.y -= DX::XM_2PI; }
-        else if (camera->m_springArmParams.pitchYawRoll.y < -DX::XM_PI) { camera->m_springArmParams.pitchYawRoll.y += DX::XM_2PI; }
+        float newCameraYaw = (desiredYaw - character->m_yaw - inputAngle);
+        if (newCameraYaw > DX::XM_PI) { newCameraYaw -= DX::XM_2PI; }
+        else if (newCameraYaw < -DX::XM_PI) { newCameraYaw += DX::XM_2PI; }
+
+		camera->SetSpringArmYaw(newCameraYaw);
     }
 
     float desiredVelocity = input.Length() * controller->m_moveSpeed;
@@ -453,7 +455,8 @@ void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)
     }
 
     JPH::RVec3 charPos = charContrComp->m_character->GetPosition();
-    transformComp->m_position = DXSM::Vector3(charPos.GetX(), charPos.GetY(), charPos.GetZ());
+    
+    transformComp->SetPosition(DXSM::Vector3(charPos.mF32));
 
     charContrComp->m_character->SetRotation(
         JPH::Quat::sRotation(
@@ -462,9 +465,6 @@ void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)
         )
     );
 
-
     JPH::Quat quatRot = charContrComp->m_character->GetRotation();
-    transformComp->m_rotation =
-        DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
-        );
+    transformComp->SetRotation(DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()));
 }

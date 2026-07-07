@@ -21,10 +21,10 @@ function behavior:start()
                 if (phys) then
                     takenObject = phys
                 end
-                print("Trigger enter", otherUUID.hi, otherUUID.lo)
+                print("Magnet Trigger enter", otherUUID.hi, otherUUID.lo)
             elseif event == "exit" then
                 takenObject = nil
-                print("Trigger exit", otherUUID.hi, otherUUID.lo)
+                print("Magnet Trigger exit", otherUUID.hi, otherUUID.lo)
             end
         end)
     end
@@ -32,8 +32,7 @@ end
 
 function behavior:update(dt)
 
-    local inputSystem = getInputSystem()
-    local turnMagnet = inputSystem:getAxis("TurnMagnet")
+    local turnMagnet = InputSystem:getAxis("TurnMagnet")
 
     if takenObject then
         local playerYaw = playerChar.yaw

@@ -359,7 +359,7 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
 
             auto ViewerTC = ViewerGO->GetComponent<TransformComponent>();
 
-            DXSM::Vector3 ViewerPos = ViewerTC->m_position + ViewerPC->EyesOffset;
+            DXSM::Vector3 ViewerPos = ViewerTC->GetPosition() + ViewerPC->EyesOffset;
 
             DXSM::Vector3 z_plus = DXSM::Vector3(0.0f, 0.0f, 1.0f);
             const auto wMat = ViewerTC->GetWorldMatrix_noLocal();
@@ -394,7 +394,7 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
                     }
 
                     auto TargetTC = TargetGO->GetComponent<TransformComponent>();
-                    DXSM::Vector3 TargetPos = TargetTC->m_position;
+                    DXSM::Vector3 TargetPos = TargetTC->GetPosition();
 
                     DXSM::Vector3 Dir = TargetPos - ViewerPos;
                     float Dist = Dir.Length();
@@ -562,7 +562,7 @@ bool PerceptionSystem::ReportNoise(PerceptionComponent* SourcePC, float Loudness
 
             auto ObjTC = Obj->GetComponent<TransformComponent>();
 
-            if (perceiver->HearingRadius > (ObjTC->m_position - SourceTC->m_position).Length())
+            if (perceiver->HearingRadius > (ObjTC->GetPosition() - SourceTC->GetPosition()).Length())
             {
                 auto NewLoudness = Loudness* perceiver->Sensitivity;
 

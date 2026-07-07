@@ -276,26 +276,28 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene, float deltaTime) {
             JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(bodyEntry.m_joltBodyId);
             JPH::Quat quatRot = m_bodyInterface->GetRotation(bodyEntry.m_joltBodyId);
 
-            tc->m_position =
-                DXSM::Vector3(position.mF32
-                );
-            tc->m_rotation =
+            tc->SetPosition(DXSM::Vector3(position.mF32));
+            tc->SetRotation(
                 DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
-                );
+                ));
         }
         else if (motionType == JPH::EMotionType::Kinematic && tc->m_parentTransform)
         {
-            DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
-            DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
+            // if (tc->IsDirty() | TransformComponent::DirtyFlags::Physics)
+            {
+                DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
+                DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
 
-            // Push TransformComponent data into the kinematic body
-            const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
-            const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
+                // Push TransformComponent data into the kinematic body
+                const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
+                const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
-            m_bodyInterface->MoveKinematic(bodyEntry.m_joltBodyId,
-                targetPos,
-                targetRot,
-                deltaTime);
+                m_bodyInterface->MoveKinematic(bodyEntry.m_joltBodyId,
+                    targetPos,
+                    targetRot,
+                    deltaTime);
+                tc->ClearFlag(TransformComponent::DirtyFlags::Physics);
+            }
         }
 
         auto movingPlatform = objPtr->GetComponent<MovingPlatformComponent>();
@@ -321,26 +323,27 @@ void PhysicsSystem::SyncronizeTransforms(Scene* scene, float deltaTime) {
             JPH::RVec3 position = m_bodyInterface->GetCenterOfMassPosition(joltId);
             JPH::Quat quatRot = m_bodyInterface->GetRotation(joltId);
 
-            tc->m_position =
-                DXSM::Vector3(position.mF32
-                );
-            tc->m_rotation =
+            tc->SetPosition(DXSM::Vector3(position.mF32));
+            tc->SetRotation(
                 DXSM::Vector3(DXSM::Quaternion(quatRot.mValue.mF32).ToEuler()
-                );
+                ));
         }
         else if (motionType == JPH::EMotionType::Kinematic && tc->m_parentTransform)
         {
-            DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
-            DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
+            // if (tc->IsDirty() | TransformComponent::DirtyFlags::Physics)
+            {
+                DXSM::Vector3 _pos = tc->GetAbsoluteWorldPosition();
+                DXSM::Quaternion _quat = tc->GetAbsoluteWorldRotation_quat();
 
-            // Push TransformComponent data into the kinematic body
-            const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
-            const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
+                // Push TransformComponent data into the kinematic body
+                const JPH::RVec3 targetPos(_pos.x, _pos.y, _pos.z);
+                const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
-            m_bodyInterface->MoveKinematic(joltId,
-                targetPos,
-                targetRot,
-                deltaTime);
+                m_bodyInterface->MoveKinematic(joltId,
+                    targetPos,
+                    targetRot,
+                    deltaTime);
+            }
         }
     }
 }

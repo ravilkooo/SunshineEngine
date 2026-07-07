@@ -59,9 +59,12 @@ namespace SE_G {
 
     void PointLightTechnique::Pass(ID3D11DeviceContext* context)
     {
-        DXSM::Vector3 old_localScaleFactor = m_assignedTransform->m_localScaleFactor;
-        DXSM::Vector3 old_localRotation = m_assignedTransform->m_localRotation;
-        DXSM::Vector3 old_localPosition = m_assignedTransform->m_localPosition;
+        // Save dirty flags, cause mesh editing marks dirty
+        uint32_t dirtyFlags = m_assignedTransform->IsDirty();
+
+        DXSM::Vector3 old_localScaleFactor = m_assignedTransform->GetLocalScaleFactor();
+        DXSM::Vector3 old_localRotation = m_assignedTransform->GetLocalRotation();
+        DXSM::Vector3 old_localPosition = m_assignedTransform->GetLocalPosition();
 
         m_assignedTransform->EnableMeshTransformMode();
         DXSM::Matrix fullTransform = m_assignedTransform->GetWorldMatrix_noLocal();
@@ -70,28 +73,37 @@ namespace SE_G {
         DXSM::Vector3 translation;
         DecomposeTransform(fullTransform, scale, rotate, translation);
 
-        m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
-        m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
-        m_assignedTransform->m_localScaleFactor = DXSM::Vector3(
+        m_assignedTransform->SetLocalPosition(DXSM::Vector3::Zero);
+        m_assignedTransform->SetLocalRotation(DXSM::Vector3::Zero);
+        m_assignedTransform->SetLocalScaleFactor(DXSM::Vector3(
             1.0f / scale.x,
             1.0f / scale.y,
             1.0f / scale.z
-        );
+        ));
         m_assignedTransform->BindToGraphicsPipeline(context);
 
-        // to-do: update only when changed
-		m_lightData->Position = DXSM::Vector3(fullTransform._41, fullTransform._42, fullTransform._43);
-        m_lightDataVertexCBuffer->Update(context, *m_lightData);
-        m_lightDataPixelCBuffer->Update(context, *m_lightData);
+        if (dirtyFlags | TransformComponent::DirtyFlags::LightPos)
+        {
+            // to-do: update only when changed
+            m_lightData->Position = DXSM::Vector3(fullTransform._41, fullTransform._42, fullTransform._43);
+            m_lightDataVertexCBuffer->Update(context, *m_lightData);
+            m_lightDataPixelCBuffer->Update(context, *m_lightData);
+
+            dirtyFlags = dirtyFlags & ~TransformComponent::DirtyFlags::LightPos;
+        }
+
         BindAll(context);
         DrawTechnique(context);
 
         m_assignedTransform->DisableMeshTransformMode();
-        m_assignedTransform->m_localPosition = old_localPosition;
-        m_assignedTransform->m_localRotation = old_localRotation;
-        m_assignedTransform->m_localScaleFactor = old_localScaleFactor;
-    }
+        m_assignedTransform->SetLocalPosition(old_localPosition);
+        m_assignedTransform->SetLocalRotation(old_localRotation);
+        m_assignedTransform->SetLocalScaleFactor(old_localScaleFactor);
 
+        // Restore dirty flags
+        m_assignedTransform->SetDirty(dirtyFlags | TransformComponent::DirtyFlags::GPU);
+    }
+    
     void PointLightTechnique::ChooseDepthStencilState(ID3D11DeviceContext* context, LightPosition lightPos)
     {
         if (lightPos == LightPosition::INSIDE) {

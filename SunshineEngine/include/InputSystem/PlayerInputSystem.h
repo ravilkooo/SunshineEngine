@@ -151,7 +151,7 @@ public:
     bool IsPressed(const std::string& action) const;
     bool IsReleased(const std::string& action) const;
     bool IsHeld(const std::string& action) const;
-    bool IsHeld(Keys key) const;
+    bool IsKeyHeld(Keys key) const;
 
     InputActionPhase GetPhase(const std::string& action) const;
 

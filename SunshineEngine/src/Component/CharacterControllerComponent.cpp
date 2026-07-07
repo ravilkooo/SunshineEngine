@@ -58,11 +58,9 @@ void CharacterControllerComponent::Initialize(PhysicsSystem* physicsSystem,
 	DXSM::Quaternion _quat = transformComp->GetAbsoluteWorldRotation_quat();
 	const JPH::Quat targetRot(_quat.x, _quat.y, _quat.z, _quat.w);
 
+	auto temp = transformComp->GetPosition();
 	m_character = new JPH::CharacterVirtual(&settings,
-		JPH::RVec3(
-			transformComp->m_position.x,
-			transformComp->m_position.y,
-			transformComp->m_position.z),
+		JPH::RVec3Arg(temp.x, temp.y, temp.z),
 		targetRot, m_uuid.m_UUID, &physSystem);
 
 

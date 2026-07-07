@@ -227,7 +227,7 @@ void Game::ClearCachedAbsoluteTransforms()
 		auto tc = it.second->GetComponent<TransformComponent>();
 		if (tc)
 		{
-			tc->m_isAbsoluteTransformCached = false;
+			tc->MarkAsNotCached();
 		}
 	}
 }
@@ -257,7 +257,7 @@ void Game::Update(float deltaTime) {
 	PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
 	BehaviorStorage::Get().Update(deltaTime);
 
-	ClearCachedAbsoluteTransforms();
+	// ClearCachedAbsoluteTransforms();
 
 	m_renderer->GetMainCamera()->Update(deltaTime);
 

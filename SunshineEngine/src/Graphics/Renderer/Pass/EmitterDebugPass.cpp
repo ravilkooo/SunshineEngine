@@ -129,13 +129,13 @@ namespace SE_G {
 		{
 			if (!tech.second->IsEnabled())
 				continue;
-			DXSM::Vector3 old_scaleFactor = tech.second->m_assignedTransform->m_scaleFactor;
-			tech.second->m_assignedTransform->m_scaleFactor = DXSM::Vector3::One;
+			DXSM::Vector3 old_scaleFactor = tech.second->m_assignedTransform->GetScaleFactor();
+			tech.second->m_assignedTransform->SetScaleFactor(DXSM::Vector3::One);
 
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
 
-			tech.second->m_assignedTransform->m_scaleFactor = old_scaleFactor;
+			tech.second->m_assignedTransform->SetScaleFactor(old_scaleFactor);
 		}
 	}
 

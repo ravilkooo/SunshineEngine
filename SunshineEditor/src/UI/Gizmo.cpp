@@ -259,14 +259,14 @@ void Gizmo::UpdateObjectMatrix()
     {
         if (!m_hasRotationCache)
         {
-            m_gizmoRotation = ConvertEulerToQuaternion(comp.m_localRotation);
+            m_gizmoRotation = ConvertEulerToQuaternion(comp.GetLocalRotation());
             m_hasRotationCache = true;
         }
 
         DXSM::Matrix worldMatrix =
-            DXSM::Matrix::CreateScale(comp.m_localScaleFactor) *
+            DXSM::Matrix::CreateScale(comp.GetLocalScaleFactor()) *
             DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
-            DXSM::Matrix::CreateTranslation(comp.m_localPosition);
+            DXSM::Matrix::CreateTranslation(comp.GetLocalPosition());
 
         memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
     }
@@ -274,14 +274,14 @@ void Gizmo::UpdateObjectMatrix()
     {
         if (!m_hasRotationCache)
         {
-            m_gizmoRotation = ConvertEulerToQuaternion(comp.m_rotation);
+            m_gizmoRotation = ConvertEulerToQuaternion(comp.GetRotation());
             m_hasRotationCache = true;
         }
 
         DXSM::Matrix worldMatrix =
-            DXSM::Matrix::CreateScale(comp.m_scaleFactor) *
+            DXSM::Matrix::CreateScale(comp.GetScaleFactor()) *
             DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
-            DXSM::Matrix::CreateTranslation(comp.m_position);
+            DXSM::Matrix::CreateTranslation(comp.GetPosition());
 
         memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
     }
@@ -289,14 +289,14 @@ void Gizmo::UpdateObjectMatrix()
     {
         if (!m_hasRotationCache)
         {
-            m_gizmoRotation = ConvertEulerToQuaternion(comp.m_localRotation);
+            m_gizmoRotation = ConvertEulerToQuaternion(comp.GetLocalRotation());
             m_hasRotationCache = true;
         }
 
         DXSM::Matrix worldMatrix =
-            DXSM::Matrix::CreateScale(comp.m_localScaleFactor) *
+            DXSM::Matrix::CreateScale(comp.GetLocalScaleFactor()) *
             DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
-            DXSM::Matrix::CreateTranslation(comp.m_localPosition);
+            DXSM::Matrix::CreateTranslation(comp.GetLocalPosition());
 
         memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
     }
@@ -304,14 +304,14 @@ void Gizmo::UpdateObjectMatrix()
     {
         if (!m_hasRotationCache)
         {
-            m_gizmoRotation = ConvertEulerToQuaternion(comp.m_rotation);
+            m_gizmoRotation = ConvertEulerToQuaternion(comp.GetRotation());
             m_hasRotationCache = true;
         }
 
         DXSM::Matrix worldMatrix =
-            DXSM::Matrix::CreateScale(comp.m_scaleFactor) *
+            DXSM::Matrix::CreateScale(comp.GetScaleFactor()) *
             DXSM::Matrix::CreateFromQuaternion(m_gizmoRotation) *
-            DXSM::Matrix::CreateTranslation(comp.m_position);
+            DXSM::Matrix::CreateTranslation(comp.GetPosition());
 
         memcpy(m_objectMatrix, &worldMatrix, sizeof(float) * 16);
     }
@@ -548,15 +548,18 @@ void Gizmo::ExtractTransformFromMatrix(const float* matrix)
     if (!transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
     {
         auto& comp = *transformComp->m_assignedComponent;
-        DX::XMStoreFloat3(&comp.m_localPosition, translation);
-        DX::XMStoreFloat3(&comp.m_localScaleFactor, scale);
+        DXSM::Vector3 temp;
+        DX::XMStoreFloat3(&temp, translation);
+        comp.SetLocalPosition(temp);
+        DX::XMStoreFloat3(&temp, scale);
+        comp.SetLocalScaleFactor(temp);
 
         if (m_currentOperation != ImGuizmo::SCALE)
         {
             DX::XMStoreFloat4(&m_gizmoRotation, rotation);
             m_hasRotationCache = true;
 
-            comp.m_localRotation = ConvertQuaternionToEuler(m_gizmoRotation);
+            comp.SetLocalRotation(ConvertQuaternionToEuler(m_gizmoRotation));
         }
         else
         {
@@ -566,17 +569,18 @@ void Gizmo::ExtractTransformFromMatrix(const float* matrix)
     else if (!transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings)
     {
         auto& comp = *transformComp->m_assignedComponent;
-
-
-        DX::XMStoreFloat3(&comp.m_position, translation);
-        DX::XMStoreFloat3(&comp.m_scaleFactor, scale);
+        DXSM::Vector3 temp;
+        DX::XMStoreFloat3(&temp, translation);
+        comp.SetPosition(temp);
+        DX::XMStoreFloat3(&temp, scale);
+        comp.SetScaleFactor(temp);
 
         if (m_currentOperation != ImGuizmo::SCALE)
         {
             DX::XMStoreFloat4(&m_gizmoRotation, rotation);
             m_hasRotationCache = true;
 
-            comp.m_rotation = ConvertQuaternionToEuler(m_gizmoRotation);
+            comp.SetRotation(ConvertQuaternionToEuler(m_gizmoRotation));
         }
         else
         {
@@ -586,15 +590,18 @@ void Gizmo::ExtractTransformFromMatrix(const float* matrix)
     else if (transformComp->m_assignedComponent->GetParentTransform() && m_isMeshSettings)
     {
         auto& comp = *transformComp->m_assignedComponent;
-        DX::XMStoreFloat3(&comp.m_localPosition, translation);
-        DX::XMStoreFloat3(&comp.m_localScaleFactor, scale);
+        DXSM::Vector3 temp;
+        DX::XMStoreFloat3(&temp, translation);
+        comp.SetLocalPosition(temp);
+        DX::XMStoreFloat3(&temp, scale);
+        comp.SetLocalScaleFactor(temp);
 
         if (m_currentOperation != ImGuizmo::SCALE)
         {
             DX::XMStoreFloat4(&m_gizmoRotation, rotation);
             m_hasRotationCache = true;
 
-            comp.m_localRotation = ConvertQuaternionToEuler(m_gizmoRotation);
+            comp.SetLocalRotation(ConvertQuaternionToEuler(m_gizmoRotation));
         }
         else
         {
@@ -604,15 +611,18 @@ void Gizmo::ExtractTransformFromMatrix(const float* matrix)
     else if (transformComp->m_assignedComponent->GetParentTransform() && !m_isMeshSettings)
     {
         auto& comp = *transformComp->m_assignedComponent;
-        DX::XMStoreFloat3(&comp.m_position, translation);
-        DX::XMStoreFloat3(&comp.m_scaleFactor, scale);
+        DXSM::Vector3 temp;
+        DX::XMStoreFloat3(&temp, translation);
+        comp.SetPosition(temp);
+        DX::XMStoreFloat3(&temp, scale);
+        comp.SetScaleFactor(temp);
 
         if (m_currentOperation != ImGuizmo::SCALE)
         {
             DX::XMStoreFloat4(&m_gizmoRotation, rotation);
             m_hasRotationCache = true;
 
-            comp.m_rotation = ConvertQuaternionToEuler(m_gizmoRotation);
+            comp.SetRotation(ConvertQuaternionToEuler(m_gizmoRotation));
         }
         else
         {

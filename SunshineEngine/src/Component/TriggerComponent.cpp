@@ -106,13 +106,11 @@ void TriggerComponent::InitTransforms()
 {
     transformComp->CalcAbsoluteTransform();
 
-    m_position.Set(transformComp->m_cachedAbsoluteWorldPosition.x,
-        transformComp->m_cachedAbsoluteWorldPosition.y,
-        transformComp->m_cachedAbsoluteWorldPosition.z);
-    m_orientation.Set(transformComp->m_cachedAbsoluteWorldRotation_quat.x,
-        transformComp->m_cachedAbsoluteWorldRotation_quat.y,
-        transformComp->m_cachedAbsoluteWorldRotation_quat.z,
-        transformComp->m_cachedAbsoluteWorldRotation_quat.w);
+    auto pos = transformComp->GetAbsoluteWorldPosition();
+    auto quat = transformComp->GetAbsoluteWorldRotation_quat();
+
+    m_position.Set(pos.x, pos.y, pos.z);
+    m_orientation.Set(quat.x, quat.y, quat.z, quat.w);
 }
 
 JPH::BodyID TriggerComponent::GetBodyID() const

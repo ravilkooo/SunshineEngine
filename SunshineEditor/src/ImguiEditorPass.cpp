@@ -387,7 +387,9 @@ void ImguiEditorPass::Pass()
 
 				if (go)
 				{
-					go->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position += DXSM::Vector3(1,0,0);
+					go->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(
+						go->GetComponent<TransformComponent_Info>()->m_assignedComponent->GetPosition() + DXSM::Vector3(1, 0, 0)
+					);
 					auto uuid = m_editorApp->m_worldEditor->m_scene->AddGameObject(std::move(go));
 					m_editorApp->m_worldEditor->m_scene->m_sceneGraph->Add(uuid);
 
@@ -416,7 +418,7 @@ void ImguiEditorPass::Pass()
 
 				if (go)
 				{
-					go->GetComponent<TransformComponent_Info>()->m_assignedComponent->m_position = m_clickWorldPos;
+					go->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(m_clickWorldPos);
 					auto uuid = m_editorApp->m_worldEditor->m_scene->AddGameObject(std::move(go));
 					m_editorApp->m_worldEditor->m_scene->m_sceneGraph->Add(uuid);
 

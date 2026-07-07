@@ -98,9 +98,9 @@ void GameObject::AttachToParent(bool alreadyLocalTransform)
         DXSM::Vector3 rotate;
         DXSM::Vector3 translation;
         DecomposeTransform(newTransform, scale, rotate, translation);
-        tc->m_scaleFactor = scale;
-        tc->m_position = translation;
-        tc->m_rotation = rotate;
+        tc->SetScaleFactor(scale);
+        tc->SetPosition(translation);
+        tc->SetRotation(rotate);
     }
 
 
@@ -138,9 +138,9 @@ void GameObject::DetachFromParent()
     DXSM::Vector3 rotate;
     DXSM::Vector3 translation;
     DecomposeTransform(newTransform, scale, rotate, translation);
-    tc->m_scaleFactor = scale;
-    tc->m_position = translation;
-    tc->m_rotation = rotate;
+    tc->SetScaleFactor(scale);
+    tc->SetPosition(translation);
+    tc->SetRotation(rotate);
 
     GetComponent<TransformComponent>()->SetParentTransform(
         nullptr
@@ -389,9 +389,9 @@ void GameObject_Info::AttachToParent(bool alreadyLocalTransform)
         DXSM::Vector3 rotate;
         DXSM::Vector3 translation;
         DecomposeTransform(newTransform, scale, rotate, translation);
-        tc->m_scaleFactor = scale;
-        tc->m_position = translation;
-        tc->m_rotation = rotate;
+        tc->SetScaleFactor(scale);
+        tc->SetPosition(translation);
+        tc->SetRotation(rotate);
     }
 
     GetComponent<TransformComponent_Info>()->SetParentTransform(
@@ -422,9 +422,9 @@ void GameObject_Info::DetachFromParent()
     DXSM::Vector3 rotate;
     DXSM::Vector3 translation;
     DecomposeTransform(newTransform, scale, rotate, translation);
-    tc->m_scaleFactor = scale;
-    tc->m_position = translation;
-    tc->m_rotation = rotate;
+    tc->SetScaleFactor(scale);
+    tc->SetPosition(translation);
+    tc->SetRotation(rotate);
 
     GetComponent<TransformComponent_Info>()->SetParentTransform(
         nullptr

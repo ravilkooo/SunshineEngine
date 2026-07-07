@@ -45,12 +45,6 @@ namespace SE_G {
 		rastDesc.FillMode = D3D11_FILL_SOLID;
 		m_rasterizer = eastl::make_unique<Bind::Rasterizer>(device, rastDesc);
 
-		D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT{});
-		dsDesc.DepthEnable = TRUE;
-		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-		m_depthStencilState = eastl::make_unique<Bind::DepthStencilState>(device, dsDesc);
-
 		m_uuidBuffer = eastl::make_unique<Bind::PixelConstantBuffer<SE::UUIDhilo>>(
 			device,
 			uuid.GetHilo(),

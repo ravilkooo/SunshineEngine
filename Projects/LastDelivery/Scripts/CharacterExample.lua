@@ -80,26 +80,31 @@ end
 
 function behavior:update(dt)
     local tr = self.owner:getTransform()
-    tr.localPosition = Vector3.new(tr.localPosition.x, yMidLevel + floatingAmp * math.sin(os.clock() * floatingSpeed), tr.localPosition.z)
+    local pos = tr.localPosition
 
-    local inputSystem = getInputSystem()
+    tr.localPosition = Vector3.new(
+        pos.x,
+        yMidLevel + floatingAmp * math.sin(os.clock() * floatingSpeed),
+        pos.z
+    )
+
     local speed = 0.1
     local char = self.owner:getCharacterComponent()
 
     if (char.isPlayerControlled) then
-        local camera = self.owner:getCameraComponent()
+        local camera = self.owner:getCameraComponent():getCamera()
 
-        local inputValue = inputSystem:getAxis2D("Forward", "Right")
-        char.moveInput = Vector2.new(inputValue.y, inputValue.x)
-        camera:getCamera():rotateSpringArmYaw(0.4 * inputSystem:getMouseDeltaX())
-        camera:getCamera():rotateSpringArmPitch(0.4 * inputSystem:getMouseDeltaY())
+        local inputValue = InputSystem:getAxis2D("Right", "Forward")
+        char.moveInput = inputValue
+        camera:rotateSpringArmYaw(0.4 * InputSystem:getMouseDeltaX())
+        camera:rotateSpringArmPitch(0.4 * InputSystem:getMouseDeltaY())
 
-        local mouseWheelDelta = inputSystem:getMouseWheelDelta()
+        local mouseWheelDelta = InputSystem:getMouseWheelDelta()
         if (mouseWheelDelta ~= 0) then
-            camera:getCamera():zoomSpringArm(-1 * mouseWheelDelta)
+            camera:zoomSpringArm(-1 * mouseWheelDelta)
         end
 
-        if (inputSystem:isPressed("Jump")) then
+        if (InputSystem:isPressed("Jump")) then
             print("== JUMP! ==")
             char.jumpRequested = true
         end

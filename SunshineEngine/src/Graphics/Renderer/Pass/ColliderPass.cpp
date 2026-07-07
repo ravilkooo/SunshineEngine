@@ -131,9 +131,13 @@ namespace SE_G {
 		{
 			if (!tech.second->IsEnabled())
 				continue;
-			DXSM::Vector3 old_localScaleFactor = tech.second->m_assignedTransform->m_localScaleFactor;
-			DXSM::Vector3 old_localRotation = tech.second->m_assignedTransform->m_localRotation;
-			DXSM::Vector3 old_localPosition = tech.second->m_assignedTransform->m_localPosition;
+
+			// Save dirty flags, cause mesh editing marks dirty
+			uint32_t dirtyFlags = tech.second->m_assignedTransform->IsDirty();
+
+			DXSM::Vector3 old_localScaleFactor = tech.second->m_assignedTransform->GetLocalScaleFactor();
+			DXSM::Vector3 old_localRotation = tech.second->m_assignedTransform->GetLocalRotation();
+			DXSM::Vector3 old_localPosition = tech.second->m_assignedTransform->GetLocalPosition();
 
 			tech.second->m_assignedTransform->EnableMeshTransformMode();
 			DXSM::Matrix fullTransform = tech.second->m_assignedTransform->GetWorldMatrix_noLocal();
@@ -142,42 +146,58 @@ namespace SE_G {
 			DXSM::Vector3 translation;
 			DecomposeTransform(fullTransform, scale, rotate, translation);
 			
-			tech.second->m_assignedTransform->m_localPosition = DXSM::Vector3::Zero;
-			tech.second->m_assignedTransform->m_localRotation = DXSM::Vector3::Zero;
-			tech.second->m_assignedTransform->m_localScaleFactor = DXSM::Vector3(
+			tech.second->m_assignedTransform->SetLocalPosition(DXSM::Vector3::Zero);
+			tech.second->m_assignedTransform->SetLocalRotation(DXSM::Vector3::Zero);
+			tech.second->m_assignedTransform->SetLocalScaleFactor(DXSM::Vector3(
 				1.0f / scale.x,
 				1.0f / scale.y,
 				1.0f / scale.z
-			);
+			));
+
+			// Restore dirty flags
+			tech.second->m_assignedTransform->SetDirty(dirtyFlags);
+
 			tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech.second->Pass(GetDeviceContext());
 			tech.second->m_assignedTransform->DisableMeshTransformMode();
 
-			tech.second->m_assignedTransform->m_localPosition = old_localPosition;
-			tech.second->m_assignedTransform->m_localRotation = old_localRotation;
-			tech.second->m_assignedTransform->m_localScaleFactor = old_localScaleFactor;
+			tech.second->m_assignedTransform->SetLocalPosition(old_localPosition);
+			tech.second->m_assignedTransform->SetLocalRotation(old_localRotation);
+			tech.second->m_assignedTransform->SetLocalScaleFactor(old_localScaleFactor);
+
+			// Restore dirty flags
+			tech.second->m_assignedTransform->SetDirty(dirtyFlags);
 		}
 
 		// Custom shapes
 		for (auto& tech : m_customTechniques)
 		{
+			// Save dirty flags, cause mesh editing marks dirty
+			uint32_t dirtyFlags = tech->m_assignedTransform->IsDirty();
+
 			DXSM::Matrix fullTransform = tech->m_assignedTransform->GetWorldMatrix_noLocal();
 			DXSM::Vector3 scale;
 			DXSM::Vector3 rotate;
 			DXSM::Vector3 translation;
 			DecomposeTransform(fullTransform, scale, rotate, translation);
 
-			DXSM::Vector3 old_scaleFactor = tech->m_assignedTransform->m_scaleFactor;
-			tech->m_assignedTransform->m_scaleFactor = DXSM::Vector3(
+			DXSM::Vector3 old_scaleFactor = tech->m_assignedTransform->GetScaleFactor();
+			tech->m_assignedTransform->SetScaleFactor(DXSM::Vector3(
 				old_scaleFactor.x / scale.x,
 				old_scaleFactor.y / scale.y,
 				old_scaleFactor.z / scale.z
-			);
+			));
+
+			// Restore dirty flags
+			tech->m_assignedTransform->SetDirty(dirtyFlags);
 
 			tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 			tech->Pass(GetDeviceContext());
 
-			tech->m_assignedTransform->m_scaleFactor = old_scaleFactor;
+			tech->m_assignedTransform->SetScaleFactor(old_scaleFactor);
+
+			// Restore dirty flags
+			tech->m_assignedTransform->SetDirty(dirtyFlags);
 		}
 	}
 

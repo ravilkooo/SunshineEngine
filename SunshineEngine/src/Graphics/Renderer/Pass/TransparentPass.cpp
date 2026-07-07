@@ -95,12 +95,10 @@ namespace SE_G {
 		// Bind camera buffer to 1u slot
 		m_renderer->GetMainCamera()->BindBuffer(context);
 
-		// temporary solution to sort objects every frame, until we have a proper system to detect when an object is moved
-		m_isDirty = true;
-		if (m_isDirty)
+		
+		if (CheckObjectsTransformDirty() || CheckCameraDirty())
 		{
 			SortObjects();
-			m_isDirty = false;
 		}
 	}
 
@@ -134,20 +132,33 @@ namespace SE_G {
 	void TransparentPass::SortObjects()
 	{
 		m_objectsOrder.clear();
+		auto cam = m_renderer->GetMainCamera();
+		auto viewMatrix = cam->GetViewMatrix();
 
 		for (auto& tech : m_techniques) {
 			if (!tech.second->IsEnabled())
 				continue;
-			TransparentPassData data;
-			data.objectUUID = tech.first;
-			data.pos = tech.second->m_assignedTransform->GetAbsoluteWorldPosition();
-			m_objectsOrder.push_back(data);
+
+			// Use view position to sort objects in camera space
+			auto pos = tech.second->m_assignedTransform->GetAbsoluteWorldPosition();
+			float zValue = DXSM::Vector3::Transform(pos, viewMatrix).z;
+
+			if (zValue > 0) {
+				TransparentPassData data;
+				data.objectUUID = tech.first;
+				data.zValue = zValue;
+				m_objectsOrder.push_back(data);
+			}
+
+			tech.second->m_assignedTransform->ClearFlag(TransformComponent::DirtyFlags::Transparent);
 		}
 
 		std::sort(m_objectsOrder.begin(), m_objectsOrder.end(),
 			[](const TransparentPassData& a, const TransparentPassData& b) {
-				return a.pos.z > b.pos.z; // Sort by z position in descending order
+				return a.zValue > b.zValue; // Sort by z position in descending order
 			});
+
+		cam->ClearDirtyFlag(Camera::DirtyFlags::Transparent);
 	}
 
 	// GBuffer should be resized before this method
@@ -170,5 +181,21 @@ namespace SE_G {
 		viewport.TopLeftY = 0;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1.0f;
+	}
+
+	bool TransparentPass::CheckCameraDirty()
+	{
+		return (m_renderer->GetMainCamera()->IsDirty() | Camera::DirtyFlags::Transparent);
+	}
+
+	bool TransparentPass::CheckObjectsTransformDirty()
+	{
+		for (auto& tech : m_techniques) {
+			if (!tech.second->IsEnabled())
+				continue;
+			if (tech.second->m_assignedTransform->IsDirty() | TransformComponent::DirtyFlags::Transparent)
+				return true;
+		}
+		return false;
 	}
 }

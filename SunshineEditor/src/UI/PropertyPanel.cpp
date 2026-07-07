@@ -316,43 +316,38 @@ void PropertyPanel::DrawTransformComponent(GameObject_Info* obj)
     {
         EditorUI::FontStyles::Pop();
 
-        ImguiUtils::DrawVector3Control("Position", transform->m_position,
+        DXSM::Vector3 position = transform->GetPosition();
+        if (ImguiUtils::DrawVector3Control("Position", position,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
-            0.0f);
+            0.0f))
+        {
+            transform->SetPosition(position);
+        }
 
-        DXSM::Vector3 rotationDeg = transform->m_rotation * (180.0f / DirectX::XM_PI);
+        DXSM::Vector3 rotationDeg = transform->GetRotation() * (180.0f / DirectX::XM_PI);
         if (ImguiUtils::DrawVector3Control("Rotation", rotationDeg,
             DXSM::Vector3(-360.0f, -360.0f, -360.0f),
             DXSM::Vector3(360.0f, 360.0f, 360.0f),
             0.0f))
         {
-            transform->m_rotation = rotationDeg * (DirectX::XM_PI / 180.0f);
+            transform->SetRotation(rotationDeg * (DirectX::XM_PI / 180.0f));
         }
 
-        ImguiUtils::DrawVector3Control("Scale", transform->m_scaleFactor,
+        DXSM::Vector3 scale = transform->GetScaleFactor();
+        if (ImguiUtils::DrawVector3Control("Scale", scale,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
-            1.0f);
-
-        ImguiUtils::DrawVector2Control("UV Multiplier", transform->m_uvMultiplier, 1.0f);
-
-        /*
-        if (ImGui::TreeNode("Local Transform"))
+            1.0f))
         {
-            ImguiUtils::DrawVector3Control("Local Position", transform->m_localPosition, 0.0f);
-
-            DXSM::Vector3 localRotDeg = transform->m_localRotation * (180.0f / DirectX::XM_PI);
-            if (ImguiUtils::DrawVector3Control("Local Rotation", localRotDeg, 0.0f))
-            {
-                transform->m_localRotation = localRotDeg * (DirectX::XM_PI / 180.0f);
-            }
-
-            ImguiUtils::DrawVector3Control("Local Scale", transform->m_localScaleFactor, 1.0f);
-
-            ImGui::TreePop();
+            transform->SetScaleFactor(scale);
         }
-        */
+
+        auto uvMultiplier = transform->GetUVMultiplier();
+        if (ImguiUtils::DrawVector2Control("UV Multiplier", uvMultiplier, 1.0f))
+        {
+            transform->SetUVMultiplier(uvMultiplier);
+        }
 
         ImGui::TreePop();
     }
@@ -1662,9 +1657,9 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
                 ImGui::TreePop();
 
                 auto tcInfo = obj->GetComponent<TransformComponent_Info>();
-                tcInfo->m_assignedComponent->m_localPosition = DXSM::Vector3::Zero;
-                tcInfo->m_assignedComponent->m_localRotation = DXSM::Vector3::Zero;
-                tcInfo->m_assignedComponent->m_localScaleFactor = DXSM::Vector3::One;
+                tcInfo->m_assignedComponent->SetLocalPosition(DXSM::Vector3::Zero);
+                tcInfo->m_assignedComponent->SetLocalRotation(DXSM::Vector3::Zero);
+                tcInfo->m_assignedComponent->SetLocalScaleFactor(DXSM::Vector3::One);
 
                 return;
             }
@@ -1691,24 +1686,32 @@ void PropertyPanel::DrawMeshComponent(GameObject_Info* obj)
             EditorUI::FontStyles::Pop();
             auto transform = obj->GetComponent<TransformComponent_Info>()->m_assignedComponent.get();
 
-            ImguiUtils::DrawVector3Control("Mesh Offset", transform->m_localPosition,
+            DXSM::Vector3 position = transform->GetLocalPosition();
+            if (ImguiUtils::DrawVector3Control("Mesh Offset", position,
                 DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
                 DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
-                0.0f);
+                0.0f))
+            {
+                transform->SetLocalPosition(position);
+            }
 
-            DXSM::Vector3 localRotDeg = transform->m_localRotation * (180.0f / DirectX::XM_PI);
-            if (ImguiUtils::DrawVector3Control("Mesh Rotation", localRotDeg,
+            DXSM::Vector3 rotationDeg = transform->GetLocalRotation() * (180.0f / DirectX::XM_PI);
+            if (ImguiUtils::DrawVector3Control("Mesh Rotation", rotationDeg,
                 DXSM::Vector3(-360.0f, -360.0f, -360.0f),
                 DXSM::Vector3(360.0f, 360.0f, 360.0f),
                 0.0f))
             {
-                transform->m_localRotation = localRotDeg * (DirectX::XM_PI / 180.0f);
+                transform->SetLocalRotation(rotationDeg * (DirectX::XM_PI / 180.0f));
             }
 
-            ImguiUtils::DrawVector3Control("Mesh Scale", transform->m_localScaleFactor,
+            DXSM::Vector3 scale = transform->GetLocalScaleFactor();
+            if (ImguiUtils::DrawVector3Control("Mesh Scale", scale,
                 DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
                 DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
-                1.0f);
+                1.0f))
+            {
+                transform->SetLocalScaleFactor(scale);
+            }
 
             ImGui::TreePop();
         }
@@ -1888,46 +1891,55 @@ void PropertyPanel::DrawCameraComponent(GameObject_Info* obj)
         ImVec2 avail = ImGui::GetContentRegionAvail();
         avail.y = avail.x * 360.0f / 640.0f;
 
+        cameraInfo->m_assignedComponent->m_camera->UpdateBuffer(m_WorldEditor->m_miniViewRenderer->GetDeviceContext());
         ImGui::Image((ImTextureID)m_WorldEditor->m_miniViewRenderer->m_GBuffer->pLightSRV.Get(), avail);
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         ImGui::Text("Spring Arm Params");
         EditorUI::FontStyles::Pop();
 
-        float stickLength = cameraInfo->m_assignedComponent->m_camera->m_springArmParams.length;
+        float stickLength = cameraInfo->m_assignedComponent->m_camera->GetSpringArmLength();
         if (ImGui::DragFloat("Length", &stickLength, 0.1f, 0.1f, 90.0f, "%.1f m"))
         {
-            cameraInfo->m_assignedComponent->m_camera->m_springArmParams.length = stickLength;
+            cameraInfo->m_assignedComponent->m_camera->SetSpringArmLength(stickLength);
         }
 
-        DXSM::Vector3 springArmRotationDeg = cameraInfo->m_assignedComponent->m_camera->m_springArmParams.pitchYawRoll * (180.0f / DirectX::XM_PI);
+        DXSM::Vector3 springArmRotationDeg = cameraInfo->m_assignedComponent->m_camera->GetSpringArmRotation() * (180.0f / DirectX::XM_PI);
         if (ImguiUtils::DrawVector3Control("Rotation", springArmRotationDeg,
             DXSM::Vector3(-90.0f, -80.0f, -360.0f),
             DXSM::Vector3(90.0f, 80.0f, 360.0f),
             0.0f))
         {
-            cameraInfo->m_assignedComponent->m_camera->m_springArmParams.pitchYawRoll = springArmRotationDeg * (DirectX::XM_PI / 180.0f);
+            cameraInfo->m_assignedComponent->m_camera->SetSpringArmRotation(springArmRotationDeg * (DirectX::XM_PI / 180.0f));
         }
 
-        ImguiUtils::DrawVector3Control("Offset",
-            cameraInfo->m_assignedComponent->m_camera->m_springArmParams.rootOffset,
+        DXSM::Vector3 rootOffset = cameraInfo->m_assignedComponent->m_camera->GetSpringArmRootOffset();
+        if (ImguiUtils::DrawVector3Control("Offset",
+            rootOffset,
             DXSM::Vector3(-1'000'000.0f, -1'000'000.0f, -1'000'000.0f),
             DXSM::Vector3(1'000'000.0f, 1'000'000.0f, 1'000'000.0f),
-            0.0f);
+            0.0f))
+        {
+            cameraInfo->m_assignedComponent->m_camera->SetSpringArmRootOffset(rootOffset);
+        }
 
-        DrawFloatControl("Zoom acceleration", cameraInfo->m_assignedComponent->m_camera->m_zoomAcceleration, 1.0f, 0.1f, 0.0f, 1000.0f, "%.1f");
+        float zoomAccel = cameraInfo->m_assignedComponent->m_camera->GetZoomAcceleration();
+        if (DrawFloatControl("Zoom acceleration", zoomAccel, 1.0f, 0.1f, 0.0f, 1000.0f, "%.1f"))
+        {
+            cameraInfo->m_assignedComponent->m_camera->SetZoomAcceleration(zoomAccel);
+        }
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         ImGui::Text("Camera Params");
         EditorUI::FontStyles::Pop();
 
-        DXSM::Vector3 cameraRotationDeg = cameraInfo->m_assignedComponent->m_camera->cameraPitchYawRoll * (180.0f / DirectX::XM_PI);
+        DXSM::Vector3 cameraRotationDeg = cameraInfo->m_assignedComponent->m_camera->GetCameraRotation() * (180.0f / DirectX::XM_PI);
         if (ImguiUtils::DrawVector3Control("Rotation", cameraRotationDeg,
             DXSM::Vector3(-90.0f, -80.0f, -360.0f),
             DXSM::Vector3(90.0f, 80.0f, 360.0f),
             0.0f))
         {
-            cameraInfo->m_assignedComponent->m_camera->cameraPitchYawRoll = cameraRotationDeg * (DirectX::XM_PI / 180.0f);
+            cameraInfo->m_assignedComponent->m_camera->SetCameraRotation(cameraRotationDeg * (DirectX::XM_PI / 180.0f));
         }
 
         if (DrawComponentRemoveButton<CameraComponent_Info>(obj))

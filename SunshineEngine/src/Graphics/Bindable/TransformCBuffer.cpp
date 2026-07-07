@@ -24,20 +24,24 @@ namespace SE_G {
 
 		void TransformCBuffer::Update(ID3D11DeviceContext* context) noexcept
 		{
-			const auto wMat = pParent->GetWorldMatrix();
-			DXSM::Matrix A = wMat;
-			// Correct ?
-			A._41 = 0;
-			A._42 = 0;
-			A._43 = 0;
-			A._44 = 1;
+			if (pParent->IsDirty() | TransformComponent::DirtyFlags::GPU)
+			{
+				const auto wMat = pParent->GetWorldMatrix();
+				DXSM::Matrix A = wMat;
+				// Correct ?
+				A._41 = 0;
+				A._42 = 0;
+				A._43 = 0;
+				A._44 = 1;
 
-			const auto wMatInvTranspose = (A.Invert()).Transpose();
+				const auto wMatInvTranspose = (A.Invert()).Transpose();
 
-			const Transforms tf = {
-				wMat, wMatInvTranspose, pParent->m_uvMultiplier.x, pParent->m_uvMultiplier.y
-			};
-			pVcbuf->Update(context, tf);
+				const Transforms tf = {
+					wMat, wMatInvTranspose, pParent->GetUVMultiplier().x, pParent->GetUVMultiplier().y
+				};
+				pVcbuf->Update(context, tf);
+				pParent->ClearFlag(TransformComponent::DirtyFlags::GPU);
+			}
 		}
 		void TransformCBuffer::Bind(ID3D11DeviceContext* context) noexcept
 		{
