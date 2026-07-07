@@ -152,7 +152,7 @@ namespace SE_G {
             {
                 if ((m_isDirty | DirtyFlags::InnerParams) || (m_assignedTransform->IsDirty() | TransformComponent::DirtyFlags::Camera))
                 {
-                    DXSM::Matrix targetTransform = m_assignedTransform->GetWorldMatrix_noLocal();
+                    DXSM::Matrix targetTransform = m_assignedTransform->GetWorldMatrix();
 
                     DXSM::Vector3 targetPos;
                     targetPos.x = targetTransform._41;
@@ -196,7 +196,7 @@ namespace SE_G {
             up = DXSM::Vector3::Transform(up, springArmRot);
             forward = DXSM::Vector3::Transform(forward, springArmRot);
 
-            auto assignedTransform = m_assignedTransform->GetWorldMatrix_noLocal();
+            auto assignedTransform = m_assignedTransform->GetWorldMatrix();
             assignedTransform._41 = 0;
             assignedTransform._42 = 0;
             assignedTransform._43 = 0;

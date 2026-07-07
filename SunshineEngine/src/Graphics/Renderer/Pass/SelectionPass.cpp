@@ -225,7 +225,7 @@ namespace SE_G {
 
 			m_renderer->GetMainCamera()->BindBuffer(context);
 
-			transformComponent->EnableMeshTransformMode();
+			//transformComponent->EnableMeshTransformMode();
 
 			transformComponent->BindToGraphicsPipeline(
 				GetDeviceContext()
@@ -294,7 +294,7 @@ namespace SE_G {
 
 				// transformComponent->SetLocalScaleFactor(actualLocalScaleFactor);
 			}
-			transformComponent->DisableMeshTransformMode();
+			//transformComponent->DisableMeshTransformMode();
 		}
 
 		context->OMSetDepthStencilState(nullptr, 0);

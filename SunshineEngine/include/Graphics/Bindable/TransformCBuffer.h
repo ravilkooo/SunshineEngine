@@ -19,6 +19,9 @@ namespace SE_G {
 			{
 				DirectX::XMMATRIX wMat;
 				DirectX::XMMATRIX wMatInvTranspose;
+
+				DirectX::XMMATRIX lMat; // For mesh
+				DirectX::XMMATRIX lMatInvTranspose; // For mesh
 				float uMultiplier = 1;
 				float vMultiplier = 1;
 				//DirectX::XMMATRIX viewProj;

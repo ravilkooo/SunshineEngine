@@ -82,7 +82,6 @@ public:
     DXSM::Matrix GetLocalScaleMatrix() const;
 
     DXSM::Matrix GetLocalTransformMatrix() const;
-    DXSM::Matrix GetWorldMatrix_noLocal() const;
 
     // Full World Position
     void CalcAbsoluteTransform();
@@ -159,10 +158,6 @@ public:
 
     void SetParentTransform(TransformComponent* parentTransform);
     TransformComponent* GetParentTransform();
-
-	void EnableMeshTransformMode();
-	void DisableMeshTransformMode();
-	bool IsMeshTransformMode();
 
     TransformComponent* m_parentTransform = nullptr;
 private:

@@ -17,6 +17,7 @@ cbuffer TransformCBuf : register(b0)
 {
     row_major float4x4 wMat;
     row_major float4x4 wInvTransposeMat;
+    row_major float4x4 lMat;
 };
 
 cbuffer CameraCBuf : register(b1)
@@ -85,7 +86,8 @@ PS_IN VSMain(VS_IN input)
     if (input.vertexID == 0u)
     {
         // center vertex
-        output.pos = mul(float4(EyesOffset, 1.0f), wMat);
+        output.pos = mul(float4(EyesOffset, 1.0f), lMat);
+        output.pos = mul(output.pos, wMat);
         output.pos = output.pos.xyzw / output.pos.w;
         output.pos = mul(output.pos, viewProjMat);
         return output;
@@ -102,6 +104,7 @@ PS_IN VSMain(VS_IN input)
     output.pos.y = 0.0f;
     output.pos.w = 1.0f;
     
+    output.pos = mul(output.pos, lMat);
     output.pos = mul(output.pos, wMat);
     output.pos = output.pos.xyzw / output.pos.w;
 

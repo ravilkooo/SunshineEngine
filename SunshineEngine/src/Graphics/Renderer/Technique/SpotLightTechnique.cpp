@@ -66,8 +66,7 @@ namespace SE_G {
 
         if (m_assignedTransform->IsDirty() | TransformComponent::DirtyFlags::LightPos)
         {
-            auto wMat = m_assignedTransform->GetWorldMatrix();
-            m_lightData->Position = DXSM::Vector3(wMat._41, wMat._42, wMat._43);
+            m_lightData->Position = m_assignedTransform->GetAbsoluteWorldPosition();
 
             DXSM::Matrix rot = m_assignedTransform->GetRotationMatrix();
             DXSM::Vector3 dir = DXSM::Vector3::Transform(DXSM::Vector3::Down, rot);

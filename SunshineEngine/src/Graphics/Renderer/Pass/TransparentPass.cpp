@@ -112,10 +112,10 @@ namespace SE_G {
 				auto& tech = it->second;
 				if (!tech->IsEnabled())
 					continue;
-				tech->m_assignedTransform->EnableMeshTransformMode();
+				//tech->m_assignedTransform->EnableMeshTransformMode();
 				tech->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 				tech->Pass(GetDeviceContext());
-				tech->m_assignedTransform->DisableMeshTransformMode();
+				//tech->m_assignedTransform->DisableMeshTransformMode();
 			}
 		}
 	}
