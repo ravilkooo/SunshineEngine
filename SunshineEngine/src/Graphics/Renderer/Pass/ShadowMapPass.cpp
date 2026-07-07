@@ -248,7 +248,7 @@ namespace SE_G {
 
 				if (tech.second->GetTechniqueTag() == "GPass")
 				{
-					//tech.second->m_assignedTransform->EnableMeshTransformMode();
+					tech.second->m_assignedTransform->EnableMeshTransformMode();
 
 					tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
 					// tech.second->BindAll(GetDeviceContext());
@@ -258,7 +258,7 @@ namespace SE_G {
 
 					tech.second->DrawTechnique(GetDeviceContext());
 
-					//tech.second->m_assignedTransform->DisableMeshTransformMode();
+					tech.second->m_assignedTransform->DisableMeshTransformMode();
 				}
 			}
 
