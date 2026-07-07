@@ -16,9 +16,6 @@ namespace SE_G {
         orthZ(10.0f), isPerspective(true),
         cameraMode(CAMERA_MODE::FPS)
     {
-        //SetUpCameraViewByAspectRatio(aspectRatio);
-        //fov = 2.0f * atan(aspectRatio * 0.5625f); 
-
         SetUpCameraViewByFOV(DX::XM_PI * 0.333f);
 
         InitBuffer(device);
@@ -40,8 +37,13 @@ namespace SE_G {
 
     void Camera::UpdateBuffer(ID3D11DeviceContext* context)
     {
-        DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
-        cameraBuffer->Update(context, { viewProjMat, GetPosition(), farZ });
+        if (m_isDirty | DirtyFlags::GPU)
+        {
+            DXSM::Matrix viewProjMat = GetViewMatrix() * GetProjectionMatrix();
+            cameraBuffer->Update(context, { viewProjMat, GetPosition(), farZ });
+
+            ClearDirtyFlag(DirtyFlags::GPU);
+        }
     }
 
     void Camera::BindBuffer(ID3D11DeviceContext* context)
@@ -55,6 +57,8 @@ namespace SE_G {
         SetFOV(2.0f * atan(aspectRatio * 0.5625f)); // 2 * atan(9x/16)
         SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
         SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+
+        m_isDirty |= DirtyFlags::All;
     }
 
     void Camera::SetUpCameraViewByAspectRatio_horizontal(float newAspectRatio)
@@ -63,15 +67,18 @@ namespace SE_G {
         SetAspectRatio(newAspectRatio);
         SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
         SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+
+        m_isDirty |= DirtyFlags::All;
     }
 
     void Camera::SetUpCameraViewByAspectRatio_vertical(float newAspectRatio)
     {
         SetFOV(2.0f * atan(tan(fov * 0.5f) * aspectRatio / newAspectRatio));
         SetAspectRatio(newAspectRatio);
-
         SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
         SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+
+        m_isDirty |= DirtyFlags::All;
     }
 
     void Camera::SetUpCameraViewByFOV(float newFOV)
@@ -80,6 +87,8 @@ namespace SE_G {
         SetAspectRatio(16.0f * tan(fov * 0.5f) / 9.0f);
         SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
         SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
+
+        m_isDirty |= DirtyFlags::All;
     }
 
     /*
@@ -107,6 +116,7 @@ namespace SE_G {
         SetViewWidth(aspectRatio * 2.0f * tanf(0.5f * fov) * orthZ);
         SetViewHeight(2.0f * tanf(0.5f * fov) * orthZ);
 
+        m_isDirty |= DirtyFlags::All;
         /*
         SetFOV(2.0f * atan(tan(DX::XM_PIDIV2 * 0.5f) * 16.0f / 9.0f / newAspectRatio));
         SetAspectRatio(newAspectRatio);
@@ -120,26 +130,41 @@ namespace SE_G {
     void Camera::AssignTransformComponent(TransformComponent* trComp)
     {
         m_assignedTransform = trComp;
+
+        m_isDirty |= DirtyFlags::All;
     }
 
     void Camera::Update(float deltaTime)
     {
-		m_deltaTime = deltaTime;
+        m_deltaTime = deltaTime;
 
         if (cameraMode == CAMERA_MODE::FOLLOW)
         {
             if (!m_assignedTransform)
             {
-                UpdateTargetPoistion(DXSM::Vector3::Zero);
+                if (m_isDirty | DirtyFlags::InnerParams)
+                {
+                    UpdateTargetPoistion(DXSM::Vector3::Zero);
+                    ClearDirtyFlag(DirtyFlags::InnerParams);
+                }
             }
-            DXSM::Matrix targetTransform = m_assignedTransform->GetWorldMatrix_noLocal();
+            else
+            {
+                if ((m_isDirty | DirtyFlags::InnerParams) || (m_assignedTransform->IsDirty() | TransformComponent::DirtyFlags::Camera))
+                {
+                    DXSM::Matrix targetTransform = m_assignedTransform->GetWorldMatrix_noLocal();
 
-            DXSM::Vector3 targetPos;
-            targetPos.x = targetTransform._41;
-            targetPos.y = targetTransform._42;
-            targetPos.z = targetTransform._43;
+                    DXSM::Vector3 targetPos;
+                    targetPos.x = targetTransform._41;
+                    targetPos.y = targetTransform._42;
+                    targetPos.z = targetTransform._43;
 
-            UpdateTargetPoistion(targetPos);
+                    UpdateTargetPoistion(targetPos);
+
+                    ClearDirtyFlag(DirtyFlags::InnerParams);
+                    m_assignedTransform->ClearFlag(TransformComponent::DirtyFlags::Camera);
+                }
+            }
         }
     }
 
@@ -184,7 +209,7 @@ namespace SE_G {
 
             final_position = targetPoistion + final_position;
             position = final_position;
-            
+
             target = position + forward;
         }
     }
@@ -217,6 +242,7 @@ namespace SE_G {
         {
             // orthZ = eastl::max(orthZ + speed * m_deltaTime, nearZ * 1.1f);
         }
+        m_isDirty |= (cameraMode == CAMERA_MODE::FPS) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::MoveBackward(float speed)
@@ -240,6 +266,8 @@ namespace SE_G {
         target.x += speed * m_deltaTime * right.x;
         target.y += speed * m_deltaTime * right.y;
         target.z += speed * m_deltaTime * right.z;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FPS) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::MoveRight(float speed)
@@ -251,6 +279,8 @@ namespace SE_G {
     {
         position.y += speed * m_deltaTime;
         target.y += speed * m_deltaTime;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FPS) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::MoveDown(float speed)
@@ -263,6 +293,8 @@ namespace SE_G {
         DXSM::Vector3 look_dir = DXSM::Vector3::Transform(target - position,
             DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(up, angle * m_deltaTime)));
         target = position + look_dir;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FPS) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::RotatePitch(float angle)
@@ -283,11 +315,15 @@ namespace SE_G {
                 DXSM::Matrix::CreateFromQuaternion(DXSM::Quaternion::CreateFromAxisAngle(_axis, -angle * m_deltaTime)));
             target = position + look_dir;
         }
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FPS) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::SwitchToFPSMode()
     {
         cameraMode = CAMERA_MODE::FPS;
+
+        m_isDirty |= DirtyFlags::All;
     }
 
     void Camera::SetFollowUUID(SE::UUID followUUID)
@@ -301,7 +337,7 @@ namespace SE_G {
         cameraMode = CAMERA_MODE::FOLLOW;
 
         m_springArmParams.length = 10.0f;
-        m_springArmParams.pitchYawRoll = DXSM::Vector3( DX::XM_PI * 0.166f, 0.0f, 0.0f );
+        m_springArmParams.pitchYawRoll = DXSM::Vector3(DX::XM_PI * 0.166f, 0.0f, 0.0f);
 
         m_springArmParams.rootOffset = DXSM::Vector3::Zero;
         /*
@@ -309,6 +345,8 @@ namespace SE_G {
         this->referenceLen = referenceLen;
         up = DXSM::Vector3(0.0f, 1.0f, 0.0f);
         */
+
+        m_isDirty |= DirtyFlags::All;
     }
 
     void Camera::SwitchProjection() {
@@ -325,69 +363,75 @@ namespace SE_G {
             }
         }
 
+        m_isDirty |= DirtyFlags::All;
     }
 
     Camera::FrustumPlanes Camera::GetFrustumPlanes()
     {
-        DXSM::Matrix mat = GetViewMatrix() * GetProjectionMatrix();
-        FrustumPlanes planes;
+        if (m_isDirty | DirtyFlags::FrustumPlanesDirty)
+        {
+            DXSM::Matrix mat = GetViewMatrix() * GetProjectionMatrix();
 
-        // Левая плоскость
-        planes.Left = DX::XMVectorSet(mat._14 + mat._11, mat._24 + mat._21, mat._34 + mat._31, mat._44 + mat._41);
-        planes.Left = DirectX::XMPlaneNormalize(planes.Left);
+            // Левая плоскость
+            m_frustumPlanes.Left = DX::XMVectorSet(mat._14 + mat._11, mat._24 + mat._21, mat._34 + mat._31, mat._44 + mat._41);
+            m_frustumPlanes.Left = DirectX::XMPlaneNormalize(m_frustumPlanes.Left);
 
-        // Правая плоскость
-        planes.Right = DX::XMVectorSet(mat._14 - mat._11, mat._24 - mat._21, mat._34 - mat._31, mat._44 - mat._41);
-        planes.Right = DirectX::XMPlaneNormalize(planes.Right);
+            // Правая плоскость
+            m_frustumPlanes.Right = DX::XMVectorSet(mat._14 - mat._11, mat._24 - mat._21, mat._34 - mat._31, mat._44 - mat._41);
+            m_frustumPlanes.Right = DirectX::XMPlaneNormalize(m_frustumPlanes.Right);
 
-        // Верхняя плоскость
-        planes.Top = DX::XMVectorSet(mat._14 - mat._12, mat._24 - mat._22, mat._34 - mat._32, mat._44 - mat._42);
-        planes.Top = DirectX::XMPlaneNormalize(planes.Top);
+            // Верхняя плоскость
+            m_frustumPlanes.Top = DX::XMVectorSet(mat._14 - mat._12, mat._24 - mat._22, mat._34 - mat._32, mat._44 - mat._42);
+            m_frustumPlanes.Top = DirectX::XMPlaneNormalize(m_frustumPlanes.Top);
 
-        // Нижняя плоскость
-        planes.Bottom = DX::XMVectorSet(mat._14 + mat._12, mat._24 + mat._22, mat._34 + mat._32, mat._44 + mat._42);
-        planes.Bottom = DirectX::XMPlaneNormalize(planes.Bottom);
+            // Нижняя плоскость
+            m_frustumPlanes.Bottom = DX::XMVectorSet(mat._14 + mat._12, mat._24 + mat._22, mat._34 + mat._32, mat._44 + mat._42);
+            m_frustumPlanes.Bottom = DirectX::XMPlaneNormalize(m_frustumPlanes.Bottom);
 
-        // Ближняя плоскость
-        planes.Near = DX::XMVectorSet(mat._14 + mat._13, mat._24 + mat._23, mat._34 + mat._33, mat._44 + mat._43);
-        planes.Near = DirectX::XMPlaneNormalize(planes.Near);
+            // Ближняя плоскость
+            m_frustumPlanes.Near = DX::XMVectorSet(mat._14 + mat._13, mat._24 + mat._23, mat._34 + mat._33, mat._44 + mat._43);
+            m_frustumPlanes.Near = DirectX::XMPlaneNormalize(m_frustumPlanes.Near);
 
-        // Дальняя плоскость
-        planes.Far = DX::XMVectorSet(mat._14 - mat._13, mat._24 - mat._23, mat._34 - mat._33, mat._44 - mat._43);
-        planes.Far = DirectX::XMPlaneNormalize(planes.Far);
+            // Дальняя плоскость
+            m_frustumPlanes.Far = DX::XMVectorSet(mat._14 - mat._13, mat._24 - mat._23, mat._34 - mat._33, mat._44 - mat._43);
+            m_frustumPlanes.Far = DirectX::XMPlaneNormalize(m_frustumPlanes.Far);
 
-        return planes;
+            ClearDirtyFlag(DirtyFlags::FrustumPlanesDirty);
+        }
+        return m_frustumPlanes;
     }
 
     Camera::FrustumCorners Camera::GetFrustumCorners()
     {
-        FrustumCorners corners;
+        if (m_isDirty | DirtyFlags::FrustumCornersDirty)
+        {
+            DXSM::Matrix viewProjMatrix = GetViewMatrix() * GetProjectionMatrix();
+            DX::XMMATRIX invViewProj = XMMatrixInverse(nullptr, viewProjMatrix);
 
-        DXSM::Matrix viewProjMatrix = GetViewMatrix() * GetProjectionMatrix();
-        DX::XMMATRIX invViewProj = XMMatrixInverse(nullptr, viewProjMatrix);
+            DX::XMVECTOR ndcCorners[8] = {
+                DX::XMVectorSet(-1, -1, 0, 1),
+                DX::XMVectorSet(1, -1, 0, 1),
+                DX::XMVectorSet(-1, 1, 0, 1),
+                DX::XMVectorSet(1, 1, 0, 1),
+                DX::XMVectorSet(-1, -1, 1, 1),
+                DX::XMVectorSet(1, -1, 1, 1),
+                DX::XMVectorSet(-1, 1, 1, 1),
+                DX::XMVectorSet(1, 1, 1, 1)
+            };
 
-        DX::XMVECTOR ndcCorners[8] = {
-            DX::XMVectorSet(-1, -1, 0, 1),
-            DX::XMVectorSet(1, -1, 0, 1),
-            DX::XMVectorSet(-1, 1, 0, 1),
-            DX::XMVectorSet(1, 1, 0, 1),
-            DX::XMVectorSet(-1, -1, 1, 1),
-            DX::XMVectorSet(1, -1, 1, 1),
-            DX::XMVectorSet(-1, 1, 1, 1),
-            DX::XMVectorSet(1, 1, 1, 1)
-        };
-
-        for (int i = 0; i < 8; ++i) {
-            DX::XMVECTOR worldPos = XMVector3TransformCoord(ndcCorners[i], invViewProj);
-            if (i < 4) {
-                corners.Near[i] = worldPos;
+            for (int i = 0; i < 8; ++i) {
+                DX::XMVECTOR worldPos = XMVector3TransformCoord(ndcCorners[i], invViewProj);
+                if (i < 4) {
+                    m_frustumCorners.Near[i] = worldPos;
+                }
+                else {
+                    m_frustumCorners.Far[i - 4] = worldPos;
+                }
             }
-            else {
-                corners.Far[i - 4] = worldPos;
-            }
+
+            ClearDirtyFlag(DirtyFlags::FrustumCornersDirty);
         }
-
-        return corners;
+        return m_frustumCorners;
     }
 
     void Camera::RotateSpringArmYaw(float yawSpeed)
@@ -399,6 +443,8 @@ namespace SE_G {
         _stickYaw = _stickYaw < -DX::XM_PI ? (_stickYaw + DX::XM_2PI) : _stickYaw;
 
         m_springArmParams.pitchYawRoll.y = _stickYaw;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FOLLOW) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::RotateSpringArmPitch(float pitchSpeed)
@@ -409,6 +455,8 @@ namespace SE_G {
         _stickPitch = fmax(-80.0f * DX::XM_PIDIV2 / 90.0f, fmin(_stickPitch, 80.0f * DX::XM_PIDIV2 / 90.0f));
 
         m_springArmParams.pitchYawRoll.x = _stickPitch;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FOLLOW) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::RollSpringArm(float rollSpeed)
@@ -421,6 +469,8 @@ namespace SE_G {
         _stickRoll = _stickRoll < -DX::XM_PI ? (_stickRoll + DX::XM_2PI) : _stickRoll;
 
         m_springArmParams.pitchYawRoll.z = _stickRoll;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FOLLOW) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::RotateSpringArmYawPitch(float yawSpeed, float pitchSpeed)
@@ -444,6 +494,8 @@ namespace SE_G {
         _cameraYaw = _cameraYaw < -DX::XM_PI ? (_cameraYaw + DX::XM_2PI) : _cameraYaw;
 
         cameraPitchYawRoll.y = _cameraYaw;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FOLLOW) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::RotateCameraPitch(float pitchSpeed)
@@ -454,6 +506,8 @@ namespace SE_G {
         _cameraPitch = fmax(-80.0f * DX::XM_PIDIV2 / 90.0f, fmin(_cameraPitch, 80.0f * DX::XM_PIDIV2 / 90.0f));
 
         cameraPitchYawRoll.x = _cameraPitch;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FOLLOW) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::RollCamera(float rollSpeed)
@@ -465,6 +519,8 @@ namespace SE_G {
         _cameraRoll = _cameraRoll < -DX::XM_PI ? (_cameraRoll + DX::XM_2PI) : _cameraRoll;
 
         cameraPitchYawRoll.z = _cameraRoll;
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FOLLOW) ? DirtyFlags::All : DirtyFlags::None;
     }
 
     void Camera::RotateCameraYawPitch(float yawSpeed, float pitchSpeed)
@@ -482,6 +538,8 @@ namespace SE_G {
     void Camera::ZoomSpringArm(float zoomSpeed)
     {
         float desiredLength = std::clamp(0.001f, m_springArmParams.length + zoomSpeed * m_deltaTime, 10000.0f);
-		m_springArmParams.length = std::lerp(m_springArmParams.length, desiredLength, m_zoomAcceleration * m_deltaTime);
+        m_springArmParams.length = std::lerp(m_springArmParams.length, desiredLength, m_zoomAcceleration * m_deltaTime);
+
+        m_isDirty |= (cameraMode == CAMERA_MODE::FOLLOW) ? DirtyFlags::All : DirtyFlags::None;
     }
 }

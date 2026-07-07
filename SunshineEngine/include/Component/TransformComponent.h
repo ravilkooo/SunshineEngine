@@ -40,8 +40,10 @@ public:
         GPU = 1 << 0,
         Physics = 1 << 1,
         LightPos = 1 << 2,
+        Camera = 1 << 3,
+        Transparent = 1 << 4,
 
-        All = GPU | Physics | LightPos,
+        All = GPU | Physics | LightPos | Camera | Transparent,
     };
 
 private:

@@ -247,21 +247,19 @@ namespace SE_G {
 					continue;
 
 				if (tech.second->GetTechniqueTag() == "GPass")
-					tech.second->m_assignedTransform->EnableMeshTransformMode();
-
-				tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
-				// tech.second->BindAll(GetDeviceContext());
-
-				if (tech.second->GetTechniqueTag() == "GPass")
 				{
+					//tech.second->m_assignedTransform->EnableMeshTransformMode();
+
+					tech.second->m_assignedTransform->BindToGraphicsPipeline(GetDeviceContext());
+					// tech.second->BindAll(GetDeviceContext());
+
 					auto gTech = static_cast<GPassTechnique*>(tech.second.get());
 					gTech->m_meshData->m_mesh->Bind(context);
+
+					tech.second->DrawTechnique(GetDeviceContext());
+
+					//tech.second->m_assignedTransform->DisableMeshTransformMode();
 				}
-
-				tech.second->DrawTechnique(GetDeviceContext());
-
-				if (tech.second->GetTechniqueTag() == "GPass")
-					tech.second->m_assignedTransform->DisableMeshTransformMode();
 			}
 
 		}

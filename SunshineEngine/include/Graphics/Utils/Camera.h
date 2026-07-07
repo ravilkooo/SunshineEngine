@@ -26,6 +26,33 @@ namespace SE_G {
     {
         friend class ShadowMapPass;
 
+    public:
+        enum DirtyFlags : uint32_t
+        {
+            None = 0,
+            GPU = 1 << 0,
+            InnerParams = 1 << 1,
+            Transparent = 1 << 2,
+            FrustumPlanesDirty = 1 << 3,
+            FrustumCornersDirty = 1 << 4,
+
+            All = GPU | InnerParams | Transparent | FrustumPlanesDirty | FrustumCornersDirty,
+        };
+
+        struct FrustumPlanes {
+            DX::XMVECTOR Left;
+            DX::XMVECTOR Right;
+            DX::XMVECTOR Top;
+            DX::XMVECTOR Bottom;
+            DX::XMVECTOR Near;
+            DX::XMVECTOR Far;
+        };
+
+        struct FrustumCorners {
+            DX::XMVECTOR Near[4];
+            DX::XMVECTOR Far[4];
+        };
+
     private:
         enum class CAMERA_MODE
         {
@@ -65,13 +92,17 @@ namespace SE_G {
         float viewWidth;
         float viewHeight;
 
+        // Frustum
+        FrustumPlanes m_frustumPlanes;
+        FrustumCorners m_frustumCorners;
+
         // camera mode
         CAMERA_MODE cameraMode = CAMERA_MODE::FPS;
 
         // for FOLLOW camera mode
         float followPitch;
 
-        bool m_isDirty = true;
+        uint32_t m_isDirty = DirtyFlags::All;
 
         TransformComponent* m_assignedTransform = nullptr;
 
@@ -103,26 +134,41 @@ namespace SE_G {
         void UpdateBuffer(ID3D11DeviceContext* context);
         void BindBuffer(ID3D11DeviceContext* context);
 
-        bool IsDirty() const { return m_isDirty; };
-        void MarkAsDirty() { m_isDirty = true; };
+        uint32_t IsDirty() const { return m_isDirty; };
+        void MarkAsDirty() { m_isDirty |= DirtyFlags::All; };
+        void ClearDirtyFlag(DirtyFlags flag) { m_isDirty &= ~flag; }
 
         const DXSM::Vector3& GetPosition() const { return position; }
-        void SetPosition(const DXSM::Vector3& newPosition) { position = newPosition; }
+        void SetPosition(const DXSM::Vector3& newPosition) {
+            position = newPosition;
+            m_isDirty |= (cameraMode == CAMERA_MODE::FPS) ? DirtyFlags::All : DirtyFlags::None;
+        }
 
         const DXSM::Vector3& GetTarget() const { return target; }
-        void SetTarget(const DXSM::Vector3& newTarget) { target = newTarget; }
+        void SetTarget(const DXSM::Vector3& newTarget) {
+            target = newTarget;
+            m_isDirty |= (cameraMode == CAMERA_MODE::FPS) ? DirtyFlags::All : DirtyFlags::None;
+        }
 
         const DXSM::Vector3& GetUp() const { return up; }
-        void SetUp(const DXSM::Vector3& newUp) { up = newUp; }
+        void SetUp(const DXSM::Vector3& newUp) {
+            up = newUp; 
+            m_isDirty |= (cameraMode == CAMERA_MODE::FPS) ? DirtyFlags::All : DirtyFlags::None;
+        }
 
         const DXSM::Vector3& GetRight() const { return right; }
         const DXSM::Vector3& GetForward() const { return forward; }
 
         float GetNearZ() const { return nearZ; }
-        void SetNearZ(float newNearZ) { nearZ = newNearZ; }
+        void SetNearZ(float newNearZ) {
+            nearZ = newNearZ;
+            m_isDirty |= DirtyFlags::All;
+        }
 
         float GetFarZ() const { return farZ; }
-        void SetFarZ(float newFarZ) { farZ = newFarZ; }
+        void SetFarZ(float newFarZ) {
+            farZ = newFarZ; m_isDirty |= DirtyFlags::All;
+        }
 
         void SetUpCameraViewByAspectRatio(float newAspectRatio);
         void SetUpCameraViewByAspectRatio_horizontal(float newAspectRatio);
@@ -172,22 +218,7 @@ namespace SE_G {
         void SwitchProjection();
         bool IsPerspectiveCamera() const { return isPerspective; }
 
-        struct FrustumPlanes {
-            DX::XMVECTOR Left;
-            DX::XMVECTOR Right;
-            DX::XMVECTOR Top;
-            DX::XMVECTOR Bottom;
-            DX::XMVECTOR Near;
-            DX::XMVECTOR Far;
-        };
-
         FrustumPlanes GetFrustumPlanes();
-
-        struct FrustumCorners {
-            DX::XMVECTOR Near[4];
-            DX::XMVECTOR Far[4];
-        };
-
         FrustumCorners GetFrustumCorners();
 
         const DXSM::Vector3& GetSpringArmRootOffset() const { return m_springArmParams.rootOffset; }
