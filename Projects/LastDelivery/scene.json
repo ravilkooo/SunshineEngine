@@ -25,7 +25,7 @@
                     "m_position": [
                         0.0,
                         3.2424516677856445,
-                        0.0
+                        -3.725290298461914e-09
                     ],
                     "m_rotation": [
                         -0.0,
@@ -275,7 +275,7 @@
                     "m_moveSpeed": 20.0,
                     "m_stepHeight": 0.30000001192092896,
                     "m_syncronizeYawWithCameraForwardDir": true,
-                    "m_turnAcceleration": 40.0
+                    "m_turnAcceleration": 20.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -668,9 +668,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -19.103649139404297,
-                        7.463678359985352,
-                        2.664740562438965
+                        -23.156015396118164,
+                        2.827667236328125,
+                        5.079833984375
                     ],
                     "m_rotation": [
                         -0.0,
@@ -778,9 +778,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -20.622051239013672,
-                        4.994833946228027,
-                        3.3536200523376465
+                        -22.65204429626465,
+                        2.403318166732788,
+                        12.760368347167969
                     ],
                     "m_rotation": [
                         -0.0,
@@ -847,7 +847,7 @@
                     "m_moveSpeed": 15.0,
                     "m_stepHeight": 0.30000001192092896,
                     "m_syncronizeYawWithCameraForwardDir": false,
-                    "m_turnAcceleration": 30.0
+                    "m_turnAcceleration": 10.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -905,19 +905,19 @@
                         3.0
                     ],
                     "m_position": [
-                        -0.2718088626861572,
-                        4.743507385253906,
-                        65.5211410522461
+                        20.322463989257813,
+                        3.8629114627838135,
+                        -0.1778101921081543
                     ],
                     "m_rotation": [
                         -0.0,
-                        -2.8867745399475098,
+                        -0.0019204028649255633,
                         0.0
                     ],
                     "m_scaleFactor": [
-                        0.9999992847442627,
+                        1.0000001192092896,
                         1.0,
-                        0.9999992847442627
+                        1.0000001192092896
                     ],
                     "m_uvMultiplier": [
                         1.0,
@@ -1015,9 +1015,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -18.248199462890625,
-                        4.478931427001953,
-                        3.7991890907287598
+                        -21.50979995727539,
+                        1.3562231063842773,
+                        8.599126815795898
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1252,7 +1252,7 @@
                     "m_moveSpeed": 0.0,
                     "m_stepHeight": 0.30000001192092896,
                     "m_syncronizeYawWithCameraForwardDir": false,
-                    "m_turnAcceleration": 30.0
+                    "m_turnAcceleration": 10.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -1282,7 +1282,7 @@
                         "y": 0.0,
                         "z": 0.0
                     },
-                    "FieldOfView": 90.0,
+                    "FieldOfView": 180.0,
                     "HearingRadius": 0.0,
                     "LoseRadius": 25.0,
                     "Sensitivity": 1.0,
@@ -1316,8 +1316,8 @@
                     ],
                     "m_rotation": [
                         -0.0,
-                        0.0,
-                        -0.0
+                        -0.10105544328689575,
+                        0.0
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -1521,7 +1521,7 @@
                     "m_position": [
                         7.8473005294799805,
                         6.807664394378662,
-                        1.569185733795166
+                        64.94496154785156
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1621,7 +1621,7 @@
                     "m_position": [
                         14.401396751403809,
                         2.0240304470062256,
-                        1.569185733795166
+                        74.77998352050781
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2277,13 +2277,13 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        20.0,
+                        3.0,
                         1.0,
                         3.0
                     ],
                     "m_position": [
-                        -19.35784912109375,
-                        1.8725165128707886,
+                        -22.814899444580078,
+                        1.8519076108932495,
                         2.3579773902893066
                     ],
                     "m_rotation": [
@@ -2332,134 +2332,6 @@
             "m_UUID": 11130932358406658119,
             "m_UUID_hi": 2591622145,
             "m_UUID_lo": 2042288199,
-            "m_group": "Shapes",
-            "m_name": "Plane",
-            "m_parent": null,
-            "m_shapeData": null,
-            "m_type": "Plane"
-        },
-        {
-            "components": {
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Plane"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Color:0,0,0,10.dds"
-                    },
-                    "m_cullMode": "CULL_BACK"
-                },
-                "Render": {
-                    "m_isTransparent": true,
-                    "m_isVisible": true
-                },
-                "Transform": {
-                    "m_localPosition": [
-                        0.0,
-                        -0.8999999761581421,
-                        0.0
-                    ],
-                    "m_localRotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localScaleFactor": [
-                        10.0,
-                        1.0,
-                        3.0
-                    ],
-                    "m_position": [
-                        -26.659181594848633,
-                        3.579531192779541,
-                        2.3096230030059814
-                    ],
-                    "m_rotation": [
-                        -0.0,
-                        0.0,
-                        -0.0
-                    ],
-                    "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_uvMultiplier": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            "m_UUID": 15038837568598535099,
-            "m_UUID_hi": 3501502230,
-            "m_UUID_lo": 3877465019,
-            "m_group": "Shapes",
-            "m_name": "Plane",
-            "m_parent": null,
-            "m_shapeData": null,
-            "m_type": "Plane"
-        },
-        {
-            "components": {
-                "Mesh": {
-                    "Mesh": {
-                        "assetSource": 0,
-                        "relativePath": "Plane"
-                    },
-                    "Sampler": 0,
-                    "Texture": {
-                        "assetSource": 0,
-                        "relativePath": "Color:205,0,240,105.dds"
-                    },
-                    "m_cullMode": "CULL_BACK"
-                },
-                "Render": {
-                    "m_isTransparent": true,
-                    "m_isVisible": true
-                },
-                "Transform": {
-                    "m_localPosition": [
-                        0.0,
-                        -0.8999999761581421,
-                        0.0
-                    ],
-                    "m_localRotation": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ],
-                    "m_localScaleFactor": [
-                        10.0,
-                        1.0,
-                        3.0
-                    ],
-                    "m_position": [
-                        -25.659181594848633,
-                        -1.6834144592285156,
-                        1.3956916332244873
-                    ],
-                    "m_rotation": [
-                        -0.0,
-                        0.0,
-                        -0.0
-                    ],
-                    "m_scaleFactor": [
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "m_uvMultiplier": [
-                        1.0,
-                        1.0
-                    ]
-                }
-            },
-            "m_UUID": 5328354593799603003,
-            "m_UUID_hi": 1240604229,
-            "m_UUID_lo": 2965308219,
             "m_group": "Shapes",
             "m_name": "Plane",
             "m_parent": null,
@@ -2547,7 +2419,7 @@
                     "m_position": [
                         8.0390625,
                         1.8682811260223389,
-                        1.3916015625
+                        63.53074645996094
                     ],
                     "m_rotation": [
                         -0.0,

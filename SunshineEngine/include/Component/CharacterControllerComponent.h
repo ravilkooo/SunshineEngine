@@ -59,7 +59,7 @@ public:
     DXSM::Vector3 m_velocity = DXSM::Vector3::Zero;
 
     bool m_grounded = false;
-    JPH::Vec3 m_groundSpeed = DXSM::Vector3::Zero;
+    JPH::Vec3 m_groundSpeed = JPH::Vec3::sZero();
 
     DXSM::Vector3 m_groundNormal = DXSM::Vector3(0, 1, 0);
 
@@ -105,6 +105,9 @@ public:
 
     const DXSM::Vector3& GetGroundNormal() const { return m_groundNormal; }
     void SetGroundNormal(const DXSM::Vector3& groundNormal) { m_groundNormal = groundNormal; }
+
+    float GetTurnAcceleration() const { return m_turnAcceleration; }
+    void SetTurnAcceleration(float turnAcceleration) { m_turnAcceleration = turnAcceleration; }
 
     float GetMoveSpeed() const { return m_moveSpeed; }
     void SetMoveSpeed(float moveSpeed) { m_moveSpeed = moveSpeed; }
@@ -199,6 +202,7 @@ public:
     FP(grounded, &CharacterControllerComponent::IsGrounded, &CharacterControllerComponent::SetGrounded) , \
     FP(groundNormal, &CharacterControllerComponent::GetGroundNormal, &CharacterControllerComponent::SetGroundNormal) , \
     FP(moveSpeed, &CharacterControllerComponent::GetMoveSpeed, &CharacterControllerComponent::SetMoveSpeed) , \
+    FP(turnAcceleration, &CharacterControllerComponent::GetTurnAcceleration, &CharacterControllerComponent::SetTurnAcceleration) , \
     FP(acceleration, &CharacterControllerComponent::GetAcceleration, &CharacterControllerComponent::SetAcceleration) , \
     FP(airAcceleration, &CharacterControllerComponent::GetAirAcceleration, &CharacterControllerComponent::SetAirAcceleration) , \
     FP(jumpSpeed, &CharacterControllerComponent::GetJumpSpeed, &CharacterControllerComponent::SetJumpSpeed) , \

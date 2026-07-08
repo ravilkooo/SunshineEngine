@@ -45,6 +45,7 @@ public:
     //
 
     DXSM::Vector2 m_moveInput = DXSM::Vector2::Zero;
+    DXSM::Vector2 m_yawPitchDeltaInput = DXSM::Vector2::Zero;
 
     bool m_jumpRequested = false;
     bool m_attackRequested = false;
@@ -74,6 +75,9 @@ public:
 
     const DXSM::Vector2& GetMoveInput() const { return m_moveInput; };
     void SetMoveInput(const DXSM::Vector2& moveInput) { m_moveInput = moveInput; };
+    
+    const DXSM::Vector2& GetYawPitchInput() const { return m_yawPitchDeltaInput; };
+    void SetYawPitchInput(const DXSM::Vector2& yawPitchInput) { m_yawPitchDeltaInput = yawPitchInput; };
 
     bool GetJumpRequested() const { return m_jumpRequested; };
     void SetJumpRequested(bool jumpRequested) { m_jumpRequested = jumpRequested; };
@@ -135,6 +139,7 @@ public:
     FP(isDead, &CharacterComponent::GetIsDead, &CharacterComponent::SetIsDead), \
     FP(isAttacking, &CharacterComponent::GetIsAttacking, &CharacterComponent::SetIsAttacking), \
     FP(moveInput, &CharacterComponent::GetMoveInput, &CharacterComponent::SetMoveInput), \
+    FP(yawPitchInput, &CharacterComponent::GetYawPitchInput, &CharacterComponent::SetYawPitchInput), \
     FP(jumpRequested, &CharacterComponent::GetJumpRequested, &CharacterComponent::SetJumpRequested), \
     FP(attackRequested, &CharacterComponent::GetAttackRequested, &CharacterComponent::SetAttackRequested), \
     FP(yaw, &CharacterComponent::GetYaw, &CharacterComponent::SetYaw), \

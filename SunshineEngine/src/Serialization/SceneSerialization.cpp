@@ -478,7 +478,9 @@ json CharacterControllerComponent_Info::ToJson() const
             {"m_enableStickToFloor", m_assignedComponent->m_enableStickToFloor},
             {"m_enableWalkStairs", m_assignedComponent->m_enableWalkStairs},
             {"m_stepHeight", m_assignedComponent->m_stepHeight},
-            {"m_maxSlopeAngle", m_assignedComponent->m_maxSlopeAngle}
+            {"m_maxSlopeAngle", m_assignedComponent->m_maxSlopeAngle},
+            
+            {"m_turnAcceleration", m_assignedComponent->m_turnAcceleration}
         };
 
 
@@ -534,6 +536,10 @@ void CharacterControllerComponent::FromJson(const json& j)
     }
     if (j.contains("m_maxSlopeAngle") && j["m_maxSlopeAngle"].is_number_float()) {
         m_maxSlopeAngle = j["m_maxSlopeAngle"].get<float>();
+    }
+
+    if (j.contains("m_turnAcceleration") && j["m_turnAcceleration"].is_number_float()) {
+        m_turnAcceleration = j["m_turnAcceleration"].get<float>();
     }
     
     // Collider/shape data

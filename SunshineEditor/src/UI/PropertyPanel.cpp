@@ -1847,7 +1847,6 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
         {
             EditorUI::FontStyles::Pop();
             ImGui::Checkbox("Syncronize yaw with camera\nforward direction", &charContrInfo->m_assignedComponent->m_syncronizeYawWithCameraForwardDir);
-            DrawFloatControl("Turn around acceleration", charContrInfo->m_assignedComponent->m_turnAcceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");
 
             DrawFloatControl("Move speed", charContrInfo->m_assignedComponent->m_moveSpeed, 6.0f, 0.01f, 0.0f, 100.0f, "%.2f");
             DrawFloatControl("Move acceleration", charContrInfo->m_assignedComponent->m_acceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");
@@ -1855,6 +1854,8 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
             DrawFloatControl("Jump speed", charContrInfo->m_assignedComponent->m_jumpSpeed, 8.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
             DrawFloatControl("Gravity", charContrInfo->m_assignedComponent->m_gravity, -24.0f, 0.01f, -1000.0f, 1000.0f, "%.2f");
             DrawFloatControl("Max fall speed", charContrInfo->m_assignedComponent->m_maxFallSpeed, -24.0f, 0.01f, -1000.0f, 1000.0f, "%.2f");
+
+            DrawFloatControl("Turn around acceleration", charContrInfo->m_assignedComponent->m_turnAcceleration, 6.0, 0.01f, 0.0f, 1000.0f, "%.2f");
 
             ImGui::Checkbox("Enable stick to floor", &charContrInfo->m_assignedComponent->m_enableStickToFloor);
             ImGui::Checkbox("Enable walk stairs", &charContrInfo->m_assignedComponent->m_enableWalkStairs);
@@ -2064,7 +2065,7 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
         }
 
         float FieldOfView = percInfo->FieldOfView;
-        if (ImGui::InputFloat("Field Of View", &FieldOfView))
+        if (DrawFloatControl("Field Of View", FieldOfView, 90.0f, 0.1f, 0.0f, 360.0f, "%.1f"))
         {
             percInfo->SetFieldOfView(FieldOfView);
         }
@@ -2091,13 +2092,13 @@ void PropertyPanel::DrawPerceptionComponent(GameObject_Info* obj)
         }
 
         float Threshold = percInfo->Threshold;
-        if (ImGui::InputFloat("Threshold", &Threshold))
+        if (DrawFloatControl("Threshold", Threshold, 0.0f, 0.1f, 0.0f, 100.0f, "%.1f"))
         {
             percInfo->SetThreshold(Threshold);
         }
 
         float Sensitivity = percInfo->Sensitivity;
-        if (ImGui::InputFloat("Sensitivity", &Sensitivity))
+        if (DrawFloatControl("Sensitivity", Sensitivity, 0.0f, 0.1f, 0.0f, 100.0f, "%.1f"))
         {
             percInfo->SetSensitivity(Sensitivity);
         }

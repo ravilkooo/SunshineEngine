@@ -129,6 +129,13 @@ void CharacterControllerSystem::InitCharacters()
     for (auto& pair : m_scene->uuidToObjectMap)
     {
         auto gameObj = pair.second.get();
+
+        auto tc = gameObj->GetComponent<TransformComponent>();
+        auto charComp = gameObj->GetComponent<CharacterComponent>();
+        if (charComp && tc)
+        {
+            charComp->m_yaw = tc->GetRotation().y;
+        }
         if (gameObj->HasComponent<CharacterControllerComponent>())
         {
             auto charContrComp = gameObj->GetComponent<CharacterControllerComponent>();
@@ -218,48 +225,72 @@ void CharacterControllerSystem::ApplyMovementInput(
         input.Normalize();
     }
 
-    if ((input.x != 0 || input.y != 0) && controller->m_syncronizeYawWithCameraForwardDir)
+    if (controller->m_syncronizeYawWithCameraForwardDir)
     {
-		float inputAngle = atan2(input.x, input.y);
+        if ((input.x != 0 || input.y != 0))
+        {
+            float inputAngle = atan2(input.x, input.y);
 
-        auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
-        float camYaw = 0.0f;
-        if (camera)
-        {
-            camYaw = camera->GetSpringArmRotation().y;
-        }
-        // character->m_yaw += camYaw;
-        float desiredYaw = character->m_yaw + camYaw + inputAngle;
-        if (desiredYaw > DX::XM_PI) { desiredYaw -= DX::XM_2PI; }
-        else if (desiredYaw < -DX::XM_PI) { desiredYaw += DX::XM_2PI; }
+            auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
+            float camYaw = 0.0f;
+            if (camera)
+            {
+                camYaw = camera->GetSpringArmRotation().y;
+            }
+            // character->m_yaw += camYaw;
+            float desiredYaw = character->m_yaw + camYaw + inputAngle;
+            if (desiredYaw > DX::XM_PI) { desiredYaw -= DX::XM_2PI; }
+            else if (desiredYaw < -DX::XM_PI) { desiredYaw += DX::XM_2PI; }
 
-        if (controller->m_inputVelocity == 0)
-        {
-            character->m_yaw = desiredYaw;
+            if (controller->m_inputVelocity == 0)
+            {
+                character->m_yaw = desiredYaw;
+            }
+            else
+            {
+                if ((character->m_yaw - desiredYaw) > DX::XM_PI)
+                {
+                    character->m_yaw -= DX::XM_2PI;
+                }
+                else if ((character->m_yaw - desiredYaw) < -DX::XM_PI)
+                {
+                    character->m_yaw += DX::XM_2PI;
+                }
+
+                character->m_yaw = std::lerp(
+                    character->m_yaw,
+                    desiredYaw,
+                    controller->m_turnAcceleration * deltaTime);
+            }
+            // character->m_yaw = std::clamp(character->m_yaw, -DX::XM_PI, DX::XM_PI);
+
+            float newCameraYaw = (desiredYaw - character->m_yaw - inputAngle);
+            if (newCameraYaw > DX::XM_PI) { newCameraYaw -= DX::XM_2PI; }
+            else if (newCameraYaw < -DX::XM_PI) { newCameraYaw += DX::XM_2PI; }
+
+            camera->SetSpringArmYaw(newCameraYaw);
         }
-        else
+    }
+    else
+    {
+        DXSM::Vector2 inputTurn = character->m_yawPitchDeltaInput;
+        if (inputTurn != DXSM::Vector2::Zero)
         {
-            if ((character->m_yaw - desiredYaw) > DX::XM_PI)
-            {
-                character->m_yaw -= DX::XM_2PI;
-            }
-            else if ((character->m_yaw - desiredYaw) < -DX::XM_PI)
-            {
-                character->m_yaw += DX::XM_2PI;
-            }
+            float desiredYaw = character->m_yaw + inputTurn.x;
+
+            if (inputTurn.x < -DX::XM_PI) { character->m_yaw -= DX::XM_2PI; }
+            else if (inputTurn.x > DX::XM_PI) { character->m_yaw += DX::XM_2PI; }
 
             character->m_yaw = std::lerp(
                 character->m_yaw,
                 desiredYaw,
                 controller->m_turnAcceleration * deltaTime);
-		}
-        // character->m_yaw = std::clamp(character->m_yaw, -DX::XM_PI, DX::XM_PI);
 
-        float newCameraYaw = (desiredYaw - character->m_yaw - inputAngle);
-        if (newCameraYaw > DX::XM_PI) { newCameraYaw -= DX::XM_2PI; }
-        else if (newCameraYaw < -DX::XM_PI) { newCameraYaw += DX::XM_2PI; }
+            if (character->m_yaw > DX::XM_PI) { character->m_yaw -= DX::XM_2PI; }
+            else if (character->m_yaw < -DX::XM_PI) { character->m_yaw += DX::XM_2PI; }
 
-		camera->SetSpringArmYaw(newCameraYaw);
+            character->m_yawPitchDeltaInput = DXSM::Vector2::Zero;
+        }
     }
 
     float desiredVelocity = input.Length() * controller->m_moveSpeed;
