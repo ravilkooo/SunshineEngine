@@ -169,9 +169,9 @@ namespace SE_G {
 			DXSM::Vector3 rotate;
 			DXSM::Vector3 translation;
 			DecomposeTransform(fullTransform, scale, rotate, translation);
-			tc->m_assignedComponent->SetLocalScaleFactor(DXSM::Vector3::Zero);
+			tc->m_assignedComponent->SetLocalPosition(DXSM::Vector3::Zero);
 			tc->m_assignedComponent->SetLocalRotation(DXSM::Vector3::Zero);
-			tc->m_assignedComponent->SetLocalPosition(DXSM::Vector3(
+			tc->m_assignedComponent->SetLocalScaleFactor(DXSM::Vector3(
 				1.0f / scale.x,
 				1.0f / scale.y,
 				1.0f / scale.z
