@@ -33,6 +33,7 @@ public:
     ID3D11Buffer** GetConstantBufferAddress();
 
     void MarkAsNotCached();
+    bool IsAbsoluteTransformCached();
 
     enum DirtyFlags : uint32_t
     {

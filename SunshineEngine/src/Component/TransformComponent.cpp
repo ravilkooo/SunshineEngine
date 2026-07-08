@@ -38,6 +38,13 @@ void TransformComponent::MarkAsNotCached()
     m_isAbsoluteTransformCached = false;
 }
 
+bool TransformComponent::IsAbsoluteTransformCached()
+{
+    return m_isAbsoluteTransformCached &&
+        (m_parentTransform && m_parentTransform->IsAbsoluteTransformCached() ||
+            !m_parentTransform);
+}
+
 DXSM::Matrix TransformComponent::GetLocalTransalationMatrix() const
 {
     return DXSM::Matrix::CreateTranslation(m_localPosition);
@@ -76,7 +83,7 @@ DXSM::Matrix TransformComponent::GetScaleMatrix() const
 
 void TransformComponent::CalcAbsoluteTransform()
 {
-    if (!m_isAbsoluteTransformCached || (m_parentTransform && !m_parentTransform->m_isAbsoluteTransformCached))
+    if (!IsAbsoluteTransformCached())
     {
         auto wMat = GetWorldMatrix();
 
