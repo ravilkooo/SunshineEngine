@@ -9,6 +9,7 @@
 
 #include <EASTL/unordered_set.h>
 
+#include <Physics/PhysicsEnums.h>
 #include <Physics/CollisionUtils.h>
 #include <Component/Component.h>
 #include <Utils/UUID.h>
@@ -40,24 +41,15 @@ public:
     }
 
     static const SE::ComponentType s_componentType = SE::ComponentType::TRIGGER;
-    virtual const SE::ComponentType ComponentType() const override
-    {
-        return s_componentType;
-    }
+    virtual const SE::ComponentType ComponentType() const override { return s_componentType; }
 
     void SetLuaCallback(sol::function callback);
     void OnEnter(SE::UUID otherUUID);
     void OnExit(SE::UUID otherUUID);
 
-    const eastl::unordered_set<SE::UUID>& GetInsideObjects() const
-    {
-        return m_insideObjects;
-    }
+    const eastl::unordered_set<SE::UUID>& GetInsideObjects() const { return m_insideObjects; }
 
-    auto GetInsideObjects_Lua()
-    {
-        return eastl::ref(m_insideObjects);
-    }
+    auto GetInsideObjects_Lua() { return eastl::ref(m_insideObjects); }
     
     // Setters for configuration before adding body
     void SetObjecUUID(SE::UUID objectUUID);
@@ -73,7 +65,6 @@ private:
     sol::function m_luaCallback;
     eastl::unordered_set<SE::UUID> m_insideObjects;
 
-private:
     PhysicsSystem* m_physicsSystem;
 
     TransformComponent* transformComp;
@@ -85,12 +76,11 @@ private:
     JPH::RVec3 m_position = JPH::RVec3::sZero();
     JPH::Quat m_orientation = JPH::Quat::sIdentity();
     JPH::ShapeRefC m_shape = nullptr;
+    JPH::EMotionType m_triggerMotionType = JPH::EMotionType::Static;
 
     // Configuration properties before creating body
-    static const JPH::EMotionType s_triggerMotionType = JPH::EMotionType::Kinematic;
     static const JPH::EActivation s_triggerActivation = JPH::EActivation::Activate;
     static const JPH::ObjectLayer s_triggerObjectLayer = SE::Layers::TRIGGER;
-
 };
 
 class TriggerComponent_Info : public Component_Info
@@ -122,12 +112,17 @@ public:
     SE::ColliderShapeType GetShape() const;
     void SetShape(SE::ColliderShapeType shape);
 
+    SE::PhysicsMotionType GetMotion() const { return m_triggerMotionType; }
+    void SetMotion(SE::PhysicsMotionType motion) { m_triggerMotionType = motion; }
+
     // valid Render ColliderTech        
     bool m_isValid = false;
     RenderComponent_Info* m_rc_info;
 
     // All colliders settings
     eastl::shared_ptr<SE::ColliderData> m_colliderData;
+
+    SE::PhysicsMotionType m_triggerMotionType = SE::PhysicsMotionType::Static;
 };
 
 #ifndef TRIGGER_LUA_METHODS_APPLY

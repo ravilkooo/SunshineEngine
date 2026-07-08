@@ -433,7 +433,7 @@ void PhysicsSystem::CreateAndAddTrigger(TriggerComponent* triggerComp) {
 
     JPH::BodyCreationSettings settings(triggerComp->m_shape,
         triggerComp->m_position, triggerComp->m_orientation,
-        triggerComp->s_triggerMotionType, triggerComp->s_triggerObjectLayer);
+        triggerComp->m_triggerMotionType, triggerComp->s_triggerObjectLayer);
     settings.mObjectLayer = triggerComp->s_triggerObjectLayer;
     settings.mAllowSleeping = (triggerComp->s_triggerActivation != JPH::EActivation::DontActivate);
     settings.mIsSensor = true;

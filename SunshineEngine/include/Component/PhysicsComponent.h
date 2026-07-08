@@ -190,7 +190,6 @@ public:
     void SetCollisionLayer(const SE::CollisionLayer& layer);
     void SetCollisionLayer(SE::CollisionLayer&& layer);
 
-
     /*
     SE::ColliderTransforms GetTransformData();
     void SetTransformData(SE::ColliderTransforms transform);

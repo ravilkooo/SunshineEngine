@@ -76,7 +76,7 @@ DXSM::Matrix TransformComponent::GetScaleMatrix() const
 
 void TransformComponent::CalcAbsoluteTransform()
 {
-    if (!m_isAbsoluteTransformCached || (m_parentTransform && m_parentTransform->m_isAbsoluteTransformCached))
+    if (!m_isAbsoluteTransformCached || (m_parentTransform && !m_parentTransform->m_isAbsoluteTransformCached))
     {
         auto wMat = GetWorldMatrix();
 

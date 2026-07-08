@@ -15,10 +15,10 @@ function behavior:start()
                 if (phys) then
                     innerObjects[otherUUID.hi] = phys
                 end
-                print("Trigger enter", otherUUID.hi, otherUUID.lo)
+                print("Platform Trigger enter", otherUUID.hi, otherUUID.lo)
             elseif event == "exit" then
                 innerObjects[otherUUID.hi] = nil
-                print("Trigger exit", otherUUID.hi, otherUUID.lo)
+                print("Platform Trigger exit", otherUUID.hi, otherUUID.lo)
             end
         end)
     end
@@ -26,8 +26,7 @@ end
 
 function behavior:update(dt)
 
-    local inputSystem = getInputSystem()
-    local turnMagnet = inputSystem:getAxis("TurnMagnet")
+    local turnMagnet = InputSystem:getAxis("TurnMagnet")
 
     for hi, phys in pairs(innerObjects) do
         phys:addForce(Vector3.new(0, magnetForce * turnMagnet,0))

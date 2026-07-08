@@ -871,6 +871,12 @@ void PropertyPanel::DrawTriggerComponent(GameObject_Info* obj)
             return;
         }
 
+        auto currentMotion = triggerInfo->GetMotion();
+        if (ImGui::Combo("Motion Type", (int*)&currentMotion, "Static\0Kinematic\0"))
+        {
+            triggerInfo->SetMotion(currentMotion);
+        }
+
         if (auto colliderData = triggerInfo->m_colliderData)
         {
             DrawColliderSettings(colliderData);

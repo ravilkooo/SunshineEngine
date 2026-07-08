@@ -128,6 +128,16 @@ void TriggerComponent::FromJson(const json& j)
     {
         m_colliderData = SE::ColliderData(SE::ColliderShapeType::Box);
     }
+    SE::PhysicsMotionType motion = SE::PhysicsMotionType::Static;
+    if (j.contains("m_motion"))
+    {
+        j.at("m_motion").get_to(motion);
+    }
+    switch (motion) {
+    case SE::PhysicsMotionType::Static:    m_triggerMotionType = JPH::EMotionType::Static; break;
+    case SE::PhysicsMotionType::Kinematic: m_triggerMotionType = JPH::EMotionType::Kinematic; break;
+    default: m_triggerMotionType = JPH::EMotionType::Static; break;
+    }
 }
 
 TriggerComponent_Info::TriggerComponent_Info(
@@ -179,6 +189,7 @@ json TriggerComponent_Info::ToJson() const
     if (m_colliderData) {
         j["collider"] = m_colliderData->ToJson();
     }
+    j["m_motion"] = m_triggerMotionType;
     return j;
 }
 
@@ -191,6 +202,7 @@ void TriggerComponent_Info::FromJson(const json& j)
         }
         m_colliderData->FromJson(j["collider"]);
     }
+    if (j.contains("m_motion")) j.at("m_motion").get_to(m_triggerMotionType);
     m_colliderData->m_settings.colliderColor = DXSM::Vector3(
         1.0f,
         1.0f,
