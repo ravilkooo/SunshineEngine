@@ -22,6 +22,7 @@
 //#include <Scripting/LuaManager.h>
 
 class PhysicsSystem;
+class GrabSystem;
 class CharacterControllerSystem;
 class AudioSystem;
 
@@ -97,5 +98,7 @@ public:
     SE::ParticleSystem* m_particleSystem;
 
     eastl::unique_ptr<CharacterControllerSystem> m_characterControllerSystem;
+
+    eastl::unique_ptr<GrabSystem> m_grabSystem;
 };
 

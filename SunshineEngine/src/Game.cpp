@@ -140,6 +140,7 @@ bool Game::LoadScene(const wchar_t* scenePath)
 	}
 
 	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
+	m_grabSystem = eastl::make_unique<GrabSystem>();
 
 	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), j);
 

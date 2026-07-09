@@ -37,14 +37,15 @@
 #include <Physics/CollisionLayerVsGroupTable.h>
 #include <Physics/TriggerContactListener.h>
 
-#include <EASTL/unordered_map.h>
-
+#include <Physics/GrabSystem.h>
 
 #include <Utils/UUID.h>
 
 class PhysicsComponent;
 class TriggerComponent;
 class MovingPlatformComponent;
+
+struct PhysicsConstraintDesc;
 
 class PhysicsSystem_Info {
 public:
@@ -319,6 +320,12 @@ public:
 
     void AddMovingPlatform(MovingPlatformComponent* platformComp);
     MovingPlatformComponent* GetMovingPlatform(SE::UUID platformUUID);
+
+    // Constraint API
+
+    eastl::shared_ptr<PhysicsConstraint> CreateConstraint(PhysicsConstraintDesc desc);
+    void DestroyConstraint(GrabRuntime& handle);
+    void UpdateConstraint(GrabRuntime& handle, DXSM::Vector3 newTarget);
 
 private:
 

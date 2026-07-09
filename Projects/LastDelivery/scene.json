@@ -277,6 +277,14 @@
                     "m_syncronizeYawWithCameraForwardDir": true,
                     "m_turnAcceleration": 20.0
                 },
+                "Grab": {
+                    "m_canGrabDynamicBodies": true,
+                    "m_canGrabKinematicBodies": false,
+                    "m_holdDistance": 2.0,
+                    "m_maxGrabDistance": 3.0,
+                    "m_rotateWithCamera": true,
+                    "m_throwImpulse": 10.0
+                },
                 "Lua": {
                     "scriptLoaded": true,
                     "scriptPath": {

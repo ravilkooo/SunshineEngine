@@ -16,6 +16,7 @@
 #include <Component/CharacterControllerComponent.h>
 #include <Component/BouncePadComponent.h>
 #include <Component/MovingPlatformComponent.h>
+#include <Component/GrabComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -684,6 +685,7 @@ json GameObject_Info::ToJson() const {
             case SE::ComponentType::CAMERA:              key = "Camera"; break;
             case SE::ComponentType::BOUNCE_PAD:              key = "BouncePad"; break;
             case SE::ComponentType::MOVING_PLATFORM:              key = "MovingPlatform"; break;
+            case SE::ComponentType::GRAB:              key = "Grab"; break;
             default: continue;
         }
         j["components"][key.c_str()] = compPtr->ToJson();
@@ -840,6 +842,11 @@ void Scene::FromJson(
                             objJ["components"]["CharacterController"],
                             physicsSystem,
                             go->GetComponent<TransformComponent>().get(), go->m_UUID);
+                    }
+
+                    if (objJ["components"].contains("Grab")) {
+                        auto c = go->AddComponent<GrabComponent>();
+                        c->FromJson(objJ["components"]["Grab"]);
                     }
                 }
 
@@ -1062,6 +1069,11 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
                     go->GetComponent<TransformComponent_Info>().get());
                 c->FromJson(objJ["components"]["CharacterController"]);
             }
+        }
+
+        if (objJ["components"].contains("Grab")) {
+            auto c = go->AddComponent<GrabComponent_Info>();
+            c->FromJson(objJ["components"]["Grab"]);
         }
 
         if (objJ["components"].contains("Camera"))

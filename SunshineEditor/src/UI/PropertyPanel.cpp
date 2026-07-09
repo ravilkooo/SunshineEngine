@@ -34,6 +34,7 @@
 #include <Component/CharacterControllerComponent.h>
 #include <Component/BouncePadComponent.h>
 #include <Component/MovingPlatformComponent.h>
+#include <Component/GrabComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -455,6 +456,7 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         DrawTriggerComponent(obj);
         DrawCharacterComponent(obj);
         DrawCharacterControllerComponent(obj);
+        DrawGrabComponent(obj);
         DrawCameraComponent(obj);
         DrawPerceptionComponent(obj);
         DrawBehaviorController(obj);
@@ -1446,6 +1448,23 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
                 ImGui::SetItemTooltip("Can't have both Character Controller and Trigger components");
         }
 
+        if (!obj->HasComponent<GrabComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            ImGui::BeginDisabled(!HasCharacterComponent);
+
+            if (ImGui::MenuItem("Grab Component", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::GRAB);
+            }
+
+            ImGui::EndDisabled();
+
+            if (!HasCharacterComponent)
+                ImGui::SetItemTooltip("Can't have Grab Component without Character component");
+        }
+
         if (!obj->HasComponent<CameraComponent_Info>())
         {
             HasAllComponents = false;
@@ -1794,7 +1813,8 @@ void PropertyPanel::DrawCharacterComponent(GameObject_Info* obj)
         EditorUI::FontStyles::Pop();
 
         bool HasCharacterControllerComponent = obj->HasComponent<CharacterControllerComponent_Info>();
-        ImGui::BeginDisabled(HasCharacterControllerComponent);
+        bool HasGrabComponent = obj->HasComponent<GrabComponent_Info>();
+        ImGui::BeginDisabled(HasCharacterControllerComponent || HasGrabComponent);
 
         if (DrawComponentRemoveButton<CharacterComponent_Info>(obj))
         {
@@ -1805,6 +1825,8 @@ void PropertyPanel::DrawCharacterComponent(GameObject_Info* obj)
 
         if (HasCharacterControllerComponent)
             ImGui::SetItemTooltip("Can't delete Character Component before Character Controller");
+        if (HasGrabComponent)
+            ImGui::SetItemTooltip("Can't delete Character Component before Grab Component");
 
         ImGui::EndDisabled();
 
@@ -1866,6 +1888,42 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
             ImGui::TreePop();
         }
         else EditorUI::FontStyles::Pop();
+
+        ImGui::TreePop();
+    }
+    else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawGrabComponent(GameObject_Info* obj)
+{
+    if (!obj->HasComponent<GrabComponent_Info>())
+        return;
+    auto grabInfo = obj->GetComponent<GrabComponent_Info>();
+
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen |
+        ImGuiTreeNodeFlags_Framed |
+        ImGuiTreeNodeFlags_SpanAvailWidth;
+
+    ImGui::Separator();
+    EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header2);
+    if (ImGui::TreeNodeEx("Grab Component", flags))
+    {
+        EditorUI::FontStyles::Pop();
+
+        if (DrawComponentRemoveButton<GrabComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
+
+        DrawFloatControl("holdDistance", grabInfo->m_assignedComponent->m_holdDistance, 2.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
+        DrawFloatControl("maxGrabDistance", grabInfo->m_assignedComponent->m_maxGrabDistance, 3.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
+        DrawFloatControl("throwImpulse", grabInfo->m_assignedComponent->m_throwImpulse, 10.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
+
+        ImGui::Checkbox("rotateWithCamera", &grabInfo->m_assignedComponent->m_rotateWithCamera);
+        ImGui::Checkbox("canGrabDynamicBodies", &grabInfo->m_assignedComponent->m_canGrabDynamicBodies);
+        ImGui::Checkbox("canGrabKinematicBodies", &grabInfo->m_assignedComponent->m_canGrabKinematicBodies);
+
 
         ImGui::TreePop();
     }
