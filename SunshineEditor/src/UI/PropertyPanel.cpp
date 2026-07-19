@@ -1944,6 +1944,7 @@ void PropertyPanel::DrawGrabComponent(GameObject_Info* obj)
             ImGui::Checkbox("canGrabKinematicBodies", &grabInfo->m_assignedComponent->m_canGrabKinematicBodies);
 
             ImGui::BeginDisabled(!grabInfo->m_assignedComponent->m_canGrabKinematicBodies);
+            ImGui::Checkbox("keepObjectsOriginalRotation", &grabInfo->m_assignedComponent->m_keepObjectsOriginalRotation);
             ImGui::EndDisabled();
 
             ImGui::TreePop();

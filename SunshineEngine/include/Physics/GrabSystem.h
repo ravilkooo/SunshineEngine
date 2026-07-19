@@ -39,6 +39,7 @@ public:
 
     DXSM::Vector3 m_targetPosition;
     // future work
+    bool m_keepOriginalRotation = true;
     DXSM::Quaternion m_targetRotation;
 };
 

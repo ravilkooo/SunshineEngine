@@ -23,16 +23,19 @@ public:
 
     float m_holdDistance = 2.0f;
     float m_maxGrabDistance = 3.0f;
-    float m_throwImpulse = 10.0f;
 
     // Grab Spring settings
 
+    bool m_canGrabDynamicBodies = true;
     float m_grabSpringStrength = 15000.0f;
     float m_grabSpringDamping = 2000.0f;
+    float m_throwImpulse = 10.0f;
 
-    bool m_rotateWithCamera = true;
-    bool m_canGrabDynamicBodies = true;
     bool m_canGrabKinematicBodies = false;
+    bool m_keepObjectsOriginalRotation = true;
+
+    // not used
+    bool m_rotateWithCamera = true;
 
     SE::UUID m_grabbedObject = SE::UUID(0u);
 

@@ -89,7 +89,15 @@ void GrabSystem::UpdateGrabTargets(float deltaTime)
 		}
 		else
 		{
-			grabPhysics->MoveKinematicPosition(grabPair.second.m_targetPosition, deltaTime);
+			if (grabPair.second.m_keepOriginalRotation)
+			{
+				grabPhysics->MoveKinematicPosition(grabPair.second.m_targetPosition, deltaTime);
+			}
+			else
+			{
+				auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(character->m_yaw, 0, 0);
+				grabPhysics->MoveKinematic_Quat(grabPair.second.m_targetPosition, quat, deltaTime);
+			}
 		}
 	}
 }
@@ -144,6 +152,7 @@ void GrabSystem::ProcessGrab(GameObject* gameObj)
 		grabRt.m_character = gameObj->m_UUID;
 		grabRt.m_grabbedObject = hitUUID;
 		grabRt.m_isDynamic = false;
+		grabRt.m_keepOriginalRotation = grabComp->m_keepObjectsOriginalRotation;
 
 		m_grabPairs[gameObj->m_UUID] = grabRt;
 
@@ -156,6 +165,7 @@ void GrabSystem::ProcessRelease(GameObject* gameObj)
 {
 	auto res = m_grabPairs.find(gameObj->m_UUID);
 	if (res == m_grabPairs.end()) { return; }
+	bool keepOriginalRot = res->second.m_keepOriginalRotation;
 	bool isDynamic = res->second.m_isDynamic;
 	m_grabPairs.erase(res);
 
@@ -169,6 +179,17 @@ void GrabSystem::ProcessRelease(GameObject* gameObj)
 		auto grabPhysics = grabObj->GetComponent<PhysicsComponent>();
 		if (!grabPhysics) { return; }
 		grabPhysics->SetLinearVelocity(DXSM::Vector3::Zero);
+
+		/*
+		if (!keepOriginalRot)
+		{
+			auto character = gameObj->GetComponent<CharacterComponent>();
+			if (!character) { return; }
+
+			auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(character->m_yaw, 0, 0);
+			grabPhysics->SetOrientation(JPH::Quat(quat.x, quat.y, quat.z, quat.w));
+		}
+		*/
 	}
 
 	grabComp->m_grabbedObject = SE::UUID(0u);

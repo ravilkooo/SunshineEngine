@@ -274,7 +274,7 @@
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 20.0,
                     "m_stepHeight": 0.30000001192092896,
-                    "m_syncronizeYawWithCameraForwardDir": true,
+                    "m_syncronizeYawWithCameraForwardDir": false,
                     "m_turnAcceleration": 20.0
                 },
                 "Grab": {
@@ -283,6 +283,7 @@
                     "m_grabSpringDamping": 10000.0,
                     "m_grabSpringStrength": 50000.0,
                     "m_holdDistance": 10.0,
+                    "m_keepObjectsOriginalRotation": false,
                     "m_maxGrabDistance": 10.0,
                     "m_rotateWithCamera": true,
                     "m_throwImpulse": 100000.0
@@ -1529,9 +1530,9 @@
                         5.0
                     ],
                     "m_position": [
-                        7.8473005294799805,
-                        6.807664394378662,
-                        64.94496154785156
+                        -20.410587310791016,
+                        6.807671070098877,
+                        8.239385604858398
                     ],
                     "m_rotation": [
                         -0.0,

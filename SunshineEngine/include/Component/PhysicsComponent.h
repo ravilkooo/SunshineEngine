@@ -106,6 +106,7 @@ public:
 
     // Move kinematic
     void MoveKinematic(DXSM::Vector3 inPosition, DXSM::Vector3 inRotation, float deltaTime);
+    void MoveKinematic_Quat(DXSM::Vector3 inPosition, DXSM::Quaternion inQuaternion, float deltaTime);
     void MoveKinematicPosition(DXSM::Vector3 inPosition, float deltaTime);
     void MoveKinematicRotation(DXSM::Vector3 inRotation, float deltaTime);
 

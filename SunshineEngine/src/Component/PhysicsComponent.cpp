@@ -395,6 +395,30 @@ void PhysicsComponent::MoveKinematic(DXSM::Vector3 inPosition, DXSM::Vector3 inR
         });
 }
 
+void PhysicsComponent::MoveKinematic_Quat(DXSM::Vector3 inPosition, DXSM::Quaternion inQuaternion, float deltaTime)
+{
+    if (!m_physicsSystem)
+        return;
+
+    m_physicsSystem->EnqueueCommand([this, inPosition, inQuaternion, deltaTime]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+
+            return bodyInterface.MoveKinematic(m_joltBodyId,
+                JPH::Vec3(inPosition.x, inPosition.y, inPosition.z),
+                JPH::Quat(inQuaternion.x, inQuaternion.y, inQuaternion.z, inQuaternion.w),
+                deltaTime);
+        });
+
+
+    m_physicsSystem->EnqueuePreNextFrameCommand([this]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            bodyInterface.SetLinearVelocity(m_joltBodyId, JPH::Vec3::sZero());
+            return bodyInterface.SetAngularVelocity(m_joltBodyId, JPH::Vec3::sZero());
+        });
+}
+
 void PhysicsComponent::MoveKinematicPosition(DXSM::Vector3 inPosition, float deltaTime)
 {
     if (!m_physicsSystem)
