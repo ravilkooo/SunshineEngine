@@ -22,11 +22,6 @@ public:
     SE::UUID m_character;
     SE::UUID m_grabbedObject;
 
-    // Default values
-
-    float m_springStrength = 150.0f;
-    float m_damping = 20.0f;
-
     // Updated every frame
 
     DXSM::Vector3 m_localGrabOffset = DXSM::Vector3::Zero;

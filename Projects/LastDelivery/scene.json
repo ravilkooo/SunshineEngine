@@ -280,6 +280,8 @@
                 "Grab": {
                     "m_canGrabDynamicBodies": true,
                     "m_canGrabKinematicBodies": false,
+                    "m_grabSpringDamping": 100000.0,
+                    "m_grabSpringStrength": 1000000.0,
                     "m_holdDistance": 10.0,
                     "m_maxGrabDistance": 10.0,
                     "m_rotateWithCamera": true,
@@ -2668,6 +2670,116 @@
             "m_UUID": 4917987749370674916,
             "m_UUID_hi": 1145058253,
             "m_UUID_lo": 720781028,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
+        },
+        {
+            "components": {
+                "Behavior": {
+                    "IsEnabled": true
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/SortableCube3.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_density": 700.0,
+                    "m_friction": 1.0,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        -21.39044189453125,
+                        2.7025508880615234,
+                        7.3335700035095215
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 6677022659140919050,
+            "m_UUID_hi": 1554615483,
+            "m_UUID_lo": 1800675082,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_parent": null,

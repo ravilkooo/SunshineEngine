@@ -95,10 +95,10 @@ void GrabSystem::UpdateGrabTargets(float deltaTime)
 		auto grabPhysics = grabObj->GetComponent<PhysicsComponent>();
 		if (!grabPhysics) { continue; }
 
-		DXSM::Vector3 force = grabPair.second.m_localGrabOffset * grabPair.second.m_springStrength
-			- grabPhysics->GetLinearVelocity() * grabPair.second.m_damping;
+		DXSM::Vector3 force = grabPair.second.m_localGrabOffset * grabComp->m_grabSpringStrength
+			- grabPhysics->GetLinearVelocity() * grabComp->m_grabSpringDamping;
 
-		grabPhysics->AddImpulse(force);
+		grabPhysics->AddForce(force);
 	}
 }
 

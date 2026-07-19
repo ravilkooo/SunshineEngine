@@ -12,6 +12,13 @@ void GrabComponent::FromJson(const json& j)
         m_throwImpulse = j["m_throwImpulse"].get<float>();
     }
 
+    if (j.contains("m_grabSpringStrength") && j["m_grabSpringStrength"].is_number_float()) {
+        m_grabSpringStrength = j["m_grabSpringStrength"].get<float>();
+    }
+    if (j.contains("m_grabSpringDamping") && j["m_grabSpringDamping"].is_number_float()) {
+        m_grabSpringDamping = j["m_grabSpringDamping"].get<float>();
+    }
+
     if (j.contains("m_rotateWithCamera") && j["m_rotateWithCamera"].is_boolean()) {
         m_rotateWithCamera = j["m_rotateWithCamera"].get<bool>();
     }
@@ -36,6 +43,10 @@ json GrabComponent_Info::ToJson() const
             {"m_holdDistance", m_assignedComponent->m_holdDistance},
             {"m_maxGrabDistance", m_assignedComponent->m_maxGrabDistance},
             {"m_throwImpulse", m_assignedComponent->m_throwImpulse},
+
+            {"m_grabSpringStrength", m_assignedComponent->m_grabSpringStrength},
+            {"m_grabSpringDamping", m_assignedComponent->m_grabSpringDamping},
+
             {"m_rotateWithCamera", m_assignedComponent->m_rotateWithCamera},
             {"m_canGrabDynamicBodies", m_assignedComponent->m_canGrabDynamicBodies},
             {"m_canGrabKinematicBodies", m_assignedComponent->m_canGrabKinematicBodies}
