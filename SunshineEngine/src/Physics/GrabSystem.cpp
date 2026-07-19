@@ -53,6 +53,47 @@ void GrabSystem::FlushGrabQueue()
 	m_grabInputQueue.clear();
 }
 
+void GrabSystem::UpdateGrabTargets(float deltaTime)
+{
+	for (auto grabPair : m_grabPairs)
+	{
+		auto charUUID = grabPair.first;
+		auto charObj = m_systemContext.scene->GetGameObjectByUUID(charUUID);
+
+		auto grabObjUUID = grabPair.second.m_grabbedObject;
+		auto grabObj = m_systemContext.scene->GetGameObjectByUUID(grabObjUUID);
+
+		auto grabComp = charObj->GetComponent<GrabComponent>();
+		if (!grabComp) { continue; }
+		auto character = charObj->GetComponent<CharacterComponent>();
+		if (!character) { continue; }
+		auto charTransform = charObj->GetComponent<TransformComponent>();
+		if (!charTransform) { continue; }
+		auto grabTransform = grabObj->GetComponent<TransformComponent>();
+		if (!grabTransform) { continue; }
+
+		auto forwardDir = DXSM::Vector3(sin(character->m_yaw), 0, cos(character->m_yaw));
+		forwardDir *= grabComp->m_holdDistance;
+
+		grabPair.second.m_targetPosition = charTransform->GetAbsoluteWorldPosition() + forwardDir;
+		grabPair.second.m_localGrabOffset = grabPair.second.m_targetPosition - grabTransform->GetAbsoluteWorldPosition();
+
+		auto grabPhysics = grabObj->GetComponent<PhysicsComponent>();
+		if (!grabPhysics) { continue; }
+
+		if (grabPair.second.m_isDynamic)
+		{
+			DXSM::Vector3 force = grabPair.second.m_localGrabOffset * grabComp->m_grabSpringStrength
+				- grabPhysics->GetLinearVelocity() * grabComp->m_grabSpringDamping;
+			grabPhysics->AddForce(force);
+		}
+		else
+		{
+			grabPhysics->MoveKinematicPosition(grabPair.second.m_targetPosition, deltaTime);
+		}
+	}
+}
+
 void GrabSystem::Update(float deltaTime)
 {
 	FlushGrabQueue();
@@ -89,6 +130,7 @@ void GrabSystem::ProcessGrab(GameObject* gameObj)
 		GrabRuntime grabRt;
 		grabRt.m_character = gameObj->m_UUID;
 		grabRt.m_grabbedObject = hitUUID;
+		grabRt.m_isDynamic = true;
 		
 		m_grabPairs[gameObj->m_UUID] = grabRt;
 
@@ -96,52 +138,38 @@ void GrabSystem::ProcessGrab(GameObject* gameObj)
 
 		// other data will be calculated in grabSystem update
 	}
-	// for now only dynamic items can be grabbed
-}
-
-void GrabSystem::UpdateGrabTargets(float deltaTime)
-{
-	for (auto grabPair : m_grabPairs)
+	if (physComp->GetMotionType() == JPH::EMotionType::Kinematic && grabComp->m_canGrabKinematicBodies)
 	{
-		auto charUUID = grabPair.first;
-		auto charObj = m_systemContext.scene->GetGameObjectByUUID(charUUID);
+		GrabRuntime grabRt;
+		grabRt.m_character = gameObj->m_UUID;
+		grabRt.m_grabbedObject = hitUUID;
+		grabRt.m_isDynamic = false;
 
-		auto grabObjUUID = grabPair.second.m_grabbedObject;
-		auto grabObj = m_systemContext.scene->GetGameObjectByUUID(grabObjUUID);
+		m_grabPairs[gameObj->m_UUID] = grabRt;
 
-		auto grabComp = charObj->GetComponent<GrabComponent>();
-		if (!grabComp) { continue; }
-		auto character = charObj->GetComponent<CharacterComponent>();
-		if (!character) { continue; }
-		auto charTransform = charObj->GetComponent<TransformComponent>();
-		if (!charTransform) { continue; }
-		auto grabTransform = grabObj->GetComponent<TransformComponent>();
-		if (!grabTransform) { continue; }
-
-		auto forwardDir = DXSM::Vector3(sin(character->m_yaw), 0, cos(character->m_yaw));
-		forwardDir *= grabComp->m_holdDistance;
-
-		grabPair.second.m_targetPosition = charTransform->GetAbsoluteWorldPosition() + forwardDir;
-		grabPair.second.m_localGrabOffset = grabPair.second.m_targetPosition - grabTransform->GetAbsoluteWorldPosition();
-
-		auto grabPhysics = grabObj->GetComponent<PhysicsComponent>();
-		if (!grabPhysics) { continue; }
-
-		DXSM::Vector3 force = grabPair.second.m_localGrabOffset * grabComp->m_grabSpringStrength
-			- grabPhysics->GetLinearVelocity() * grabComp->m_grabSpringDamping;
-
-		grabPhysics->AddForce(force);
+		grabComp->m_grabbedObject = hitUUID;
 	}
+	
 }
 
 void GrabSystem::ProcessRelease(GameObject* gameObj)
 {
 	auto res = m_grabPairs.find(gameObj->m_UUID);
 	if (res == m_grabPairs.end()) { return; }
+	bool isDynamic = res->second.m_isDynamic;
 	m_grabPairs.erase(res);
 
 	eastl::shared_ptr<GrabComponent> grabComp = gameObj->GetComponent<GrabComponent>();
 	if (!grabComp) { return; }
+
+	if (!isDynamic)
+	{
+		auto grabObj = m_systemContext.scene->GetGameObjectByUUID(grabComp->m_grabbedObject);
+
+		auto grabPhysics = grabObj->GetComponent<PhysicsComponent>();
+		if (!grabPhysics) { return; }
+		grabPhysics->SetLinearVelocity(DXSM::Vector3::Zero);
+	}
 
 	grabComp->m_grabbedObject = SE::UUID(0u);
 }
@@ -153,6 +181,7 @@ void GrabSystem::ProcessThrow(GameObject* gameObj)
 		return;
 	}
 
+	bool isDynamic = res->second.m_isDynamic;
 	auto grabRt = res->second;
 	m_grabPairs.erase(res);
 
@@ -169,9 +198,16 @@ void GrabSystem::ProcessThrow(GameObject* gameObj)
 	auto grabPhysics = grabObj->GetComponent<PhysicsComponent>();
 	if (!grabPhysics) { return; }
 
-	DXSM::Vector3 impulse = grabComp->m_throwImpulse * forwardDir;
+	if (isDynamic)
+	{
+		DXSM::Vector3 impulse = grabComp->m_throwImpulse * forwardDir;
 
-	grabPhysics->AddImpulse(impulse);
+		grabPhysics->AddImpulse(impulse);
+	}
+	else
+	{
+		grabPhysics->SetLinearVelocity(DXSM::Vector3::Zero);
+	}
 
 	grabComp->m_grabbedObject = SE::UUID(0u);
 }

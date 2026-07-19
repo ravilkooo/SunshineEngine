@@ -31,6 +31,8 @@ public:
     SE::UUID m_character;
     SE::UUID m_grabbedObject;
 
+    bool m_isDynamic = true;
+
     // Updated every frame
 
     DXSM::Vector3 m_localGrabOffset = DXSM::Vector3::Zero;

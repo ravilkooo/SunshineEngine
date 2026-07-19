@@ -1918,14 +1918,37 @@ void PropertyPanel::DrawGrabComponent(GameObject_Info* obj)
 
         DrawFloatControl("holdDistance", grabInfo->m_assignedComponent->m_holdDistance, 2.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
         DrawFloatControl("maxGrabDistance", grabInfo->m_assignedComponent->m_maxGrabDistance, 3.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
-        DrawFloatControl("throwImpulse", grabInfo->m_assignedComponent->m_throwImpulse, 10.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
+        //ImGui::Checkbox("rotateWithCamera", &grabInfo->m_assignedComponent->m_rotateWithCamera);
 
-        DrawFloatControl("grabSpringStrength", grabInfo->m_assignedComponent->m_grabSpringStrength, 1'000'000.0f, 0.1f, 0.0f, 1'000'000'000.0f, "%.1f");
-        DrawFloatControl("grabSpringDamping", grabInfo->m_assignedComponent->m_grabSpringDamping, 1'000'000.0f, 0.1f, 0.0f, 1'000'000'000.0f, "%.1f");
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        if (ImGui::TreeNodeEx("Grab Dynamic settings", flags))
+        {
+            EditorUI::FontStyles::Pop();
+            ImGui::Checkbox("canGrabDynamicBodies", &grabInfo->m_assignedComponent->m_canGrabDynamicBodies);
 
-        ImGui::Checkbox("rotateWithCamera", &grabInfo->m_assignedComponent->m_rotateWithCamera);
-        ImGui::Checkbox("canGrabDynamicBodies", &grabInfo->m_assignedComponent->m_canGrabDynamicBodies);
-        ImGui::Checkbox("canGrabKinematicBodies", &grabInfo->m_assignedComponent->m_canGrabKinematicBodies);
+            ImGui::BeginDisabled(!grabInfo->m_assignedComponent->m_canGrabDynamicBodies);
+            DrawFloatControl("throwImpulse", grabInfo->m_assignedComponent->m_throwImpulse, 10.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
+            DrawFloatControl("grabSpringStrength", grabInfo->m_assignedComponent->m_grabSpringStrength, 1'000'000.0f, 0.1f, 0.0f, 1'000'000'000.0f, "%.1f");
+            DrawFloatControl("grabSpringDamping", grabInfo->m_assignedComponent->m_grabSpringDamping, 1'000'000.0f, 0.1f, 0.0f, 1'000'000'000.0f, "%.1f");
+            ImGui::EndDisabled();
+
+            ImGui::TreePop();
+        }
+        else EditorUI::FontStyles::Pop();
+        
+
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        if (ImGui::TreeNodeEx("Grab Kinematic settings", flags))
+        {
+            EditorUI::FontStyles::Pop();
+            ImGui::Checkbox("canGrabKinematicBodies", &grabInfo->m_assignedComponent->m_canGrabKinematicBodies);
+
+            ImGui::BeginDisabled(!grabInfo->m_assignedComponent->m_canGrabKinematicBodies);
+            ImGui::EndDisabled();
+
+            ImGui::TreePop();
+        }
+        else EditorUI::FontStyles::Pop();
 
 
         ImGui::TreePop();
