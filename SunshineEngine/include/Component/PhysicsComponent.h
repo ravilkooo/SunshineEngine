@@ -228,28 +228,28 @@ public:
 // Macro listing methods of PhysicsComponent to expose in Lua bindings
 #ifndef PHYSICSCOMPONENT_LUA_METHODS_APPLY
 #define PHYSICSCOMPONENT_LUA_METHODS_APPLY(FM) \
-    FM("addForce", [](PhysicsComponent* self, const DXSM::Vector3& inForce){ self->AddForce(inForce); }) \
-    FM("addImpulse", [](PhysicsComponent* self, const DXSM::Vector3& inImpulse){ self->AddImpulse(inImpulse); }) \
-    FM("addTorque", [](PhysicsComponent* self, const DXSM::Vector3& inTorque){ self->AddTorque(inTorque); }) \
-    FM("addAngularImpulse", [](PhysicsComponent* self, const DXSM::Vector3& inAngularImpulse){ self->AddAngularImpulse(inAngularImpulse); }) \
-    FM("getAccumulatedForce", [](PhysicsComponent* self){ return self->GetAccumulatedForce(); }) \
-    FM("getAccumulatedTorque", [](PhysicsComponent* self){ return self->GetAccumulatedTorque(); }) \
-    FM("getLinearVelocity", [](PhysicsComponent* self){ return self->GetLinearVelocity(); }) \
-    FM("setLinearVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetLinearVelocity(v); }) \
-    FM("getAngularVelocity", [](PhysicsComponent* self){ return self->GetAngularVelocity(); }) \
-    FM("setAngularVelocity", [](PhysicsComponent* self, const DXSM::Vector3& v){ self->SetAngularVelocity(v); }) \
-    FM("getPointVelocity", [](PhysicsComponent* self, const DXSM::Vector3& pt){ return self->GetPointVelocity(pt); }) \
-    FM("getPosition", [](PhysicsComponent* self){ return self->GetPosition(); }) \
-    FM("getRotation", [](PhysicsComponent* self){ return self->GetRotation(); }) \
-    FM("moveKinematic", [](PhysicsComponent* self, DXSM::Vector3 inPos, DXSM::Vector3 inRot, float deltaTime) { return self->MoveKinematic(inPos, inRot, deltaTime); }) \
-    FM("moveKinematicPosition", [](PhysicsComponent* self, DXSM::Vector3 inPos, float deltaTime) { return self->MoveKinematicPosition(inPos, deltaTime); }) \
-    FM("moveKinematicRotation", [](PhysicsComponent* self, DXSM::Vector3 inRot, float deltaTime) { return self->MoveKinematicRotation(inRot, deltaTime); }) \
-    FM("getGravityFactor", [](PhysicsComponent* self){ return self->GetGravityFactor(); }) \
-    FM("setGravityFactor", [](PhysicsComponent* self, float inVal){ return self->SetGravityFactor(inVal); }) \
-    FM("resetForce", [](PhysicsComponent* self){ self->ResetForce(); }) \
-    FM("resetTorque", [](PhysicsComponent* self){ self->ResetTorque(); }) \
-    FM("setActive", [](PhysicsComponent* self, bool active){ self->SetActive(active); }) \
-    FM("isActive", [](PhysicsComponent* self){ return self->IsActive(); })
+    FM("addForce", &PhysicsComponent::AddForce) \
+    FM("addImpulse", &PhysicsComponent::AddImpulse) \
+    FM("addTorque", &PhysicsComponent::AddTorque) \
+    FM("addAngularImpulse", &PhysicsComponent::AddAngularImpulse) \
+    FM("getAccumulatedForce", &PhysicsComponent::GetAccumulatedForce) \
+    FM("getAccumulatedTorque", &PhysicsComponent::GetAccumulatedTorque) \
+    FM("getLinearVelocity", &PhysicsComponent::GetLinearVelocity) \
+    FM("setLinearVelocity", &PhysicsComponent::SetLinearVelocity) \
+    FM("getAngularVelocity", &PhysicsComponent::GetAngularVelocity) \
+    FM("setAngularVelocity", &PhysicsComponent::SetAngularVelocity) \
+    FM("getPointVelocity", &PhysicsComponent::GetPointVelocity) \
+    FM("getPosition", &PhysicsComponent::GetPosition) \
+    FM("getRotation", &PhysicsComponent::GetRotation) \
+    FM("moveKinematic", &PhysicsComponent::MoveKinematic) \
+    FM("moveKinematicPosition", &PhysicsComponent::MoveKinematicPosition) \
+    FM("moveKinematicRotation", &PhysicsComponent::MoveKinematicRotation) \
+    FM("getGravityFactor", &PhysicsComponent::GetGravityFactor) \
+    FM("setGravityFactor", &PhysicsComponent::SetGravityFactor) \
+    FM("resetForce", &PhysicsComponent::ResetForce) \
+    FM("resetTorque", &PhysicsComponent::ResetTorque) \
+    FM("setActive", &PhysicsComponent::SetActive) \
+    FM("isActive", &PhysicsComponent::IsActive)
 #endif
 
 #ifndef PHYSICSCOMPONENT_LUA_PROPERTIES_APPLY

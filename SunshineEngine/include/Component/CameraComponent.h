@@ -82,5 +82,5 @@ public:
 // Macro listing methods of CameraComponent to expose in Lua bindings
 #ifndef CAMERACOMPONENT_LUA_METHODS_APPLY
 #define CAMERACOMPONENT_LUA_METHODS_APPLY(FM) \
-    FM("getCamera", [](CameraComponent* self){ return self->GetCamera(); })
+    FM("getCamera", &CameraComponent::GetCamera)
 #endif

@@ -78,9 +78,3 @@ public:
 #define MOVING_PLATFORM_COMPONENT_LUA_PROPERTIES_APPLY(FP) \
     FP(affectCharacters, &MovingPlatformComponent::GetAffectCharacters, &MovingPlatformComponent::SetAffectCharacters)
 #endif
-
-#ifndef BOUNCEPADCOMPONENT_LUA_METHODS_APPLY
-#define BOUNCEPADCOMPONENT_LUA_METHODS_APPLY(FM) \
-    FM("bounceCharacter", [](MovingPlatformComponent* self, CharacterComponent* character){ return self->BounceCharacter(character); }) \
-    FM("bounceCharacterByUUID", [](MovingPlatformComponent* self, SE::UUIDhilo characterUUID){ return self->BounceCharacter(SE::UUID::FromHilo(characterUUID)); })
-#endif
