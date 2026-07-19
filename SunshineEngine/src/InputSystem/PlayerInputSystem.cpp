@@ -210,12 +210,20 @@ bool PlayerInputSystem::FromJson(const json& j)
             m_actions[a.second[i]] = ActionState{};
         }
     }
-    
+    PrepareStates();
     return true;
 }
 
 void PlayerInputSystem::BeginFrame()
 {
+
+}
+
+void PlayerInputSystem::EndFrame() {
+    PrepareStates();
+}
+
+void PlayerInputSystem::PrepareStates() {
     for (auto& [key, state] : m_keys)
     {
         state.Pressed = false;
@@ -232,10 +240,6 @@ void PlayerInputSystem::BeginFrame()
     m_mouse.DeltaY = 0.0f;
 
     m_mouse.WheelDelta = 0.0f;
-}
-
-void PlayerInputSystem::EndFrame() {
-    // To-do
 }
 
 #pragma region Handling keys
@@ -424,6 +428,11 @@ void PlayerInputSystem::PressAction(
     if (state.PressCount == 1)
     {
         state.Pressed = true;
+        state.Held = true;
+    }
+    else
+    {
+        state.Pressed = false;
         state.Held = true;
     }
     

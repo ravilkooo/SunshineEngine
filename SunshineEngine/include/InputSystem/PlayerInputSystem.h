@@ -134,6 +134,7 @@ public:
     //
 
     void BeginFrame();
+    void PrepareStates();
     void EndFrame();
 
     //
