@@ -1868,7 +1868,15 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
         if (ImGui::TreeNodeEx("Additional Forces", flags))
         {
             EditorUI::FontStyles::Pop();
-            ImGui::Checkbox("Syncronize yaw with camera\nforward direction", &charContrInfo->m_assignedComponent->m_syncronizeYawWithCameraForwardDir);
+            ImGui::Checkbox("Syncronize yaw with camera forward direction", &charContrInfo->m_assignedComponent->m_syncronizeYawWithCameraForwardDir);
+            if (ImGui::TreeNodeEx("##SyncronizeYaw", ImGuiTreeNodeFlags_Leaf))
+            {
+                ImGui::BeginDisabled(!charContrInfo->m_assignedComponent->m_syncronizeYawWithCameraForwardDir);
+                ImGui::Checkbox("Sync only when moved", &charContrInfo->m_assignedComponent->m_syncOnlyWhenMoved);
+                ImGui::Checkbox("Keep yaw forward while strafe", &charContrInfo->m_assignedComponent->m_keepYawWhileStrafe);
+                ImGui::EndDisabled();
+                ImGui::TreePop();
+            }
 
             DrawFloatControl("Move speed", charContrInfo->m_assignedComponent->m_moveSpeed, 6.0f, 0.01f, 0.0f, 100.0f, "%.2f");
             DrawFloatControl("Move acceleration", charContrInfo->m_assignedComponent->m_acceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");

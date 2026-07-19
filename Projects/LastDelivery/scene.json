@@ -270,11 +270,13 @@
                     "m_enableWalkStairs": false,
                     "m_gravity": -24.0,
                     "m_jumpSpeed": 8.0,
+                    "m_keepYawWhileStrafe": false,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 20.0,
                     "m_stepHeight": 0.30000001192092896,
-                    "m_syncronizeYawWithCameraForwardDir": false,
+                    "m_syncOnlyWhenMoved": true,
+                    "m_syncronizeYawWithCameraForwardDir": true,
                     "m_turnAcceleration": 20.0
                 },
                 "Grab": {
@@ -283,7 +285,7 @@
                     "m_grabSpringDamping": 10000.0,
                     "m_grabSpringStrength": 50000.0,
                     "m_holdDistance": 10.0,
-                    "m_keepObjectsOriginalRotation": false,
+                    "m_keepObjectsOriginalRotation": true,
                     "m_maxGrabDistance": 10.0,
                     "m_rotateWithCamera": true,
                     "m_throwImpulse": 100000.0
@@ -853,10 +855,12 @@
                     "m_enableWalkStairs": false,
                     "m_gravity": -24.0,
                     "m_jumpSpeed": 8.0,
+                    "m_keepYawWhileStrafe": false,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 15.0,
                     "m_stepHeight": 0.30000001192092896,
+                    "m_syncOnlyWhenMoved": true,
                     "m_syncronizeYawWithCameraForwardDir": false,
                     "m_turnAcceleration": 10.0
                 },
@@ -1258,10 +1262,12 @@
                     "m_enableWalkStairs": false,
                     "m_gravity": -24.0,
                     "m_jumpSpeed": 8.0,
+                    "m_keepYawWhileStrafe": false,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 0.0,
                     "m_stepHeight": 0.30000001192092896,
+                    "m_syncOnlyWhenMoved": true,
                     "m_syncronizeYawWithCameraForwardDir": false,
                     "m_turnAcceleration": 10.0
                 },
@@ -2973,9 +2979,9 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        5.0,
-                        5.0,
-                        5.0
+                        7.201037883758545,
+                        3.6329994201660156,
+                        1.8915069103240967
                     ],
                     "m_position": [
                         3.4542794227600098,

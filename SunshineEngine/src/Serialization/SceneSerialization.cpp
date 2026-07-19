@@ -468,6 +468,9 @@ json CharacterControllerComponent_Info::ToJson() const
     if (m_assignedComponent) {
         j = nlohmann::json{
             {"m_syncronizeYawWithCameraForwardDir", m_assignedComponent->m_syncronizeYawWithCameraForwardDir},
+            {"m_keepYawWhileStrafe", m_assignedComponent->m_keepYawWhileStrafe},
+            {"m_syncOnlyWhenMoved", m_assignedComponent->m_syncOnlyWhenMoved},
+
             {"m_turnAcceleration", m_assignedComponent->m_turnAcceleration},
 
             {"m_moveSpeed", m_assignedComponent->m_moveSpeed},
@@ -504,6 +507,13 @@ void CharacterControllerComponent::FromJson(const json& j)
     if (j.contains("m_syncronizeYawWithCameraForwardDir") && j["m_syncronizeYawWithCameraForwardDir"].is_boolean()) {
         m_syncronizeYawWithCameraForwardDir = j["m_syncronizeYawWithCameraForwardDir"].get<bool>();
     }
+    if (j.contains("m_keepYawWhileStrafe") && j["m_keepYawWhileStrafe"].is_boolean()) {
+        m_keepYawWhileStrafe = j["m_keepYawWhileStrafe"].get<bool>();
+    }
+    if (j.contains("m_syncOnlyWhenMoved") && j["m_syncOnlyWhenMoved"].is_boolean()) {
+        m_syncOnlyWhenMoved = j["m_syncOnlyWhenMoved"].get<bool>();
+    }
+
     if (j.contains("m_turnAcceleration") && j["m_turnAcceleration"].is_number_float()) {
         m_turnAcceleration = j["m_turnAcceleration"].get<float>();
     }

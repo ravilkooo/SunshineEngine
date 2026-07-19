@@ -232,9 +232,9 @@ void CharacterControllerSystem::ApplyMovementInput(
 
     if (controller->m_syncronizeYawWithCameraForwardDir)
     {
-        if ((input.x != 0 || input.y != 0))
+        if (!controller->m_syncOnlyWhenMoved || (input.x != 0 || input.y != 0))
         {
-            float inputAngle = atan2(input.x, input.y);
+            float inputAngle = controller->m_keepYawWhileStrafe ? 0.0f : atan2(input.x, input.y);
 
             auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
             float camYaw = 0.0f;
@@ -269,22 +269,27 @@ void CharacterControllerSystem::ApplyMovementInput(
             }
             // character->m_yaw = std::clamp(character->m_yaw, -DX::XM_PI, DX::XM_PI);
 
-            float newCameraYaw = (desiredYaw - character->m_yaw - inputAngle);
-            if (newCameraYaw > DX::XM_PI) { newCameraYaw -= DX::XM_2PI; }
-            else if (newCameraYaw < -DX::XM_PI) { newCameraYaw += DX::XM_2PI; }
+            if (camera)
+            {
+                float newCameraYaw = (desiredYaw - character->m_yaw - inputAngle);
+                if (newCameraYaw > DX::XM_PI) { newCameraYaw -= DX::XM_2PI; }
+                else if (newCameraYaw < -DX::XM_PI) { newCameraYaw += DX::XM_2PI; }
 
-            camera->SetSpringArmYaw(newCameraYaw);
+                camera->SetSpringArmYaw(newCameraYaw);
+            }
         }
     }
     else
     {
+        // float inputAngle = (input.x != 0 || input.y != 0) ? atan2(input.x, input.y) : 0.0f;
+
         DXSM::Vector2 inputTurn = character->m_yawPitchDeltaInput;
         if (inputTurn != DXSM::Vector2::Zero)
         {
             float desiredYaw = character->m_yaw + inputTurn.x;
 
-            if (inputTurn.x < -DX::XM_PI) { character->m_yaw -= DX::XM_2PI; }
-            else if (inputTurn.x > DX::XM_PI) { character->m_yaw += DX::XM_2PI; }
+            if ((character->m_yaw - desiredYaw) > DX::XM_PI) { character->m_yaw -= DX::XM_2PI; }
+            else if ((character->m_yaw - desiredYaw) < -DX::XM_PI) { character->m_yaw += DX::XM_2PI; }
 
             character->m_yaw = std::lerp(
                 character->m_yaw,
@@ -298,16 +303,34 @@ void CharacterControllerSystem::ApplyMovementInput(
         }
     }
 
+    // mark
     float desiredVelocity = input.Length() * controller->m_moveSpeed;
+
+    DXSM::Vector3 desiredVelocity_3d =
+        DXSM::Vector3(input.x * controller->m_moveSpeed,
+            controller->m_inputVelocity_3d.y,
+            input.y * controller->m_moveSpeed);
 
     float accel =
         controller->m_grounded
         ? controller->m_acceleration
         : controller->m_airAcceleration;
 
+    // mark
     controller->m_inputVelocity = std::lerp(
         controller->m_inputVelocity,
         desiredVelocity,
+        accel * deltaTime
+    );
+
+    controller->m_inputVelocity_3d.x = std::lerp(
+        controller->m_inputVelocity_3d.x,
+        desiredVelocity_3d.x,
+        accel * deltaTime
+    );
+    controller->m_inputVelocity_3d.z = std::lerp(
+        controller->m_inputVelocity_3d.z,
+        desiredVelocity_3d.z,
         accel * deltaTime
     );
 }
@@ -414,13 +437,41 @@ void CharacterControllerSystem::UpdatePhysics(
         return;
     }
 
-    controller->m_character->SetLinearVelocity(
-        JPH::Vec3(
-            controller->m_velocity.x + controller->m_inputVelocity * sin(character->m_yaw),
-            controller->m_velocity.y,
-            controller->m_velocity.z + controller->m_inputVelocity * cos(character->m_yaw)
-        ) + controller->m_groundSpeed
-    );
+    // mark
+    if (controller->m_syncronizeYawWithCameraForwardDir)
+    {
+        if (controller->m_keepYawWhileStrafe)
+        {
+            controller->m_character->SetLinearVelocity(
+                JPH::Vec3(
+                    controller->m_velocity.x + controller->m_inputVelocity_3d.x * cos(character->m_yaw) + controller->m_inputVelocity_3d.z * sin(character->m_yaw),
+                    controller->m_velocity.y + controller->m_inputVelocity_3d.y,
+                    controller->m_velocity.z + controller->m_inputVelocity_3d.z * cos(character->m_yaw) - controller->m_inputVelocity_3d.x * sin(character->m_yaw)
+                ) + controller->m_groundSpeed
+            );
+        }
+        else
+        {
+            controller->m_character->SetLinearVelocity(
+                JPH::Vec3(
+                    controller->m_velocity.x + controller->m_inputVelocity * sin(character->m_yaw),
+                    controller->m_velocity.y,
+                    controller->m_velocity.z + controller->m_inputVelocity * cos(character->m_yaw)
+                ) + controller->m_groundSpeed
+            );
+        }
+    }
+    else
+    {
+        controller->m_character->SetLinearVelocity(
+            JPH::Vec3(
+                controller->m_velocity.x + controller->m_inputVelocity_3d.x * cos(character->m_yaw) + controller->m_inputVelocity_3d.z * sin(character->m_yaw),
+                controller->m_velocity.y + controller->m_inputVelocity_3d.y,
+                controller->m_velocity.z + controller->m_inputVelocity_3d.z * cos(character->m_yaw) - controller->m_inputVelocity_3d.x * sin(character->m_yaw)
+            ) + controller->m_groundSpeed
+        );
+
+    }
 
     JPH::CharacterVirtual::ExtendedUpdateSettings update_settings;
     DXSM::Vector3 upVector = controller->m_groundNormal;

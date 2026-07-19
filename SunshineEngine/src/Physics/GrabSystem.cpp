@@ -132,6 +132,7 @@ void GrabSystem::ProcessGrab(GameObject* gameObj)
 
 	auto hitObj = m_systemContext.scene->GetGameObjectByUUID(hitUUID);
 	auto physComp = hitObj->GetComponent<PhysicsComponent>();
+	if (!physComp) { return; }
 
 	if (physComp->GetMotionType() == JPH::EMotionType::Dynamic && grabComp->m_canGrabDynamicBodies)
 	{
