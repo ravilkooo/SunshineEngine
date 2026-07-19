@@ -7,6 +7,11 @@
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
+#include <SystemContext.h>
+#include <Physics/PhysicsSystem.h>
+#include <ControllerSystem/CharacterControllerSystem.h>
+#include <Physics/GrabSystem.h>
+
 #include <SunshineEngineAPI.h>
 
 #include <Windows/InputDevice.h>
@@ -21,8 +26,6 @@
 // To-do: move lua manager from Editor to Engine
 //#include <Scripting/LuaManager.h>
 
-class PhysicsSystem;
-class CharacterControllerSystem;
 class AudioSystem;
 
 namespace SE
@@ -68,6 +71,7 @@ public:
 
     bool LoadScene(const wchar_t* scenePath);
     bool LoadInputMapping(eastl::wstring inputMappingDir);
+    void InitSystemContext();
 
     void OnResize(UINT resizeWidth, UINT resizeHeight);
 
@@ -76,13 +80,15 @@ public:
     void HandleKeyUp(Keys key);
     void HandleMouseMove(const InputDevice::MouseMoveEventArgs& args);
 
+    SystemContext m_systemContext;
+
     UINT m_screenWidth = 800u;
     UINT m_screenHeight = 800u;
 
     GameTimer m_timer;
     //eastl::shared_ptr<Scene> m_scene;
     eastl::unique_ptr<SE_G::DeferredRenderer> m_renderer;
-    eastl::unique_ptr<PhysicsSystem> m_physicsSystem;
+    PhysicsSystem m_physicsSystem;
 
     eastl::shared_ptr<SE_G::DirectionalLightData> lightData;
     SE_G::ShadowMapPass* m_shadowMapPass;
@@ -96,6 +102,8 @@ public:
 
     SE::ParticleSystem* m_particleSystem;
 
-    eastl::unique_ptr<CharacterControllerSystem> m_characterControllerSystem;
+    CharacterControllerSystem m_characterControllerSystem;
+
+    GrabSystem m_grabSystem;
 };
 

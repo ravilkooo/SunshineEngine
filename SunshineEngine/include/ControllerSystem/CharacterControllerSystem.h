@@ -1,13 +1,16 @@
 #pragma once
 
 #include <Jolt/Jolt.h>
+#include <Jolt/Physics/Body/BodyInterface.h>
 #include <Jolt/Physics/Collision/CollideShape.h>
 #include <Jolt/Physics/Character/CharacterVirtual.h>
 
 #include <EASTL/unique_ptr.h>
 #include <EASTL/shared_ptr.h>
 
-#include "GameObject/GameObject.h"
+#include <GameObject/GameObject.h>
+
+#include <SystemContext.h>
 
 class Scene;
 class CharacterComponent;
@@ -99,9 +102,10 @@ public:
 
     void UpdateCharacters(float deltaTime);
     void UpdateTriggerOverlaps();
-    void UpdatePhysicsInteractions();
 
+	void SetSystemContext(const SystemContext& context) { m_systemContext = context; }
 private:
+    SystemContext m_systemContext;
 
     //
     // Internal update stages
@@ -114,6 +118,8 @@ private:
         eastl::shared_ptr<CharacterControllerComponent> controller,
         float deltaTime
     );
+
+    void ProcessGrabInput(GameObject* gameObj);
 
     void ApplyGravity(
         eastl::shared_ptr<CharacterComponent> character,

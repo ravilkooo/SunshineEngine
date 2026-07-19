@@ -11,6 +11,7 @@
 #include <Component/CharacterControllerComponent.h>
 #include <Component/BouncePadComponent.h>
 #include <Component/MovingPlatformComponent.h>
+#include <Component/GrabComponent.h>
 
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
@@ -293,8 +294,6 @@ void GameObject_Info::AddDefaultComponent(SE::ComponentType compType)
         break;
 
         case SE::ComponentType::CHARACTER_CONTROLLER:
-
-            // Add PhysicsComponent with default values
         {
             if (HasComponent<PhysicsComponent_Info>())
             {
@@ -323,6 +322,19 @@ void GameObject_Info::AddDefaultComponent(SE::ComponentType compType)
             auto cam_info = AddComponent<CameraComponent_Info>(rc_info->GetDevice(), tc_info->m_assignedComponent.get(), m_UUID);
         }
 
+        break;
+
+        case SE::ComponentType::GRAB:
+        {
+            if (!HasComponent<CharacterComponent_Info>())
+            {
+                printSunshineErrorMessage("GrabComponent requires CharacterComponent. Please add CharacterComponent first.");
+                break;
+            }
+
+            auto gr_info = AddComponent<GrabComponent_Info>();
+
+        }
         break;
 
         default:

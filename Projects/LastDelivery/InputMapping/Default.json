@@ -5,7 +5,7 @@
             "key": 32
         },
         {
-            "action": "FAction",
+            "action": "Grab",
             "key": 70
         },
         {
@@ -15,6 +15,10 @@
         {
             "action": "Jump2",
             "key": 13
+        },
+        {
+            "action": "Throw",
+            "key": 500
         }
     ],
     "axis_bindings": [

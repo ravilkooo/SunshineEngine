@@ -115,6 +115,7 @@ private:
 
     void DrawCharacterComponent(GameObject_Info* obj);
     void DrawCharacterControllerComponent(GameObject_Info* obj);
+    void DrawGrabComponent(GameObject_Info* obj);
     void DrawCameraComponent(GameObject_Info* obj);
     void DrawBouncePadComponent(GameObject_Info* obj);
     void DrawMovingPlatformComponent(GameObject_Info* obj);

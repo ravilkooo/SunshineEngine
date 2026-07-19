@@ -5,6 +5,7 @@
 
 void RegisterBouncePadComponentLuaBindings();
 void RegisterMovingPlatformComponentLuaBindings();
+void RegisterGrabComponentLuaBindings();
 
 #include <Physics/PhysicsSystem.h>
 
@@ -160,6 +161,7 @@ namespace ScriptingBindings
         // Execute all component binders registered via LUA_REGISTER_COMPONENT
 		RegisterBouncePadComponentLuaBindings();
 		RegisterMovingPlatformComponentLuaBindings();
+		RegisterGrabComponentLuaBindings();
         AutoBindings::RegisterAll(lua);
 		
 		// Remove object from scene

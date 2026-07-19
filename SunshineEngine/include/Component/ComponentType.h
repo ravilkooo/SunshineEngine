@@ -18,6 +18,7 @@ namespace SE {
 		BOUNCE_PAD,
 		MOVING_PLATFORM,
 		CHARACTER_CONTROLLER,
+		GRAB,
 		COUNT
 	};
 }
@@ -38,4 +39,5 @@ NLOHMANN_JSON_SERIALIZE_ENUM(SE::ComponentType, {
 	{SE::ComponentType::CHARACTER_CONTROLLER,   "CHARACTER_CONTROLLER"},
 	{SE::ComponentType::BOUNCE_PAD,   "BOUNCE_PAD"},
 	{SE::ComponentType::MOVING_PLATFORM,   "MOVING_PLATFORM"},
+	{SE::ComponentType::GRAB,   "GRAB"},
 })

@@ -140,6 +140,7 @@ void EditorApp::RunApp()
 		if (m_runtimeMode == RuntimeMode::GAME_MODE)
 		{
 			PlayerInputSystem::GetInstance().BeginFrame();
+			//printf("!\tStart Frame\n");
 		}
 
 		// Handle the windows messages.
@@ -223,6 +224,7 @@ void EditorApp::RunApp()
 		if (m_runtimeMode == RuntimeMode::GAME_MODE)
 		{
 			PlayerInputSystem::GetInstance().EndFrame();
+			// printf("!\tEnd Frame\n");
 		}
 
 		if (!m_projectSelected && imguiEditorPass->IsProjectSelected()) {

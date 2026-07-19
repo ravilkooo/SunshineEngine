@@ -78,9 +78,14 @@ function behavior:start()
     yMidLevel = tr.localPosition.y
 end
 
+-- local frameNum = 0
+
 function behavior:update(dt)
     local tr = self.owner:getTransform()
     local pos = tr.localPosition
+
+    -- frameNum = frameNum + 1
+    -- print("Frame #" .. frameNum)
 
     tr.localPosition = Vector3.new(
         pos.x,
@@ -107,6 +112,23 @@ function behavior:update(dt)
         if (InputSystem:isPressed("Jump")) then
             print("== JUMP! ==")
             char.jumpRequested = true
+        end
+
+        local grab = self.owner:getGrabComponent()
+        if (InputSystem:isPressed("Grab")) then
+            if (grab:isGrabbing()) then
+                print("== RELEASE! ==")
+                char.releaseRequested = true
+            else
+                print("== GRAB! ==")
+                char.grabRequested = true
+            end
+        end
+        if (InputSystem:isPressed("Throw")) then
+            if (grab:isGrabbing()) then
+                print("== THROW! ==")
+                char.throwRequested = true
+            end
         end
     end
 

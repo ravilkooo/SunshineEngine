@@ -3,14 +3,17 @@
 
 #include <Physics/PhysicsSystem.h>
 
-#include "ControllerSystem/CharacterControllerSystem.h"
+#include <ControllerSystem/CharacterControllerSystem.h>
 
-#include "Component/TransformComponent.h"
-#include "Component/PhysicsComponent.h"
-#include "Component/TriggerComponent.h"
-#include "Component/MovingPlatformComponent.h"
-#include "Component/CharacterComponent.h"
-#include "Component/CharacterControllerComponent.h"
+#include <Component/TransformComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/TriggerComponent.h>
+#include <Component/MovingPlatformComponent.h>
+#include <Component/CharacterComponent.h>
+#include <Component/CharacterControllerComponent.h>
+#include <Component/GrabComponent.h>
+
+#include <Physics/GrabSystem.h>
 
 #include <Scene.h>
 #include <CameraManager.h>
@@ -199,6 +202,8 @@ void CharacterControllerSystem::UpdateCharacter(
 
     ApplyMovementInput(charComp, charContrComp, deltaTime);
 
+    ProcessGrabInput(gameObj);
+
     ApplyBounce(charComp, charContrComp);
 
     ApplyGravity(charComp, charContrComp, deltaTime);
@@ -305,6 +310,33 @@ void CharacterControllerSystem::ApplyMovementInput(
         desiredVelocity,
         accel * deltaTime
     );
+}
+
+void CharacterControllerSystem::ProcessGrabInput(GameObject* gameObj)
+{
+    eastl::shared_ptr<GrabComponent> grabComp = gameObj->GetComponent<GrabComponent>();
+    if (!grabComp)
+    {
+        return;
+    }
+    eastl::shared_ptr<CharacterComponent> character = gameObj->GetComponent<CharacterComponent>();
+    if (!character)
+    {
+        return;
+    }
+
+    if (character->m_grabRequested && !m_systemContext.grab->HasGrabPair(gameObj->m_UUID))
+    {
+        m_systemContext.grab->EnqueueGrabInput(GrabInput(gameObj, gameObj->m_UUID, GrabInput::Grab));
+    }
+    else if (character->m_releaseRequested && m_systemContext.grab->HasGrabPair(gameObj->m_UUID))
+    {
+        m_systemContext.grab->EnqueueGrabInput(GrabInput(gameObj, gameObj->m_UUID, GrabInput::Release));
+    }
+    else if (character->m_throwRequested && m_systemContext.grab->HasGrabPair(gameObj->m_UUID))
+    {
+        m_systemContext.grab->EnqueueGrabInput(GrabInput(gameObj, gameObj->m_UUID, GrabInput::Throw));
+    }
 }
 
 void CharacterControllerSystem::ApplyGravity(
@@ -472,6 +504,9 @@ void CharacterControllerSystem::ClearFrameState(
     eastl::shared_ptr<CharacterControllerComponent> controller)
 {
     character->m_jumpRequested = false;
+    character->m_grabRequested = false;
+    character->m_releaseRequested = false;
+    character->m_throwRequested = false;
 }
 
 void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)

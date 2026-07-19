@@ -50,6 +50,12 @@ public:
     bool m_jumpRequested = false;
     bool m_attackRequested = false;
 
+    // Grab objects
+
+    bool m_grabRequested = false;
+    bool m_releaseRequested = false;
+    bool m_throwRequested = false;
+
     // Interactions
 
     bool m_bounced = false;
@@ -81,6 +87,15 @@ public:
 
     bool GetJumpRequested() const { return m_jumpRequested; };
     void SetJumpRequested(bool jumpRequested) { m_jumpRequested = jumpRequested; };
+
+    bool GetGrabRequested() const { return m_grabRequested; };
+    void SetGrabRequested(bool grabRequested) { m_grabRequested = grabRequested; };
+
+    bool GetThrowRequested() const { return m_throwRequested; };
+    void SetThrowRequested(bool throwRequested) { m_throwRequested = throwRequested; };
+
+    bool GetReleaseRequested() const { return m_releaseRequested; };
+    void SetReleaseRequested(bool releaseRequested) { m_releaseRequested = releaseRequested; };
 
     bool GetAttackRequested() const { return m_attackRequested; };
     void SetAttackRequested(bool attackRequested) { m_attackRequested = attackRequested; };
@@ -141,6 +156,9 @@ public:
     FP(moveInput, &CharacterComponent::GetMoveInput, &CharacterComponent::SetMoveInput), \
     FP(yawPitchInput, &CharacterComponent::GetYawPitchInput, &CharacterComponent::SetYawPitchInput), \
     FP(jumpRequested, &CharacterComponent::GetJumpRequested, &CharacterComponent::SetJumpRequested), \
+    FP(grabRequested, &CharacterComponent::GetGrabRequested, &CharacterComponent::SetGrabRequested), \
+    FP(throwRequested, &CharacterComponent::GetThrowRequested, &CharacterComponent::SetThrowRequested), \
+    FP(releaseRequested, &CharacterComponent::GetReleaseRequested, &CharacterComponent::SetReleaseRequested), \
     FP(attackRequested, &CharacterComponent::GetAttackRequested, &CharacterComponent::SetAttackRequested), \
     FP(yaw, &CharacterComponent::GetYaw, &CharacterComponent::SetYaw), \
     FP(pitch, &CharacterComponent::GetPitch, &CharacterComponent::SetPitch)
