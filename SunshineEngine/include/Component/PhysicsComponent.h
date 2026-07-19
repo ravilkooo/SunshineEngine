@@ -83,6 +83,7 @@ public:
     void SetPosition(const JPH::RVec3& pos);
     void SetOrientation(const JPH::Quat& rot);
     void SetMotionType(JPH::EMotionType type);
+    JPH::EMotionType GetMotionType();
     void SetActivation(JPH::EActivation activation);
     void SetShape(JPH::ShapeRefC shapePtr);
 

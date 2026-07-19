@@ -4,34 +4,56 @@
 #include <EASTL/shared_ptr.h>
 
 #include <Utils/UUID.h>
+#include <SystemContext.h>
 
-class PhysicsConstraint;
+#include <SimpleMath.h>
+
+namespace DX = DirectX;
+namespace DXSM = DX::SimpleMath;
+
+class GrabComponent;
+class CharacterComponent;
+class GameObject;
 
 class GrabRuntime
 {
 public:
 
-    SE::UUID Character;
+    SE::UUID m_character;
+    SE::UUID m_grabbedObject;
 
-    SE::UUID GrabbedObject;
+    // Default values
 
-    eastl::shared_ptr<PhysicsConstraint> Constraint;
+    float m_springStrength = 150.0f;
+    float m_damping = 20.0f;
 
-    SE::UUID TargetAnchor;
+    // Updated every frame
 
-    bool IsThrowRequested = false;
+    DXSM::Vector3 m_localGrabOffset = DXSM::Vector3::Zero;
+
+    DXSM::Vector3 m_targetPosition;
+    // future work
+    DXSM::Quaternion m_targetRotation;
 };
 
 class GrabSystem
 {
 public:
-    void Update();
+    GrabSystem();
 
-    void ProcessGrabInput();
-    void UpdateGrabTargets();
-    void UpdateConstraints();
+    bool HasGrabPair(SE::UUID character);
+
+    void Update(float deltaTime);
+
+    void ProcessGrabInput(GameObject* gObj);
+    void UpdateGrabTargets(float deltaTime);
+    // void UpdateConstraints();
     void ProcessRelease();
     void ProcessThrow();
 
+    void SetSystemContext(const SystemContext& context) { m_systemContext = context; }
+
     eastl::unordered_map<SE::UUID, GrabRuntime> m_grabPairs;
+private:
+    SystemContext m_systemContext;
 };

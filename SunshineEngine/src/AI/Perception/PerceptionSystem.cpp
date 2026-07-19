@@ -455,7 +455,7 @@ void PerceptionSystem::CheckSights(PhysicsSystem* PS)
 
                         SE::UUID HitUUID = SE::UUID(0u);
 
-                        bool HitSMTH = PS->PerceptionTrace(JPH::RVec3(ViewerPos.x, ViewerPos.y, ViewerPos.z),
+                        bool HitSMTH = PS->RayCast(JPH::RVec3(ViewerPos.x, ViewerPos.y, ViewerPos.z),
                             JPH::Vec3(DirNorm.x, DirNorm.y, DirNorm.z),
                             Dist, Ignore, &HitUUID);
 

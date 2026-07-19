@@ -108,6 +108,11 @@ function behavior:update(dt)
             print("== JUMP! ==")
             char.jumpRequested = true
         end
+
+        if (InputSystem:isPressed("Grab")) then
+            print("== GRAB! ==")
+            char.grabRequested = true
+        end
     end
 
     return "success"

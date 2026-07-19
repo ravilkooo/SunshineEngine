@@ -3,11 +3,16 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Constraints/Constraint.h>
 
-#include <SimpleMath.h>
+#include <EASTL/shared_ptr.h>
+
 #include <Utils/UUID.h>
+#include <SimpleMath.h>
 
 namespace DX = DirectX;
 namespace DXSM = DX::SimpleMath;
+
+/*
+// Low level (game engine)
 
 struct PhysicsConstraintDesc
 {
@@ -44,9 +49,39 @@ public:
 
     virtual ~PhysicsConstraint() = default;
 
-    virtual Type GetType() const = 0;
+    Type GetType() const;
 
-protected:
+private:
+
+    friend class PhysicsSystem;
+
+    Type m_type;
 
     JPH::Ref<JPH::Constraint> m_constraint;
 };
+
+// High level (game design)
+
+class PhysicsGrabHandle
+{
+public:
+
+    SE::UUID m_grabbedBody;
+
+    // eastl::shared_ptr<PhysicsConstraint> m_constraint;
+
+    DXSM::Vector3 m_targetPosition;
+
+    DXSM::Quaternion m_targetRotation;
+
+    void SetTargetPosition(
+        const DXSM::Vector3& position);
+
+    void SetTargetRotation(
+        const DXSM::Quaternion& rotation);
+
+    void Release();
+};
+
+*/
+

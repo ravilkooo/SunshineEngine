@@ -295,6 +295,10 @@ void PhysicsComponent::SetOrientation(const JPH::Quat& rot) { m_orientation = ro
 
 // Initial
 void PhysicsComponent::SetMotionType(JPH::EMotionType type) { m_motionType = type; }
+JPH::EMotionType PhysicsComponent::GetMotionType()
+{
+    return m_motionType;
+}
 
 // Initial
 void PhysicsComponent::SetActivation(JPH::EActivation activation) { activation = activation; }

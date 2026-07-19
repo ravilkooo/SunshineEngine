@@ -106,19 +106,19 @@ void Game::SetupPhysics()
 	{
 		auto pc = it.second->GetComponent<PhysicsComponent>();
 		if (pc)
-			m_physicsSystem->CreateAndAddBody(pc.get());
+			m_physicsSystem.CreateAndAddBody(pc.get());
 
 		auto trigc = it.second->GetComponent<TriggerComponent>();
 		if (trigc)
-			m_physicsSystem->CreateAndAddTrigger(trigc.get());
+			m_physicsSystem.CreateAndAddTrigger(trigc.get());
 
 		auto movpl = it.second->GetComponent<MovingPlatformComponent>();
 		if (movpl)
-			m_physicsSystem->AddMovingPlatform(movpl.get());
+			m_physicsSystem.AddMovingPlatform(movpl.get());
 	}
-	m_physicsSystem->FinalizeScene();
+	m_physicsSystem.FinalizeScene();
 
-	Scene::GetInstance().m_physicsSystem = m_physicsSystem.get();
+	Scene::GetInstance().m_physicsSystem = &m_physicsSystem;
 }
 
 bool Game::LoadScene(const wchar_t* scenePath)
@@ -139,10 +139,10 @@ bool Game::LoadScene(const wchar_t* scenePath)
 		return false;
 	}
 
-	m_physicsSystem = eastl::make_unique<PhysicsSystem>();
-	m_grabSystem = eastl::make_unique<GrabSystem>();
+	// m_physicsSystem = PhysicsSystem();
+	m_grabSystem = GrabSystem();
 
-	Scene::FromJson(m_renderer.get(), m_physicsSystem.get(), j);
+	Scene::FromJson(m_renderer.get(), &m_physicsSystem, j);
 
 	m_renderer->SetMainCamera(
 		Scene::GetInstance().m_cameraManager->GetCameraByUUID(
@@ -151,13 +151,13 @@ bool Game::LoadScene(const wchar_t* scenePath)
 
 	SetupPhysics();
 	LuaManager::GetInstance().InitializeBehavior();
-
-	m_physicsSystem->FinalizeScene();
 	
 	InitializeAudio();
 
-	m_characterControllerSystem = eastl::make_unique<CharacterControllerSystem>(&Scene::GetInstance(), m_physicsSystem.get());
-	m_characterControllerSystem->InitCharacters();
+	m_characterControllerSystem = CharacterControllerSystem(&Scene::GetInstance(), &m_physicsSystem);
+	m_characterControllerSystem.InitCharacters();
+
+	InitSystemContext();
 
 	return true;
 }
@@ -187,6 +187,21 @@ bool Game::LoadInputMapping(eastl::wstring inputMappingDir)
 	//LOG_EDITOR_INFO("Input mapping loaded");
 
 	return true;
+}
+
+void Game::InitSystemContext()
+{
+	m_systemContext.renderer = m_renderer.get();
+	m_systemContext.audio = m_audioSystem;
+	m_systemContext.physics = &m_physicsSystem;
+	m_systemContext.scene = &Scene::GetInstance();
+	m_systemContext.grab = &m_grabSystem;
+	m_systemContext.input = &PlayerInputSystem::GetInstance();
+	m_systemContext.characterController = &m_characterControllerSystem;
+	m_systemContext.particle = m_particleSystem;
+
+	m_characterControllerSystem.SetSystemContext(m_systemContext);
+	m_grabSystem.SetSystemContext(m_systemContext);
 }
 
 void Game::InitializeAudio()
@@ -238,15 +253,17 @@ void Game::Update(float deltaTime) {
 
 	LuaManager::GetInstance().Update(&Scene::GetInstance(), deltaTime);
 
-	m_physicsSystem->FlushCommands();
+	m_physicsSystem.FlushCommands();
 
-	m_physicsSystem->SyncronizeTransforms(&Scene::GetInstance(), deltaTime);
-	m_characterControllerSystem->UpdateCharacters(deltaTime);
-	m_characterControllerSystem->UpdateTriggerOverlaps();
+	m_physicsSystem.SyncronizeTransforms(&Scene::GetInstance(), deltaTime);
+	m_characterControllerSystem.UpdateCharacters(deltaTime);
+	m_characterControllerSystem.UpdateTriggerOverlaps();
 
-	m_physicsSystem->Step(deltaTime);
+	m_grabSystem.Update(deltaTime);
 
-	m_physicsSystem->FlushPreNextFrameCommands();
+	m_physicsSystem.Step(deltaTime);
+
+	m_physicsSystem.FlushPreNextFrameCommands();
 
 
 	if (m_particleSystem)
@@ -255,7 +272,7 @@ void Game::Update(float deltaTime) {
 	// m_playerObject->m_playerController.UpdatePlayer(deltaTime);
 
 	// AI
-	PerceptionSystem::Get().CheckSights(m_physicsSystem.get());
+	PerceptionSystem::Get().CheckSights(&m_physicsSystem);
 	BehaviorStorage::Get().Update(deltaTime);
 
 	// ClearCachedAbsoluteTransforms();

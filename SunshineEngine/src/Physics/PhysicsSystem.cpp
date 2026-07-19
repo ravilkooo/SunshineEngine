@@ -92,7 +92,7 @@ public:
     }
 };
 
-bool PhysicsSystem::PerceptionTrace(const JPH::RVec3& begin,
+bool PhysicsSystem::RayCast(const JPH::RVec3& begin,
     const JPH::Vec3& dir,
     float length,
     const eastl::vector<SE::UUID>& ignore,

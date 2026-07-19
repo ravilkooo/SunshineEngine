@@ -38,6 +38,7 @@
 #include <Physics/TriggerContactListener.h>
 
 #include <Physics/GrabSystem.h>
+#include <Physics/ConstraintUtils.h>
 
 #include <Utils/UUID.h>
 
@@ -45,7 +46,6 @@ class PhysicsComponent;
 class TriggerComponent;
 class MovingPlatformComponent;
 
-struct PhysicsConstraintDesc;
 
 class PhysicsSystem_Info {
 public:
@@ -281,7 +281,7 @@ public:
     ~PhysicsSystem();
 
     // begin: world-space start; dir: normalized; layerKey: your editor layer key
-    bool PerceptionTrace(const JPH::RVec3& begin,
+    bool RayCast(const JPH::RVec3& begin,
         const JPH::Vec3& dir,
         float length,
         const eastl::vector<SE::UUID>& ignore,
@@ -321,11 +321,16 @@ public:
     void AddMovingPlatform(MovingPlatformComponent* platformComp);
     MovingPlatformComponent* GetMovingPlatform(SE::UUID platformUUID);
 
-    // Constraint API
+    // Grab API
 
-    eastl::shared_ptr<PhysicsConstraint> CreateConstraint(PhysicsConstraintDesc desc);
-    void DestroyConstraint(GrabRuntime& handle);
-    void UpdateConstraint(GrabRuntime& handle, DXSM::Vector3 newTarget);
+    /*
+    eastl::shared_ptr<PhysicsGrabHandle> CreatePhysicsGrabRuntime(SE::UUID body);
+    void DestroyPhysicsGrabHandle(eastl::shared_ptr<PhysicsGrabHandle>);
+
+    void SetPhysicsHandleTarget(eastl::shared_ptr<PhysicsGrabHandle>,
+        const DXSM::Vector3& position,
+        const DXSM::Quaternion& rotation);
+    */
 
 private:
 

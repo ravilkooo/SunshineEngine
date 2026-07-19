@@ -1,6 +1,11 @@
 #pragma once
 
+#include <EASTL/shared_ptr.h>
+
 #include <Component/Component.h>
+#include <Utils/UUID.h>
+
+class PhysicsConstraint;
 
 class GrabComponent : public Component
 {
@@ -25,6 +30,17 @@ public:
     bool m_rotateWithCamera = true;
     bool m_canGrabDynamicBodies = true;
     bool m_canGrabKinematicBodies = false;
+
+    SE::UUID GrabbedObject;
+
+    eastl::shared_ptr<PhysicsConstraint> Constraint;
+
+    // Don't need it?
+    bool IsGrabbing() const
+    {
+        return false;
+        // return GrabbedObject.IsValid();
+    }
 
     //
     // Optional

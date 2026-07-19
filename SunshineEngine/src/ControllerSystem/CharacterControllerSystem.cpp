@@ -3,14 +3,17 @@
 
 #include <Physics/PhysicsSystem.h>
 
-#include "ControllerSystem/CharacterControllerSystem.h"
+#include <ControllerSystem/CharacterControllerSystem.h>
 
-#include "Component/TransformComponent.h"
-#include "Component/PhysicsComponent.h"
-#include "Component/TriggerComponent.h"
-#include "Component/MovingPlatformComponent.h"
-#include "Component/CharacterComponent.h"
-#include "Component/CharacterControllerComponent.h"
+#include <Component/TransformComponent.h>
+#include <Component/PhysicsComponent.h>
+#include <Component/TriggerComponent.h>
+#include <Component/MovingPlatformComponent.h>
+#include <Component/CharacterComponent.h>
+#include <Component/CharacterControllerComponent.h>
+#include <Component/GrabComponent.h>
+
+#include <Physics/GrabSystem.h>
 
 #include <Scene.h>
 #include <CameraManager.h>
@@ -199,6 +202,8 @@ void CharacterControllerSystem::UpdateCharacter(
 
     ApplyMovementInput(charComp, charContrComp, deltaTime);
 
+    ProcessGrabInput(gameObj);
+
     ApplyBounce(charComp, charContrComp);
 
     ApplyGravity(charComp, charContrComp, deltaTime);
@@ -305,6 +310,34 @@ void CharacterControllerSystem::ApplyMovementInput(
         desiredVelocity,
         accel * deltaTime
     );
+}
+
+void CharacterControllerSystem::ProcessGrabInput(GameObject* gameObj)
+{
+    eastl::shared_ptr<GrabComponent> grabComp = gameObj->GetComponent<GrabComponent>();
+    if (!grabComp)
+    {
+        return;
+    }
+    eastl::shared_ptr<CharacterComponent> character = gameObj->GetComponent<CharacterComponent>();
+    if (!character)
+    {
+        return;
+    }
+
+    if (character->m_grabRequested && !m_systemContext.grab->HasGrabPair(gameObj->m_UUID))
+    {
+        eastl::shared_ptr<TransformComponent> trComp = gameObj->GetComponent<TransformComponent>();
+        m_systemContext.grab->ProcessGrabInput(gameObj);
+    }
+    else if (character->m_releaseRequested)
+    {
+
+    }
+    else if (character->m_throwRequested)
+    {
+
+    }
 }
 
 void CharacterControllerSystem::ApplyGravity(
@@ -472,6 +505,7 @@ void CharacterControllerSystem::ClearFrameState(
     eastl::shared_ptr<CharacterControllerComponent> controller)
 {
     character->m_jumpRequested = false;
+    character->m_grabRequested = false;
 }
 
 void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)

@@ -280,8 +280,8 @@
                 "Grab": {
                     "m_canGrabDynamicBodies": true,
                     "m_canGrabKinematicBodies": false,
-                    "m_holdDistance": 2.0,
-                    "m_maxGrabDistance": 3.0,
+                    "m_holdDistance": 10.0,
+                    "m_maxGrabDistance": 10.0,
                     "m_rotateWithCamera": true,
                     "m_throwImpulse": 10.0
                 },
@@ -1023,9 +1023,9 @@
                         1.0
                     ],
                     "m_position": [
-                        -21.50979995727539,
+                        -21.411645889282227,
                         1.3562231063842773,
-                        8.599126815795898
+                        7.3335700035095215
                     ],
                     "m_rotation": [
                         -0.0,
@@ -2111,14 +2111,14 @@
                         0.800000011920929
                     ],
                     "m_position": [
-                        0.0,
-                        -0.9389052391052246,
-                        2.2483272552490234
+                        2.9723362922668457,
+                        2.7340774536132813,
+                        -10.323594093322754
                     ],
                     "m_rotation": [
                         1.5707957744598389,
                         0.0,
-                        1.0735390202963079e-16
+                        1.0735393511685529e-16
                     ],
                     "m_scaleFactor": [
                         1.0,
@@ -2137,7 +2137,7 @@
             "m_group": "Shapes",
             "m_name": "CharacterMagnet",
             "m_parent": {
-                "attached": true,
+                "attached": false,
                 "uuid": 17227216129192393426
             },
             "m_shapeData": {
@@ -2448,6 +2448,226 @@
             "m_UUID": 16517370699367337927,
             "m_UUID_hi": 3845750051,
             "m_UUID_lo": 1732005831,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
+        },
+        {
+            "components": {
+                "Behavior": {
+                    "IsEnabled": true
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/SortableCube3.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    5.0,
+                                    5.0,
+                                    5.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_density": 700.0,
+                    "m_friction": 1.0,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        5.0,
+                        5.0,
+                        5.0
+                    ],
+                    "m_position": [
+                        -9.90469741821289,
+                        3.849910020828247,
+                        7.3335700035095215
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 16210512776782356566,
+            "m_UUID_hi": 3774304123,
+            "m_UUID_lo": 3339395158,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
+        },
+        {
+            "components": {
+                "Behavior": {
+                    "IsEnabled": true
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/SortableCube3.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    5.0,
+                                    5.0,
+                                    5.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_density": 10.0,
+                    "m_friction": 1.0,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Dynamic",
+                    "m_restitution": 0.0
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        5.0,
+                        5.0,
+                        5.0
+                    ],
+                    "m_position": [
+                        -3.7255661487579346,
+                        3.849910020828247,
+                        7.3335700035095215
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 4917987749370674916,
+            "m_UUID_hi": 1145058253,
+            "m_UUID_lo": 720781028,
             "m_group": "Shapes",
             "m_name": "Box",
             "m_parent": null,
