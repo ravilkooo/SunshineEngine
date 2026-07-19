@@ -1,6 +1,7 @@
 #pragma once
 
 #include <EASTL/unordered_map.h>
+#include <EASTL/vector.h>
 #include <EASTL/shared_ptr.h>
 
 #include <Utils/UUID.h>
@@ -14,6 +15,14 @@ namespace DXSM = DX::SimpleMath;
 class GrabComponent;
 class CharacterComponent;
 class GameObject;
+
+struct GrabInput
+{
+    GameObject* gameObject;
+    SE::UUID character;
+
+    enum GrabAction { Grab, Release, Throw } action;
+};
 
 class GrabRuntime
 {
@@ -38,17 +47,21 @@ public:
 
     bool HasGrabPair(SE::UUID character);
 
-    void Update(float deltaTime);
+    void EnqueueGrabInput(GrabInput grabInput);
+    void FlushGrabQueue();
 
-    void ProcessGrabInput(GameObject* gObj);
+    void Update(float deltaTime);
     void UpdateGrabTargets(float deltaTime);
-    // void UpdateConstraints();
-    void ProcessRelease();
-    void ProcessThrow();
+
+    void ProcessGrab(GameObject* gObj);
+    void ProcessRelease(GameObject* gameObj);
+    void ProcessThrow(GameObject* gameObj);
 
     void SetSystemContext(const SystemContext& context) { m_systemContext = context; }
 
     eastl::unordered_map<SE::UUID, GrabRuntime> m_grabPairs;
 private:
     SystemContext m_systemContext;
+
+    eastl::vector<GrabInput> m_grabInputQueue;
 };

@@ -5,8 +5,6 @@
 #include <Component/Component.h>
 #include <Utils/UUID.h>
 
-class PhysicsConstraint;
-
 class GrabComponent : public Component
 {
 public:
@@ -36,15 +34,13 @@ public:
     bool m_canGrabDynamicBodies = true;
     bool m_canGrabKinematicBodies = false;
 
-    SE::UUID GrabbedObject;
-
-    eastl::shared_ptr<PhysicsConstraint> Constraint;
+    SE::UUID m_grabbedObject = SE::UUID(0u);
 
     // Don't need it?
     bool IsGrabbing() const
     {
-        return false;
-        // return GrabbedObject.IsValid();
+        //printf("%s\n", m_grabbedObject.ToString().c_str());
+        return m_grabbedObject != SE::UUID(0u);
     }
 
     //
@@ -97,3 +93,8 @@ public:
     json ToJson() const override;
     void FromJson(const json& j) override;
 };
+
+#ifndef GRABCOMPONENT_LUA_METHODS_APPLY
+#define GRABCOMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("isGrabbing", &GrabComponent::IsGrabbing) 
+#endif

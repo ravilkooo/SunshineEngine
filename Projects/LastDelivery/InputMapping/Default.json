@@ -15,6 +15,10 @@
         {
             "action": "Jump2",
             "key": 13
+        },
+        {
+            "action": "Throw",
+            "key": 500
         }
     ],
     "axis_bindings": [

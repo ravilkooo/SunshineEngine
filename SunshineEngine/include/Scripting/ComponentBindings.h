@@ -15,6 +15,7 @@ class CharacterComponent;
 class CharacterControllerComponent;
 class BouncePadComponent;
 class MovingPlatformComponent;
+class GrabComponent;
 
 namespace ScriptingBindings {
     // Registers all engine types and GameObject accessors to the given Lua state.
@@ -39,5 +40,6 @@ namespace ScriptingBindings {
     F(CameraComponent, "getCameraComponent"), \
     F(CharacterComponent, "getCharacterComponent"), \
     F(CharacterControllerComponent, "getCharacterController") \
-    F(MovingPlatformComponent, "getMovingPlatform")
+    F(MovingPlatformComponent, "getMovingPlatform") \
+    F(GrabComponent, "getGrabComponent")
 #endif

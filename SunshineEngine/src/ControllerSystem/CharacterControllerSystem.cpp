@@ -327,16 +327,15 @@ void CharacterControllerSystem::ProcessGrabInput(GameObject* gameObj)
 
     if (character->m_grabRequested && !m_systemContext.grab->HasGrabPair(gameObj->m_UUID))
     {
-        eastl::shared_ptr<TransformComponent> trComp = gameObj->GetComponent<TransformComponent>();
-        m_systemContext.grab->ProcessGrabInput(gameObj);
+        m_systemContext.grab->EnqueueGrabInput(GrabInput(gameObj, gameObj->m_UUID, GrabInput::Grab));
     }
-    else if (character->m_releaseRequested)
+    else if (character->m_releaseRequested && m_systemContext.grab->HasGrabPair(gameObj->m_UUID))
     {
-
+        m_systemContext.grab->EnqueueGrabInput(GrabInput(gameObj, gameObj->m_UUID, GrabInput::Release));
     }
-    else if (character->m_throwRequested)
+    else if (character->m_throwRequested && m_systemContext.grab->HasGrabPair(gameObj->m_UUID))
     {
-
+        m_systemContext.grab->EnqueueGrabInput(GrabInput(gameObj, gameObj->m_UUID, GrabInput::Throw));
     }
 }
 
@@ -506,6 +505,8 @@ void CharacterControllerSystem::ClearFrameState(
 {
     character->m_jumpRequested = false;
     character->m_grabRequested = false;
+    character->m_releaseRequested = false;
+    character->m_throwRequested = false;
 }
 
 void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)

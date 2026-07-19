@@ -1,5 +1,8 @@
 #include <Component/GrabComponent.h>
 
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
+
 void GrabComponent::FromJson(const json& j)
 {
     if (j.contains("m_holdDistance") && j["m_holdDistance"].is_number_float()) {
@@ -62,3 +65,17 @@ void GrabComponent_Info::FromJson(const json& j)
     m_assignedComponent->FromJson(j);
 }
 
+void RegisterGrabComponentLuaBindings()
+{
+}
+
+#define GRAB_ADD_METHOD(k, fn) k, fn
+
+LUA_REGISTER_COMPONENT(
+    GrabComponent,
+    "GrabComponent",
+    /* no fields */,
+    /* no properties */,
+    GRABCOMPONENT_LUA_METHODS_APPLY(GRAB_ADD_METHOD),
+    "getGrabComponent")
+#undef GRAB_ADD_METHOD

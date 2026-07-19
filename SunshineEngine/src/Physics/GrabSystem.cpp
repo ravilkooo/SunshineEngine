@@ -17,6 +17,7 @@
 GrabSystem::GrabSystem()
 {
 	m_grabPairs = eastl::unordered_map<SE::UUID, GrabRuntime>();
+	m_grabInputQueue = eastl::vector<GrabInput>();
 }
 
 bool GrabSystem::HasGrabPair(SE::UUID character)
@@ -24,12 +25,41 @@ bool GrabSystem::HasGrabPair(SE::UUID character)
 	return m_grabPairs.contains(character);
 }
 
+void GrabSystem::EnqueueGrabInput(GrabInput grabInput)
+{
+	m_grabInputQueue.push_back(grabInput);
+}
+
+void GrabSystem::FlushGrabQueue()
+{
+	for (auto grabInput : m_grabInputQueue)
+	{
+		switch (grabInput.action)
+		{
+		case GrabInput::Grab:
+			ProcessGrab(grabInput.gameObject);
+			break;
+		case GrabInput::Release:
+			ProcessRelease(grabInput.gameObject);
+			break;
+		case GrabInput::Throw:
+			ProcessThrow(grabInput.gameObject);
+			break;
+		default:
+			break;
+		}
+
+	}
+	m_grabInputQueue.clear();
+}
+
 void GrabSystem::Update(float deltaTime)
 {
+	FlushGrabQueue();
 	UpdateGrabTargets(deltaTime);
 }
 
-void GrabSystem::ProcessGrabInput(GameObject* gameObj)
+void GrabSystem::ProcessGrab(GameObject* gameObj)
 {
 	eastl::shared_ptr<GrabComponent> grabComp = gameObj->GetComponent<GrabComponent>();
 	eastl::shared_ptr<CharacterComponent> charComp = gameObj->GetComponent<CharacterComponent>();
@@ -61,6 +91,8 @@ void GrabSystem::ProcessGrabInput(GameObject* gameObj)
 		grabRt.m_grabbedObject = hitUUID;
 		
 		m_grabPairs[gameObj->m_UUID] = grabRt;
+
+		grabComp->m_grabbedObject = hitUUID;
 
 		// other data will be calculated in grabSystem update
 	}
@@ -102,12 +134,44 @@ void GrabSystem::UpdateGrabTargets(float deltaTime)
 	}
 }
 
-void GrabSystem::ProcessRelease()
+void GrabSystem::ProcessRelease(GameObject* gameObj)
 {
+	auto res = m_grabPairs.find(gameObj->m_UUID);
+	if (res == m_grabPairs.end()) { return; }
+	m_grabPairs.erase(res);
 
+	eastl::shared_ptr<GrabComponent> grabComp = gameObj->GetComponent<GrabComponent>();
+	if (!grabComp) { return; }
+
+	grabComp->m_grabbedObject = SE::UUID(0u);
 }
 
-void GrabSystem::ProcessThrow()
+void GrabSystem::ProcessThrow(GameObject* gameObj)
 {
+	auto res = m_grabPairs.find(gameObj->m_UUID);
+	if (res == m_grabPairs.end()) {
+		return;
+	}
 
+	auto grabRt = res->second;
+	m_grabPairs.erase(res);
+
+	eastl::shared_ptr<GrabComponent> grabComp = gameObj->GetComponent<GrabComponent>();
+	if (!grabComp) { return; }
+	eastl::shared_ptr<CharacterComponent> charComp = gameObj->GetComponent<CharacterComponent>();
+	if (!charComp) { return; }
+
+	auto grabObjUUID = grabRt.m_grabbedObject;
+	auto grabObj = m_systemContext.scene->GetGameObjectByUUID(grabObjUUID);
+
+	auto forwardDir = DXSM::Vector3(sin(charComp->m_yaw), 0, cos(charComp->m_yaw));
+
+	auto grabPhysics = grabObj->GetComponent<PhysicsComponent>();
+	if (!grabPhysics) { return; }
+
+	DXSM::Vector3 impulse = grabComp->m_throwImpulse * forwardDir;
+
+	grabPhysics->AddImpulse(impulse);
+
+	grabComp->m_grabbedObject = SE::UUID(0u);
 }
