@@ -227,6 +227,7 @@ namespace SE_G {
         const DXSM::Vector3& GetSpringArmRotation() const { return m_springArmParams.pitchYawRoll; }
         void SetSpringArmRotation(const DXSM::Vector3& newRotation) { m_springArmParams.pitchYawRoll = newRotation; }
         void SetSpringArmYaw(float newYaw) { m_springArmParams.pitchYawRoll.y = newYaw; }
+        void SetSpringArmPitch(float newPitch) { m_springArmParams.pitchYawRoll.x = newPitch; }
 
         float GetSpringArmLength() const { return m_springArmParams.length; };
         void ZoomSpringArm(float zoomSpeed = 1.0f);

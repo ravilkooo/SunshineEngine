@@ -283,10 +283,10 @@ void CharacterControllerSystem::ApplyMovementInput(
     {
         // float inputAngle = (input.x != 0 || input.y != 0) ? atan2(input.x, input.y) : 0.0f;
 
-        DXSM::Vector2 inputTurn = character->m_yawPitchDeltaInput;
-        if (inputTurn != DXSM::Vector2::Zero)
+        float inputYaw = character->m_yawPitchDeltaInput.x;
+        if (inputYaw != 0.0f)
         {
-            float desiredYaw = character->m_yaw + inputTurn.x;
+            float desiredYaw = character->m_yaw + inputYaw;
 
             if ((character->m_yaw - desiredYaw) > DX::XM_PI) { character->m_yaw -= DX::XM_2PI; }
             else if ((character->m_yaw - desiredYaw) < -DX::XM_PI) { character->m_yaw += DX::XM_2PI; }
@@ -299,7 +299,45 @@ void CharacterControllerSystem::ApplyMovementInput(
             if (character->m_yaw > DX::XM_PI) { character->m_yaw -= DX::XM_2PI; }
             else if (character->m_yaw < -DX::XM_PI) { character->m_yaw += DX::XM_2PI; }
 
-            character->m_yawPitchDeltaInput = DXSM::Vector2::Zero;
+            character->m_yawPitchDeltaInput.x = 0.0f;
+        }
+    }
+    if (controller->m_syncronizePitchWithCameraForwardDir)
+    {
+        auto camera = Scene::GetInstance().m_cameraManager->GetCameraByUUID(controller->m_uuid);
+        if (camera)
+        {
+            float camPitch = -camera->GetSpringArmRotation().x;
+            
+            if ((character->m_pitch - camPitch) > DX::XM_PI) { character->m_pitch -= DX::XM_2PI; }
+            else if ((character->m_pitch - camPitch) < -DX::XM_PI) { character->m_pitch += DX::XM_2PI; }
+
+
+            character->m_pitch = std::lerp(
+                character->m_pitch,
+                camPitch,
+                controller->m_turnAcceleration * deltaTime);
+        }
+    }
+    else
+    {
+        float inputPitch = character->m_yawPitchDeltaInput.y;
+        if (inputPitch != 0.0f)
+        {
+            float desiredPitch = character->m_pitch + inputPitch;
+
+            if ((character->m_pitch - desiredPitch) > DX::XM_PI) { character->m_pitch -= DX::XM_2PI; }
+            else if ((character->m_pitch - desiredPitch) < -DX::XM_PI) { character->m_pitch += DX::XM_2PI; }
+
+            character->m_pitch = std::lerp(
+                character->m_pitch,
+                desiredPitch,
+                controller->m_turnAcceleration * deltaTime);
+
+            if (character->m_pitch > DX::XM_PI) { character->m_pitch -= DX::XM_2PI; }
+            else if (character->m_pitch < -DX::XM_PI) { character->m_pitch += DX::XM_2PI; }
+
+            character->m_yawPitchDeltaInput.y = 0.0f;
         }
     }
 

@@ -11,6 +11,12 @@ void GrabComponent::FromJson(const json& j)
     if (j.contains("m_maxGrabDistance") && j["m_maxGrabDistance"].is_number_float()) {
         m_maxGrabDistance = j["m_maxGrabDistance"].get<float>();
     }
+    if (j.contains("m_grabPitchOffset") && j["m_grabPitchOffset"].is_number_float()) {
+        m_grabPitchOffset = j["m_grabPitchOffset"].get<float>();
+    }
+    if (j.contains("m_throwPitchOffset") && j["m_throwPitchOffset"].is_number_float()) {
+        m_throwPitchOffset = j["m_throwPitchOffset"].get<float>();
+    }
     
     if (j.contains("m_canGrabDynamicBodies") && j["m_canGrabDynamicBodies"].is_boolean()) {
         m_canGrabDynamicBodies = j["m_canGrabDynamicBodies"].get<bool>();
@@ -49,6 +55,8 @@ json GrabComponent_Info::ToJson() const
         j = nlohmann::json{
             {"m_holdDistance", m_assignedComponent->m_holdDistance},
             {"m_maxGrabDistance", m_assignedComponent->m_maxGrabDistance},
+            {"m_grabPitchOffset", m_assignedComponent->m_grabPitchOffset},
+            {"m_throwPitchOffset", m_assignedComponent->m_throwPitchOffset},
 
             {"m_canGrabDynamicBodies", m_assignedComponent->m_canGrabDynamicBodies},
             {"m_grabSpringStrength", m_assignedComponent->m_grabSpringStrength},

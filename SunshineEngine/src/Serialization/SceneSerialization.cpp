@@ -470,6 +470,8 @@ json CharacterControllerComponent_Info::ToJson() const
             {"m_syncronizeYawWithCameraForwardDir", m_assignedComponent->m_syncronizeYawWithCameraForwardDir},
             {"m_keepYawWhileStrafe", m_assignedComponent->m_keepYawWhileStrafe},
             {"m_syncOnlyWhenMoved", m_assignedComponent->m_syncOnlyWhenMoved},
+            
+            {"m_syncronizePitchWithCameraForwardDir", m_assignedComponent->m_syncronizePitchWithCameraForwardDir},
 
             {"m_turnAcceleration", m_assignedComponent->m_turnAcceleration},
 
@@ -512,6 +514,10 @@ void CharacterControllerComponent::FromJson(const json& j)
     }
     if (j.contains("m_syncOnlyWhenMoved") && j["m_syncOnlyWhenMoved"].is_boolean()) {
         m_syncOnlyWhenMoved = j["m_syncOnlyWhenMoved"].get<bool>();
+    }
+
+    if (j.contains("m_syncronizePitchWithCameraForwardDir") && j["m_syncronizePitchWithCameraForwardDir"].is_boolean()) {
+        m_syncronizePitchWithCameraForwardDir = j["m_syncronizePitchWithCameraForwardDir"].get<bool>();
     }
 
     if (j.contains("m_turnAcceleration") && j["m_turnAcceleration"].is_number_float()) {

@@ -106,6 +106,9 @@ public:
     float GetPitch() const { return m_pitch; };
     void SetPitch(float pitch) { m_pitch = pitch; };
 
+    // Yaw Pitch
+    DXSM::Vector3 GetForwardDir() const;
+
     // Inherited via Component
     const std::type_info& getType() const override {
         return typeid(CharacterComponent);

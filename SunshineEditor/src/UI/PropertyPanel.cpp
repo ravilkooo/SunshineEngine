@@ -1859,7 +1859,8 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
             return;
         }
 
-        if (auto colliderData = charContrInfo->m_assignedComponent->m_colliderData)
+        eastl::shared_ptr<SE::ColliderData> colliderData = charContrInfo->m_assignedComponent->m_colliderData;
+        if (colliderData)
         {
             DrawColliderSettings(colliderData, true);
         }
@@ -1877,6 +1878,8 @@ void PropertyPanel::DrawCharacterControllerComponent(GameObject_Info* obj)
                 ImGui::EndDisabled();
                 ImGui::TreePop();
             }
+            
+            ImGui::Checkbox("Syncronize pitch with camera forward direction", &charContrInfo->m_assignedComponent->m_syncronizePitchWithCameraForwardDir);
 
             DrawFloatControl("Move speed", charContrInfo->m_assignedComponent->m_moveSpeed, 6.0f, 0.01f, 0.0f, 100.0f, "%.2f");
             DrawFloatControl("Move acceleration", charContrInfo->m_assignedComponent->m_acceleration, 30.0, 0.01f, 0.0f, 1000.0f, "%.2f");
@@ -1926,7 +1929,19 @@ void PropertyPanel::DrawGrabComponent(GameObject_Info* obj)
 
         DrawFloatControl("holdDistance", grabInfo->m_assignedComponent->m_holdDistance, 2.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
         DrawFloatControl("maxGrabDistance", grabInfo->m_assignedComponent->m_maxGrabDistance, 3.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
-        //ImGui::Checkbox("rotateWithCamera", &grabInfo->m_assignedComponent->m_rotateWithCamera);
+        
+        {
+            float grabPitchOffset = grabInfo->m_assignedComponent->m_grabPitchOffset * (180.0f / DirectX::XM_PI);
+            if (DrawFloatControl("Grab pitch offset", grabPitchOffset, 0.0f, 1.0f, -80.0f, 80.0f, "%.1f"))
+            {
+                grabInfo->m_assignedComponent->m_grabPitchOffset = grabPitchOffset * (DirectX::XM_PI / 180.0f);
+            }
+            float throwPitchOffset = grabInfo->m_assignedComponent->m_throwPitchOffset * (180.0f / DirectX::XM_PI);
+            if (DrawFloatControl("Grab throw offset", throwPitchOffset, 0.0f, 1.0f, -80.0f, 80.0f, "%.1f"))
+            {
+                grabInfo->m_assignedComponent->m_throwPitchOffset = throwPitchOffset * (DirectX::XM_PI / 180.0f);
+            }
+        }
 
         EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
         if (ImGui::TreeNodeEx("Grab Dynamic settings", flags))
