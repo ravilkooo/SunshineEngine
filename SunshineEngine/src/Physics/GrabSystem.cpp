@@ -65,14 +65,18 @@ void GrabSystem::UpdateGrabTargets(float deltaTime)
 
 		auto grabComp = charObj->GetComponent<GrabComponent>();
 		if (!grabComp) { continue; }
-		auto character = charObj->GetComponent<CharacterComponent>();
-		if (!character) { continue; }
+		auto charComp = charObj->GetComponent<CharacterComponent>();
+		if (!charComp) { continue; }
 		auto charTransform = charObj->GetComponent<TransformComponent>();
 		if (!charTransform) { continue; }
 		auto grabTransform = grabObj->GetComponent<TransformComponent>();
 		if (!grabTransform) { continue; }
 
-		auto forwardDir = DXSM::Vector3(sin(character->m_yaw), 0, cos(character->m_yaw));
+		float _oldPitch = charComp->m_pitch;
+		charComp->m_pitch += grabComp->m_grabPitchOffset;
+		auto forwardDir = charComp->GetForwardDir();
+		charComp->m_pitch = _oldPitch;
+
 		forwardDir *= grabComp->m_holdDistance;
 
 		grabPair.second.m_targetPosition = charTransform->GetAbsoluteWorldPosition() + forwardDir;
@@ -95,7 +99,7 @@ void GrabSystem::UpdateGrabTargets(float deltaTime)
 			}
 			else
 			{
-				auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(character->m_yaw, 0, 0);
+				auto quat = DXSM::Quaternion::CreateFromYawPitchRoll(charComp->m_yaw, 0, 0);
 				grabPhysics->MoveKinematic_Quat(grabPair.second.m_targetPosition, quat, deltaTime);
 			}
 		}
@@ -116,8 +120,13 @@ void GrabSystem::ProcessGrab(GameObject* gameObj)
 	eastl::shared_ptr<TransformComponent> trComp = gameObj->GetComponent<TransformComponent>();
 
 	auto viewPos = trComp->GetAbsoluteWorldPosition();
-	float charYaw = charComp->m_yaw;
-	auto viewDir = JPH::RVec3(sin(charYaw), 0.0f, cos(charYaw));
+
+	float _oldPitch = charComp->m_pitch;
+	charComp->m_pitch += grabComp->m_grabPitchOffset;
+	auto charViewDir = charComp->GetForwardDir();
+	charComp->m_pitch = _oldPitch;
+
+	auto viewDir = JPH::RVec3(charViewDir.x, charViewDir.y, charViewDir.z);
 
 	eastl::vector<SE::UUID> ignoreObjects = eastl::vector<SE::UUID>(1, gameObj->m_UUID);
 
@@ -132,6 +141,7 @@ void GrabSystem::ProcessGrab(GameObject* gameObj)
 
 	auto hitObj = m_systemContext.scene->GetGameObjectByUUID(hitUUID);
 	auto physComp = hitObj->GetComponent<PhysicsComponent>();
+	if (!physComp) { return; }
 
 	if (physComp->GetMotionType() == JPH::EMotionType::Dynamic && grabComp->m_canGrabDynamicBodies)
 	{
@@ -214,7 +224,10 @@ void GrabSystem::ProcessThrow(GameObject* gameObj)
 	auto grabObjUUID = grabRt.m_grabbedObject;
 	auto grabObj = m_systemContext.scene->GetGameObjectByUUID(grabObjUUID);
 
-	auto forwardDir = DXSM::Vector3(sin(charComp->m_yaw), 0, cos(charComp->m_yaw));
+	float _oldPitch = charComp->m_pitch;
+	charComp->m_pitch += grabComp->m_throwPitchOffset;
+	auto forwardDir = charComp->GetForwardDir();
+	charComp->m_pitch = _oldPitch;
 
 	auto grabPhysics = grabObj->GetComponent<PhysicsComponent>();
 	if (!grabPhysics) { return; }

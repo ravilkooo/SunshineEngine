@@ -3,6 +3,12 @@
 #include <Scripting/AutoBindings.h>
 #include <Scripting/ComponentBindings.h>
 
+// Yaw Pitch
+DXSM::Vector3 CharacterComponent::GetForwardDir() const
+{
+	return DXSM::Vector3(sin(m_yaw) * cos(m_pitch), sin(m_pitch), cos(m_yaw) * cos(m_pitch));
+}
+
 CharacterComponent_Info::CharacterComponent_Info()
 {
 	m_assignedComponent = eastl::make_unique<CharacterComponent>();

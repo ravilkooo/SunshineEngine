@@ -55,7 +55,7 @@ function behavior:update(dt)
 
     local char = self.owner:getCharacterComponent()
     if (stareAtPlayer) then
-        char.moveInput = Vector2.new(1, 0)
+        char.moveInput = Vector2.new(0.2 * math.sin(os.clock() * 10), 1)
         -- print(char.yaw)
         local chasedPlayerPos = chasedPlayer:getTransform().position
         local dir = chasedPlayerPos - self.owner:getTransform().position

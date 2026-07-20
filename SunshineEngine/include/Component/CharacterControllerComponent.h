@@ -25,7 +25,7 @@ class CharacterControllerComponent : public Component
 {
 public:
 	CharacterControllerComponent();
-	~CharacterControllerComponent();
+    ~CharacterControllerComponent();
 	CharacterControllerComponent(PhysicsSystem* physicsSystem,
         TransformComponent* transformComp,
         SE::UUID uuid);
@@ -56,6 +56,7 @@ public:
 
     // Local velocity
     float m_inputVelocity = 0.0f;
+    DXSM::Vector3 m_inputVelocity_3d = DXSM::Vector3::Zero;
     DXSM::Vector3 m_velocity = DXSM::Vector3::Zero;
 
     bool m_grounded = false;
@@ -68,6 +69,11 @@ public:
     //
 
     bool m_syncronizeYawWithCameraForwardDir = false;
+    bool m_syncOnlyWhenMoved = true;
+    bool m_keepYawWhileStrafe = false;
+
+    bool m_syncronizePitchWithCameraForwardDir = false;
+
     float m_turnAcceleration = 30.0f;
 
     float m_moveSpeed = 6.0f;
@@ -90,8 +96,6 @@ public:
     //
 
     eastl::shared_ptr<SE::ColliderData> m_colliderData;
-    // float Radius = 0.35f;
-    // float Height = 1.8f;
 
     float m_stepHeight = 0.3f;
 

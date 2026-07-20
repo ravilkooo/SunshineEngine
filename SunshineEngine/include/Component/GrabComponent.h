@@ -23,6 +23,8 @@ public:
 
     float m_holdDistance = 2.0f;
     float m_maxGrabDistance = 3.0f;
+    float m_grabPitchOffset = 0.0f;
+    float m_throwPitchOffset = 0.0f;
 
     // Grab Spring settings
 

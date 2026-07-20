@@ -246,7 +246,7 @@
                     "collider": {
                         "settings": {
                             "capsule": {
-                                "height": 0.8999999761581421,
+                                "height": 0.949999988079071,
                                 "radius": 1.7999999523162842
                             }
                         },
@@ -270,23 +270,28 @@
                     "m_enableWalkStairs": false,
                     "m_gravity": -24.0,
                     "m_jumpSpeed": 8.0,
+                    "m_keepYawWhileStrafe": false,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 20.0,
                     "m_stepHeight": 0.30000001192092896,
-                    "m_syncronizeYawWithCameraForwardDir": false,
+                    "m_syncOnlyWhenMoved": true,
+                    "m_syncronizePitchWithCameraForwardDir": true,
+                    "m_syncronizeYawWithCameraForwardDir": true,
                     "m_turnAcceleration": 20.0
                 },
                 "Grab": {
                     "m_canGrabDynamicBodies": true,
                     "m_canGrabKinematicBodies": true,
+                    "m_grabPitchOffset": 0.2617993950843811,
                     "m_grabSpringDamping": 10000.0,
                     "m_grabSpringStrength": 50000.0,
                     "m_holdDistance": 10.0,
-                    "m_keepObjectsOriginalRotation": false,
+                    "m_keepObjectsOriginalRotation": true,
                     "m_maxGrabDistance": 10.0,
                     "m_rotateWithCamera": true,
-                    "m_throwImpulse": 100000.0
+                    "m_throwImpulse": 100000.0,
+                    "m_throwPitchOffset": 0.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -853,10 +858,13 @@
                     "m_enableWalkStairs": false,
                     "m_gravity": -24.0,
                     "m_jumpSpeed": 8.0,
+                    "m_keepYawWhileStrafe": false,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 15.0,
                     "m_stepHeight": 0.30000001192092896,
+                    "m_syncOnlyWhenMoved": true,
+                    "m_syncronizePitchWithCameraForwardDir": false,
                     "m_syncronizeYawWithCameraForwardDir": false,
                     "m_turnAcceleration": 10.0
                 },
@@ -1258,10 +1266,13 @@
                     "m_enableWalkStairs": false,
                     "m_gravity": -24.0,
                     "m_jumpSpeed": 8.0,
+                    "m_keepYawWhileStrafe": false,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 0.0,
                     "m_stepHeight": 0.30000001192092896,
+                    "m_syncOnlyWhenMoved": true,
+                    "m_syncronizePitchWithCameraForwardDir": false,
                     "m_syncronizeYawWithCameraForwardDir": false,
                     "m_turnAcceleration": 10.0
                 },
