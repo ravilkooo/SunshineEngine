@@ -318,7 +318,7 @@ json PhysicsComponent_Info::ToJson() const {
         {"m_motion",        m_motion},
         {"m_activation",    m_activation},
         {"m_collisionLayer",  std::string{m_collisionLayer.c_str()} },
-        //{"m_collisionLayer",  "MOVING" },
+        {"m_isGrabbable", m_isGrabbable},
         {"m_friction", m_friction},
         {"m_linearDamping", m_linearDamping},
         {"m_angularDamping", m_angularDamping},
@@ -336,6 +336,10 @@ void PhysicsComponent_Info::FromJson(const json& j) {
     // Read motion + activation (enums use NLOHMANN_JSON_SERIALIZE_ENUM)
     if (j.contains("m_motion")) j.at("m_motion").get_to(m_motion);
     if (j.contains("m_activation")) j.at("m_activation").get_to(m_activation);
+
+    if (j.contains("m_isGrabbable") && j["m_isGrabbable"].is_boolean()) {
+        m_isGrabbable = j.at("m_isGrabbable").get<bool>();
+    }
 
     if (j.contains("m_collisionLayer") && j["m_collisionLayer"].is_string()) {
         m_collisionLayer = SE::CollisionLayer{ j.at("m_collisionLayer").get<std::string>().c_str() };
@@ -371,7 +375,7 @@ void PhysicsComponent::FromJson(const json& j) {
     else if (info.m_collisionLayer == "CHARACTER")      m_objectLayer = SE::Layers::CHARACTER;
     else                                         m_objectLayer = SE::Layers::NON_MOVING;
     
-    // m_objectLayer = SE::Layers::MOVING;
+    m_isGrabbable = info.m_isGrabbable;
 
     switch (info.m_motion) {
         case SE::PhysicsMotionType::Static:    m_motionType = JPH::EMotionType::Static; break;

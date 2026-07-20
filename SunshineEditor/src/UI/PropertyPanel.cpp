@@ -781,8 +781,9 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
         {
             physicsInfo->SetCollisionLayer(layerIndex == 0 ? "NON_MOVING" : "MOVING");
         }
-        ImGui::Separator();
+        ImGui::Checkbox("Is grabbable", &physicsInfo->m_isGrabbable);
 
+        ImGui::Separator();
 
         if (auto colliderData = physicsInfo->m_colliderData)
         {

@@ -99,6 +99,8 @@ public:
     void SetGravityFactor(float inGravityFactor);
     float GetGravityFactor() const;
 
+    // Grabbable
+
     // Set position
     // void SetPosition(DXSM::Vector3 inPosition);
     // Set rotation
@@ -149,6 +151,13 @@ private:
     /*
     ColliderTransformCB m_transformMat;
     */
+
+    // Grab
+    bool m_isGrabbable = true;
+
+public:
+    bool IsGrabbable() const { return m_isGrabbable; }
+    void SetGrabbable(bool isGrabbable) { m_isGrabbable = isGrabbable; }
 };
 
 class RenderComponent_Info;
@@ -224,6 +233,9 @@ public:
     float m_density = 1000.0f;
 
     SE::CollisionLayer m_collisionLayer = "MOVING";
+
+    // Grab
+    bool m_isGrabbable = true;
 };
 
 // Macro listing methods of PhysicsComponent to expose in Lua bindings
@@ -255,6 +267,7 @@ public:
 
 #ifndef PHYSICSCOMPONENT_LUA_PROPERTIES_APPLY
 #define PHYSICSCOMPONENT_LUA_PROPERTIES_APPLY(FP) \
+    FP(isGrabbable, &PhysicsComponent::IsGrabbable, &PhysicsComponent::SetGrabbable), \
     FP(gravityFactor, &PhysicsComponent::GetGravityFactor, &PhysicsComponent::SetGravityFactor), \
     FP(linearVelocity, &PhysicsComponent::GetLinearVelocity, &PhysicsComponent::SetLinearVelocity), \
     FP(angularVelocity, &PhysicsComponent::GetAngularVelocity, &PhysicsComponent::SetAngularVelocity), \
