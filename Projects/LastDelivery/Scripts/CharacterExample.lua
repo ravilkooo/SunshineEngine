@@ -131,7 +131,7 @@ function behavior:update(dt)
             end
         end
     end
-    print("char pitch = " .. char.pitch)
+    -- print("char pitch = " .. char.pitch)
     return "success"
 end
 

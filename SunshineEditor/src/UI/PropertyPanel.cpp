@@ -781,8 +781,9 @@ void PropertyPanel::DrawPhysicsComponent(GameObject_Info* obj)
         {
             physicsInfo->SetCollisionLayer(layerIndex == 0 ? "NON_MOVING" : "MOVING");
         }
-        ImGui::Separator();
+        ImGui::Checkbox("Is grabbable", &physicsInfo->m_isGrabbable);
 
+        ImGui::Separator();
 
         if (auto colliderData = physicsInfo->m_colliderData)
         {
@@ -1929,6 +1930,7 @@ void PropertyPanel::DrawGrabComponent(GameObject_Info* obj)
 
         DrawFloatControl("holdDistance", grabInfo->m_assignedComponent->m_holdDistance, 2.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
         DrawFloatControl("maxGrabDistance", grabInfo->m_assignedComponent->m_maxGrabDistance, 3.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
+        DrawFloatControl("grabCastRadius", grabInfo->m_assignedComponent->m_grabCastRadius, 1.0f, 0.01f, 0.0f, 1000.0f, "%.2f");
         
         {
             float grabPitchOffset = grabInfo->m_assignedComponent->m_grabPitchOffset * (180.0f / DirectX::XM_PI);

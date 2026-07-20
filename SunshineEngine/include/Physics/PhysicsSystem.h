@@ -286,6 +286,14 @@ public:
         float length,
         const eastl::vector<SE::UUID>& ignore,
         SE::UUID* out_id);
+
+    bool SphereCast(
+        const JPH::RVec3& begin,
+        float radius,
+        const JPH::Vec3& dir,
+        float length,
+        const eastl::vector<SE::UUID>& ignore,
+        SE::UUID* out_id);
     
     void CreateAndAddBody(PhysicsComponent* physComp);
 
