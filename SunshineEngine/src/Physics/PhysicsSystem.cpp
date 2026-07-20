@@ -8,6 +8,9 @@
 
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/ShapeCast.h>
+#include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
 
 PhysicsSystem::PhysicsSystem() :
     m_bodyEntries(eastl::vector<PhysicsBodyEntry>()),
@@ -149,7 +152,73 @@ bool PhysicsSystem::RayCast(const JPH::RVec3& begin,
     }
 	return true;
 }
+
 //////////////////////////////////////////
+//////////////////////////////////////////
+
+bool PhysicsSystem::SphereCast(
+    const JPH::RVec3& begin,
+    float radius,
+    const JPH::Vec3& dir,
+    float length,
+    const eastl::vector<SE::UUID>& ignore,
+    SE::UUID* out_id)
+{
+    if (!m_physicsSystem)
+        return false;
+
+    eastl::unordered_set<SE::UUID> ignore_set(ignore.begin(), ignore.end());
+
+    // Create sphere shape
+    JPH::Ref<JPH::Shape> sphere = JPH::SphereShapeSettings(radius).Create().Get();
+
+    JPH::RShapeCast shape_cast(
+        sphere,
+        JPH::Vec3::sReplicate(1.0f),
+        JPH::Mat44::sTranslation(begin),
+        JPH::RVec3(dir * length)
+    );
+
+    // Create filter for specific broad-phase layer
+    PerceptionBroadPhaseLayerFilter bpFilter;
+    // Cast againts all layers
+    EmptyFilter layer_filter = EmptyFilter();
+    IgnoreUUIDBodyFilter body_filter(ignore_set, m_physicsSystem->GetBodyLockInterface());
+
+    // ClosestShapeCastCollector collector;
+    JPH::ClosestHitCollisionCollector<JPH::CastShapeCollector> collector;
+
+    auto& nq = m_physicsSystem->GetNarrowPhaseQuery();
+
+    nq.CastShape(
+        shape_cast,
+        JPH::ShapeCastSettings(),
+        JPH::RVec3::sZero(),
+        collector, bpFilter, layer_filter, body_filter);
+
+    if (!collector.HadHit())
+        return false;
+
+    const JPH::ShapeCastResult& result = collector.mHit;
+    JPH::BodyID body_id = result.mBodyID2;
+
+    JPH::BodyLockRead lock(
+        m_physicsSystem->GetBodyLockInterface(),
+        body_id
+    );
+
+    if (!lock.Succeeded())
+    {
+        *out_id = SE::UUID(0u);
+        return false;
+    }
+
+    const JPH::Body& body = lock.GetBody();
+    *out_id = SE::UUID(body.GetUserData());
+
+    return true;
+}
+
 //////////////////////////////////////////
 
 void PhysicsSystem::CreateAndAddBody(PhysicsComponent* physComp) {

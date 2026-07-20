@@ -131,11 +131,16 @@ void GrabSystem::ProcessGrab(GameObject* gameObj)
 	eastl::vector<SE::UUID> ignoreObjects = eastl::vector<SE::UUID>(1, gameObj->m_UUID);
 
 	SE::UUID hitUUID = SE::UUID(0u);
+	/*
 	bool hitSMTH = m_systemContext.physics->RayCast(JPH::RVec3(viewPos.x, viewPos.y, viewPos.z),
 		viewDir,
 		grabComp->m_maxGrabDistance, ignoreObjects, &hitUUID);
+	*/
+	m_systemContext.physics->SphereCast(JPH::RVec3(viewPos.x, viewPos.y, viewPos.z), grabComp->m_grabCastRadius,
+		viewDir,
+		grabComp->m_maxGrabDistance, ignoreObjects, &hitUUID);
 
-	if (!hitSMTH || hitUUID == SE::UUID(0u)) {
+	if (hitUUID == SE::UUID(0u)) {
 		return;
 	}
 

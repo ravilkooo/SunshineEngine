@@ -283,6 +283,7 @@
                 "Grab": {
                     "m_canGrabDynamicBodies": true,
                     "m_canGrabKinematicBodies": true,
+                    "m_grabCastRadius": 2.0,
                     "m_grabPitchOffset": 0.2617993950843811,
                     "m_grabSpringDamping": 10000.0,
                     "m_grabSpringStrength": 50000.0,
