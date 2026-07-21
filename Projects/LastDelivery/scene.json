@@ -351,9 +351,9 @@
                         1.0
                     ],
                     "m_position": [
-                        0.0,
-                        5.305912494659424,
-                        -14.741567611694336
+                        50.69297790527344,
+                        3.650130271911621,
+                        -17.226924896240234
                     ],
                     "m_rotation": [
                         -0.0,
@@ -1548,7 +1548,7 @@
                         5.0
                     ],
                     "m_position": [
-                        -20.410587310791016,
+                        -26.055627822875977,
                         6.807671070098877,
                         8.239385604858398
                     ],
@@ -3005,9 +3005,9 @@
                         5.0
                     ],
                     "m_position": [
-                        3.4542794227600098,
-                        3.849910020828247,
-                        7.3335700035095215
+                        50.002071380615234,
+                        2.8743786811828613,
+                        -1.0404577255249023
                     ],
                     "m_rotation": [
                         -0.0,
@@ -3146,6 +3146,267 @@
                 "UvCubeMapMode": false
             },
             "m_type": "Box"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    50.0,
+                                    1.0,
+                                    50.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "NON_MOVING",
+                    "m_density": 1000.0,
+                    "m_friction": 0.699999988079071,
+                    "m_isGrabbable": true,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Static",
+                    "m_restitution": 0.0
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.5,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        50.0,
+                        1.0,
+                        50.0
+                    ],
+                    "m_position": [
+                        60.77834701538086,
+                        0.0,
+                        0.0
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 9424677351266400809,
+            "m_UUID_hi": 2194353693,
+            "m_UUID_lo": 3974576681,
+            "m_group": "Shapes",
+            "m_name": "TestFloor",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
+        },
+        {
+            "components": {
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        49.0,
+                        9.297298431396484,
+                        -10.336692810058594
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 7009250202913807279,
+            "m_UUID_hi": 1631968236,
+            "m_UUID_lo": 1182997423,
+            "m_group": "Shapes",
+            "m_name": "SpawnPoint1",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
+        },
+        {
+            "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/LooseZone_1.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        50.0,
+                        2.9602246284484863,
+                        7.632071495056152
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    4.0,
+                                    2.0,
+                                    4.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_motion": "Static"
+                }
+            },
+            "m_UUID": 9963716862649509678,
+            "m_UUID_hi": 2319858610,
+            "m_UUID_lo": 1355491118,
+            "m_group": "Shapes",
+            "m_name": "LooseZone1",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
         }
     ],
     "inputMapping": "Default",

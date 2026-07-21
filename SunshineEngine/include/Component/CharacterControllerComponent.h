@@ -143,6 +143,8 @@ public:
     float GetMaxSlopeAngle() const { return m_maxSlopeAngle; }
     void SetMaxSlopeAngle(float maxSlopeAngle) { m_maxSlopeAngle = maxSlopeAngle; }
 
+    void SetPosition(const DXSM::Vector3& position);
+
     // Inherited via Component
     const std::type_info& getType() const override {
         return typeid(CharacterControllerComponent);
@@ -155,8 +157,12 @@ public:
     void FromJson(const json& j) override;
     void FromJson(const json& j, PhysicsSystem* physicsSystem,
         TransformComponent* transformComp, SE::UUID uuid);
+    
+    bool m_setPositionRequested = false;
+    DXSM::Vector3 m_setNewPosition = DXSM::Vector3::Zero;
 private:
     void DestroyCharacter();
+
 };
 
 class RenderComponent_Info;
@@ -216,4 +222,9 @@ public:
     FP(enableWalkStairs, &CharacterControllerComponent::GetEnableWalkStairs, &CharacterControllerComponent::SetEnableWalkStairs) , \
     FP(stepHeight, &CharacterControllerComponent::GetStepHeight, &CharacterControllerComponent::SetStepHeight) , \
     FP(maxSlopeAngle, &CharacterControllerComponent::GetMaxSlopeAngle, &CharacterControllerComponent::SetMaxSlopeAngle)
+#endif
+
+#ifndef CHARACTERCONTROLLER_LUA_METHODS_APPLY
+#define CHARACTERCONTROLLER_LUA_METHODS_APPLY(FM) \
+    FM("setPosition", &CharacterControllerComponent::SetPosition)
 #endif

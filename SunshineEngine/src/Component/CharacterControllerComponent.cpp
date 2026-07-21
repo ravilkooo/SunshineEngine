@@ -81,6 +81,13 @@ void CharacterControllerComponent::DestroyCharacter()
 	m_groundNormal = DXSM::Vector3(0.0f, 1.0f, 0.0f);
 }
 
+
+void CharacterControllerComponent::SetPosition(const DXSM::Vector3& position)
+{
+	m_setNewPosition = position;
+	m_setPositionRequested = true;
+}
+
 CharacterControllerComponent_Info::CharacterControllerComponent_Info(
 	RenderComponent_Info* rc_info,
 	TransformComponent_Info* tc_info)
@@ -107,14 +114,14 @@ CharacterControllerComponent_Info::~CharacterControllerComponent_Info() {
 #define CHARCONTR_ADD_PROPERTIES(name, getter, setter) #name, sol::property(getter, setter)
 #define CHARCONTR_PROPERTIES_PAIRS CHARACTERCONTROLLER_LUA_PROPERTIES_APPLY(CHARCONTR_ADD_PROPERTIES)
 
-#define CHARCONTR_METHOD_PAIRS
+#define CHARCONTR_ADD_METHOD(k, fn) , k, fn
 
 LUA_REGISTER_COMPONENT(
 	CharacterControllerComponent,
 	"CharacterControllerComponent",
 	/* no fields */,
 	CHARCONTR_PROPERTIES_PAIRS,
-	CHARCONTR_METHOD_PAIRS,
+	CHARACTERCONTROLLER_LUA_METHODS_APPLY(CHARCONTR_ADD_METHOD),
 	"getCharacterController")
 
 #undef CHARCONTR_ADD_PROPERTIES

@@ -200,15 +200,21 @@ void CharacterControllerSystem::UpdateCharacter(
         return;
 	}
 
-    ApplyMovementInput(charComp, charContrComp, deltaTime);
-
-    ProcessGrabInput(gameObj);
-
-    ApplyBounce(charComp, charContrComp);
-
-    ApplyGravity(charComp, charContrComp, deltaTime);
-
-    ApplyJump(charComp, charContrComp);
+    if (charContrComp->m_setPositionRequested)
+    {
+        charContrComp->m_character->SetLinearVelocity(JPH::Vec3Arg::sZero());
+        charContrComp->m_character->SetPosition(JPH::RVec3Arg(
+            charContrComp->m_setNewPosition.x, charContrComp->m_setNewPosition.y, charContrComp->m_setNewPosition.z
+        ));
+    }
+    else
+    {
+        ApplyMovementInput(charComp, charContrComp, deltaTime);
+        ProcessGrabInput(gameObj);
+        ApplyBounce(charComp, charContrComp);
+        ApplyGravity(charComp, charContrComp, deltaTime);
+        ApplyJump(charComp, charContrComp);
+    }
 
     UpdatePhysics(charComp, charContrComp, deltaTime);
 
@@ -596,6 +602,8 @@ void CharacterControllerSystem::ClearFrameState(
     character->m_grabRequested = false;
     character->m_releaseRequested = false;
     character->m_throwRequested = false;
+
+    controller->m_setPositionRequested = false;
 }
 
 void CharacterControllerSystem::SynchronizeTransforms(GameObject* gameObj)
