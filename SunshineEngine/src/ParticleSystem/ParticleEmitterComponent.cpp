@@ -418,7 +418,7 @@ namespace SE
 
     void ParticleData::EmitPass()
     {
-        if (m_enabled)
+        if (IsEnabled())
         {
             if (m_emitterConstantBufferData.maxSpawn == 0)
             {
@@ -460,7 +460,7 @@ namespace SE
 
     void ParticleData::InitSimDispatchArgsPass()
     {
-        if (m_enabled)
+        if (IsEnabled())
         {
             auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
@@ -480,7 +480,7 @@ namespace SE
 
     void ParticleData::SimulatePass()
     {
-        if (m_enabled)
+        if (IsEnabled())
         {
             //simulation
             auto context = m_particleSystem->m_renderer->GetDeviceContext();
@@ -551,7 +551,7 @@ namespace SE
 
     void ParticleData::RenderPass()
     {
-        if (m_enabled)
+        if (IsEnabled())
         {
             auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
@@ -577,7 +577,7 @@ namespace SE
 
     void ParticleData::UpdateEmitter(float deltaTime)
     {
-        if (m_enabled)
+        if (IsEnabled())
         {
             auto context = m_particleSystem->m_renderer->GetDeviceContext();
 
@@ -618,7 +618,7 @@ namespace SE
     void ParticleData::EnableEmission()
     {
         m_enabled = true;
-        SetEmissionRate(m_deaultEmissionRate);
+        //SetEmissionRate(m_deaultEmissionRate);
         ResetParticlesPass();
         SetEmissionRate(m_deaultEmissionRate);
     }
@@ -626,7 +626,7 @@ namespace SE
     void ParticleData::DisableEmission()
     {
         m_enabled = false;
-        SetEmissionRate(0u);
+        //SetEmissionRate(0u);
         ResetParticlesPass();
         SetEmissionRate(0u);
     }

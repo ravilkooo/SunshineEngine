@@ -1,11 +1,13 @@
 #include <Component/RenderComponent.h>
-#include <Scripting/AutoBindings.h>
-#include <Scripting/ComponentBindings.h>
+
 #include <Graphics/Renderer/Technique/RenderTechnique.h>
 #include <Graphics/Renderer/Technique/GPassTechnique.h>
 #include <Graphics/Renderer/Technique/TransparentTechnique.h>
 
 #include <Graphics/Renderer/DeferredRenderer.h>
+
+#include <Scripting/AutoBindings.h>
+#include <Scripting/ComponentBindings.h>
 
 RenderComponent::~RenderComponent() {
 	m_renderSystem->RemoveAllTechniques(m_objectUUID);
@@ -177,3 +179,18 @@ void RenderComponent_Info::ToggleVisibility()
 	else if (m_transparentTech)
 		m_transparentTech->m_isHiddenInEditor = !m_isVisible;
 }
+
+#define RC_ADD_PROPERTY(name, getter, setter) #name, sol::property(getter, setter)
+#define RC_PROPERTY_PAIRS RENDERCOMPONENT_LUA_PROPERTIES_APPLY(RC_ADD_PROPERTY)
+
+#define RC_ADD_METHOD(k, fn) , k, fn
+
+LUA_REGISTER_COMPONENT(
+	RenderComponent,
+	"RenderComponent",
+	/* no fields */,
+	RC_PROPERTY_PAIRS,
+	RENDERCOMPONENT_LUA_METHODS_APPLY(RC_ADD_METHOD),
+	"getRender")
+#undef RC_ADD_METHOD
+#undef RC_ADD_PROPERTY

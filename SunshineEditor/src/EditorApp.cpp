@@ -467,7 +467,7 @@ void EditorApp::RunGame()
 	FPSstatisticTimer = 0;
 
 	m_currentGame->m_particleSystem->Enable();
-	m_currentGame->m_particleSystem->EnableAllEmitters();
+	//m_currentGame->m_particleSystem->EnableAllEmitters();
 
 	m_currentGame->m_timer.Reset();
 }

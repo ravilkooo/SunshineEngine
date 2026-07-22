@@ -126,3 +126,15 @@ private:
     SE_G::TransparentTechnique* m_transparentTech = nullptr;
     bool m_hasGPassMesh = false;
 };
+
+// Macro listing methods of RenderComponent to expose in Lua bindings
+#ifndef RENDERCOMPONENT_LUA_METHODS_APPLY
+#define RENDERCOMPONENT_LUA_METHODS_APPLY(FM) \
+    FM("toggleVisibility", &RenderComponent::ToggleVisibility) \
+    FM("isTransparent", &RenderComponent::GetIsTransparent)
+#endif
+
+#ifndef RENDERCOMPONENT_LUA_PROPERTIES_APPLY
+#define RENDERCOMPONENT_LUA_PROPERTIES_APPLY(FP) \
+    FP(visibility, &RenderComponent::GetVisibility, &RenderComponent::SetVisibility)
+#endif
