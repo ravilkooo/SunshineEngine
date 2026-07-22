@@ -86,6 +86,7 @@ namespace SE
 		~ParticleSystem();
 
 		void AddEmitter(SE::UUID uuid, eastl::shared_ptr<ParticleData> particleData);
+		void RemoveEmitter(SE::UUID uuid);
 
 		void LoadCS(AssetPath shaderPath, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& m_computeShader);
 

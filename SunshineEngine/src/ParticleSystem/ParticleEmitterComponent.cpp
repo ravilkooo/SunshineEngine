@@ -28,6 +28,7 @@ ParticleEmitterComponent::ParticleEmitterComponent(
     SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc
 )
 {
+    m_objectUUID = objectUUID;
     m_particleData = eastl::make_shared<SE::ParticleData>(particleSystem, emitterDesc, simulatorDesc);
     m_particleData->m_transformComp = tc;
     particleSystem->AddEmitter(objectUUID, m_particleData);
@@ -37,15 +38,14 @@ ParticleEmitterComponent::ParticleEmitterComponent(
 
 ParticleEmitterComponent::~ParticleEmitterComponent()
 {
-
+    m_particleData->m_particleSystem->RemoveEmitter(m_objectUUID);
 }
 
 void ParticleEmitterComponent::FromJson(const json& j,
     SE::UUID objectUUID, TransformComponent* tc,
     SE::ParticleSystem* particleSystem)
 {
-    // obj->m_UUID = SE::UUID(j["m_UUID"].get<uint64_t>());
-    // obj->m_name = j["m_name"].get<std::string>().c_str();
+    m_objectUUID = objectUUID;
 
     if (j.contains("emitterData"))
     {
@@ -73,6 +73,7 @@ ParticleEmitterComponent_Info::ParticleEmitterComponent_Info(
     SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc
 )
 {
+    m_objectUUID = objectUUID;
     m_particleData = eastl::make_shared<SE::ParticleData>(particleSystem, emitterDesc, simulatorDesc);
     m_particleData->m_transformComp = tc;
     particleSystem->AddEmitter(objectUUID, m_particleData);
@@ -80,7 +81,7 @@ ParticleEmitterComponent_Info::ParticleEmitterComponent_Info(
 
 ParticleEmitterComponent_Info::~ParticleEmitterComponent_Info()
 {
-
+    m_particleData->m_particleSystem->RemoveEmitter(m_objectUUID);
 }
 
 json ParticleEmitterComponent_Info::ToJson() const {
@@ -93,6 +94,7 @@ void ParticleEmitterComponent_Info::FromJson(const json& j,
     SE::UUID objectUUID, TransformComponent* tc,
     SE::ParticleSystem* particleSystem)
 {
+    m_objectUUID = objectUUID;
     if (j.contains("emitterData"))
     {
         m_particleData = SE::ParticleData::FromJson(j["emitterData"], particleSystem);

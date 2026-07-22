@@ -199,6 +199,8 @@ public:
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
     }
+private:
+    SE::UUID m_objectUUID;
 };
 
 class ParticleEmitterComponent_Info :
@@ -234,6 +236,9 @@ public:
     }
 
     bool IsAssigned() override { return false; }
+
+private:
+    SE::UUID m_objectUUID;
 };
 
 // Macro listing methods of ParticleEmitterComponent to expose in Lua bindings

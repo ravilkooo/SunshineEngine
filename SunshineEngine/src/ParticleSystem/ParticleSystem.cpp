@@ -304,6 +304,16 @@ namespace SE
 		it->second = particleData;
 	}
 
+	void ParticleSystem::RemoveEmitter(SE::UUID uuid)
+	{
+		auto mapIt = m_emitters.find(uuid);
+		if (mapIt == m_emitters.end())
+			return;
+
+		m_emitters.erase(mapIt);
+		return;
+	}
+
 	void ParticleSystem::ComputePassForAllEmitters()
 	{
 		if (!m_enabled)
