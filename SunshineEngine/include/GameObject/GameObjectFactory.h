@@ -35,13 +35,6 @@ namespace SE_G {
 class GameObjectFactory
 {
 public:
-	static eastl::unique_ptr<GameObject> CreateParticleEmitter(
-		SE::ParticleSystem* particleSystem);
-
-	static eastl::unique_ptr<GameObject> CreateParticleEmitter(
-		SE::ParticleSystem* particleSystem,
-		const json& j);
-
 	static eastl::unique_ptr<GameObject> CreateCustomMesh(
 		SE_G::DeferredRenderer* renderSystem,
 		const json& j);

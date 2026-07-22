@@ -186,7 +186,6 @@ public:
     void AddPointLight(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
     void AddSpotLight(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
     void AddCustomMesh(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
-    void AddParticleEmitter(DXSM::Vector3 initPos = DXSM::Vector3::Zero);
 
     // Copy/Paste objects
     SE::UUID m_copiedObjUUID = SE::UUID(0u);

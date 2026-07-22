@@ -14,6 +14,9 @@ namespace DX = DirectX;
 namespace DXSM = DirectX::SimpleMath;
 
 class TransformComponent;
+class TransformComponent_Info;
+class RenderComponent;
+class RenderComponent_Info;
 
 namespace SE_G
 {
@@ -115,6 +118,8 @@ namespace SE
 
         };
 
+        static EmitterPointConstantBuffer sDefaultEmitterDesc();
+
         EmitterPointConstantBuffer  m_emitterConstantBufferData;
         Microsoft::WRL::ComPtr<ID3D11Buffer>    m_emitterConstantBuffer;
 
@@ -123,6 +128,8 @@ namespace SE
             DXSM::Vector3 force;
             float pad;
         };
+
+        static SimulateParticlesConstantBuffer sDefaultSimulateDesc();
 
         SimulateParticlesConstantBuffer  m_simulateParticlesConstantBufferData;
         Microsoft::WRL::ComPtr<ID3D11Buffer>    m_simulateParticlesConstantBuffer;
@@ -181,7 +188,7 @@ public:
 
     ParticleEmitterComponent(
         SE::UUID objectUUID, TransformComponent* tc,
-        SE::ParticleSystem* particleSystem,
+        RenderComponent* rc,
         SE::ParticleData::EmitterPointConstantBuffer emitterDesc,
         SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
 
@@ -190,7 +197,7 @@ public:
     void FromJson(
         const json& j,
         SE::UUID objectUUID, TransformComponent* tc,
-        SE::ParticleSystem* particleSystem);
+        RenderComponent* rc);
 
     const std::type_info& getType() const override {
         return typeid(ParticleEmitterComponent);
@@ -213,8 +220,12 @@ public:
     ParticleEmitterComponent_Info();
 
     ParticleEmitterComponent_Info(
-        SE::UUID objectUUID, TransformComponent* tc,
-        SE::ParticleSystem* particleSystem,
+        SE::UUID objectUUID, TransformComponent_Info* tc_info,
+        RenderComponent_Info* rc_info);
+
+    ParticleEmitterComponent_Info(
+        SE::UUID objectUUID, TransformComponent_Info* tc_info,
+        RenderComponent_Info* rc_info,
         SE::ParticleData::EmitterPointConstantBuffer emitterDesc,
         SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc);
 
@@ -224,8 +235,8 @@ public:
 
     void FromJson(
         const json& j,
-        SE::UUID objectUUID, TransformComponent* tc,
-        SE::ParticleSystem* particleSystem);
+        SE::UUID objectUUID, TransformComponent_Info* tc_info,
+        RenderComponent_Info* rc_info);
 
     const SE::ComponentType ComponentType() const override {
         return s_componentType;
@@ -239,6 +250,7 @@ public:
 
 private:
     SE::UUID m_objectUUID;
+    RenderComponent_Info* m_rc_info;
 };
 
 // Macro listing methods of ParticleEmitterComponent to expose in Lua bindings

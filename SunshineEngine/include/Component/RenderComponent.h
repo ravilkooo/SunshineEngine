@@ -62,6 +62,8 @@ public:
 
     void FromJson(const json& j) override;
 
+    SE_G::DeferredRenderer* GetRenderSystem() { return m_renderSystem; };
+
 private:
     bool m_isVisible = true;
     bool m_isTransparent = false;

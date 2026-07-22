@@ -643,27 +643,6 @@ void WorldEditor::AddCustomMesh(DXSM::Vector3 initPos)
 	}
 }
 
-
-void WorldEditor::AddParticleEmitter(DXSM::Vector3 initPos)
-{
-	if (m_renderer && m_scene)
-	{
-		auto particleEmitter = EditorObjectFactory::CreateParticleEmitter(
-			m_renderer->m_particleSystem.get());
-
-		if (particleEmitter)
-		{
-			particleEmitter->GetComponent<TransformComponent_Info>()->m_assignedComponent->SetPosition(initPos);
-			auto uuid = m_scene->AddGameObject(std::move(particleEmitter));
-			m_scene->m_sceneGraph->Add(uuid);
-		}
-	}
-	else
-	{
-		LOG_EDITOR_ERROR("Cannot add Custom Mesh: Renderer or Scene not initialized");
-	}
-}
-
 /*
 void WorldEditor::DeprojectScreenToWorld(DXSM::Vector2 mouseScreenCoords, DXSM::Vector2 lastGameViewportSize)
 {

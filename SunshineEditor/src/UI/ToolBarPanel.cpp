@@ -169,9 +169,4 @@ void ToolbarPanel::ShowAddMenu()
     {
         m_editorApp->m_worldEditor->AddCustomMesh();
     }
-
-    if (ImGui::MenuItem("Particle Emitter"))
-    {
-        m_editorApp->m_worldEditor->AddParticleEmitter();
-    }
 }

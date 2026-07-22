@@ -446,10 +446,6 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
                 break;
             }
         }
-        else if (obj->m_group == GameObjectGroup::ParticleEmitter)
-        {
-            DrawEmitterDetails(obj);
-        }
 
         DrawMeshComponent(obj);
         DrawPhysicsComponent(obj);
@@ -462,6 +458,7 @@ void PropertyPanel::DrawDetails(GameObject_Info* obj)
         DrawBehaviorController(obj);
         DrawBouncePadComponent(obj);
         DrawMovingPlatformComponent(obj);
+        DrawEmitterDetails(obj);
         DrawLuaComponent(obj);
 
         ImGui::TreePop();
@@ -1536,6 +1533,16 @@ void PropertyPanel::DrawComponentAddPopup(GameObject_Info* obj)
             }
         }
 
+        if (!obj->HasComponent<ParticleEmitterComponent_Info>())
+        {
+            HasAllComponents = false;
+
+            if (ImGui::MenuItem("Particle emitter", nullptr, false, true))
+            {
+                obj->AddDefaultComponent(SE::ComponentType::PARTICLE_EMITTER);
+            }
+        }
+
         if (HasAllComponents)
         {
             ImGui::TextDisabled("All available components added");
@@ -2272,6 +2279,12 @@ void PropertyPanel::DrawEmitterDetails(
     if (ImGui::TreeNodeEx("Particle Emitter", flags))
     {
         EditorUI::FontStyles::Pop();
+
+        if (DrawComponentRemoveButton<ParticleEmitterComponent_Info>(obj))
+        {
+            ImGui::TreePop();
+            return;
+        }
 
         auto emitterData = emitterInfo->m_particleData.get();
         auto emitterPointBuffer = &emitterData->m_emitterConstantBufferData;

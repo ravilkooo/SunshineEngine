@@ -5,10 +5,13 @@
 #include <Graphics/Renderer/DeferredRenderer.h>
 #include <Graphics/GraphicsResources/Texture.h>
 
+#include <Graphics/Renderer/Technique/EmitterTechnique.h>
+
 #include <Graphics/Bindable/TransformCBuffer.h>
 #include <Graphics/Bindable/ConstantBuffer.h>
 
 #include <Component/TransformComponent.h>
+#include <Component/RenderComponent.h>
 
 #include <Utils/AssetPath.h>
 
@@ -17,23 +20,26 @@
 
 #include <ResourceManager/ResourceManagerFacade.h>
 
+#include <EASTL/unique_ptr.h>
+
 ParticleEmitterComponent::ParticleEmitterComponent()
 {
 }
 
 ParticleEmitterComponent::ParticleEmitterComponent(
     SE::UUID objectUUID, TransformComponent* tc,
-    SE::ParticleSystem* particleSystem,
+    RenderComponent* rc,
     SE::ParticleData::EmitterPointConstantBuffer emitterDesc,
     SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc
 )
 {
+    auto renderSystem = rc->GetRenderSystem();
+    auto particleSystem = renderSystem->m_particleSystem.get();
+
     m_objectUUID = objectUUID;
     m_particleData = eastl::make_shared<SE::ParticleData>(particleSystem, emitterDesc, simulatorDesc);
     m_particleData->m_transformComp = tc;
     particleSystem->AddEmitter(objectUUID, m_particleData);
-
-    // m_name = "ParticleEmitterComponent";
 }
 
 ParticleEmitterComponent::~ParticleEmitterComponent()
@@ -43,8 +49,11 @@ ParticleEmitterComponent::~ParticleEmitterComponent()
 
 void ParticleEmitterComponent::FromJson(const json& j,
     SE::UUID objectUUID, TransformComponent* tc,
-    SE::ParticleSystem* particleSystem)
+    RenderComponent* rc)
 {
+    auto renderSystem = rc->GetRenderSystem();
+    auto particleSystem = renderSystem->m_particleSystem.get();
+
     m_objectUUID = objectUUID;
 
     if (j.contains("emitterData"))
@@ -67,21 +76,42 @@ ParticleEmitterComponent_Info::ParticleEmitterComponent_Info()
 }
 
 ParticleEmitterComponent_Info::ParticleEmitterComponent_Info(
-    SE::UUID objectUUID, TransformComponent* tc,
-    SE::ParticleSystem* particleSystem,
+    SE::UUID objectUUID, TransformComponent_Info* tc_info,
+    RenderComponent_Info* rc_info) :
+    ParticleEmitterComponent_Info(objectUUID, tc_info, rc_info,
+        SE::ParticleData::sDefaultEmitterDesc(), SE::ParticleData::sDefaultSimulateDesc())
+{
+}
+
+ParticleEmitterComponent_Info::ParticleEmitterComponent_Info(
+    SE::UUID objectUUID, TransformComponent_Info* tc_info,
+    RenderComponent_Info* rc_info,
     SE::ParticleData::EmitterPointConstantBuffer emitterDesc,
     SE::ParticleData::SimulateParticlesConstantBuffer simulatorDesc
 )
 {
+    m_rc_info = rc_info;
+    auto tc = tc_info->m_assignedComponent.get();
+
+    auto renderSystem = rc_info->m_assignedComponent->GetRenderSystem();
+    auto particleSystem = renderSystem->m_particleSystem.get();
+
     m_objectUUID = objectUUID;
     m_particleData = eastl::make_shared<SE::ParticleData>(particleSystem, emitterDesc, simulatorDesc);
     m_particleData->m_transformComp = tc;
     particleSystem->AddEmitter(objectUUID, m_particleData);
+
+    auto emitTech = eastl::make_unique<SE_G::EmitterTechnique>(
+        particleSystem->m_renderer->GetDevice(),
+        tc_info->m_assignedComponent.get(), eastl::string("EmitterDebugPass"),
+        m_particleData.get());
+    rc_info->AddTechnique(eastl::move(emitTech));
 }
 
 ParticleEmitterComponent_Info::~ParticleEmitterComponent_Info()
 {
     m_particleData->m_particleSystem->RemoveEmitter(m_objectUUID);
+    m_rc_info->RemoveTechnique("EmitterDebugPass");
 }
 
 json ParticleEmitterComponent_Info::ToJson() const {
@@ -91,9 +121,15 @@ json ParticleEmitterComponent_Info::ToJson() const {
 }
 
 void ParticleEmitterComponent_Info::FromJson(const json& j,
-    SE::UUID objectUUID, TransformComponent* tc,
-    SE::ParticleSystem* particleSystem)
+    SE::UUID objectUUID, TransformComponent_Info* tc_info,
+    RenderComponent_Info* rc_info)
 {
+    m_rc_info = rc_info;
+    auto tc = tc_info->m_assignedComponent.get();
+
+    auto renderSystem = rc_info->m_assignedComponent->GetRenderSystem();
+    auto particleSystem = renderSystem->m_particleSystem.get();
+
     m_objectUUID = objectUUID;
     if (j.contains("emitterData"))
     {
@@ -107,10 +143,39 @@ void ParticleEmitterComponent_Info::FromJson(const json& j,
 
     m_particleData->m_transformComp = tc;
     particleSystem->AddEmitter(objectUUID, m_particleData);
+
+    auto emitTech = eastl::make_unique<SE_G::EmitterTechnique>(
+        particleSystem->m_renderer->GetDevice(),
+        tc_info->m_assignedComponent.get(), eastl::string("EmitterDebugPass"),
+        m_particleData.get());
+    rc_info->AddTechnique(eastl::move(emitTech));
 }
 
 namespace SE
 {
+    ParticleData::EmitterPointConstantBuffer ParticleData::sDefaultEmitterDesc()
+    {
+        return EmitterPointConstantBuffer{
+            DXSM::Matrix::Identity,
+            { 0, 0, 0 }, 3.0f,
+            { 1, 1, 1 }, 1.0f,
+            { 1, 1, 1 }, 1.0f,
+
+            8, 1, 0.2, 0.5,
+
+            0, DX::XM_2PI, -DX::XM_PI / 10, DX::XM_PI / 10,
+
+            100u, { 0, 0, 0 },
+        };
+    }
+
+    ParticleData::SimulateParticlesConstantBuffer ParticleData::sDefaultSimulateDesc()
+    {
+        return SimulateParticlesConstantBuffer{
+            { 0, -5, 0 }, 0
+        };
+    }
+
     ParticleData::ParticleData()
     { }
 

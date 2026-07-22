@@ -165,7 +165,6 @@ namespace SE_G {
 				return;
 			}
 		}
-		// log << "RenderGroup not found in RenderingSystem";
 		printSunshineMessage(groupName + " RenderGroup not found in RenderingSystem");
 	}
 

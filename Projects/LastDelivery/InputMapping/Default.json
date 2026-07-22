@@ -19,6 +19,10 @@
         {
             "action": "Throw",
             "key": 500
+        },
+        {
+            "action": "Destroy",
+            "key": 500
         }
     ],
     "axis_bindings": [

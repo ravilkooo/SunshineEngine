@@ -366,10 +366,6 @@ void ImguiEditorPass::Pass()
 			{
 				m_editorApp->m_worldEditor->AddCustomMesh(m_clickWorldPos);
 			}
-			if (ImGui::MenuItem("Particle Emitter"))
-			{
-				m_editorApp->m_worldEditor->AddParticleEmitter(m_clickWorldPos);
-			}
 
 			ImGui::EndMenu();
 		}

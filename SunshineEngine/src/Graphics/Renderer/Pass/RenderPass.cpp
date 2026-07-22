@@ -53,7 +53,7 @@ namespace SE_G {
 		auto [it, inserted] = m_techniques.emplace(id, nullptr);
 		if (!inserted)
 		{
-			printf("Duplicate UUID in RenderPass::AddGameObject\n");
+			printf("Duplicate UUID in RenderPass::AddGameObject: %s\n", uuid.ToString().c_str());
 			//return nullptr;
 		}
 		it->second = std::move(tech);

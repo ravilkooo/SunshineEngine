@@ -786,14 +786,9 @@ void Scene::FromJson(
                     renderSystem, objJ);
                 break;
             }
-            case GameObjectGroup::ParticleEmitter:
-            {
-                go = GameObjectFactory::CreateParticleEmitter(
-                    renderSystem->m_particleSystem.get(), objJ);
-
-                break;
-            }
             case GameObjectGroup::Other:
+                go = GameObjectFactory::CreateCustomMesh(
+                    renderSystem, objJ);
                 break;
             default:
                 break;
@@ -890,6 +885,16 @@ void Scene::FromJson(
                     auto c = go->AddComponent<MovingPlatformComponent>();
                     c->FromJson(objJ["components"]["MovingPlatform"]);
                     c->m_objectUUID = go->m_UUID;
+                }
+
+                if (objJ["components"].contains("ParticleEmitter")) {
+                    auto pec = go->AddComponent<ParticleEmitterComponent>();
+
+                    pec->FromJson(objJ["components"]["ParticleEmitter"],
+                        go->m_UUID,
+                        go->GetComponent<TransformComponent>().get(),
+                        go->GetComponent<RenderComponent>().get()
+                    );
                 }
                 
                 // Parentnes
@@ -1008,14 +1013,8 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         go = EditorObjectFactory::CreateCustomMesh(renderSystem, objJ);
     }
     break;
-    case GameObjectGroup::ParticleEmitter:
-    {
-        go = EditorObjectFactory::CreateParticleEmitter(
-            renderSystem->m_particleSystem.get(), objJ);
-
-        break;
-    }
     case GameObjectGroup::Other:
+        go = EditorObjectFactory::CreateCustomMesh(renderSystem, objJ);
         break;
     default:
         break;
@@ -1114,6 +1113,16 @@ eastl::unique_ptr<GameObject_Info> Scene_Info::JsonToGameObject_Info(
         if (objJ["components"].contains("MovingPlatform")) {
             auto c = go->AddComponent<MovingPlatformComponent_Info>();
             c->FromJson(objJ["components"]["MovingPlatform"]);
+        }
+
+        if (objJ["components"].contains("ParticleEmitter")) {
+            auto pec = go->AddComponent<ParticleEmitterComponent_Info>();
+
+            pec->FromJson(objJ["components"]["ParticleEmitter"],
+                go->m_UUID, 
+                go->GetComponent<TransformComponent_Info>().get(),
+                go->GetComponent<RenderComponent_Info>().get()
+            );
         }
 
         // Parentnes

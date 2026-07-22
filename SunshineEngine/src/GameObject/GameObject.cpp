@@ -13,6 +13,8 @@
 #include <Component/MovingPlatformComponent.h>
 #include <Component/GrabComponent.h>
 
+#include <ParticleSystem/ParticleEmitterComponent.h>
+
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
 
@@ -335,6 +337,18 @@ void GameObject_Info::AddDefaultComponent(SE::ComponentType compType)
             auto gr_info = AddComponent<GrabComponent_Info>();
 
         }
+        break;
+
+        case SE::ComponentType::PARTICLE_EMITTER:
+        {
+            auto tc_info = GetComponent<TransformComponent_Info>();
+            auto rc_info = GetComponent<RenderComponent_Info>();
+
+            auto pec_info = AddComponent<ParticleEmitterComponent_Info>(
+                m_UUID, tc_info.get(), rc_info.get()
+            );
+        }
+
         break;
 
         default:

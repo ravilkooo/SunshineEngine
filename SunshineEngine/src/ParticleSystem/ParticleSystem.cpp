@@ -298,7 +298,7 @@ namespace SE
 		auto [it, inserted] = m_emitters.emplace(id, nullptr);
 		if (!inserted)
 		{
-			printf("Duplicate UUID in ParticleSystem::AddEmitter");
+			printf("Duplicate UUID in ParticleSystem::AddEmitter: %s\n", uuid.ToString().c_str());
 			return;
 		}
 		it->second = particleData;

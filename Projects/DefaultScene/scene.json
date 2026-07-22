@@ -2,7 +2,10 @@
     "gameObjects": [
         {
             "components": {
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -107,11 +110,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -168,7 +175,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 15551142850770219886,
@@ -226,11 +234,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.46000000834465027,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -291,7 +303,10 @@
                     },
                     "m_cullMode": "CULL_NONE"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -380,11 +395,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -473,11 +492,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -587,11 +610,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 1.0,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.8500000238418579
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -691,11 +718,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Kinematic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -747,7 +778,10 @@
         },
         {
             "components": {
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -804,7 +838,10 @@
         {
             "CastsShadow": true,
             "components": {
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -919,11 +956,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1012,11 +1053,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.9900000095367432,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1079,7 +1124,10 @@
                     },
                     "m_cullMode": "CULL_NONE"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1170,11 +1218,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1263,11 +1315,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 500.0,
                     "m_friction": 0.10000000149011612,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1332,7 +1388,8 @@
                             2.0,
                             -0.800000011920929
                         ]
-                    }
+                    },
+                    "m_zoomAccelerations": 1.0
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -1383,11 +1440,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.75,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1448,7 +1509,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 1087253342462268591,
@@ -1499,11 +1561,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 1.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1566,7 +1632,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1657,11 +1726,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1750,11 +1823,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1917,11 +1994,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -1968,7 +2049,10 @@
         },
         {
             "components": {
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2094,11 +2178,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2159,7 +2247,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 15773750746235853067,
@@ -2217,11 +2306,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2314,11 +2407,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Kinematic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2388,7 +2485,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2449,7 +2549,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 7345188172897550059,
@@ -2487,7 +2588,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2544,7 +2648,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 543340317642731850,
@@ -2602,7 +2707,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2659,7 +2767,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 15857968606328152152,
@@ -2740,11 +2849,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 1.0,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Kinematic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2814,7 +2927,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -2875,7 +2991,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 7345188172897550060,
@@ -2912,7 +3029,8 @@
                             1.5,
                             0.0
                         ]
-                    }
+                    },
+                    "m_zoomAccelerations": 1.0
                 },
                 "Character": {
                     "m_isPlayerControlled": false
@@ -2945,10 +3063,13 @@
                     "m_enableWalkStairs": false,
                     "m_gravity": -24.0,
                     "m_jumpSpeed": 8.0,
+                    "m_keepYawWhileStrafe": false,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 10.119999885559082,
                     "m_stepHeight": 0.30000001192092896,
+                    "m_syncOnlyWhenMoved": true,
+                    "m_syncronizePitchWithCameraForwardDir": false,
                     "m_syncronizeYawWithCameraForwardDir": true,
                     "m_turnAcceleration": 30.0
                 },
@@ -2971,7 +3092,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3030,7 +3154,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         -0.27000001072883606,
@@ -3092,7 +3219,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.27000001072883606,
@@ -3173,10 +3303,13 @@
                     "m_enableWalkStairs": false,
                     "m_gravity": -24.0,
                     "m_jumpSpeed": 8.0,
+                    "m_keepYawWhileStrafe": false,
                     "m_maxFallSpeed": -24.0,
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 6.0,
                     "m_stepHeight": 0.30000001192092896,
+                    "m_syncOnlyWhenMoved": true,
+                    "m_syncronizePitchWithCameraForwardDir": false,
                     "m_syncronizeYawWithCameraForwardDir": false,
                     "m_turnAcceleration": 30.0
                 },
@@ -3199,7 +3332,10 @@
                     },
                     "m_cullMode": "CULL_NONE"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3258,7 +3394,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3347,11 +3486,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3412,7 +3555,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3510,11 +3656,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.0,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3575,7 +3725,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 14541272477798150626,
@@ -3633,11 +3784,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3726,11 +3881,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3819,11 +3978,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -3912,11 +4075,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Dynamic",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         10.742356300354004,
@@ -4007,11 +4174,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4102,11 +4273,15 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4167,7 +4342,10 @@
                     },
                     "m_cullMode": "CULL_NONE"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4228,7 +4406,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4289,7 +4470,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 3752785341488394944,
@@ -4327,7 +4509,10 @@
                     },
                     "m_cullMode": "CULL_NONE"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4391,7 +4576,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4452,7 +4640,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 6988824681597552997,
@@ -4480,7 +4669,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4541,7 +4733,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 11688363306020334540,
@@ -4576,7 +4769,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4637,7 +4833,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 16732231383476263002,
@@ -4672,7 +4869,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4733,7 +4933,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 7140255544193535038,
@@ -4768,7 +4969,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4829,7 +5033,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 1050389133146479867,
@@ -4897,11 +5102,15 @@
                     "m_collisionLayer": "NON_MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 1.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -4962,7 +5171,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 18396376531357425538,
@@ -5030,11 +5240,15 @@
                     "m_collisionLayer": "NON_MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 1.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -5095,7 +5309,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 9330690255343450390,
@@ -5163,11 +5378,15 @@
                     "m_collisionLayer": "NON_MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
+                    "m_isGrabbable": true,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 1.0
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -5228,7 +5447,8 @@
                                 0.0
                             ]
                         }
-                    }
+                    },
+                    "m_motion": "Static"
                 }
             },
             "m_UUID": 8812603596333723014,
@@ -5256,7 +5476,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -5315,7 +5538,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -5377,7 +5603,10 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
-                "Render": null,
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
                 "Transform": {
                     "m_localPosition": [
                         0.0,
@@ -5425,6 +5654,125 @@
                 "UvCubeMapMode": false
             },
             "m_type": "Box"
+        },
+        {
+            "components": {
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 3.0,
+                        "Emitter": {
+                            "alphaEnd": 1.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "emitterSize": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "latitudeMax": 0.3141592741012573,
+                            "latitudeMin": -0.3141592741012573,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 100,
+                            "particleSizeEnd": 0.5,
+                            "particleSizeStart": 0.20000000298023224,
+                            "particlesBaseSpeed": 8.0,
+                            "particlesLifeSpan": 3.0,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                -5.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 0,
+                            "relativePath": "Textures/DefaultTexture.dds"
+                        }
+                    }
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_position": [
+                        15.28125,
+                        6.5,
+                        21.046875
+                    ],
+                    "m_rotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 7817829503365677167,
+            "m_UUID_hi": 1820230275,
+            "m_UUID_lo": 1051590767,
+            "m_group": "ParticleEmitter",
+            "m_name": "ParticleEmitter",
+            "m_parent": null
         }
     ],
     "inputMapping": "Default",
