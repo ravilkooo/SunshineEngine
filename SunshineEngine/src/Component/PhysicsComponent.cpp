@@ -369,6 +369,47 @@ float PhysicsComponent::GetGravityFactor() const
     return bodyInterface.GetGravityFactor(m_joltBodyId);
 }
 
+void PhysicsComponent::ActivateBody()
+{
+    if (!m_physicsSystem)
+        return;
+
+    m_physicsSystem->EnqueueCommand([this]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.ActivateBody(m_joltBodyId);
+        });
+}
+
+void PhysicsComponent::DeactivateBody()
+{
+    if (!m_physicsSystem)
+        return;
+
+    m_physicsSystem->EnqueueCommand([this]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.DeactivateBody(m_joltBodyId);
+        });
+}
+
+void PhysicsComponent::RemoveBody()
+{
+    if (!m_physicsSystem)
+        return;
+
+    if (m_removed)
+        return;
+
+    m_physicsSystem->EnqueueCommand([this]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            return bodyInterface.RemoveBody(m_joltBodyId);
+        });
+
+    m_removed = true;
+}
+
 void PhysicsComponent::MoveKinematic(DXSM::Vector3 inPosition, DXSM::Vector3 inRotation, float deltaTime)
 {
     if (!m_physicsSystem)

@@ -276,7 +276,9 @@ void PhysicsSystem::RemoveBody(PhysicsComponent* physComp)
     // Remove from physics world
     if (m_bodyInterface->IsAdded(bodyId))
     {
-        m_bodyInterface->RemoveBody(bodyId);
+        if (!physComp->m_removed)
+            m_bodyInterface->RemoveBody(bodyId);
+        physComp->m_removed = true;
     }
 
     // Destroy the body
@@ -434,7 +436,8 @@ void PhysicsSystem::ClearAllBodies()
 {
     for (auto body : m_bodyEntries)
     {
-        m_bodyInterface->RemoveBody(body.m_joltBodyId);
+        if (m_bodyInterface->IsAdded(body.m_joltBodyId))
+            m_bodyInterface->RemoveBody(body.m_joltBodyId);
         m_bodyInterface->DestroyBody(body.m_joltBodyId);
     }
     m_bodyEntries.clear();
@@ -442,7 +445,8 @@ void PhysicsSystem::ClearAllBodies()
     // eastl::vector<JPH::BodyID> m_activeTriggers;
     for (auto it : m_activeTriggers)
     {
-        m_bodyInterface->RemoveBody(it.second->m_joltBodyId);
+        if (m_bodyInterface->IsAdded(it.second->m_joltBodyId))
+            m_bodyInterface->RemoveBody(it.second->m_joltBodyId);
         m_bodyInterface->DestroyBody(it.second->m_joltBodyId);
     }
     m_activeTriggers.clear();

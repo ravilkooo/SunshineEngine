@@ -76,6 +76,9 @@ public:
     // Enable/disable physics body (removes from simulation but keeps data)
     void SetActive(bool active);
     bool IsActive() const;
+    void ActivateBody();
+    void DeactivateBody();
+    void RemoveBody();
     
     // Setters for configuration before adding body
     void SetObjecUUID(SE::UUID objectUUID);
@@ -154,6 +157,8 @@ private:
 
     // Grab
     bool m_isGrabbable = true;
+
+    bool m_removed = false;
 
 public:
     bool IsGrabbable() const { return m_isGrabbable; }
@@ -261,7 +266,10 @@ public:
     FM("setGravityFactor", &PhysicsComponent::SetGravityFactor) \
     FM("resetForce", &PhysicsComponent::ResetForce) \
     FM("resetTorque", &PhysicsComponent::ResetTorque) \
+    FM("removeBody", &PhysicsComponent::RemoveBody) \
     FM("setActive", &PhysicsComponent::SetActive) \
+    FM("activate", &PhysicsComponent::ActivateBody) \
+    FM("deactivate", &PhysicsComponent::DeactivateBody) \
     FM("isActive", &PhysicsComponent::IsActive)
 #endif
 

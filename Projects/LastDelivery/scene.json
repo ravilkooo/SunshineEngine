@@ -276,7 +276,7 @@
                     "m_maxSlopeAngle": 45.0,
                     "m_moveSpeed": 20.0,
                     "m_stepHeight": 0.30000001192092896,
-                    "m_syncOnlyWhenMoved": true,
+                    "m_syncOnlyWhenMoved": false,
                     "m_syncronizePitchWithCameraForwardDir": true,
                     "m_syncronizeYawWithCameraForwardDir": true,
                     "m_turnAcceleration": 20.0
@@ -934,7 +934,7 @@
                     ],
                     "m_rotation": [
                         -0.0,
-                        -0.0019204028649255633,
+                        -0.0019204029813408852,
                         0.0
                     ],
                     "m_scaleFactor": [
@@ -3005,9 +3005,9 @@
                         5.0
                     ],
                     "m_position": [
-                        50.002071380615234,
-                        2.8743786811828613,
-                        -1.0404577255249023
+                        49.22563552856445,
+                        2.8743784427642822,
+                        -10.619660377502441
                     ],
                     "m_rotation": [
                         -0.0,
@@ -3429,6 +3429,75 @@
                     },
                     "m_cullMode": "CULL_BACK"
                 },
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 40.0,
+                        "Emitter": {
+                            "alphaEnd": 0.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "emitterSize": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "latitudeMax": 1.5707963705062866,
+                            "latitudeMin": -1.5707963705062866,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 100,
+                            "particleSizeEnd": 0.5,
+                            "particleSizeStart": 0.20000000298023224,
+                            "particlesBaseSpeed": 8.0,
+                            "particlesLifeSpan": 1.0,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 1,
+                            "relativePath": "Textures/primogem.dds"
+                        }
+                    }
+                },
                 "Render": {
                     "m_isTransparent": false,
                     "m_isVisible": true
@@ -3531,7 +3600,7 @@
                 },
                 "ParticleEmitter": {
                     "emitterData": {
-                        "EmissionRate": 20.0,
+                        "EmissionRate": 40.0,
                         "Emitter": {
                             "alphaEnd": 1.0,
                             "alphaStart": 1.0,
@@ -3588,13 +3657,13 @@
                         "Simulate": {
                             "force": [
                                 0.0,
-                                -20.0,
+                                -40.0,
                                 0.0
                             ]
                         },
                         "Texture": {
-                            "assetSource": 0,
-                            "relativePath": "Textures/DefaultTexture.dds"
+                            "assetSource": 1,
+                            "relativePath": "Textures/dust.dds"
                         }
                     }
                 },
@@ -3711,6 +3780,379 @@
                 "UvCubeMapMode": true
             },
             "m_type": "Box"
+        },
+        {
+            "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/Box.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/box.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 40.0,
+                        "Emitter": {
+                            "alphaEnd": 1.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "emitterSize": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "latitudeMax": 1.5533430576324463,
+                            "latitudeMin": -0.3490658402442932,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 0,
+                            "particleSizeEnd": 0.30000001192092896,
+                            "particleSizeStart": 0.30000001192092896,
+                            "particlesBaseSpeed": 12.0,
+                            "particlesLifeSpan": 0.5,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                -40.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 1,
+                            "relativePath": "Textures/dust.dds"
+                        }
+                    }
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    2.0,
+                                    2.0,
+                                    2.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "NON_MOVING",
+                    "m_density": 1000.0,
+                    "m_friction": 0.0,
+                    "m_isGrabbable": false,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Static",
+                    "m_restitution": 0.0
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        2.0,
+                        2.0,
+                        2.0
+                    ],
+                    "m_position": [
+                        68.10104370117188,
+                        1.8133524656295776,
+                        -9.148858070373535
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        -0.8409073352813721,
+                        0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    4.0,
+                                    2.0,
+                                    4.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_motion": "Static"
+                }
+            },
+            "m_UUID": 7801057915797748193,
+            "m_UUID_hi": 1816325335,
+            "m_UUID_lo": 3076504033,
+            "m_group": "Shapes",
+            "m_name": "Box",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": true
+            },
+            "m_type": "Box"
+        },
+        {
+            "components": {
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/Coin.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Cylinder"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 1,
+                        "relativePath": "Textures/coin.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "ParticleEmitter": {
+                    "emitterData": {
+                        "EmissionRate": 40.0,
+                        "Emitter": {
+                            "alphaEnd": 0.0,
+                            "alphaStart": 1.0,
+                            "colorEnd": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "colorStart": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "emitterSize": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "latitudeMax": 1.5707963705062866,
+                            "latitudeMin": -1.5707963705062866,
+                            "longitudeMax": 6.2831854820251465,
+                            "longitudeMin": 0.0,
+                            "maxSpawn": 100,
+                            "particleSizeEnd": 0.5,
+                            "particleSizeStart": 0.20000000298023224,
+                            "particlesBaseSpeed": 8.0,
+                            "particlesLifeSpan": 1.0,
+                            "particlesMass": 1.0,
+                            "position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotMatrix": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ]
+                        },
+                        "MaxParticles": 256,
+                        "Simulate": {
+                            "force": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        },
+                        "Texture": {
+                            "assetSource": 1,
+                            "relativePath": "Textures/primogem.dds"
+                        }
+                    }
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        -1.5707963705062866,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        1.0,
+                        0.30000001192092896,
+                        1.0
+                    ],
+                    "m_position": [
+                        63.4741325378418,
+                        2.0039331912994385,
+                        10.887612342834473
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        0.9999998211860657,
+                        1.000000238418579,
+                        1.0000003576278687
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    2.0,
+                                    2.0,
+                                    0.30000001192092896
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_motion": "Static"
+                }
+            },
+            "m_UUID": 8399965063035255040,
+            "m_UUID_hi": 1955769272,
+            "m_UUID_lo": 1273526528,
+            "m_group": "Shapes",
+            "m_name": "Cylinder",
+            "m_parent": null,
+            "m_shapeData": {
+                "SliceCount": 12
+            },
+            "m_type": "Cylinder"
         }
     ],
     "inputMapping": "Default",
