@@ -23,6 +23,8 @@ class LuaComponent;
 class WorldEditor;
 class AudioEditor;
 
+class MemoryBoard;
+
 namespace SE {
     class ColliderData;
 }
@@ -122,6 +124,7 @@ private:
 
     void DrawPerceptionComponent(GameObject_Info* obj);
     void DrawBehaviorController(GameObject_Info* obj);
+    void DrawMemoryBoard(MemoryBoard* MBoard);
 
     void DrawLuaComponent(GameObject_Info* obj);
     

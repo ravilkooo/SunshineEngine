@@ -610,7 +610,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -721,7 +722,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -962,7 +964,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -2373,7 +2376,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -2484,7 +2488,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -2595,7 +2600,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -2706,7 +2712,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -2817,7 +2824,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -2928,7 +2936,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -3005,9 +3014,9 @@
                         5.0
                     ],
                     "m_position": [
-                        49.22563552856445,
-                        2.8743784427642822,
-                        -10.619660377502441
+                        44.66952896118164,
+                        2.8743791580200195,
+                        -1.4031050205230713
                     ],
                     "m_rotation": [
                         -0.0,
@@ -3039,7 +3048,8 @@
         {
             "components": {
                 "Behavior": {
-                    "IsEnabled": true
+                    "IsEnabled": true,
+                    "MemoryBoard": {}
                 },
                 "Lua": {
                     "scriptLoaded": true,
@@ -3281,8 +3291,8 @@
                         1.0
                     ],
                     "m_position": [
-                        49.0,
-                        9.297298431396484,
+                        49.79952621459961,
+                        10.088592529296875,
                         -10.336692810058594
                     ],
                     "m_rotation": [
@@ -3783,6 +3793,47 @@
         },
         {
             "components": {
+                "Behavior": {
+                    "IsEnabled": false,
+                    "MemoryBoard": {
+                        "change": {
+                            "type": "Int",
+                            "value": 0
+                        },
+                        "fl": {
+                            "type": "Float",
+                            "value": 1.0199999809265137
+                        },
+                        "fls": {
+                            "type": "Bool",
+                            "value": false
+                        },
+                        "int": {
+                            "type": "Int",
+                            "value": 12
+                        },
+                        "str": {
+                            "type": "String",
+                            "value": "somestr"
+                        },
+                        "true": {
+                            "type": "Bool",
+                            "value": true
+                        },
+                        "uuid": {
+                            "type": "UUID",
+                            "value": 14541272477798150626
+                        },
+                        "vec": {
+                            "type": "Vector3",
+                            "value": [
+                                10.300000190734863,
+                                45.540000915527344,
+                                0.9800000190734863
+                            ]
+                        }
+                    }
+                },
                 "Lua": {
                     "scriptLoaded": true,
                     "scriptPath": {
@@ -3927,9 +3978,9 @@
                         2.0
                     ],
                     "m_position": [
-                        68.10104370117188,
+                        44.89480972290039,
                         1.8133524656295776,
-                        -9.148858070373535
+                        -10.675639152526855
                     ],
                     "m_rotation": [
                         -0.0,

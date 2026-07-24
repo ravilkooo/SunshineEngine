@@ -20,7 +20,6 @@ function behavior:start()
 
     local trigger = self.owner:getTrigger()
 
-
     if (trigger) then
         trigger:setLuaCallback(function(event, otherUUID)
             if not destroyed then
@@ -40,6 +39,31 @@ function behavior:start()
     end
 
     print(PlayerVar)
+
+    local beh = self.owner:getBehavior()
+    if (beh) then
+        print("Behavior found")
+        print("int = " .. beh:MB_getInt("int"))
+        print("change = " .. beh:MB_getInt("change"))
+        print("fl = " .. beh:MB_getFloat("fl"))
+        if (beh:MB_getBool("fls")) then
+            print("fls = 1")
+        else
+            print("fls = 0")
+        end
+        if (beh:MB_getBool("true")) then
+            print("true = 1")
+        else
+            print("true = 0")
+        end
+        print("str = " .. beh:MB_getString("str"))
+        local vec = beh:MB_getVector3("vec")
+        print("vec = " .. vec.x .. ", " .. vec.y .. ", " .. vec.z)
+        print("uuid = " .. beh:MB_getUUID("uuid").hi .. ", " .. beh:MB_getUUID("uuid").lo)
+
+    else
+        print("No behavior found")
+    end
 end
 
 local function startDestroyTimer(self)

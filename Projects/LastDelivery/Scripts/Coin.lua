@@ -3,7 +3,6 @@ local behavior = {}
 local playerUUID
 local playerObj
 local collected = false
-local rotSpeed = 10
 local destroyed = false
 local destroyMoment
 local emissionDuration = 0.2
@@ -32,6 +31,8 @@ function behavior:start()
     playerUUID.lo = 3110370002
     playerObj = getGameObjectByUUID(playerUUID)
 
+    self.rotSpeed = 10
+
     local emitter = self.owner:getParticleEmitter()
     emitter:disableEmission()
 
@@ -56,7 +57,7 @@ function behavior:update(dt)
     if not collected then
 
         local currentTime = os.clock()
-        self.owner:getTransform().rotation = Vector3.new(0, rotSpeed * currentTime, 0)
+        self.owner:getTransform().rotation = Vector3.new(0, self.rotSpeed * currentTime, 0)
         
     elseif (destroyed) and (os.clock() - destroyMoment >= emissionDuration) then
         local emitter = self.owner:getParticleEmitter()

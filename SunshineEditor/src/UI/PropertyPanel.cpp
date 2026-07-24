@@ -36,6 +36,8 @@
 #include <Component/MovingPlatformComponent.h>
 #include <Component/GrabComponent.h>
 
+#include <AI/Behavior/MemoryBoard.h>
+
 #include "AI/Perception/PerceptionComponent.h"
 #include "AI/Behavior/BehaviorController.h"
 
@@ -2250,9 +2252,273 @@ void PropertyPanel::DrawBehaviorController(GameObject_Info* obj)
 
         ImGui::Checkbox("Is Enabled", &behaviorInfo->IsEnabled);
 
+        EditorUI::FontStyles::Push(EditorUI::FontStyles::Style::Header3);
+        if (ImGui::TreeNodeEx("Memory board settings", flags))
+        {
+            EditorUI::FontStyles::Pop();
+            DrawMemoryBoard(behaviorInfo->m_MBoard.get());
+            ImGui::TreePop();
+        }
+        else EditorUI::FontStyles::Pop();
+
         ImGui::TreePop();
     }
     else EditorUI::FontStyles::Pop();
+}
+
+void PropertyPanel::DrawMemoryBoard(MemoryBoard* MBoard)
+{
+    if (!MBoard)
+    {
+        ImGui::TextDisabled("MemoryBoard not available");
+        return;
+    }
+
+    bool hasEntries = false;
+    std::string keyToRemove;
+    std::string pendingTypeChangeKey;
+    MemoryBoard::ValueType pendingTypeChange = MemoryBoard::ValueType::Unknown;
+
+    static const char* TypeNames[] = { "Unknown", "Int", "Float", "Bool", "String", "Vector3", "UUID" };
+    static constexpr int TypeCount = sizeof(TypeNames) / sizeof(TypeNames[0]);
+
+    if (!ImGui::BeginTable("MemoryBoardTable", 4,
+        ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
+    {
+        return;
+    }
+
+    ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+    ImGui::TableHeadersRow();
+
+    MBoard->ForEachEntry([&](const std::string& key, const std::shared_ptr<MemoryBoard::HolderStructInterface>& holder)
+    {
+        hasEntries = true;
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::PushID(key.c_str());
+        ImGui::TextUnformatted(key.c_str());
+
+        ImGui::TableSetColumnIndex(1);
+        int typeIndex = static_cast<int>(holder->GetValueType());
+        if (typeIndex < 0 || typeIndex >= TypeCount)
+            typeIndex = 0;
+
+        ImGui::PushID("type");
+        if (ImGui::Combo("##type", &typeIndex, TypeNames, TypeCount))
+        {
+            pendingTypeChangeKey = key;
+            pendingTypeChange = static_cast<MemoryBoard::ValueType>(typeIndex);
+        }
+        ImGui::PopID();
+
+        ImGui::TableSetColumnIndex(2);
+        bool changed = false;
+
+        switch (static_cast<MemoryBoard::ValueType>(typeIndex))
+        {
+        case MemoryBoard::ValueType::Int:
+        {
+            auto intHolder = std::static_pointer_cast<MemoryBoard::HolderStruct<int>>(holder);
+            int current = intHolder->Value;
+            changed = ImGui::InputInt("##value", &current);
+            if (changed)
+            {
+                MBoard->SetInt(key, current);
+            }
+            break;
+        }
+        case MemoryBoard::ValueType::Float:
+        {
+            auto floatHolder = std::static_pointer_cast<MemoryBoard::HolderStruct<float>>(holder);
+            float current = floatHolder->Value;
+            changed = ImGui::InputFloat("##value", &current, 0.1f, 1.0f, "%.3f");
+            if (changed)
+            {
+                MBoard->SetFloat(key, current);
+            }
+            break;
+        }
+        case MemoryBoard::ValueType::Bool:
+        {
+            auto boolHolder = std::static_pointer_cast<MemoryBoard::HolderStruct<bool>>(holder);
+            bool current = boolHolder->Value;
+            changed = ImGui::Checkbox("##value", &current);
+            if (changed)
+            {
+                MBoard->SetBool(key, current);
+            }
+            break;
+        }
+        case MemoryBoard::ValueType::String:
+        {
+            auto stringHolder = std::static_pointer_cast<MemoryBoard::HolderStruct<std::string>>(holder);
+            char buffer[512] = {0};
+            strncpy(buffer, stringHolder->Value.c_str(), sizeof(buffer) - 1);
+            changed = ImGui::InputText("##value", buffer, sizeof(buffer));
+            if (changed)
+            {
+                MBoard->SetString(key, std::string(buffer));
+            }
+            break;
+        }
+        case MemoryBoard::ValueType::Vector3:
+        {
+            auto vectorHolder = std::static_pointer_cast<MemoryBoard::HolderStruct<DXSM::Vector3>>(holder);
+            DXSM::Vector3 current = vectorHolder->Value;
+            changed = ImGui::InputFloat3("##value", &current.x);
+            if (changed)
+            {
+                MBoard->SetVector3(key, current);
+            }
+            break;
+        }
+        case MemoryBoard::ValueType::UUID:
+        {
+            auto uuidHolder = std::static_pointer_cast<MemoryBoard::HolderStruct<SE::UUID>>(holder);
+            uint64_t current = (uint64_t)uuidHolder->Value;
+            changed = ImGui::InputScalar("##value", ImGuiDataType_U64, &current, nullptr, nullptr, "%llu");
+            if (changed)
+            {
+                MBoard->SetUUID(key, SE::UUID(current));
+            }
+            break;
+        }
+        default:
+            ImGui::TextDisabled("Unsupported type");
+            break;
+        }
+
+        ImGui::TableSetColumnIndex(3);
+        if (ImGui::SmallButton("Delete"))
+        {
+            keyToRemove = key;
+        }
+
+        ImGui::PopID();
+    });
+
+    ImGui::EndTable();
+
+    if (!pendingTypeChangeKey.empty())
+    {
+        MBoard->RemoveKey(pendingTypeChangeKey);
+        switch (pendingTypeChange)
+        {
+        case MemoryBoard::ValueType::Int:
+            MBoard->SetInt(pendingTypeChangeKey, 0);
+            break;
+        case MemoryBoard::ValueType::Float:
+            MBoard->SetFloat(pendingTypeChangeKey, 0.0f);
+            break;
+        case MemoryBoard::ValueType::Bool:
+            MBoard->SetBool(pendingTypeChangeKey, false);
+            break;
+        case MemoryBoard::ValueType::String:
+            MBoard->SetString(pendingTypeChangeKey, "");
+            break;
+        case MemoryBoard::ValueType::Vector3:
+            MBoard->SetVector3(pendingTypeChangeKey, DXSM::Vector3(0.0f, 0.0f, 0.0f));
+            break;
+        case MemoryBoard::ValueType::UUID:
+            MBoard->SetUUID(pendingTypeChangeKey, SE::UUID(0ull));
+            break;
+        default:
+            break;
+        }
+    }
+
+    static char newKeyBuffer[64] = "";
+    static int newTypeIndex = static_cast<int>(MemoryBoard::ValueType::Int);
+    static int newIntValue = 0;
+    static float newFloatValue = 0.0f;
+    static bool newBoolValue = false;
+    static char newStringValue[256] = "";
+    static DXSM::Vector3 newVectorValue = DXSM::Vector3(0.0f, 0.0f, 0.0f);
+    static uint64_t newUUIDValue = 0;
+
+    ImGui::Separator();
+    ImGui::Text("Add new MemoryBoard entry");
+    ImGui::InputText("Key", newKeyBuffer, sizeof(newKeyBuffer));
+    // ImGui::SameLine();
+    ImGui::SetNextItemWidth(80.0f);
+    ImGui::Combo("Type", &newTypeIndex, TypeNames, TypeCount);
+
+    switch (static_cast<MemoryBoard::ValueType>(newTypeIndex))
+    {
+    case MemoryBoard::ValueType::Int:
+        ImGui::InputInt("Value", &newIntValue);
+        break;
+    case MemoryBoard::ValueType::Float:
+        ImGui::InputFloat("Value", &newFloatValue, 0.1f, 1.0f, "%.3f");
+        break;
+    case MemoryBoard::ValueType::Bool:
+        ImGui::Checkbox("Value", &newBoolValue);
+        break;
+    case MemoryBoard::ValueType::String:
+        ImGui::InputText("Value", newStringValue, sizeof(newStringValue));
+        break;
+    case MemoryBoard::ValueType::Vector3:
+        ImGui::InputFloat3("Value", &newVectorValue.x);
+        break;
+    case MemoryBoard::ValueType::UUID:
+        ImGui::InputScalar("Value", ImGuiDataType_U64, &newUUIDValue, nullptr, nullptr, "%llu");
+        break;
+    default:
+        break;
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Add entry"))
+    {
+        std::string newKey(newKeyBuffer);
+        if (newKey.empty())
+        {
+            newKey = "NewValue" + std::to_string(rand());
+        }
+
+        if (!MBoard->HasKey(newKey))
+        {
+            switch (static_cast<MemoryBoard::ValueType>(newTypeIndex))
+            {
+            case MemoryBoard::ValueType::Int:
+                MBoard->SetInt(newKey, newIntValue);
+                break;
+            case MemoryBoard::ValueType::Float:
+                MBoard->SetFloat(newKey, newFloatValue);
+                break;
+            case MemoryBoard::ValueType::Bool:
+                MBoard->SetBool(newKey, newBoolValue);
+                break;
+            case MemoryBoard::ValueType::String:
+                MBoard->SetString(newKey, std::string(newStringValue));
+                break;
+            case MemoryBoard::ValueType::Vector3:
+                MBoard->SetVector3(newKey, newVectorValue);
+                break;
+            case MemoryBoard::ValueType::UUID:
+                MBoard->SetUUID(newKey, SE::UUID(newUUIDValue));
+                break;
+            default:
+                break;
+            }
+
+            newKeyBuffer[0] = '\0';
+        }
+    }
+
+    if (!hasEntries)
+    {
+        ImGui::TextDisabled("MemoryBoard is empty");
+    }
+
+    if (!keyToRemove.empty())
+    {
+        MBoard->RemoveKey(keyToRemove);
+    }
 }
 
 void PropertyPanel::DrawEmitterDetails(

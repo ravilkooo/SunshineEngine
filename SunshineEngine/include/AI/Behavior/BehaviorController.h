@@ -302,7 +302,12 @@ private:
 class BehaviorController_Info : public Component_Info
 {
 public:
-    explicit BehaviorController_Info() { }
+    explicit BehaviorController_Info() {
+        m_MBoard = std::make_shared<MemoryBoard>();
+    }
+    ~BehaviorController_Info() {
+        m_MBoard->Clear();
+    }
 
     static const SE::ComponentType s_componentType = SE::ComponentType::BEHAVIOR;
 
@@ -314,6 +319,26 @@ public:
     void FromJson(const json& j) override;
 
     bool IsEnabled = false;
+
+    std::shared_ptr<MemoryBoard> m_MBoard;
+
+    bool MemoryBoard_SetInt(const std::string& Key, int Value) { return m_MBoard->SetTypedValue<int>(Key, Value); }
+    bool MemoryBoard_SetFloat(const std::string& Key, float Value) { return m_MBoard->SetTypedValue<float>(Key, Value); }
+    bool MemoryBoard_SetBool(const std::string& Key, bool Value) { return m_MBoard->SetTypedValue<bool>(Key, Value); }
+    bool MemoryBoard_SetString(const std::string& Key, const std::string& Value) { return m_MBoard->SetTypedValue<std::string>(Key, Value); }
+    bool MemoryBoard_SetVector3(const std::string& Key, const DXSM::Vector3& Value) { return m_MBoard->SetTypedValue<DXSM::Vector3>(Key, Value); }
+    bool MemoryBoard_SetUUID(const std::string& Key, const SE::UUIDhilo Value) { return m_MBoard->SetTypedValue<SE::UUID>(Key, SE::UUID::FromHilo(Value)); }
+
+    bool MemoryBoard_GetInt(const std::string& Key, int& OutValue) const { return m_MBoard->GetTypedValue<int>(Key, OutValue); }
+    bool MemoryBoard_GetFloat(const std::string& Key, float& OutValue) const { return m_MBoard->GetTypedValue<float>(Key, OutValue); }
+    bool MemoryBoard_GetBool(const std::string& Key, bool& OutValue) const { return m_MBoard->GetTypedValue<bool>(Key, OutValue); }
+    bool MemoryBoard_GetString(const std::string& Key, std::string& OutValue) const { return m_MBoard->GetTypedValue<std::string>(Key, OutValue); }
+    bool MemoryBoard_GetVector3(const std::string& Key, DXSM::Vector3& OutValue) const { return m_MBoard->GetTypedValue<DXSM::Vector3>(Key, OutValue); }
+    bool MemoryBoard_GetUUID(const std::string& Key, SE::UUID& OutValue) const { return m_MBoard->GetTypedValue<SE::UUID>(Key, OutValue); }
+
+    bool MemoryBoard_HasKey(const std::string& Key) const { return m_MBoard->HasKey(Key); }
+    void MemoryBoard_RemoveKey(const std::string& Key) { m_MBoard->RemoveKey(Key); }
+    void MemoryBoard_Clear() { m_MBoard->Clear(); }
 };
 
 

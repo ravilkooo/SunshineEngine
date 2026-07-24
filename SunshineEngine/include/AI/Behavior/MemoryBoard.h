@@ -13,6 +13,11 @@
 // Lua
 #include <sol/sol.hpp>
 
+// Json
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 
 namespace DXSM = DirectX::SimpleMath;
 
@@ -23,9 +28,33 @@ namespace DXSM = DirectX::SimpleMath;
 class MemoryBoard
 {
     friend class BehaviorController;
+    friend class BehaviorController_Info;
 
 public:
+    enum class ValueType
+    {
+        Unknown,
+        Int,
+        Float,
+        Bool,
+        String,
+        Vector3,
+        UUID
+    };
+
     MemoryBoard() {}
+
+    json ToJson() const;
+    void FromJson(const json& j);
+
+    template<typename F>
+    void ForEachEntry(F&& Callback) const
+    {
+        for (const auto& Pair : Data)
+        {
+            Callback(Pair.first, Pair.second);
+        }
+    }
 
     // Base interface for type erasure.
     struct HolderStructInterface 
@@ -33,6 +62,7 @@ public:
         virtual ~HolderStructInterface() = default; 
 
         virtual const std::type_info& GetType() const = 0;
+        virtual ValueType GetValueType() const = 0;
     };
 
     // Base interface for type erasure.
@@ -42,6 +72,24 @@ public:
         HolderStruct(const T& InValue) : Value(InValue) {}
 
         const std::type_info& GetType() const override { return typeid(T); }
+        ValueType GetValueType() const override { return GetStaticValueType(); }
+
+        static ValueType GetStaticValueType()
+        {
+            if constexpr (std::is_same_v<T, int>)
+                return ValueType::Int;
+            if constexpr (std::is_same_v<T, float>)
+                return ValueType::Float;
+            if constexpr (std::is_same_v<T, bool>)
+                return ValueType::Bool;
+            if constexpr (std::is_same_v<T, std::string>)
+                return ValueType::String;
+            if constexpr (std::is_same_v<T, DXSM::Vector3>)
+                return ValueType::Vector3;
+            if constexpr (std::is_same_v<T, SE::UUID>)
+                return ValueType::UUID;
+            return ValueType::Unknown;
+        }
 
         T Value;
     };

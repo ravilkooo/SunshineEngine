@@ -558,6 +558,10 @@ void BehaviorController::FromJson(const json& j)
 	{
 		IsEnabled = j.at("IsEnabled").get<bool>();
 	}
+	if (j.contains("MemoryBoard") && j["MemoryBoard"].is_object())
+	{
+		MBoard->FromJson(j["MemoryBoard"]);
+	}
 }
 //
 
@@ -1282,6 +1286,7 @@ json BehaviorController_Info::ToJson() const
 	j = nlohmann::json
 	{
 		{"IsEnabled",           IsEnabled},
+		{"MemoryBoard", m_MBoard->ToJson()}
 	};
 
 	return j;
@@ -1292,6 +1297,10 @@ void BehaviorController_Info::FromJson(const json& j)
 	if (j.contains("IsEnabled") && j["IsEnabled"].is_boolean())
 	{
 		IsEnabled = j.at("IsEnabled").get<bool>();
+	}
+	if (j.contains("MemoryBoard") && j["MemoryBoard"].is_object())
+	{
+		m_MBoard->FromJson(j["MemoryBoard"]);
 	}
 }
 
