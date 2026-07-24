@@ -4204,6 +4204,142 @@
                 "SliceCount": 12
             },
             "m_type": "Cylinder"
+        },
+        {
+            "components": {
+                "Behavior": {
+                    "IsEnabled": true,
+                    "MemoryBoard": {
+                        "Position1": {
+                            "type": "Vector3",
+                            "value": [
+                                53.0,
+                                0.0,
+                                28.0
+                            ]
+                        },
+                        "Position2": {
+                            "type": "Vector3",
+                            "value": [
+                                53.0,
+                                0.0,
+                                46.0
+                            ]
+                        },
+                        "speed": {
+                            "type": "Float",
+                            "value": 0.09999968856573105
+                        }
+                    }
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/RoutePlatform.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Box_repeat"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Textures/DefaultTexture.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "MovingPlatform": {
+                    "m_affectCharacters": true
+                },
+                "Physics": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    5.0,
+                                    0.5,
+                                    5.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_activation": "Activate",
+                    "m_angularDamping": 0.05000000074505806,
+                    "m_collisionLayer": "MOVING",
+                    "m_density": 1.0,
+                    "m_friction": 2.0,
+                    "m_isGrabbable": false,
+                    "m_linearDamping": 0.05000000074505806,
+                    "m_motion": "Kinematic",
+                    "m_restitution": 0.0
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        5.0,
+                        0.5,
+                        5.0
+                    ],
+                    "m_position": [
+                        53.0,
+                        0.0,
+                        46.706844329833984
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                }
+            },
+            "m_UUID": 9401375145137302396,
+            "m_UUID_hi": 2188928226,
+            "m_UUID_lo": 1176005500,
+            "m_group": "Shapes",
+            "m_name": "RoutePlatform",
+            "m_parent": null,
+            "m_shapeData": {
+                "UvCubeMapMode": false
+            },
+            "m_type": "Box"
         }
     ],
     "inputMapping": "Default",
