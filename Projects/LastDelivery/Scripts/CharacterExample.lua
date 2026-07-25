@@ -6,6 +6,8 @@ local floatingSpeed = 4
 local floatingAmp = 0.1
 local yMidLevel
 
+local particlesUUID
+
 controlPlayerMove = true
 
 local function TestPerceptionSystem(self)
@@ -121,15 +123,21 @@ function behavior:update(dt)
             if (grab:isGrabbing()) then
                 print("== RELEASE! ==")
                 char.releaseRequested = true
+                disableCharacterParticles()
             else
                 print("== GRAB! ==")
                 char.grabRequested = true
+                enableCharacterParticles()
             end
+        end
+        if (InputSystem:isReleased("Grab") and not grab:isGrabbing()) then
+            disableCharacterParticles()
         end
         if (InputSystem:isPressed("Throw")) then
             if (grab:isGrabbing()) then
                 print("== THROW! ==")
                 char.throwRequested = true
+                disableCharacterParticles()
             end
         end
     end
