@@ -6,6 +6,8 @@ local floatingSpeed = 4
 local floatingAmp = 0.1
 local yMidLevel
 
+controlPlayerMove = true
+
 local function TestPerceptionSystem(self)
     local ps = getPerceptionSystem()
 

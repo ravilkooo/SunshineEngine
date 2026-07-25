@@ -1,5 +1,10 @@
-behavior = {}
-magnetSpeed = 10
+local behavior = {}
+local magnetSpeed = 10
+local enableMagnet = false
+
+function enableMagnetControl()
+    enableMagnet = true
+end
 
 function behavior:start()
 
@@ -7,15 +12,18 @@ end
 
 function behavior:update(dt)
 
-    local inputValue = InputSystem:getAxis2D("ForwardMagnet", "RightMagnet")
-    local upMagnet = InputSystem:getAxis("UpMagnet")
-    local deltaPos = Vector3.new(inputValue.x, upMagnet, inputValue.y) * magnetSpeed * dt
-    -- print(deltaPos.x .. " " .. deltaPos.y .. " " .. deltaPos.z)
+    if (enableMagnet) then
+        
+        local inputValue = InputSystem:getAxis2D("Forward", "Right")
+        local upMagnet = InputSystem:getAxis("UpMagnet")
+        local deltaPos = Vector3.new(-inputValue.x, upMagnet, inputValue.y) * magnetSpeed * dt
+        -- print(deltaPos.x .. " " .. deltaPos.y .. " " .. deltaPos.z)
 
-    local ph = self.owner:getPhysics()
-    local pos = ph:getPosition()
+        local ph = self.owner:getPhysics()
+        local pos = ph:getPosition()
 
-    ph:moveKinematicPosition(pos + deltaPos, dt)
+        ph:moveKinematicPosition(pos + deltaPos, dt)
+    end
 
     return "success"
 end
