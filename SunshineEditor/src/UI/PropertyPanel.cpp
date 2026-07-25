@@ -111,8 +111,22 @@ bool PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
     {
         obj->m_name = nameBuffer;
     }
-    
-    ImGui::TextDisabled("UUID: %llu", obj->m_UUID.m_UUID);
+
+    ImGui::TextUnformatted("UUID:");
+    ImGui::SameLine();
+
+    static char uuid_buf[32];
+    snprintf(uuid_buf, sizeof(uuid_buf), "%llu",
+        static_cast<unsigned long long>(obj->m_UUID.m_UUID));
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0));
+    ImGui::PushItemWidth(-FLT_MIN);
+    ImGui::InputText("##uuid", uuid_buf, IM_ARRAYSIZE(uuid_buf),
+        ImGuiInputTextFlags_ReadOnly);
+    ImGui::PopItemWidth();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
     
     // Remove GameObject button
     ImGui::SameLine();
@@ -168,7 +182,21 @@ bool PropertyPanel::DrawGameObjectHeader(GameObject_Info* obj)
     }
 
     auto uuidhilo = obj->m_UUID.GetHilo();
-    ImGui::TextDisabled("UUID (hi,lo): (%lu, %lu)", uuidhilo.hi, uuidhilo.lo);
+
+    ImGui::TextUnformatted("UUID (hi, lo):");
+    ImGui::SameLine();
+
+    snprintf(uuid_buf, sizeof(uuid_buf), "(%lu, %lu)", uuidhilo.hi, uuidhilo.lo);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0));
+    ImGui::PushItemWidth(-FLT_MIN);
+    ImGui::InputText("##uuid_hilo", uuid_buf, IM_ARRAYSIZE(uuid_buf),
+        ImGuiInputTextFlags_ReadOnly);
+    ImGui::PopItemWidth();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+
 	// ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "UUID (hi,lo): (%lu, %lu)", uuidhilo.hi, uuidhilo.lo);
 
     return true;
