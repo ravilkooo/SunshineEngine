@@ -288,7 +288,7 @@ void PhysicsComponent::SetObjecUUID(SE::UUID objectUUID) {
 void PhysicsComponent::SetObjectLayer(JPH::ObjectLayer layer) { m_objectLayer = layer; }
 
 // Initial pos
-void PhysicsComponent::SetPosition(const JPH::RVec3& pos) { m_position = pos; }
+void PhysicsComponent::SetInitialPosition(const JPH::RVec3& pos) { m_position = pos; }
 
 // Initial orientation
 void PhysicsComponent::SetOrientation(const JPH::Quat& rot) { m_orientation = rot; }
@@ -315,6 +315,22 @@ void PhysicsComponent::SetFriction(float inFriction)
         {
             JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
             return bodyInterface.SetFriction(m_joltBodyId, inFriction);
+        });
+}
+
+void PhysicsComponent::SetPosition(const DXSM::Vector3& inPosition)
+{
+    if (!m_physicsSystem)
+        return;
+
+    m_physicsSystem->EnqueueCommand([this, inPosition]()
+        {
+            JPH::BodyInterface& bodyInterface = m_physicsSystem->Bodies();
+            JPH::Vec3 pos = JPH::Vec3(inPosition.x, inPosition.y, inPosition.z);
+
+            return bodyInterface.SetPosition(m_joltBodyId,
+                pos,
+                JPH::EActivation::Activate);
         });
 }
 

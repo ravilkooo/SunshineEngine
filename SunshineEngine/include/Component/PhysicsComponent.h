@@ -83,12 +83,14 @@ public:
     // Setters for configuration before adding body
     void SetObjecUUID(SE::UUID objectUUID);
     void SetObjectLayer(JPH::ObjectLayer layer);
-    void SetPosition(const JPH::RVec3& pos);
+    void SetInitialPosition(const JPH::RVec3& pos);
     void SetOrientation(const JPH::Quat& rot);
     void SetMotionType(JPH::EMotionType type);
     JPH::EMotionType GetMotionType();
     void SetActivation(JPH::EActivation activation);
     void SetShape(JPH::ShapeRefC shapePtr);
+
+    void SetPosition(const DXSM::Vector3& pos);
 
     // Friction
     void SetFriction(float inFriction);
@@ -258,6 +260,7 @@ public:
     FM("setAngularVelocity", &PhysicsComponent::SetAngularVelocity) \
     FM("getPointVelocity", &PhysicsComponent::GetPointVelocity) \
     FM("getPosition", &PhysicsComponent::GetPosition) \
+    FM("setPosition", &PhysicsComponent::SetPosition) \
     FM("getRotation", &PhysicsComponent::GetRotation) \
     FM("moveKinematic", &PhysicsComponent::MoveKinematic) \
     FM("moveKinematicPosition", &PhysicsComponent::MoveKinematicPosition) \
@@ -275,6 +278,7 @@ public:
 
 #ifndef PHYSICSCOMPONENT_LUA_PROPERTIES_APPLY
 #define PHYSICSCOMPONENT_LUA_PROPERTIES_APPLY(FP) \
+    FP(position, &PhysicsComponent::GetPosition, &PhysicsComponent::SetPosition), \
     FP(isGrabbable, &PhysicsComponent::IsGrabbable, &PhysicsComponent::SetGrabbable), \
     FP(gravityFactor, &PhysicsComponent::GetGravityFactor, &PhysicsComponent::SetGravityFactor), \
     FP(linearVelocity, &PhysicsComponent::GetLinearVelocity, &PhysicsComponent::SetLinearVelocity), \
