@@ -90,20 +90,20 @@ void main(uint3 id : SV_DispatchThreadID)
         
         Particle p = (Particle) 0;
         
-        float4 emitterPos = float4(0.0, 0.0, 0.0, 1.0);
-        emitterPos = mul(emitterPos, wMat);
-        emitterPos = emitterPos / emitterPos.w;
-        
-        p.position = emitterPos + float4(emitterPositionOffset, 0.0f);
-        
         uint3 rng_state_pos = uint3(
             wang_hash(id.x + asuint(rngSeed2)),
             wang_hash(id.x + 3 * asuint(rngSeed2)),
             wang_hash(id.x + asuint(rngSeed3)));
         
-        p.position.x = p.position.x + emitterSize.x * (-0.5 + rand_xorshift_normalized(rng_state_pos.x));
-        p.position.y = p.position.y + emitterSize.y * (-0.5 + rand_xorshift_normalized(rng_state_pos.y));
-        p.position.z = p.position.z + emitterSize.z * (-0.5 + rand_xorshift_normalized(rng_state_pos.z));
+        float4 emitterPos = float4(0.0, 0.0, 0.0, 1.0);
+        emitterPos.x = emitterSize.x * (-0.5 + rand_xorshift_normalized(rng_state_pos.x));
+        emitterPos.y = emitterSize.y * (-0.5 + rand_xorshift_normalized(rng_state_pos.y));
+        emitterPos.z = emitterSize.z * (-0.5 + rand_xorshift_normalized(rng_state_pos.z));
+        
+        emitterPos = mul(emitterPos, wMat);
+        emitterPos = emitterPos / emitterPos.w;
+        
+        p.position = emitterPos + float4(emitterPositionOffset, 0.0f);
 
         float colatitude = latitudeMin
             + (latitudeMax - latitudeMin) * rand_xorshift_normalized(rng_state); // 3.1415
