@@ -1,7 +1,6 @@
 local behavior = {}
 local pressed = false
-local gate1
-local gate2
+local wall
 local firstPos
 local secondPos
 
@@ -30,14 +29,10 @@ local function startAnimation(self)
 end
 
 local function pushButton(self)
-    local gate1_obj = getGameObjectByUUID(gate1)
-    local gate2_obj = getGameObjectByUUID(gate2)
+    local wall_obj = getGameObjectByUUID(wall)
     
-    local beh1 = gate1_obj:getBehavior()
+    local beh1 = wall_obj:getBehavior()
     beh1:MB_setBool("startReq", true)
-    
-    local beh2 = gate2_obj:getBehavior()
-    beh2:MB_setBool("startReq", true)
     
     startAnimation(self)
 end
@@ -45,8 +40,7 @@ end
 function behavior:start()
 
     local beh = self.owner:getBehavior()
-    gate1 = beh:MB_getUUID("gate1")
-    gate2 = beh:MB_getUUID("gate2")
+    wall = beh:MB_getUUID("wallUUID")
 
     local trigger = self.owner:getTrigger()
 
