@@ -1,21 +1,43 @@
-behavior = {}
+local behavior = {}
 
-local playerObj
-local playerUUID
 
-local spawnUUID
+local sortZoneColorCount = { 0, 0, 0 }
+local reqSortZoneColorCount = { 2, 2, 1 }
+
+local finishedTask = false
+
+function incrementColorCount(color)
+    sortZoneColorCount[color] = sortZoneColorCount[color] + 1
+    print("colors: " .. sortZoneColorCount[1] .. ", " .. sortZoneColorCount[2] .. ", " .. sortZoneColorCount[3])
+end
+
+function decrementColorCount(color)
+    sortZoneColorCount[color] = sortZoneColorCount[color] - 1
+    print("colors: " .. sortZoneColorCount[1] .. ", " .. sortZoneColorCount[2] .. ", " .. sortZoneColorCount[3])
+end
+
+function checkZoneColorCount()
+    local res = true
+    for i = 1, 3 do
+        res = res and (sortZoneColorCount[i] == reqSortZoneColorCount[i])
+    end
+    if (res) then
+        finishedTask = true
+        disableMagnetControl()
+        setCameraByUUID(playerUUID)
+        local player = getGameObjectByUUID(playerUUID)
+        local char = player:getCharacterComponent()
+        char.isPlayerControlled = true
+    end
+    return res
+end
 
 function behavior:start()
-
-    playerUUID = UUID.new()
-    playerUUID.hi = 4011023819
-    playerUUID.lo = 3110370002
-
     local trigger = self.owner:getTrigger()
 
     if (trigger) then
         trigger:setLuaCallback(function(event, otherUUID)
-            if event == "enter" then
+            if not finishedTask and (event == "enter") then
                 if (otherUUID:isEqual(playerUUID)) then
                     
                     local player = getGameObjectByUUID(playerUUID)

@@ -901,11 +901,43 @@ void PropertyPanel::DrawTriggerComponent(GameObject_Info* obj)
             return;
         }
 
+        /*
+        
+        */
+
+        static SE::PhysicsMotionType selectedTriggerMotion = triggerInfo->GetMotion(); // SE::PhysicsMotionType::Static;
+        const char* items[] = { "Static", "Kinematic" };
+        const char* tooltips[] = {
+            "Only detect active bodies entering their area.\n\
+As soon as a body goes to sleep, the contact will be lost.",
+            "Detect all bodies. Keep entered bodies awake."
+        };
+        if (ImGui::BeginCombo("Motion Type", items[static_cast<int>(selectedTriggerMotion)]))
+        {
+            for (int i = 0; i < IM_ARRAYSIZE(items); ++i)
+            {
+                bool is_selected = (static_cast<int>(selectedTriggerMotion) == i);
+                if (ImGui::Selectable(items[i], is_selected))
+                {
+                    selectedTriggerMotion = static_cast<SE::PhysicsMotionType>(i);
+                    triggerInfo->SetMotion(selectedTriggerMotion);
+                }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("%s", tooltips[i]);
+
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+        /*
         auto currentMotion = triggerInfo->GetMotion();
         if (ImGui::Combo("Motion Type", (int*)&currentMotion, "Static\0Kinematic\0"))
         {
-            triggerInfo->SetMotion(currentMotion);
         }
+        */
 
         if (auto colliderData = triggerInfo->m_colliderData)
         {

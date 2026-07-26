@@ -537,7 +537,7 @@ void ImguiEditorPass::ShowSceneHierarchy()
 
 void ImguiEditorPass::ShowContentBrowser()
 {
-	m_ContentBrowserPanel.OnImGuiRender();
+	// m_ContentBrowserPanel.OnImGuiRender();
 }
 
 void ImguiEditorPass::ShowProperties()

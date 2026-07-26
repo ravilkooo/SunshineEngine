@@ -1,4 +1,4 @@
-behavior = {}
+local behavior = {}
 local magnetForce = 1000000
 local innerObjects = {}
 
@@ -15,10 +15,10 @@ function behavior:start()
                 if (phys) then
                     innerObjects[otherUUID.hi] = phys
                 end
-                print("Platform Trigger enter", otherUUID.hi, otherUUID.lo)
+                -- print("Platform Trigger enter", otherUUID.hi, otherUUID.lo)
             elseif event == "exit" then
                 innerObjects[otherUUID.hi] = nil
-                print("Platform Trigger exit", otherUUID.hi, otherUUID.lo)
+                -- print("Platform Trigger exit", otherUUID.hi, otherUUID.lo)
             end
         end)
     end

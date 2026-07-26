@@ -1400,7 +1400,7 @@
                 },
                 "Render": {
                     "m_isTransparent": false,
-                    "m_isVisible": true
+                    "m_isVisible": false
                 },
                 "Transform": {
                     "m_localPosition": [
@@ -1414,9 +1414,9 @@
                         0.0
                     ],
                     "m_localScaleFactor": [
-                        0.0,
-                        0.0,
-                        0.0
+                        1.0,
+                        1.0,
+                        1.0
                     ],
                     "m_position": [
                         0.0,
@@ -2266,9 +2266,9 @@
                         40.0
                     ],
                     "m_position": [
-                        30.753284454345703,
-                        4.710404872894287,
-                        39.39011764526367
+                        31.013896942138672,
+                        1.096387505531311,
+                        40.03769302368164
                     ],
                     "m_rotation": [
                         -0.0,
@@ -5528,7 +5528,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -5629,7 +5629,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -5730,7 +5730,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -5831,7 +5831,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -5968,7 +5968,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Kinematic",
                     "m_restitution": 0.0
@@ -6069,7 +6069,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -7129,7 +7129,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -7446,7 +7446,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -7547,7 +7547,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -7648,7 +7648,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -7749,7 +7749,7 @@
                     "m_collisionLayer": "MOVING",
                     "m_density": 1000.0,
                     "m_friction": 0.20000000298023224,
-                    "m_isGrabbable": true,
+                    "m_isGrabbable": false,
                     "m_linearDamping": 0.05000000074505806,
                     "m_motion": "Static",
                     "m_restitution": 0.0
@@ -8216,8 +8216,8 @@
                         1.0
                     ],
                     "m_position": [
-                        -7.200189113616943,
-                        2.186662197113037,
+                        10.298330307006836,
+                        3.4081497192382813,
                         62.10267639160156
                     ],
                     "m_rotation": [
@@ -8721,6 +8721,327 @@
                 "UvCubeMapMode": false
             },
             "m_type": "Box"
+        },
+        {
+            "components": {
+                "Behavior": {
+                    "IsEnabled": false,
+                    "MemoryBoard": {
+                        "color": {
+                            "type": "Int",
+                            "value": 1
+                        }
+                    }
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/StoreColorZone.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:105,0,0,255.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        -0.5,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        4.0,
+                        1.0,
+                        4.0
+                    ],
+                    "m_position": [
+                        10.401071548461914,
+                        1.0214730501174927,
+                        62.64832305908203
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    4.0,
+                                    1.0,
+                                    4.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_motion": "Kinematic"
+                }
+            },
+            "m_UUID": 5504495534140500249,
+            "m_UUID_hi": 1281615238,
+            "m_UUID_lo": 875243801,
+            "m_group": "Shapes",
+            "m_name": "Plane",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
+        },
+        {
+            "components": {
+                "Behavior": {
+                    "IsEnabled": false,
+                    "MemoryBoard": {
+                        "color": {
+                            "type": "Int",
+                            "value": 2
+                        }
+                    }
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/StoreColorZone.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:0,105,0,255.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        -0.5,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        4.0,
+                        1.0,
+                        4.0
+                    ],
+                    "m_position": [
+                        16.045082092285156,
+                        1.0215872526168823,
+                        69.67140197753906
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    4.0,
+                                    1.0,
+                                    4.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_motion": "Kinematic"
+                }
+            },
+            "m_UUID": 9192147705371805388,
+            "m_UUID_hi": 2140213666,
+            "m_UUID_lo": 3449538252,
+            "m_group": "Shapes",
+            "m_name": "Plane",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
+        },
+        {
+            "components": {
+                "Behavior": {
+                    "IsEnabled": false,
+                    "MemoryBoard": {
+                        "color": {
+                            "type": "Int",
+                            "value": 3
+                        }
+                    }
+                },
+                "Lua": {
+                    "scriptLoaded": true,
+                    "scriptPath": {
+                        "assetSource": 1,
+                        "relativePath": "Scripts/StoreColorZone.lua"
+                    }
+                },
+                "Mesh": {
+                    "Mesh": {
+                        "assetSource": 0,
+                        "relativePath": "Plane"
+                    },
+                    "Sampler": 0,
+                    "Texture": {
+                        "assetSource": 0,
+                        "relativePath": "Color:0,0,105,255.dds"
+                    },
+                    "m_cullMode": "CULL_BACK"
+                },
+                "Render": {
+                    "m_isTransparent": false,
+                    "m_isVisible": true
+                },
+                "Transform": {
+                    "m_localPosition": [
+                        0.0,
+                        -0.5,
+                        0.0
+                    ],
+                    "m_localRotation": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ],
+                    "m_localScaleFactor": [
+                        4.0,
+                        1.0,
+                        4.0
+                    ],
+                    "m_position": [
+                        12.025412559509277,
+                        1.0214107036590576,
+                        85.36012268066406
+                    ],
+                    "m_rotation": [
+                        -0.0,
+                        0.0,
+                        -0.0
+                    ],
+                    "m_scaleFactor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "m_uvMultiplier": [
+                        1.0,
+                        1.0
+                    ]
+                },
+                "Trigger": {
+                    "collider": {
+                        "settings": {
+                            "box": {
+                                "size": [
+                                    4.0,
+                                    1.0,
+                                    4.0
+                                ]
+                            }
+                        },
+                        "shapeType": "Box",
+                        "transforms": {
+                            "offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "rotation": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ]
+                        }
+                    },
+                    "m_motion": "Kinematic"
+                }
+            },
+            "m_UUID": 1756239765666625210,
+            "m_UUID_hi": 408906435,
+            "m_UUID_lo": 217675450,
+            "m_group": "Shapes",
+            "m_name": "Plane",
+            "m_parent": null,
+            "m_shapeData": null,
+            "m_type": "Plane"
         }
     ],
     "inputMapping": "Default",

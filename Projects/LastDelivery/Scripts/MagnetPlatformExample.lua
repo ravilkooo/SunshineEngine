@@ -6,6 +6,10 @@ function enableMagnetControl()
     enableMagnet = true
 end
 
+function disableMagnetControl()
+    enableMagnet = false
+end
+
 function behavior:start()
 
 end

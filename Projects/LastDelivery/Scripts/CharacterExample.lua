@@ -1,7 +1,7 @@
-behavior = {}
+local behavior = {}
 
-local playerUUID
-local playerObj
+playerUUID = UUID.new()
+
 local floatingSpeed = 4
 local floatingAmp = 0.1
 local yMidLevel
@@ -75,6 +75,8 @@ local function TestCharacterFields(self)
 end
 
 function behavior:start()
+    playerUUID = self.owner:getUUID()
+
     TestPerceptionSystem(self)
     TestCharacterFields(self)
     
@@ -129,6 +131,9 @@ function behavior:update(dt)
                 char.grabRequested = true
                 enableCharacterParticles()
             end
+        end
+        if (InputSystem:isHeld("Grab") and not grab:isGrabbing()) then
+            char.grabRequested = true
         end
         if (InputSystem:isReleased("Grab") and not grab:isGrabbing()) then
             disableCharacterParticles()

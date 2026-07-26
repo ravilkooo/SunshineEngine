@@ -85,6 +85,11 @@
             "key": 78,
             "name": "TurnMagnet",
             "scale": -1.0
+        },
+        {
+            "key": 500,
+            "name": "TurnMagnet",
+            "scale": 1.0
         }
     ],
     "name": "Default"
